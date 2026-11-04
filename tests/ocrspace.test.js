@@ -125,16 +125,22 @@ test('corrupt quota ledger fails closed', async () => {
     } finally { await fs.rm(dir, { recursive: true, force: true }); }
 });
 
-test('provider stays disabled without explicit enablement or a server-side key', async () => {
+test('provider auto-enables with a configured key and can be explicitly disabled', async () => {
     let builds = 0, network = 0;
     const cropPlan = [{ field: 'xp', engine: 2, rect: { left: 1, top: 2, width: 10, height: 4 } }];
     const buildCrop = async () => { builds++; return Buffer.from('crop'); };
-    const off = await collectOcrSpaceFieldEvidence({ env: {}, cropPlan, buildCrop, client: async () => { network++; } });
-    const noKey = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '1' }, cropPlan, buildCrop, client: async () => { network++; } });
-    assert.equal(off.status, 'disabled');
+    const noKey = await collectOcrSpaceFieldEvidence({ env: {}, cropPlan, buildCrop, client: async () => { network++; } });
+    const explicitlyOff = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '0', OCRSPACE_API_KEY: 'key' }, cropPlan, buildCrop, client: async () => { network++; } });
+    const auto = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_API_KEY: 'key' }, cropPlan,
+        quotaLedger: { reserve: async () => ({ reserved: true }) },
+        client: async () => { network++; return { engine: 2, parsedText: '451', overlay: [], partial: false, processingTimeMs: 5 }; },
+        buildCrop });
     assert.equal(noKey.status, 'disabled');
-    assert.equal(builds, 0);
-    assert.equal(network, 0);
+    assert.equal(explicitlyOff.status, 'disabled');
+    assert.equal(auto.status, 'complete');
+    assert.equal(auto.requests, 1);
+    assert.equal(builds, 1);
+    assert.equal(network, 1);
 });
 
 test('field evidence submits bounded crops sequentially and stays outside candidates', async () => {
