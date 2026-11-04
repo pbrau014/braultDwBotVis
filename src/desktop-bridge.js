@@ -286,6 +286,8 @@ function createDesktopBridge(options={}){
         '/api/admin/match-outcomes':'recordMatchOutcome',
         '/api/admin/bracket/advance':'advanceBracket',
         '/api/admin/race-side-events':'createRaceSideEvent',
+        '/api/admin/approvals':'createApprovalRecord',
+        '/api/admin/awards':'createAward',
       };
       if(req.method==='POST'&&lifecycleRoutes[p]){
         const result=await call(lifecycleRoutes[p],principal,await readJson(req));
