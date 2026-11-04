@@ -3517,8 +3517,8 @@ const YOLO_SLASH_COMMAND = {
     options: [
         { type: 1, name: 'help', description: 'Show tournament command guidance' },
         { type: 1, name: 'panel', description: 'Open the interactive tournament panel' },
-        { type: 1, name: 'totals', description: 'Show accurate all-player doubloon and dollar totals' },
-        { type: 1, name: 'standings', description: 'Show leaderboard and total value', options: [{ type: 3, name: 'event', description: 'Optional event leaderboard', required: false, choices: Tournament.EVENTS.map(event => ({ name: Tournament.EVENT_LABELS[event], value: event })) }] },
+        { type: 1, name: 'totals', description: 'Show all-player doubloon totals' },
+        { type: 1, name: 'standings', description: 'Show leaderboard and doubloon totals', options: [{ type: 3, name: 'event', description: 'Optional event leaderboard', required: false, choices: Tournament.EVENTS.map(event => ({ name: Tournament.EVENT_LABELS[event], value: event })) }] },
         { type: 1, name: 'players', description: 'Show the active participant roster' },
         { type: 1, name: 'status', description: 'Show progress across all participants' },
     ],
