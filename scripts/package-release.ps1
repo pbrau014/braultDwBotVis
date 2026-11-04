@@ -32,5 +32,6 @@ foreach($e in $m.files){$p=Join-Path $extract $e.path; if(!(Test-Path -LiteralPa
 if($bad.Count){throw ($bad -join [Environment]::NewLine)}
 $forbidden=Get-ChildItem $extract -Force -Recurse|Where-Object{$_.FullName -match '[\\/]node_modules([\\/]|$)' -or $_.Name -eq '.env' -or $_.Name -match '^\.env\.'}; if($forbidden){throw 'Forbidden path found'}
 Push-Location $extract; try{& npm.cmd ci --no-audit --no-fund; if($LASTEXITCODE){throw 'npm ci failed in extracted package'}; & npm.cmd test; if($LASTEXITCODE){throw 'npm test failed in extracted package'}; & npm.cmd run test:prelive; if($LASTEXITCODE){throw 'prelive failed in extracted package'}}finally{Pop-Location}
+Remove-Item -LiteralPath $stage,$extract -Recurse -Force
 $verify=[ordered]@{sourceCommit=$commit;zip=$zip;zipSha256=$zipHash;sourceFiles=$included.Count;manifestEntries=@($m.files).Count;zipEntries=$listed.Count;manifestVerified=$true;cleanExtraction=$true;npmCi='PASS';npmTest='PASS';prelive='PASS';passed=$true}
 $verify|ConvertTo-Json -Depth 5|Set-Content (Join-Path $OutputRoot 'release-package-verification.json') -Encoding utf8; Write-Host ($verify|ConvertTo-Json -Depth 5)
