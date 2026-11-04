@@ -9,6 +9,7 @@
     async function load(){
       [overview]=await Promise.all([D.api('/api/overview')]);
       const submissions=await D.api('/api/submissions');
+      const yoloFormats=await D.api('/api/admin/yolo-tournaments');
       D.$('admin-roster-count').textContent=overview.roster.length+'/'+overview.maxPlayers;
       D.$('admin-total').textContent=D.number(overview.aggregate.doubloons);
       D.$('admin-value').textContent=D.money(overview.aggregate.estimatedValue);
@@ -46,12 +47,34 @@
         }
         standings.append(tr);
       }
+      const formatList=D.$('yolo-tournament-list');formatList.replaceChildren();
+      if(!yoloFormats.items.length)formatList.append(D.node('p','muted','No Pilot or Full YOLO tournament records have been created.'));
+      for(const item of yoloFormats.items){
+        const card=D.node('article','event-row','');
+        const details=document.createElement('div');
+        const heading=D.node('strong','',item.name+' · '+item.format.toUpperCase());
+        const meta=D.node('span','',item.status+' · '+(item.season?item.season.durationWeeks+' week season':'single-evening event'));
+        details.append(heading,meta);
+        if(item.stages?.length){const stages=D.node('span','',item.stages.map(s=>s.type+': '+s.status).join(' · '));details.append(stages);}
+        card.append(details);formatList.append(card);
+      }
       const list=D.$('admin-submissions');list.replaceChildren();
       if(!submissions.items.length)list.append(D.node('p','muted','No screenshot records in the archive yet.'));
       for(const item of submissions.items)list.append(D.renderSubmission(item,{admin:true,roster:overview.roster,onDone:load}));
       status('Admin state loaded from the active tournament store.','success');
       updateSettingFields();
     }
+    const formatSelect=D.$('yolo-format-select'),durationWrap=D.$('yolo-duration-wrap');
+    function updateFormatFields(){durationWrap.classList.toggle('hidden',formatSelect.value!=='full');}
+    formatSelect.addEventListener('change',updateFormatFields);updateFormatFields();
+    D.$('yolo-tournament-form').addEventListener('submit',async e=>{
+      e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
+      const id=form.elements.id.value.trim(),format=form.elements.format.value;
+      const body={id,name:form.elements.name.value.trim(),format};
+      if(format==='full')body.season={id:id+'-season',durationWeeks:Number(form.elements.durationWeeks.value)};
+      try{await D.api('/api/admin/yolo-tournaments',{method:'POST',body});form.reset();updateFormatFields();await load();}
+      catch(error){status(error.message,'error');}finally{button.disabled=false;}
+    });
     D.$('add-player-form').addEventListener('submit',async e=>{
       e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
       try{await D.api('/api/admin/players',{method:'POST',body:{name:form.elements.name.value.trim()}});form.reset();await load();}
