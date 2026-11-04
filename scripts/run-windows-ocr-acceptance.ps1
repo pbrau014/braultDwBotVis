@@ -1,11 +1,13 @@
 [CmdletBinding()]
 param(
- [string]$ProjectRoot = (Split-Path -Parent $PSScriptRoot),
- [string]$OutputRoot = (Join-Path $ProjectRoot 'testdata\ocr-acceptance'),
+ [string]$ProjectRoot = '',
+ [string]$OutputRoot = '',
  [string]$MinimumNodeVersion = '24.22.1'
 )
 $ErrorActionPreference='Stop'
+if ([string]::IsNullOrWhiteSpace($ProjectRoot)) { $ProjectRoot = (Get-Location).Path }
 $ProjectRoot=(Resolve-Path -LiteralPath $ProjectRoot).Path
+if ([string]::IsNullOrWhiteSpace($OutputRoot)) { $OutputRoot = Join-Path $ProjectRoot 'testdata\ocr-acceptance' }
 $OutputRoot=[System.IO.Path]::GetFullPath($OutputRoot)
 Push-Location $ProjectRoot
 try {
