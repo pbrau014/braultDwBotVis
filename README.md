@@ -61,3 +61,6 @@ The Discord REST manager's `rateLimited` event is logged without credentials or 
 ## Credential exposure remediation
 
 A hard-coded Discord webhook was found in the historical Image Text Reader HTML sample at `dwbotStuff/scoreReport_dark_clipboard (1).html`. The current branch version has had the webhook URL and direct-posting implementation removed; OCR text now remains in the browser for review, copy or download and manual submission. Because the old URL was committed previously, editing the current file does not revoke it or erase it from Git history. The webhook owner must revoke/delete that webhook in Discord and create a new one only if separately needed. Never reuse the exposed URL.
+
+
+**Important:** the sanitized OCR reader is committed on `dwbotVis`, but the current read-only `main` copy still contains the exposed webhook. The owner must revoke/delete that webhook in Discord immediately; removing it from a non-default branch does not invalidate it.

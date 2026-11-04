@@ -23,4 +23,9 @@ The webhook owner must revoke/delete the exposed webhook in the Discord channel'
 
 ## History and limitations
 
-Repository history was not rewritten. This preserves existing commits and avoids a force-push to the authorized delivery branch. This remediation only removes the credential from the current branch file; it does not purge previous commits, cached clones, forks, mirrors or external copies. The owner should revoke the webhook promptly and review Discord channel activity for unexpected posts.
+Repository history was not rewritten. This preserves existing commits and avoids a force-push to the authorized delivery branch. This remediation only removes the credential from the current `dwbotVis` file; the current `main` branch copy and prior commits still contain it. It does not purge cached clones, forks, mirrors or external copies. The project authority currently keeps `main` read-only, so no change was made there. The owner should revoke the webhook promptly and review Discord channel activity for unexpected posts.
+
+
+## Critical outstanding exposure
+
+The default `main` branch remains unchanged and still contains the same hard-coded webhook in the current version of the HTML file. This is not merely a historical-commit concern. Until the webhook is revoked in Discord, it must be treated as potentially usable by anyone who can read the public repository. The code fix on `dwbotVis` does not neutralize it. The owner must revoke/delete it immediately; updating `main` requires a separately authorized change because current project rules designate `main` as read-only.

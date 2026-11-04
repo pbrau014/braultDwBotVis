@@ -73,3 +73,8 @@ Do not report the project as release-ready based on the partial tests or a later
 ## Credential exposure note
 
 A static HTML file contained a hard-coded Discord webhook URL. Its current branch version has been sanitized and direct posting removed. The previous URL remains in Git history; the owner must revoke it in Discord. No live request was sent. No history rewrite was performed.
+
+
+## Critical default-branch credential exposure
+
+A read-only check of `main` confirmed that its current `dwbotStuff/scoreReport_dark_clipboard (1).html` still contains the hard-coded webhook. The `dwbotVis` copy is sanitized, but `main` remains unchanged by design. Revoke/delete the webhook in Discord immediately; the branch-only code change does not disable the credential. Do not reuse it. No history rewrite or main-branch change was performed.
