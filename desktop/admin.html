@@ -61,6 +61,17 @@
           <button type="submit" class="button secondary">Update setting</button>
         </form>
       </section>
+      <section class="panel" id="yolo-format-management" data-help="Create Pilot or Full YOLO tournament records here. Publication is blocked until the format-specific settings and organizer approval are complete.">
+        <div class="panel-heading"><div><p class="eyebrow">TOURNAMENT FORMATS</p><h2>Pilot and Full YOLO lifecycle</h2><p class="muted">Pilot is a single-evening event. Full YOLO is a season with Regular Season, Postseason and Grand YOLO Finale.</p></div></div>
+        <form id="yolo-tournament-form" class="form-grid">
+          <label>Tournament title<input name="title" maxlength="100" required placeholder="Example: Winter YOLO Season"></label>
+          <label>Format<select name="format" required><option value="pilot">Pilot YOLO - single evening</option><option value="full">Full YOLO - season</option></select></label>
+          <label class="span-all">Format settings JSON<textarea name="settings" rows="6" required placeholder='{"timezone":"America/Chicago","...":"Complete every required field before publication"}'></textarea></label>
+          <button type="submit" class="button primary span-all">Create draft tournament</button>
+        </form>
+        <label>Organizer approval JSON (required to publish)<textarea id="yolo-approval-json" rows="3" placeholder='{"approvedBy":"...","approvedAt":"...","rulesVersion":"...","rulesHash":"..."}'></textarea></label>
+        <div id="yolo-tournament-list" class="submission-list"><p class="muted">Loading Pilot and Full tournaments…</p></div>
+      </section>
       <section class="panel">
         <div class="panel-heading"><div><p class="eyebrow">SCREENSHOT QUEUE</p><h2>OCR submissions and approvals</h2><p class="muted">Admin can review all records. Participants cannot view another account’s submissions.</p></div><a class="button secondary small" href="/upload.html">Upload on behalf of player</a></div>
         <div id="admin-submissions" class="submission-list"></div>
