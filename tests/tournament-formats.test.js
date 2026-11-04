@@ -20,7 +20,7 @@ function full() {
   F.lockRoster(t, 'home'); F.lockRoster(t, 'away');
   F.publishTournament(t, { approvedBy: 'Organizer A', matchOutcomeMethod: {
     approved: true, publishedAt: '2026-11-01T00:00:00Z', version: 'v1',
-    weights: { damage: 1, kills: 1000 },
+    weights: { damage: 1, kills: 1000 }, aggregation: 'sum',
   } });
   return t;
 }
@@ -89,7 +89,7 @@ test('tie-break order is explicit and unresolved ties block advancement', () => 
     { teamId: 'a', metrics: { damage: 100, kills: 1 } },
     { teamId: 'b', metrics: { damage: 100, kills: 1 } },
   ] };
-  const method = { approved: true, publishedAt: '2026-11-01', version: 'v1', weights: { damage: 1, kills: 1 } };
+  const method = { approved: true, publishedAt: '2026-11-01', version: 'v1', weights: { damage: 1, kills: 1 }, aggregation: 'sum' };
   assert.throws(() => F.resolveMatch(match, method), /No approved tie-breaker/);
   assert.equal(F.resolveMatch(match, method, { tieBreak: { seasonRecordHome: 5, seasonRecordAway: 3 } }).winnerTeamId, 'a');
   assert.equal(F.resolveMatch(match, method, { tieBreak: { randomDrawAuthorized: true, randomDrawWinner: 'b' } }).decidedBy, 'authorized_random_draw');
@@ -153,7 +153,7 @@ test('head-to-head tie-break is explicit and has precedence over later criteria'
     { teamId: 'a', metrics: { damage: 100, kills: 1 } },
     { teamId: 'b', metrics: { damage: 100, kills: 1 } },
   ] };
-  const method = { approved: true, publishedAt: '2026-11-01', version: 'v1', weights: { damage: 1, kills: 1 } };
+  const method = { approved: true, publishedAt: '2026-11-01', version: 'v1', weights: { damage: 1, kills: 1 }, aggregation: 'sum' };
   const result = F.resolveMatch(match, method, { tieBreak: {
     headToHeadWinnerTeamId: 'b', seasonRecordHome: 10, seasonRecordAway: 1,
   } });
