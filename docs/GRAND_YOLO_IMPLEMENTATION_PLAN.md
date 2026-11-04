@@ -76,3 +76,6 @@ Append future findings here with sequential amendment IDs. Every code change sho
 
 ### A7 - Publication schedule and freeze enforcement
 Pilot and Full publication now require valid start/end timestamps and a configured timezone; Full additionally requires organizer-selected season duration. Registration must close before stage activation and team roster locks. Both the desktop settings endpoint and Discord !yolo setting command now consult active competition stages and block legacy global scoring-setting changes while the freeze is in force. Evidence metadata is validated and can be linked from existing OCR screenshot records.
+
+### A8 - Event-night scheduling and Discord registration
+Added event-night records and requires each Full YOLO fixture to belong to a scheduled event night in the same stage. Discord now has read-only format discovery and linked-player registration commands. Admin lifecycle actions remain server-authorized through the desktop service; live Discord scheduled-event publication and production permission testing remain unrun.
