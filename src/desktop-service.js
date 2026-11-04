@@ -271,9 +271,15 @@ function createDesktopService(options = {}) {
       role(principal,['admin']);
       return mutate(async()=>{
         const current=state();
-        const tournament=Tournament.YoloFormats.createTournament({
-          id:crypto.randomUUID(),title:body?.title,format:body?.format,settings:body?.settings||{},
-        });
+        let tournament;
+        try {
+          tournament=Tournament.YoloFormats.createTournament({
+            id:crypto.randomUUID(),title:body?.title,format:body?.format,settings:body?.settings||{},
+          });
+        } catch(error) {
+          if(!error.status){error.status=400;error.code='INVALID_YOLO_TOURNAMENT';}
+          throw error;
+        }
         current.yoloTournaments.push(tournament);
         await options.saveState();
         return {id:tournament.id,title:tournament.title,format:tournament.format,lifecycle:tournament.lifecycle,stage:tournament.stage};
@@ -286,6 +292,7 @@ function createDesktopService(options = {}) {
         if(!t) throw Object.assign(new Error('YOLO tournament was not found.'),{status:404,code:'YOLO_TOURNAMENT_NOT_FOUND'});
         const Y=Tournament.YoloFormats, actor=principal.discordUserId;
         let result;
+        try {
         switch(action) {
           case 'publish': result=Y.publishTournament(t,body?.approval,actor); break;
           case 'start': result=Y.startTournament(t,actor); break;
@@ -305,6 +312,10 @@ function createDesktopService(options = {}) {
           case 'withdraw': result=Y.withdrawRegistration(t,body?.playerId,{reason:body?.reason,actor}); break;
           case 'finish-pilot': result=Y.finishPilot(t,{actor}); break;
           default: throw Object.assign(new Error('Unsupported YOLO tournament action.'),{status:400,code:'INVALID_YOLO_ACTION'});
+        }
+        } catch(error) {
+          if(!error.status){error.status=400;error.code='INVALID_YOLO_TOURNAMENT_ACTION';}
+          throw error;
         }
         await options.saveState();
         return {id:t.id,action,lifecycle:t.lifecycle,stage:t.stage,result};
