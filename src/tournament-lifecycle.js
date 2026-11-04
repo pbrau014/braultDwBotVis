@@ -59,6 +59,7 @@ function createMatch(season,fixtureId,input={}) {
   season.matches||=[]; if(season.matches.some(x=>x.id===row.id)) throw new Error('Match id already exists.');
   season.matches.push(row); return row;
 }
+function createApprovalRecord(input={}) { const approvedAt=text(input.approvedAt,'Approval timestamp'); if(!Number.isFinite(Date.parse(approvedAt))) throw new TypeError('Approval timestamp must be a valid ISO date/time.'); return {id:text(input.id,'Approval id'),scope:text(input.scope,'Approval scope'),version:text(input.version,'Approved version'),approvedBy:text(input.approvedBy,'Approver id'),approvedAt:new Date(approvedAt).toISOString(),status:'approved',notes:String(input.notes||'')}; }
 function createAward(input={}) {
   return {id:text(input.id,'Award id'),tournamentId:text(input.tournamentId,'Tournament id'),recipientId:text(input.recipientId,'Recipient id'),label:text(input.label,'Award label'),amount:input.amount==null?null:score(input.amount,'Award amount'),currency:input.currency||null,approvalId:text(input.approvalId,'Award approval id'),status:'approved'};
 }
