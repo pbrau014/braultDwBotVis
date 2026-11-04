@@ -95,3 +95,35 @@ test('authenticated Admin backup retains private roster links and pending correc
   assert.equal(backup.pending_submissions[0].userId,PLAYER);
   assert.equal(backup.pending_ocr_corrections.length,1);
 });
+
+test('admin can create and publish a Pilot tournament and a linked player can register',async()=>{
+  const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN}),player=await f.service.resolvePrincipal({id:PLAYER});
+  const created=await f.service.competitionAction(admin,{action:'create_tournament',tournament:{
+    id:'pilot-desktop',name:'Desktop Pilot',format:'pilot',config:{timezone:'America/Chicago',eventStart:'2026-12-01T18:00:00-06:00'},
+  }});
+  assert.equal(created.format,'pilot');
+  await f.service.competitionAction(admin,{action:'publish',tournamentId:'pilot-desktop',approval:{}});
+  const registration=await f.service.registerForTournament(player,'pilot-desktop');
+  assert.equal(registration.status,'registered');
+  const overview=await f.service.getOverview(player);
+  assert.equal(overview.tournaments.find(t=>t.id==='pilot-desktop').registered,true);
+});
+
+test('admin Full YOLO publication requires and persists an approved match method',async()=>{
+  const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
+  await f.service.competitionAction(admin,{action:'create_tournament',tournament:{
+    id:'full-desktop',name:'Desktop Full',format:'full',config:{timezone:'America/Chicago',seasonWeeks:10},
+  }});
+  await assert.rejects(f.service.competitionAction(admin,{action:'publish',tournamentId:'full-desktop',approval:{}}),/approved, published match-outcome/);
+  await f.service.competitionAction(admin,{action:'publish',tournamentId:'full-desktop',approval:{
+    approvedBy:'Organizer',matchOutcomeMethod:{approved:true,publishedAt:'2026-11-04T00:00:00Z',version:'v1',aggregation:'sum',weights:{damage:1,kills:1000}},
+  }});
+  const overview=await f.service.getOverview(admin);
+  assert.equal(overview.competition.tournaments.find(t=>t.id==='full-desktop').config.matchOutcomeMethod.version,'v1');
+});
+
+test('player cannot invoke admin lifecycle actions or register to a missing tournament',async()=>{
+  const f=fixture(),player=await f.service.resolvePrincipal({id:PLAYER});
+  await assert.rejects(f.service.competitionAction(player,{action:'create_tournament',tournament:{id:'x',name:'x',format:'pilot'}}),e=>e.status===403);
+  await assert.rejects(f.service.registerForTournament(player,'missing'),/not found/);
+});
