@@ -89,6 +89,21 @@
         </form>
         <h3>Certify a match outcome</h3>
         <p class="muted">The bot does not invent or calculate a scoring formula. Enter the externally reconciled result and the approved method/evidence references.</p>
+        <h3>Race side-event and Race-time metric</h3>
+        <form id="yolo-race-side-event-form" class="form-grid compact-form">
+          <label>Event night<select name="eventNightId" id="yolo-race-night" required></select></label>
+          <label>Side-event ID<input name="id" required></label>
+          <label>Schedule offset before event (minutes)<input name="scheduleOffsetMinutes" type="number" min="0" max="1440" value="60" required></label>
+          <label>Approved scoring policy ID<input name="scoringPolicyId" required></label>
+          <label>Approved settings record ID<input name="approvedSettingsId" required></label>
+          <button class="button secondary span-all" type="submit">Create approved Race side-event</button>
+        </form>
+        <form id="yolo-race-time-form" class="form-grid compact-form">
+          <label>Game ID<input name="gameId" required></label>
+          <label>Accepted evidence record ID<input name="evidenceRecordId" required></label>
+          <label>Elapsed seconds<input name="elapsedSeconds" type="number" min="0.001" step="0.001" required></label>
+          <button class="button secondary" type="submit">Record Race-time metric</button>
+        </form>
         <form id="yolo-match-outcome-form" class="form-grid compact-form">
           <label>Match ID<input name="matchId" required></label>
           <label>Winning team ID<input name="winnerTeamId" required></label>
