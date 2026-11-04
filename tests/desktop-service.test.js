@@ -95,3 +95,113 @@ test('authenticated Admin backup retains private roster links and pending correc
   assert.equal(backup.pending_submissions[0].userId,PLAYER);
   assert.equal(backup.pending_ocr_corrections.length,1);
 });
+
+test('Admin manages Pilot and Full lifecycles; match outcomes require a stored organizer approval',async()=>{
+  const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN}),player=await f.service.resolvePrincipal({id:PLAYER});
+  const pilot=await f.service.createTournament(admin,{id:'pilot-1',name:'Pilot Night',format:'pilot'});
+  assert.equal(pilot.format,'pilot');
+  await assert.rejects(f.service.createSeason(admin,{tournamentId:pilot.id}),/Full YOLO/);
+  const full=await f.service.createTournament(admin,{id:'full-1',name:'Full Season',format:'full'});
+  const season=await f.service.createSeason(admin,{tournamentId:full.id,id:'season-1',name:'Season 1'});
+  const regular=await f.service.addStage(admin,{seasonId:season.id,type:'regular_season'});
+  const postseason=await f.service.addStage(admin,{seasonId:season.id,type:'postseason'});
+  const finale=await f.service.addStage(admin,{seasonId:season.id,type:'grand_finale'});
+  await assert.rejects(f.service.activateStage(admin,{seasonId:season.id,stageId:finale.id}),/preceding/);
+  await f.service.activateStage(admin,{seasonId:season.id,stageId:regular.id});
+  await f.service.completeStage(admin,{seasonId:season.id,stageId:regular.id});
+  await f.service.activateStage(admin,{seasonId:season.id,stageId:postseason.id});
+  const a=await f.service.createTeam(admin,{seasonId:season.id,name:'Red'});
+  const b=await f.service.createTeam(admin,{seasonId:season.id,name:'Blue'});
+  await f.service.registerParticipant(admin,{seasonId:season.id,participantId:'p1',displayName:'Alpha'});
+  const night=await f.service.createEventNight(admin,{seasonId:season.id,stageId:postseason.id});
+  await f.service.assignRoster(admin,{seasonId:season.id,participantId:'p1',teamId:a.id,eventNightId:night.id});
+  for(const status of ['registration_open','locked','active'])await f.service.transitionEventNight(admin,{seasonId:season.id,eventNightId:night.id,status});
+  const fixture=await f.service.createFixture(admin,{seasonId:season.id,stageId:postseason.id,eventNightId:night.id,teamA:a.id,teamB:b.id});
+  const match=await f.service.createMatch(admin,{seasonId:season.id,fixtureId:fixture.id});
+  await assert.rejects(f.service.recordMatchOutcome(admin,{seasonId:season.id,matchId:match.id,id:'o0',teamA:a.id,teamB:b.id,scoreA:2,scoreB:1,methodId:'missing'}),e=>e.code==='SCORING_APPROVAL_REQUIRED');
+  const approval=await f.service.createApprovalRecord(admin,{id:'D21-v1',scope:'match outcome scoring',version:'1',sourceReference:'signed-method-D21-v1',confirmed:true,approvedAt:'2026-11-04T12:00:00.000Z'});
+  const outcome=await f.service.recordMatchOutcome(admin,{seasonId:season.id,matchId:match.id,id:'o1',teamA:a.id,teamB:b.id,scoreA:2,scoreB:1,methodId:approval.id});
+  assert.equal(outcome.winnerTeamId,a.id);
+  const c=await f.service.createTeam(admin,{seasonId:season.id,name:'Green'});
+  const nextFixture=await f.service.createFixture(admin,{seasonId:season.id,stageId:postseason.id,eventNightId:night.id,teamA:a.id,teamB:c.id});
+  const progression=await f.service.advanceBracket(admin,{seasonId:season.id,outcomeId:outcome.id,toFixtureId:nextFixture.id,methodId:approval.id});
+  assert.equal(progression.winnerTeamId,a.id);
+  await assert.rejects(f.service.createAward(admin,{id:'bad-award',tournamentId:full.id,recipientId:'p1',label:'Winner',approvalId:approval.id}),e=>e.code==='AWARD_APPROVAL_REQUIRED');
+  const awardApproval=await f.service.createApprovalRecord(admin,{id:'award-v1',scope:'award authorization',version:'1',sourceReference:'signed-award-PUB01',confirmed:true,approvedAt:'2026-11-04T12:01:00.000Z'});
+  const award=await f.service.createAward(admin,{id:'award-1',tournamentId:full.id,recipientId:'p1',label:'Winner',approvalId:awardApproval.id});
+  assert.equal(award.status,'approved');
+  assert.ok(f.state.lifecycle.auditLog.some(x=>x.action==='tournament.created'&&x.actor===ADMIN));
+  assert.ok(f.state.lifecycle.auditLog.some(x=>x.action==='match.outcome.recorded'));
+  await assert.rejects(f.service.createTournament(player,{id:'unauthorized',format:'pilot'}),e=>e.status===403);
+});
+
+test('Pilot scores are stored in a per-event ledger and do not alter legacy category totals',async()=>{
+  const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
+  const pilot=await f.service.createTournament(admin,{id:'pilot-ledger',name:'Pilot Ledger',format:'pilot'});
+  await f.service.registerPilotParticipant(admin,{tournamentId:pilot.id,participantId:String(f.alpha.id)});
+  const night=await f.service.createPilotEventNight(admin,{tournamentId:pilot.id});
+  for(const status of ['registration_open','locked','active'])await f.service.transitionEventNight(admin,{tournamentId:pilot.id,eventNightId:night.id,status});
+  await f.service.transitionTournament(admin,{tournamentId:pilot.id,status:'registration_open'});
+  await f.service.transitionTournament(admin,{tournamentId:pilot.id,status:'locked'});
+  await f.service.transitionTournament(admin,{tournamentId:pilot.id,status:'active'});
+  const result=await f.service.recordTournamentScore(admin,{tournamentId:pilot.id,participantId:String(f.alpha.id),category:'damage',gameNumber:1,shipClass:'DD',tier:8,damage:12345,eventNightId:night.id,evidenceId:'pilot-evidence-1'});
+  assert.equal(result.entry.tournamentId,pilot.id);
+  assert.equal(f.state.players[0].events.damage[0].metric,0);
+  const overview=await f.service.getOverview(admin);
+  assert.equal(Object.hasOwn(overview.aggregate,'estimatedValue'),false);
+  assert.equal(Object.hasOwn(overview.standings[0]||{},'estimatedValue'),false);
+  const summary=overview.tournaments.find(x=>x.id===pilot.id);
+  assert.equal(summary.standings[0].id,f.alpha.id);
+});
+
+test('screenshot mapping can target a Pilot ledger without altering legacy score buckets',async()=>{
+  const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
+  const pilot=await f.service.createTournament(admin,{id:'pilot-ocr',name:'Pilot OCR',format:'pilot'});
+  await f.service.registerPilotParticipant(admin,{tournamentId:pilot.id,participantId:String(f.alpha.id)});
+  const night=await f.service.createPilotEventNight(admin,{tournamentId:pilot.id});
+  for(const status of ['registration_open','locked','active'])await f.service.transitionEventNight(admin,{tournamentId:pilot.id,eventNightId:night.id,status});
+  await f.service.transitionTournament(admin,{tournamentId:pilot.id,status:'registration_open'});
+  await f.service.transitionTournament(admin,{tournamentId:pilot.id,status:'locked'});
+  await f.service.transitionTournament(admin,{tournamentId:pilot.id,status:'active'});
+  const upload=await f.service.submitImage(admin,{buffer:Buffer.from('pilot synthetic evidence'),filename:'pilot.png',contentType:'image/png'});
+  const mapped=await f.service.mapSubmission(admin,upload.submissionId,{playerId:f.alpha.id,event:'damage',gameNumber:1,shipClass:'DD',tier:8,tournamentId:pilot.id,eventNightId:night.id});
+  assert.equal(mapped.tournamentId,pilot.id);
+  assert.equal(f.state.players[0].events.damage[0].metric,0);
+  assert.equal(f.state.lifecycle.tournaments.find(x=>x.id===pilot.id).scoreEntries.length,1);
+});
+
+test('Race standings rank shorter elapsed time ahead of longer elapsed time',async()=>{
+  const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
+  const pilot=await f.service.createTournament(admin,{id:'pilot-race',name:'Pilot Race',format:'pilot'});
+  await f.service.registerPilotParticipant(admin,{tournamentId:pilot.id,participantId:String(f.alpha.id)});
+  await f.service.registerPilotParticipant(admin,{tournamentId:pilot.id,participantId:'2'});
+  const night=await f.service.createPilotEventNight(admin,{tournamentId:pilot.id});
+  for(const status of ['registration_open','locked','active'])await f.service.transitionTournament(admin,{tournamentId:pilot.id,status});
+  await f.service.recordTournamentScore(admin,{tournamentId:pilot.id,participantId:String(f.alpha.id),category:'race',gameNumber:1,shipClass:'DD',tier:8,time:90,eventNightId:night.id,evidenceId:'race-90'});
+  await f.service.recordTournamentScore(admin,{tournamentId:pilot.id,participantId:'2',category:'race',gameNumber:1,shipClass:'DD',tier:8,time:120,eventNightId:night.id,evidenceId:'race-120'});
+  const summary=(await f.service.getOverview(admin)).tournaments.find(x=>x.id===pilot.id);
+  assert.equal(summary.standings[0].id,f.alpha.id);
+});
+
+test('Player team visibility follows Pilot-visible and Full-ready-up rules',async()=>{
+ const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN}),player=await f.service.resolvePrincipal({id:PLAYER});
+ const pilot=await f.service.createTournament(admin,{id:'pilot-visibility',name:'Pilot',format:'pilot'});
+ await f.service.registerPilotParticipant(admin,{tournamentId:pilot.id,participantId:String(f.alpha.id)});
+ const pilotNight=await f.service.createPilotEventNight(admin,{tournamentId:pilot.id});
+ const pilotTeam=await f.service.createPilotTeam(admin,{tournamentId:pilot.id,name:'Home'});
+ await f.service.assignPilotRoster(admin,{tournamentId:pilot.id,participantId:String(f.alpha.id),teamId:pilotTeam.id,eventNightId:pilotNight.id});
+ let overview=await f.service.getOverview(player);
+ assert.equal(overview.tournaments.find(x=>x.id===pilot.id).myAssignments[0].teamName,'Home');
+ const full=await f.service.createTournament(admin,{id:'full-visibility',name:'Full',format:'full'});
+ const season=await f.service.createSeason(admin,{tournamentId:full.id,id:'season-visibility'});
+ const stage=await f.service.addStage(admin,{seasonId:season.id,type:'regular_season'});
+ const night=await f.service.createEventNight(admin,{seasonId:season.id,stageId:stage.id});
+ const team=await f.service.createTeam(admin,{seasonId:season.id,name:'Hidden Team'});
+ await f.service.registerParticipant(admin,{seasonId:season.id,participantId:String(f.alpha.id),displayName:f.alpha.name});
+ await f.service.assignRoster(admin,{seasonId:season.id,participantId:String(f.alpha.id),teamId:team.id,eventNightId:night.id});
+ overview=await f.service.getOverview(player);
+ assert.equal(overview.tournaments.find(x=>x.id===full.id).myAssignments.length,0);
+ for(const status of ['registration_open','locked'])await f.service.transitionEventNight(admin,{seasonId:season.id,eventNightId:night.id,status});
+ overview=await f.service.getOverview(player);
+ assert.equal(overview.tournaments.find(x=>x.id===full.id).myAssignments[0].teamName,'Hidden Team');
+});

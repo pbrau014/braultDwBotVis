@@ -17,7 +17,7 @@
     D.$('player-subtitle').textContent='Roster entry #'+overview.player.id+' · signed in as '+session.user.username;
     const standing=overview.standing||{};
     D.$('player-total').textContent=D.number(standing.total)+' 🪙';
-    D.$('player-value').textContent=D.money(standing.estimatedValue);
+    D.$('player-value').textContent='Not published';
     const rank=overview.publicStandings.findIndex(x=>x.id===overview.player.id)+1;
     D.$('player-rank').textContent=rank?('#'+rank):'—';
     D.$('roster-count').textContent=overview.publicStandings.length+' active participants';
@@ -29,10 +29,21 @@
       row.append(D.node('span','',label),D.node('strong','',D.number(standing.events?.[key])));
       eventList.append(row);
     }
+    const tournamentList=D.$('player-tournament-list');tournamentList.replaceChildren();
+    const tournamentRows=overview.tournaments||[];
+    if(!tournamentRows.length)tournamentList.append(D.node('p','muted','No Pilot or Full YOLO tournament has been assigned to this account yet.'));
+    for(const tournament of tournamentRows){
+      const own=(tournament.standings||[]).find(row=>String(row.id)===String(overview.player.id));
+      const row=D.node('div','event-row');
+      const left=D.node('span','',tournament.name+' · '+(tournament.format==='pilot'?'Pilot YOLO':'Full YOLO')+' · '+tournament.status);
+      const teams=(tournament.myAssignments||[]).map(a=>a.teamName).join(', ');
+      const right=D.node('strong','', (own?'#'+own.rank+' · '+D.number(own.total):'Not registered')+(teams?' · Team: '+teams:''));
+      row.append(left,right);tournamentList.append(row);
+    }
     const tbody=D.$('standings-body');tbody.replaceChildren();
     for(const row of overview.publicStandings){
       const tr=document.createElement('tr');
-      for(const value of [row.rank,row.name,D.number(row.total),D.money(row.estimatedValue)]){
+      for(const value of [row.rank,row.name,D.number(row.total)]){
         const td=document.createElement('td');td.textContent=String(value);tr.append(td);
       }
       if(row.id===overview.player.id)tr.classList.add('current-player');
@@ -41,7 +52,7 @@
     const list=D.$('submission-list');list.replaceChildren();
     if(!submissions.items.length)list.append(D.node('p','muted','No desktop screenshot submissions yet. Submit a battle result screenshot to begin.'));
     for(const item of submissions.items){
-      list.append(D.renderSubmission(item,{admin:false,onDone:()=>location.reload()}));
+      list.append(D.renderSubmission(item,{admin:false,tournaments:(overview.tournaments||[]).filter(t=>(t.standings||[]).some(r=>String(r.id)===String(overview.player.id))),onDone:()=>location.reload()}));
     }
     status('Tournament data loaded from the local bot service.','success');
     async function refresh(){

@@ -62,3 +62,46 @@ test('desktop styles provide narrow-screen layouts without a third-party style d
   assert.match(css, /@media\(max-width:620px\)/);
   assert.match(css, /:root/);
 });
+
+test('Pilot and Full format guidance is present with keyboard-accessible hover quick notes', () => {
+  const player = read('desktop/player.html');
+  const admin = read('desktop/admin.html');
+  const css = read('desktop/desktop.css');
+  for (const html of [player, admin]) {
+    assert.match(html, /Pilot YOLO/);
+    assert.match(html, /Full YOLO/);
+    assert.match(html, /class="help-tip"/);
+    assert.match(html, /aria-describedby=/);
+    assert.match(html, /role="tooltip"/);
+  }
+  assert.match(css, /\.help-tip:hover/);
+  assert.match(css, /\.help-tip:focus-visible/);
+  assert.match(css, /\.format-guide__grid/);
+});
+
+test('Admin lifecycle forms use same-origin protected API routes and cover Pilot/Full operations', () => {
+  const html = read('desktop/admin.html');
+  const script = read('desktop/admin.js');
+  const bridge = read('src/desktop-bridge.js');
+  for (const route of ['/api/admin/tournaments','/api/admin/seasons','/api/admin/stages','/api/admin/teams','/api/admin/registrations','/api/admin/rosters','/api/admin/event-nights','/api/admin/fixtures','/api/admin/matches','/api/admin/match-outcomes','/api/admin/bracket/advance','/api/admin/approvals','/api/admin/pilot/registrations','/api/admin/pilot/event-nights','/api/admin/pilot/teams','/api/admin/pilot/rosters','/api/admin/pilot/fixtures','/api/admin/pilot/matches','/api/admin/event-nights/transition','/api/admin/tournament-scores','/api/admin/awards']) {
+    assert.ok(html.includes('data-lifecycle-endpoint="'+route+'"'), 'Admin form missing '+route);
+    assert.ok(bridge.includes("'"+route+"'"), 'Bridge route missing '+route);
+  }
+  assert.match(script, /data-lifecycle-endpoint/);
+  assert.match(script, /data-entity/);
+  assert.match(script, /pilotTournaments/);
+  assert.match(read('desktop/player.js'), /player-tournament-list/);
+  assert.match(read('desktop/admin.js'), /admin-tournament-list/);
+  assert.match(bridge, /csrf\(req,session\)/);
+  assert.match(bridge, /role\(principal,\['admin'\]\)/);
+});
+
+test('event-night selection is available for scoped score mapping and roster assignment',()=>{const admin=read('desktop/admin.html');const app=read('desktop/desktop.js');assert.match(admin,/name="eventNightId"/);assert.match(app,/eventNightId/);assert.match(read('desktop/admin.js'),/eventNights/);});
+
+test('participant surfaces do not publish the historical H12 dollar conversion', () => {
+  const bot = read('src/bot.js');
+  const service = read('src/desktop-service.js');
+  assert.doesNotMatch(bot, /estimatedValue|Estimated total value|0\.54\*G12\/100/);
+  assert.doesNotMatch(service, /estimatedValue:total\*0\.54/);
+  assert.match(bot, /Workbook download is temporarily admin-only/);
+});
