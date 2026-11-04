@@ -27,7 +27,7 @@ The current captured verification status is documented in `GITHUB_TRANSFER_STATU
 
 ## Release status
 
-The project is not marked release-ready. The latest Phase 9 report records a historical offline full-suite result of 214 passed / 0 failed on Node 22.16.0; it has not been rerun after the latest Gateway preflight changes. The six new channel-preflight unit tests passed separately on Node 22.16.0. No live Discord login, real permission check, Windows/native-Tesseract test, or OCR.space request has been performed.
+The project is not marked release-ready. Historical offline suite results (including the 214/214 report) are historical only and do not describe the current branch. Current CI on Node 22.16.0: clean install PASS, syntax PASS, OCR.space 15/15 PASS, Discord offline preflight 21/21 PASS, but full npm test FAILS at 36 passed / 29 failed / 65 total because source modules, test fixtures and the intended tests/ layout are missing from the current branch. See the current run and handoff report. No live Discord login, real permission check, Windows/native-Tesseract test, or OCR.space request has been performed.
 
 ## Sensitive data
 
@@ -43,8 +43,8 @@ The current branch contains application source, scripts, tests, documentation, m
 - Canonical repository: [pbrau014/braultDwBotVis](https://github.com/pbrau014/braultDwBotVis).
 - Authorized delivery branch: `dwbotVis` only. Keep `main` read-only; do not substitute `pop1` or another repository.
 - The authoritative continuation rule and security boundaries are in `docs/continuation/PROJECT_AUTHORITY_AND_IMPLEMENTATION_RULES.md`; the append-only roadmap is `plan1.txt`.
-- Phase 9 offline/simulated suite currently passes 214/214 on Node 22.16.0, but live Discord and Windows gates are not yet verified. See `docs/iteration23/PHASE9_DISCORD_INTEGRATION_STATUS_2026-11-04.md` and `docs/iteration23/DISCORD_LIVE_TEST_QUICKSTART.md`.
-- Phase 10 remains the final phase for Player/Admin HTML interfaces, bot integration, distribution and the one-PDF user manual. The user-pasted Image Text Reader and workbook calculator are the design baselines. The hard-coded webhook in the Image Text Reader example must never be reused.
+- Current CI evidence: `npm run test:ocrspace` 15/15 and `npm run test:discord-preflight` 21/21 pass; full `npm test` currently fails 29/65 due missing source/fixtures and test placement. Historical 214/214 reports must not be presented as current-branch evidence. See `docs/continuation/NEXT_CHAT_HANDOFF_2026-11-04.md`.
+- The Player/Admin desktop HTML interface and companion image-upload page are now an explicitly authorized parallel workstream. Inspect the two linked Library HTML baselines in `docs/continuation/NEXT_CHAT_HANDOFF_2026-11-04.md`; preview and integrate the UI before live Discord smoke where practicable. Use a trusted local Node bridge; never put bot/webhook/OCR credentials in browser code. Prepare Discord application-command integration without pretending static HTML can inject slash-command interactions.
 - Production remains **NO-GO** until all mandatory OCR, Windows/native, live Discord, security, recovery, interface and packaging gates have verified evidence.
 
 
