@@ -26,6 +26,7 @@ const bot = require('../src/bot');
 const { numericValueOrNull } = require('../src/battle-record');
 const { compareExpected } = require('../src/acceptance-checks');
 const { createOcrReportMetadata } = require('../src/ocr-report-metadata');
+const { failProgressRecord, createProgressRecord, markJobStarted, recordJobResult, finishProgressRecord, writeJsonAtomically } = require('../src/ocr-sequence-checkpoint');
 const packageInfo = require('../package.json');
 const root = path.join(__dirname, '..');
 const specs = {
@@ -73,6 +74,9 @@ function selectedSpecs(args) {
     });
 }
 
+let activeProgress = null;
+let activeProgressPath = null;
+
 (async () => {
     const results = [];
     const startedAll = Date.now();
@@ -96,14 +100,31 @@ function selectedSpecs(args) {
         console.log(`[OCR-SEQUENCE] TEST-ONLY expected override: ${fixtureKey}.${field}=${String(value)}`);
     }
     const outputPath = path.resolve(process.env.OCR_SEQUENCE_REPORT_PATH || path.join(root, 'testdata', 'ocr-acceptance', `sequence-${new Date().toISOString().replace(/[:.]/g, '-')}-${process.pid}.json`));
+    const progressPath = path.resolve(process.env.OCR_SEQUENCE_PROGRESS_PATH || (outputPath + '.progress.json'));
+    const progress = createProgressRecord({
+        runId: new Date().toISOString().replace(/[:.]/g, '-') + '-' + process.pid,
+        reportPath: outputPath,
+        fixtureOrder: entries.map(entry => entry.key),
+        packageName: packageInfo.name,
+        packageVersion: packageInfo.version,
+        configuredEngine: String(process.env.OCR_ENGINE || 'auto').toLowerCase(),
+        networkBlocked: process.env.OCR_NETWORK_BLOCK_ENABLED === '1',
+        sourceMetadata: createOcrReportMetadata(root),
+    });
+    activeProgress = progress;
+    activeProgressPath = progressPath;
+    await writeJsonAtomically(progressPath, progress);
     const saveRaw = process.env.OCR_SAVE_RAW_DIAGNOSTICS === '1';
     try {
         for (let position = 0; position < entries.length; position += 1) {
             const spec = entries[position];
             const start = Date.now();
             console.log(`[OCR-SEQUENCE] ${position + 1}/${entries.length} START ${spec.key}`);
+            markJobStarted(progress, { index: position + 1, fixtureKey: spec.key, filename: spec.filename, startedAt: new Date().toISOString() });
+            await writeJsonAtomically(progressPath, progress);
             let supervision = null;
             let childTempDir = null;
+            let resultRecorded = false;
             try {
                 const buffer = await fs.readFile(spec.path);
                 const imageSha256 = crypto.createHash('sha256').update(buffer).digest('hex');
@@ -212,10 +233,17 @@ function selectedSpecs(args) {
                     } : {}),
                 };
                 results.push(row);
+                recordJobResult(progress, row);
+                resultRecorded = true;
+                await writeJsonAtomically(progressPath, progress);
                 console.log(`[OCR-SEQUENCE] ${row.allRequiredFieldsPass && row.requiredMissing.length === 0 ? 'PASS' : 'FAIL'} ${spec.key} ${row.elapsedMs}ms (mandatoryExact=${row.allRequiredFieldsPass}, allComparedExact=${row.allExpectedFieldsPass}, missing=${row.requiredMissing.length})`);
                 if (!row.allRequiredFieldsPass || row.requiredMissing.length) process.exitCode = 1;
             } catch (error) {
-                results.push({
+                // Once a successful row has been added to the in-memory report,
+                // checkpoint failures must abort the sequence rather than add a
+                // second, contradictory failure row for the same image.
+                if (resultRecorded) throw error;
+                const errorRow = {
                     fixtureKey: spec.key, filename: spec.filename, elapsedMs: Date.now() - start,
                     pipelineCompleted: false, error: error.message, code: error.code || null,
                     supervision: {
@@ -224,7 +252,10 @@ function selectedSpecs(args) {
                         childSignal: error.signal ?? null,
                         timeoutMs: error.timeoutMs ?? null,
                     },
-                });
+                };
+                results.push(errorRow);
+                recordJobResult(progress, errorRow);
+                await writeJsonAtomically(progressPath, progress);
                 console.error(`[OCR-SEQUENCE] ERROR ${spec.key}: ${error.message}`);
                 process.exitCode = 1;
             } finally {
@@ -239,6 +270,7 @@ function selectedSpecs(args) {
 
     const report = {
         reportMetadata: createOcrReportMetadata(root),
+        progressCheckpointPath: progressPath,
         buildVersion: packageInfo.version,
         packageName: packageInfo.name,
         packageEngines: packageInfo.engines,
@@ -258,14 +290,27 @@ function selectedSpecs(args) {
         networkBlocked: process.env.OCR_NETWORK_BLOCK_ENABLED === '1',
         results,
     };
-    await fs.mkdir(path.dirname(outputPath), { recursive: true });
-    await fs.writeFile(outputPath, `${JSON.stringify(report, null, 2)}\n`);
+    await writeJsonAtomically(outputPath, report);
+    finishProgressRecord(progress, {
+        reportPath: outputPath,
+        acceptancePassed: report.completedImages === entries.length
+            && report.exactMatches === entries.length
+            && report.mandatoryExactMatches === entries.length
+            && report.requiredFieldsComplete === entries.length,
+    });
+    await writeJsonAtomically(progressPath, progress);
+    console.log('[OCR-SEQUENCE] Progress checkpoint: ' + progressPath);
     console.log(`[OCR-SEQUENCE] Report: ${outputPath}`);
     console.log(`[OCR-SEQUENCE] Summary ${report.completedImages}/${entries.length} completed, ${report.mandatoryExactMatches}/${entries.length} exact nine-field mandatory records, ${report.requiredFieldsComplete}/${entries.length} complete required fields; all compared values exact=${report.exactMatches}/${entries.length}`);
     if (report.completedImages !== entries.length || report.mandatoryExactMatches !== entries.length || report.requiredFieldsComplete !== entries.length) process.exitCode = 1;
 })().catch(async error => {
     console.error('[OCR-SEQUENCE] Fatal:', error);
     process.exitCode = 1;
+    if (activeProgress && activeProgressPath) {
+        failProgressRecord(activeProgress, error);
+        try { await writeJsonAtomically(activeProgressPath, activeProgress); }
+        catch (checkpointError) { console.error('[OCR-SEQUENCE] Could not persist fatal progress checkpoint:', checkpointError.message); }
+    }
     try { await bot.terminateOcrWorker(); } catch {}
     Module._load = originalLoad;
 });

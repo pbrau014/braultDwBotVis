@@ -12,7 +12,7 @@ The bot ingests WoWS battle-result screenshots, extracts structured battle evide
 - Tesseract.js remains the primary OCR engine.
 - OpenCV-assisted field localization is opt-in; it proposes image geometry/crops and is not an authority for recognized values.
 - PaddleOCR is an optional locally benchmarked secondary candidate, disabled by default.
-- OCR.space is implemented as an optional external crop recognizer. It receives localized crops only; its candidates still pass the existing exact parsers and consensus logic.
+- OCR.space is implemented as an optional localized-crop evidence stage (`src/ocrspace-client.js`, `src/ocrspace-quota-ledger.js`, `src/ocrspace-field-evidence.js`) and is wired into the bot. It remains disabled by default; evidence is kept separate from exact-value candidates and cannot accept or rewrite mandatory fields. Current CI: 15/15 mocked OCR.space contract/quota tests pass; no real provider request or image transmission has been made.
 - Nine required battle fields remain strict and exact. The parser must abstain on conflicts or uncertainty rather than fuzzy-correcting player names, IDs, ships, or numbers.
 
 ## Runtime and tests
@@ -20,19 +20,50 @@ The bot ingests WoWS battle-result screenshots, extracts structured battle evide
 - Preferred reproducible runtime: Node.js 22.16.0 (`.nvmrc`).
 - Install with `npm ci`.
 - Run offline tests with `npm test`.
-- Run the explicit provider dry-run with `npm run test:ocrspace-live:dry`.
-- Run live OCR.space smoke test with `npm run test:ocrspace-live` after configuring a free API key locally.
+- Run the combined Discord channel-preflight and command-policy unit tests with `npm run test:discord-preflight`.
+- Run `npm run test:ocrspace` for the offline mocked provider/crop/quota contract tests. The optional provider remains disabled by default; no live OCR.space POST has been performed.
 
-The current captured verification status is documented in `GITHUB_TRANSFER_STATUS.md` and `OCRSPACE_LIVE_PROVIDER_GATE_STATUS_2026-11-04.md`.
+The current captured verification status is documented in `GITHUB_TRANSFER_STATUS.md`, `docs/iteration23/PHASE9_DISCORD_INTEGRATION_STATUS_2026-11-04.md`, and `docs/continuation/NEXT_CHAT_HANDOFF_2026-11-04.md`. The 2026-11-04 GitHub Actions run passed clean install, syntax, OCR.space (15/15) and Discord preflight (21/21), but the full suite failed 29/65 due missing source modules/fixtures and incorrect test placement. Production remains NO-GO.
 
 ## Release status
 
-The project is not marked release-ready. The OCR.space adapter contract suite passed 17/17 on Node 22.16.0 and its local crop dry-run passed. The full project test suite last reported 215 passed / 1 failed because the extracted test environment lacked the declared `dotenv` package. A real OCR.space POST was not verified: the current execution environment cannot resolve `api.ocr.space` and no project API key is configured. Windows/native-Tesseract and Discord smoke-test gates also remain separate.
+The project is not marked release-ready. Historical offline suite results (including the 214/214 report) are historical only and do not describe the current branch. Current CI on Node 22.16.0: clean install PASS, syntax PASS, OCR.space 15/15 PASS, Discord offline preflight 21/21 PASS, but full npm test FAILS at 36 passed / 29 failed / 65 total because source modules, test fixtures and the intended tests/ layout are missing from the current branch. See the current run and handoff report. No live Discord login, real permission check, Windows/native-Tesseract test, or OCR.space request has been performed.
 
 ## Sensitive data
 
-Never commit a real Discord bot token, OCR provider key, `.env`, database, local runtime state, or private user data. Use `.env.example` for placeholders and keep real values in a local `.env` file excluded by Git.
+Never commit a real Discord bot token, OCR provider key, `.env`, database, local runtime state, or private user data. Use `.env.discord-test.example` for safe test placeholders and keep real values in a local `.env` file excluded by Git.
 
 ## Complete source package
 
-The current full checkpoint contains application source, scripts, tests, documentation, model assets, fixtures, expanded corpus inputs, and provenance records. The repository upload helper is `PUSH_COMPLETE_DWBOT_POP1.ps1`; it pushes only to branch `pop1` of this repository, using Git Credential Manager and a force-with-lease check against the verified initial branch head. It does not modify `main`.
+The current branch contains application source, scripts, tests, documentation, model assets, fixtures, expanded corpus inputs, and provenance records. Exact byte-for-byte equivalence with every historical working-copy package has not been established; consult `GITHUB_TRANSFER_STATUS.md` before treating a package as a complete transfer. The only authorized delivery branch is `dwbotVis`. Historical scripts targeting `pop1` are not authorized for current use. `main` is read-only.
+
+
+## Current DWBOT project rules and continuation status
+
+- Canonical repository: [pbrau014/braultDwBotVis](https://github.com/pbrau014/braultDwBotVis).
+- Authorized delivery branch: `dwbotVis` only. Keep `main` read-only; do not substitute `pop1` or another repository.
+- The authoritative continuation rule and security boundaries are in `docs/continuation/PROJECT_AUTHORITY_AND_IMPLEMENTATION_RULES.md`; the append-only roadmap is `plan1.txt`.
+- Current CI evidence: `npm run test:ocrspace` 15/15 and `npm run test:discord-preflight` 21/21 pass; full `npm test` currently fails 29/65 due missing source/fixtures and test placement. Historical 214/214 reports must not be presented as current-branch evidence. See `docs/continuation/NEXT_CHAT_HANDOFF_2026-11-04.md`.
+- The Player/Admin desktop HTML interface and companion image-upload page are now an explicitly authorized parallel workstream. Inspect the two linked Library HTML baselines in `docs/continuation/NEXT_CHAT_HANDOFF_2026-11-04.md`; preview and integrate the UI before live Discord smoke where practicable. Use a trusted local Node bridge; never put bot/webhook/OCR credentials in browser code. Prepare Discord application-command integration without pretending static HTML can inject slash-command interactions.
+- Production remains **NO-GO** until all mandatory OCR, Windows/native, live Discord, security, recovery, interface and packaging gates have verified evidence.
+
+
+## Discord readiness hardening
+
+The bot now records discord.js shard READY/disconnect/reconnect/resume/error events and validates the configured guild text channel after the client reaches ClientReady. The read-only preflight checks View Channel, Send Messages (or Send Messages in Threads for a thread), and Attach Files before reporting the bot as fully online. discord.js remains responsible for Gateway heartbeat and session recovery.
+
+The focused check is `npm run test:discord-preflight`. Its six isolated unit tests passed on Node.js v22.16.0; this is not a live Discord test. See the Phase 9 quickstart for the isolated test guild procedure.
+
+
+The Discord REST manager's `rateLimited` event is logged without credentials or request bodies; discord.js retains responsibility for dynamic REST bucket scheduling and retry timing.
+
+
+## Credential exposure remediation
+
+A hard-coded Discord webhook was found in the historical Image Text Reader HTML sample at `dwbotStuff/scoreReport_dark_clipboard (1).html`. The current branch version has had the webhook URL and direct-posting implementation removed; OCR text now remains in the browser for review, copy or download and manual submission. Because the old URL was committed previously, editing the current file does not revoke it or erase it from Git history. The webhook owner must revoke/delete that webhook in Discord and create a new one only if separately needed. Never reuse the exposed URL.
+
+
+**Important:** the sanitized OCR reader is committed on `dwbotVis`, but the current read-only `main` copy still contains the exposed webhook. The owner must revoke/delete that webhook in Discord immediately; removing it from a non-default branch does not invalidate it.
+
+
+The isolated live-test configuration can be checked without contacting Discord using `npm run preflight:discord-test`. This validates local settings only; it cannot validate the token, Developer Portal intent toggles or live channel permissions.

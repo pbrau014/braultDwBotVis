@@ -1,0 +1,67 @@
+name: DWBOT verification
+
+on:
+  push:
+    branches:
+      - dwbotVis
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dwbot-verification-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  node22-linux:
+    name: Node.js 22.16.0 · Linux verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the exact triggering commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # actions/checkout v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up the project's required Node.js runtime
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # actions/setup-node v7.1.0
+        with:
+          node-version: 22.16.0
+          cache: npm
+          package-manager-cache: false
+
+      - name: Record runtime and install the locked dependencies
+        run: |
+          node --version
+          npm --version
+          npm ci --no-audit --no-fund
+
+      - name: Check JavaScript syntax
+        run: |
+          node --check src/bot.js
+          node --check src/desktop-service.js
+          node --check src/desktop-bridge.js
+          node --check tests/desktop-service.test.js
+          node --check tests/desktop-bridge.test.js
+          node --check src/ocrspace-client.js
+          node --check src/ocrspace-quota-ledger.js
+          node --check src/ocrspace-field-evidence.js
+          node --check src/discord-test-preflight.js
+          node --check src/ocr-sequence-checkpoint.js
+          node --check scripts/run-ocr-sequence.js
+          node --check tests/ocr-sequence-checkpoint.test.js
+
+      - name: Verify OCR.space contract, quotas and crop isolation
+        run: npm run test:ocrspace
+
+      - name: Verify Discord channel, admin policy and local test configuration
+        run: npm run test:discord-preflight
+
+      - name: Verify authenticated desktop UI service and bridge
+        run: npm run test:desktop
+
+      - name: Run the complete project test suite
+        run: npm test

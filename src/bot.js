@@ -10,6 +10,7 @@ const {
     GatewayIntentBits,
     Events,
     Partials,
+    PermissionFlagsBits,
     AttachmentBuilder,
     ActionRowBuilder,
     ButtonBuilder,
@@ -17,6 +18,9 @@ const {
     StringSelectMenuBuilder,
 } = require('discord.js');
 const { createWorker } = require('./ocr-worker');
+const { inspectTargetChannelPermissions } = require('./discord-gateway-diagnostics');
+const { isAdminOnlyCommand } = require('./tournament-command-policy');
+const { collectOcrSpaceFieldEvidence } = require('./ocrspace-field-evidence');
 const path = require('node:path');
 const { createHash } = require('node:crypto');
 const os = require('node:os');
@@ -109,6 +113,14 @@ const client = new Client({
         GatewayIntentBits.MessageContent,
     ],
     partials: [Partials.Channel],
+});
+
+// discord.js REST already schedules requests around Discord's dynamic buckets.
+// Observe 429 handling without hard-coding limits or creating a competing retry loop.
+client.rest.on('rateLimited', (rateLimit) => {
+    console.warn(
+        `[Discord REST] rate limited: ${rateLimit.method} ${rateLimit.route}; scope=${rateLimit.scope}; global=${Boolean(rateLimit.global)}; retryAfterMs=${Number(rateLimit.retryAfter) || 0}. discord.js REST manager is applying its rate-limit queue.`,
+    );
 });
 
 let ocrWorker = null;
@@ -1368,6 +1380,7 @@ async function extractTextCore(imageBuffer) {
     // the damage value. All crop sizes are proportional to the detected image size.
     let damageFieldOcr = { text: '', lines: [], words: [], confidence: 0 };
     let damageFieldOcrCandidates = [];
+    let damageProviderRect = null;
     if (performanceAnchor?.bbox && missionsAnchor?.bbox) {
         const performanceHeadingHeight = Math.max(1, performanceAnchor.bbox.y1 - performanceAnchor.bbox.y0);
         const effectivePerformanceHeadingHeight = Math.min(performanceHeadingHeight, imageHeight * 0.035);
@@ -1383,6 +1396,7 @@ async function extractTextCore(imageBuffer) {
         // consensus when a ribbon edge still contaminates the cropped read.
         const narrowWidth = Math.min(imageWidth - left, Math.ceil(imageWidth * (compactLeftLayout ? 0.09 : 0.075)));
         const narrowRect = { left, top, width: narrowWidth, height: bottom - top };
+        damageProviderRect = { ...narrowRect };
         if (bottom - top >= imageHeight * 0.018 && narrowWidth > 15) {
             const psm7 = await runCrop('damage-value-psm7', { ...narrowRect }, 1400, 7);
             const psm6 = await runCrop('damage-value-psm6', { ...narrowRect }, 1400, 6);
@@ -2464,6 +2478,55 @@ async function extractTextCore(imageBuffer) {
         pageSegmentationMode: 'combined',
     };
 
+    // OCR.space is an explicitly opted-in external evidence provider. Only unresolved
+    // mandatory fields are eligible. Crops are sent sequentially; full screenshots
+    // are never uploaded by this stage. Provider output remains diagnostics only.
+    if (process.env.OCRSPACE_ENABLED === '1') {
+        try {
+            const previewRecord = buildBattleRecord(combined.text, extractedFields);
+            const missingLabels = new Set(getMissingRequiredFields(previewRecord).map((item) => String(item.label)));
+            const cropPlan = [];
+            const addCrop = (field, engine, rect, source, imageSource, outputWidth) => {
+                if (rect && Number(rect.width) >= 8 && Number(rect.height) >= 6) {
+                    cropPlan.push({ field, engine, rect: { ...rect }, source, imageSource, outputWidth });
+                }
+            };
+            if (missingLabels.has('Player')) addCrop('player', 3, identityTightRescueRect, 'localized-player-identity', 'original', 1800);
+            for (const field of ['xp', 'freeXp', 'credits']) {
+                const label = field === 'freeXp' ? 'Free XP' : field === 'xp' ? 'XP' : 'Credits';
+                if (!missingLabels.has(label)) continue;
+                const rect = localizedRewardEvidence.rects[field + '-psm7'] || localizedRewardEvidence.rects[field + '-psm8'];
+                if (rect) addCrop(field, 2, rect, 'localized-reward-column', 'prepared', Math.max(420, Math.min(1400, Math.round(rect.width * 3.5))));
+            }
+            if (missingLabels.has('Damage')) addCrop('damage', 2, damageProviderRect, 'localized-damage-column', 'prepared', 1400);
+            if (missingLabels.has('Battle Result')) addCrop('result', 2, resultTitleRect, 'localized-result-title', 'original', 1700);
+            if (missingLabels.has('Map') || missingLabels.has('Battle Mode') || missingLabels.has('Battle Start Time')) {
+                addCrop('battleMetadata', 2, sourceMetadataTightRect, 'localized-battle-metadata', 'original', 1700);
+            }
+            const remainingBudget = OCR_IMAGE_TIMEOUT_MS - (Date.now() - imageStartedAt) - 1500;
+            if (remainingBudget >= 1500) {
+                extractedFields.ocrSpaceEvidence = await collectOcrSpaceFieldEvidence({
+                    env: { ...process.env, OCRSPACE_STAGE_BUDGET_MS: String(Math.min(20000, remainingBudget)) },
+                    cropPlan,
+                    buildCrop: async (spec) => imageProcessor.cropResize(
+                        spec.imageSource === 'prepared' ? preparedBuffer : imageBuffer,
+                        spec.rect,
+                        spec.outputWidth,
+                        { grayscale: true, contrastStretch: '0.5%x0.5%', sharpen: '0x1+1+0.02' },
+                    ),
+                });
+            } else {
+                extractedFields.ocrSpaceEvidence = { status: 'skipped', reason: 'insufficient remaining per-image time budget', requests: 0, evidence: [] };
+            }
+        } catch (error) {
+            // Third-party OCR errors never fail or mutate local Tesseract results.
+            console.warn('[OCR.space] Optional evidence stage failed; local OCR remains authoritative:', String(error && error.message || error).slice(0, 240));
+            extractedFields.ocrSpaceEvidence = { status: 'failed', reason: String(error && error.code || 'OCRSPACE_STAGE_ERROR'), requests: 0, evidence: [] };
+        }
+    } else {
+        extractedFields.ocrSpaceEvidence = { status: 'disabled', reason: 'OCRSPACE_ENABLED is not 1', requests: 0, evidence: [] };
+    }
+
     await worker.setParameters({ tessedit_pageseg_mode: '3' });
     // Optional second-engine field-crop fallback. Disabled by default and strictly
     // local-only. It runs only for unresolved, ambiguous, or contradictory fields;
@@ -2798,8 +2861,7 @@ async function handleTournamentCommand(message) {
     const firstSpace = rest.search(/\s/);
     const command = (firstSpace < 0 ? rest : rest.slice(0, firstSpace)).toLowerCase();
     const args = firstSpace < 0 ? '' : rest.slice(firstSpace).trim();
-    const adminOnly = new Set(['add-player', 'rename-player', 'remove-player', 'result', 'setting', 'import', 'map', 'clear-slot', 'clear-event', 'clear-results', 'finalize', 'export', 'export-workbook', 'snapshot']);
-    if (adminOnly.has(command) && !isTournamentAdmin(message)) {
+    if (isAdminOnlyCommand(command) && !isTournamentAdmin(message)) {
         await message.reply({ content: 'That command is restricted to tournament admins (Manage Server permission or an ID in `TOURNAMENT_ADMIN_IDS`).', allowedMentions: { repliedUser: false, parse: [] } });
         return true;
     }
@@ -3487,13 +3549,64 @@ async function handleInteraction(interaction) {
 }
 
 client.on(Events.InteractionCreate || 'interactionCreate', handleInteraction);
-client.once(Events.ClientReady, (readyClient) => {
-    console.log(`Logged in as ${readyClient.user.tag}.`);
-    console.log(`Watching channel ID: ${TARGET_CHANNEL_ID}`);
+// discord.js owns Gateway heartbeats, reconnects and session resumption. These
+// listeners record lifecycle evidence without creating a competing Gateway loop.
+client.on('shardReady', (shardId) => {
+    console.log(`[Discord Gateway] shard ${shardId} READY.`);
+});
+client.on('shardDisconnect', (closeEvent, shardId) => {
+    const code = Number(closeEvent?.code);
+    const reason = String(closeEvent?.reason || '').slice(0, 160);
+    console.warn(`[Discord Gateway] shard ${shardId} disconnected (code ${Number.isFinite(code) ? code : 'unknown'}): ${reason || 'no reason supplied'}`);
+});
+client.on('shardReconnecting', (shardId) => {
+    console.warn(`[Discord Gateway] shard ${shardId} reconnecting; discord.js is managing recovery.`);
+});
+client.on('shardResume', (shardId, replayedEvents) => {
+    console.log(`[Discord Gateway] shard ${shardId} resumed; replayed ${Number(replayedEvents) || 0} event(s).`);
+});
+client.on('shardError', (error, shardId) => {
+    console.error(`[Discord Gateway] shard ${shardId} error:`, error?.message || error);
+});
+client.on(Events.Error, (error) => console.error('[Discord client] error:', error?.message || error));
+client.on(Events.Warn, (warning) => console.warn('[Discord client] warning:', warning));
+
+client.once(Events.ClientReady, async (readyClient) => {
+    console.log(`[Discord Gateway] READY as ${readyClient.user.tag} (bot user ID ${readyClient.user.id}).`);
+    console.log(`[Discord Gateway] Connected shard count: ${readyClient.ws.shards.size}.`);
+    console.log(`[Discord] Checking configured target channel ${TARGET_CHANNEL_ID}...`);
+    let targetChannel = null;
+    try {
+        targetChannel = await readyClient.channels.fetch(TARGET_CHANNEL_ID);
+    } catch (error) {
+        console.error('[Discord preflight] FAILED: target channel fetch failed:', error?.message || error);
+    }
+    const botMember = targetChannel?.guild?.members?.me || null;
+    const channelCheck = inspectTargetChannelPermissions(targetChannel, botMember, [
+        { name: 'ViewChannel', flag: PermissionFlagsBits.ViewChannel },
+        { name: targetChannel?.isThread?.() ? 'SendMessagesInThreads' : 'SendMessages', flag: targetChannel?.isThread?.() ? PermissionFlagsBits.SendMessagesInThreads : PermissionFlagsBits.SendMessages },
+        { name: 'AttachFiles', flag: PermissionFlagsBits.AttachFiles },
+    ]);
+    if (!channelCheck.ok) {
+        console.error(`[Discord preflight] FAILED: ${channelCheck.reason}. Missing permissions: ${channelCheck.missingPermissions.join(', ') || 'none reported'}.`);
+        console.error('[Discord preflight] Startup is aborting. Correct the test channel and bot permissions before retrying.');
+        // Fail closed: do not leave a connected bot running with a broken target
+        // channel, where subsequent commands or archive writes could generate 403s.
+        isShuttingDown = true;
+        try {
+            await tournamentStore.close?.();
+        } catch (error) {
+            console.error('[Discord preflight] Could not close tournament storage cleanly:', error?.message || error);
+        }
+        readyClient.destroy();
+        process.exitCode = 1;
+        return;
+    }
+    console.log(`[Discord preflight] PASS: guild ${channelCheck.guildId}, channel #${channelCheck.channelName} (${channelCheck.channelId}); required permissions: ${channelCheck.requiredPermissions.join(', ')}.`);
     console.log(`Tournament storage: ${tournamentStore.engine || 'JSON'} (${tournamentStore.path}).`);
     if (ENABLE_SLASH_COMMANDS) registerSlashCommands(readyClient).catch(error => console.error('Slash command registration failed:', error.message));
     else console.log('Slash command registration is disabled; use `!yolo panel` for public interactive controls.');
-    console.log('The bot is online. Missing or conflicting required fields trigger a correction prompt; missing ribbons never block posting.');
+    console.log('The bot is online and the configured channel preflight passed. Missing or conflicting required fields trigger a correction prompt; missing ribbons never block posting.');
 });
 
 async function terminateOcrWorker() {

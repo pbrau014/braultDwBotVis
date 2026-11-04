@@ -59,13 +59,34 @@ function normalizeSettings(settings) {
   }
   return out;
 }
+function normalizePlayerAccountLinks(raw, players) {
+  const source = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+  const knownPlayerIds = new Set(players.map(player => String(player.id)));
+  const seenDiscordIds = new Set();
+  const links = {};
+  for (const [playerId, rawDiscordId] of Object.entries(source)) {
+    const discordId = String(rawDiscordId || '').trim();
+    if (!knownPlayerIds.has(String(playerId))) throw new Error(`Discord account link refers to unknown tournament player ${playerId}.`);
+    if (!/^\d{17,20}$/.test(discordId)) throw new Error(`Discord account link for player ${playerId} is not a valid Discord snowflake.`);
+    if (seenDiscordIds.has(discordId)) throw new Error(`Discord account ${discordId} is linked to more than one tournament player.`);
+    seenDiscordIds.add(discordId);
+    links[String(playerId)] = discordId;
+  }
+  return links;
+}
+
 function normalizeState(input = {}) {
-  const players = Array.isArray(input.players) ? input.players : [];
+  const players = Array.isArray(input.players) ? input.players.map(normalizePlayer) : [];
   if (players.length > MAX_PLAYERS) throw new Error(`Tournament backups may contain at most ${MAX_PLAYERS} players because the bundled workbook supports that many.`);
+  const playerAccountLinks = normalizePlayerAccountLinks(
+    input.playerAccountLinks ?? input.player_account_links,
+    players,
+  );
   return {
     version: 2,
-    players: players.map(normalizePlayer),
+    players,
     settings: normalizeSettings(input.settings),
+    playerAccountLinks,
     importedBattleRecordIds: Array.isArray(input.importedBattleRecordIds) ? input.importedBattleRecordIds.filter(v => typeof v === 'string') : [],
     battleRecords: Array.isArray(input.battleRecords) ? input.battleRecords : [],
     pendingSubmissions: Array.isArray(input.pendingSubmissions) ? input.pendingSubmissions : [],
@@ -78,6 +99,31 @@ function findPlayer(state, nameOrId) {
   const query = String(nameOrId ?? '').trim();
   if (!query) return null;
   return state.players.find(p => String(p.id) === query) || state.players.find(p => p.name.toLowerCase() === query.toLowerCase()) || null;
+}
+function findPlayerByDiscordUserId(state, discordUserId) {
+  const userId = String(discordUserId || '').trim();
+  if (!/^\d{17,20}$/.test(userId)) return null;
+  const linkedId = Object.entries(state.playerAccountLinks || {}).find(([, value]) => value === userId)?.[0];
+  return linkedId == null ? null : findPlayer(state, linkedId);
+}
+function linkPlayerDiscordAccount(state, playerNameOrId, discordUserId) {
+  const player = findPlayer(state, playerNameOrId);
+  if (!player) throw new Error(`Player "${playerNameOrId}" was not found.`);
+  const userId = String(discordUserId || '').trim();
+  if (!/^\d{17,20}$/.test(userId)) throw new Error('Discord user ID must be a 17–20 digit snowflake.');
+  const currentOwner = findPlayerByDiscordUserId(state, userId);
+  if (currentOwner && currentOwner.id !== player.id) throw new Error(`Discord account ${userId} is already linked to ${currentOwner.name}.`);
+  state.playerAccountLinks ||= {};
+  state.playerAccountLinks[String(player.id)] = userId;
+  return { player, discordUserId: userId };
+}
+function unlinkPlayerDiscordAccount(state, playerNameOrId) {
+  const player = findPlayer(state, playerNameOrId);
+  if (!player) throw new Error(`Player "${playerNameOrId}" was not found.`);
+  state.playerAccountLinks ||= {};
+  const discordUserId = state.playerAccountLinks[String(player.id)] || null;
+  delete state.playerAccountLinks[String(player.id)];
+  return { player, discordUserId };
 }
 function addPlayer(state, name) {
   if (state.players.length >= MAX_PLAYERS) throw new Error(`The roster is full (${MAX_PLAYERS} players). The bundled workbook supports up to ${MAX_PLAYERS} participants.`);
@@ -92,6 +138,7 @@ function removePlayer(state, nameOrId) {
   const player = findPlayer(state, nameOrId);
   if (!player) throw new Error(`Player "${nameOrId}" was not found.`);
   state.players = state.players.filter(p => p.id !== player.id);
+  if (state.playerAccountLinks) delete state.playerAccountLinks[String(player.id)];
   return player;
 }
 function renamePlayer(state, nameOrId, newName) {
@@ -222,7 +269,16 @@ function makeWorkbookBackup(state) {
   return { version: 2, exportedAt: new Date().toISOString(), players: clone(state.players), settings: clone(state.settings), importedBattleRecordIds: [...state.importedBattleRecordIds] };
 }
 function makeArchiveSnapshot(state) {
-  return { format: 'wows-yolo-tourney-state', schema_version: 1, exported_at: new Date().toISOString(), workbook_backup: makeWorkbookBackup(state), battle_records: clone(state.battleRecords), pending_submissions: clone(state.pendingSubmissions), pending_ocr_corrections: clone(state.pendingOcrCorrections || []) };
+  return {
+    format: 'wows-yolo-tourney-state',
+    schema_version: 1,
+    exported_at: new Date().toISOString(),
+    workbook_backup: makeWorkbookBackup(state),
+    battle_records: clone(state.battleRecords),
+    pending_submissions: clone(state.pendingSubmissions),
+    pending_ocr_corrections: clone(state.pendingOcrCorrections || []),
+    player_account_links: clone(state.playerAccountLinks || {}),
+  };
 }
 function importBackup(raw) {
   const source = raw?.workbook_backup || raw;
@@ -232,6 +288,7 @@ function importBackup(raw) {
     state.battleRecords = Array.isArray(raw.battle_records) ? raw.battle_records : [];
     state.pendingSubmissions = Array.isArray(raw.pending_submissions) ? raw.pending_submissions : [];
     state.pendingOcrCorrections = Array.isArray(raw.pending_ocr_corrections) ? raw.pending_ocr_corrections : [];
+    state.playerAccountLinks = normalizePlayerAccountLinks(raw.player_account_links, state.players);
   }
   return state;
 }
@@ -414,7 +471,8 @@ function deterministicBattleId(record) {
 
 module.exports = {
   EVENTS, EVENT_LABELS, CLASSES, DEFAULT_SETTINGS, normalizeClass, classWeightFor,
-  MAX_PLAYERS, normalizeState, createState, findPlayer, addPlayer, removePlayer, renamePlayer, clearSlot, clearEvent, clearAllResults, eventTotal,
-  eventScore, standings, getSlot, validateResult, recordResult, setSetting,
+  MAX_PLAYERS, normalizeState, createState, findPlayer, findPlayerByDiscordUserId,
+  linkPlayerDiscordAccount, unlinkPlayerDiscordAccount, addPlayer, removePlayer, renamePlayer,
+  clearSlot, clearEvent, clearAllResults, eventTotal, eventScore, standings, getSlot, validateResult, recordResult, setSetting,
   makeWorkbookBackup, makeArchiveSnapshot, importBackup, createStore, createSqliteStore, deterministicBattleId,
 };

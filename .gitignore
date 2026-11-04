@@ -1,0 +1,31 @@
+# Dependencies and package-manager caches
+node_modules/
+.npm/
+.pnpm-store/
+
+# Local credentials and environment files (keep only safe templates)
+.env
+.env.*
+!.env.example
+!.env.discord-test.example
+
+# Runtime state, databases, and generated backups
+data/
+testdata/live-discord-state/
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+*.sqlite3
+
+# Logs and test/build output
+*.log
+npm-debug.log*
+coverage/
+.nyc_output/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

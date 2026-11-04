@@ -308,10 +308,8 @@
         const progressBar = document.getElementById("progressBar");
 
 		
-        // Discord webhook configuration.
-        // Replace this placeholder with your NEW webhook URL.
-        // Do not publish this file publicly with the webhook URL inside it.
-        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1562298219092901918/Vcb6RNo2vrkkl5zD13upx6yww-_TP2iCRQCWfky0bY_eTbzMzCl_cPxT8ELYAJhd7J13";
+        // Direct Discord posting is intentionally disabled in this static browser tool.
+        // Use Copy or Download and submit the reviewed text manually through the bot.
 
         // --------------------------------------------------
         // 4.2: APPLICATION STATE
@@ -326,8 +324,7 @@
         imageInput.addEventListener("change", () => {
             if (imageInput.files.length > 0) {
                 loadImage(imageInput.files[0]);
-                // Automatically run OCR; the OCR completion handler posts the
-                // extracted text to Discord without another button click.
+                // Run browser OCR automatically; results remain local until the user copies or downloads them.
                 setTimeout(() => readButton.click(), 0);
             }
         });
@@ -505,12 +502,7 @@
                     outputText.value = result.data.text.trim();
 
                     if (outputText.value) {
-                        // Automatically post the recognized text to Discord.
-                        const posted = await postTextToDiscord(outputText.value);
-
-                        status.textContent = posted
-                            ? "Text recognition complete. Results posted to Discord."
-                            : "Text recognition complete, but Discord posting failed.";
+                        status.textContent = "Text recognition complete. Review the result, then use Copy or Download to submit it manually through DWBOT.";
 
                         copyButton.disabled = false;
                         downloadButton.disabled = false;
@@ -622,77 +614,8 @@
         });
 		
 	
-/* ==================================================
-   DISCORD: AUTOMATIC OCR RESULT POSTING
-================================================== */
-
-// Uses DISCORD_WEBHOOK_URL configured near the top of the script.
-
-async function postTextToDiscord(extractedText) {
-    const text = extractedText.trim();
-
-    if (!text) {
-        status.textContent = "No text was found to post.";
-        return false;
-    }
-
-    if (
-        !DISCORD_WEBHOOK_URL.startsWith("https://discord.com/api/webhooks/") ||
-        DISCORD_WEBHOOK_URL.includes("PASTE_YOUR_NEW_DISCORD_WEBHOOK_URL_HERE")
-    ) {
-        status.textContent = "Discord is not configured. Add your new webhook URL in the JavaScript section.";
-        return false;
-    }
-
-    // Keep each message safely below Discord's 2,000-character limit.
-    const chunks = text.match(/[\s\S]{1,1750}/g) || [];
-    status.textContent = "Sending extracted text to Discord...";
-
-    try {
-        for (let i = 0; i < chunks.length; i++) {
-            const heading = chunks.length > 1
-                ? `Extracted image text (${i + 1}/${chunks.length}):\n`
-                : "Extracted image text:\n";
-
-            const response = await fetch(DISCORD_WEBHOOK_URL + "?wait=true", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    content: heading + chunks[i],
-                    allowed_mentions: { parse: [] }
-                })
-            });
-
-            if (!response.ok) {
-                let detail = "";
-                try {
-                    const body = await response.json();
-                    detail = body.message || "";
-                } catch (_) {
-                    // The response may not contain JSON.
-                }
-
-                if (response.status === 401 || response.status === 404) {
-                    throw new Error(`Webhook rejected (HTTP ${response.status}). It may be invalid, deleted, or regenerated. ${detail}`.trim());
-                }
-                if (response.status === 429) {
-                    throw new Error("Discord rate limit reached. Wait a little and try again.");
-                }
-                throw new Error(`Discord returned HTTP ${response.status}. ${detail}`.trim());
-            }
-        }
-
-        return true;
-    } catch (error) {
-        console.error("Discord posting failed:", error);
-        const message = error instanceof TypeError
-            ? "Browser could not reach Discord (network/CORS issue). Try serving this HTML from localhost; if it still fails, use a small backend instead of a direct webhook."
-            : error.message;
-        status.textContent = `OCR succeeded, but Discord posting failed: ${message}`;
-        return false;
-    }
-}
-
+/* Direct webhook posting was removed. Static browser tools must not contain Discord credentials.
+   Copy or download the reviewed OCR result and submit it manually through the bot. */
 
     </script>
 </body>
