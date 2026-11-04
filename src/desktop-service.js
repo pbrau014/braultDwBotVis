@@ -265,7 +265,7 @@ function createDesktopService(options = {}) {
     },
     async listYoloTournaments(principal) {
       role(principal,['admin']);
-      return { items: [...(state().yoloTournaments || [])] };
+      return { items: [...(state().yoloTournaments || [])], eventNights: [...(state().eventNights || [])] };
     },
     async createYoloTournament(principal,body) {
       role(principal,['admin']);
