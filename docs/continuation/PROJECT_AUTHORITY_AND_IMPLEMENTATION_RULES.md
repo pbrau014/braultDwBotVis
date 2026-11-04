@@ -2,10 +2,10 @@
 
 **Canonical GitHub repository:** https://github.com/pbrau014/braultDwBotVis.git  
 **Repository:** `pbrau014/braultDwBotVis`  
-**Only authorized delivery branch:** `dwbotVis`  
-**Read-only source branch:** `main`
+**Active implementation/delivery branch:** `main`  
+**Historical integration snapshot:** `dwbotVis`
 
-The `dwbotVis` branch was created from verified `main` commit `9981355e6895a6c24c3b59a78be57865fbecafbb` on 2026-11-04. Before every remote change, re-read the `dwbotVis` head and use an expected-head/lease check. Verify each resulting commit/tree. Never commit, push, merge, force-push, or otherwise change `main`, regardless of GitHub's protection metadata. Do not substitute `pop1`, `pbrau014/dwbot`, or another remote.
+The user explicitly authorized synchronizing main to the verified 850-file dwbotVis tree and making main the active implementation branch. Synchronization commit 6270f6e56c9064fb98df9976098ddf77ad74b837 preserves the former main head as its parent and uses the exact dwbotVis tree; no force-push or history rewrite occurred. dwbotVis remains a historical snapshot. Before every remote write, re-read main, use an expected-head lease, then fetch and verify the resulting commit and tree. Do not substitute another repository.
 
 ## Persistent implementation rule
 
@@ -44,3 +44,16 @@ Keep all existing implementation phases and their order. Phase 9 is the evidence
 ## Packaging and completion
 
 At meaningful milestones create a complete candidate archive with source, scripts, tests, reports, docs, manifest, SHA-256 sidecar, ZIP integrity and clean-extraction checks. Exclude `.env`, credentials, `node_modules`, active databases, runtime state, caches and private data. Production remains NO-GO until mandatory OCR, Windows/native, live Discord, security, recovery, UI integration, manual, and package gates have verified evidence.
+
+
+## Current real-environment release gates - 2026-11-04
+
+The following remain OPEN and cannot be represented as passed based on Linux CI or mocks:
+
+1. Current-source complete screenshot OCR acceptance on Windows Node 24.22.1, including native Tesseract 5.x and paired Tesseract.js baseline.
+2. Real local Discord OAuth, browser visual QA, Player/Admin authorization checks and synthetic screenshot upload through the running bot.
+3. Isolated development-guild Discord smoke: READY, effective channel permissions, command policy, synthetic attachment processing, restart/recovery and natural rate-limit observations.
+4. Windows persistence/recovery: separate-process JSON/SQLite reopen, full private archive restore, physical SQLite copy/restore, WAL checkpoint and database integrity.
+5. PDF user manual, final package SHA-256, ZIP integrity and clean extraction followed by verification from that extracted copy.
+
+Exact OCR rules remain unchanged: nine mandatory fields in the established order, XP ninth; no fuzzy or expected-value repairs. Release remains NO-GO until all gates have actual evidence.
