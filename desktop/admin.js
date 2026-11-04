@@ -9,7 +9,7 @@
     async function load(){
       [overview]=await Promise.all([D.api('/api/overview')]);
       const submissions=await D.api('/api/submissions');
-      populateLifecycleSelectors(overview.lifecycle||{});
+      populateLifecycleSelectors(overview.lifecycle||{},overview.roster||[]);
       D.$('admin-roster-count').textContent=overview.roster.length+'/'+overview.maxPlayers;
       D.$('admin-total').textContent=D.number(overview.aggregate.doubloons);
       D.$('admin-value').textContent=D.money(overview.aggregate.estimatedValue);
@@ -54,10 +54,13 @@
       updateSettingFields();
     }
 
-    function populateLifecycleSelectors(lifecycle){
+    function populateLifecycleSelectors(lifecycle,roster=[]){
       const groups={
         tournaments:(lifecycle.tournaments||[]).map(t=>[t.id,t.name+' ('+t.format+')']),
         fullTournaments:(lifecycle.tournaments||[]).filter(t=>t.format==='full').map(t=>[t.id,t.name]),
+        pilotTournaments:(lifecycle.tournaments||[]).filter(t=>t.format==='pilot').map(t=>[t.id,t.name]),
+        allTournaments:(lifecycle.tournaments||[]).map(t=>[t.id,t.name+' ('+t.format+')']),
+        players:roster.map(p=>[String(p.id),p.name]),
         seasons:(lifecycle.seasons||[]).map(x=>[x.id,x.name||x.id]),
         stages:(lifecycle.seasons||[]).flatMap(x=>(x.stages||[]).map(y=>[y.id,(x.name||x.id)+' · '+y.type])),
         teams:(lifecycle.seasons||[]).flatMap(x=>(x.teams||[]).map(y=>[y.id,(x.name||x.id)+' · '+y.name])),
@@ -76,7 +79,7 @@
         event.preventDefault();const button=form.querySelector('button[type="submit"]');if(button)button.disabled=true;
         try{
           const body=Object.fromEntries(new FormData(form).entries());
-          for(const key of ['scoreA','scoreB','gameNumber','elapsedSeconds','amount'])if(body[key]!==undefined&&body[key]!=='')body[key]=Number(body[key]);
+          for(const key of ['scoreA','scoreB','gameNumber','elapsedSeconds','amount','time','damage','kills','tier'])if(body[key]!==undefined&&body[key]!=='')body[key]=Number(body[key]);
           for(const [key,value] of Object.entries(body))if(value==='')delete body[key];
           if(body.startsAt)body.startsAt=new Date(body.startsAt).toISOString();
           if(body.approvedAt)body.approvedAt=new Date(body.approvedAt).toISOString();
