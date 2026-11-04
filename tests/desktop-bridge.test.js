@@ -31,6 +31,7 @@ async function fixture(t,options={}){
     async listYoloTournaments(){return{items:[]};},
     async createYoloTournament(p,body){actions.push({name:'yolo-create',body});return{id:body.id,format:body.format};},
     async createYoloEventNight(p,body){actions.push({name:'yolo-night',body});return{id:body.id};},
+    async registerYoloParticipant(p,id,body){actions.push({name:'yolo-register',id,body,role:p.role});return{registered:true};},
     async registerYoloParticipant(p,id,body){actions.push({name:'yolo-register',id,body});return{registered:true};},
     async transitionYoloStage(p,id,body){actions.push({name:'yolo-stage',id,body});return{status:body.status};},
     async transitionYoloTournament(p,id,body){actions.push({name:'yolo-status',id,body});return{status:body.status};},
@@ -161,4 +162,14 @@ test('admin format lifecycle endpoints require session, CSRF and admin role',asy
  const player=await login(f.origin,'player');
  const denied=await fetch(f.origin+'/api/admin/yolo-tournaments',{headers:{Cookie:player.cookie}});
  assert.equal(denied.status,403);
+});
+
+test('linked participant can self-register only through authenticated player route',async t=>{
+ const f=await fixture(t),auth=await login(f.origin,'player');
+ const headers={Cookie:auth.cookie,Origin:f.origin,'X-CSRF-Token':auth.session.csrfToken,'Content-Type':'application/json'};
+ const noCsrf=await fetch(f.origin+'/api/yolo-event-nights/night-1/registration',{method:'POST',headers:{...headers,'X-CSRF-Token':''},body:'{}'});
+ assert.equal(noCsrf.status,403);
+ const registered=await fetch(f.origin+'/api/yolo-event-nights/night-1/registration',{method:'POST',headers,body:'{}'});
+ assert.equal(registered.status,201);
+ assert.equal(f.actions.at(-1).role,'player');
 });
