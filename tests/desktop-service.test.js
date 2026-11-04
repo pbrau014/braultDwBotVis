@@ -170,3 +170,16 @@ test('Full operations preserve registered roster, fixture, match, game and revie
  const reviewed=await f.service.reviewYoloGameEvidence(admin,game.id,{accepted:true});
  assert.equal(reviewed.status,'evidence-accepted');
 });
+
+test('event-night publication requires signed settings and activation locks registration',async()=>{
+ const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN}),player=await f.service.resolvePrincipal({id:PLAYER});
+ await f.service.createYoloTournament(admin,{id:'pilot-lock',name:'Pilot Lock',format:'pilot'});
+ await f.service.createYoloEventNight(admin,{id:'night-lock',tournamentId:'pilot-lock',startsAt:'2026-11-08T18:00:00Z'});
+ await assert.rejects(f.service.transitionYoloEventNight(admin,'night-lock',{status:'published'}),/approved event settings/);
+ await f.service.createYoloEventNight(admin,{id:'night-approved',tournamentId:'pilot-lock',startsAt:'2026-11-08T18:00:00Z',approvedSettingsId:'signed-event-settings'});
+ await f.service.transitionYoloEventNight(admin,'night-approved',{status:'published'});
+ const active=await f.service.transitionYoloEventNight(admin,'night-approved',{status:'active'});
+ assert.ok(active.rosterLockedAt);
+ await assert.rejects(f.service.registerYoloParticipant(player,'night-approved'),/Registration is closed/);
+ assert.ok(active.audit.some(entry=>entry.action==='event-night-transitioned'));
+});
