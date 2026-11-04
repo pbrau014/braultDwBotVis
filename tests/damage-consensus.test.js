@@ -229,3 +229,28 @@ test('leading-digit recovery stays fail-closed when full-screen values conflict'
   );
   assert.equal(selected.selectedValue, null);
 });
+
+
+test('PSM 11 retains a split damage value near the top of the performance block when its caption appears later', () => {
+  const candidates = extractFullScreenDamageCandidates([{
+    pageSegmentationMode: 11,
+    confidence: 82,
+    text: [
+      'Battle performance',
+      'Te Li.l',
+      '166 183',
+      'Tax',
+      '=',
+      '—',
+      'SZ',
+      '=',
+      '=',
+      'Set on fire',
+      'Citadel hits',
+      'Damage',
+      'Target hits',
+      'Combat Missions',
+    ].join('\\n'),
+  }]);
+  assert.deepEqual(candidates.map(candidate => candidate.value), ['166183']);
+});
