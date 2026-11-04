@@ -95,3 +95,5 @@ test('Admin lifecycle forms use same-origin protected API routes and cover Pilot
   assert.match(bridge, /csrf\(req,session\)/);
   assert.match(bridge, /role\(principal,\['admin'\]\)/);
 });
+
+test('event-night selection is available for scoped score mapping and roster assignment',()=>{const admin=read('desktop/admin.html');const app=read('desktop/desktop.js');assert.match(admin,/name="eventNightId"/);assert.match(app,/eventNightId/);assert.match(read('desktop/admin.js'),/eventNights/);});
