@@ -32,7 +32,8 @@
           <label>Tournament name<input name="name" required maxlength="100" placeholder="Winter YOLO"></label>
           <label>Format<select name="format" required><option value="pilot">Pilot YOLO · single evening</option><option value="full">Full YOLO · season</option></select></label>
           <label>Timezone<input name="timezone" required value="America/Chicago" placeholder="America/Chicago"></label>
-          <label id="pilot-start-field">Pilot start<input name="eventStart" type="datetime-local"></label>
+          <label><span id="event-start-label">Pilot start</span><input name="eventStart" type="datetime-local" required></label>
+          <label><span id="event-end-label">Pilot end</span><input name="eventEnd" type="datetime-local" required></label>
           <label id="season-weeks-field" class="hidden">Season duration (weeks)<input name="seasonWeeks" type="number" min="1" max="52" step="1" value="12"></label>
           <button class="button primary span-all" type="submit">Create draft tournament</button>
         </form>
