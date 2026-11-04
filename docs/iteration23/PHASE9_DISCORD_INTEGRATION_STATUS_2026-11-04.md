@@ -81,3 +81,8 @@ This is a code-level authorization fix. The new policy unit tests are run separa
 
 
 The synthetic full-system test now also asserts that a non-admin is denied both the read-only `!yolo settings` command and the `!yolo setting` mutation command. These two integration assertions are committed but have not been executed in the current environment because the complete dependency-backed test checkout is unavailable.
+
+
+## Static HTML webhook exposure remediation — 2026-11-04
+
+A hard-coded Discord webhook URL was detected in `dwbotStuff/scoreReport_dark_clipboard (1).html`. The current branch version removes the credential assignment and the direct HTTP POST function. The OCR page now keeps results local for review, copy and download; manual submission through DWBOT is required. No request was made to the webhook. The URL remains in prior Git history, so the webhook owner must revoke/delete it in Discord; a source edit alone does not revoke a webhook. History rewriting was not performed, preserving repository history and avoiding a force-push.

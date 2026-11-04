@@ -68,3 +68,8 @@ Because the branch head can change when additional connector commits are made, t
 - Native Windows/Tesseract and Discord smoke-test gates remain distinct and outstanding.
 
 Do not report the project as release-ready based on the partial tests or a later successful Git upload alone.
+
+
+## Credential exposure note
+
+A static HTML file contained a hard-coded Discord webhook URL. Its current branch version has been sanitized and direct posting removed. The previous URL remains in Git history; the owner must revoke it in Discord. No live request was sent. No history rewrite was performed.

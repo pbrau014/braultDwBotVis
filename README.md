@@ -56,3 +56,8 @@ The focused check is `npm run test:discord-gateway-diagnostics`. Its six isolate
 
 
 The Discord REST manager's `rateLimited` event is logged without credentials or request bodies; discord.js retains responsibility for dynamic REST bucket scheduling and retry timing.
+
+
+## Credential exposure remediation
+
+A hard-coded Discord webhook was found in the historical Image Text Reader HTML sample at `dwbotStuff/scoreReport_dark_clipboard (1).html`. The current branch version has had the webhook URL and direct-posting implementation removed; OCR text now remains in the browser for review, copy or download and manual submission. Because the old URL was committed previously, editing the current file does not revoke it or erase it from Git history. The webhook owner must revoke/delete that webhook in Discord and create a new one only if separately needed. Never reuse the exposed URL.
