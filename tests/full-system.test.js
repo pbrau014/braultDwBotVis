@@ -605,16 +605,26 @@ test('complete synthetic Discord tour: all commands, every slot, formulas, persi
   };
   H.getTournamentState().battleRecords.push({ record_id: grandMapRecord.record_id, status: 'unmapped', captured_at: new Date().toISOString(), source_file: 'synthetic-grand-map.png', record: grandMapRecord });
   await H.saveTournamentState({ archive: false });
-  const fullArchiveExport = exportedAttachment(await send('!yolo export'), 'yolo-tourney-full-archive.json');
-  assert.equal(fullArchiveExport.json.format, 'wows-yolo-tourney-state');
-  assert.equal(fullArchiveExport.json.schema_version, 1);
-  assert.equal(fullArchiveExport.json.workbook_backup.players.length, 3);
-  assert.equal(fullArchiveExport.json.battle_records.length, 2);
-  assert.equal(fullArchiveExport.json.pending_ocr_corrections.length, 1);
-  assert.ok(fullArchiveExport.json.workbook_backup.players.every(p => Tournament.EVENTS.every(e => p.events[e].length === 7)));
-  await fs.writeFile(path.join(outputDir, 'synthetic-full-state-archive.json'), `${JSON.stringify(fullArchiveExport.json, null, 2)}\n`);
+  const publicArchiveExport = exportedAttachment(await send('!yolo export'), 'yolo-tourney-public-archive.json');
+  assert.equal(publicArchiveExport.json.format, 'wows-yolo-tourney-state');
+  assert.equal(publicArchiveExport.json.schema_version, 1);
+  assert.equal(publicArchiveExport.json.public_snapshot, true);
+  assert.equal(publicArchiveExport.json.workbook_backup.players.length, 3);
+  assert.equal(publicArchiveExport.json.battle_records.length, 2);
+  assert.deepEqual(publicArchiveExport.json.player_account_links, {});
+  assert.deepEqual(publicArchiveExport.json.pending_ocr_corrections, []);
+  assert.equal(publicArchiveExport.json.pending_workflow_counts.pending_ocr_corrections, 1);
+  assert.ok(publicArchiveExport.json.workbook_backup.players.every(p => Tournament.EVENTS.every(e => p.events[e].length === 7)));
 
-  // Importing the full archive restores both the working tournament and the in-memory pending OCR queue.
+  // The authenticated local Admin download remains the complete private archive.
+  // Simulate that archive separately from the public Discord export.
+  const fullArchiveExport = { json: Tournament.makeArchiveSnapshot(H.getTournamentState()) };
+  fullArchiveExport.data = JSON.stringify(fullArchiveExport.json, null, 2);
+  assert.equal(fullArchiveExport.json.player_account_links !== undefined, true);
+  assert.equal(fullArchiveExport.json.pending_ocr_corrections.length, 1);
+  await fs.writeFile(path.join(outputDir, 'synthetic-full-state-archive.json'), JSON.stringify(fullArchiveExport.json, null, 2) + '\n');
+
+  // Importing the full local Admin archive restores both working state and its pending OCR queue.
   H.pendingRecords.clear();
   await H.setTournamentState(Tournament.createState());
   try {
