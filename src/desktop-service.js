@@ -277,7 +277,7 @@ function createDesktopService(options = {}) {
     },
     async createLifecycle(principal,body) {
       role(principal,['admin']);
-      return mutate(async()=>{const item=domainCall(()=>Tournament.YoloFormats.createTournament({id:body?.id||crypto.randomUUID(),title:body?.title,format:body?.format,settings:body?.settings||{}}));state().yoloTournaments.push(item);await options.saveState();return{id:item.id,title:item.title,format:item.format,lifecycle:item.lifecycle,stage:item.stage};});
+      return mutate(async()=>{const current=state(),id=String(body?.id||crypto.randomUUID());if(current.yoloTournaments.some(item=>item.id===id))throw Object.assign(new Error('A YOLO tournament with that ID already exists.'),{status:409,code:'LIFECYCLE_ID_CONFLICT'});const item=domainCall(()=>Tournament.YoloFormats.createTournament({id,title:body?.title,format:body?.format,settings:body?.settings||{}}));item.createdByDiscordUserId=principal.discordUserId;current.yoloTournaments.push(item);await options.saveState();return{id:item.id,title:item.title,format:item.format,lifecycle:item.lifecycle,stage:item.stage};});
     },
     async publishLifecycle(principal,body) {
       role(principal,['admin']);
