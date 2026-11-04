@@ -58,7 +58,7 @@
       }
       const list=D.$('admin-submissions');list.replaceChildren();
       if(!submissions.items.length)list.append(D.node('p','muted','No screenshot records in the archive yet.'));
-      for(const item of submissions.items)list.append(D.renderSubmission(item,{admin:true,roster:overview.roster,onDone:load}));
+      for(const item of submissions.items)list.append(D.renderSubmission(item,{admin:true,roster:overview.roster,tournaments:overview.tournaments||[],onDone:load}));
       status('Admin state loaded from the active tournament store.','success');
       updateSettingFields();
     }
