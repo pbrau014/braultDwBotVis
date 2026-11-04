@@ -5,6 +5,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const YoloFormats = require('./yolo-formats');
 
 const EVENTS = ['damage', 'kills', 'race', 'grand'];
 const EVENT_LABELS = { damage: 'Damage', kills: 'Kills', race: 'Race', grand: 'Grand Yolo' };
@@ -85,6 +86,8 @@ function normalizeState(input = {}) {
   return {
     version: 2,
     players,
+    // Existing v2 scores remain unclassified; only explicitly declared tournaments are added.
+    yoloTournaments: YoloFormats.normalizeTournamentCollection(input.yoloTournaments ?? input.yolo_tournaments),
     settings: normalizeSettings(input.settings),
     playerAccountLinks,
     importedBattleRecordIds: Array.isArray(input.importedBattleRecordIds) ? input.importedBattleRecordIds.filter(v => typeof v === 'string') : [],
@@ -266,7 +269,7 @@ function setSetting(state, event, field, value) {
   return n;
 }
 function makeWorkbookBackup(state) {
-  return { version: 2, exportedAt: new Date().toISOString(), players: clone(state.players), settings: clone(state.settings), importedBattleRecordIds: [...state.importedBattleRecordIds] };
+  return { version: 2, exportedAt: new Date().toISOString(), players: clone(state.players), settings: clone(state.settings), importedBattleRecordIds: [...state.importedBattleRecordIds], yoloTournaments: clone(state.yoloTournaments || []) };
 }
 function makeArchiveSnapshot(state) {
   return {
@@ -274,6 +277,7 @@ function makeArchiveSnapshot(state) {
     schema_version: 1,
     exported_at: new Date().toISOString(),
     workbook_backup: makeWorkbookBackup(state),
+    yolo_tournaments: clone(state.yoloTournaments || []),
     battle_records: clone(state.battleRecords),
     pending_submissions: clone(state.pendingSubmissions),
     pending_ocr_corrections: clone(state.pendingOcrCorrections || []),
@@ -289,8 +293,11 @@ function makePublicArchiveSnapshot(state) {
     'battle_records[].desktop_owner_role',
     'pending_submissions',
     'pending_ocr_corrections',
+    'yolo_tournaments[].registrations[].discordUserId',
   ];
   snapshot.player_account_links = {};
+  snapshot.yolo_tournaments = (snapshot.yolo_tournaments || []).map(YoloFormats.redactTournamentPrivateData);
+  if (snapshot.workbook_backup) snapshot.workbook_backup.yoloTournaments = (snapshot.workbook_backup.yoloTournaments || []).map(YoloFormats.redactTournamentPrivateData);
   snapshot.battle_records = snapshot.battle_records.map(entry => {
     const { desktop_owner_id, desktop_owner_role, ...publicEntry } = entry || {};
     return publicEntry;
@@ -314,6 +321,7 @@ function importBackup(raw) {
     state.pendingOcrCorrections = Array.isArray(raw.pending_ocr_corrections) ? raw.pending_ocr_corrections : [];
     state.playerAccountLinks = normalizePlayerAccountLinks(raw.player_account_links, state.players);
   }
+  state.yoloTournaments = YoloFormats.normalizeTournamentCollection(raw?.yolo_tournaments ?? raw?.yoloTournaments ?? source.yoloTournaments);
   return state;
 }
 function createStore(filePath) {
@@ -494,7 +502,7 @@ function deterministicBattleId(record) {
 }
 
 module.exports = {
-  EVENTS, EVENT_LABELS, CLASSES, DEFAULT_SETTINGS, normalizeClass, classWeightFor,
+  EVENTS, EVENT_LABELS, CLASSES, DEFAULT_SETTINGS, YoloFormats, normalizeClass, classWeightFor,
   MAX_PLAYERS, normalizeState, createState, findPlayer, findPlayerByDiscordUserId,
   linkPlayerDiscordAccount, unlinkPlayerDiscordAccount, addPlayer, removePlayer, renamePlayer,
   clearSlot, clearEvent, clearAllResults, eventTotal, eventScore, standings, getSlot, validateResult, recordResult, setSetting,

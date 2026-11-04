@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dwbotVis
+      - grand-yolo-format-implementation
   workflow_dispatch:
 
 permissions:
@@ -37,6 +38,8 @@ jobs:
           node --check src/bot.js
           node --check src/desktop-service.js
           node --check src/desktop-bridge.js
+          node --check src/tournament.js
+          node --check src/yolo-formats.js
           node --check src/desktop-test-preflight.js
           node --check src/ocrspace-client.js
           node --check src/ocrspace-quota-ledger.js
@@ -54,6 +57,8 @@ jobs:
         run: npm run preflight:desktop-test
       - name: Desktop service and bridge tests
         run: npm run test:desktop
+      - name: Pilot and Full YOLO lifecycle tests
+        run: npm run test:yolo-formats
       - name: Process-level JSON and SQLite recovery
         run: npm run test:persistence-recovery
       - name: Full project suite

@@ -7,6 +7,7 @@
   <title>DWBOT · Admin</title>
   <link rel="stylesheet" href="/desktop.css">
   <script src="/desktop.js" defer></script>
+  <script src="/help-tips.js" defer></script>
   <script src="/admin.js" defer></script>
 </head>
 <body>
@@ -16,7 +17,7 @@
     <div class="user-area"><span id="signed-in-user">Checking Discord…</span><button id="logout" class="button quiet small">Sign out</button></div>
   </header>
   <main class="page">
-    <section class="page-heading"><div><p class="eyebrow">ADMIN WORKSPACE</p><h1>Tournament control</h1><p class="lede small">Roster, account links, scoring, OCR review and recovery exports. Every mutation is authorized again by the Node service.</p></div><a class="button secondary" href="/api/admin/backup">Download full recovery JSON</a></section>
+    <section class="page-heading" data-help="Pilot YOLO is a single-evening event. Full YOLO is a multi-week or multi-month season. Create and publish format-specific rules only after the required organizer decisions are approved."><div><p class="eyebrow">ADMIN WORKSPACE</p><h1>Tournament control</h1><p class="lede small">Roster, account links, scoring, OCR review and recovery exports. Every mutation is authorized again by the Node service.</p></div><a class="button secondary" href="/api/admin/backup">Download full recovery JSON</a></section>
     <section id="admin-denied" class="notice warning hidden"><h2>Administrator access required</h2><p>This page and its operations are restricted to Discord IDs listed in <code>TOURNAMENT_ADMIN_IDS</code> in the local bot environment.</p></section>
     <section id="admin-content" class="hidden">
       <div class="metric-grid">
@@ -28,7 +29,7 @@
       <div class="content-grid">
         <section class="panel">
           <div class="panel-heading"><div><p class="eyebrow">PARTICIPANTS</p><h2>Roster management</h2></div></div>
-          <form id="add-player-form" class="inline-form"><label>New player name<input name="name" maxlength="80" required placeholder="[CLAN]PlayerName"></label><button class="button primary" type="submit">Add player</button></form>
+          <form id="add-player-form" class="inline-form" data-help="Roster players are shared identities. A Pilot or Full tournament registration is a separate record and must be explicitly created for that format."><label>New player name<input name="name" maxlength="80" required placeholder="[CLAN]PlayerName"></label><button class="button primary" type="submit">Add player</button></form>
           <div class="table-wrap"><table><thead><tr><th>ID</th><th>Player</th><th>Discord account link</th></tr></thead><tbody id="roster-body"></tbody></table></div>
           <form id="link-player-form" class="form-grid compact-form">
             <label>Roster player<select name="playerId" id="link-player-select" required></select></label>
@@ -38,7 +39,7 @@
         </section>
         <section class="panel">
           <div class="panel-heading"><div><p class="eyebrow">MANUAL ENTRY</p><h2>Record a tournament result</h2></div></div>
-          <form id="manual-result-form" class="form-grid">
+          <form id="manual-result-form" class="form-grid" data-help="This form writes to the existing individual scoring categories. It does not create a Full YOLO match outcome, fixture, season-stage result or Race side-event record.">
             <label>Player<select name="playerId" id="score-player-select" required></select></label>
             <label>Event<select name="event" required><option value="damage">Damage</option><option value="kills">Kills</option><option value="race">Race</option><option value="grand">Grand Yolo</option></select></label>
             <label>Game number<input name="gameNumber" type="number" min="1" max="7" step="1" required></label>
@@ -53,12 +54,23 @@
       </div>
       <section class="panel">
         <div class="panel-heading"><div><p class="eyebrow">SCORING CONFIGURATION</p><h2>Event settings</h2><p class="muted">Grand Yolo defaults to tierWeight 0.9. The workbook’s Totals!H12 formula remains =0.54*G12/100.</p></div></div>
-        <form id="settings-form" class="form-grid compact-form">
+        <form id="settings-form" class="form-grid compact-form" data-help="These settings affect the legacy individual-score workbook model. They are not a substitute for a published, versioned Full YOLO match-outcome method.">
           <label>Event<select name="event" id="setting-event"><option value="damage">Damage</option><option value="kills">Kills</option><option value="race">Race</option><option value="grand">Grand Yolo</option></select></label>
           <label>Setting<select name="field" id="setting-field"></select></label>
           <label>Value<input name="value" type="number" min="0" step="any" required></label>
           <button type="submit" class="button secondary">Update setting</button>
         </form>
+      </section>
+      <section class="panel" id="yolo-format-management" data-help="Create Pilot or Full YOLO tournament records here. Publication is blocked until the format-specific settings and organizer approval are complete.">
+        <div class="panel-heading"><div><p class="eyebrow">TOURNAMENT FORMATS</p><h2>Pilot and Full YOLO lifecycle</h2><p class="muted">Pilot is a single-evening event. Full YOLO is a season with Regular Season, Postseason and Grand YOLO Finale.</p></div></div>
+        <form id="yolo-tournament-form" class="form-grid">
+          <label>Tournament title<input name="title" maxlength="100" required placeholder="Example: Winter YOLO Season"></label>
+          <label>Format<select name="format" required><option value="pilot">Pilot YOLO - single evening</option><option value="full">Full YOLO - season</option></select></label>
+          <label class="span-all">Format settings JSON<textarea name="settings" rows="6" required placeholder='{"timezone":"America/Chicago","...":"Complete every required field before publication"}'></textarea></label>
+          <button type="submit" class="button primary span-all">Create draft tournament</button>
+        </form>
+        <label>Organizer approval JSON (required to publish)<textarea id="yolo-approval-json" rows="3" placeholder='{"approvedBy":"...","approvedAt":"...","rulesVersion":"...","rulesHash":"..."}'></textarea></label>
+        <div id="yolo-tournament-list" class="submission-list"><p class="muted">Loading Pilot and Full tournaments…</p></div>
       </section>
       <section class="panel">
         <div class="panel-heading"><div><p class="eyebrow">SCREENSHOT QUEUE</p><h2>OCR submissions and approvals</h2><p class="muted">Admin can review all records. Participants cannot view another account’s submissions.</p></div><a class="button secondary small" href="/upload.html">Upload on behalf of player</a></div>
