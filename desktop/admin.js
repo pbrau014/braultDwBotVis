@@ -107,7 +107,7 @@
       e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
       const id=form.elements.id.value.trim(),format=form.elements.format.value;
       const body={id,name:form.elements.name.value.trim(),format};
-      if(format==='full')body.season={id:id+'-season',durationWeeks:Number(form.elements.durationWeeks.value)};
+      if(format==='full')body.season={id:id.slice(0,56)+'-season',durationWeeks:Number(form.elements.durationWeeks.value)};
       try{await D.api('/api/admin/yolo-tournaments',{method:'POST',body});form.reset();updateFormatFields();await load();}
       catch(error){status(error.message,'error');}finally{button.disabled=false;}
     });
