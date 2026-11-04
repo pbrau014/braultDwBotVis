@@ -2,14 +2,13 @@
 const path = require('node:path');
 const { recognizeCrop, MAX_FREE_FILE_BYTES } = require('./ocrspace-client');
 const { OcrSpaceQuotaLedger } = require('./ocrspace-quota-ledger');
-function isEnabled(v) { return String(v || '').trim() === '1'; }
+function isEnabled(v, apiKey) { return String(v || '').trim() !== '0' && Boolean(String(apiKey || '').trim()); }
 function parseCropCap(v) { const n = Number(v); return Number.isFinite(n) ? Math.max(1, Math.min(7, Math.floor(n))) : 2; }
 /** Sends only pre-localized crops. Returned text stays separate from all exact-value candidate lists. */
 async function collectOcrSpaceFieldEvidence({ env = process.env, cropPlan = [], buildCrop, fetchImpl = globalThis.fetch,
     quotaLedger = null, client = recognizeCrop, now = () => new Date() }) {
-    if (!isEnabled(env.OCRSPACE_ENABLED)) return { status: 'disabled', reason: 'OCRSPACE_ENABLED is not 1', requests: 0, evidence: [] };
     const apiKey = String(env.OCRSPACE_API_KEY || '').trim();
-    if (!apiKey) return { status: 'disabled', reason: 'OCRSPACE_API_KEY is not configured', requests: 0, evidence: [] };
+    if (!isEnabled(env.OCRSPACE_ENABLED, apiKey)) return { status: 'disabled', reason: String(env.OCRSPACE_ENABLED || '').trim() === '0' ? 'OCRSPACE_ENABLED is explicitly disabled' : 'OCRSPACE_API_KEY is not configured', requests: 0, evidence: [] };
     if (typeof buildCrop !== 'function') return { status: 'skipped', reason: 'crop builder unavailable', requests: 0, evidence: [] };
     const max = parseCropCap(env.OCRSPACE_MAX_CROPS);
     const budget = Math.max(1000, Math.min(30000, Number(env.OCRSPACE_STAGE_BUDGET_MS) || 20000));
