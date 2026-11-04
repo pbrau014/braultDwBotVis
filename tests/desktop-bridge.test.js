@@ -36,6 +36,7 @@ async function fixture(t,options={}){
     async createYoloFixture(p,id,body){actions.push({name:'yolo-fixture',id,body});return{id:body.id};},
     async createYoloMatch(p,id,body){actions.push({name:'yolo-match',id,body});return{id:body.id};},
     async createYoloGame(p,id,body){actions.push({name:'yolo-game',id,body});return{id:body.id};},
+    async certifyYoloMatchOutcome(p,id,body){actions.push({name:'yolo-outcome',id,body});return{matchId:id};},
     async linkYoloGameEvidence(p,id,body){actions.push({name:'yolo-evidence-link',id,body});return{status:'awaiting-evidence-review'};},
     async reviewYoloGameEvidence(p,id,body){actions.push({name:'yolo-evidence-review',id,body});return{status:'evidence-accepted'};},
     async registerYoloParticipant(p,id,body){actions.push({name:'yolo-register',id,body,role:p.role});return{registered:true};},
@@ -190,10 +191,11 @@ test('team match game and evidence review APIs are restricted to authenticated A
   ['/api/admin/yolo-event-nights/night-1/fixtures',{id:'fixture-a',homeTeamId:'team-a',awayTeamId:'team-b',scheduledAt:'2026-11-09T18:00:00Z'}],
   ['/api/admin/yolo-fixtures/fixture-a/matches',{id:'match-a',matchNumber:1}],
   ['/api/admin/yolo-matches/match-a/games',{id:'game-a',gameNumber:1}],
+  ['/api/admin/yolo-matches/match-a/outcome',{winnerTeamId:'team-a',approvedScoringMethodId:'approved',acceptedPerformanceRecordIds:['r1'],aggregation:'sum',rounding:'nearest',tieBreakOrder:['head-to-head'],decisionReference:'ref'}],
   ['/api/admin/yolo-games/game-a/evidence',{recordId:'record-a'}],
   ['/api/admin/yolo-games/game-a/evidence-review',{accepted:true}],
  ];
- for(const [url,body] of calls){const res=await fetch(f.origin+url,{method:'POST',headers,body:JSON.stringify(body)});assert.equal(res.status,body.scheduledAt?201:(url.endsWith('/evidence')?200:(url.endsWith('/evidence-review')?200:201)),url);}
+ for(const [url,body] of calls){const res=await fetch(f.origin+url,{method:'POST',headers,body:JSON.stringify(body)});assert.equal(res.status,body.scheduledAt?201:(url.endsWith('/evidence')?200:(url.endsWith('/evidence-review')||url.endsWith('/outcome')?200:201)),url);}
  const player=await login(f.origin,'player');
  const denied=await fetch(f.origin+'/api/admin/yolo-event-nights/night-1/teams',{method:'POST',headers:{Cookie:player.cookie,Origin:f.origin,'X-CSRF-Token':player.session.csrfToken,'Content-Type':'application/json'},body:'{}'});
  assert.equal(denied.status,403);
