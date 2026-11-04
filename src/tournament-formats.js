@@ -151,6 +151,7 @@ function assignTeam(tournament, teamInput, actor = 'organizer') {
 }
 
 function lockRoster(tournament, teamId, actor = 'organizer') {
+  if (tournament.config.registrationOpen) throw new Error('Close registration before locking team rosters.');
   const team = tournament.teams.find(t => t.id === String(teamId));
   if (!team) throw new Error('Team was not found.');
   team.rosterLocked = true;
@@ -189,6 +190,9 @@ function activateStage(tournament, stageKey, actor = 'organizer') {
   if (index < 0) throw new Error('Stage does not belong to this tournament format.');
   if (index > 0 && tournament.stages[index - 1].status !== STATUS.COMPLETE) throw new Error('The preceding stage must be complete before this stage begins.');
   if (![STATUS.PUBLISHED, STATUS.ACTIVE].includes(tournament.status)) throw new Error('Tournament must be published before a stage can begin.');
+  if (tournament.config.registrationOpen) throw new Error('Close registration before starting the event stage.');
+  if (tournament.format === FORMAT.FULL && stageKey === STAGES.REGULAR_SEASON && (!tournament.teams.length || tournament.teams.some(team => !team.rosterLocked)))
+    throw new Error('Full YOLO regular season requires all team rosters to be locked.');
   const stage = tournament.stages[index];
   stage.status = STATUS.ACTIVE;
   stage.startedAt = now();
@@ -200,6 +204,8 @@ function activateStage(tournament, stageKey, actor = 'organizer') {
 function completeStage(tournament, stageKey, actor = 'organizer') {
   const stage = tournament.stages.find(s => s.key === stageKey);
   if (!stage || stage.status !== STATUS.ACTIVE) throw new Error('Only an active stage can be completed.');
+  if (tournament.format === FORMAT.FULL && !tournament.fixtures.some(f => f.stageKey === stageKey))
+    throw new Error('A Full YOLO stage requires at least one resolved fixture before completion.');
   if (tournament.fixtures.some(f => f.stageKey === stageKey && (!f.matchId || !['complete','forfeit','bye'].includes(f.status)))) {
     throw new Error('All fixtures in the stage must have a resolved match or approved bye before completion.');
   }
@@ -242,7 +248,7 @@ function createMatch(tournament, fixtureId, actor = 'organizer') {
   return match;
 }
 
-function recordGame(match, game, teams = []) {
+function recordGame(match, game, teams = [], registrations = []) {
   if (match.status !== 'scheduled' && match.status !== 'active') throw new Error('Match is not open for game results.');
   const gameNumber = Number(game.gameNumber);
   if (!Number.isInteger(gameNumber) || gameNumber < 1) throw new Error('Game number must be a positive integer.');
@@ -259,6 +265,8 @@ function recordGame(match, game, teams = []) {
   if (teams.length) {
     const team = teams.find(item => item.id === result.teamId);
     if (!team || !team.rosterLocked || !team.playerIds.includes(result.playerId)) throw new Error('Game player must belong to the locked roster of the recorded team.');
+    if (registrations.length && !registrations.some(item => item.playerId === result.playerId && item.status === 'registered'))
+      throw new Error('Game player must have an active registration.');
   }
   match.games.push(result);
   match.status = 'active';
@@ -355,7 +363,7 @@ function freezeSettings(tournament, changes, actor = 'organizer') {
   const active = tournament.stages.find(s => s.status === STATUS.ACTIVE);
   if (active && tournament.config.settingsFreeze) {
     audit(tournament, 'settings_change_blocked', { stageKey: active.key, changes }, actor);
-    throw new Error('Settings are frozen for the active stage. Apply changes prospectively to a future stage or event.');
+    return { blocked: true, reason: 'Settings are frozen for the active stage. Apply changes prospectively to a future stage or event.' };
   }
   audit(tournament, 'settings_changed', { changes, effectiveScope: 'future_unplayed_games' }, actor);
   return { effectiveScope: 'future_unplayed_games' };
