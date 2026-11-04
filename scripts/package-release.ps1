@@ -15,10 +15,15 @@ $tracked=@(& git -C $ProjectRoot ls-files); if($LASTEXITCODE -ne 0 -or !$tracked
 $included=@()
 foreach($rel in $tracked){$n=$rel -replace '\\','/'; if($n -match '(^|/)(node_modules|\.git|\.cache|coverage|release-artifacts|persistence-recovery)(/|$)'){continue}; if($n -match '(^|/)\.env($|\.)'){continue}; if($n -match '(^|/)(tournament-state|live-discord-state)(/|$)'){continue}; $src=Join-Path $ProjectRoot $rel; if(!(Test-Path -LiteralPath $src -PathType Leaf)){throw "Missing tracked file $rel"}; $dst=Join-Path $stage $rel; New-Item -ItemType Directory -Force -Path (Split-Path -Parent $dst)|Out-Null; Copy-Item -LiteralPath $src -Destination $dst; $included+=$rel}
 if(!($included -contains 'package.json') -or !($included -contains 'package-lock.json')){throw 'Node manifests missing'}
+$pdfSource=Join-Path $OutputRoot 'DWBOT_LOCAL_OPERATIONS_AND_RELEASE_VERIFICATION_MANUAL_2026-11-04.pdf'
+if(!(Test-Path -LiteralPath $pdfSource -PathType Leaf)){throw 'Rendered PDF manual is missing; package cannot be release-verified'}
+$pdfRel='docs/iteration23/DWBOT_LOCAL_OPERATIONS_AND_RELEASE_VERIFICATION_MANUAL_2026-11-04.pdf'
+$pdfDest=Join-Path $stage $pdfRel; New-Item -ItemType Directory -Force -Path (Split-Path -Parent $pdfDest)|Out-Null; Copy-Item -LiteralPath $pdfSource -Destination $pdfDest; $included+=$pdfRel
 $entries=@($included|Sort-Object|ForEach-Object{$p=Join-Path $stage $_; [pscustomobject]@{path=$_;sizeBytes=(Get-Item $p).Length;sha256=(Get-FileHash $p -Algorithm SHA256).Hash.ToLowerInvariant()}})
 $manifest=@{schemaVersion=1;sourceCommit=$commit;createdAt=(Get-Date).ToUniversalTime().ToString('o');excluded=@('.env*','node_modules','.git','.cache','coverage','runtime state/databases','private backups');files=$entries}
 $manifest|ConvertTo-Json -Depth 6|Set-Content -LiteralPath (Join-Path $stage 'RELEASE_PACKAGE_MANIFEST.json') -Encoding utf8
-Compress-Archive -Path (Join-Path $stage '*') -DestinationPath $zip -CompressionLevel Optimal
+$archiveInputs=@(Get-ChildItem -LiteralPath $stage -Force | Select-Object -ExpandProperty FullName)
+Compress-Archive -Path $archiveInputs -DestinationPath $zip -CompressionLevel Optimal
 $zipHash=(Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant(); "$zipHash  $(Split-Path -Leaf $zip)"|Set-Content ($zip+'.sha256') -Encoding ascii
 $extract=Join-Path $OutputRoot ('verify-'+$commit.Substring(0,12)); if(Test-Path $extract){Remove-Item $extract -Recurse -Force}; Expand-Archive -LiteralPath $zip -DestinationPath $extract
 $listed=& tar.exe -tf $zip; if($LASTEXITCODE -ne 0){throw 'ZIP integrity failed'}
