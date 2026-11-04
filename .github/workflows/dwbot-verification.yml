@@ -109,7 +109,7 @@ jobs:
           $opencvPython = Join-Path $venv 'Scripts\\python.exe'
           & $opencvPython -m pip install --disable-pip-version-check --no-warn-script-location --only-binary=:all: opencv-python-headless==4.10.0.84
           if ($LASTEXITCODE -ne 0) { throw 'Could not install the pinned OpenCV wheel.' }
-          & $opencvPython -c 'import cv2, numpy; print("OpenCV", cv2.__version__, "NumPy", numpy.__version__)'
+          & $opencvPython -c 'import cv2, numpy; print(cv2.__version__, numpy.__version__)'
           if ($LASTEXITCODE -ne 0) { throw 'OpenCV geometry runtime failed its import check.' }
           "OPENCV_PYTHON_BIN=$opencvPython" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
       - name: Install locked dependencies
