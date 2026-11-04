@@ -288,6 +288,12 @@ function createDesktopService(options = {}) {
           case 'register_participant':
             if(!tournament) throw new Error('Tournament ID is required.');
             result=TournamentFormats.registerParticipant(tournament,body.participant||{},actor);break;
+          case 'close_registration':
+            if(!tournament) throw new Error('Tournament ID is required.');
+            result=TournamentFormats.closeRegistration(tournament,actor);break;
+          case 'withdraw_participant':
+            if(!tournament) throw new Error('Tournament ID is required.');
+            result=TournamentFormats.withdrawParticipant(tournament,body.playerId,body.reason,actor);break;
           case 'create_team':
             if(!tournament) throw new Error('Tournament ID is required.');
             result=TournamentFormats.assignTeam(tournament,body.team||{},actor);break;
@@ -313,13 +319,16 @@ function createDesktopService(options = {}) {
             if(!tournament) throw new Error('Tournament ID is required.');
             const match=tournament.matches.find(item=>item.id===String(body.matchId));
             if(!match) throw new Error('Match was not found.');
-            result=TournamentFormats.recordGame(match,body.game||{});
+            result=TournamentFormats.recordGame(match,body.game||{},tournament.teams);
             TournamentFormats.audit(tournament,'match_game_recorded',{matchId:match.id,gameNumber:result.gameNumber},actor);
             break;
           }
           case 'complete_match':
             if(!tournament) throw new Error('Tournament ID is required.');
             result=TournamentFormats.completeMatch(tournament,body.matchId,body.options||{},actor);break;
+          case 'resolve_forfeit':
+            if(!tournament) throw new Error('Tournament ID is required.');
+            result=TournamentFormats.resolveForfeit(tournament,body.matchId,body.winnerTeamId,body.reason,body.evidenceId,actor);break;
           case 'race_side_event':
             if(!tournament) throw new Error('Tournament ID is required.');
             result=TournamentFormats.recordRaceSideEvent(tournament,body.event||{},actor);break;
