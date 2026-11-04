@@ -76,7 +76,8 @@
       if(!submissions.items.length)list.append(D.node('p','muted','No screenshot records in the archive yet.'));
       for(const item of submissions.items)list.append(D.renderSubmission(item,{admin:true,roster:overview.roster,onDone:load}));
       status('Admin state loaded from the active tournament store.','success');
-      updateSettingFields();\n      updateStageFields();
+      updateSettingFields();
+      updateStageFields();
     }
     const formatSelect=D.$('yolo-format-select'),durationWrap=D.$('yolo-duration-wrap');
     function updateFormatFields(){durationWrap.classList.toggle('hidden',formatSelect.value!=='full');}
