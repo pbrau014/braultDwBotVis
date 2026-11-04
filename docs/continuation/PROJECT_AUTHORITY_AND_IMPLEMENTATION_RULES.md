@@ -18,7 +18,10 @@ Distinguish facts, assumptions, inferred design, and uncertainty. Never invent a
 - The existing Node.js Discord bot, its persistence, permissions, tournament rules and scoring functions remain authoritative.
 - Preserve exactly nine mandatory OCR fields in order: `result`, `player`, `map`, `mode`, `battleStart`, `credits`, `freeXp`, `damage`, `xp`. XP is mandatory and ninth/final.
 - Missing, invalid, ambiguous, conflicting or incorrect mandatory values block acceptance. Do not fuzzy-correct values or modify approved ground truth to create a pass.
-- Tesseract.js remains the baseline. OpenCV proposes geometry only. PaddleOCR and OCR.space remain optional evidence sources and may not independently accept fields.
+- Prefer an appropriate configured non-local OCR API for OCR evidence when a suitable free service is available; the selected DWBOT provider is OCR.space Free API. Do not silently substitute a paid service or unrelated provider. Keep provider credentials local and never commit them.
+- OCR.space is the preferred remote evidence source for unresolved, pre-localized crops. Do not upload full screenshots by default. Keep remote output isolated as diagnostic evidence; it cannot independently accept, rewrite, normalize, or fuzzy-correct mandatory fields.
+- Tesseract.js remains the local baseline and must continue to work when the API is unavailable, unconfigured, rate-limited, or over budget. OpenCV proposes geometry/ROI only. PaddleOCR remains an optional local comparison/fallback engine.
+- Record whether API use was configured, attempted, succeeded, failed, or skipped. Mock tests are not live-provider verification; never claim a live request or accuracy benefit without measured evidence.
 - Preserve original archives and prior test reports. New reports must be tied to the actual source/runtime tested.
 
 ## Security and browser-interface boundary
