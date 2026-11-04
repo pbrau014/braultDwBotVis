@@ -1,0 +1,118 @@
+
+> wows-yolo-tourney-discord-bot@2.5.0 test:tesseractjs
+> node scripts/accept-tesseractjs.js
+
+
+[ACCEPTANCE] START unit-and-contract-tests
+[ACCEPTANCE] PASS unit-and-contract-tests; exit=0; elapsed=1946ms; log=testdata/ocr-acceptance/2026-10-25T03-20-04-937Z-47361/unit-and-contract-tests.log
+# pass 33
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1899.889403
+
+[ACCEPTANCE] START local-asset-package-check
+[ACCEPTANCE] PASS local-asset-package-check; exit=0; elapsed=65ms; log=testdata/ocr-acceptance/2026-10-25T03-20-04-937Z-47361/local-asset-package-check.log
+      "sizeBytes": 3954569,
+      "sha256": "9d7c43fb206dc9f48475228b46bf35f888fa9e6259da2e67d5a75c77049f2dc7"
+    }
+  ],
+  "allAssetsPresent": true
+}
+
+[ACCEPTANCE] START deliberately-wrong-expected-value-must-fail
+[ACCEPTANCE] FAIL deliberately-wrong-expected-value-must-fail; exit=1; elapsed=29674ms; log=testdata/ocr-acceptance/2026-10-25T03-20-04-937Z-47361/deliberately-wrong-expected-value-must-fail.log
+[OCR-SEQUENCE] TEST-ONLY expected override: reported.damage=87313
+[OCR-SEQUENCE] 1/1 START reported
+[OCR-SEQUENCE] FAIL reported 29606ms (exact=false, missing=0)
+[OCR-SEQUENCE] Report: /mnt/data/phase1_work/wows-yolo-tournament-discord-bot/testdata/ocr-acceptance/2026-10-25T03-20-04-937Z-47361/negative-expected-value.json
+[OCR-SEQUENCE] Summary 1/1 completed, 0/1 exact, 1/1 complete-required-fields
+[OCR-SUPERVISOR] child pid=47504 close code=0 signal=
+[ACCEPTANCE] PASS negative expected-value test; verified=true
+
+[ACCEPTANCE] START integrated-real-recognition-stall-recovery
+[ACCEPTANCE] PASS integrated-real-recognition-stall-recovery; exit=0; elapsed=47773ms; log=testdata/ocr-acceptance/2026-10-25T03-20-04-937Z-47361/integrated-real-recognition-stall-recovery.log
+[INTEGRATED-CHILD:real-image-recovery:stdout] [OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[INTEGRATED-CHILD:real-image-recovery:stdout] [OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":1}
+[INTEGRATED-CHILD:real-image-recovery:stdout] [OCR-WORKER] {"event":"worker-terminated","confirmed":true,"exitCode":1}
+[INTEGRATED-STALL] real-image-recovery child closed 0 after 29739ms
+[INTEGRATED-STALL] PASS: genuine first recognition completed; injected second recognition stalled; watchdog timeout fired; worker termination confirmed; failed child closed; fresh real-image recovery passed 9/9 exact and all required fields; no network attempts.
+[INTEGRATED-STALL] Report: /mnt/data/phase1_work/wows-yolo-tournament-discord-bot/testdata/phase1-evidence/integrated-stall-recovery-2026-10-25T03-20-36-701Z-47705/report.json
+[OCR-SUPERVISOR] child pid=47719 close code=1 signal=
+[OCR-SUPERVISOR] child pid=47751 close code=0 signal=
+
+[ACCEPTANCE] START reported-screenshot-no-network
+[ACCEPTANCE] PASS reported-screenshot-no-network; exit=0; elapsed=30337ms; log=testdata/ocr-acceptance/2026-10-25T03-20-04-937Z-47361/reported-screenshot-no-network.log
+    }
+  },
+  "allExpectedFieldsPass": true,
+  "requiredMissing": [],
+  "ambiguities": {}
+}
+[OCR-SUPERVISOR] child pid=47923 close code=0 signal=
+
+[ACCEPTANCE] START five-image-sequential-no-network-1
+[ACCEPTANCE] PASS five-image-sequential-no-network-1; exit=0; elapsed=147649ms; log=testdata/ocr-acceptance/2026-10-25T03-20-04-937Z-47361/five-image-sequential-no-network-1.log
+[OCR-SEQUENCE] 4/5 START libertad-victory.jpg
+[OCR-SEQUENCE] PASS libertad-victory.jpg 29352ms (exact=true, missing=0)
+[OCR-SEQUENCE] 5/5 START schlieffen-defeat.jpg
+[OCR-SEQUENCE] PASS schlieffen-defeat.jpg 32741ms (exact=true, missing=0)
+[OCR-SEQUENCE] Report: /mnt/data/phase1_work/wows-yolo-tournament-discord-bot/testdata/ocr-acceptance/2026-10-25T03-20-04-937Z-47361/five-image-sequence-1.json
+[OCR-SEQUENCE] Summary 5/5 completed, 5/5 exact, 5/5 complete-required-fields
+[OCR-SUPERVISOR] child pid=48258 close code=0 signal=
+[OCR-SUPERVISOR] child pid=48422 close code=0 signal=
+[OCR-SUPERVISOR] child pid=48578 close code=0 signal=
+[OCR-SUPERVISOR] child pid=48760 close code=0 signal=
+
+[ACCEPTANCE] START five-image-sequential-no-network-2
+[ACCEPTANCE] PASS five-image-sequential-no-network-2; exit=0; elapsed=147848ms; log=testdata/ocr-acceptance/2026-10-25T03-20-04-937Z-47361/five-image-sequential-no-network-2.log
+[OCR-SEQUENCE] 4/5 START libertad-victory.jpg
+[OCR-SEQUENCE] PASS libertad-victory.jpg 29463ms (exact=true, missing=0)
+[OCR-SEQUENCE] 5/5 START schlieffen-defeat.jpg
+[OCR-SEQUENCE] PASS schlieffen-defeat.jpg 33307ms (exact=true, missing=0)
+[OCR-SEQUENCE] Report: /mnt/data/phase1_work/wows-yolo-tournament-discord-bot/testdata/ocr-acceptance/2026-10-25T03-20-04-937Z-47361/five-image-sequence-2.json
+[OCR-SEQUENCE] Summary 5/5 completed, 5/5 exact, 5/5 complete-required-fields
+[OCR-SUPERVISOR] child pid=49122 close code=0 signal=
+[OCR-SUPERVISOR] child pid=49344 close code=0 signal=
+[OCR-SUPERVISOR] child pid=49530 close code=0 signal=
+[OCR-SUPERVISOR] child pid=49720 close code=0 signal=
+
+[ACCEPTANCE] START five-image-sequential-no-network-3
+[ACCEPTANCE] PASS five-image-sequential-no-network-3; exit=0; elapsed=149401ms; log=testdata/ocr-acceptance/2026-10-25T03-20-04-937Z-47361/five-image-sequential-no-network-3.log
+[OCR-SEQUENCE] 4/5 START libertad-victory.jpg
+[OCR-SEQUENCE] PASS libertad-victory.jpg 30121ms (exact=true, missing=0)
+[OCR-SEQUENCE] 5/5 START schlieffen-defeat.jpg
+[OCR-SEQUENCE] PASS schlieffen-defeat.jpg 33456ms (exact=true, missing=0)
+[OCR-SEQUENCE] Report: /mnt/data/phase1_work/wows-yolo-tournament-discord-bot/testdata/ocr-acceptance/2026-10-25T03-20-04-937Z-47361/five-image-sequence-3.json
+[OCR-SEQUENCE] Summary 5/5 completed, 5/5 exact, 5/5 complete-required-fields
+[OCR-SUPERVISOR] child pid=50098 close code=0 signal=
+[OCR-SUPERVISOR] child pid=50282 close code=0 signal=
+[OCR-SUPERVISOR] child pid=50448 close code=0 signal=
+[OCR-SUPERVISOR] child pid=50638 close code=0 signal=
+
+[ACCEPTANCE] START hoffmann-then-asashio-no-network
+[ACCEPTANCE] PASS hoffmann-then-asashio-no-network; exit=0; elapsed=55050ms; log=testdata/ocr-acceptance/2026-10-25T03-20-04-937Z-47361/hoffmann-then-asashio-no-network.log
+[OCR-SEQUENCE] 1/2 START hoffmann-victory.png
+[OCR-SEQUENCE] PASS hoffmann-victory.png 28781ms (exact=true, missing=0)
+[OCR-SEQUENCE] 2/2 START asashio-defeat.jpg
+[OCR-SEQUENCE] PASS asashio-defeat.jpg 26204ms (exact=true, missing=0)
+[OCR-SEQUENCE] Report: /mnt/data/phase1_work/wows-yolo-tournament-discord-bot/testdata/ocr-acceptance/2026-10-25T03-20-04-937Z-47361/hoffmann-asashio.json
+[OCR-SEQUENCE] Summary 2/2 completed, 2/2 exact, 2/2 complete-required-fields
+[OCR-SUPERVISOR] child pid=50838 close code=0 signal=
+[OCR-SUPERVISOR] child pid=51016 close code=0 signal=
+
+[ACCEPTANCE] START asashio-then-hoffmann-no-network
+[ACCEPTANCE] PASS asashio-then-hoffmann-no-network; exit=0; elapsed=56368ms; log=testdata/ocr-acceptance/2026-10-25T03-20-04-937Z-47361/asashio-then-hoffmann-no-network.log
+[OCR-SEQUENCE] 1/2 START asashio-defeat.jpg
+[OCR-SEQUENCE] PASS asashio-defeat.jpg 26848ms (exact=true, missing=0)
+[OCR-SEQUENCE] 2/2 START hoffmann-victory.png
+[OCR-SEQUENCE] PASS hoffmann-victory.png 29451ms (exact=true, missing=0)
+[OCR-SEQUENCE] Report: /mnt/data/phase1_work/wows-yolo-tournament-discord-bot/testdata/ocr-acceptance/2026-10-25T03-20-04-937Z-47361/asashio-hoffmann.json
+[OCR-SEQUENCE] Summary 2/2 completed, 2/2 exact, 2/2 complete-required-fields
+[OCR-SUPERVISOR] child pid=51192 close code=0 signal=
+[OCR-SUPERVISOR] child pid=51364 close code=0 signal=
+
+[ACCEPTANCE] Report: testdata/ocr-acceptance/2026-10-25T03-20-04-937Z-47361/acceptance-report.json
+[ACCEPTANCE] Report SHA-256: abde2ea8fd7331c92734ef716ee00a4a10c53f12dcc2e177ecbf62cfea5b07e0
+[ACCEPTANCE] Summary 10/10 commands passed; blocked network attempts=no

@@ -1,0 +1,268 @@
+Initializing Tesseract OCR (language: eng)...
+Tesseract OCR is ready.
+[OCR] pass 1 start (PSM 3, 413051 bytes)
+[OCR-WORKER] {"event":"worker-initialized"}
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":0}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+Detected 39 diacritics
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":1249}
+[OCR] pass 1 done in 1467 ms
+[OCR] pass 2 start (PSM 11, 413051 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":0}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+Detected 16 diacritics
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":1359}
+[OCR] pass 2 done in 1359 ms
+[OCR] pass 3 start (PSM 6, 208607 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":2}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":502}
+[OCR] pass 3 done in 505 ms
+[OCR] pass 4 start (PSM 11, 208607 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":2}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":540}
+[OCR] pass 4 done in 543 ms
+[OCR] pass 5 start (PSM 6, 434065 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":4}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":1487}
+[OCR] pass 5 done in 1493 ms
+[OCR] pass 6 start (PSM 6, 155918 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":1}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":313}
+[OCR] pass 6 done in 314 ms
+[OCR] pass 7 start (PSM 6, 66831 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":1}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":224}
+[OCR] pass 7 done in 225 ms
+[OCR] pass 8 start (PSM 11, 66831 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":0}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":277}
+[OCR] pass 8 done in 278 ms
+[OCR] pass 9 start (PSM 6, 367741 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":2}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":661}
+[OCR] pass 9 done in 663 ms
+[OCR] pass 10 start (PSM 11, 367741 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":1}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":642}
+[OCR] pass 10 done in 643 ms
+[OCR] pass 11 start (PSM 6, 79263 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":0}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":275}
+[OCR] pass 11 done in 276 ms
+[OCR] pass 12 start (PSM 11, 79263 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":1}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":245}
+[OCR] pass 12 done in 246 ms
+[OCR] pass 13 start (PSM 7, 97110 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":1}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":114}
+[OCR] pass 13 done in 115 ms
+[OCR] pass 14 start (PSM 8, 97110 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":1}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":111}
+[OCR] pass 14 done in 113 ms
+[OCR] pass 15 start (PSM 7, 246078 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":4}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":177}
+[OCR] pass 15 done in 182 ms
+[OCR] pass 16 start (PSM 8, 246078 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":0}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":179}
+[OCR] pass 16 done in 179 ms
+[OCR] pass 17 start (PSM 6, 93268 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":0}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":245}
+[OCR] pass 17 done in 246 ms
+[OCR] pass 18 start (PSM 11, 93268 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":1}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":286}
+[OCR] pass 18 done in 287 ms
+[OCR] pass 19 start (PSM 6, 93393 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":0}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":242}
+[OCR] pass 19 done in 246 ms
+[OCR] pass 20 start (PSM 7, 93393 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":2}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":103}
+[OCR] pass 20 done in 105 ms
+[OCR] pass 21 start (PSM 11, 93393 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":2}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":249}
+[OCR] pass 21 done in 251 ms
+[OCR] pass 22 start (PSM 6, 39595 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":0}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":142}
+[OCR] pass 22 done in 142 ms
+[OCR] pass 23 start (PSM 7, 39595 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":0}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":89}
+[OCR] pass 23 done in 90 ms
+[OCR] pass 24 start (PSM 11, 39595 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":0}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":96}
+[OCR] pass 24 done in 96 ms
+[OCR] pass 25 start (PSM 6, 46979 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":1}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":249}
+[OCR] pass 25 done in 250 ms
+[OCR] pass 26 start (PSM 6, 66343 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":1}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":138}
+[OCR] pass 26 done in 139 ms
+[OCR] pass 27 start (PSM 11, 46979 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":1}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":184}
+[OCR] pass 27 done in 185 ms
+[OCR] pass 28 start (PSM 11, 66343 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":1}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+Detected 26 diacritics
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":262}
+[OCR] pass 28 done in 263 ms
+[OCR] pass 29 start (PSM 6, 84187 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":4}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":251}
+[OCR] pass 29 done in 256 ms
+[OCR] pass 30 start (PSM 11, 84187 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":1}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":228}
+[OCR] pass 30 done in 229 ms
+[OCR] pass 31 start (PSM 6, 94986 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":0}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":353}
+[OCR] pass 31 done in 354 ms
+[OCR] pass 32 start (PSM 11, 94986 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":0}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":358}
+[OCR] pass 32 done in 358 ms
+[OCR] pass 33 start (PSM 6, 120597 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":1}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":175}
+[OCR] pass 33 done in 176 ms
+[OCR] pass 34 start (PSM 11, 120597 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":1}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+Detected 8 diacritics
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":353}
+[OCR] pass 34 done in 354 ms
+[OCR] pass 35 start (PSM 6, 193045 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":2}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":439}
+[OCR] pass 35 done in 443 ms
+[OCR] pass 36 start (PSM 6, 795520 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":1}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+Image too small to scale!! (2x36 vs min width of 3)
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":1791}
+[OCR] pass 36 done in 1793 ms
+Line cannot be recognized!!
+[OCR] pass 37 start (PSM 11, 795520 bytes)
+[OCR-WORKER] {"event":"operation-start","operation":"setParameters"}
+[OCR-WORKER] {"event":"operation-complete","operation":"setParameters","elapsedMs":3}
+[OCR-WORKER] {"event":"operation-start","operation":"recognize"}
+[OCR] Tesseract.js recognition nearing completion.
+[OCR-WORKER] {"event":"operation-complete","operation":"recognize","elapsedMs":1792}
+[OCR] pass 37 done in 1798 ms
