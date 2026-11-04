@@ -1289,3 +1289,38 @@ Next authorized order:
 ================================================================================
 END DWBOT-UPD-2026-11-04-004
 ================================================================================
+
+
+================================================================================
+DWBOT-UPD-2026-11-04-005 — OFFLINE DISCORD CONFIGURATION PREFLIGHT COMPLETE
+================================================================================
+
+Latest remote verification:
+- dwbotVis head: b75760d6b9ed2f6847c30a5f36227756533cced3.
+- main remains unchanged/read-only at 9981355e6895a6c24c3b59a78be57865fbecafbb.
+- Current dwbotVis tree: 886 entries / 810 files / 19 src files / 31 test files.
+
+Additional offline pre-live implementation:
+- Added src/discord-test-preflight.js, scripts/preflight-discord-test.js and discord-test-preflight.test.js.
+- Added npm scripts preflight:discord-test and expanded test:discord-preflight.
+- The local preflight checks runtime >=22.16, NODE_ENV development/test, token presence without returning/logging the token, target-channel and admin-ID snowflake syntax, JSON test storage, JSON/SQLite state path containment in testdata/live-discord-state, distinct state paths, and disabled slash/experimental features.
+- The preflight makes no network requests and does not claim token validity, Developer Portal intent toggle, actual bot membership, channel permissions or live Gateway readiness.
+- Ten configuration tests passed. The combined isolated test suite passed 21/21 on Node v22.16.0.
+- The script wrapper smoke test passed using a stubbed dotenv module and synthetic non-secret environment values. Actual dotenv loading and a real local .env were not tested.
+- Full npm test, full bot syntax check, clean npm ci, Windows/native tests and live Discord remain NOT RUN.
+
+Security remains urgent:
+- dwbotVis has a sanitized Image Text Reader HTML file with direct webhook posting removed.
+- The current main branch still contains the exposed webhook in the corresponding file. The owner must revoke/delete it in Discord immediately. The secret is not repeated here.
+- No main edit, PR merge or history rewrite was performed. Do not reuse the exposed webhook.
+
+Current phase disposition:
+- Discord offline preparation: implemented with focused tests; live readiness remains OPEN.
+- Current-branch OCR.space integration: NOT PRESENT; historical adapter results are not current-branch evidence.
+- Complete dependency restore and full test suite: OPEN.
+- Live Gateway, real admin/participant behavior, attachment delivery, reconnect/resume, REST 429 observation and restart recovery: OPEN.
+- Production: NO-GO.
+
+================================================================================
+END DWBOT-UPD-2026-11-04-005
+================================================================================
