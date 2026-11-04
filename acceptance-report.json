@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-25T03-31-59-739Z-51914",
+  "createdAt": "2026-10-25T03:38:07.425Z",
+  "package": {
+    "name": "wows-yolo-tourney-discord-bot",
+    "version": "2.5.0",
+    "engines": {
+      "node": ">=24.17.0"
+    },
+    "lockfileSha256": "efad3621991b05aaa53a793636d713040f40ad9ae404cbadac02b7401cbff3eb"
+  },
+  "sourceBuild": {
+    "sha256": "e1a34cf51ce20bab6acd5d78e9395234bc82a40b884d39b1ba4b4bb668115144",
+    "files": 46
+  },
+  "runtime": {
+    "node": "v22.16.0",
+    "npm": "npm/10.9.2 node/v22.16.0 linux x64 workspaces/false",
+    "platform": "linux",
+    "arch": "x64"
+  },
+  "engineVersions": {
+    "tesseractJs": "6.0.1",
+    "tesseractJsCore": "6.1.2"
+  },
+  "configuredEngine": "tesseractjs",
+  "expectedEngineVersions": {
+    "tesseractJs": "6.0.1",
+    "tesseractJsCore": "6.1.2"
+  },
+  "nativeTesseractAvailable": true,
+  "networkIsolation": {
+    "networkBlocked": true,
+    "blockedAttemptLog": "testdata/ocr-acceptance/2026-10-25T03-31-59-739Z-51914/blocked-network-attempts.log",
+    "blockedAttemptsDetected": false
+  },
+  "results": [
+    {
+      "label": "unit-and-contract-tests",
+      "args": [
+        "--test",
+        "tests/damage-consensus.test.js",
+        "tests/localized-numeric-parser.test.js",
+        "tests/ocr-process-supervisor.test.js",
+        "tests/ocr-watchdog.test.js",
+        "tests/windows-process-cancel.test.js",
+        "tests/tesseractjs-acceptance.test.js",
+        "tests/ocr-report-metadata.test.js",
+        "tests/ocr-local-assets.test.js",
+        "tests/serial-task-queue.test.js"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "spawnError": null,
+      "elapsedMs": 1975,
+      "logfile": "testdata/ocr-acceptance/2026-10-25T03-31-59-739Z-51914/unit-and-contract-tests.log",
+      "networkBlocked": false,
+      "passed": true
+    },
+    {
+      "label": "local-asset-package-check",
+      "args": [
+        "scripts/check-tesseractjs-assets.js"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "spawnError": null,
+      "elapsedMs": 62,
+      "logfile": "testdata/ocr-acceptance/2026-10-25T03-31-59-739Z-51914/local-asset-package-check.log",
+      "networkBlocked": false,
+      "passed": true
+    },
+    {
+      "label": "deliberately-wrong-expected-value-must-fail",
+      "args": [
+        "scripts/run-ocr-sequence.js",
+        "reported"
+      ],
+      "exitCode": 1,
+      "signal": null,
+      "spawnError": null,
+      "elapsedMs": 29856,
+      "logfile": "testdata/ocr-acceptance/2026-10-25T03-31-59-739Z-51914/deliberately-wrong-expected-value-must-fail.log",
+      "networkBlocked": true,
+      "passed": true,
+      "expectedFailureValidated": true,
+      "note": "Expected nonzero exit is a pass only when the JSON proves the injected damage expectation mismatched."
+    },
+    {
+      "label": "integrated-real-recognition-stall-recovery",
+      "args": [
+        "scripts/integrated-ocr-stall-recovery.js"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "spawnError": null,
+      "elapsedMs": 47983,
+      "logfile": "testdata/ocr-acceptance/2026-10-25T03-31-59-739Z-51914/integrated-real-recognition-stall-recovery.log",
+      "networkBlocked": true,
+      "passed": true
+    },
+    {
+      "label": "reported-screenshot-no-network",
+      "args": [
+        "scripts/run-reported-screenshot-regression.js"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "spawnError": null,
+      "elapsedMs": 29824,
+      "logfile": "testdata/ocr-acceptance/2026-10-25T03-31-59-739Z-51914/reported-screenshot-no-network.log",
+      "networkBlocked": true,
+      "passed": true
+    },
+    {
+      "label": "five-image-sequential-no-network-1",
+      "args": [
+        "scripts/run-ocr-sequence.js"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "spawnError": null,
+      "elapsedMs": 146945,
+      "logfile": "testdata/ocr-acceptance/2026-10-25T03-31-59-739Z-51914/five-image-sequential-no-network-1.log",
+      "networkBlocked": true,
+      "passed": true
+    },
+    {
+      "label": "hoffmann-then-asashio-no-network",
+      "args": [
+        "scripts/run-ocr-sequence.js",
+        "hoffmann-victory.png",
+        "asashio-defeat.jpg"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "spawnError": null,
+      "elapsedMs": 55366,
+      "logfile": "testdata/ocr-acceptance/2026-10-25T03-31-59-739Z-51914/hoffmann-then-asashio-no-network.log",
+      "networkBlocked": true,
+      "passed": true
+    },
+    {
+      "label": "asashio-then-hoffmann-no-network",
+      "args": [
+        "scripts/run-ocr-sequence.js",
+        "asashio-defeat.jpg",
+        "hoffmann-victory.png"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "spawnError": null,
+      "elapsedMs": 55657,
+      "logfile": "testdata/ocr-acceptance/2026-10-25T03-31-59-739Z-51914/asashio-then-hoffmann-no-network.log",
+      "networkBlocked": true,
+      "passed": true
+    }
+  ],
+  "passed": true
+}

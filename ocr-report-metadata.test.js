@@ -1,0 +1,48 @@
+'use strict';
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const path = require('node:path');
+const { createOcrReportMetadata, describeOcrConfiguration } = require('../src/ocr-report-metadata');
+
+test('OCR reports include reproducible build, engine, language-model and local asset identity', () => {
+    const metadata = createOcrReportMetadata(path.join(__dirname, '..'));
+    assert.equal(metadata.package.version, require('../package.json').version);
+    assert.match(metadata.sourceBuild.sha256, /^[a-f0-9]{64}$/);
+    assert.ok(metadata.sourceBuild.files > 0);
+    assert.equal(metadata.engineVersions.tesseractJs, require('tesseract.js/package.json').version);
+    assert.equal(metadata.engineVersions.tesseractJsCore, require('tesseract.js-core/package.json').version);
+    assert.equal(metadata.languageModel.language, 'eng');
+    assert.match(metadata.languageModel.sha256, /^[a-f0-9]{64}$/);
+    assert.ok(metadata.localAssets.length >= 2);
+    assert.ok(metadata.localAssets.every(asset => asset.exists && /^[a-f0-9]{64}$/.test(asset.sha256)));
+});
+
+
+test('OCR configuration metadata makes optional engine and network feature flags explicit', () => {
+    const defaults = describeOcrConfiguration({});
+    assert.equal(defaults.engine, 'auto');
+    assert.equal(defaults.opencvAssistEnabled, false);
+    assert.equal(defaults.paddleOcrFieldFallbackEnabled, false);
+    assert.equal(defaults.networkBlockingEnabled, false);
+    assert.equal(defaults.imageTimeoutMs, 90000);
+    assert.equal(defaults.operationTimeoutMs, 15000);
+
+    const enabled = describeOcrConfiguration({
+        OCR_ENGINE: 'TESSERACTJS',
+        OCR_CV_ASSIST: '1',
+        PADDLEOCR_FIELD_FALLBACK: '1',
+        OCR_NETWORK_BLOCK_ENABLED: '1',
+        OCR_IMAGE_TIMEOUT_MS: '120000',
+        OCR_OPERATION_TIMEOUT_MS: '9000',
+    });
+    assert.deepEqual(enabled, {
+        engine: 'tesseractjs',
+        opencvAssistEnabled: true,
+        paddleOcrFieldFallbackEnabled: true,
+        networkBlockingEnabled: true,
+        imageTimeoutMs: 120000,
+        operationTimeoutMs: 9000,
+    });
+    assert.equal(describeOcrConfiguration({ OCR_CV_ASSIST: 'true', PADDLEOCR_FIELD_FALLBACK: 'yes' }).opencvAssistEnabled, false);
+    assert.equal(describeOcrConfiguration({ OCR_CV_ASSIST: 'true', PADDLEOCR_FIELD_FALLBACK: 'yes' }).paddleOcrFieldFallbackEnabled, false);
+});
