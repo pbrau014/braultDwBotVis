@@ -10,6 +10,15 @@
       [overview]=await Promise.all([D.api('/api/overview')]);
       const submissions=await D.api('/api/submissions');
       populateLifecycleSelectors(overview.lifecycle||{},overview.roster||[]);
+      const tournamentList=D.$('admin-tournament-list');tournamentList.replaceChildren();
+      if(!(overview.tournaments||[]).length)tournamentList.append(D.node('p','muted','No Pilot or Full tournament instances have been created.'));
+      for(const tournament of overview.tournaments||[]){
+        const row=D.node('div','event-row');
+        const left=D.node('span','',tournament.name+' · '+(tournament.format==='pilot'?'Pilot YOLO':'Full YOLO')+' · '+tournament.status);
+        const right=D.node('strong','',String((tournament.standings||[]).length)+' registered');
+        row.append(left,right);tournamentList.append(row);
+      }
+
       D.$('admin-roster-count').textContent=overview.roster.length+'/'+overview.maxPlayers;
       D.$('admin-total').textContent=D.number(overview.aggregate.doubloons);
       D.$('admin-value').textContent=D.money(overview.aggregate.estimatedValue);
