@@ -22,7 +22,7 @@ const { inspectTargetChannelPermissions } = require('./discord-gateway-diagnosti
 const { isAdminOnlyCommand } = require('./tournament-command-policy');
 const { collectOcrSpaceFieldEvidence } = require('./ocrspace-field-evidence');
 const path = require('node:path');
-const { createHash } = require('node:crypto');
+const { createHash, randomUUID } = require('node:crypto');
 const os = require('node:os');
 const fs = require('node:fs/promises');
 const { runSupervisedProcess } = require('./ocr-process-supervisor');
@@ -2667,6 +2667,17 @@ function tournamentHelp() {
     return [
         '**YOLO Tourney commands**',
         '`!yolo help` — show this help',
+        '`!yolo formats` — explain Pilot YOLO and Full YOLO',
+        '`!yolo lifecycle` — list configured Pilot/Full tournaments',
+        '`!yolo lifecycle-create` with JSON — create a draft tournament (admin)',
+        '`!yolo lifecycle-publish` with JSON — publish an approved rules snapshot (admin)',
+        '`!yolo lifecycle-start <tournament ID>` — start a published tournament (admin)',
+        '`!yolo lifecycle-register <tournament ID>` — register your linked identity for Full YOLO',
+        '`!yolo lifecycle-checkin <tournament ID>` — check in to a Pilot event with your linked identity',
+        '`!yolo lifecycle-team / lifecycle-assign / lifecycle-lock / lifecycle-fixture` with JSON — manage Full teams and fixtures (admin)',
+        '`!yolo lifecycle-game / lifecycle-complete-fixture / lifecycle-resolve / lifecycle-stage` with JSON — record evidence and manage progression (admin)',
+        '`!yolo lifecycle-pilot-result / lifecycle-race` with JSON — record Pilot Damage or Full Race side-event evidence (admin)',
+        '`!yolo lifecycle-finish <tournament ID>` — complete an active Pilot event (admin)',
         '`!yolo players` — list roster players and IDs',
         '`!yolo panel` — public interactive totals, standings, roster and event leaderboard panel',
         '`!yolo download-workbook` / `!yolo workbook` — download the Excel source workbook',
@@ -2891,7 +2902,82 @@ async function handleTournamentCommand(message) {
     }
     try {
         let response;
-        if (!command || command === 'help') response = tournamentHelp();
+        const lifecycle = Tournament.YoloFormats;
+        const parseLifecycle = () => { try { return JSON.parse(args); } catch { throw new Error('Supply one valid JSON object as the command arguments.'); } };
+        const findLifecycle = (id) => { const item = tournamentState.yoloTournaments.find(row => row.id === String(id)); if (!item) throw new Error('YOLO tournament not found.'); return item; };
+        const evidenceHash = (recordId) => { const row = tournamentState.battleRecords.find(item => item.record_id === String(recordId)); const value = row?.record?.sourceEvidence?.sha256 || row?.sourceEvidence?.sha256; if (!/^[a-f0-9]{64}$/i.test(String(value || ''))) throw new Error('The referenced archived screenshot has no verified source-evidence SHA-256.'); return String(value).toLowerCase(); };
+        if (command === 'formats') {
+            response = '**YOLO formats**\n• **Pilot YOLO** — one single-evening event; attendance/lineup check-in; individual Damage placement; no season carryover.\n• **Full YOLO** — organizer-defined multi-week/month season: Regular Season → Postseason → Grand YOLO Finale.\nShared identity, evidence, correction and audit procedures apply to both.';
+        } else if (command === 'lifecycle') {
+            const rows = tournamentState.yoloTournaments || [];
+            response = rows.length ? '**Configured YOLO tournaments**\n' + rows.map(row => `• **${row.title}** — ${row.format.toUpperCase()} · ${row.stage || 'draft'} · ${row.lifecycle}`).join('\n') : 'No Pilot or Full YOLO lifecycle has been created yet.';
+        } else if (command === 'lifecycle-create') {
+            const input = parseLifecycle();
+            const created = lifecycle.createTournament({ ...input, id: input.id || randomUUID() });
+            tournamentState.yoloTournaments.push(created); await saveTournamentState();
+            response = `Created **${created.title}** (${created.format.toUpperCase()}) as \`${created.id}\`. It remains a draft until the organizer publication checklist is complete.`;
+        } else if (command === 'lifecycle-publish') {
+            const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
+            lifecycle.publishTournament(item, input.approval, message.author?.tag || message.author?.id);
+            await saveTournamentState(); response = `Published **${item.title}** using approved rules version ${item.publication.rulesVersion}.`;
+        } else if (command === 'lifecycle-start') {
+            const item = findLifecycle(args); lifecycle.startTournament(item, message.author?.tag || message.author?.id);
+            await saveTournamentState(); response = `Started **${item.title}** at stage ${item.stage}.`;
+        } else if (command === 'lifecycle-register' || command === 'lifecycle-checkin') {
+            const item = findLifecycle(args), player = Tournament.findPlayerByDiscordUserId(tournamentState, message.author?.id);
+            if (!player) throw new Error('Your Discord account is not linked to a tournament roster entry. Ask an admin to link it first.');
+            const identity = { playerId: player.id, discordUserId: message.author.id, identityVerified: true, actor: message.author.tag || message.author.id };
+            if (command === 'lifecycle-register') lifecycle.registerPlayer(item, identity);
+            else lifecycle.checkInPilotPlayer(item, identity);
+            await saveTournamentState(); response = `Your linked roster entry **${player.name}** is recorded for ${item.title}.`;
+        } else if (command === 'lifecycle-finish') {
+            const item = findLifecycle(args); lifecycle.finishPilot(item, { actor: message.author?.tag || message.author?.id });
+            await saveTournamentState(); response = `Completed Pilot YOLO event **${item.title}**.`;
+        } else if (command === 'lifecycle-team') {
+            const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
+            const team = lifecycle.createTeam(item, { ...input.team, actor: message.author?.tag || message.author?.id });
+            await saveTournamentState(); response = `Created team **${team.name}** (${team.id}).`;
+        } else if (command === 'lifecycle-assign') {
+            const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
+            lifecycle.assignPlayerToTeam(item, input.playerId, input.teamId, { actor: message.author?.tag || message.author?.id });
+            await saveTournamentState(); response = `Assigned player #${input.playerId} to team ${input.teamId}.`;
+        } else if (command === 'lifecycle-lock') {
+            const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
+            lifecycle.lockTeamRoster(item, input.teamId, { actor: message.author?.tag || message.author?.id });
+            await saveTournamentState(); response = `Locked roster for team ${input.teamId}.`;
+        } else if (command === 'lifecycle-fixture') {
+            const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
+            const fixture = lifecycle.scheduleFixture(item, { ...input.fixture, actor: message.author?.tag || message.author?.id });
+            await saveTournamentState(); response = `Scheduled fixture ${fixture.id} for stage ${fixture.stage}.`;
+        } else if (command === 'lifecycle-game') {
+            const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
+            const { evidenceRecordId, ...game } = input.game;
+            const saved = lifecycle.recordGame(item, { ...game, evidenceSha256: evidenceHash(evidenceRecordId), actor: message.author?.tag || message.author?.id });
+            await saveTournamentState(); response = `Recorded game ${saved.id} with archived screenshot evidence.`;
+        } else if (command === 'lifecycle-complete-fixture') {
+            const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
+            const { evidenceRecordId, ...outcome } = input.outcome;
+            const saved = lifecycle.completeFixture(item, input.fixtureId, { outcome: { ...outcome, evidenceSha256: evidenceHash(evidenceRecordId) }, actor: message.author?.tag || message.author?.id });
+            await saveTournamentState(); response = `Verified fixture ${input.fixtureId}; winner team ${saved.winnerTeamId}.`;
+        } else if (command === 'lifecycle-resolve') {
+            const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
+            const saved = lifecycle.resolveFixture(item, input.fixtureId, { ...input.resolution, evidenceSha256: input.resolution?.evidenceRecordId ? evidenceHash(input.resolution.evidenceRecordId) : null, actor: message.author?.tag || message.author?.id });
+            await saveTournamentState(); response = `Resolved fixture ${saved.id} as ${saved.status}.`;
+        } else if (command === 'lifecycle-stage') {
+            const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
+            lifecycle.transitionFullStage(item, input.nextStage, { qualifiedTeamIds: input.qualifiedTeamIds || [], actor: message.author?.tag || message.author?.id });
+            await saveTournamentState(); response = `Advanced **${item.title}** to ${item.stage}.`;
+        } else if (command === 'lifecycle-pilot-result') {
+            const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
+            const { evidenceRecordId, ...result } = input.result;
+            const saved = lifecycle.recordPilotResult(item, { ...result, evidenceSha256: evidenceHash(evidenceRecordId), actor: message.author?.tag || message.author?.id });
+            await saveTournamentState(); response = `Recorded Pilot Damage result for player #${saved.playerId}, game ${saved.gameNumber}.`;
+        } else if (command === 'lifecycle-race') {
+            const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
+            const { evidenceRecordId, ...result } = input.result;
+            const saved = lifecycle.recordRaceSideEvent(item, { ...result, evidenceSha256: evidenceHash(evidenceRecordId), actor: message.author?.tag || message.author?.id });
+            await saveTournamentState(); response = `Recorded Full YOLO Race side-event time ${saved.elapsedSeconds}s.`;
+        } else if (!command || command === 'help') response = tournamentHelp();
         else if (command === 'panel') {
             await message.reply({ content: tournamentPanelText(), components: buildTournamentPanelComponents(), allowedMentions: { repliedUser: false, parse: [] } });
             return true;
