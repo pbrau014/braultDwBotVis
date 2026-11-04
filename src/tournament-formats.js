@@ -65,9 +65,9 @@ function normalizeTournament(raw) {
       registrationOpen: raw.config?.registrationOpen !== false,
       registrationClosedAt: raw.config?.registrationClosedAt || null,
     },
-    stages: stages.length ? stages.map(clone) : expected.map((key, index) => ({
+    stages: stages.length ? stages.map(stage => ({ ...clone(stage), qualifiedTeamIds: Array.isArray(stage.qualifiedTeamIds) ? stage.qualifiedTeamIds.map(String) : [] })) : expected.map((key, index) => ({
       id: raw.id + ':' + key, key, order: index + 1,
-      status: STATUS.DRAFT, startsAt: null, endsAt: null,
+      status: STATUS.DRAFT, startsAt: null, endsAt: null, qualifiedTeamIds: [],
     })),
     registrations: Array.isArray(raw.registrations) ? raw.registrations.map(clone) : [],
     teams: Array.isArray(raw.teams) ? raw.teams.map(clone) : [],
@@ -185,6 +185,27 @@ function publishTournament(tournament, approval = {}, actor = 'organizer') {
   return tournament;
 }
 
+function setStageQualifiers(tournament, stageKey, teamIds, approval = {}, actor = 'organizer') {
+  if (tournament.format !== FORMAT.FULL || ![STAGES.POSTSEASON, STAGES.GRAND_FINALE].includes(stageKey))
+    throw new Error('Only Full YOLO Postseason and Grand Finale stages have qualification lists.');
+  const stageIndex = tournament.stages.findIndex(stage => stage.key === stageKey);
+  const previous = tournament.stages[stageIndex - 1];
+  if (!previous || previous.status !== STATUS.COMPLETE) throw new Error('The preceding stage must be complete before qualification is determined.');
+  const ids = [...new Set((teamIds || []).map(String))];
+  if (ids.length < 2) throw new Error('At least two teams must qualify for this stage.');
+  if (ids.some(id => !tournament.teams.some(team => team.id === id))) throw new Error('Every qualifier must be an existing tournament team.');
+  if (!approval.approvedBy || !approval.methodVersion || !approval.publishedAt || approval.approved !== true)
+    throw new Error('Stage qualification requires an approved, versioned and published qualification method with a named approver.');
+  const stage = tournament.stages[stageIndex];
+  if (stage.status !== STATUS.DRAFT && stage.status !== STATUS.PUBLISHED) throw new Error('Qualification list is frozen once the stage is active.');
+  stage.qualifiedTeamIds = ids;
+  stage.qualificationApproval = { approvedBy: cleanText(approval.approvedBy, 'Qualification approver'),
+    methodVersion: cleanText(approval.methodVersion, 'Qualification method version'),
+    publishedAt: cleanText(approval.publishedAt, 'Qualification publication timestamp') };
+  audit(tournament, 'stage_qualifiers_published', { stageKey, teamIds: ids, approval: stage.qualificationApproval }, actor);
+  return stage;
+}
+
 function activateStage(tournament, stageKey, actor = 'organizer') {
   const index = tournament.stages.findIndex(s => s.key === stageKey);
   if (index < 0) throw new Error('Stage does not belong to this tournament format.');
@@ -193,6 +214,8 @@ function activateStage(tournament, stageKey, actor = 'organizer') {
   if (tournament.config.registrationOpen) throw new Error('Close registration before starting the event stage.');
   if (tournament.format === FORMAT.FULL && stageKey === STAGES.REGULAR_SEASON && (!tournament.teams.length || tournament.teams.some(team => !team.rosterLocked)))
     throw new Error('Full YOLO regular season requires all team rosters to be locked.');
+  if (tournament.format === FORMAT.FULL && [STAGES.POSTSEASON, STAGES.GRAND_FINALE].includes(stageKey) && stage.qualifiedTeamIds.length < 2)
+    throw new Error('Publish an approved qualification list before activating this Full YOLO stage.');
   const stage = tournament.stages[index];
   stage.status = STATUS.ACTIVE;
   stage.startedAt = now();
@@ -206,7 +229,7 @@ function completeStage(tournament, stageKey, actor = 'organizer') {
   if (!stage || stage.status !== STATUS.ACTIVE) throw new Error('Only an active stage can be completed.');
   if (tournament.format === FORMAT.FULL && !tournament.fixtures.some(f => f.stageKey === stageKey))
     throw new Error('A Full YOLO stage requires at least one resolved fixture before completion.');
-  if (tournament.fixtures.some(f => f.stageKey === stageKey && (!f.matchId || !['complete','forfeit','bye'].includes(f.status)))) {
+  if (tournament.fixtures.some(f => f.stageKey === stageKey && ((f.status !== 'bye' && !f.matchId) || !['complete','forfeit','bye'].includes(f.status)))) {
     throw new Error('All fixtures in the stage must have a resolved match or approved bye before completion.');
   }
   if (tournament.matches.some(m => m.stageKey === stageKey && m.status !== STATUS.COMPLETE && m.status !== STATUS.FORFEIT)) {
@@ -226,6 +249,9 @@ function createFixture(tournament, input, actor = 'organizer') {
   const away = tournament.teams.find(t => t.id === String(input.awayTeamId));
   if (!home || !away || home.id === away.id) throw new Error('Fixture requires two distinct registered teams.');
   if (!home.rosterLocked || !away.rosterLocked) throw new Error('Both team rosters must be locked before scheduling a fixture.');
+  if ([STAGES.POSTSEASON, STAGES.GRAND_FINALE].includes(input.stageKey) &&
+      (!stage.qualifiedTeamIds.includes(home.id) || !stage.qualifiedTeamIds.includes(away.id)))
+    throw new Error('Postseason and Grand Finale fixtures may include only published qualifiers.');
   if (tournament.fixtures.some(f => f.id === String(input.id))) throw new Error('Fixture ID already exists.');
   const fixture = { id: cleanText(input.id, 'Fixture ID'), stageKey: input.stageKey,
     homeTeamId: home.id, awayTeamId: away.id, scheduledAt: input.scheduledAt || null,
@@ -330,6 +356,23 @@ function completeMatch(tournament, matchId, options = {}, actor = 'organizer') {
   return match;
 }
 
+function recordBye(tournament, stageKey, teamId, reason, evidenceId, actor = 'organizer') {
+  const stage = tournament.stages.find(item => item.key === stageKey && item.status === STATUS.ACTIVE);
+  if (!stage) throw new Error('A bye can only be recorded in an active stage.');
+  const team = tournament.teams.find(item => item.id === String(teamId));
+  if (!team) throw new Error('Bye team was not found.');
+  if ([STAGES.POSTSEASON, STAGES.GRAND_FINALE].includes(stageKey) && !stage.qualifiedTeamIds.includes(team.id))
+    throw new Error('Only a published qualifier can receive a stage bye.');
+  const cleanReason = cleanText(reason, 'Bye reason');
+  const proof = cleanText(evidenceId, 'Bye evidence reference');
+  const fixture = { id: tournament.id + ':bye:' + (tournament.fixtures.length + 1), stageKey,
+    homeTeamId: team.id, awayTeamId: null, scheduledAt: null, status: 'bye', matchId: null,
+    outcome: { winnerTeamId: team.id, decidedBy: 'bye', reason: cleanReason, evidenceId: proof, completedAt: now() } };
+  tournament.fixtures.push(fixture);
+  audit(tournament, 'stage_bye_recorded', { fixtureId: fixture.id, stageKey, teamId: team.id, reason: cleanReason, evidenceId: proof }, actor);
+  return fixture;
+}
+
 function resolveForfeit(tournament, matchId, winnerTeamId, reason, evidenceId, actor = 'organizer') {
   const match = tournament.matches.find(item => item.id === String(matchId));
   if (!match) throw new Error('Match was not found.');
@@ -372,6 +415,6 @@ function freezeSettings(tournament, changes, actor = 'organizer') {
 module.exports = {
   FORMAT, STAGES, STAGE_ORDER, STATUS, normalizeCompetition, normalizeTournament,
   createTournament, getTournament, registerParticipant, closeRegistration, withdrawParticipant, assignTeam, lockRoster,
-  publishTournament, activateStage, completeStage, createFixture, createMatch,
-  recordGame, aggregateMatchMetrics, resolveMatch, completeMatch, resolveForfeit, recordRaceSideEvent, freezeSettings, audit,
+  publishTournament, setStageQualifiers, activateStage, completeStage, createFixture, createMatch,
+  recordGame, aggregateMatchMetrics, resolveMatch, completeMatch, resolveForfeit, recordBye, recordRaceSideEvent, freezeSettings, audit,
 };
