@@ -2905,7 +2905,7 @@ async function handleTournamentCommand(message) {
         const lifecycle = Tournament.YoloFormats;
         const parseLifecycle = () => { try { return JSON.parse(args); } catch { throw new Error('Supply one valid JSON object as the command arguments.'); } };
         const findLifecycle = (id) => { const item = tournamentState.yoloTournaments.find(row => row.id === String(id)); if (!item) throw new Error('YOLO tournament not found.'); return item; };
-        const evidenceHash = (recordId) => { const row = tournamentState.battleRecords.find(item => item.record_id === String(recordId)); const value = row?.record?.sourceEvidence?.sha256 || row?.sourceEvidence?.sha256; if (!/^[a-f0-9]{64}$/i.test(String(value || ''))) throw new Error('The referenced archived screenshot has no verified source-evidence SHA-256.'); return String(value).toLowerCase(); };
+        const evidenceHash = (recordId) => { const row = tournamentState.battleRecords.find(item => item.record_id === String(recordId)); const value = row?.record?.source?.evidence?.sha256 || row?.record?.sourceEvidence?.sha256 || row?.sourceEvidence?.sha256; if (!/^[a-f0-9]{64}$/i.test(String(value || ''))) throw new Error('The referenced archived screenshot has no verified source-evidence SHA-256.'); return String(value).toLowerCase(); };
         if (command === 'formats') {
             response = '**YOLO formats**\n• **Pilot YOLO** — one single-evening event; attendance/lineup check-in; individual Damage placement; no season carryover.\n• **Full YOLO** — organizer-defined multi-week/month season: Regular Season → Postseason → Grand YOLO Finale.\nShared identity, evidence, correction and audit procedures apply to both.';
         } else if (command === 'lifecycle') {
