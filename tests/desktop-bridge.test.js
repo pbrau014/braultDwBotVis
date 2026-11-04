@@ -28,6 +28,12 @@ async function fixture(t,options={}){
     async unlinkPlayer(p,id){actions.push({name:'unlink',id});return{linked:false};},
     async recordResult(p,body){actions.push({name:'score',body});return{ok:true};},
     async setSetting(p,body){actions.push({name:'setting',body});return{ok:true};},
+    async createLifecycle(p,body){actions.push({name:'lifecycle-create',body,role:p.role});return{id:'pilot-1'};},
+    async publishLifecycle(p,body){actions.push({name:'lifecycle-publish',body,role:p.role});return{ok:true};},
+    async startLifecycle(p,body){actions.push({name:'lifecycle-start',body,role:p.role});return{ok:true};},
+    async lifecycleAction(p,body){actions.push({name:'lifecycle-action',body,role:p.role});return{ok:true};},
+    async registerLifecycle(p,body){actions.push({name:'lifecycle-register',body,role:p.role});return{ok:true};},
+    async checkInPilotLifecycle(p,body){actions.push({name:'lifecycle-checkin',body,role:p.role});return{ok:true};},
     async exportBackup(){return JSON.stringify({format:'dwbot-test-archive'});},
   };
   const fetchImpl=async(url,init={})=>{
@@ -136,4 +142,27 @@ test('OAuth callback rejects missing transaction state',async t=>{
   const f=await fixture(t);
   const responseResult=await fetch(f.origin+'/auth/discord/callback?code=stolen&state=missing',{redirect:'manual'});
   assert.equal(responseResult.status,400);
+});
+
+test('desktop lifecycle routes require session CSRF and server-side roles',async t=>{
+  const f=await fixture(t),player=await login(f.origin),admin=await login(f.origin,'admin');
+  const playerHeaders={Cookie:player.cookie,Origin:f.origin,'X-CSRF-Token':player.session.csrfToken,'Content-Type':'application/json'};
+  const adminHeaders={Cookie:admin.cookie,Origin:f.origin,'X-CSRF-Token':admin.session.csrfToken,'Content-Type':'application/json'};
+  const badCsrf=await fetch(f.origin+'/api/lifecycle/register',{method:'POST',headers:{...playerHeaders,'X-CSRF-Token':''},body:JSON.stringify({tournamentId:'full-1'})});
+  assert.equal(badCsrf.status,403);
+  const registered=await fetch(f.origin+'/api/lifecycle/register',{method:'POST',headers:playerHeaders,body:JSON.stringify({tournamentId:'full-1'})});
+  assert.equal(registered.status,200);
+  const checked=await fetch(f.origin+'/api/lifecycle/check-in',{method:'POST',headers:playerHeaders,body:JSON.stringify({tournamentId:'pilot-1'})});
+  assert.equal(checked.status,200);
+  const denied=await fetch(f.origin+'/api/admin/lifecycle',{method:'POST',headers:playerHeaders,body:JSON.stringify({title:'No',format:'pilot'})});
+  assert.equal(denied.status,403);
+  const created=await fetch(f.origin+'/api/admin/lifecycle',{method:'POST',headers:adminHeaders,body:JSON.stringify({title:'Pilot',format:'pilot'})});
+  assert.equal(created.status,201);
+  const published=await fetch(f.origin+'/api/admin/lifecycle/publish',{method:'POST',headers:adminHeaders,body:JSON.stringify({tournamentId:'pilot-1'})});
+  assert.equal(published.status,200);
+  const started=await fetch(f.origin+'/api/admin/lifecycle/start',{method:'POST',headers:adminHeaders,body:JSON.stringify({tournamentId:'pilot-1'})});
+  assert.equal(started.status,200);
+  const action=await fetch(f.origin+'/api/admin/lifecycle/action',{method:'POST',headers:adminHeaders,body:JSON.stringify({tournamentId:'full-1',action:'team'})});
+  assert.equal(action.status,200);
+  assert.deepEqual(f.actions.filter(x=>x.name.startsWith('lifecycle')).map(x=>x.name),['lifecycle-register','lifecycle-checkin','lifecycle-create','lifecycle-publish','lifecycle-start','lifecycle-action']);
 });
