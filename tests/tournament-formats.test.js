@@ -142,6 +142,7 @@ test('active-stage settings freeze is prospective and audited', () => {
 
 test('registrations, team rosters and fixture references are validated', () => {
   const t = full();
+  F.activateStage(t,F.STAGES.REGULAR_SEASON);
   assert.throws(() => F.registerParticipant(t, { playerId: 'p1', displayName: 'Alpha' }), /Registration is closed/);
   assert.throws(() => F.assignTeam(t, { id: 'bad', name: 'Bad', playerIds: ['unknown'] }), /active registration/);
   const night=F.createEventNight(t,{id:'night-invalid',stageKey:F.STAGES.REGULAR_SEASON,name:'Night',startsAt:'2026-12-02T18:00:00-06:00',endsAt:'2026-12-02T22:00:00-06:00',timezone:'America/Chicago'});
