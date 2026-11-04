@@ -3536,7 +3536,17 @@ client.once(Events.ClientReady, async (readyClient) => {
     ]);
     if (!channelCheck.ok) {
         console.error(`[Discord preflight] FAILED: ${channelCheck.reason}. Missing permissions: ${channelCheck.missingPermissions.join(', ') || 'none reported'}.`);
-        console.error('[Discord preflight] Bot Gateway READY, but channel readiness is not verified; live-test gate remains blocked.');
+        console.error('[Discord preflight] Startup is aborting. Correct the test channel and bot permissions before retrying.');
+        // Fail closed: do not leave a connected bot running with a broken target
+        // channel, where subsequent commands or archive writes could generate 403s.
+        isShuttingDown = true;
+        try {
+            await tournamentStore.close?.();
+        } catch (error) {
+            console.error('[Discord preflight] Could not close tournament storage cleanly:', error?.message || error);
+        }
+        readyClient.destroy();
+        process.exitCode = 1;
         return;
     }
     console.log(`[Discord preflight] PASS: guild ${channelCheck.guildId}, channel #${channelCheck.channelName} (${channelCheck.channelId}); required permissions: ${channelCheck.requiredPermissions.join(', ')}.`);

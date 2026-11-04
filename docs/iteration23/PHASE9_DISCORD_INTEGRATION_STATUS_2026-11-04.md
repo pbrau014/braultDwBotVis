@@ -66,3 +66,8 @@ The bot now subscribes to discord.js REST `rateLimited` events and records metho
 - The package script name and command were exercised in an isolated temporary npm package with the same script definition; the full project dependency tree was not installed in this environment.
 - The committed `.gitignore` behavior was checked with Git: `.env`, `node_modules/`, local SQLite files and `testdata/live-discord-state/` are ignored; `.env.discord-test.example` is not ignored.
 - The modified `src/bot.js` has been reviewed at the changed import, client setup, REST rate-limit listener and READY/preflight sections, but a full-project `node --check src/bot.js` and full `npm test` have not been run from a complete local checkout in this environment.
+
+
+## Fail-closed startup behavior
+
+The channel permission preflight now aborts startup if the configured channel cannot be fetched, is not a sendable guild text channel, or lacks any required permission. It closes tournament storage, destroys the Discord client and sets a non-zero process exit status. This prevents the bot from remaining connected in a degraded state that could generate repeated permission failures. The behavior is code-reviewed but has not yet been exercised in a complete installed application or live Discord test.

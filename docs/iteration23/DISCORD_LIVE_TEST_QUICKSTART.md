@@ -56,7 +56,7 @@ Do not start the live bot until dependency installation and the test suite compl
 npm start
 ```
 
-Observe `Logged in as ...`, the expected test channel, storage selection, and `The bot is online.` Confirm the bot identity in the test guild. A configured token alone is not evidence of a login pass.
+Observe `[Discord Gateway] READY as ...` with the expected bot user ID, then `[Discord preflight] PASS` with the expected test guild/channel and permissions, followed by the storage selection and online-success line. Confirm the bot identity in the test guild. A configured token or a resolved `client.login()` alone is not evidence of a READY pass. If the channel preflight fails, startup closes storage and the Discord client and exits with a non-zero status; correct the channel/permissions before retrying.
 
 ## Verify permissions
 
@@ -107,6 +107,7 @@ Gateway event limits and HTTP REST rate limits are distinct. Do not flood either
 - Message object behavior when Message Content is unavailable: https://docs.discord.com/developers/resources/message
 - discord.js 14.27 Client events and shard lifecycle events: https://discordjs.dev/docs/packages/discord.js/14.27.0/Client%3AClass
 - Application commands and guild-scoped testing: https://docs.discord.com/developers/interactions/application-commands
+- HTTP REST rate limits and 429 handling: https://docs.discord.com/developers/topics/rate-limits
 
 The bot requests Guilds, Guild Messages and Message Content. Message Content is privileged and must be enabled in the Developer Portal. The bot does not request Guild Members or Guild Presences. Gateway event limits are not the same as REST API limits; do not intentionally flood either. Discord also documents a global IDENTIFY limit, so avoid repeated restart loops.
 
@@ -116,3 +117,6 @@ The bot requests Guilds, Guild Messages and Message Content. Message Content is 
 Discord HTTP REST limits are separate from Gateway event limits. The bot now observes discord.js REST `rateLimited` events and logs only the HTTP method, normalized route, scope, global flag and retry delay in milliseconds. It does not log authorization headers, bot tokens, request bodies or full URLs.
 
 Do not hard-code Discord route limits. Discord recommends following dynamic response headers and the `Retry-After` header or `retry_after` response field for 429 responses. The existing discord.js REST manager owns request scheduling; DWBOT does not add a second retry loop. A live 429 is not required to run this test, and must not be deliberately induced against a real bot.
+
+
+The current Discord documentation lists up to 120 Gateway events per connection per 60 seconds and a global 1,000 IDENTIFY calls per 24 hours across shards. Do not create restart loops or attempt to test these limits. For HTTP REST requests, Discord publishes a 50 requests/second global bot limit plus dynamic per-route/shared buckets; do not hard-code route limits. On 429, use the documented `Retry-After` header or `retry_after` field. discord.js REST is responsible for its own queue/backoff.
