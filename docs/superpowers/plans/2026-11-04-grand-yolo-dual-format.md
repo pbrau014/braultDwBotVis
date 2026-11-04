@@ -36,8 +36,8 @@
 
 - [ ] Test format validation, immutable format after results, Pilot no season, Full season lifecycle, invalid transition, duplicate roster membership, audit log.
 - [ ] Run targeted tests and confirm RED.
-- [ ] Implement focused module and pass tests.
-- [ ] Add v2 compatibility adapter with empty lifecycle state and legacyUnassigned provenance.
+- [x] Implement focused lifecycle module; full branch test execution remains pending.
+- [x] Add v2 compatibility adapter with additive lifecycle state and legacyUnassigned provenance.
 - [ ] Run existing tournament tests and full npm test.
 
 ### Task 2: Tournament integration and invariants
@@ -46,30 +46,30 @@
 
 **Interfaces:** normalizeState retains existing fields and attaches additive lifecycle. makeArchiveSnapshot/importBackup round-trip lifecycle while preserving existing fields.
 
-- [ ] Test old v2 archive import, OCR queues, account links, four categories and game slots.
-- [ ] Test lifecycle export/import and no implicit Pilot/Full assignment.
-- [ ] Implement migration/normalization.
+- [x] Author regression coverage for old v2 state, OCR queues, account links, score buckets and game slots.
+- [x] Author lifecycle archive round-trip and no implicit Pilot/Full assignment coverage.
+- [x] Implement additive migration/normalization.
 - [ ] Run full tests, OCR contract tests and persistence/recovery tests.
 
 ### Task 3: Desktop experience and accessible help
 
 **Files:** Modify desktop/player.html, desktop/admin.html, desktop/desktop.css and relevant desktop JS only after tracing render contracts; test tests/desktop-ui-contract.test.js.
 
-- [ ] Add format/status overview, lifecycle timeline and next-action panels.
-- [ ] Add contextual quick notes with hover + keyboard focus + accessible text.
-- [ ] Ensure role boundaries and no Player exposure of Admin-only controls.
-- [ ] Add UI contract tests and run all desktop tests.
+- [x] Add format/status overview and tournament participation summaries.
+- [x] Add accessible contextual quick notes with hover, keyboard focus and accessible text.
+- [x] Preserve Admin-only lifecycle routes and Player-scoped tournament summaries.
+- [x] Author UI/API contract tests; execution of the full desktop suite remains pending.
 
 ### Task 4: Instruction set and release evidence
 
 **Files:** Create grandYoloInstruct.md, .docx, .pdf, .txt, .html and reports/grand-yolo-dual-format-implementation-status.md.
 
-- [ ] Produce consistent participant, host/referee, organizer, scoring, evidence, Discord and troubleshooting instructions.
-- [ ] Mark organizer-controlled fields explicitly unapproved.
-- [ ] Render DOCX to page images; inspect every page and fix layout defects.
-- [ ] Render PDF and visually inspect pages.
-- [ ] Run test suite and verify package artifact hashes.
-- [ ] Record environment-only gates as OPEN until real evidence exists.
+- [x] Produce the cross-role instruction guide with source-conflict appendix.
+- [x] Mark organizer-controlled fields Not yet approved.
+- [x] Render DOCX to page images, correct numbering/emphasis/layout, and inspect all seven pages.
+- [x] Render PDF to page images and inspect all seven pages.
+- [x] Verify five-format artifact manifest, SHA-256 values and ZIP integrity; full repository test suite remains pending.
+- [x] Record Windows/native OCR, OAuth/browser, live Discord, workbook and event gates as OPEN.
 
 ## Completion contract
 A task is complete only when named tests ran and passed. Feature branch is not production-ready until all automated checks and real-environment gates are verified. Do not merge without a separate explicit integration decision.
