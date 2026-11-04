@@ -280,6 +280,27 @@ function createDesktopBridge(options={}){
       if(link&&req.method==='DELETE'){
         const result=await call('unlinkPlayer',principal,Number(link[1]));audit(principal,'player-account-unlink');sendJson(res,200,result);return true;
       }
+      if(req.method==='GET'&&p==='/api/admin/yolo-tournaments'){
+        sendJson(res,200,await call('listYoloTournaments',principal));return true;
+      }
+      if(req.method==='POST'&&p==='/api/admin/yolo-tournaments'){
+        const result=await call('createYoloTournament',principal,await readJson(req));
+        audit(principal,'yolo-tournament-create');sendJson(res,201,result);return true;
+      }
+      const tournamentTransition=p.match(/^\/api\/admin\/yolo-tournaments\/([A-Za-z0-9._-]+)\/status$/);
+      if(req.method==='POST'&&tournamentTransition){
+        const result=await call('transitionYoloTournament',principal,tournamentTransition[1],await readJson(req));
+        audit(principal,'yolo-tournament-status');sendJson(res,200,result);return true;
+      }
+      if(req.method==='POST'&&p==='/api/admin/yolo-event-nights'){
+        const result=await call('createYoloEventNight',principal,await readJson(req));
+        audit(principal,'yolo-event-night-create');sendJson(res,201,result);return true;
+      }
+      const eventRegistration=p.match(/^\/api\/admin\/yolo-event-nights\/([A-Za-z0-9._-]+)\/registrations$/);
+      if(req.method==='POST'&&eventRegistration){
+        const result=await call('registerYoloParticipant',principal,eventRegistration[1],await readJson(req));
+        audit(principal,'yolo-participant-registration');sendJson(res,201,result);return true;
+      }
       if(req.method==='POST'&&p==='/api/admin/results'){
         const result=await call('recordResult',principal,await readJson(req));audit(principal,'manual-score-entry');sendJson(res,200,result);return true;
       }
