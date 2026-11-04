@@ -32,6 +32,10 @@ Copy .env.discord-test.example to a local .env, then replace the placeholder wit
 
 Never put a real key in Git, chat, logs, screenshots, or test fixtures. Store it only in the local environment. Do not use production credentials in an isolated test configuration.
 
+## Provider data handling
+
+The provider states that uploaded documents are deleted after processing and are not retained; it also states that API access IP addresses are logged for one month. Recheck the provider's current privacy policy and terms before changing what data is transmitted. DWBOT's default scope remains localized crops only, not complete battle screenshots. Source: https://ocr.space/privacypolicy.
+
 ## Data boundary and validation
 
 - Only unresolved mandatory fields are eligible for remote evidence.
