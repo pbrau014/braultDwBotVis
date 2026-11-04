@@ -2969,7 +2969,8 @@ async function handleTournamentCommand(message) {
             await saveTournamentState(); response = `Resolved fixture ${saved.id} as ${saved.status}.`;
         } else if (command === 'lifecycle-stage') {
             const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
-            lifecycle.transitionFullStage(item, input.nextStage, { qualification: input.qualification || null, actor: message.author?.tag || message.author?.id });
+            const qualification = input.qualification ? { ...input.qualification, evidenceSha256: evidenceHash(input.qualification.evidenceRecordId) } : null;
+            lifecycle.transitionFullStage(item, input.nextStage, { qualification, actor: message.author?.tag || message.author?.id });
             await saveTournamentState(); response = `Advanced **${item.title}** to ${item.stage}.`;
         } else if (command === 'lifecycle-pilot-result') {
             const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
