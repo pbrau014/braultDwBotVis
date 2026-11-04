@@ -270,6 +270,28 @@ function createDesktopBridge(options={}){
         res.end(body);return true;
       }
       csrf(req,session);
+      const lifecycleRoutes={
+        '/api/admin/tournaments':'createTournament',
+        '/api/admin/tournaments/transition':'transitionTournament',
+        '/api/admin/seasons':'createSeason',
+        '/api/admin/stages':'addStage',
+        '/api/admin/stages/activate':'activateStage',
+        '/api/admin/stages/complete':'completeStage',
+        '/api/admin/teams':'createTeam',
+        '/api/admin/registrations':'registerParticipant',
+        '/api/admin/rosters':'assignRoster',
+        '/api/admin/event-nights':'createEventNight',
+        '/api/admin/fixtures':'createFixture',
+        '/api/admin/matches':'createMatch',
+        '/api/admin/match-outcomes':'recordMatchOutcome',
+        '/api/admin/bracket/advance':'advanceBracket',
+        '/api/admin/race-side-events':'createRaceSideEvent',
+      };
+      if(req.method==='POST'&&lifecycleRoutes[p]){
+        const result=await call(lifecycleRoutes[p],principal,await readJson(req));
+        audit(principal,'tournament-lifecycle:'+lifecycleRoutes[p]);
+        sendJson(res,201,result);return true;
+      }
       if(req.method==='POST'&&p==='/api/admin/players'){
         const result=await call('addPlayer',principal,await readJson(req));audit(principal,'player-add');sendJson(res,201,result);return true;
       }
