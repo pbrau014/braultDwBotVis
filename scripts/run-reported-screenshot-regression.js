@@ -9,7 +9,7 @@ const originalLoad = Module._load;
 Module._load = function patchedLoad(request, parent, isMain) {
     if (request === 'dotenv') return { config() {} };
     if (request === 'discord.js') {
-        class MockClient { on() { return this; } once() { return this; } destroy() {} async login() {} }
+        class MockClient { constructor() { this.rest = { on() {} }; } on() { return this; } once() { return this; } destroy() {} async login() {} }
         return {
             Client: MockClient,
             GatewayIntentBits: { Guilds: 1, GuildMessages: 2, MessageContent: 4 },
