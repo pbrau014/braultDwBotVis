@@ -66,9 +66,13 @@ test('Pilot is one single-evening stage and does not create a season or carryove
   const t = pilot();
   assert.deepEqual(t.stages.map(s => s.key), [F.STAGES.PILOT_EVENT]);
   assert.equal(t.config.seasonWeeks, null);
+  F.registerParticipant(t,{playerId:'p1',displayName:'Alpha'});
   F.publishTournament(t);
   F.closeRegistration(t);
   F.activateStage(t, F.STAGES.PILOT_EVENT);
+  evidence(t,'pilot-result-evidence');
+  F.recordPilotResult(t,{playerId:'p1',gameNumber:1,damage:12345,evidenceId:'pilot-result-evidence'});
+  assert.equal(F.pilotStandings(t)[0].totalDamage,12345);
   F.completeStage(t, F.STAGES.PILOT_EVENT);
   assert.equal(t.status, F.STATUS.COMPLETE);
   assert.equal(t.stages.length, 1);
@@ -238,4 +242,14 @@ test('evidence registry rejects invalid digests and duplicate IDs and preserves 
   evidence(t,'unique-evidence');
   assert.throws(()=>evidence(t,'unique-evidence'),/immutable/);
   assert.equal(t.evidence[0].sha256.length,64);
+});
+
+test('Pilot result requires an active registration, unique game slot and original evidence',()=>{
+  const t=pilot();
+  F.registerParticipant(t,{playerId:'p1',displayName:'Alpha'});
+  F.publishTournament(t);F.closeRegistration(t);F.activateStage(t,F.STAGES.PILOT_EVENT);
+  evidence(t,'pilot-evidence');
+  F.recordPilotResult(t,{playerId:'p1',gameNumber:1,damage:5000,evidenceId:'pilot-evidence'});
+  assert.throws(()=>F.recordPilotResult(t,{playerId:'p1',gameNumber:1,damage:6000,evidenceId:'pilot-evidence'}),/slot already exists/);
+  assert.throws(()=>F.recordPilotResult(t,{playerId:'p1',gameNumber:2,damage:'',evidenceId:'pilot-evidence'}),/explicit non-negative/);
 });
