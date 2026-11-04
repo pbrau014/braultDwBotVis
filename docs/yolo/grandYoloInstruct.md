@@ -2,8 +2,8 @@
 ## Pilot and Full YOLO Tournament System
 **Implementation and operations manual - organizer publication required**
 
-Revision: 1.1
-Status: lifecycle foundation implemented; desktop lifecycle controls and final production gates remain open.
+Revision: 1.2
+Status: lifecycle foundation and Discord command operations implemented; guided desktop lifecycle controls and final production gates remain open.
 
 ## 1. Governing model
 
