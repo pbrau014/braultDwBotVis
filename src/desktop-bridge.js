@@ -312,6 +312,11 @@ function createDesktopBridge(options={}){
         const result=await call('registerYoloParticipant',principal,eventRegistration[1],await readJson(req));
         audit(principal,'yolo-participant-registration');sendJson(res,201,result);return true;
       }
+      const eventNightStatus=p.match(/^\/api\/admin\/yolo-event-nights\/([A-Za-z0-9._-]+)\/status$/);
+      if(req.method==='POST'&&eventNightStatus){
+        const result=await call('transitionYoloEventNight',principal,eventNightStatus[1],await readJson(req));
+        audit(principal,'yolo-event-night-status');sendJson(res,200,result);return true;
+      }
       const teamRoute=p.match(/^\/api\/admin\/yolo-event-nights\/([A-Za-z0-9._-]+)\/teams$/);
       if(req.method==='POST'&&teamRoute){
         const result=await call('createYoloTeam',principal,teamRoute[1],await readJson(req));
