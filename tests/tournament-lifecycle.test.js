@@ -99,8 +99,9 @@ test('event nights, fixtures, matches and awards are season-scoped', () => {
   s.stages.push(stage);
   L.createTeam(s, { id: 'a', name: 'Alpha' });
   L.createTeam(s, { id: 'b', name: 'Bravo' });
-  assert.equal(L.createEventNight(s, { id: 'n1', stageId: stage.id }).seasonId, s.id);
-  const fixture = L.createFixture(s, { id: 'fx1', stageId: stage.id, teamA: 'a', teamB: 'b' });
+  const night=L.createEventNight(s, { id: 'n1', stageId: stage.id });
+  assert.equal(night.seasonId,s.id);
+  const fixture = L.createFixture(s, { id: 'fx1', stageId: stage.id, eventNightId:night.id, teamA: 'a', teamB: 'b' });
   assert.equal(L.createMatch(s, fixture.id, { id: 'm1', gameNumber: 1 }).fixtureId, fixture.id);
   assert.throws(() => L.createFixture(s, { id: 'fx2', stageId: stage.id, eventNightId:night.id, teamA: 'a', teamB: 'missing' }), /two different teams/);
   assert.equal(L.createAward({ id: 'award-1', tournamentId: t.id, recipientId: 'u1', label: 'Winner', approvalId: 'PUB-1' }).status, 'approved');
