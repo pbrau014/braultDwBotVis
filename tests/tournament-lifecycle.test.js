@@ -67,7 +67,9 @@ test('match outcomes require an approved, identified scoring method and exact po
   L.createTeam(s, { id: 'b', name: 'Bravo' });
   const stage = L.createStage(s.id, 'regular_season', { id: 'regular' });
   s.stages.push(stage);
-  const fixture = L.createFixture(s, { id: 'fx', stageId: stage.id, teamA: 'a', teamB: 'b' });
+  const night=L.createEventNight(s,{id:'match-night',stageId:stage.id});
+  for(const status of ['registration_open','locked','active'])L.transitionEventNight(night,status,{actor:'admin'});
+  const fixture = L.createFixture(s, { id: 'fx', stageId: stage.id, eventNightId:night.id, teamA: 'a', teamB: 'b' });
   const match = L.createMatch(s, fixture.id, { id: 'match-1' });
   assert.throws(() => L.recordMatchOutcome(s, { id: 'm1', matchId: match.id, method: { approved: false }, teamA: 'a', teamB: 'b', scoreA: 1, scoreB: 0 }), /approved/);
   const result = L.recordMatchOutcome(s, { id: 'm2', matchId: match.id, method: { approved: true, methodId: 'D21-approved-v1', approvedAt: '2026-11-04T12:00:00Z', approvedBy: 'organizer-1' }, teamA: 'a', teamB: 'b', scoreA: 12.5, scoreB: 9 });
@@ -100,7 +102,7 @@ test('event nights, fixtures, matches and awards are season-scoped', () => {
   assert.equal(L.createEventNight(s, { id: 'n1', stageId: stage.id }).seasonId, s.id);
   const fixture = L.createFixture(s, { id: 'fx1', stageId: stage.id, teamA: 'a', teamB: 'b' });
   assert.equal(L.createMatch(s, fixture.id, { id: 'm1', gameNumber: 1 }).fixtureId, fixture.id);
-  assert.throws(() => L.createFixture(s, { id: 'fx2', stageId: stage.id, teamA: 'a', teamB: 'missing' }), /two different teams/);
+  assert.throws(() => L.createFixture(s, { id: 'fx2', stageId: stage.id, eventNightId:night.id, teamA: 'a', teamB: 'missing' }), /two different teams/);
   assert.equal(L.createAward({ id: 'award-1', tournamentId: t.id, recipientId: 'u1', label: 'Winner', approvalId: 'PUB-1' }).status, 'approved');
 });
 
@@ -109,6 +111,7 @@ test('Pilot registration, single event night and score ledger are format-scoped'
   L.registerPilotParticipant(t,{participantId:'17',displayName:'Alpha'});
   assert.throws(()=>L.registerPilotParticipant(t,{participantId:'17',displayName:'Alpha'}),/already registered/);
   const night=L.createPilotEventNight(t,{id:'pilot-night'});
+  for(const status of ['registration_open','locked','active'])L.transitionEventNight(night,status,{actor:'admin'});
   assert.equal(night.tournamentId,t.id);
   assert.throws(()=>L.createPilotEventNight(t,{id:'pilot-night-2'}),/one single-evening/);
   assert.throws(()=>L.recordScoreEntry(t,{participantId:'17',category:'damage',gameNumber:1,shipClass:'DD',tier:8,eventNightId:night.id,evidenceId:'e1',damage:100}),/active/);
@@ -126,6 +129,7 @@ test('Full score entry requires a season registration and positive Race time', (
   L.registerParticipant(season,{participantId:'u1',displayName:'Alpha'});
   const stage=L.createStage(season.id,'regular_season',{id:'rs'});season.stages.push(stage);
   const night=L.createEventNight(season,{id:'full-night',stageId:stage.id});
+  for(const status of ['registration_open','locked','active'])L.transitionEventNight(night,status,{actor:'admin'});
   L.transitionTournament(t,'registration_open',{actor:'admin'});
   L.transitionTournament(t,'locked',{actor:'admin'});
   L.transitionTournament(t,'active',{actor:'admin'});
@@ -139,4 +143,17 @@ test('organizer approval records require a valid timestamp and attribution', () 
   assert.throws(()=>L.createApprovalRecord({id:'a',scope:'match outcome scoring',version:'1',approvedBy:'admin',approvedAt:'invalid'}),/valid ISO/);
   const approval=L.createApprovalRecord({id:'a',scope:'match outcome scoring',version:'1',approvedBy:'admin',approvedAt:'2026-11-04T12:00:00Z'});
   assert.equal(approval.status,'approved');
+});
+
+test('event-night status locks roster and only accepts results while active',()=>{
+ const t=L.createTournament({id:'f-night',format:'full'}),season=L.createSeason(t.id,{id:'s-night',tournament:t});
+ const stage=L.createStage(season.id,'regular_season',{id:'rs'});season.stages.push(stage);
+ const night=L.createEventNight(season,{id:'n',stageId:stage.id});
+ L.registerParticipant(season,{participantId:'u',displayName:'User'});L.createTeam(season,{id:'red',name:'Red'});
+ L.assignRoster(season,{participantId:'u',teamId:'red',eventNightId:night.id});
+ L.transitionEventNight(night,'registration_open',{actor:'admin'});L.transitionEventNight(night,'locked',{actor:'admin'});
+ assert.throws(()=>L.assignRoster(season,{participantId:'u',teamId:'red',eventNightId:night.id}),/locked/);
+ assert.throws(()=>L.recordScoreEntry(t,{participantId:'u',category:'damage',gameNumber:1,shipClass:'DD',tier:8,evidenceId:'e',eventNightId:night.id,damage:10},season),/only while the event night is active/);
+ L.transitionEventNight(night,'active',{actor:'admin'});
+ assert.equal(L.recordScoreEntry(t,{participantId:'u',category:'damage',gameNumber:1,shipClass:'DD',tier:8,evidenceId:'e',eventNightId:night.id,damage:10},season).metric,10);
 });
