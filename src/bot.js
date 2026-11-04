@@ -2945,6 +2945,10 @@ async function handleTournamentCommand(message) {
             const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
             lifecycle.lockTeamRoster(item, input.teamId, { actor: message.author?.tag || message.author?.id });
             await saveTournamentState(); response = `Locked roster for team ${input.teamId}.`;
+        } else if (command === 'lifecycle-night') {
+            const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
+            const night = lifecycle.createEventNight(item, { ...input.night, actor: message.author?.tag || message.author?.id });
+            await saveTournamentState(); response = `Scheduled event night **${night.title}** (${night.id}) in stage ${night.stage}.`;
         } else if (command === 'lifecycle-fixture') {
             const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
             const fixture = lifecycle.scheduleFixture(item, { ...input.fixture, actor: message.author?.tag || message.author?.id });
@@ -2965,7 +2969,7 @@ async function handleTournamentCommand(message) {
             await saveTournamentState(); response = `Resolved fixture ${saved.id} as ${saved.status}.`;
         } else if (command === 'lifecycle-stage') {
             const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
-            lifecycle.transitionFullStage(item, input.nextStage, { qualifiedTeamIds: input.qualifiedTeamIds || [], actor: message.author?.tag || message.author?.id });
+            lifecycle.transitionFullStage(item, input.nextStage, { qualification: input.qualification || null, actor: message.author?.tag || message.author?.id });
             await saveTournamentState(); response = `Advanced **${item.title}** to ${item.stage}.`;
         } else if (command === 'lifecycle-pilot-result') {
             const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
