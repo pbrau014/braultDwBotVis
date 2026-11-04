@@ -62,3 +62,19 @@ test('desktop styles provide narrow-screen layouts without a third-party style d
   assert.match(css, /@media\(max-width:620px\)/);
   assert.match(css, /:root/);
 });
+
+test('Pilot and Full format guidance is present with keyboard-accessible hover quick notes', () => {
+  const player = read('desktop/player.html');
+  const admin = read('desktop/admin.html');
+  const css = read('desktop/desktop.css');
+  for (const html of [player, admin]) {
+    assert.match(html, /Pilot YOLO/);
+    assert.match(html, /Full YOLO/);
+    assert.match(html, /class="help-tip"/);
+    assert.match(html, /aria-describedby=/);
+    assert.match(html, /role="tooltip"/);
+  }
+  assert.match(css, /\.help-tip:hover/);
+  assert.match(css, /\.help-tip:focus-visible/);
+  assert.match(css, /\.format-guide__grid/);
+});
