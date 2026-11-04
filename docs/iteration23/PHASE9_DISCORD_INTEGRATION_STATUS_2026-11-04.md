@@ -111,3 +111,8 @@ After correcting the permission helper to require the cached bot `GuildMember`, 
 Added `src/discord-test-preflight.js`, `scripts/preflight-discord-test.js`, and ten unit tests. The pure validator checks Node version, development/test environment, token presence without returning or printing its value, channel/admin snowflake syntax, JSON storage, test-directory containment for JSON/SQLite state paths, distinct state paths, and disabled slash/experimental provider flags. The script loads the local `.env` and reports only pass/fail names and credential presence. It makes no network requests and explicitly does not claim to validate the token, Developer Portal intent settings, or live Discord permissions.
 
 The current repository did not contain the previously described standalone preflight script or the referenced `PHASE9_DISCORD_INTEGRATION_TEST_REPORT_2026-11-04.md`; those prior references were historical working-copy notes and are not current-branch artifacts. The new offline preflight replaces only the local configuration-validation portion. DNS/HTTPS and actual Discord checks remain separate and are not run by this script.
+
+
+## Combined 21-test offline preflight suite
+
+After adding the local configuration validator, the combined `npm run test:discord-preflight` command was executed in an isolated Node.js v22.16.0 environment using the committed script definition and corresponding pure helper/test logic. Result: **21 passed / 0 failed / 0 skipped**: seven channel-permission tests, four command-policy tests, and ten local-configuration tests. No Discord credentials or network calls were used. The script wrapper itself and the full application dependencies have not been exercised in the complete project checkout.
