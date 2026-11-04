@@ -304,6 +304,14 @@ function makePublicArchiveSnapshot(state) {
     for (const entry of competition.audit || []) redactActor(entry);
     for (const tournament of competition.tournaments || []) {
       for (const entry of tournament.audit || []) redactActor(entry);
+      for (const evidence of tournament.evidence || []) {
+        if (evidence && /^\\d{17,20}$/.test(String(evidence.registeredBy || ''))) evidence.registeredBy = 'redacted';
+        if (evidence?.source && typeof evidence.source === 'object') {
+          for (const key of ['userId','discordUserId','messageId','channelId','attachmentId','messageUrl']) {
+            if (Object.hasOwn(evidence.source,key)) evidence.source[key] = 'redacted';
+          }
+        }
+      }
     }
   }
   snapshot.battle_records = snapshot.battle_records.map(entry => {
