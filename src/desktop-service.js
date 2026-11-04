@@ -114,7 +114,13 @@ function createDesktopService(options = {}) {
         season:t.season?{durationWeeks:t.season.durationWeeks,startsAt:t.season.startsAt,endsAt:t.season.endsAt}:null,
         stages:(t.stages || []).map(s=>({type:s.type,status:s.status})),
       }));
-      const base={aggregate,maxPlayers:Tournament.MAX_PLAYERS,events: Tournament.EVENTS,eventLabels:Tournament.EVENT_LABELS,formats};
+      const playerForRegistration=principal.role==='player'?Tournament.findPlayer(current,principal.player.id):null;
+      const eventNights=(current.eventNights || []).map(night=>({
+        id:night.id,tournamentId:night.tournamentId,stage:night.stage,startsAt:night.startsAt,status:night.status,
+        registrationCount:(night.registrations || []).length,
+        isRegistered:Boolean(playerForRegistration && (night.registrations || []).some(r=>String(r.participantId)===String(playerForRegistration.id))),
+      }));
+      const base={aggregate,maxPlayers:Tournament.MAX_PLAYERS,events: Tournament.EVENTS,eventLabels:Tournament.EVENT_LABELS,formats,eventNights};
       if(principal.role==='player') {
         const player=Tournament.findPlayer(current,principal.player.id);
         if(!player) throw Object.assign(new Error('Your linked roster entry no longer exists.'),{status:403,code:'PLAYER_UNLINKED'});
