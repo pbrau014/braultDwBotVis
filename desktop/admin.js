@@ -56,7 +56,8 @@
 
     function populateLifecycleSelectors(lifecycle){
       const groups={
-        tournaments:(lifecycle.tournaments||[]).filter(t=>t.format==='full').map(t=>[t.id,t.name+' ('+t.format+')']),
+        tournaments:(lifecycle.tournaments||[]).map(t=>[t.id,t.name+' ('+t.format+')']),
+        fullTournaments:(lifecycle.tournaments||[]).filter(t=>t.format==='full').map(t=>[t.id,t.name]),
         seasons:(lifecycle.seasons||[]).map(x=>[x.id,x.name||x.id]),
         stages:(lifecycle.seasons||[]).flatMap(x=>(x.stages||[]).map(y=>[y.id,(x.name||x.id)+' · '+y.type])),
         teams:(lifecycle.seasons||[]).flatMap(x=>(x.teams||[]).map(y=>[y.id,(x.name||x.id)+' · '+y.name])),
@@ -75,7 +76,8 @@
         event.preventDefault();const button=form.querySelector('button[type="submit"]');if(button)button.disabled=true;
         try{
           const body=Object.fromEntries(new FormData(form).entries());
-          for(const key of ['scoreA','scoreB','gameNumber','elapsedSeconds'])if(body[key]!==undefined&&body[key]!=='')body[key]=Number(body[key]);
+          for(const key of ['scoreA','scoreB','gameNumber','elapsedSeconds','amount'])if(body[key]!==undefined&&body[key]!=='')body[key]=Number(body[key]);
+          for(const [key,value] of Object.entries(body))if(value==='')delete body[key];
           if(body.startsAt)body.startsAt=new Date(body.startsAt).toISOString();
           if(body.approvedAt)body.approvedAt=new Date(body.approvedAt).toISOString();
           await D.api(form.dataset.lifecycleEndpoint,{method:'POST',body});
