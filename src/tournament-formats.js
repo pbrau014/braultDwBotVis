@@ -138,7 +138,8 @@ function withdrawParticipant(tournament, playerId, reason, actor = 'organizer') 
 function assignTeam(tournament, teamInput, actor = 'organizer') {
   const stageKey = tournament.format === FORMAT.PILOT ? STAGES.PILOT_EVENT : STAGES.REGULAR_SEASON;
   if (tournament.teams.some(t => t.id === String(teamInput.id))) throw new Error('Team ID already exists.');
-  const members = [...new Set((teamInput.playerIds || []).map(String))];
+  if (!Array.isArray(teamInput.playerIds)) throw new Error('Team playerIds must be an array of registered player IDs.');
+  const members = [...new Set(teamInput.playerIds.map(String))];
   if (!members.length) throw new Error('A team must contain at least one registered participant.');
   for (const id of members) {
     const registration = tournament.registrations.find(r => r.playerId === id && r.status === 'registered');
@@ -195,7 +196,8 @@ function setStageQualifiers(tournament, stageKey, teamIds, approval = {}, actor 
   const stageIndex = tournament.stages.findIndex(stage => stage.key === stageKey);
   const previous = tournament.stages[stageIndex - 1];
   if (!previous || previous.status !== STATUS.COMPLETE) throw new Error('The preceding stage must be complete before qualification is determined.');
-  const ids = [...new Set((teamIds || []).map(String))];
+  if (!Array.isArray(teamIds)) throw new Error('Qualified team IDs must be an array.');
+  const ids = [...new Set(teamIds.map(String))];
   if (ids.length < 2) throw new Error('At least two teams must qualify for this stage.');
   if (ids.some(id => !tournament.teams.some(team => team.id === id))) throw new Error('Every qualifier must be an existing tournament team.');
   if (!approval.approvedBy || !approval.methodVersion || !approval.publishedAt || approval.approved !== true)
@@ -257,8 +259,8 @@ function registerEvidence(tournament, input, actor = 'organizer') {
   if (!['image/png','image/jpeg','image/webp','image/bmp','image/tiff'].includes(contentType.toLowerCase())) throw new Error('Tournament screenshot evidence must be PNG, JPEG, WEBP, BMP or TIFF.');
   if (!Number.isFinite(Date.parse(String(input.capturedAt || '')))) throw new Error('Evidence capture timestamp must be a valid date/time.');
   if (tournament.evidence.some(item => item.sha256 === sha256)) throw new Error('This screenshot digest is already registered; reuse the existing evidence ID.');
-  const record = { id, sha256, sizeBytes, contentType, sourceFile: cleanText(input.sourceFile, 'Evidence source filename'),
-    capturedAt: cleanText(input.capturedAt, 'Evidence capture timestamp'), source: input.source ? clone(input.source) : null,
+  const record = { id, sha256, sizeBytes, contentType: contentType.toLowerCase(), sourceFile: cleanText(input.sourceFile, 'Evidence source filename'),
+    capturedAt: new Date(input.capturedAt).toISOString(), source: input.source ? clone(input.source) : null,
     registeredAt: now(), registeredBy: String(actor) };
   tournament.evidence.push(record);
   audit(tournament, 'evidence_registered', { evidenceId: id, sha256, sizeBytes, contentType }, actor);
@@ -315,7 +317,7 @@ function recordGame(match, game, teams = [], registrations = [], evidence = null
   if (teams.length) {
     const team = teams.find(item => item.id === result.teamId);
     if (!team || !team.rosterLocked || !team.playerIds.includes(result.playerId)) throw new Error('Game player must belong to the locked roster of the recorded team.');
-    if (registrations.length && !registrations.some(item => item.playerId === result.playerId && item.status === 'registered'))
+    if (Array.isArray(registrations) && !registrations.some(item => item.playerId === result.playerId && item.status === 'registered'))
       throw new Error('Game player must have an active registration.');
   }
   match.games.push(result);
@@ -414,12 +416,13 @@ function resolveForfeit(tournament, matchId, winnerTeamId, reason, evidenceId, a
   return match;
 }
 
-function recordRaceSideEvent(tournament, input, actor = 'organizer', evidence = tournament.evidence) {
+function recordRaceSideEvent(tournament, input, actor = 'organizer', evidence = tournament.evidence, registrations = tournament.registrations) {
   if (tournament.format !== FORMAT.FULL) throw new Error('Race side-events are only configured for Full YOLO.');
   const seconds = Number(input.elapsedSeconds);
   if (!Number.isFinite(seconds) || seconds <= 0) throw new Error('Race elapsed time must be positive seconds.');
   const evidenceId = cleanText(input.evidenceId, 'Evidence reference');
   if (!evidence.some(item => item.id === evidenceId)) throw new Error('Race side-event requires registered original evidence.');
+  if (!registrations.some(item => item.playerId === String(input.playerId) && item.status === 'registered')) throw new Error('Race side-event player must have an active tournament registration.');
   const event = { id: cleanText(input.id, 'Race side-event ID'), seasonWeek: Number(input.seasonWeek),
     playerId: cleanText(input.playerId, 'Player ID'), elapsedSeconds: seconds,
     raceMetric: 1 / seconds, evidenceId, recordedAt: now() };
