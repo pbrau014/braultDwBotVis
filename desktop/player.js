@@ -15,6 +15,26 @@
     D.$('player-content').classList.remove('hidden');
     D.$('player-title').textContent=overview.player.name;
     D.$('player-subtitle').textContent='Roster entry #'+overview.player.id+' · signed in as '+session.user.username;
+    const lifecycleList=D.$('lifecycle-player-list');lifecycleList.replaceChildren();
+    const lifecycleRows=overview.yoloTournaments||[];
+    if(!lifecycleRows.length)lifecycleList.append(D.node('p','muted','There are no published Pilot or Full YOLO events available yet.'));
+    for(const item of lifecycleRows){
+      const card=D.node('article','lifecycle-card');
+      card.append(D.node('h3','',item.title+' · '+item.format.toUpperCase()));
+      card.append(D.node('p','muted','Status: '+item.lifecycle+' · Stage: '+(item.stage||'not started')));
+      if(item.registered)card.append(D.node('p','', 'Your Full YOLO registration is active.'));
+      else if(item.checkedIn)card.append(D.node('p','', 'You are checked in for this Pilot event.'));
+      else if(item.lifecycle==='published'&&item.format==='full'){
+        const button=D.node('button','button secondary','Register for season');button.type='button';
+        button.addEventListener('click',async()=>{button.disabled=true;try{await D.api('/api/lifecycle/register',{method:'POST',body:{tournamentId:item.id}});location.reload();}catch(error){button.disabled=false;status(error.message,'error');}});
+        card.append(button);
+      }else if(item.lifecycle==='published'&&item.format==='pilot'){
+        const button=D.node('button','button secondary','Check in to Pilot');button.type='button';
+        button.addEventListener('click',async()=>{button.disabled=true;try{await D.api('/api/lifecycle/check-in',{method:'POST',body:{tournamentId:item.id}});location.reload();}catch(error){button.disabled=false;status(error.message,'error');}});
+        card.append(button);
+      }else card.append(D.node('p','muted','Registration/check-in is not open.'));
+      lifecycleList.append(card);
+    }
     const standing=overview.standing||{};
     D.$('player-total').textContent=D.number(standing.total)+' 🪙';
     D.$('player-value').textContent=D.money(standing.estimatedValue);
