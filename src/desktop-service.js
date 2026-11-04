@@ -124,7 +124,7 @@ function createDesktopService(options = {}) {
       const current=state(), rows=Tournament.standings(current);
       const total=rows.reduce((s,r)=>s+r.total,0);
       const aggregate={doubloons:total,estimatedValue:total*0.54/100};
-      const lifecycle=current.lifecycle||Lifecycle.createLifecycleState(current);\n      const publicTournaments=lifecycle.tournaments.map(t=>{const season=lifecycle.seasons.find(x=>x.id===t.seasonId)||null;return{id:t.id,name:t.name,format:t.format,status:t.status,seasonId:t.seasonId||null,standings:tournamentStandings(current,t,season).map((r,i)=>({rank:i+1,...r}))};});\n      const base={aggregate,maxPlayers:Tournament.MAX_PLAYERS,events: Tournament.EVENTS,eventLabels:Tournament.EVENT_LABELS,formats:Lifecycle.FORMATS,scoringCategories:Lifecycle.SCORING_CATEGORIES,tournaments:publicTournaments};
+      const lifecycle=current.lifecycle||Lifecycle.createLifecycleState(current);\n      const publicTournaments=lifecycle.tournaments.map(t=>{const season=lifecycle.seasons.find(x=>x.id===t.seasonId)||null;return{id:t.id,name:t.name,format:t.format,status:t.status,seasonId:t.seasonId||null,eventNights:(t.format==='pilot'?t.eventNights:(season?.eventNights||[])).map(n=>({id:n.id,startsAt:n.startsAt,status:n.status})),standings:tournamentStandings(current,t,season).map((r,i)=>({rank:i+1,...r}))};});\n      const base={aggregate,maxPlayers:Tournament.MAX_PLAYERS,events: Tournament.EVENTS,eventLabels:Tournament.EVENT_LABELS,formats:Lifecycle.FORMATS,scoringCategories:Lifecycle.SCORING_CATEGORIES,tournaments:publicTournaments};
       if(principal.role==='player') {
         const player=Tournament.findPlayer(current,principal.player.id);
         if(!player) throw Object.assign(new Error('Your linked roster entry no longer exists.'),{status:403,code:'PLAYER_UNLINKED'});
@@ -239,7 +239,7 @@ function createDesktopService(options = {}) {
             scopedTournament=current.lifecycle.tournaments.find(x=>x.id===body.tournamentId);
             if(!scopedTournament)throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});
             const season=scopedTournament.format==='full'?current.lifecycle.seasons.find(x=>x.id===scopedTournament.seasonId):null;
-            const scoreEntry=Lifecycle.recordScoreEntry(scopedTournament,{participantId:String(player.id),category:event,gameNumber,shipClass,tier,evidenceId:entry.record_id,damage,kills,time},season);
+            const scoreEntry=Lifecycle.recordScoreEntry(scopedTournament,{participantId:String(player.id),category:event,gameNumber,shipClass,tier,evidenceId:entry.record_id,eventNightId:body?.eventNightId,damage,kills,time},season);
             scopedStanding=tournamentStandings(current,scopedTournament,season).find(x=>String(x.id)===String(player.id))||null;
             result={player,event,gameNumber,game:scoreEntry,scores:tournamentStandings(current,scopedTournament,season)};
           }else{
@@ -295,7 +295,7 @@ function createDesktopService(options = {}) {
     },
     async recordTournamentScore(principal,body) {
       role(principal,['admin']);
-      return mutate(async()=>{const current=state();const t=current.lifecycle?.tournaments.find(x=>x.id===body?.tournamentId);if(!t)throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});const player=Tournament.findPlayer(current,body?.participantId);if(!player)throw Object.assign(new Error('Participant was not found.'),{status:404,code:'PLAYER_REQUIRED'});const season=t.format==='full'?current.lifecycle.seasons.find(x=>x.id===t.seasonId):null;const entry=Lifecycle.recordScoreEntry(t,{...body,participantId:String(player.id),evidenceId:body?.evidenceId||('manual-'+crypto.randomUUID())},season);await options.saveState();return{entry,standings:tournamentStandings(current,t,season)};});
+      return mutate(async()=>{const current=state();const t=current.lifecycle?.tournaments.find(x=>x.id===body?.tournamentId);if(!t)throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});const player=Tournament.findPlayer(current,body?.participantId);if(!player)throw Object.assign(new Error('Participant was not found.'),{status:404,code:'PLAYER_REQUIRED'});const season=t.format==='full'?current.lifecycle.seasons.find(x=>x.id===t.seasonId):null;const entry=Lifecycle.recordScoreEntry(t,{...body,participantId:String(player.id),evidenceId:body?.evidenceId||('manual-'+crypto.randomUUID()),eventNightId:body?.eventNightId},season);await options.saveState();return{entry,standings:tournamentStandings(current,t,season)};});
     },
     async createTournament(principal,body) {
       role(principal,['admin']);
