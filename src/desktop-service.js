@@ -333,6 +333,11 @@ function createDesktopService(options = {}) {
       role(principal,['admin']);
       return mutate(async()=>{const current=state();const season=current.lifecycle?.seasons.find(x=>x.id===body?.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});const assignment=Lifecycle.assignRoster(season,{participantId:body?.participantId,teamId:body?.teamId,eventNightId:body?.eventNightId});auditLifecycle(current,principal,'roster.assigned',{seasonId:season.id,eventNightId:assignment.eventNightId,participantId:assignment.participantId,teamId:assignment.teamId});await options.saveState();return assignment;});
     },
+
+    async transitionEventNight(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();let night=null,season=null,tournament=null;if(body?.seasonId){season=current.lifecycle?.seasons.find(x=>x.id===body.seasonId);night=season?.eventNights.find(x=>x.id===body?.eventNightId);}else if(body?.tournamentId){tournament=current.lifecycle?.tournaments.find(x=>x.id===body.tournamentId);night=tournament?.eventNights.find(x=>x.id===body?.eventNightId);}if(!night)throw Object.assign(new Error('Event night was not found in the selected tournament/season.'),{status:404,code:'EVENT_NIGHT_NOT_FOUND'});Lifecycle.transitionEventNight(night,body?.status,{actor:principal.discordUserId,reason:body?.reason});auditLifecycle(current,principal,'event-night.status.changed',{eventNightId:night.id,status:night.status,seasonId:season?.id||null,tournamentId:tournament?.id||null});await options.saveState();return night;});
+    },
     async createEventNight(principal,body) {
       role(principal,['admin']);
       return mutate(async()=>{const current=state();const season=current.lifecycle?.seasons.find(x=>x.id===body?.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});const eventNight=Lifecycle.createEventNight(season,{id:body?.id||crypto.randomUUID(),stageId:body?.stageId,startsAt:body?.startsAt,settings:body?.settings});auditLifecycle(current,principal,'event-night.created',{seasonId:season.id,eventNightId:eventNight.id,stageId:eventNight.stageId});await options.saveState();return eventNight;});
@@ -355,7 +360,7 @@ function createDesktopService(options = {}) {
     },
     async createRaceSideEvent(principal,body) {
       role(principal,['admin']);
-      return mutate(async()=>{const current=state();const event=Lifecycle.createRaceSideEvent(body||{});const season=current.lifecycle?.seasons.find(x=>x.id===event.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});season.raceSideEvents||=[];season.raceSideEvents.push(event);current.lifecycle.raceSideEvents.push(event);auditLifecycle(current,principal,'race-side-event.created',{seasonId:season.id,eventNightId:event.eventNightId,eventId:event.id});await options.saveState();return event;});
+      return mutate(async()=>{const current=state();const event=Lifecycle.createRaceSideEvent(body||{});const season=current.lifecycle?.seasons.find(x=>x.id===event.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});if(!season.eventNights.some(x=>x.id===event.eventNightId))throw Object.assign(new Error('Race side-event must reference an event night in this season.'),{status:400,code:'EVENT_NIGHT_REQUIRED'});season.raceSideEvents||=[];season.raceSideEvents.push(event);current.lifecycle.raceSideEvents.push(event);auditLifecycle(current,principal,'race-side-event.created',{seasonId:season.id,eventNightId:event.eventNightId,eventId:event.id});await options.saveState();return event;});
     },
 
     async transitionTournament(principal,body) {
