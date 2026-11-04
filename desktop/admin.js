@@ -6,6 +6,67 @@
     if(session.role!=='admin'){D.$('admin-denied').classList.remove('hidden');return;}
     D.$('admin-content').classList.remove('hidden');
     let overview=null;
+    function competitionAction(body){
+      return D.api('/api/admin/competition',{method:'POST',body});
+    }
+    function renderCompetitions(){
+      const target=D.$('competition-list');target.replaceChildren();
+      const items=overview.competition?.tournaments||[];
+      if(!items.length){target.append(D.node('p','muted','No tournaments created. Create a Pilot or Full YOLO draft above.'));return;}
+      for(const tournament of items){
+        const card=D.node('article','submission-card');
+        card.append(D.node('h3','',tournament.name+' · '+(tournament.format==='pilot'?'Pilot YOLO':'Full YOLO')));
+        card.append(D.node('p','submission-meta','ID '+tournament.id+' · '+tournament.status+' · '+(tournament.config?.seasonWeeks?tournament.config.seasonWeeks+' weeks':'single-event format')));
+        const stages=D.node('div','event-list');
+        for(const stage of tournament.stages){
+          const row=D.node('div','event-row');
+          row.append(D.node('span','',stage.key.replace(/_/g,' ')+' · '+stage.status));
+          if(stage.status==='active'){
+            const complete=D.node('button','button secondary small','Complete stage');
+            complete.type='button';complete.addEventListener('click',async()=>{
+              complete.disabled=true;
+              try{await competitionAction({action:'complete_stage',tournamentId:tournament.id,stageKey:stage.key});await load();}
+              catch(error){complete.disabled=false;status(error.message,'error');}
+            });row.append(complete);
+          }else if(stage.status!=='complete'&&tournament.status!=='draft'){
+            const activate=D.node('button','button secondary small','Activate stage');
+            activate.type='button';activate.addEventListener('click',async()=>{
+              activate.disabled=true;
+              try{await competitionAction({action:'activate_stage',tournamentId:tournament.id,stageKey:stage.key});await load();}
+              catch(error){activate.disabled=false;status(error.message,'error');}
+            });row.append(activate);
+          }
+          stages.append(row);
+        }
+        card.append(stages);
+        const controls=D.node('div','button-row');
+        if(tournament.status==='draft'){
+          const publish=D.node('button','button primary small','Publish tournament');
+          publish.type='button';publish.addEventListener('click',async()=>{
+            publish.disabled=true;
+            const approval={};
+            if(tournament.format==='full'){
+              approval.approvedBy=D.$('match-method-approver').value.trim();
+              approval.matchOutcomeMethod={approved:true,publishedAt:new Date().toISOString(),
+                version:D.$('match-method-version').value.trim(),
+                aggregation:D.$('match-method-aggregation').value,
+                weights:{damage:Number(D.$('match-method-damage').value),kills:Number(D.$('match-method-kills').value)}};
+            }
+            try{await competitionAction({action:'publish',tournamentId:tournament.id,approval});await load();}
+            catch(error){publish.disabled=false;status(error.message,'error');}
+          });controls.append(publish);
+        }
+        if(tournament.config?.registrationOpen){
+          const close=D.node('button','button quiet small','Close registration');
+          close.type='button';close.addEventListener('click',async()=>{
+            close.disabled=true;
+            try{await competitionAction({action:'close_registration',tournamentId:tournament.id});await load();}
+            catch(error){close.disabled=false;status(error.message,'error');}
+          });controls.append(close);
+        }
+        card.append(controls);target.append(card);
+      }
+    }
     async function load(){
       [overview]=await Promise.all([D.api('/api/overview')]);
       const submissions=await D.api('/api/submissions');
@@ -49,9 +110,33 @@
       const list=D.$('admin-submissions');list.replaceChildren();
       if(!submissions.items.length)list.append(D.node('p','muted','No screenshot records in the archive yet.'));
       for(const item of submissions.items)list.append(D.renderSubmission(item,{admin:true,roster:overview.roster,onDone:load}));
+      renderCompetitions();
       status('Admin state loaded from the active tournament store.','success');
       updateSettingFields();
     }
+    const competitionForm=D.$('competition-create-form');
+    const formatSelect=competitionForm.elements.format;
+    function updateFormatFields(){
+      const pilot=formatSelect.value==='pilot';
+      D.$('pilot-start-field').classList.toggle('hidden',!pilot);
+      D.$('season-weeks-field').classList.toggle('hidden',pilot);
+    }
+    formatSelect.addEventListener('change',updateFormatFields);updateFormatFields();
+    competitionForm.addEventListener('submit',async e=>{
+      e.preventDefault();const button=competitionForm.querySelector('button');button.disabled=true;
+      const format=formatSelect.value;
+      const config={timezone:competitionForm.elements.timezone.value.trim()};
+      if(format==='pilot'){
+        const start=competitionForm.elements.eventStart.value;
+        if(start)config.eventStart=new Date(start).toISOString();
+      }else config.seasonWeeks=Number(competitionForm.elements.seasonWeeks.value);
+      try{
+        await competitionAction({action:'create_tournament',tournament:{
+          id:competitionForm.elements.id.value.trim(),name:competitionForm.elements.name.value.trim(),format,config,
+        }});
+        competitionForm.reset();updateFormatFields();await load();
+      }catch(error){status(error.message,'error');}finally{button.disabled=false;}
+    });
     D.$('add-player-form').addEventListener('submit',async e=>{
       e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
       try{await D.api('/api/admin/players',{method:'POST',body:{name:form.elements.name.value.trim()}});form.reset();await load();}
