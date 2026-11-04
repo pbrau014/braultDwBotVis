@@ -119,7 +119,7 @@ test('Admin manages Pilot and Full lifecycles; match outcomes require a stored o
   const fixture=await f.service.createFixture(admin,{seasonId:season.id,stageId:postseason.id,eventNightId:night.id,teamA:a.id,teamB:b.id});
   const match=await f.service.createMatch(admin,{seasonId:season.id,fixtureId:fixture.id});
   await assert.rejects(f.service.recordMatchOutcome(admin,{seasonId:season.id,matchId:match.id,id:'o0',teamA:a.id,teamB:b.id,scoreA:2,scoreB:1,methodId:'missing'}),e=>e.code==='SCORING_APPROVAL_REQUIRED');
-  const approval=await f.service.createApprovalRecord(admin,{id:'D21-v1',scope:'match outcome scoring',version:'1',approvedAt:'2026-11-04T12:00:00.000Z'});
+  const approval=await f.service.createApprovalRecord(admin,{id:'D21-v1',scope:'match outcome scoring',version:'1',sourceReference:'signed-method-D21-v1',confirmed:true,approvedAt:'2026-11-04T12:00:00.000Z'});
   const outcome=await f.service.recordMatchOutcome(admin,{seasonId:season.id,matchId:match.id,id:'o1',teamA:a.id,teamB:b.id,scoreA:2,scoreB:1,methodId:approval.id});
   assert.equal(outcome.winnerTeamId,a.id);
   const c=await f.service.createTeam(admin,{seasonId:season.id,name:'Green'});
@@ -127,7 +127,7 @@ test('Admin manages Pilot and Full lifecycles; match outcomes require a stored o
   const progression=await f.service.advanceBracket(admin,{seasonId:season.id,outcomeId:outcome.id,toFixtureId:nextFixture.id,methodId:approval.id});
   assert.equal(progression.winnerTeamId,a.id);
   await assert.rejects(f.service.createAward(admin,{id:'bad-award',tournamentId:full.id,recipientId:'p1',label:'Winner',approvalId:approval.id}),e=>e.code==='AWARD_APPROVAL_REQUIRED');
-  const awardApproval=await f.service.createApprovalRecord(admin,{id:'award-v1',scope:'award authorization',version:'1',approvedAt:'2026-11-04T12:01:00.000Z'});
+  const awardApproval=await f.service.createApprovalRecord(admin,{id:'award-v1',scope:'award authorization',version:'1',sourceReference:'signed-award-PUB01',confirmed:true,approvedAt:'2026-11-04T12:01:00.000Z'});
   const award=await f.service.createAward(admin,{id:'award-1',tournamentId:full.id,recipientId:'p1',label:'Winner',approvalId:awardApproval.id});
   assert.equal(award.status,'approved');
   assert.ok(f.state.lifecycle.auditLog.some(x=>x.action==='tournament.created'&&x.actor===ADMIN));
