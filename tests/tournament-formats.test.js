@@ -160,3 +160,14 @@ test('head-to-head tie-break is explicit and has precedence over later criteria'
   assert.equal(result.winnerTeamId, 'b');
   assert.equal(result.decidedBy, 'head_to_head');
 });
+
+test('public archive redacts Discord actor snowflakes but retains audit events', () => {
+  const s = state();
+  const t = F.createTournament(s.competition, { id: 'pilot-privacy', name: 'Pilot Privacy', format: 'pilot',
+    config: { timezone: 'America/Chicago', eventStart: '2026-12-01T18:00:00-06:00' } });
+  F.audit(t, 'sensitive-actor-check', {}, '12345678901234567');
+  const archive = T.makePublicArchiveSnapshot(s);
+  const saved = archive.workbook_backup.competition.tournaments[0];
+  assert.equal(saved.audit.at(-1).action, 'sensitive-actor-check');
+  assert.equal(saved.audit.at(-1).actor, 'redacted');
+});
