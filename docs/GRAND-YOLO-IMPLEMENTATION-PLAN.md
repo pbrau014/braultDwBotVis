@@ -1,6 +1,6 @@
 # Pilot and Full YOLO implementation plan
 
-**Version:** 1.1 implementation appendment  
+**Version:** 1.2 implementation appendment  
 **Updated:** 2026-11-04  
 **Branch:** `grand-yolo-format-implementation` (branched from reviewed `dwbotVis`)  
 **Base:** `5559e2be2c1fcd12b22cff9197ac5c5cb29e3f63`  
@@ -12,7 +12,7 @@ One YOLO system supports two distinct formats. Pilot YOLO is a single-evening ev
 
 ## Implemented in this branch
 
-1. `src/yolo-formats.js`: format-specific tournament record, publication gates, registration, team/roster assignment and lock, fixture scheduling, evidence-linked game records, verified match outcome provenance, Race side-event separation, stage progression, withdrawal guard and Pilot completion.
+1. `src/yolo-formats.js`: format-specific tournament record, publication gates (including valid IANA timezone, SHA-256 rules digest and complete stage/date/policy declarations), registration, team/roster assignment and lock, stage-stamped fixture scheduling, evidence-linked game records, verified match outcome provenance, ordered tie-break evidence, Race side-event separation, stage history/advancement records, withdrawal guard and Pilot completion.
 2. `src/tournament.js`: state normalization and full archive import/export now preserve explicitly declared YOLO tournaments. Legacy v2 player scores are retained and are not automatically assigned to Pilot or Full. Public snapshots redact registration Discord IDs.
 3. `src/desktop-service.js`: administrator-only list/create/update lifecycle operations. Registration uses an existing player-to-Discord link, not a caller-supplied identity assertion.
 4. `src/desktop-bridge.js`: authenticated, CSRF-protected Admin endpoints under `/api/admin/yolo-tournaments`.
@@ -46,7 +46,7 @@ All routes are inside the existing administrator authorization and CSRF boundary
 
 ### A. Stage-aware match progression
 
-Fixtures record the stage in which they were scheduled. Stage transition is blocked if the current stage has no fixtures or any current-stage fixture remains unresolved. Continue testing Regular Season -> Postseason -> Grand Finale -> Complete, including byes, forfeits, no-shows, withdrawals, and organizer-approved tie resolution.
+Fixtures record the stage in which they were scheduled. Stage transition is blocked if the current stage has no fixtures or any current-stage fixture remains unresolved. Current transitions persist stage history and qualified-team advancement records. Tie-break validation enforces head-to-head, record among tied teams, point differential, extra deciding game, then authorized random draw; no step may be skipped. Continue testing Regular Season -> Postseason -> Grand Finale -> Complete, including byes, forfeits, no-shows, withdrawals, and organizer-approved tie resolution.
 
 ### B. Organizer policy completeness
 
@@ -54,7 +54,7 @@ The system intentionally blocks publication when required settings or approval p
 
 ### C. Full participant and organizer UI
 
-The current Admin page supports draft creation and publish/start/complete controls. Full roster/fixture/match administration is available through the authenticated service/API actions but does not yet have dedicated visual forms for every action. Add role-specific UI for registration, team assignment, roster locking, fixture scheduling, game evidence, match verification, stage advancement and race side-event entry; expose only participant-owned registration and results to Players.
+The current Admin page supports draft creation and publish/start/complete controls. Full roster/fixture/match administration is available through the authenticated service/API actions but does not yet have dedicated visual forms for every action. A separate EventNight entity, per-night schedule windows, Pilot-specific per-game result ledger, and complete bracket UI remain planned additions; they are not represented as completed work. Add role-specific UI for registration, team assignment, roster locking, fixture scheduling, game evidence, match verification, stage advancement and race side-event entry; expose only participant-owned registration and results to Players.
 
 ### D. Validation and release
 
@@ -64,14 +64,14 @@ Run the exact-branch Node 22/24 CI suite and add UI contract tests for the help 
 
 | Gate | Status | Evidence needed |
 |---|---|---|
-| Domain lifecycle implementation | Implemented; local tests passed for the isolated prototype | Current branch CI |
-| State migration and private snapshot redaction | Implemented | Current branch persistence tests |
+| Domain lifecycle implementation | Implemented; isolated prototype tests passed locally before repository integration; branch CI pending | Current branch CI |
+| State migration and private snapshot redaction | Implemented; both public archive layers redact Discord IDs | Current branch persistence tests |
 | Authenticated Admin lifecycle service/API | Implemented | Current branch desktop/API tests |
-| Admin visual lifecycle controls | Partial | Browser interaction and expanded stage/team forms |
-| Mouse + keyboard quick-help | Implemented | Browser/accessibility review |
+| Admin visual lifecycle controls | Partial; draft/publish/start/complete visible, advanced actions are API-only | Browser interaction and expanded stage/team forms |
+| Mouse + keyboard quick-help | Implemented on Player, Admin and Upload pages | Browser/accessibility review |
 | Canonical workbook/match-outcome parity | BLOCKED | Designated canonical workbook + signed method |
 | Organizer event settings | BLOCKED | Complete approved settings record |
-| Windows/native OCR acceptance | NOT RUN in this implementation turn | Exact current branch on supported Windows host |
+| Windows/native OCR acceptance | CI queued/in progress; no final result yet | Exact current branch on supported Windows host |
 | Local OAuth/browser upload | NOT RUN in this implementation turn | Local browser test with synthetic screenshots |
 | Isolated Discord smoke | NOT RUN in this implementation turn | Development guild/channel and test credentials |
 | Production release | NO-GO | All required gates above closed |
