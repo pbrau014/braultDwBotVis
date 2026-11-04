@@ -32,6 +32,18 @@ function inspectTargetChannelPermissions(channel, botUser, requiredPermissions =
         };
     }
 
+    if (!botUser) {
+        return {
+            ok: false,
+            reason: 'bot-guild-member-not-resolved',
+            channelId: String(channel.id || ''),
+            guildId: String(channel.guildId || ''),
+            channelName: String(channel.name || ''),
+            requiredPermissions: requiredPermissions.map(item => item.name),
+            missingPermissions: [],
+        };
+    }
+
     const permissions = channel.permissionsFor(botUser);
     if (!permissions || typeof permissions.has !== 'function') {
         return {

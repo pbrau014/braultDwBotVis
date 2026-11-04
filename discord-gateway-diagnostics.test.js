@@ -63,3 +63,14 @@ test('Discord preflight fails closed when a required permission flag is undefine
     assert.equal(result.ok, false);
     assert.deepEqual(result.missingPermissions, ['UnknownPermission']);
 });
+
+
+test('Discord preflight fails closed when the bot guild member is not resolved', () => {
+    const channel = channelWith();
+    channel.permissionsFor = () => {
+        throw new Error('permissionsFor must not be called without a GuildMember');
+    };
+    const result = inspectTargetChannelPermissions(channel, null, required);
+    assert.equal(result.ok, false);
+    assert.equal(result.reason, 'bot-guild-member-not-resolved');
+});

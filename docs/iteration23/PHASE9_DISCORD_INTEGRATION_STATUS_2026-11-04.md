@@ -94,3 +94,8 @@ A hard-coded Discord webhook URL was detected in `dwbotStuff/scoreReport_dark_cl
 - Result: **10 passed / 0 failed / 0 skipped**.
 - Breakdown: six channel/permission preflight cases and four admin-command policy cases.
 - The run uses no Discord token, makes no network request, and does not import the full bot. It does not replace the unrun `full-system.test.js` integration suite or a live Discord role test.
+
+
+## Permission preflight API correction
+
+The preflight now resolves the bot's cached `GuildMember` from `targetChannel.guild.members.me` before calling discord.js `GuildChannel.permissionsFor`. The discord.js 14.27 API documents that method as accepting a `GuildMember` or `Role`, not a generic client user. The helper now fails closed if the bot guild member cannot be resolved, and a regression test covers that case. This avoids relying on an ambiguous User-to-member cache resolution.

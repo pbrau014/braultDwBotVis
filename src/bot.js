@@ -3529,7 +3529,8 @@ client.once(Events.ClientReady, async (readyClient) => {
     } catch (error) {
         console.error('[Discord preflight] FAILED: target channel fetch failed:', error?.message || error);
     }
-    const channelCheck = inspectTargetChannelPermissions(targetChannel, readyClient.user, [
+    const botMember = targetChannel?.guild?.members?.me || null;
+    const channelCheck = inspectTargetChannelPermissions(targetChannel, botMember, [
         { name: 'ViewChannel', flag: PermissionFlagsBits.ViewChannel },
         { name: targetChannel?.isThread?.() ? 'SendMessagesInThreads' : 'SendMessages', flag: targetChannel?.isThread?.() ? PermissionFlagsBits.SendMessagesInThreads : PermissionFlagsBits.SendMessages },
         { name: 'AttachFiles', flag: PermissionFlagsBits.AttachFiles },
