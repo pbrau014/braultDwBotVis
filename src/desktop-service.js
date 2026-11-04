@@ -312,6 +312,9 @@ function createDesktopService(options = {}) {
           case 'complete_stage':
             if(!tournament) throw new Error('Tournament ID is required.');
             result=TournamentFormats.completeStage(tournament,body.stageKey,actor);break;
+          case 'register_evidence':
+            if(!tournament) throw new Error('Tournament ID is required.');
+            result=TournamentFormats.registerEvidence(tournament,body.evidence||{},actor);break;
           case 'create_fixture':
             if(!tournament) throw new Error('Tournament ID is required.');
             result=TournamentFormats.createFixture(tournament,body.fixture||{},actor);break;
@@ -322,7 +325,7 @@ function createDesktopService(options = {}) {
             if(!tournament) throw new Error('Tournament ID is required.');
             const match=tournament.matches.find(item=>item.id===String(body.matchId));
             if(!match) throw new Error('Match was not found.');
-            result=TournamentFormats.recordGame(match,body.game||{},tournament.teams,tournament.registrations);
+            result=TournamentFormats.recordGame(match,body.game||{},tournament.teams,tournament.registrations,tournament.evidence);
             TournamentFormats.audit(tournament,'match_game_recorded',{matchId:match.id,gameNumber:result.gameNumber},actor);
             break;
           }
