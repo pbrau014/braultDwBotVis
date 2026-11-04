@@ -14,6 +14,7 @@ const STAGES = Object.freeze({
   GRAND_FINALE: 'grand_finale',
 });
 const STAGE_ORDER = Object.freeze([STAGES.REGULAR_SEASON, STAGES.POSTSEASON, STAGES.GRAND_FINALE]);
+const PilotResults = require('./pilot-results');
 const STATUS = Object.freeze({ DRAFT: 'draft', PUBLISHED: 'published', ACTIVE: 'active', COMPLETE: 'complete', FORFEIT: 'forfeit', CANCELLED: 'cancelled' });
 const clone = value => JSON.parse(JSON.stringify(value));
 const cleanText = (value, label) => {
@@ -74,6 +75,7 @@ function normalizeTournament(raw) {
     eventNights: Array.isArray(raw.eventNights) ? raw.eventNights.map(clone) : [],
     fixtures: Array.isArray(raw.fixtures) ? raw.fixtures.map(clone) : [],
     matches: Array.isArray(raw.matches) ? raw.matches.map(clone) : [],
+    pilotResults: Array.isArray(raw.pilotResults) ? raw.pilotResults.map(clone) : [],
     evidence: Array.isArray(raw.evidence) ? raw.evidence.map(clone) : [],
     raceSideEvents: Array.isArray(raw.raceSideEvents) ? raw.raceSideEvents.map(clone) : [],
     awards: Array.isArray(raw.awards) ? raw.awards.map(clone) : [],
@@ -236,6 +238,7 @@ function activateStage(tournament, stageKey, actor = 'organizer') {
 function completeStage(tournament, stageKey, actor = 'organizer') {
   const stage = tournament.stages.find(s => s.key === stageKey);
   if (!stage || stage.status !== STATUS.ACTIVE) throw new Error('Only an active stage can be completed.');
+  if (tournament.format === FORMAT.PILOT && !tournament.pilotResults.length) throw new Error('Pilot Event cannot close until at least one individual Damage result is recorded.');
   if (tournament.format === FORMAT.FULL && !tournament.fixtures.some(f => f.stageKey === stageKey))
     throw new Error('A Full YOLO stage requires at least one resolved fixture before completion.');
   if (tournament.fixtures.some(f => f.stageKey === stageKey && ((f.status !== 'bye' && !f.matchId) || !['complete','forfeit','bye'].includes(f.status)))) {
@@ -487,4 +490,5 @@ module.exports = {
   createTournament, getTournament, registerParticipant, closeRegistration, withdrawParticipant, assignTeam, lockRoster,
   publishTournament, setStageQualifiers, activateStage, completeStage, createEventNight, registerEvidence, createFixture, createMatch,
   recordGame, aggregateMatchMetrics, resolveMatch, completeMatch, resolveForfeit, recordBye, recordRaceSideEvent, freezeSettings, audit,
+  recordPilotResult: PilotResults.recordPilotResult, pilotStandings: PilotResults.pilotStandings,
 };
