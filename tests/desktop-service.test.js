@@ -154,3 +154,16 @@ test('screenshot mapping can target a Pilot ledger without altering legacy score
   assert.equal(f.state.players[0].events.damage[0].metric,0);
   assert.equal(f.state.lifecycle.tournaments.find(x=>x.id===pilot.id).scoreEntries.length,1);
 });
+
+test('Race standings rank shorter elapsed time ahead of longer elapsed time',async()=>{
+  const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
+  const pilot=await f.service.createTournament(admin,{id:'pilot-race',name:'Pilot Race',format:'pilot'});
+  await f.service.registerPilotParticipant(admin,{tournamentId:pilot.id,participantId:String(f.alpha.id)});
+  await f.service.registerPilotParticipant(admin,{tournamentId:pilot.id,participantId:'2'});
+  const night=await f.service.createPilotEventNight(admin,{tournamentId:pilot.id});
+  for(const status of ['registration_open','locked','active'])await f.service.transitionTournament(admin,{tournamentId:pilot.id,status});
+  await f.service.recordTournamentScore(admin,{tournamentId:pilot.id,participantId:String(f.alpha.id),category:'race',gameNumber:1,shipClass:'DD',tier:8,time:90,eventNightId:night.id,evidenceId:'race-90'});
+  await f.service.recordTournamentScore(admin,{tournamentId:pilot.id,participantId:'2',category:'race',gameNumber:1,shipClass:'DD',tier:8,time:120,eventNightId:night.id,evidenceId:'race-120'});
+  const summary=(await f.service.getOverview(admin)).tournaments.find(x=>x.id===pilot.id);
+  assert.equal(summary.standings[0].id,f.alpha.id);
+});
