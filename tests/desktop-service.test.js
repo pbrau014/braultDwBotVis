@@ -99,7 +99,7 @@ test('authenticated Admin backup retains private roster links and pending correc
 test('admin can create and publish a Pilot tournament and a linked player can register',async()=>{
   const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN}),player=await f.service.resolvePrincipal({id:PLAYER});
   const created=await f.service.competitionAction(admin,{action:'create_tournament',tournament:{
-    id:'pilot-desktop',name:'Desktop Pilot',format:'pilot',config:{timezone:'America/Chicago',eventStart:'2026-12-01T18:00:00-06:00'},
+    id:'pilot-desktop',name:'Desktop Pilot',format:'pilot',config:{timezone:'America/Chicago',eventStart:'2026-12-01T18:00:00-06:00',eventEnd:'2026-12-01T22:00:00-06:00'},
   }});
   assert.equal(created.format,'pilot');
   await f.service.competitionAction(admin,{action:'publish',tournamentId:'pilot-desktop',approval:{}});
@@ -112,7 +112,7 @@ test('admin can create and publish a Pilot tournament and a linked player can re
 test('admin Full YOLO publication requires and persists an approved match method',async()=>{
   const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
   await f.service.competitionAction(admin,{action:'create_tournament',tournament:{
-    id:'full-desktop',name:'Desktop Full',format:'full',config:{timezone:'America/Chicago',seasonWeeks:10},
+    id:'full-desktop',name:'Desktop Full',format:'full',config:{timezone:'America/Chicago',seasonWeeks:10,eventStart:'2026-12-01T00:00:00-06:00',eventEnd:'2027-03-01T00:00:00-06:00'},
   }});
   await assert.rejects(f.service.competitionAction(admin,{action:'publish',tournamentId:'full-desktop',approval:{}}),/approved, published match-outcome/);
   await f.service.competitionAction(admin,{action:'publish',tournamentId:'full-desktop',approval:{
