@@ -14,7 +14,7 @@ const STAGES = Object.freeze({
   GRAND_FINALE: 'grand_finale',
 });
 const STAGE_ORDER = Object.freeze([STAGES.REGULAR_SEASON, STAGES.POSTSEASON, STAGES.GRAND_FINALE]);
-const STATUS = Object.freeze({ DRAFT: 'draft', PUBLISHED: 'published', ACTIVE: 'active', COMPLETE: 'complete', CANCELLED: 'cancelled' });
+const STATUS = Object.freeze({ DRAFT: 'draft', PUBLISHED: 'published', ACTIVE: 'active', COMPLETE: 'complete', FORFEIT: 'forfeit', CANCELLED: 'cancelled' });
 const clone = value => JSON.parse(JSON.stringify(value));
 const cleanText = (value, label) => {
   const text = String(value ?? '').trim();
@@ -130,7 +130,6 @@ function withdrawParticipant(tournament, playerId, reason, actor = 'organizer') 
   if (!registration) throw new Error('Active participant registration was not found.');
   const cleanReason = cleanText(reason, 'Withdrawal reason');
   registration.status = 'withdrawn'; registration.withdrawnAt = now(); registration.withdrawalReason = cleanReason;
-  for (const team of tournament.teams) if (team.playerIds.includes(String(playerId))) team.playerIds = team.playerIds.filter(id => id !== String(playerId));
   audit(tournament, 'participant_withdrawn', { playerId: String(playerId), reason: cleanReason }, actor);
   return registration;
 }
@@ -211,6 +210,7 @@ function createFixture(tournament, input, actor = 'organizer') {
   const home = tournament.teams.find(t => t.id === String(input.homeTeamId));
   const away = tournament.teams.find(t => t.id === String(input.awayTeamId));
   if (!home || !away || home.id === away.id) throw new Error('Fixture requires two distinct registered teams.');
+  if (!home.rosterLocked || !away.rosterLocked) throw new Error('Both team rosters must be locked before scheduling a fixture.');
   if (tournament.fixtures.some(f => f.id === String(input.id))) throw new Error('Fixture ID already exists.');
   const fixture = { id: cleanText(input.id, 'Fixture ID'), stageKey: input.stageKey,
     homeTeamId: home.id, awayTeamId: away.id, scheduledAt: input.scheduledAt || null,
@@ -247,6 +247,10 @@ function recordGame(match, game, teams = []) {
     playerId: cleanText(game.playerId, 'Player ID'), metrics: { damage: Number(metrics.damage), kills: Number(metrics.kills) },
     evidenceId: cleanText(game.evidenceId, 'Evidence reference'), recordedAt: now() };
   if (![match.homeTeamId, match.awayTeamId].includes(result.teamId)) throw new Error('Game result team is not part of this match.');
+  if (teams.length) {
+    const team = teams.find(item => item.id === result.teamId);
+    if (!team || !team.rosterLocked || !team.playerIds.includes(result.playerId)) throw new Error('Game player must belong to the locked roster of the recorded team.');
+  }
   match.games.push(result);
   match.status = 'active';
   return result;
@@ -288,7 +292,8 @@ function resolveMatch(match, method, options = {}) {
 function completeMatch(tournament, matchId, options = {}, actor = 'organizer') {
   const match = tournament.matches.find(m => m.id === String(matchId));
   if (!match) throw new Error('Match was not found.');
-  if (match.status === STATUS.COMPLETE) throw new Error('Match is already complete.');
+  if (match.status === STATUS.COMPLETE || match.status === STATUS.FORFEIT) throw new Error('Match is already resolved.');
+  if (!match.games.length) throw new Error('A match with no recorded games cannot be completed.');
   if (tournament.format === FORMAT.FULL) {
     const method = tournament.config.matchOutcomeMethod;
     const outcome = resolveMatch(match, method, options);
