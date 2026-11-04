@@ -45,13 +45,13 @@ try {
   param([string]$Label,[string[]]$Arguments)
   $Log=Join-Path $RunDir ($Label+'.log')
   Write-Host "[WINDOWS-OCR] START $Label"
-  ("COMMAND: npm "+($Arguments -join ' ')) | Set-Content -LiteralPath $Log -Encoding utf8
-  $PreviousErrorActionPreference=$ErrorActionPreference
-  try {
-   $ErrorActionPreference='Continue'
-   & npm.cmd @Arguments *> $Log
-   $Code=$LASTEXITCODE
-  } finally { $ErrorActionPreference=$PreviousErrorActionPreference }
+  $OutputLog=$Log+'.output.tmp'
+  $CommandLine='npm.cmd '+($Arguments -join ' ')+' > "'+$OutputLog+'" 2>&1'
+  & $env:ComSpec /d /c $CommandLine
+  $Code=$LASTEXITCODE
+  $Output=if(Test-Path -LiteralPath $OutputLog){Get-Content -LiteralPath $OutputLog -Raw}else{''}
+  @("COMMAND: npm "+($Arguments -join ' '),"EXIT: $Code",$Output) | Set-Content -LiteralPath $Log -Encoding utf8
+  Remove-Item -LiteralPath $OutputLog -Force -ErrorAction SilentlyContinue
   Get-Content -LiteralPath $Log | ForEach-Object { Write-Host $_ }
   $Outcome=if($Code -eq 0){'PASS'}else{'FAIL'}
   $script:Results += [pscustomobject]@{label=$Label;arguments=$Arguments;exitCode=$Code;log=[System.IO.Path]::GetFileName($Log);passed=($Code -eq 0)}
