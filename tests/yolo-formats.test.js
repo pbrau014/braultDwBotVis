@@ -27,3 +27,23 @@ test('Full stages activate and complete in order; season cannot close early',()=
  t=Y.transitionStage(t,'grand-finale','completed','admin');
  assert.equal(t.stages.every(s=>s.status==='completed'),true);
 });
+
+test('lifecycle identifiers and event times are validated',()=>{
+ assert.throws(()=>Y.createTournament({id:'bad/id',name:'Bad',format:'pilot'}),/identifier/);
+ assert.throws(()=>Y.createEventNight({id:'night',tournamentId:'p',startsAt:'2026-11-05T18:00:00Z',endsAt:'2026-11-05T17:00:00Z'}),/after its start/);
+});
+test('teams, fixtures, matches and games enforce distinct identities and valid structure',()=>{
+ const teamA=Y.createTeam({id:'team-a',eventNightId:'night-1',name:'A',participantIds:['1','2']});
+ assert.equal(teamA.participantIds.length,2);
+ assert.throws(()=>Y.createTeam({id:'team-b',eventNightId:'night-1',name:'B',participantIds:['1','1']}),/twice/);
+ assert.throws(()=>Y.createFixture({id:'fx',eventNightId:'night-1',homeTeamId:'team-a',awayTeamId:'team-a',scheduledAt:'2026-11-05T18:00:00Z'}),/distinct/);
+ const fixture=Y.createFixture({id:'fx',eventNightId:'night-1',homeTeamId:'team-a',awayTeamId:'team-b',scheduledAt:'2026-11-05T18:00:00Z',seriesLength:3});
+ const match=Y.createMatch({id:'m1',fixtureId:fixture.id,matchNumber:1});
+ const game=Y.createGame({id:'g1',matchId:match.id,gameNumber:1});
+ assert.equal(game.status,'pending-evidence');
+ assert.throws(()=>Y.createFixture({id:'fx2',eventNightId:'night-1',homeTeamId:'a',awayTeamId:'b',scheduledAt:'2026-11-05T18:00:00Z',seriesLength:2}),/odd integer/);
+});
+test('official outcome requires non-empty unique accepted records and tie-breaks',()=>{
+ assert.throws(()=>Y.validateMatchOutcome({approvedScoringMethodId:'v1',acceptedPerformanceRecordIds:['r1','r1'],aggregation:'sum',rounding:'nearest',tieBreakOrder:['head-to-head']}),/Unique accepted/);
+ assert.throws(()=>Y.validateMatchOutcome({approvedScoringMethodId:'v1',acceptedPerformanceRecordIds:['r1'],aggregation:'sum',rounding:'nearest',tieBreakOrder:[]}),/tie-break order/);
+});
