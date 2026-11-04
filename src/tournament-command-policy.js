@@ -16,6 +16,7 @@ const ADMIN_ONLY_COMMANDS = new Set([
     'export',
     'export-workbook',
     'snapshot',
+    'lifecycle-create','lifecycle-publish','lifecycle-start','lifecycle-finish','lifecycle-team','lifecycle-assign','lifecycle-lock','lifecycle-fixture','lifecycle-game','lifecycle-complete-fixture','lifecycle-resolve','lifecycle-stage','lifecycle-pilot-result','lifecycle-race',
 ]);
 
 function isAdminOnlyCommand(command) {
