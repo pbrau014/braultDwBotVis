@@ -73,3 +73,6 @@ Player view displays Pilot/Full events and self-registration. Admin view creates
 
 ## Change control
 Append future findings here with sequential amendment IDs. Every code change should add/update tests, update this plan and instruction manual where relevant, and distinguish attempted, completed, tested, verified and accepted. Do not mark production ready until all applicable release gates have evidence.
+
+### A7 - Publication schedule and freeze enforcement
+Pilot and Full publication now require valid start/end timestamps and a configured timezone; Full additionally requires organizer-selected season duration. Registration must close before stage activation and team roster locks. Both the desktop settings endpoint and Discord !yolo setting command now consult active competition stages and block legacy global scoring-setting changes while the freeze is in force. Evidence metadata is validated and can be linked from existing OCR screenshot records.
