@@ -139,3 +139,14 @@ test('Full YOLO cannot close until every season stage is completed in order',asy
  const final=await f.service.transitionYoloTournament(admin,'full-stage',{status:'completed'});
  assert.equal(final.status,'completed');
 });
+
+test('participant overview exposes only aggregate event registration state, not other roster identities',async()=>{
+ const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN}),player=await f.service.resolvePrincipal({id:PLAYER});
+ await f.service.createYoloTournament(admin,{id:'pilot-public',name:'Public Pilot',format:'pilot'});
+ await f.service.createYoloEventNight(admin,{id:'night-public',tournamentId:'pilot-public',startsAt:'2026-11-06T18:00:00Z'});
+ await f.service.registerYoloParticipant(player,'night-public');
+ const overview=await f.service.getOverview(player);
+ assert.equal(overview.eventNights[0].isRegistered,true);
+ assert.equal(overview.eventNights[0].registrationCount,1);
+ assert.equal(Object.hasOwn(overview.eventNights[0],'registrations'),false);
+});
