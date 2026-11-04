@@ -59,7 +59,7 @@ test('match outcomes require an approved, identified scoring method and exact po
   const t = L.createTournament({ id: 'f4', format: 'full' });
   const s = L.createSeason(t.id, { id: 's4', tournament: t });
   assert.throws(() => L.recordMatchOutcome(s, { id: 'm1', method: { approved: false }, teamA: 'a', teamB: 'b', scoreA: 1, scoreB: 0 }), /approved/);
-  const result = L.recordMatchOutcome(s, { id: 'm2', method: { approved: true, methodId: 'D21-approved-v1' }, teamA: 'a', teamB: 'b', scoreA: 12.5, scoreB: 9 });
+  const result = L.recordMatchOutcome(s, { id: 'm2', method: { approved: true, methodId: 'D21-approved-v1', approvedAt: '2026-11-04T12:00:00Z', approvedBy: 'organizer-1' }, teamA: 'a', teamB: 'b', scoreA: 12.5, scoreB: 9 });
   assert.equal(result.winnerTeamId, 'a');
   assert.throws(() => L.recordMatchOutcome(s, { id: 'm3', method: { approved: true, methodId: 'D21-approved-v1' }, teamA: 'a', teamB: 'b', scoreA: '', scoreB: 0 }), /finite/);
 });
