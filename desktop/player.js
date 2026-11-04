@@ -15,6 +15,25 @@
     D.$('player-content').classList.remove('hidden');
     D.$('player-title').textContent=overview.player.name;
     D.$('player-subtitle').textContent='Roster entry #'+overview.player.id+' · signed in as '+session.user.username;
+    const formatList=D.$('tournament-format-list');formatList.replaceChildren();
+    for(const tournament of overview.tournaments||[]){
+      const card=D.node('article','submission-card');
+      card.append(D.node('h3','',tournament.name+' · '+(tournament.format==='pilot'?'Pilot YOLO':'Full YOLO')));
+      card.append(D.node('p','submission-meta',tournament.status+' · '+(tournament.format==='pilot'?'single-evening event':(tournament.seasonWeeks?tournament.seasonWeeks+' week season':'season duration pending'))));
+      const stages=D.node('p','muted',tournament.stages.map(stage=>stage.key.replace(/_/g,' ')+' ('+stage.status+')').join(' → '));
+      card.append(stages);
+      if(tournament.registered)card.append(D.node('p','form-success','You are registered for this tournament.'));
+      else if(tournament.registrationOpen&&['published','active'].includes(tournament.status)){
+        const register=D.node('button','button primary small','Register for this tournament');
+        register.type='button';register.addEventListener('click',async()=>{
+          register.disabled=true;
+          try{await D.api('/api/competition/'+encodeURIComponent(tournament.id)+'/register',{method:'POST',body:{}});status('Registration confirmed.','success');location.reload();}
+          catch(error){register.disabled=false;status(error.message,'error');}
+        });card.append(register);
+      }else card.append(D.node('p','muted',tournament.registrationOpen?'Registration opens when the tournament is published.':'Registration is closed.'));
+      formatList.append(card);
+    }
+    if(!(overview.tournaments||[]).length)formatList.append(D.node('p','muted','No Pilot or Full YOLO tournament is currently published.'));
     const standing=overview.standing||{};
     D.$('player-total').textContent=D.number(standing.total)+' 🪙';
     D.$('player-value').textContent=D.money(standing.estimatedValue);
