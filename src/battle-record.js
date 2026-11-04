@@ -150,10 +150,13 @@ function parseModeMap(text) {
     // the adjacent mode token. In that narrowly bounded shape, the pre-separator
     // text is a usable map candidate; do not infer a mode or whitelist map names.
     if (map === NOT_DETECTED) {
-        const trailingSeparator = source.match(/^([^\n|]{2,80}?)\s+[—–-]+\s*$/);
-        if (trailingSeparator && !/battle start time|victory|defeat|received|battle performance/i.test(trailingSeparator[1])) {
-            map = trailingSeparator[1].trim();
-        }
+        // OCR often emits the map title and trailing separator on their own line,
+        // followed by the timestamp or other metadata. Search individual lines,
+        // not only a one-line document, and exclude known non-map headings.
+        const trailingSeparatorLine = lines
+            .map((line) => line.match(/^([^\n|]{2,80}?)\s+[—–-]+\s*$/))
+            .find((match) => match && !/battle start time|victory|defeat|received|battle performance/i.test(match[1]));
+        if (trailingSeparatorLine) map = trailingSeparatorLine[1].trim();
     }
     // Repair common OCR separators in a map title without making a closed list
     // of map names. The fused "Sealof" token is a recurring OCR artifact for
