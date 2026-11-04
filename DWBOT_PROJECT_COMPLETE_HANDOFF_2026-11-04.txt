@@ -1,0 +1,255 @@
+DWBOT — COMPLETE PROJECT HANDOFF AND IMPLEMENTATION GUIDE
+Snapshot: 2026-11-04
+Repository: https://github.com/pbrau014/braultDwBotVis.git
+Delivery branch: dwbotVis only
+Read-only branch: main
+Implementation checkpoint before this docs package: 8494c05687494b5afd8cb18aeab96faceeb56620
+CI run: https://github.com/pbrau014/braultDwBotVis/actions/runs/41813315107
+
+===============================================================================
+1. PROJECT IDENTITY
+===============================================================================
+DWBOT is the World of Warships YOLO Tournament Discord bot, local tournament scoring engine, screenshot OCR/image-extraction pipeline, Discord integration and desktop Player/Admin interface.
+
+It combines tournament scoring/state with 50 players, four events and seven game slots per player/event; Discord commands and image attachments; strict OCR validation; and desktop Player/Admin/upload pages using the same bot state and OCR queue. plan1.txt remains the full append-only roadmap and historical change record.
+
+===============================================================================
+2. REPOSITORY AND WORKING RULES
+===============================================================================
+Canonical repository: pbrau014/braultDwBotVis
+Only delivery branch: dwbotVis
+main is read-only. No merge, rewrite, force-push or default-branch change.
+Do not substitute pop1, pbrau014/dwbot or another remote.
+
+Before every write: fetch dwbotVis head, compare expected SHA, build a tree from current tree, create commit with exact parent, update only dwbotVis with expected-head protection, then fetch/verify exact SHA and tree.
+
+Last observed main head: ad34090f6dafebe558ab505dd6aebecc542f8c47. This differs from older historical baseline. No inference is made about who moved it; no main write occurred.
+
+Preserve original versus derivative/historical/current-source distinctions. Never present historical test data as current-source acceptance. Do not invent evidence or secrets.
+
+===============================================================================
+3. PROJECT HISTORY — INITIAL WORK THROUGH CURRENT
+===============================================================================
+The full chronological requirements, change explanations and previous test evidence are in plan1.txt and historical reports/manifests.
+
+Tournament/workbook foundation:
+- Four events: Damage, Kills, Race and Grand Yolo.
+- Seven game slots per event; up to 50 players.
+- Ship class/tier weighting, event totals, standings, workbook backup/export.
+- Grand Yolo tierWeight remains 0.9.
+- Workbook Totals!H12 formula is =0.54*G12/100; default display $12.49. Earlier conversational claim of tierWeight 1 / $12.56 was mistaken and withdrawn.
+
+Phase 0: source baseline/repair, preserve originals, manifests and expanded screenshot corpus.
+Phase 1: bounded serial OCR, child-process supervision, timeout/cancellation and verified close.
+Phase 2: repeatable OCR acceptance, exact comparisons and strong negative control.
+Phase 3: RC3 reliability/accuracy work, separated recovery lifecycle from recognition, geometry-based localized reward crops, cautious map artifact cleanup, abstention on damage/name disagreement.
+Phase 4: nine-field mandatory contract and exact corrections.
+Phase 5: Windows/native Tesseract and Node v24 current-source validation; open.
+Phase 6: optional privacy-safe diagnostics only with explicit consent/retention/access rules.
+Phase 7: broad regression; current Node 22 Linux suite green, Windows/native separate.
+Phase 8: source/package manifest, SHA, clean extraction, docs and manual; still open.
+Phase 9: Discord READY/channel/role/attachment/persistence/recovery live smoke; offline preflight implemented, live smoke open.
+Phase 10: Player/Admin/upload pages, secure local Node bridge, shared OCR/state integration, visual tests, manual and release packaging; core UI/services implemented, live local verification open.
+
+===============================================================================
+4. CURRENT ARCHITECTURE
+===============================================================================
+Tournament:
+src/tournament.js is authoritative scoring/state, 50-player capacity, four events, seven games, JSON and optional built-in SQLite.
+playerAccountLinks maps unique Discord snowflakes to roster player IDs.
+
+Discord:
+src/bot.js owns Discord lifecycle, command routing, attachments and shared OCR entry point.
+src/discord-gateway-diagnostics.js checks target-channel type and effective View/Send/Attach permissions.
+Discord.js owns heartbeat/reconnect/resume. Message Content intent is required for existing prefix and attachment visibility. No GuildMembers or Presence intent.
+src/tournament-command-policy.js makes setting/settings admin-only.
+scripts/preflight-discord-test.js is offline validation only.
+Keep ENABLE_SLASH_COMMANDS=0 until an isolated guild test.
+
+OCR:
+Tesseract.js remains the baseline. extractText(imageBuffer) uses the bounded serial queue and supervised OCR worker. Image localization and OpenCV geometry isolate evidence only. PaddleOCR is optional local secondary candidate. OCR.space is optional localized-crop evidence with quota ledger, disabled by default.
+src/ocr-sequence-checkpoint.js + scripts/run-ocr-sequence.js persist atomic per-image progress; this does not claim acceptance or automatic resumability.
+
+Desktop:
+desktop/index.html sign-in landing.
+desktop/player.html and player.js: Player totals, standings, event scores, owned screenshot submissions and OCR review/mapping.
+desktop/admin.html and admin.js: roster, account links, manual scores, scoring settings, review, standings and private backup.
+desktop/upload.html and upload.js: one-image file picker/drop/preview/validation/progress.
+desktop/desktop.css and desktop.js shared styles and API behavior.
+Original workbook and image reader HTML files remain in dwbotStuff as source baselines; the new pages are derivatives.
+
+Bridge/service:
+src/desktop-bridge.js: loopback-only Node HTTP server, Discord OAuth identify, nonce/session cookie, CSRF, strict origin/Host, file-size/signature checks, rate limits, CSP, audit.
+src/desktop-service.js reuses tournament state/scoring/BattleRecord validators and existing extractText queue.
+Players see own records and can map only exact linked identity. Mismatch remains admin-review. Admin operations checked by service, not UI.
+Bridge starts only after Discord READY/channel preflight and only with ENABLE_DESKTOP_UI=1. Shutdown closes it. Desktop Admin requires TOURNAMENT_ADMIN_IDS; Manage Server alone is insufficient.
+
+===============================================================================
+5. PUBLIC AND PRIVATE BACKUP CONTRACT
+===============================================================================
+Full private local state contains account links, desktop record ownership IDs and per-user pending workflows. Authenticated local Admin GET /api/admin/backup returns full private archive.
+Public Discord snapshots and public !yolo export / !yolo finalize use makePublicArchiveSnapshot. They retain scores and battle records but omit player_account_links, desktop_owner_id/desktop_owner_role, pending_submissions and pending_ocr_corrections. Counts and explanatory note are retained.
+Public snapshot is not complete private backup. Importing one requires account relinking and restart of omitted pending workflows. Use authenticated local Admin backup for complete private recovery.
+
+===============================================================================
+6. EXACT OCR CONTRACT
+===============================================================================
+Nine mandatory fields, exact order:
+1 result
+2 player
+3 map
+4 mode
+5 battleStart
+6 credits
+7 freeXp
+8 damage
+9 xp
+
+XP is mandatory and ninth. Invalid, ambiguous or conflicting required values remain unresolved. No fuzzy player/name/numeric repair, no expected-value injection and no weakening acceptance tests.
+Tesseract.js baseline; OpenCV geometry only; PaddleOCR/OCR.space secondary evidence. OCR.space remains disabled by default. No live OCR.space call/image transmission.
+Grand Yolo tierWeight 0.9; workbook H12 =0.54*G12/100, default $12.49.
+
+===============================================================================
+7. CURRENT CI AND TEST EVIDENCE
+===============================================================================
+Exact implementation checkpoint: 8494c05687494b5afd8cb18aeab96faceeb56620
+CI: https://github.com/pbrau014/braultDwBotVis/actions/runs/41813315107
+Node 22.16.0 Linux:
+- npm ci: PASS
+- syntax: PASS
+- OCR.space mocked: 15/15 PASS
+- Discord offline preflight: 21/21 PASS
+- desktop bridge/service/UI tests: 28/28 PASS
+- full npm test: 254 total / 253 passed / 0 failed / 1 skipped.
+- sole skip: optional OpenCV helper; cv2 unavailable in Linux runner.
+Full decoded log: reports/ci/2026-11-04-41813315107-node22-linux-full-log.txt.
+
+Not validated: Windows Node v24, native Tesseract, current screenshot accuracy acceptance, browser visual QA, real OAuth, Discord login/READY, real permissions, browser upload, Windows persistence/recovery, live rate-limit observation.
+
+===============================================================================
+8. SOURCE ARCHIVE AND INVENTORY
+===============================================================================
+Historical Library package: DWBOT_COMPLETE_DOWNLOAD_KIT_2026-11-03.zip
+Size: 175,126,438 bytes
+SHA-256: 7f5984ecbcd8009110b98f283e20b7d5fc5b840e2a5c08a5ad4f436959387c25
+Embedded DWBOT_NODE22PLUS_CHECKPOINT_003_MANIFEST.json reports 472 files / 108,083,848 uncompressed bytes; historical report says 472/472 path/size/hash checks passed. Independently rehashed and unzip -t passed.
+The original ZIP remains in the user's File Library. It exceeds GitHub's 100 MB per-file limit and is not committed as a single repository blob. Its SHA sidecar and manifest are present in the repository.
+
+Current tree inventory at implementation commit 8494c056:
+925 entries, 844 files, 81 directories; 26 src, 38 tests, 7 testdata, 9 desktop, 28 scripts, 46 docs, zero root-level tests.
+See docs/inventory/DWBOT_GIT_TREE_INVENTORY_2026-11-04.json for every path, Git blob SHA and size. Git blob SHA is an object ID, not SHA-256. Inventory describes the tree before this docs package.
+
+GitHub current branch ZIP:
+https://github.com/pbrau014/braultDwBotVis/archive/refs/heads/dwbotVis.zip
+
+===============================================================================
+9. LOCAL INSTALL AND TEST COMMANDS
+===============================================================================
+Use Node >=22.16.0. CI uses Node 22.16.0; user's Windows Node v24.22.1 was previously reported and must be validated on current source.
+
+From project root:
+- node --version
+- npm ci
+- npm run test:discord-preflight
+- npm run preflight:desktop-test
+- npm run test:desktop
+- npm run test:ocr
+- npm test
+- npm run test:prelive
+
+Additional OCR acceptance commands:
+- npm run test:reported-screenshot
+- npm run test:four-images
+- npm run test:additional-images
+- npm run test:tesseractjs
+- npm run test:ocr-watchdog
+- npm run test:opencv
+- npm run benchmark:paddleocr:offline
+- npm run acceptance:paddleocr (Windows PowerShell integrated gate)
+
+test:prelive combines Discord preflight, desktop config preflight, desktop tests and OCR focused tests. Full npm test remains mandatory. Full screenshot acceptance scripts are separate and have not all been run on the exact current source.
+
+===============================================================================
+10. DESKTOP LOCAL CONFIGURATION
+===============================================================================
+See .env.desktop.example and docs/iteration23/DESKTOP_UI_PRELIVE_QUICKSTART_2026-11-04.md.
+Add to existing .env; do not overwrite bot settings.
+
+ENABLE_DESKTOP_UI=1
+DESKTOP_UI_PORT=8787
+DISCORD_OAUTH_CLIENT_ID=YOUR_DISCORD_APPLICATION_ID
+DISCORD_OAUTH_CLIENT_SECRET=YOUR_LOCAL_OAUTH_CLIENT_SECRET
+DISCORD_OAUTH_REDIRECT_URI=http://127.0.0.1:8787/auth/discord/callback
+TOURNAMENT_ADMIN_IDS=YOUR_ADMIN_DISCORD_USER_ID
+ENABLE_SLASH_COMMANDS=0
+OCRSPACE_ENABLED=0
+PADDLEOCR_FIELD_FALLBACK=0
+OCR_CV_ASSIST=0
+
+Register exact Discord OAuth2 redirect:
+http://127.0.0.1:8787/auth/discord/callback
+Scope identify only. Do not commit/share secrets.
+Bridge starts after Discord READY/channel preflight; address http://127.0.0.1:8787.
+Admin must be in TOURNAMENT_ADMIN_IDS. Admin links player IDs. Players see own data and may map only exact OCR identity match. Use synthetic images only.
+
+===============================================================================
+11. DISCORD LIVE SMOKE
+===============================================================================
+Use separate dev bot/guild/channel. Message Content enabled; View/Send/Attach permissions; ENABLE_SLASH_COMMANDS=0.
+Verify READY/preflight, participant/admin allow/deny, wrong-channel ignore, synthetic screenshot via Discord and desktop, nine fields/correction/mapping, shared queue/state, no duplicate mapping, attachments, clean restart, restore and natural rate-limit behavior.
+No live Discord login, OAuth, READY/permission test, browser image submit, restart recovery or rate-limit smoke has occurred.
+
+===============================================================================
+12. SECURITY AND RISKS
+===============================================================================
+- Historical Image Text Reader webhook was exposed in source history and direct-posting removed from current dwbotVis copy. Owner must revoke/delete the exposed endpoint; never reuse it.
+- Current main at new head has not been re-inspected; no current claim about its file contents.
+- Bridge must remain loopback; do not expose through LAN/tunnel/proxy/port-forward.
+- Public snapshots omit private account links and pending identity; full Admin backup is private and must be stored securely.
+- No .env, secrets, runtime DB, private state or node_modules should be packaged.
+- CI UI tests are contract tests, not visual browser automation.
+
+===============================================================================
+13. RELEASE GATES
+===============================================================================
+PASS: Node 22 Linux CI, OCR.space mock, Discord offline preflight, desktop contract/service, public/private backup contract, historical archive checksum/integrity, source tree inventory.
+OPEN: current full screenshot OCR acceptance; Windows Node v24 and native Tesseract; real OAuth/browser visual QA; real desktop upload through running bot; isolated live Discord smoke; Windows recovery; PDF user manual; post-doc package SHA/clean extraction.
+Production: NO-GO.
+
+===============================================================================
+14. DOCUMENT INDEX AND NEXT STEPS
+===============================================================================
+Full append-only plan: plan1.txt
+Authority: docs/continuation/PROJECT_AUTHORITY_AND_IMPLEMENTATION_RULES.md
+Transfer: GITHUB_TRANSFER_STATUS.md
+Phase 9: docs/iteration23/PHASE9_DISCORD_INTEGRATION_STATUS_2026-11-04.md
+Discord smoke: docs/iteration23/DISCORD_LIVE_TEST_QUICKSTART.md
+Desktop setup: docs/iteration23/DESKTOP_UI_PRELIVE_QUICKSTART_2026-11-04.md
+Inventory: docs/inventory/DWBOT_GIT_TREE_INVENTORY_2026-11-04.json
+Current CI log: reports/ci/2026-11-04-41813315107-node22-linux-full-log.txt
+
+Next:
+1. Verify final docs/package commit and CI.
+2. Complete Windows browser/OAuth preview and synthetic upload through running bot.
+3. Run current-source OCR acceptance and Windows/native Tesseract.
+4. Complete isolated live Discord smoke.
+5. Produce PDF user manual, final SHA package and clean extraction proof.
+6. Reassess release gate only with current-source evidence.
+For a new session, fetch dwbotVis head, read this handoff and plan1.txt, then continue the open gates. Do not modify main.
+
+
+================================================================================
+FINAL DOCUMENTATION/PACKAGE VERIFICATION — 2026-11-04
+================================================================================
+Final docs/inventory package commit: f6b60d45f647d09b60355c6460bb0554d20939ed
+CI on that exact commit: https://github.com/pbrau014/braultDwBotVis/actions/runs/41814316145
+Result SUCCESS, Node.js 22.16.0 Linux:
+- Clean npm ci and syntax PASS.
+- OCR.space mocked 15/15.
+- Discord preflight 21/21.
+- Desktop suite 28/28.
+- Full npm test 254 total / 253 pass / 0 fail / 1 optional OpenCV skip (cv2 unavailable).
+Full decoded log: reports/ci/2026-11-04-41814316145-final-branch-log.txt.
+Latest main head observed at final check: e2fbcfbf680a8d40691a76d1be94aae29325016f. Main remains read-only; no changes by this work.
+The final branch includes the complete handoff, updated plan/status/README/quickstarts, path-by-path inventory, historical ZIP checksum sidecar and CI log. The original 175 MB historical ZIP remains in the File Library because it exceeds GitHub's 100 MB single-file limit.
+================================================================================

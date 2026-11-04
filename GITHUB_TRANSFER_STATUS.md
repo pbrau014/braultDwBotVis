@@ -91,3 +91,36 @@ A read-only check of `main` confirmed that its current `dwbotStuff/scoreReport_d
 - A previous assessment incorrectly claimed the workbook used Grand Yolo tierWeight 1 / H12 $12.56. The source audit and current test assert tierWeight 0.9 / H12 $12.49. Treat the former claim as withdrawn; do not alter scoring on that basis.
 - The desktop HTML Player/Admin interface is a newly authorized parallel workstream; it is not yet implemented. The detailed continuation/handoff document records the user-provided Library links and safe architecture plan.
 - `main` remains read-only at `9981355e6895a6c24c3b59a78be57865fbecafbb`; no main change or force push.
+
+
+---
+
+## Superseding current implementation and CI state — 2026-11-04 (DWBOT-UPD-007)
+
+This section supersedes earlier status claims above that desktop UI is not implemented, tests remain flattened, or the current suite fails 29/65. Historical sections remain provenance.
+
+- Repository: pbrau014/braultDwBotVis; delivery branch dwbotVis only.
+- Implementation head before docs package: 8494c05687494b5afd8cb18aeab96faceeb56620.
+- Read-only main head observed: ad34090f6dafebe558ab505dd6aebecc542f8c47; not modified.
+- CI run: https://github.com/pbrau014/braultDwBotVis/actions/runs/41813315107
+- Node 22.16.0 Linux: clean install and syntax PASS; OCR.space 15/15; Discord preflight 21/21; desktop tests 28/28; full suite 254 total / 253 passed / 0 failed / 1 skipped (optional cv2 helper only).
+- Full log: reports/ci/2026-11-04-41813315107-node22-linux-full-log.txt.
+
+### Desktop and shared OCR
+Player/Admin/Upload pages are implemented under desktop/. src/desktop-bridge.js and src/desktop-service.js provide loopback-only authenticated integration to the bot process. Desktop images use the same Tesseract-first serialized/supervised OCR pipeline as Discord attachments. Player/Admin roles are checked in the server. Discord OAuth identify only; explicit TOURNAMENT_ADMIN_IDS for desktop Admin. Bridge starts only after bot READY/channel preflight and only with ENABLE_DESKTOP_UI=1.
+
+### Backup privacy
+Public Discord snapshots and public !yolo export / !yolo finalize attachments omit private account links, per-record desktop ownership identifiers and per-user pending associations. Complete private state is available only through authenticated local Admin GET /api/admin/backup. Public snapshots are not complete private backups.
+
+### Remaining gates
+No real Discord login, OAuth flow, browser image upload, local visual QA, Windows/native-Tesseract validation, current full screenshot acceptance or live Discord smoke has occurred. Production remains NO-GO.
+
+Historical package in File Library:
+DWBOT_COMPLETE_DOWNLOAD_KIT_2026-11-03.zip — 175,126,438 bytes; SHA-256 7f5984ecbcd8009110b98f283e20b7d5fc5b840e2a5c08a5ad4f436959387c25; 472-file manifest / 108,083,848 bytes; rehashed and unzip integrity tested. The original ZIP is not a GitHub blob because it exceeds the 100 MB single-file limit. Checksum sidecar and historical manifest remain in repository.
+
+
+## Final handoff package and CI verification — 2026-11-04
+
+Final docs/inventory package commit: f6b60d45f647d09b60355c6460bb0554d20939ed. CI on that exact commit succeeded: https://github.com/pbrau014/braultDwBotVis/actions/runs/41814316145. Node 22.16.0 Linux: OCR.space 15/15; Discord preflight 21/21; desktop 28/28; full test 254 total / 253 passed / 0 failed / 1 skipped (optional cv2 helper). Full job log: reports/ci/2026-11-04-41814316145-final-branch-log.txt.
+
+The full end-to-end current guide is DWBOT_PROJECT_COMPLETE_HANDOFF_2026-11-04.txt. The exact branch inventory is docs/inventory/DWBOT_GIT_TREE_INVENTORY_2026-11-04.json. Last main SHA observed: e2fbcfbf680a8d40691a76d1be94aae29325016f; no main write was made.

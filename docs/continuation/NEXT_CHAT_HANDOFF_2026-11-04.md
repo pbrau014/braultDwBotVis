@@ -170,3 +170,20 @@ User explicitly authorized a major addition: develop the desktop user interface 
 ## 8. Start command for the next chat
 
 Continue the DWBOT project from the current `dwbotVis` branch and this handoff. First verify the branch head and read the authority/rules, plan1, transfer status, Phase 9 status and this report. Then search the Library and local/accessible project artifacts for the verified 472-file historical source archive and OCR progress checkpoint. Reuse/restore existing source before rework. Reconcile missing modules/fixtures and the intended test layout, rerun CI until full tests pass, then continue OCR.space/Discord work while building and previewing the Player/Admin desktop HTML interface and companion image upload page from the two linked baselines. Prepare safe local Node bridge and guild-scoped slash-command integration; integrate the UI before live Discord smoke where practicable. Preserve all exact OCR rules and security boundaries. Commit only to `dwbotVis` with expected-head checks and verify every push. Continue through testing, correction, retesting, packaging and final release gates; do not claim completion until a fully tested working version is verified.
+
+
+---
+
+## Current complete handoff — 2026-11-04
+
+The current end-to-end handoff is DWBOT_PROJECT_COMPLETE_HANDOFF_2026-11-04.txt. It supersedes the earlier snapshot details in this file and records implementation checkpoint 8494c05687494b5afd8cb18aeab96faceeb56620, CI run 41813315107 (254 total / 253 passed / 0 failed / 1 optional OpenCV skip), desktop and OCR architecture, public/private backup rules, historical archive provenance, exact inventory, commands and open release gates.
+
+
+---
+
+## Final verified package state — 2026-11-04
+
+Final documentation/inventory commit: f6b60d45f647d09b60355c6460bb0554d20939ed.
+Exact-commit CI run succeeded: 41814316145 (Node 22.16.0 Linux; OCR.space 15/15; Discord preflight 21/21; desktop 28/28; full suite 254 total / 253 pass / 0 fail / 1 optional cv2 skip).
+Read DWBOT_PROJECT_COMPLETE_HANDOFF_2026-11-04.txt for the complete project history, current architecture, test evidence, source archive provenance, inventory, local setup and open release gates.
+Latest main head observed: e2fbcfbf680a8d40691a76d1be94aae29325016f; main remains untouched.

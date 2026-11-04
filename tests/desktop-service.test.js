@@ -84,3 +84,14 @@ test('participant is denied admin-only roster and scoring changes',async()=>{
   await assert.rejects(f.service.addPlayer(p,{name:'Charlie'}),e=>e.status===403);
   await assert.rejects(f.service.setSetting(p,{event:'grand',field:'tierWeight',value:0.9}),e=>e.status===403);
 });
+
+
+test('authenticated Admin backup retains private roster links and pending correction workflows',async()=>{
+  const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
+  f.state.pendingSubmissions.push({record_id:'pending-1',userId:PLAYER,channelId:'33333333333333333'});
+  f.state.pendingOcrCorrections.push({key:'33333333333333333:'+PLAYER,userId:PLAYER});
+  const backup=JSON.parse(await f.service.exportBackup(admin));
+  assert.equal(backup.player_account_links[String(f.alpha.id)],PLAYER);
+  assert.equal(backup.pending_submissions[0].userId,PLAYER);
+  assert.equal(backup.pending_ocr_corrections.length,1);
+});
