@@ -27,6 +27,7 @@ Shared participant identity, evidence, scoring validation, referee review, corre
 14. Added separately approved Full Race side-event schedule records; each result must reference a scheduled event, positive elapsed seconds and archived evidence. Side-event results remain separate from match outcomes.
 15. Added stage-start settings snapshots with version and SHA-256; event nights hold their own snapshots. Added versioned prospective revisions for selected future event nights with no fixtures; published outcome/qualification/tie-break method settings remain frozen.
 16. Tightened Pilot game-number bounds to the published game count, retained tied individual placements as shared ranks rather than inventing a tiebreak, and added additive normalization for older lifecycle records.
+17. Added authenticated desktop lifecycle service methods and CSRF-protected bridge routes; Player self-registration/check-in and Admin creation/publication/start/action controls are wired into the UI.
 
 ## Appendment A - safety and provenance
 - Match outcomes cannot be derived from raw individual totals by this module. The organizer must publish a scoring method ID, version and SHA-256 hash; a completed fixture must reference that exact method and evidence.
@@ -38,11 +39,10 @@ Shared participant identity, evidence, scoring validation, referee review, corre
 
 ## Remaining plan
 ### Phase 2 - service and UI integration
-- The Discord command surface now supports lifecycle operations, but it is a JSON-argument admin workflow rather than a guided control panel. Add validated command payload schemas, clearer error examples, referee-specific authorization and end-to-end command tests.
-- Add authenticated desktop APIs for tournament creation/publication, registration, team assignment, roster lock, event-night/fixture/game administration, stage transition and audit views.
-- Add Player self-service registration/check-in and Admin lifecycle forms in the desktop UI; current panels are explanatory reference only.
-- Keep every mutation server-authorized; participant operations must resolve the caller's authenticated Discord ID to the linked roster entry.
-- Add complete lifecycle state visualizations (stage timeline, schedule, roster/fixture status, evidence and audit history). Tips already work on hover and keyboard focus; essential descriptions remain visible.
+- Implemented authenticated desktop lifecycle APIs for draft creation, publication, start, participant registration/check-in and admin lifecycle actions; bridge routes enforce session, CSRF and role checks.
+- Implemented Admin draft creation, publish/start and generic lifecycle-action forms; Player self-registration and Pilot check-in; both retain accessible quick-help.
+- Implemented Discord lifecycle commands with admin gating and server-side linked-player resolution.
+- Remaining: replace generic JSON action payloads with guided validated forms; add referee-specific authorization, complete stage timeline/schedule/roster/fixture/evidence/audit visualizations, and emergency override workflow.
 - Do not change Discord channel privacy, command registration defaults or live permissions before isolated development-guild testing.
 
 ### Phase 3 - scoring and workbook reconciliation
@@ -97,6 +97,12 @@ Shared participant identity, evidence, scoring validation, referee review, corre
 - Event nights retain their own versioned settings snapshot.
 - Prospective settings revisions are limited to selected future event nights with no fixtures; outcome method, qualification and tie-break policy remain frozen.
 - Added Pilot game-count validation, shared rank for tied Damage totals, and additive normalization for older lifecycle objects.
+
+### 2026-11-04 - implementation expansion A6: authenticated desktop lifecycle interface
+- Added desktop-service methods for lifecycle creation, publication, start, player registration/check-in and admin actions.
+- Added authenticated CSRF-protected API routes and server-side role checks.
+- Added Admin draft/action forms and Player self-service registration/check-in; lifecycle status and frozen settings hashes are visible to administrators.
+- Added service, bridge and desktop UI contract tests.
 
 ### 2026-11-04 - initial Pilot/Full lifecycle implementation
 - Added separate lifecycle module and persistence field.
