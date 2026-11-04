@@ -141,7 +141,7 @@ test('Full score entry requires a season registration and positive Race time', (
   assert.throws(()=>L.recordScoreEntry(t,{participantId:'u1',category:'race',gameNumber:2,shipClass:'DD',tier:8,eventNightId:night.id,evidenceId:'e3',time:0},season),/positive/);
 });
 test('organizer approval records require a valid timestamp and attribution', () => {
-  assert.throws(()=>L.createApprovalRecord({id:'a',scope:'match outcome scoring',version:'1',approvedBy:'admin',approvedAt:'invalid'}),/valid ISO/);
+  assert.throws(()=>L.createApprovalRecord({id:'a',scope:'match outcome scoring',version:'1',sourceReference:'approval-doc-1',confirmed:true,approvedBy:'admin',approvedAt:'invalid'}),/valid ISO/);
   const approval=L.createApprovalRecord({id:'a',scope:'match outcome scoring',version:'1',approvedBy:'admin',approvedAt:'2026-11-04T12:00:00Z'});
   assert.equal(approval.status,'approved');
 });
