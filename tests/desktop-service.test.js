@@ -95,3 +95,31 @@ test('authenticated Admin backup retains private roster links and pending correc
   assert.equal(backup.pending_submissions[0].userId,PLAYER);
   assert.equal(backup.pending_ocr_corrections.length,1);
 });
+
+test('Admin manages Pilot and Full lifecycles; match outcomes require a stored organizer approval',async()=>{
+  const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN}),player=await f.service.resolvePrincipal({id:PLAYER});
+  const pilot=await f.service.createTournament(admin,{id:'pilot-1',name:'Pilot Night',format:'pilot'});
+  assert.equal(pilot.format,'pilot');
+  await assert.rejects(f.service.createSeason(admin,{tournamentId:pilot.id}),/Full YOLO/);
+  const full=await f.service.createTournament(admin,{id:'full-1',name:'Full Season',format:'full'});
+  const season=await f.service.createSeason(admin,{tournamentId:full.id,id:'season-1',name:'Season 1'});
+  const regular=await f.service.addStage(admin,{seasonId:season.id,type:'regular_season'});
+  const postseason=await f.service.addStage(admin,{seasonId:season.id,type:'postseason'});
+  const finale=await f.service.addStage(admin,{seasonId:season.id,type:'grand_finale'});
+  await assert.rejects(f.service.activateStage(admin,{seasonId:season.id,stageId:finale.id}),/preceding/);
+  await f.service.activateStage(admin,{seasonId:season.id,stageId:regular.id});
+  await f.service.completeStage(admin,{seasonId:season.id,stageId:regular.id});
+  await f.service.activateStage(admin,{seasonId:season.id,stageId:postseason.id});
+  const a=await f.service.createTeam(admin,{seasonId:season.id,name:'Red'});
+  const b=await f.service.createTeam(admin,{seasonId:season.id,name:'Blue'});
+  await f.service.registerParticipant(admin,{seasonId:season.id,participantId:'p1',displayName:'Alpha'});
+  await f.service.assignRoster(admin,{seasonId:season.id,participantId:'p1',teamId:a.id});
+  await f.service.createEventNight(admin,{seasonId:season.id,stageId:postseason.id});
+  const fixture=await f.service.createFixture(admin,{seasonId:season.id,stageId:postseason.id,teamA:a.id,teamB:b.id});
+  await f.service.createMatch(admin,{seasonId:season.id,fixtureId:fixture.id});
+  await assert.rejects(f.service.recordMatchOutcome(admin,{seasonId:season.id,id:'o0',teamA:a.id,teamB:b.id,scoreA:2,scoreB:1,methodId:'missing'}),e=>e.code==='SCORING_APPROVAL_REQUIRED');
+  const approval=await f.service.createApprovalRecord(admin,{id:'D21-v1',scope:'match outcome scoring',version:'1',approvedAt:'2026-11-04T12:00:00.000Z'});
+  const outcome=await f.service.recordMatchOutcome(admin,{seasonId:season.id,id:'o1',teamA:a.id,teamB:b.id,scoreA:2,scoreB:1,methodId:approval.id});
+  assert.equal(outcome.winnerTeamId,a.id);
+  await assert.rejects(f.service.createTournament(player,{id:'unauthorized',format:'pilot'}),e=>e.status===403);
+});
