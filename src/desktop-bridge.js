@@ -290,6 +290,7 @@ function createDesktopBridge(options={}){
         '/api/admin/match-outcomes':'recordMatchOutcome',
         '/api/admin/bracket/advance':'advanceBracket',
         '/api/admin/race-side-events':'createRaceSideEvent',
+        '/api/admin/race-side-events/results':'recordRaceSideEventResult',
         '/api/admin/approvals':'createApprovalRecord',
         '/api/admin/awards':'createAward',
       };
