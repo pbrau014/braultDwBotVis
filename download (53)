@@ -1,0 +1,142 @@
+# YOLO Tourney and OCR Bot Changelog
+
+## Release 2.5.0 — Path 2 reliability hardening (2026-10-24)
+
+- Added whole-image, single-consumer OCR queuing with a bounded backlog; attachment downloads now occur inside the queue so queued screenshots do not allocate unbounded in-memory image buffers.
+- Hardened timeout recovery: after cleanup, the queue verifies the timed-out task settles; if it remains active—or cleanup itself stalls—OCR fails closed and tells the operator to restart instead of permitting overlapping work.
+- Preserved pending correction state if an attachment is unsupported or the OCR queue is full; a replacement correction is cleared only when the queued screenshot actually starts processing.
+- Added independent per-player/event score comparisons for a randomized 50-player dataset using formula functions extracted from the workbook HTML, including non-default multipliers, tier powers, and Grand Yolo weights.
+- Added SQLite WAL checkpointing on clean store shutdown and a physical closed-database copy/reopen/integrity regression alongside JSON archive recovery tests.
+- Updated the OCR regression report provenance to identify the selected engine honestly and record fixture runs/build metadata.
+- Release validation remains conditional: the current host uses Node.js 22.16.0 and test-only dependency shims; clean `npm ci` on Node.js 24.17+, real-package Tesseract.js fallback, and real Discord login/permissions still require target-environment verification.
+
+
+## Release 2.4.0 — production release candidate (2026-10-24)
+
+### Implemented
+
+- Reconciled the production candidate on the 50-player source tree and bundled expanded Excel workbook. `Totals!G12` uses `=SUM(G3:G11,G14:G54)` and `Totals!H12` remains `=0.54*G12/100`; default cached value remains $12.487823, displayed as **$12.49**.
+- Declared Node.js `>=24.17.0`, aligned with discord.js 14.27 requirements, and added a runtime gate.
+- Switched production default persistence to local built-in SQLite with transaction boundaries, schema-version checks, legacy JSON import on first startup, atomic JSON mirror, and JSON/Discord recovery exports. No hosted database is introduced.
+- Added public interactive `!yolo panel` buttons and event selector. Optional read-only `/yolo` commands are disabled by default to preserve the strict one-channel behavior until command permissions are restricted to the configured channel. Prefix commands remain available.
+- Extended tests for 50-player random scoring, SQLite migration/reopen/integrity, runtime requirements, and public-channel interactions.
+- Added per-image OCR regression execution and consolidated the four recorded results.
+- The release ZIP is intended to contain neither `.env`, runtime `data/`, nor `node_modules`.
+
+### Validation and remaining blockers
+
+- Offline automated test suite: **63 passed, 0 failed** on the available Node.js 22.16.0 environment with the SQLite experimental flag and a test-only dependency shim. This is useful application-logic coverage, but is not a substitute for a clean install on the required Node.js 24.17+ runtime.
+- Native OCR screenshot checks: **4/4 passed** when invoked separately; all four fixtures matched their expected fields and had no required fields missing. The one-screenshot regression also passed.
+- The reported current environment cannot resolve `registry.npmjs.org`, so a clean `npm ci` and actual Tesseract.js fallback runtime test could not be completed.
+- Actual Discord login, bot token, guild/channel permissions, attachment delivery, and live rate-limit behavior have not been tested in the real server. Complete the public-channel acceptance checklist in `RELEASE-2.4.0-AUDIT.md` before relying on the release for a real tournament.
+- Do not commit or distribute a populated `.env`. Rotate any token ever exposed in an earlier ZIP.
+
+---
+
+## Historical entries
+
+The entries below document earlier development states and test outcomes. They are not the validation status of release 2.5.0.
+
+
+## Changes
+
+- Completed OCR battle reports now include a `wows-battle-record-<record-id>.json` attachment alongside the human-readable Discord report.
+- The JSON uses the versioned `wows-yolo-tourney-battle` schema and a stable record ID suitable for duplicate-import protection.
+- Unobserved tournament fields are left null. Ship tier is only suggested from an explicit Roman numeral in the detected ship name; class, round, game number, and time are not guessed.
+- The companion HTML scorer has a separate **Import battle JSON** workflow for choosing the player, round, game slot, ship class, and tier and reviewing metrics before writing.
+- Existing slot overwrites require explicit opt-in and a confirmation. Successfully imported IDs are saved with the workbook state and backups.
+- The shared source ZIP excludes populated `.env` credentials and `node_modules`; install dependencies locally with `npm install`.
+
+## Verification
+
+- `npm test`: 35 passed, 0 failed.
+- `node --check src/bot.js` and `node --check src/battle-record.js`: passed.
+- Inline HTML JavaScript syntax check: passed.
+- Headless-browser handoff test: imported a verified sample record into the selected player/game slot, persisted the record ID, blocked a duplicate import, rejected a Race entry without time, and reported no page errors.
+- `npm run test:four-images` was attempted but did not finish within the run limit. The first screenshot exposed existing OCR mismatches for map/mode/start time/damage and an XP over-read, so the four-image OCR regression is not claimed as passing.
+
+# One-value-at-a-time correction flow
+
+## User-facing behavior
+
+When OCR cannot verify required fields, the bot sends one concise prompt for the first missing field only. The user replies with one plain value. The bot validates that answer, then prompts for the next missing field. If the answer is invalid, it repeats only that field's prompt. The report is posted only after every required field is valid.
+
+The following older user-facing content was removed from the correction flow: the bulk missing-fields checklist, the request to send multiple `Field: value` lines, the sample correction template, verbose OCR diagnostics, and the suggestion to copy example values from another screenshot.
+
+The user can still type `cancel correction` to cancel. A new screenshot clears the user's previous pending correction; pending corrections still expire after 30 minutes.
+
+## Prompt example
+
+> ⚠️ **Battle Result needed**
+> I couldn't confidently read Battle Result from `Screenshot.png`.
+>
+> **What is the correct Battle Result?**
+> Reply with the value only. Victory or Defeat.
+>
+> Type `cancel correction` to cancel this screenshot.
+
+After a valid response, the bot asks only for the next missing required value. It does not expose a multi-field template or fill in example values.
+
+## Verification
+
+- `npm test`: 32 passed, 0 failed.
+- `node --check src/bot.js`: passed.
+- `node --check src/bot_test_local.js`: passed.
+- `node --check src/battle-record.js`: passed.
+- Search of `src/` and `README.md` confirmed the old bulk prompt and diagnostic wording are absent.
+
+This ZIP updates the project source. To change the live Discord bot, deploy this ZIP's files to the host and restart the bot.
+
+
+## 2026-10-24 — System verification and same-channel archive
+
+- Automatic full-state JSON snapshots now post in `TARGET_CHANNEL_ID`, the same channel used for screenshots and commands; no second archive channel is required.
+- Full archive import now restores in-memory pending OCR corrections, not just the persisted JSON field.
+- Added a mocked-Discord integration tour covering all command families, player create/rename/delete, 84 randomized slots, every editable setting, formula comparisons to the supplied workbook reference, OCR correction restart/resume, Race and Grand Yolo guided mapping, clearing, exports, imports, and same-channel snapshots.
+- Added synthetic version-2 workbook backup, full archive, final export, and a system validation report under `examples/synthetic-validation/`.
+- Current unit/integration suite: 49 passing tests. The single reported-issue screenshot regression passed. The four-large-image pipeline timed out during this pass and is not represented as a fresh 4/4 run.
+
+
+## Build 2.4.0 — Path A production hardening
+
+- Require Node.js 24.17+ in package metadata and setup guidance.
+- Configure the Tesseract.js fallback to use the bundled local language model.
+- Add image pixel/dimension guards, ImageMagick/native-Tesseract process timeouts, a whole-image OCR budget, and subprocess output caps.
+- The four-screenshot native-Tesseract regression now passes 4/4; runner continues and records a per-image error if a fixture fails.
+- Reject unsupported attachment types before OCR.
+- Reduce Discord snapshot noise by persisting intermediate mapping steps locally without posting an attachment for each prompt.
+- Restrict full archive and workbook-compatible JSON exports to admins.
+- Add tests for image dimension/resource guards.
+
+
+## Build 2.4.0 — SQLite and interactive panel
+
+- Production storage defaults to built-in Node.js SQLite with transactional commits, schema versioning, legacy JSON/archive migration, JSON mirror, and close/rollback handling. Set `TOURNAMENT_STORAGE=json` only for an explicit JSON-only fallback.
+- Added `!yolo panel` with public totals, standings, roster buttons, and event leaderboard select menu. Added optional `/yolo` read-only subcommands; registration is off by default to preserve the strict single public-channel rule.
+- Updated source-truth fixture to the expanded 50-player Excel Totals formula and kept the original $12.49 baseline regression.
+- Added SQLite store tests for migration, reload, schema version and integrity.
+- Remaining acceptance: fresh install and real package tests on Node.js 24.17+, actual Tesseract.js fallback and four-image OCR regression, and real Discord public-channel smoke test.
+
+## Iteration 20 — Local PaddleOCR field-crop fallback (2026-10-26)
+
+- Added `src/paddleocr-field-fallback.js`, gated off by default, to request only unresolved, ambiguous, or contradictory fields after Tesseract extraction.
+- Added the local-only Python crop runner with explicit local model paths, network socket guards, bounded OpenCV in-memory crops, `enable_mkldnn=False`, and per-crop telemetry.
+- Candidate text runs through existing field parsers and existing `BattleRecord` consensus; a single Paddle candidate is capped at confidence 84, and O/0-style identity conflicts remain unresolved for review. Merged reward tokens are rejected by the existing numeric parser.
+- Added exact-manifest comparison tooling and a PowerShell runner for the integrated 16-image development corpus. Per-field/crop latency, false acceptance/rejection, human-review rate, and hash integrity are reported without modifying ground truth.
+- Added regression tests for the feature gate, candidate conflicts, strict numeric parsing, crop bounds, helper/network errors, latency metrics, optional ship side-effects, and exhausted image time budgets; added a comparison-metrics regression.
+- Final unit suite: **174/174**; OCR watchdog/process: **21/21**; OpenCV geometry: **5/5**; Paddle fallback: **16/16**; metric comparator: **1/1**; JavaScript syntax, Python compile, and comparator self-test passed.
+- Tesseract-only, network-blocked 16-image control completed 16/16 and kept accuracy unchanged from iteration 19: **135/144 exact fields (93.75%)**, **10/16 exact records**, **12/16 all fields present**, 3 accepted-wrong fields and 6 unresolved fields. Exact acceptance remains failed. Median 44.807 s, p95 58.223 s.
+- The reported-issue screenshot passes 9/9 exact values. The four original repair fixtures passed exact comparison only 2/4: Asashio still has an O/0-like player misread; Schlieffen still has unresolved Credits and XP. Native Windows Tesseract and Discord live smoke tests were not run here.
+- The PowerShell integrated benchmark now runs a paired Tesseract-only control and Tesseract-plus-Paddle candidate on the same Windows Node 24 host with local model paths and network blocking, then reports exact-field and crop-latency deltas. This benchmark has **not** yet been run on the user’s Windows project; raw Paddle full-screen recognition is not integrated field accuracy.
+- Release remains **NO-GO** until integrated accuracy/latency is measured on Windows, a fresh holdout is evaluated, remaining exact-field failures are resolved, and native Tesseract plus Discord smoke tests pass.
+
+
+## 2026-11-03 — Iteration 22 exact-value and screenshot-provenance hardening
+
+- Enforced fail-closed exact comparison across all nine mandatory fields; legacy acceptance rows without explicit nine-field pass state are rejected. XP remains mandatory and ninth/final.
+- Added constrained XP / Free XP fragmented-token geometry handling without expanding accepted numeric limits.
+- Replaced unsafe numeric fallback conversion in acceptance/report paths with a shared safe-integer converter that preserves numeric zero.
+- Added original screenshot source evidence: SHA-256 of the downloaded image bytes, Discord message/channel/attachment references, message URL, MIME type, byte size, and retrieval timestamp. This source metadata survives pending one-value correction state and is included in the structured final record after validation.
+- No image byte duplication in tournament state. Original Discord attachment remains the source location; the export carries its evidence pointer and hash.
+- Full `npm test`: 183 passed, 0 failed, 0 skipped under Node v22.16.0 (diagnostic only; project requires Node >=24.17.0). Focused source/export/workflow tests: 46 passed. Tesseract asset check, `git diff --check`, and changed JavaScript syntax checks passed.
+- Four-image OCR run and bounded Asashio retry timed out before final reports; neither is credited as OCR acceptance. Production remains NO-GO pending compliant Node 24+, Windows/native Tesseract, current-source OCR corpus, independent holdout, live Discord, security, and restore gates.

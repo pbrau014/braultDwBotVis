@@ -1,0 +1,89 @@
+> **Historical report:** This document records the 2.4.0 candidate. For the current Path 2 / 2.5.0 candidate, use `PATH2-2.5.0-AUDIT.md` and `VALIDATION-STATUS.md`; test counts and acceptance status below are retained only as historical context.
+
+# Release 2.4.0 — implementation audit and production acceptance report
+
+Date: 2026-10-24
+
+## Outcome
+
+Implemented the highest-priority local fixes in the current candidate and built around the latest 50-player source/workbook rather than the older 2.2.1 archive. This is a **release candidate**, not a claim of live-server production verification. Files modified by this implementation include source, tests, package metadata, workbook audit fixtures, and documentation in this release directory. The original `/mnt/data/pathA_review` source tree was retained unchanged.
+
+## Main changes
+
+### 1. Authoritative artifact and workbook consistency
+
+- Package and lockfile agree on version `2.4.0`; Node engine is `>=24.17.0`.
+- Bundled workbook: `assets/YOLO-Tournament-Workbook.xlsm`.
+- SHA-256: `12ad80209ef77451b3586b52359a06b5361a68bc9926fc81a9da3d6c4b586397`.
+- Expanded all-player formula: `Totals!G12 = SUM(G3:G11,G14:G54)`; there are 50 participant rows across the two ranges.
+- Dollar formula: `Totals!H12 = 0.54*G12/100`.
+- Original seed fixture: G12 = `2312.5598233298197`; H12 = `12.487823045981026`; rendered result is `$12.49`. Workbook-default Grand Yolo tier weight remains `0.9`.
+- Prior release ZIPs were not silently repackaged. This release ZIP is generated from the 2.4.0 candidate.
+
+### 2. Persistence and recovery (Path B)
+
+- Production now defaults to Node's built-in SQLite API in `data/tournament-state.sqlite`, so no hosted database or extra native npm SQLite driver is required.
+- Each tournament state document update is committed as a transaction; schema version, WAL, busy timeout, and `synchronous=FULL` are configured.
+- First-run import reads an existing JSON state or full archive without deleting the source. The JSON mirror is updated atomically after SQLite commits. Mirror-write failure is logged while the SQLite commit remains authoritative.
+- Close drains the pending queue and closes the database even if a queued save failed.
+- JSON-only storage remains an explicit `TOURNAMENT_STORAGE=json` fallback; full JSON exports and public-channel snapshots remain supported.
+- Operational boundary: run a single bot instance per live database. Multi-process coordination and concurrent multi-host writes are not claimed.
+- Node.js 24's `node:sqlite` API is documented at Release Candidate stability, so it should be reassessed if a fully stable API is a hard requirement.
+
+### 3. Public Discord UX (Path C)
+
+- Retained all existing prefix commands.
+- Added `!yolo panel` with public Overview, Totals, Standings, Players buttons and a select menu for Damage/Kills/Race/Grand Yolo leaderboards.
+- Added read-only `/yolo` slash command support, disabled by default (`ENABLE_SLASH_COMMANDS=0`). Enable only after application-command permissions are restricted to the existing configured public channel.
+- The handler ignores interactions from other channels. No private channel is created or used, no ephemeral replies are used, and all reports/snapshots continue to the same `TARGET_CHANNEL_ID`.
+- Full recovery exports remain admin-only; ordinary summaries and the panel remain public.
+- Snapshots remain coalesced to limit attachment churn; local state commits are immediate.
+
+### 4. OCR and runtime hardening
+
+- Enforced Node.js 24.17+ runtime at bot launch.
+- Tesseract.js is configured for local language/worker/core assets, with local `eng.traineddata` and `gzip: false`; local asset resolution is unit tested.
+- Existing image resource limits, ImageMagick process limits, native OCR timeouts/output caps, and whole-image timeout remain in place.
+- Native Tesseract regression fixtures are reported per image and the consolidated current report lists all four fixtures.
+
+## Test evidence
+
+| Check | Result | Qualification |
+|---|---|---|
+| `NODE_OPTIONS=--experimental-sqlite npm test` | **63 passed, 0 failed** | Ran on Node 22.16.0 with `node:sqlite` experimental flag and test-only shims for unavailable npm dependencies. Do not interpret this as a clean install. |
+| Randomized 50-player calculations | **Pass** | All four events/seven games, unrounded aggregation, dollar conversion and public same-channel command simulation. |
+| SQLite store tests | **Pass** | Transactional persistence, reopen, JSON mirror, legacy migration without source deletion, integrity and unsupported future schema. |
+| One reported screenshot | **Pass** | Native Tesseract; all nine expected fields matched and required fields complete; ship text remains optional/ambiguous. |
+| Four native Tesseract fixtures | **Pass 4/4 separately** | `hoffmann-victory.png`, `asashio-defeat.jpg`, `libertad-victory.jpg`, `schlieffen-defeat.jpg`; full expected values matched and no required fields missing. The execution environment timed out when running all four in one process, so each was run separately and the combined report records that fact. |
+| Workbook formulas and cached defaults | **Pass** | Verified directly from the bundled XLSM XML plus automated source-truth test. |
+| Clean `npm ci` with real dependencies | **Not verified** | `registry.npmjs.org` DNS resolution failed (`Could not resolve host`). Test shims were excluded from the final ZIP. |
+| Tesseract.js real fallback image run after clean install | **Not verified** | Asset-path tests passed, but real package/runtime could not be installed because of network limits. Native engine is the proven path here. |
+| Actual Discord login / permissions / delivery / rate limits | **Not verified** | Requires the user’s bot token and server; no token was requested or used. |
+
+### Verified OCR report location
+
+`testdata/four-screenshot-pipeline-results.json` lists `imageCount=4`, `completedImages=4`, `numericAndResultMatched=4`, `fullExpectedValuesMatched=4`, and `requiredFieldsComplete=4`. Each image's individual result is recorded. The one-image report is in `testdata/reported-screenshot-regression-results.json`.
+
+## Remaining blockers and exact next steps
+
+1. **Clean install — required:** On a clean machine with current network access, install Node.js 24 LTS version 24.17.0 or newer, then run `npm ci`. If it fails, inspect the npm log and correct DNS/proxy/certificate/registry reachability. Do not substitute a random `node_modules` tree.
+2. **Real package test — required:** Run `npm ls --depth=0`, `npm test`, `npm run test:reported-screenshot`, and `npm run test:four-images` after the clean install. Confirm the four-image report enumerates all four fixture images and matches the version 2.4.0 expected values.
+3. **Fallback OCR test — recommended if the fallback is intended for production:** On that clean install, run `OCR_ENGINE=tesseractjs npm run test:reported-screenshot`; confirm it loads local `eng.traineddata` and worker/core assets without a CDN request. Keep native Tesseract as preferred until this passes.
+4. **Public Discord smoke test — required:** Copy `.env.example` to an unshared `.env`, use a newly generated token, configure the single existing public `TARGET_CHANNEL_ID`, and enable Message Content Intent. Confirm View Channel, Read Message History, Send Messages, and Attach Files in that channel. Test `!yolo help`, `!yolo panel`, screenshot OCR/correction, tournament mapping, workbook download, public snapshot attachment, restart/recovery and rate-limit handling. Do not create or use private channels.
+5. **Tournament acceptance — required:** Populate 50 synthetic users in a disposable state, test all four events/seven slots and settings, export/import/restart, and compare the total using unrounded G12 followed by H12 conversion. Confirm the base sample still displays `$12.49`.
+6. **Backup discipline — required:** Keep SQLite, JSON mirror, and an offline copy. Run only one bot instance against this state path. Discord channel attachments are an additional portable recovery path, not the only backup.
+
+## Public channel visibility decision
+
+This release obeys the requested channel layout: one configured channel, all bot replies and snapshots publicly visible in it, no private channel, and no ephemeral response. This means everyone who can view that channel can read battle screenshots and recovery attachments. That visibility is intentional for the current configuration, not a privacy safeguard.
+
+## Internet references checked
+
+- discord.js 14.27 docs specify Node.js 24.17.0 or newer: https://discord.js.org/docs
+- Node.js 24 LTS/release table: https://nodejs.org/en/about/previous-releases
+- Node.js 24 SQLite documentation describes `node:sqlite` as Release Candidate stability: https://nodejs.org/download/release/latest-v24.x/docs/api/sqlite.html
+- Discord application-command permissions support channel-scoped command access: https://discord.com/developers/docs/interactions/application-commands
+
+## Final gate decision
+
+**Ready for target-host installation and controlled acceptance testing; not yet verified for a live tournament.** The largest unresolved risks are environment-dependent: clean npm install on the declared runtime, real JavaScript OCR fallback, and actual Discord integration. They cannot be honestly marked resolved without those external tests. The version 2.4.0 release candidate contains the changes that can be safely implemented and tested in this workspace, and the ZIP excludes credentials, dependency shims, and live state.

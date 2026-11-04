@@ -1,0 +1,22 @@
+# Tournament quick start
+
+**Runtime prerequisites:** Node.js 24.17.0 or newer (current Node.js 24 LTS), npm, ImageMagick, and preferably native Tesseract with the English language model. The Tesseract.js fallback uses the bundled local English model. Screenshot downloads and OCR run through a bounded queue; if timeout cleanup or OCR cannot be confirmed settled, the bot pauses OCR instead of risking overlapping jobs, and an admin must restart it after checking the logs.
+
+1. Start the bot and check `!yolo help` in the configured channel.
+2. Add one real player at a time: `!yolo add-player Exact In-Game Name`.
+3. Upload a post-battle screenshot. Complete OCR corrections if prompted, then complete tournament mapping prompts.
+4. Check `!yolo player Exact In-Game Name`, `!yolo status`, and `!yolo missing`.
+5. Review overall or event standings: `!yolo standings` or `!yolo standings grand`.
+6. Use `!yolo panel` for a public interactive view of totals, standings, the roster, and event leaderboards. Back up before making major changes (admin-only): `!yolo export`. When the round/tournament is finished, run `!yolo finalize` for a final JSON snapshot with completion counts. Use `!yolo export-workbook` (admin-only) for an HTML workbook-compatible backup, and `!yolo download-workbook` (or `!yolo workbook`) to download the Excel `.xlsm` source workbook. The source workbook's default Totals!H12 displays **$12.49**; current browser and bot defaults now match its Grand Yolo Tier weight of 0.9. Finalize does not lock the tournament.
+
+Automatic full-state JSON snapshots are posted in the same public `TARGET_CHANNEL_ID` channel as screenshots and commands—no second or private archive channel is used. Intermediate one-value prompts are saved locally but do not each create a Discord snapshot attachment. Keep the local SQLite database, its JSON mirror, and periodic offline backups. Assume everyone who can view the channel can read its screenshots, roster, scores, and recovery snapshots. Never share `.env` or a bot token.
+
+## Score entry example
+
+`!yolo result Alpha | damage | 1 | DD | 8 | 142500`
+
+For Grand Yolo:
+
+`!yolo result Alpha | grand | 1 | CA | 8 | 142500 | 2 | 74`
+
+Manual result entry requires tournament admin privileges. The bot will not overwrite an occupied slot unless the command ends with `--replace`.

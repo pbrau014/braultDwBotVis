@@ -1,0 +1,222 @@
+COMMAND: /opt/nvm/versions/node/v22.16.0/bin/node --test tests/damage-consensus.test.js tests/localized-numeric-parser.test.js tests/ocr-process-supervisor.test.js tests/ocr-watchdog.test.js tests/windows-process-cancel.test.js tests/tesseractjs-acceptance.test.js tests/ocr-local-assets.test.js tests/serial-task-queue.test.js
+EXIT: 0
+ERROR: 
+
+--- stdout ---
+TAP version 13
+# Subtest: agreeing independent full-screen damage reads override a conflicting focused-crop value
+ok 1 - agreeing independent full-screen damage reads override a conflicting focused-crop value
+  ---
+  duration_ms: 1.465419
+  type: 'test'
+  ...
+# Subtest: conflicting full-screen reads are not resolved by confidence alone
+ok 2 - conflicting full-screen reads are not resolved by confidence alone
+  ---
+  duration_ms: 0.287784
+  type: 'test'
+  ...
+# Subtest: missing full-screen evidence preserves the focused candidate for validation
+ok 3 - missing full-screen evidence preserves the focused candidate for validation
+  ---
+  duration_ms: 0.133962
+  type: 'test'
+  ...
+# Subtest: one extra final digit in a single full-screen read repairs unanimous clipped focused prefixes
+ok 4 - one extra final digit in a single full-screen read repairs unanimous clipped focused prefixes
+  ---
+  duration_ms: 0.198409
+  type: 'test'
+  ...
+# Subtest: prefix repair does not accept low-confidence or non-prefix damage values
+ok 5 - prefix repair does not accept low-confidence or non-prefix damage values
+  ---
+  duration_ms: 0.219741
+  type: 'test'
+  ...
+# Subtest: geometry-bounded crops that stop before adjacent ribbon icons override one appended full-screen icon digit
+ok 6 - geometry-bounded crops that stop before adjacent ribbon icons override one appended full-screen icon digit
+  ---
+  duration_ms: 0.194864
+  type: 'test'
+  ...
+# Subtest: focused crop cannot trim a full-screen digit unless it is explicitly marked isolated
+ok 7 - focused crop cannot trim a full-screen digit unless it is explicitly marked isolated
+  ---
+  duration_ms: 0.215826
+  type: 'test'
+  ...
+# Subtest: unique isolated crop quorum can resolve a divergent full-screen read
+ok 8 - unique isolated crop quorum can resolve a divergent full-screen read
+  ---
+  duration_ms: 0.204839
+  type: 'test'
+  ...
+# Subtest: isolated crop quorum rejects repeats that do not span multiple widths and PSMs
+ok 9 - isolated crop quorum rejects repeats that do not span multiple widths and PSMs
+  ---
+  duration_ms: 0.313082
+  type: 'test'
+  ...
+# Subtest: localized parser combines only conventional thousands groups
+ok 10 - localized parser combines only conventional thousands groups
+  ---
+  duration_ms: 1.05438
+  type: 'test'
+  ...
+# Subtest: localized XP parser rejects appended icon digits rather than accepting a false value
+ok 11 - localized XP parser rejects appended icon digits rather than accepting a false value
+  ---
+  duration_ms: 0.22531
+  type: 'test'
+  ...
+# Subtest: localized parser accepts a single isolated field but not ambiguous equally ranked values
+ok 12 - localized parser accepts a single isolated field but not ambiguous equally ranked values
+  ---
+  duration_ms: 0.119861
+  type: 'test'
+  ...
+# Subtest: localized parser rejects unknown fields and invalid reward sizes
+ok 13 - localized parser rejects unknown fields and invalid reward sizes
+  ---
+  duration_ms: 0.380123
+  type: 'test'
+  ...
+# Subtest: reward selection uses localized agreement and never accepts XP from legacy broad candidates alone
+ok 14 - reward selection uses localized agreement and never accepts XP from legacy broad candidates alone
+  ---
+  duration_ms: 1.303936
+  type: 'test'
+  ...
+# Subtest: complete reward tuple fallback requires two distinct agreeing OCR sources
+ok 15 - complete reward tuple fallback requires two distinct agreeing OCR sources
+  ---
+  duration_ms: 0.944634
+  type: 'test'
+  ...
+# Subtest: Credits prefix recovery requires isolated plus two independent broad supports
+ok 16 - Credits prefix recovery requires isolated plus two independent broad supports
+  ---
+  duration_ms: 0.427585
+  type: 'test'
+  ...
+# Subtest: Credits prefix recovery can use a matching reward-band token plus two distinct broad modes when a crop clips the last digit
+ok 17 - Credits prefix recovery can use a matching reward-band token plus two distinct broad modes when a crop clips the last digit
+  ---
+  duration_ms: 0.173852
+  type: 'test'
+  ...
+# Subtest: Tesseract.js fallback resolves language, Node worker, and every core asset from local paths
+ok 18 - Tesseract.js fallback resolves language, Node worker, and every core asset from local paths
+  ---
+  duration_ms: 8.224972
+  type: 'test'
+  ...
+# Subtest: Tesseract.js fallback errors clearly when a local language model is unavailable
+ok 19 - Tesseract.js fallback errors clearly when a local language model is unavailable
+  ---
+  duration_ms: 1.51228
+  type: 'test'
+  ...
+# [OCR-SUPERVISOR] deadline 250ms hit for pid=28281
+# [OCR-SUPERVISOR] sending termination to pid=28281
+# [OCR-SUPERVISOR] child pid=28281 close code=null signal=SIGKILL
+# Subtest: independent supervisor timeout kills child tree and waits for close confirmation
+ok 20 - independent supervisor timeout kills child tree and waits for close confirmation
+  ---
+  duration_ms: 262.526671
+  type: 'test'
+  ...
+# [OCR-SUPERVISOR] deadline 250ms hit for pid=28288
+# [OCR-SUPERVISOR] sending termination to pid=28288
+# [OCR-SUPERVISOR] child pid=28288 close code=null signal=SIGKILL
+# [OCR-SUPERVISOR] child pid=28295 close code=0 signal=
+# Subtest: serial queue starts recovery task only after timed-out supervised child closes
+ok 21 - serial queue starts recovery task only after timed-out supervised child closes
+  ---
+  duration_ms: 282.055955
+  type: 'test'
+  ...
+# Subtest: OCR operation watchdog confirms thread exit before creating a recovery worker
+ok 22 - OCR operation watchdog confirms thread exit before creating a recovery worker
+  ---
+  duration_ms: 112.030211
+  type: 'test'
+  ...
+# Subtest: OCR watchdog fails closed when worker thread termination cannot be confirmed
+ok 23 - OCR watchdog fails closed when worker thread termination cannot be confirmed
+  ---
+  duration_ms: 201.131321
+  type: 'test'
+  ...
+# Subtest: serial task queue never overlaps jobs and continues after a rejected task
+ok 24 - serial task queue never overlaps jobs and continues after a rejected task
+  ---
+  duration_ms: 47.307282
+  type: 'test'
+  ...
+# Subtest: serial task queue rejects excess pending work explicitly
+ok 25 - serial task queue rejects excess pending work explicitly
+  ---
+  duration_ms: 1.152808
+  type: 'test'
+  ...
+# Subtest: serial task timeout runs cleanup, waits for task cancellation, then allows the next job
+ok 26 - serial task timeout runs cleanup, waits for task cancellation, then allows the next job
+  ---
+  duration_ms: 35.56172
+  type: 'test'
+  ...
+# Subtest: serial task queue fails closed rather than overlapping an operation that ignores timeout cleanup
+ok 27 - serial task queue fails closed rather than overlapping an operation that ignores timeout cleanup
+  ---
+  duration_ms: 71.694963
+  type: 'test'
+  ...
+# Subtest: serial task queue fails closed if timeout cleanup itself never settles
+ok 28 - serial task queue fails closed if timeout cleanup itself never settles
+  ---
+  duration_ms: 66.538079
+  type: 'test'
+  ...
+# Subtest: exact-match acceptance rejects a deliberately incorrect expected value
+ok 29 - exact-match acceptance rejects a deliberately incorrect expected value
+  ---
+  duration_ms: 0.730862
+  type: 'test'
+  ...
+# Subtest: exact-match acceptance rejects missing or incomplete required fields
+ok 30 - exact-match acceptance rejects missing or incomplete required fields
+  ---
+  duration_ms: 0.241864
+  type: 'test'
+  ...
+# Subtest: acceptance gate passes only complete exact-match rows
+ok 31 - acceptance gate passes only complete exact-match rows
+  ---
+  duration_ms: 0.101443
+  type: 'test'
+  ...
+# Subtest: cross-platform ImageMagick process timeout confirms child close
+ok 32 - cross-platform ImageMagick process timeout confirms child close
+  ---
+  duration_ms: 260.431943
+  type: 'test'
+  ...
+# Subtest: cross-platform native OCR cancellation confirms child close
+ok 33 - cross-platform native OCR cancellation confirms child close
+  ---
+  duration_ms: 107.243492
+  type: 'test'
+  ...
+1..33
+# tests 33
+# suites 0
+# pass 33
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1867.529858
+
+--- stderr ---

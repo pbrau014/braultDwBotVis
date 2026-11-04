@@ -1,0 +1,169 @@
+Initializing Tesseract OCR (language: eng)...
+Tesseract OCR is ready.
+[OCR] pass 1 start (PSM 3, 413051 bytes)
+Detected 39 diacritics
+OCR is nearly complete.
+[OCR] pass 1 done in 1040 ms
+[OCR] pass 2 start (PSM 11, 413051 bytes)
+Detected 16 diacritics
+OCR is nearly complete.
+[OCR] pass 2 done in 1130 ms
+[OCR] pass 3 start (PSM 6, 208607 bytes)
+OCR is nearly complete.
+[OCR] pass 3 done in 359 ms
+[OCR] pass 4 start (PSM 11, 208607 bytes)
+OCR is nearly complete.
+[OCR] pass 4 done in 414 ms
+[OCR] pass 5 start (PSM 6, 434065 bytes)
+OCR is nearly complete.
+[OCR] pass 5 done in 1159 ms
+[OCR] pass 6 start (PSM 6, 155918 bytes)
+OCR is nearly complete.
+[OCR] pass 6 done in 244 ms
+[OCR] pass 7 start (PSM 6, 66831 bytes)
+OCR is nearly complete.
+[OCR] pass 7 done in 177 ms
+[OCR] pass 8 start (PSM 11, 66831 bytes)
+OCR is nearly complete.
+[OCR] pass 8 done in 182 ms
+[OCR] pass 9 start (PSM 6, 367741 bytes)
+OCR is nearly complete.
+[OCR] pass 9 done in 472 ms
+[OCR] pass 10 start (PSM 11, 367741 bytes)
+OCR is nearly complete.
+[OCR] pass 10 done in 503 ms
+[OCR] pass 11 start (PSM 6, 79263 bytes)
+OCR is nearly complete.
+[OCR] pass 11 done in 221 ms
+[OCR] pass 12 start (PSM 11, 79263 bytes)
+OCR is nearly complete.
+[OCR] pass 12 done in 185 ms
+[OCR] pass 13 start (PSM 6, 93268 bytes)
+OCR is nearly complete.
+[OCR] pass 13 done in 179 ms
+[OCR] pass 14 start (PSM 11, 93268 bytes)
+OCR is nearly complete.
+[OCR] pass 14 done in 188 ms
+[OCR] pass 15 start (PSM 6, 193045 bytes)
+OCR is nearly complete.
+[OCR] pass 15 done in 320 ms
+[OCR] pass 16 start (PSM 6, 795520 bytes)
+Image too small to scale!! (2x36 vs min width of 3)
+OCR is nearly complete.
+[OCR] pass 16 done in 1214 ms
+Line cannot be recognized!!
+[OCR] pass 17 start (PSM 11, 795520 bytes)
+OCR is nearly complete.
+[OCR] pass 17 done in 1232 ms
+[OCR] pass 18 start (PSM 7, 118645 bytes)
+OCR is nearly complete.
+[OCR] pass 18 done in 113 ms
+[OCR] pass 19 start (PSM 6, 118645 bytes)
+OCR is nearly complete.
+[OCR] pass 19 done in 113 ms
+[OCR] pass 20 start (PSM 7, 71929 bytes)
+[OCR] pass 20 done in 17 ms
+[OCR] pass 21 start (PSM 6, 71929 bytes)
+OCR is nearly complete.
+[OCR] pass 21 done in 56 ms
+[OCR] pass 22 start (PSM 6, 118004 bytes)
+OCR is nearly complete.
+[OCR] pass 22 done in 112 ms
+[OCR] pass 23 start (PSM 8, 118004 bytes)
+OCR is nearly complete.
+[OCR] pass 23 done in 66 ms
+[OCR] pass 24 start (PSM 6, 40994 bytes)
+OCR is nearly complete.
+[OCR] pass 24 done in 32 ms
+[OCR] pass 25 start (PSM 7, 40994 bytes)
+OCR is nearly complete.
+[OCR] pass 25 done in 33 ms
+[OCR] pass 26 start (PSM 8, 40994 bytes)
+OCR is nearly complete.
+[OCR] pass 26 done in 34 ms
+[OCR] pass 27 start (PSM 13, 40994 bytes)
+OCR is nearly complete.
+[OCR] pass 27 done in 33 ms
+{
+  "buildVersion": "2.5.0",
+  "configuredEngine": "tesseractjs",
+  "engine": "Tesseract.js local assets + ImageMagick preprocessing",
+  "filename": "Screenshot_2026-10-22_201950.png",
+  "imageSizeBytes": 838129,
+  "pipelineCompleted": true,
+  "attempts": 3,
+  "selectedPageSegmentationMode": 3,
+  "confidence": 80,
+  "actual": {
+    "result": "Defeat",
+    "player": "[AYNS]BabyEatingDingo",
+    "map": "New Dawn",
+    "mode": "Random Battle",
+    "battleStart": "30.09.2026 14:46",
+    "credits": 540180,
+    "xp": 4906,
+    "freeXp": 1536,
+    "damage": 87313
+  },
+  "expected": {
+    "result": "Defeat",
+    "player": "[AYNS]BabyEatingDingo",
+    "map": "New Dawn",
+    "mode": "Random Battle",
+    "battleStart": "30.09.2026 14:46",
+    "credits": 540180,
+    "xp": 4906,
+    "freeXp": 1536,
+    "damage": 87373
+  },
+  "comparison": {
+    "result": {
+      "expected": "Defeat",
+      "actual": "Defeat",
+      "pass": true
+    },
+    "player": {
+      "expected": "[AYNS]BabyEatingDingo",
+      "actual": "[AYNS]BabyEatingDingo",
+      "pass": true
+    },
+    "map": {
+      "expected": "New Dawn",
+      "actual": "New Dawn",
+      "pass": true
+    },
+    "mode": {
+      "expected": "Random Battle",
+      "actual": "Random Battle",
+      "pass": true
+    },
+    "battleStart": {
+      "expected": "30.09.2026 14:46",
+      "actual": "30.09.2026 14:46",
+      "pass": true
+    },
+    "credits": {
+      "expected": 540180,
+      "actual": 540180,
+      "pass": true
+    },
+    "xp": {
+      "expected": 4906,
+      "actual": 4906,
+      "pass": true
+    },
+    "freeXp": {
+      "expected": 1536,
+      "actual": 1536,
+      "pass": true
+    },
+    "damage": {
+      "expected": 87373,
+      "actual": 87313,
+      "pass": false
+    }
+  },
+  "allExpectedFieldsPass": false,
+  "requiredMissing": [],
+  "ambiguities": {}
+}

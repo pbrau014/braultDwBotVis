@@ -1,0 +1,31 @@
+# Phase 3 OCR Repair — Iteration 11 / Node 24 Validation
+
+Date: 2026-10-26
+
+## Runtime installation
+
+The user-supplied `node-v24.17.0-linux-x64.tar.xz` was installed at `/opt/nvm/versions/node/v24.17.0`. A fresh login shell resolves `node` to v24.17.0 and `npm` to v11.13.0. The NVM default alias is set to `24.17.0`; Node v22.16.0 remains installed as a fallback. `/etc/profile` was backed up to `/etc/profile.before-node24-install` before updating PATH precedence.
+
+## Iteration 11 code change
+
+The reward-geometry fallback now has a `requireGrouped` option so the XP fallback can explicitly prefer joined adjacent-token geometry when the normal whole-row token is too long due to a nearby medal/star glyph. A new `rewardGeometryAnchorDigitsAreUsable()` check permits one extra digit only for XP geometry used to position crops. It does not permit that extra digit as an accepted XP value: the existing `rewardGeometryValueIsValid()` remains stricter, and independent crop consensus still decides the stored value.
+
+Regression tests cover the fragmented `2` + `653>x` geometry versus the overlong `26537` whole-row read and confirm that six-digit XP is geometry-only, not a valid reward value. Ground-truth annotations, fixture expected values, and the package lockfile were not changed.
+
+## Validation results
+
+- Node.js: **v24.17.0**; npm: **11.13.0**.
+- Independent unit/test files excluding only `tests/full-system.test.js` and `tests/ocr-report-metadata.test.js`: **128 passed, 0 failed**.
+- OCR watchdog, process-cancellation, and damage-consensus tests: **18 passed, 0 failed**.
+- JavaScript syntax check: **50 files checked, 0 failures**.
+- An unrestricted `npm test` run discovered 130 tests: **128 passed**; the two failing test modules could not load because dependencies were absent (`dotenv` and `tesseract.js`). These were module-loading failures, not assertion failures.
+
+## Dependency installation blocker
+
+The full lockfile-pinned dependency install could not be completed in this environment. Offline install attempts fail with `ENOTCACHED` for missing lockfile packages (including `zlibjs@0.3.1` and `@vladfrangu/async_event_emitter@2.4.7`), and an online `npm ci` timed out while attempting registry access. Any partially extracted `node_modules` directory was removed; the lockfile remains unchanged.
+
+Accordingly, the real Tesseract.js OCR acceptance script has **not** been run against this iteration. These results do not supersede earlier Windows validation and are not evidence that OCR accuracy passes.
+
+## Release decision
+
+**Production remains NO-GO.** The next gate is a complete dependency install from the lockfile, followed by `npm test`, `npm run test:ocr-watchdog`, and `npm run test:tesseractjs` on this Node 24 runtime. OCR accuracy must pass for the reported screenshot, four-image sequence, order/repeat checks, and all 16 annotated fixtures; native Windows Tesseract and authorized Discord smoke tests remain separate release gates.

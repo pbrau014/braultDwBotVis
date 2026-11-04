@@ -1,0 +1,82 @@
+TAP version 13
+# Subtest: ImageMagick timeout kills the child and waits for confirmed process close
+ok 1 - ImageMagick timeout kills the child and waits for confirmed process close
+  ---
+  duration_ms: 1017.836826
+  type: 'test'
+  ...
+# Subtest: native Tesseract worker termination aborts the active child process promptly
+ok 2 - native Tesseract worker termination aborts the active child process promptly
+  ---
+  duration_ms: 113.182367
+  type: 'test'
+  ...
+# Subtest: OCR operation watchdog confirms thread exit before creating a recovery worker
+ok 3 - OCR operation watchdog confirms thread exit before creating a recovery worker
+  ---
+  duration_ms: 114.453094
+  type: 'test'
+  ...
+# Subtest: OCR watchdog fails closed when worker thread termination cannot be confirmed
+ok 4 - OCR watchdog fails closed when worker thread termination cannot be confirmed
+  ---
+  duration_ms: 202.119489
+  type: 'test'
+  ...
+# Subtest: parameter-update timeout is logged, terminates the old worker, and gates replacement until exit
+ok 5 - parameter-update timeout is logged, terminates the old worker, and gates replacement until exit
+  ---
+  duration_ms: 112.961266
+  type: 'test'
+  ...
+# Subtest: serial task queue never overlaps jobs and continues after a rejected task
+ok 6 - serial task queue never overlaps jobs and continues after a rejected task
+  ---
+  duration_ms: 48.642329
+  type: 'test'
+  ...
+# Subtest: serial task queue rejects excess pending work explicitly
+ok 7 - serial task queue rejects excess pending work explicitly
+  ---
+  duration_ms: 2.157841
+  type: 'test'
+  ...
+# Subtest: serial task timeout runs cleanup, waits for task cancellation, then allows the next job
+ok 8 - serial task timeout runs cleanup, waits for task cancellation, then allows the next job
+  ---
+  duration_ms: 35.652791
+  type: 'test'
+  ...
+# Subtest: serial task queue fails closed rather than overlapping an operation that ignores timeout cleanup
+ok 9 - serial task queue fails closed rather than overlapping an operation that ignores timeout cleanup
+  ---
+  duration_ms: 71.516711
+  type: 'test'
+  ...
+# Subtest: serial task queue fails closed if timeout cleanup itself never settles
+ok 10 - serial task queue fails closed if timeout cleanup itself never settles
+  ---
+  duration_ms: 66.220636
+  type: 'test'
+  ...
+# Subtest: cross-platform ImageMagick process timeout confirms child close
+ok 11 - cross-platform ImageMagick process timeout confirms child close
+  ---
+  duration_ms: 259.180022
+  type: 'test'
+  ...
+# Subtest: cross-platform native OCR cancellation confirms child close
+ok 12 - cross-platform native OCR cancellation confirms child close
+  ---
+  duration_ms: 108.099447
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2405.120861

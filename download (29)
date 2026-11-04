@@ -1,0 +1,8 @@
+[OCR-SEQUENCE] 1/2 START hoffmann-victory.png
+[OCR-SUPERVISOR] child pid=24206 close code=0 signal=
+[OCR-SEQUENCE] FAIL hoffmann-victory.png 29005ms (exact=false, missing=0)
+[OCR-SEQUENCE] 2/2 START asashio-defeat.jpg
+[OCR-SUPERVISOR] child pid=24361 close code=0 signal=
+[OCR-SEQUENCE] PASS asashio-defeat.jpg 26304ms (exact=true, missing=0)
+[OCR-SEQUENCE] Report: /mnt/data/phase1_work/wows-yolo-tournament-discord-bot/testdata/phase1-runs/two-latest-unblocked.json
+[OCR-SEQUENCE] Summary 2/2 completed, 1/2 exact, 2/2 complete-required-fields

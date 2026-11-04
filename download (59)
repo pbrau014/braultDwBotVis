@@ -1,0 +1,66 @@
+# Phase 0 Baseline Report — WoWS OCR + YOLO Discord Bot v2.5.0
+
+Date reviewed: 2026-10-24
+
+## Scope and source of truth
+
+The baseline artifact reviewed was:
+
+`wows_yolo_tournament_discord_bot_v2_5_0_path2_reliability_retry (2).zip`
+
+ZIP SHA-256:
+
+`c7e8255785aad4e36063486e3b02ef8e8f5c357784e5a7488f0e6da309218196`
+
+The archive is structurally readable and contains the expected top-level app folder. Its tracked source/data files match the contemporaneous Phase 0 manifest at `/mnt/data/phase0_v250_manifest.json` exactly. The manifest has 58 files. The ZIP contains 3,356 files under the app folder, including 3,298 additional files under `node_modules` beyond those in the manifest.
+
+The ZIP contains no live `.env` file and no `data/` live state directory. It does include `.env.example` and the expanded workbook. `node_modules` is ignored by `.gitignore`, but was nevertheless included in the ZIP; the final Phase 0 package should exclude it and rely on the lockfile plus `npm ci`.
+
+## Version and dependencies
+
+- package version: `2.5.0`
+- package and lockfile engine: Node.js `>=24.17.0`
+- locked direct dependencies from the Windows PowerShell evidence: `discord.js@14.27.0`, `dotenv@16.6.1`, `tesseract.js@6.0.1`, `tesseract.js-core@6.1.2`
+- Windows runtime evidence provided by user: Node.js `v24.22.1`, npm `11.19.1`
+- Windows `npm ci`: success; 39 packages added, 40 audited, 0 vulnerabilities reported.
+- Windows `npm ls --depth=0`: direct dependency tree reported valid.
+- ImageMagick: available on the user's Windows machine (`7.1.2-34 Q16 x64`).
+- Native Tesseract CLI: not found through Windows PowerShell (`Get-Command tesseract`, `tesseract --version`, and `tesseract --list-langs` failed). Native comparison is not yet established on that machine.
+
+The ZIP's expanded workbook SHA-256 is:
+
+`12ad80209ef77451b3586b52359a06b5361a68bc9926fc81a9da3d6c4b586397`
+
+Static OOXML inspection confirms:
+
+- `Totals!G12` formula: `=SUM(G3:G11,G14:G54)`; cached value `2312.5598233298197`.
+- `Totals!H12` formula: `=0.54*G12/100`; cached value `12.487823045981026`, displayed as `$12.49`.
+
+## Baseline test result
+
+The user's real-dependency Windows test run reports 74 tests: 71 passed, 1 failed, and 2 skipped. The failure is:
+
+`tests/full-system.test.js:808-817` — `public interactive panel renders controls, responds to totals/event selection, and ignores other channels`, throwing `TypeError: Cannot read properties of undefined (reading 'map')` at the line that reads `menu.options.map(...)`.
+
+The two skipped tests are tied to POSIX process-group fixtures for ImageMagick and native Tesseract cancellation; Windows-equivalent process cancellation should be explicitly verified.
+
+I independently reproduced the same panel-test failure in this Linux environment (Node.js `v22.16.0`, npm `10.9.2`) with the actual dependencies present in the archive: 73 passed, 1 failed, 0 skipped. This environment is below the package's declared minimum runtime, so its results are useful for regression/debugging but are not the Node.js 24 acceptance result.
+
+## Root cause of the panel test failure
+
+The runtime panel implementation builds a real discord.js `StringSelectMenuBuilder`. In discord.js `14.27.0`, `.data` does not include the option list because select options are maintained on the builder and are incorporated during `.toJSON()` serialization. The production code's builder is valid; the test incorrectly inspects the builder's internal `.data.options` rather than the serialized Discord API payload.
+
+The Phase 0 correction should update the test to inspect `menuBuilder.toJSON()`, preserving assertions for both event values and labels. This is a test/API-contract correction, not a change to the panel's runtime behavior.
+
+## OCR baseline evidence
+
+The bundled `testdata/four-screenshot-pipeline-results.json` is the historical Tesseract.js/native OCR evidence present in this artifact; it must be preserved as baseline data and not overwritten by later runs. Earlier conversation results describe Tesseract.js mismatches and an intermittent sequential stall. Those issues belong to later OCR implementation phases and are not considered resolved by this Phase 0 baseline alone.
+
+## Phase 0 action list
+
+1. Fix the public panel test to inspect actual serialized discord.js components.
+2. Rerun the full test suite and targeted panel test.
+3. Validate syntax and lockfile/package metadata.
+4. Verify workbook formulas and hashes again after the changes.
+5. Rebuild a clean ZIP from the source files, excluding `node_modules`, `.env`, and live state, and test archive integrity.
+6. Record what remains for later phases: Tesseract.js exact-match accuracy, sequential timeout and cleanup proof, cross-platform fallback acceptance command, native Tesseract installation/comparison on Windows, local-only/no-network test, optional OCR diagnostics/verified-correction feedback, and live Discord smoke test.

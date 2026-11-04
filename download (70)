@@ -1,0 +1,64 @@
+# Phase 3 Implementation Report — 2026-10-25 (RC2 follow-up)
+
+## Decision
+
+**The Phase 3 RC1 Windows main regression suite and watchdog suite passed. The Tesseract.js acceptance command did not pass (2/10 steps). A likely Windows `NODE_OPTIONS --require` preload-path problem has been patched for RC2 and covered by cross-platform helper tests, but it has not yet been confirmed by rerunning the OCR acceptance command on Windows. Production remains NO-GO.**
+
+## Baseline and preservation
+
+- Preserved Phase 0, Phase 1, Phase 2, and Phase 3 RC1 archives and their hashes; RC1 was not overwritten.
+- RC1 tested by the user: `wows_yolo_tournament_discord_bot_v2_5_0_phase3_rc1.zip`.
+- Updated working copy: `phase3_work/wows-yolo-tournament-discord-bot/`.
+- New candidate: `wows_yolo_tournament_discord_bot_v2_5_0_phase3_rc2.zip`, containing the Windows preload-path patch and regression tests. RC2 remains a validation candidate, not a production release.
+- Roadmap: `plan1.txt` remains the authoritative current plan; the old Phase 1/2 snapshots and historical test reports are preserved.
+
+## New Windows validation evidence from RC1
+
+The user-provided PowerShell transcript reports Windows Node.js **v24.22.1** and the following outcomes:
+
+- `npm ci`: success in 13 seconds; 39 packages added, 40 audited, zero vulnerabilities reported.
+- `npm ls--depth=0`: the transcript shows installed `discord.js@14.27.0`, `dotenv@16.6.1`, `tesseract.js-core@6.1.2`, and `tesseract.js@6.0.1`. The command is mistyped as `npm ls--depth=0`, but npm still printed the dependency tree.
+- `npm test`: **102 passed, 0 failed, 2 skipped**, 104 tests total. The skips are the two POSIX-specific process-group fixtures; their test messages say the Windows/native cancellation paths are covered separately.
+- `npm run test:ocr-watchdog`: **14 passed, 0 failed, 0 skipped**.
+- `npm run test:tesseractjs`: **2/10 commands passed**. Unit/contract tests passed (35/35) and the local asset check passed, with the English model asset present and hashed. The deliberately-wrong-value negative control, integrated recognition-stall recovery, reported screenshot, three sequential five-image runs, and both image-order runs each failed within about 46–51 ms, with the visible stack tail ending at `requireStack: [ 'internal/preload' ]`. The summary says no blocked network attempts were detected.
+
+Those rapid identical failures occur only in the acceptance scenarios that enable the network-blocking `NODE_OPTIONS` preload. The supplied excerpt omits the leading error text, so it does not establish the precise `MODULE_NOT_FOUND` request. This pattern points to the preload path/quoting in the Windows test harness, rather than showing that real OCR ran and produced a wrong result. Because the affected scenarios did not get to perform their intended checks, the OCR acceptance gate is **failed/incomplete**, not passed.
+
+## Phase 3 source hardening already present in RC1
+
+`tests/ocr-watchdog.test.js` includes a regression test that hangs `setParameters()` and asserts an `OCR_OPERATION_TIMEOUT` result, timeout logging, confirmed old-worker termination, and no replacement-worker initialization until the old worker exits. Existing tests cover hung `recognize()`, fail-closed behavior, queue overlap/backlog, and child-process close confirmation.
+
+## RC2 correction for acceptance harness
+
+- Added `scripts/node-options-path.js` to build quoted `--require` values and normalize Windows absolute paths to forward slashes for `NODE_OPTIONS`. Windows paths are supported by Node with forward slashes; this removes ambiguity from quoted backslash paths.
+- Updated `scripts/accept-tesseractjs.js` to use the shared preload helper for the network-blocking preload.
+- Updated `scripts/integrated-ocr-stall-recovery.js` to use the helper for both the network-blocking and injected-stall preloads, and to detect an already inherited network preload using slash-normalized paths.
+- Added `tests/node-options-path.test.js`, covering Windows path normalization, quoting, and detecting the inherited preload with either slash convention.
+
+This is a well-supported corrective hypothesis based on the failure pattern, but only a fresh Windows rerun can confirm whether it resolves the reported failure. Do not describe this fix as Windows-verified yet.
+
+## Fresh local regression evidence after the RC2 patch
+
+Command:
+
+```text
+node --test tests/node-options-path.test.js tests/ocr-watchdog.test.js tests/serial-task-queue.test.js tests/windows-process-cancel.test.js tests/image-processor-cancel.test.js tests/native-ocr-cancel.test.js
+```
+
+Result: **14 passed, 0 failed, 0 skipped**, exit 0, Linux x64 / Node.js v22.16.0. The two new path-helper tests pass; the prior lifecycle tests continue to pass. Output: `PHASE-3-PATH-REGRESSION-TESTS.log` (SHA-256 `e9a28b39f9c972a111110e59326c5438b77fa0ba63b4380aac04effa37cfa7c2`). The test exercises Windows-path normalization as unit-test inputs, but does not replace execution under Windows Node.js.
+
+A subsequent `npm test` attempt on this Linux work copy still cannot complete because its partial `node_modules` tree lacks `dotenv`; it reported **99 passed, 2 failed** overall, with both failures associated with the `tests/full-system.test.js` process failing to load `dotenv`. This is an invalid dependency state from the earlier interrupted Node 22 install, not a clean-install regression result. The authoritative complete full-suite evidence is the user's RC1 Windows run (102 pass, 0 fail, 2 skipped); RC2 still needs a clean install and rerun.
+
+## Status / remaining gates
+
+1. **Required next action:** On Windows Node.js `>=24.17.0`, unpack RC2 to a fresh directory and run `npm ci`, `npm ls --depth=0`, `npm test`, and `npm run test:tesseractjs`. Keep full acceptance detail logs and `acceptance-report.json`. Confirm the preload issue is fixed by seeing all 10 steps complete; zero network attempts alone are not sufficient.
+2. Acceptance has to establish that the negative control is recognized as an expected failure, integrated real-recognition stall/recovery passes, reported screenshot fields match, each five-image batch is exact/complete, and both image orders pass.
+3. Explicit first/middle/final recognition-pass stall injection has not yet been demonstrated on the modified RC2 source.
+4. Investigate the historical pass-16 issue with operation-level evidence; if the old logs do not identify one root cause, document the root cause as unknown rather than guessing.
+5. Windows native Tesseract comparison remains blocked until `tesseract.exe` is available and authorized; do not count the acceptance preload failure as a native engine result.
+6. Authorized live Discord login/channel/attachment/rate-limit/restart smoke tests have not been run.
+7. Phase 6 privacy-preserving correction feedback remains open and optional.
+
+## Production decision
+
+**NO-GO.** RC1's Windows unit/regression suites passed, but the OCR acceptance suite did not. RC2 includes a likely harness correction and locally passing regression tests, yet has not been run on the user's Windows runtime. Preserve RC1 and the failed log; do not deploy until RC2 clean-install/full-suite/10-step OCR acceptance and other operational gates have been passed or explicitly dispositioned.

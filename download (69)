@@ -1,0 +1,25 @@
+# Phase 2 RC1 Release Summary
+
+Phase 2 RC1 contains the Phase 1 RC2 baseline plus the Phase 2 acceptance reliability, fail-closed negative control, and reproducible OCR-report metadata updates. It is a **release candidate**, not production approved.
+
+## What changed
+
+- Repeatable `npm run test:tesseractjs` acceptance with a real wrong-expected-value negative control.
+- File-backed child output and bounded process-tree termination on acceptance timeout.
+- Shared OCR report metadata for source fingerprint, runtime, Tesseract.js/core versions, English model hash, and worker/WASM asset hashes.
+- Live child output for integrated stall/recovery diagnostics.
+- New report-metadata regression test; local full suite now 103/103.
+- Updated `plan1.txt`, Phase 2 implementation report, PowerShell guide, and curated Phase 2 evidence.
+
+## Validation status
+
+- `npm test`: 103 passed, 0 failed, 0 skipped on Linux Node.js v22.16.0.
+- `npm ls --depth=0`: exit 0, expected direct dependencies.
+- Full local OCR behavior acceptance: 10/10 commands passed, including three five-image batches and both reverse orders.
+- Current-source metadata-enabled acceptance: 8/8 commands passed with one five-image batch; zero blocked network attempts.
+- All local exact-match fixture runs passed. Integrated injected-stall/confirmed termination/fresh-child recovery passed in both acceptance runs.
+- `npm ci` on this host is unverified; it did not complete observably on Node.js 22.
+
+## Outstanding external gates
+
+The package declares Node.js `>=24.17.0`, but this host has only Node.js 22.16.0. Target Windows Node.js 24 clean install, full regression and acceptance, Windows native Tesseract comparison, and authorized live Discord smoke tests are not complete. Do not treat this candidate as production-ready until these are run and reviewed.

@@ -1,0 +1,25 @@
+# Phase 0 OCR repair iteration 9 — package note
+
+Package date: October 26, 2026
+Project: WoWS YOLO Tournament Discord Bot 2.5.0
+Runtime used for package verification: Node.js v24.17.0
+
+## Changes in this package
+
+- Narrowed the compact localized XP OCR crop to reduce contamination from the adjacent star/icon column.
+- Adjusted the compact localized Free XP crop boundary and added narrower geometry crop variants for split four-digit Free XP anchors.
+- Made the bounded damage crop sweep run when valid full-screen damage evidence conflicts with the initial focused reads, not only when the focused reads fail to form a consensus.
+- Added a restricted leading-digit recovery path for damage: isolated crops must agree across at least four reads, multiple crop widths and multiple PSMs, and meet confidence checks. Conflicting full-screen values remain fail-closed.
+- Added regression tests for the leading-digit damage case and split Free XP geometry.
+
+Ground-truth fixtures and exact-match acceptance thresholds were not intentionally modified.
+
+## Verification for this packaged source
+
+- `npm test`: **131 passed, 0 failed, 0 skipped**.
+- `npm run test:ocr-watchdog`: **18 passed, 0 failed, 0 skipped**.
+- Focused damage-consensus and reward-geometry tests: **27 passed, 0 failed**.
+
+## Acceptance status caveat
+
+The full 13-stage supervised `npm run test:tesseractjs` acceptance suite and the required native Windows Tesseract comparison were **not rerun for this packaged rebuild**. The unit-test results above do not imply Phase 0 acceptance is complete. Keep Phase 0 open until the full exact-match acceptance gate and Windows comparison are rerun and pass. Do not change ground truth or relax exact-match criteria to make a stage pass.

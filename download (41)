@@ -1,0 +1,45 @@
+# DWBOT Node 22+ Implementation Checkpoint 003 — Package Report
+
+**Date:** 2026-11-03  
+**Project:** World of Warships YOLO Tournament Discord Bot, package version 2.5.0  
+**Runtime baseline:** Node.js 22.16.0  
+**Accepted minimum:** Node.js 22.16.0 or newer stable release  
+**Release disposition:** Development checkpoint candidate; production NO-GO.
+
+## Included
+
+This package contains the complete materialized DWBOT project source tree from the Iteration 22 milestone candidate, including application source, Discord/tournament services, OCR and image-processing code, scripts, tests, fixtures, annotated screenshot ground truth, local OCR model, project documentation, source archives/provenance, and runtime/test evidence.
+
+The current Node 22+ runtime compatibility implementation updates package and lockfile engine metadata, startup runtime checks, tests, Windows PaddleOCR acceptance validation, documentation, and OCR run evidence. OpenCV is disabled by default and requires explicit `OCR_CV_ASSIST=1` for controlled evaluation. PaddleOCR remains disabled by default. Exact nine-field matching remains mandatory.
+
+## Deliberately excluded
+
+- `node_modules/`: recreated from the lockfile with `npm ci`.
+- `data/`: runtime database and user state.
+- `.env`: secrets and credentials. `.env.example` is included.
+- `.git/`: the materialized source folder had no Git metadata.
+
+## Integrity
+
+`DWBOT_NODE22PLUS_CHECKPOINT_003_MANIFEST.json` lists each package file's relative path, byte size, and SHA-256, excluding the manifest itself. The detached ZIP SHA-256 is provided in the separate `.sha256.txt` file accompanying the downloadable archive; it is not embedded into the ZIP because doing so would change the checksum.
+
+The ZIP was tested with `unzip -t`, and every file listed in the manifest was read back from the ZIP and SHA-256 verified. No excluded runtime/secrets paths were present in the ZIP.
+
+## Verification summary
+
+The current Node.js v22.16.0 / npm 10.9.2 / Linux x64 test logs are under `testdata/runtime-node22plus-2026-11-03/`:
+
+- Full suite: 185 passed, 0 failed, 0 skipped.
+- OpenCV isolation/configuration: 6 passed, 0 failed, 0 skipped.
+- OCR watchdog/process cancellation: 21 passed, 0 failed, 0 skipped.
+- PaddleOCR fallback safety: 16 passed, 0 failed, 0 skipped.
+- SQLite persistence: 5 passed, 0 failed, 0 skipped.
+- OCR report metadata: 2 passed, 0 failed, 0 skipped.
+- Top-level dependency tree and local Tesseract.js assets: passed.
+- Changed JavaScript files: syntax checks passed.
+
+A previous single reported-screenshot run completed with an exact 9/9 field match; its report predates explicit OCR feature-flag metadata and is not a paired OpenCV benchmark. The broad Tesseract.js acceptance launcher and Asashio supervised sequence did not finish within the available execution window. New CV-on and CV-off screenshot rechecks also did not complete. PaddleOCR model accuracy is unbenchmarked because the local packages/models were unavailable. A clean `npm ci`, Windows PowerShell/native-Tesseract, live Discord staging, independent holdout, dedicated secret scan, and backup/restore rehearsal were not verified.
+
+## Source and release boundaries
+
+The complete source has **not** been transferred to GitHub in this checkpoint. The remote delivery target remains `pbrau014/dwbot` branch `dwbotVis` only; `main` must not be modified. Production remains NO-GO until every required OCR, platform, holdout, Discord, security, recovery, and final acceptance gate passes.

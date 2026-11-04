@@ -1,0 +1,102 @@
+$ node --check scripts/accept-tesseractjs.js
+EXIT=0
+
+$ node --check scripts/integrated-ocr-stall-recovery.js
+EXIT=0
+
+$ node --test tests/node-options-path.test.js tests/ocr-watchdog.test.js tests/serial-task-queue.test.js tests/windows-process-cancel.test.js tests/image-processor-cancel.test.js tests/native-ocr-cancel.test.js
+TAP version 13
+# Subtest: ImageMagick timeout kills the child and waits for confirmed process close
+ok 1 - ImageMagick timeout kills the child and waits for confirmed process close
+  ---
+  duration_ms: 1015.822252
+  type: 'test'
+  ...
+# Subtest: native Tesseract worker termination aborts the active child process promptly
+ok 2 - native Tesseract worker termination aborts the active child process promptly
+  ---
+  duration_ms: 113.108258
+  type: 'test'
+  ...
+# Subtest: NODE_OPTIONS preload paths are quoted and normalized for Windows
+ok 3 - NODE_OPTIONS preload paths are quoted and normalized for Windows
+  ---
+  duration_ms: 0.89273
+  type: 'test'
+  ...
+# Subtest: existing Windows preload is detected with either slash convention
+ok 4 - existing Windows preload is detected with either slash convention
+  ---
+  duration_ms: 0.182233
+  type: 'test'
+  ...
+# Subtest: OCR operation watchdog confirms thread exit before creating a recovery worker
+ok 5 - OCR operation watchdog confirms thread exit before creating a recovery worker
+  ---
+  duration_ms: 114.144199
+  type: 'test'
+  ...
+# Subtest: OCR watchdog fails closed when worker thread termination cannot be confirmed
+ok 6 - OCR watchdog fails closed when worker thread termination cannot be confirmed
+  ---
+  duration_ms: 202.744219
+  type: 'test'
+  ...
+# Subtest: parameter-update timeout is logged, terminates the old worker, and gates replacement until exit
+ok 7 - parameter-update timeout is logged, terminates the old worker, and gates replacement until exit
+  ---
+  duration_ms: 113.113265
+  type: 'test'
+  ...
+# Subtest: serial task queue never overlaps jobs and continues after a rejected task
+ok 8 - serial task queue never overlaps jobs and continues after a rejected task
+  ---
+  duration_ms: 48.932431
+  type: 'test'
+  ...
+# Subtest: serial task queue rejects excess pending work explicitly
+ok 9 - serial task queue rejects excess pending work explicitly
+  ---
+  duration_ms: 1.306953
+  type: 'test'
+  ...
+# Subtest: serial task timeout runs cleanup, waits for task cancellation, then allows the next job
+ok 10 - serial task timeout runs cleanup, waits for task cancellation, then allows the next job
+  ---
+  duration_ms: 36.719894
+  type: 'test'
+  ...
+# Subtest: serial task queue fails closed rather than overlapping an operation that ignores timeout cleanup
+ok 11 - serial task queue fails closed rather than overlapping an operation that ignores timeout cleanup
+  ---
+  duration_ms: 71.708287
+  type: 'test'
+  ...
+# Subtest: serial task queue fails closed if timeout cleanup itself never settles
+ok 12 - serial task queue fails closed if timeout cleanup itself never settles
+  ---
+  duration_ms: 66.882292
+  type: 'test'
+  ...
+# Subtest: cross-platform ImageMagick process timeout confirms child close
+ok 13 - cross-platform ImageMagick process timeout confirms child close
+  ---
+  duration_ms: 259.829199
+  type: 'test'
+  ...
+# Subtest: cross-platform native OCR cancellation confirms child close
+ok 14 - cross-platform native OCR cancellation confirms child close
+  ---
+  duration_ms: 107.436445
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2430.572404
+EXIT=0

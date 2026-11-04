@@ -1,0 +1,11 @@
+# Iterative verification log — 2026-10-28
+
+1. Initial focused nine-field run: 51 passed, 1 failed. The failure was a correction-parser test that had not supplied XP after XP became mandatory.
+2. Fixed the test fixture to provide `XP: 4,023` and asserted the normalized XP value. Rerun: 52 passed, 0 failed.
+3. First full `npm test` attempt with incomplete dependencies after the timed-out `npm ci`: 172 passed, 2 failed due missing `dotenv` and `tesseract.js/package.json`; these were dependency-state failures.
+4. Restored the dependency tree from the verified V4 archive for diagnostics. The next full suite exposed one real test-fixture issue in the synthetic Discord tour: the correction sequence lacked XP. Added the ninth correction answer. The isolated full-system test passed 6/6.
+5. Final `npm test`: 179 passed, 0 failed under Node.js v22.16.0 using bundled V4 dependencies. This runtime is below the declared Node.js >=24.17.0 requirement, so the result is diagnostic, not a release gate.
+6. Syntax check over all JavaScript files in `src/`, `scripts/`, and `tests/`: exit code 0.
+7. Input ZIP checks: all six passed. Iteration 21 patch's internal 21-entry manifest passed. The pristine continuation archive's internal manifest reports 26 mismatches; see `continuation-original-manifest-check.log`. A fresh package manifest is generated for this candidate.
+
+No current-source OCR accuracy acceptance run, Windows Node 24 run, independent holdout, live Discord test, restore rehearsal, authenticated Git checkout, repository migration, or deployment is claimed.

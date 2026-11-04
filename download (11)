@@ -1,0 +1,4 @@
+[OCR-SEQUENCE] 1/1 START reported
+[OCR-SEQUENCE] FAIL reported 21975ms (exact=false, missing=2)
+[OCR-SEQUENCE] Report: /mnt/data/phase1_work/wows-yolo-tournament-discord-bot/testdata/phase1-runs/reported-adaptive.json
+[OCR-SEQUENCE] Summary 1/1 completed, 0/1 exact, 0/1 complete-required-fields
