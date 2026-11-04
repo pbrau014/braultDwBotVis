@@ -44,3 +44,12 @@ After `ClientReady`, startup now fetches the configured target channel and perfo
 Added pure unit coverage for missing channels, unsupported channels, unresolved permissions, successful permission checks, missing permissions, and undefined permission flags. These tests are isolated from Discord credentials and do not contact Discord.
 
 This implementation does not prove a live login, live permissions, Gateway resume, live REST rate-limit behavior, or Windows execution. Those remain open live-test gates. Message Content remains a privileged intent that must be enabled for the development application in the Developer Portal.
+
+
+## Focused Gateway preflight verification — 2026-11-04
+
+- New test file: `discord-gateway-diagnostics.test.js`.
+- Command executed in an isolated Node.js v22.16.0 runtime: `node --check src/discord-gateway-diagnostics.js`, `node --check discord-gateway-diagnostics.test.js`, and `node --test discord-gateway-diagnostics.test.js`.
+- Result: **6 passed / 0 failed / 0 skipped**.
+- Scope: pure permission-preflight helper tests only. These do not import discord.js, use credentials, connect to Discord, or validate the modified `src/bot.js` in a complete installed project.
+- The full project suite has not been rerun after this change. The previously recorded 214/214 result remains historical baseline evidence, not a current post-change result.

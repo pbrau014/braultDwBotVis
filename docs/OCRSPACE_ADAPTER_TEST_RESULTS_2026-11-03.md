@@ -9,3 +9,8 @@
 Coverage: disabled-by-default behavior; required key; official HTTPS endpoint restriction; Engine 3 player routing; Engine 2 general-field routing; evidence-only return contract; empty/invalid/oversized input; provider errors; empty OCR result; malformed JSON; HTTP failure.
 
 Limitations: the adapter is standalone and not connected to the bot's live OCR orchestration. `node_modules` is not present in this extracted package, so the complete project suite was not run. Windows/native-Tesseract, OCR.space live-provider, PaddleOCR comparative accuracy, and Discord smoke-test gates remain unverified. Production remains NO-GO.
+
+
+## Branch reproducibility notice — 2026-11-04
+
+This is a historical working-copy test report. The current `dwbotVis` branch does not contain the adapter/test files or npm script named above, so the 6/6 result is not currently reproducible from this branch. Do not count it toward current-branch acceptance until the source and tests are restored and rerun.

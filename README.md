@@ -12,7 +12,7 @@ The bot ingests WoWS battle-result screenshots, extracts structured battle evide
 - Tesseract.js remains the primary OCR engine.
 - OpenCV-assisted field localization is opt-in; it proposes image geometry/crops and is not an authority for recognized values.
 - PaddleOCR is an optional locally benchmarked secondary candidate, disabled by default.
-- OCR.space is implemented as an optional external crop recognizer. It receives localized crops only; its candidates still pass the existing exact parsers and consensus logic.
+- OCR.space is documented as a possible optional crop-evidence provider, but the current `dwbotVis` source tree does not contain its adapter module, orchestration call site, or adapter test file. Do not enable or describe it as integrated until those files are restored and verified.
 - Nine required battle fields remain strict and exact. The parser must abstain on conflicts or uncertainty rather than fuzzy-correcting player names, IDs, ships, or numbers.
 
 ## Runtime and tests
@@ -20,14 +20,14 @@ The bot ingests WoWS battle-result screenshots, extracts structured battle evide
 - Preferred reproducible runtime: Node.js 22.16.0 (`.nvmrc`).
 - Install with `npm ci`.
 - Run offline tests with `npm test`.
-- Run the explicit provider dry-run with `npm run test:ocrspace-live:dry`.
-- Run live OCR.space smoke test with `npm run test:ocrspace-live` after configuring a free API key locally.
+- Run the Discord channel-preflight unit tests with `npm run test:discord-gateway-diagnostics`.
+- OCR.space live/dry-run commands are not present in this branch's `package.json`; the provider is not currently integrated here.
 
-The current captured verification status is documented in `GITHUB_TRANSFER_STATUS.md` and `OCRSPACE_LIVE_PROVIDER_GATE_STATUS_2026-11-04.md`.
+The current captured verification status is documented in `GITHUB_TRANSFER_STATUS.md` and `docs/iteration23/PHASE9_DISCORD_INTEGRATION_STATUS_2026-11-04.md`.
 
 ## Release status
 
-The project is not marked release-ready. The OCR.space adapter contract suite passed 17/17 on Node 22.16.0 and its local crop dry-run passed. The full project test suite last reported 215 passed / 1 failed because the extracted test environment lacked the declared `dotenv` package. A real OCR.space POST was not verified: the current execution environment cannot resolve `api.ocr.space` and no project API key is configured. Windows/native-Tesseract and Discord smoke-test gates also remain separate.
+The project is not marked release-ready. The latest Phase 9 report records a historical offline full-suite result of 214 passed / 0 failed on Node 22.16.0; it has not been rerun after the latest Gateway preflight changes. The six new channel-preflight unit tests passed separately on Node 22.16.0. No live Discord login, real permission check, Windows/native-Tesseract test, or OCR.space request has been performed.
 
 ## Sensitive data
 
@@ -35,7 +35,7 @@ Never commit a real Discord bot token, OCR provider key, `.env`, database, local
 
 ## Complete source package
 
-The current full checkpoint contains application source, scripts, tests, documentation, model assets, fixtures, expanded corpus inputs, and provenance records. The repository upload helper is `PUSH_COMPLETE_DWBOT_POP1.ps1`; it pushes only to branch `pop1` of this repository, using Git Credential Manager and a force-with-lease check against the verified initial branch head. It does not modify `main`.
+The current full checkpoint contains application source, scripts, tests, documentation, model assets, fixtures, expanded corpus inputs, and provenance records. The only authorized delivery branch is `dwbotVis`. Historical scripts targeting `pop1` are not authorized for current use. `main` is read-only.
 
 
 ## Current DWBOT project rules and continuation status
@@ -46,3 +46,10 @@ The current full checkpoint contains application source, scripts, tests, documen
 - Phase 9 offline/simulated suite currently passes 214/214 on Node 22.16.0, but live Discord and Windows gates are not yet verified. See `docs/iteration23/PHASE9_DISCORD_INTEGRATION_STATUS_2026-11-04.md` and `docs/iteration23/DISCORD_LIVE_TEST_QUICKSTART.md`.
 - Phase 10 remains the final phase for Player/Admin HTML interfaces, bot integration, distribution and the one-PDF user manual. The user-pasted Image Text Reader and workbook calculator are the design baselines. The hard-coded webhook in the Image Text Reader example must never be reused.
 - Production remains **NO-GO** until all mandatory OCR, Windows/native, live Discord, security, recovery, interface and packaging gates have verified evidence.
+
+
+## Discord readiness hardening
+
+The bot now records discord.js shard READY/disconnect/reconnect/resume/error events and validates the configured guild text channel after the client reaches ClientReady. The read-only preflight checks View Channel, Send Messages (or Send Messages in Threads for a thread), and Attach Files before reporting the bot as fully online. discord.js remains responsible for Gateway heartbeat and session recovery.
+
+The focused check is `npm run test:discord-gateway-diagnostics`. Its six isolated unit tests passed on Node.js v22.16.0; this is not a live Discord test. See the Phase 9 quickstart for the isolated test guild procedure.

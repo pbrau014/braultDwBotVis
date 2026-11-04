@@ -1,4 +1,33 @@
-# DWBOT GitHub transfer status — 2026-11-04
+# DWBOT GitHub transfer status — current branch verification 2026-11-04
+
+## Superseding current status
+
+This section supersedes the historical `pop1` target and older transfer instructions below.
+
+- Canonical repository: https://github.com/pbrau014/braultDwBotVis
+- Authorized delivery branch: `dwbotVis` only.
+- Read-only branch: `main`; no changes to main were made.
+- Current branch at the prior verified checkpoint: `83ae324ce9b6a28453f5ed4dc886abf89d2ad3e8` (Gateway readiness/channel preflight implementation). Subsequent documentation/setup corrections are committed only to `dwbotVis`.
+- Read-only tree inventory before those setup corrections: 877 entries (802 files and 75 directories), including 17 files under `src/`, 29 `*.test.js` files, and `package-lock.json`.
+- The branch contains the Node.js application source, test corpus, supporting docs and release evidence. This count does not establish byte-for-byte equivalence with every historical local working-copy package; do not claim a complete archive transfer without comparing its manifest.
+- At the time of inventory, the branch lacked both `.gitignore` and `.env.discord-test.example`; both are added by the current setup-hardening change.
+- Historical references below to `pop1` and `PUSH_COMPLETE_DWBOT_POP1.ps1` are retained only as provenance. Do not run that helper or target `pop1` for current work.
+
+## Discord readiness implementation
+
+The latest implementation adds Gateway shard lifecycle logging, a read-only target-channel permission preflight, six isolated unit tests, and an updated live-test quickstart. It does not perform a live login or send a test message.
+
+## OCR.space source discrepancy
+
+The current branch contains OCR.space design/implementation notes, but the source tree does not contain `src/ocrspace-adapter.js`, an OCR.space orchestration module, an OCR.space test file, or the npm scripts named in older README text. The older adapter test report is not reproducible from this branch as currently checked out. Treat OCR.space as not integrated into this branch until code and tests are restored and verified.
+
+## Live and platform status
+
+No Discord bot token, target guild/channel, test admin, or participant identity is available in this environment. No live Gateway login, channel permission verification, attachment receipt, rate-limit event, or restart recovery has been observed. The live Discord and Windows/native-Tesseract gates remain OPEN. Production remains NO-GO.
+
+---
+
+## Historical transfer notes (superseded; retained for provenance)
 
 ## Primary repository
 

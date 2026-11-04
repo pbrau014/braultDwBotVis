@@ -4,7 +4,7 @@ Run only with a separate development bot, isolated test guild and one designated
 
 ## Prepare Discord
 
-Create/designate a development bot. Enable the **Message Content Intent**. Invite it to the test guild and grant the one test channel only: View Channel, Read Message History, Send Messages and Attach Files. Record the test guild/channel IDs, one authorized test-admin ID, and one ordinary participant ID. The participant must not have Manage Server and must not be on the bot's admin allowlist.
+Create/designate a development bot. Enable the **Message Content Intent**. Invite it to the test guild and grant the one test channel only: View Channel, Send Messages and Attach Files. Record the test guild/channel IDs, one authorized test-admin ID, and one ordinary participant ID. The participant must not have Manage Server and must not be on the bot's admin allowlist.
 
 ## Configure locally
 
@@ -31,6 +31,12 @@ OCR_CV_ASSIST=0
 Do not paste the token into chat or commit `.env`. It is excluded by the repository ignore rules.
 
 ## Restore and test
+
+First run the credential-free Discord channel-preflight unit tests:
+
+```powershell
+npm run test:discord-gateway-diagnostics
+```
 
 Use Node v22.16.0, pinned by `.nvmrc`:
 
@@ -89,6 +95,17 @@ A live connection PASS requires all of the following evidence from the same test
 3. If a disconnect occurs during the test, preserve the shard disconnect code/reason and subsequent reconnect/resume or fresh READY log. A resume is not a fresh READY event; record the actual event.
 4. A clean Ctrl+C shutdown and subsequent fresh READY after restart, followed by an unchanged state/export check.
 
-The runtime preflight checks a sendable guild text channel and the bot's `ViewChannel`, `SendMessages` (or `SendMessagesInThreads` for a thread), and `AttachFiles` permissions. The bot does not request Guild Members or Presence intents. It requests Guilds, Guild Messages, and Message Content; Message Content must be enabled in the Developer Portal for prefix commands and attachment metadata/content to be available.
+The runtime preflight checks a sendable guild text channel and the bot's `ViewChannel`, `SendMessages` (or `SendMessagesInThreads` for a thread), and `AttachFiles` permissions. Read Message History is not required by the current bot's configured-channel workflow and should not be granted unless a separately reviewed feature needs it. The bot does not request Guild Members or Presence intents. It requests Guilds, Guild Messages, and Message Content; Message Content must be enabled in the Developer Portal for prefix commands and attachment metadata/content to be available.
 
 Gateway event limits and HTTP REST rate limits are distinct. Do not flood either surface. Capture naturally occurring retry/backoff logs; a mocked 429 remains simulated evidence only.
+
+
+## Discord reference material reviewed
+
+- Gateway lifecycle, READY, intents, resume and Gateway rate limits: https://docs.discord.com/developers/events/gateway
+- Message Content privileged intent: https://docs.discord.com/developers/events/gateway#message-content-intent
+- Message object behavior when Message Content is unavailable: https://docs.discord.com/developers/resources/message
+- discord.js 14.27 Client events and shard lifecycle events: https://discordjs.dev/docs/packages/discord.js/14.27.0/Client%3AClass
+- Application commands and guild-scoped testing: https://docs.discord.com/developers/interactions/application-commands
+
+The bot requests Guilds, Guild Messages and Message Content. Message Content is privileged and must be enabled in the Developer Portal. The bot does not request Guild Members or Guild Presences. Gateway event limits are not the same as REST API limits; do not intentionally flood either. Discord also documents a global IDENTIFY limit, so avoid repeated restart loops.

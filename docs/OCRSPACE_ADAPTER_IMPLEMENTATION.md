@@ -1,8 +1,8 @@
 # OCR.space optional crop adapter — implementation note
 
-## Status
+## Status — current `dwbotVis` branch
 
-The checkpoint source did not contain an OCR.space adapter or adapter contract tests, despite a separate GitHub `pop1` README claiming the feature was integrated. This implementation adds a standalone, opt-in Node.js adapter and offline contract tests. It is **not yet wired into the bot's image-recognition orchestration**, and no live provider request has been made.
+The current `dwbotVis` tree contains this design note but does **not** contain `src/ocrspace-adapter.js`, `tests/ocrspace-adapter.test.js`, an OCR.space orchestration call site, or an `npm run test:ocrspace-adapter` script. The implementation and test details below describe a prior working-copy effort and are not evidence that the adapter exists in this branch. Treat OCR.space as NOT INTEGRATED until the code, tests, and call site are restored to this branch and verified. No live provider request is authorized or claimed.
 
 ## Safety and acceptance boundary
 
