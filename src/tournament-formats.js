@@ -62,6 +62,8 @@ function normalizeTournament(raw) {
       matchOutcomeApprovedBy: raw.config?.matchOutcomeApprovedBy || null,
       matchOutcomeApprovedAt: raw.config?.matchOutcomeApprovedAt || null,
       settingsFreeze: raw.config?.settingsFreeze !== false,
+      registrationOpen: raw.config?.registrationOpen !== false,
+      registrationClosedAt: raw.config?.registrationClosedAt || null,
     },
     stages: stages.length ? stages.map(clone) : expected.map((key, index) => ({
       id: raw.id + ':' + key, key, order: index + 1,
@@ -104,7 +106,7 @@ function getTournament(state, id) {
 }
 
 function registerParticipant(tournament, participant, actor = 'organizer') {
-  if (![STATUS.DRAFT, STATUS.PUBLISHED, STATUS.ACTIVE].includes(tournament.status)) throw new Error('Registration is closed for this tournament.');
+  if (![STATUS.DRAFT, STATUS.PUBLISHED, STATUS.ACTIVE].includes(tournament.status) || !tournament.config.registrationOpen) throw new Error('Registration is closed for this tournament.');
   const playerId = cleanText(participant?.playerId, 'Participant player ID');
   if (tournament.registrations.some(r => r.playerId === playerId && r.status !== 'withdrawn')) throw new Error('Participant is already registered.');
   if (tournament.registrations.filter(r => r.status !== 'withdrawn').length >= tournament.config.rosterCapacity) throw new Error('Tournament registration capacity reached.');
@@ -113,6 +115,24 @@ function registerParticipant(tournament, participant, actor = 'organizer') {
   tournament.registrations.push(entry);
   audit(tournament, 'participant_registered', { playerId }, actor);
   return entry;
+}
+
+function closeRegistration(tournament, actor = 'organizer') {
+  if (!tournament.config.registrationOpen) throw new Error('Registration is already closed.');
+  tournament.config.registrationOpen = false;
+  tournament.config.registrationClosedAt = now();
+  audit(tournament, 'registration_closed', {}, actor);
+  return tournament.config.registrationClosedAt;
+}
+
+function withdrawParticipant(tournament, playerId, reason, actor = 'organizer') {
+  const registration = tournament.registrations.find(r => r.playerId === String(playerId) && r.status === 'registered');
+  if (!registration) throw new Error('Active participant registration was not found.');
+  const cleanReason = cleanText(reason, 'Withdrawal reason');
+  registration.status = 'withdrawn'; registration.withdrawnAt = now(); registration.withdrawalReason = cleanReason;
+  for (const team of tournament.teams) if (team.playerIds.includes(String(playerId))) team.playerIds = team.playerIds.filter(id => id !== String(playerId));
+  audit(tournament, 'participant_withdrawn', { playerId: String(playerId), reason: cleanReason }, actor);
+  return registration;
 }
 
 function assignTeam(tournament, teamInput, actor = 'organizer') {
@@ -213,7 +233,7 @@ function createMatch(tournament, fixtureId, actor = 'organizer') {
   return match;
 }
 
-function recordGame(match, game) {
+function recordGame(match, game, teams = []) {
   if (match.status !== 'scheduled' && match.status !== 'active') throw new Error('Match is not open for game results.');
   const gameNumber = Number(game.gameNumber);
   if (!Number.isInteger(gameNumber) || gameNumber < 1) throw new Error('Game number must be a positive integer.');
@@ -251,7 +271,7 @@ function resolveMatch(match, method, options = {}) {
   const [home, away] = [totals[match.homeTeamId], totals[match.awayTeamId]];
   if (home === away) {
     const tie = options.tieBreak || {};
-    if (tie.headToHead === match.homeTeamId || tie.headToHead === match.awayTeamId) return { winnerTeamId: tie.headToHead, totals, decidedBy: 'head_to_head' };
+    if (tie.headToHeadWinnerTeamId === match.homeTeamId || tie.headToHeadWinnerTeamId === match.awayTeamId) return { winnerTeamId: tie.headToHeadWinnerTeamId, totals, decidedBy: 'head_to_head' };
     if (Number.isFinite(tie.seasonRecordHome) && Number.isFinite(tie.seasonRecordAway) && tie.seasonRecordHome !== tie.seasonRecordAway)
       return { winnerTeamId: tie.seasonRecordHome > tie.seasonRecordAway ? match.homeTeamId : match.awayTeamId, totals, decidedBy: 'season_record' };
     if (Number.isFinite(tie.pointDifferentialHome) && Number.isFinite(tie.pointDifferentialAway) && tie.pointDifferentialHome !== tie.pointDifferentialAway)
@@ -276,6 +296,19 @@ function completeMatch(tournament, matchId, options = {}, actor = 'organizer') {
   }
   match.status = STATUS.COMPLETE;
   audit(tournament, 'match_completed', { matchId, outcome: match.outcome }, actor);
+  return match;
+}
+
+function resolveForfeit(tournament, matchId, winnerTeamId, reason, evidenceId, actor = 'organizer') {
+  const match = tournament.matches.find(item => item.id === String(matchId));
+  if (!match) throw new Error('Match was not found.');
+  if (![match.homeTeamId, match.awayTeamId].includes(String(winnerTeamId))) throw new Error('Forfeit winner must be one of the teams in the match.');
+  const cleanReason = cleanText(reason, 'Forfeit reason');
+  const proof = cleanText(evidenceId, 'Forfeit evidence reference');
+  if (match.status === STATUS.COMPLETE || match.status === STATUS.FORFEIT) throw new Error('Match is already resolved.');
+  match.status = STATUS.FORFEIT;
+  match.outcome = { winnerTeamId: String(winnerTeamId), decidedBy: 'forfeit', reason: cleanReason, evidenceId: proof, completedAt: now() };
+  audit(tournament, 'match_forfeit_resolved', { matchId, winnerTeamId: String(winnerTeamId), reason: cleanReason, evidenceId: proof }, actor);
   return match;
 }
 
@@ -305,7 +338,7 @@ function freezeSettings(tournament, changes, actor = 'organizer') {
 
 module.exports = {
   FORMAT, STAGES, STAGE_ORDER, STATUS, normalizeCompetition, normalizeTournament,
-  createTournament, getTournament, registerParticipant, assignTeam, lockRoster,
+  createTournament, getTournament, registerParticipant, closeRegistration, withdrawParticipant, assignTeam, lockRoster,
   publishTournament, activateStage, completeStage, createFixture, createMatch,
-  recordGame, aggregateMatchMetrics, resolveMatch, completeMatch, recordRaceSideEvent, freezeSettings, audit,
+  recordGame, aggregateMatchMetrics, resolveMatch, completeMatch, resolveForfeit, recordRaceSideEvent, freezeSettings, audit,
 };
