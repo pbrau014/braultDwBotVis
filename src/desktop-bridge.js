@@ -307,7 +307,6 @@ function createDesktopBridge(options={}){
       csrf(req,session);role(principal,['admin','player']);
       const result=await call('checkInPilotLifecycle',principal,await readJson(req));audit(principal,'lifecycle-checkin');sendJson(res,200,result);return true;
     }
-    }
     return false;
   }
   async function handle(req,res){
