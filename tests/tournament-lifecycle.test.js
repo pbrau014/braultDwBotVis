@@ -124,7 +124,8 @@ test('Full score entry requires a season registration and positive Race time', (
   L.transitionTournament(t,'active',{actor:'admin'});
   assert.throws(()=>L.recordScoreEntry(t,{participantId:'u2',category:'race',gameNumber:1,shipClass:'DD',tier:8,evidenceId:'e1',time:90},season),/registered/);
   const entry=L.recordScoreEntry(t,{participantId:'u1',category:'race',gameNumber:1,shipClass:'DD',tier:8,evidenceId:'e2',time:90},season);
-  assert.equal(entry.metric,90);
+  assert.equal(entry.elapsedSeconds,90);
+  assert.equal(entry.metric,1/90);
   assert.throws(()=>L.recordScoreEntry(t,{participantId:'u1',category:'race',gameNumber:2,shipClass:'DD',tier:8,evidenceId:'e3',time:0},season),/positive/);
 });
 test('organizer approval records require a valid timestamp and attribution', () => {
