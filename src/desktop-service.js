@@ -316,6 +316,18 @@ function createDesktopService(options = {}) {
         return night;
       });
     },
+    async transitionYoloEventNight(principal,eventNightId,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{
+        const current=state(),index=(current.eventNights || []).findIndex(item=>item.id===eventNightId);
+        if(index<0) throw Object.assign(new Error('Event night was not found.'),{status:404,code:'EVENT_NIGHT_NOT_FOUND'});
+        const updated=YoloFormats.transitionEventNight(current.eventNights[index],body?.status,principal.discordUserId);
+        current.eventNights[index]=updated;
+        auditLifecycle(updated,principal,'event-night-transitioned',{status:updated.status});
+        await options.saveState();
+        return updated;
+      });
+    },
     async createYoloTeam(principal,eventNightId,body={}) {
       role(principal,['admin']);
       return mutate(async()=>{
