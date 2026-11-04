@@ -1229,3 +1229,63 @@ A static file:// HTML page cannot securely retrieve private current bot data, au
 
 The exact implementation.zip and the exact filenames score_report_imgToDiscord.html, score_report_imgDiscord.html and yolo_tournament_scoreCalculator.html were not found in the inspected Library/archive material. The two full HTML examples pasted by the user are therefore the primary design inputs; testdata/yolo_tourney_workbook_reference.html, scoreReport_dark_clipboard (1).html, backupWkbkBrowser.html and the workbook are supporting references. Do not claim the missing archive/files were inspected.
 
+
+
+================================================================================
+DWBOT-UPD-2026-11-04-004 — DISCORD LIVE-TEST PREPARATION / SECURITY CORRECTIONS
+================================================================================
+
+Repository state verified before this addendum:
+- Canonical repository: pbrau014/braultDwBotVis.
+- Authorized delivery branch: dwbotVis, head e796a67e8176f674a8f134d0276b1dec74d4e78b.
+- main remains read-only at 9981355e6895a6c24c3b59a78be57865fbecafbb.
+- dwbotVis tree inventory: 886 entries, 810 files, 19 src files, 31 test files. This is a repository tree count, not proof of byte-for-byte equivalence with all historical working-copy archives.
+
+Discord documentation reviewed:
+- Gateway lifecycle, intents, READY, resume and rate limits: https://docs.discord.com/developers/events/gateway
+- HTTP REST rate limits and 429 behavior: https://docs.discord.com/developers/topics/rate-limits
+- Application commands and guild-scoped testing: https://docs.discord.com/developers/interactions/application-commands
+- discord.js 14.27 Client, ClientReady and shard lifecycle events: https://discordjs.dev/docs/packages/discord.js/14.27.0/Client%3AClass
+- discord.js 14.27 GuildChannel.permissionsFor signature: https://discordjs.dev/docs/packages/discord.js/14.27.0/GuildChannel%3AClass
+
+Implementation committed only to dwbotVis:
+1. Gateway lifecycle observability: shardReady, shardDisconnect, shardReconnecting, shardResume and shardError, plus client error/warning logging. discord.js retains responsibility for heartbeat, reconnect and session resume; no second Gateway loop.
+2. REST rate-limit observability: client.rest rateLimited events record method, normalized route, scope, global flag and retry delay in milliseconds. No token, request body, authorization header or full URL is logged. No hard-coded REST limits or competing retry loop.
+3. READY and target-channel startup preflight: logs bot tag/user ID after ClientReady, fetches the configured channel, verifies a sendable guild text channel and ViewChannel, SendMessages (or SendMessagesInThreads for a thread), AttachFiles. Uses targetChannel.guild.members.me (GuildMember) for discord.js permissionsFor; fails closed if the member cannot be resolved. If preflight fails, storage is closed, client destroyed and process exit status set non-zero.
+4. Admin command authorization correction: the plural read-only !yolo settings command was missing from the previous admin-only allowlist although its handler used that name. Centralized policy now protects both settings and setting; full-system.test.js has participant-denial assertions for both.
+5. Local setup hardening: added .gitignore and safe .env.discord-test.example; no actual token or IDs are included. The quickstart grants only View Channel, Send Messages and Attach Files; Read Message History is not required by the current workflow.
+6. Offline local preflight: added src/discord-test-preflight.js and scripts/preflight-discord-test.js. It validates Node >=22.16, development/test environment, non-placeholder token presence without outputting its value, snowflake syntax, JSON test storage, state-path containment, distinct state paths and disabled slash/experimental flags. It makes no network calls and cannot validate token validity, Developer Portal intent toggles or live permissions.
+7. Static HTML credential remediation: removed the embedded Discord webhook and direct POST function from dwbotStuff/scoreReport_dark_clipboard (1).html on dwbotVis. OCR results remain local for review/copy/download/manual submission. No webhook request was made.
+
+Security blocker:
+- Read-only inspection confirmed the current main version of the same HTML file still contains the exposed webhook URL. The dwbotVis file is sanitized, but main remains unchanged under the read-only rule. The webhook owner must revoke/delete it in Discord immediately; a branch edit does not revoke it. Do not reuse it. Git history was not rewritten.
+- The current dwbotVis tree does not contain the OCR.space adapter module, orchestration call site, quota-ledger implementation or provider tests described in historical working-copy reports. OCR.space is NOT integrated in this branch. Prior 19/19 adapter and 4/4 sequence checkpoint results are historical and not reproducible from this branch until the source is restored.
+
+Focused local tests:
+- Combined npm run test:discord-preflight: 21 passed / 0 failed / 0 skipped under Node v22.16.0 in an isolated temporary runtime. Seven channel-preflight cases, four command-policy cases and ten local-config cases. No Discord credentials or network.
+- node --check passed for the isolated diagnostics, policy and config-preflight modules/tests.
+- Offline preflight wrapper smoke test passed with a stubbed dotenv module and synthetic non-secret environment values. This does not verify actual dotenv loading or any real token.
+- .gitignore behavior verified: .env, node_modules, SQLite and live test-state files ignored; .env.discord-test.example remains trackable.
+- The new full-system assertions for !yolo settings and !yolo setting are committed but not executed in the complete application suite.
+- Full npm test, full src/bot.js syntax check in a complete checkout, npm ci, Windows/native Tesseract and live Discord were NOT run in this execution environment.
+
+Current gates:
+- Offline Discord implementation/preflight: PARTIALLY IMPLEMENTED; focused 21/21 tests pass.
+- Complete dependency restore/full test suite: OPEN.
+- Live token validity, Developer Portal Message Content toggle, guild/channel permission verification, participant/admin behavior, attachment receipt, Gateway reconnect/resume, REST 429 behavior and restart recovery: OPEN.
+- Exposed webhook on main: OWNER ACTION REQUIRED — revoke/delete.
+- Windows/native OCR, current-branch OCR.space restoration, exact OCR acceptance, independent holdout, recovery, UI and complete package equivalence: OPEN.
+- Production remains NO-GO.
+
+Next authorized order:
+1. Owner revokes/deletes the exposed webhook in Discord; keep main read-only unless separately authorized.
+2. On the Windows test host, copy .env.discord-test.example to .env and fill only development bot/channel/admin values locally.
+3. Restore exact dependencies with npm ci, run npm run preflight:discord-test, npm ls --depth=0, npm run test:discord-preflight and full npm test; retain redacted logs and exit codes.
+4. Correct any test failures without weakening exact OCR validation or changing ground truth.
+5. Follow docs/iteration23/DISCORD_LIVE_TEST_QUICKSTART.md in an isolated development guild; no production tournament.
+6. Only after all offline gates pass, run the explicitly scoped live Discord smoke tests and capture evidence. Do not intentionally trigger Gateway or REST rate limits.
+7. Continue other project phases in their prescribed order; production stays NO-GO until all mandatory gates pass.
+
+================================================================================
+END DWBOT-UPD-2026-11-04-004
+================================================================================
