@@ -1596,9 +1596,16 @@ async function extractTextCore(imageBuffer) {
             const damageLeftFractions = [correctedDamageLeftFraction];
             const needsExpandedDamageSweep = fullScreenDamageCandidatesForSweep.some((full) =>
                 String(full.value || '').length >= 7);
-            const lowLeftCompactDamagePanel = anchorDisagreement && rewardBaseFraction !== null && rewardBaseFraction < 0.10;
+            // A compact left-aligned damage column can begin near 5% of the
+            // source width. In the 134,953 fixture, 10.6% ends before the final
+            // digit while the first ribbon begins just beyond 12%. Extend only
+            // this left-column sweep to the measured safe interval; the existing
+            // multi-width/multi-PSM quorum still decides whether any value is usable.
+            const lowLeftCompactDamagePanel =
+                (anchorDisagreement && rewardBaseFraction !== null && rewardBaseFraction < 0.10) ||
+                measuredDamageLeftFraction < 0.08;
             const damageSweepWidthFractions = lowLeftCompactDamagePanel
-                ? [0.108, 0.110, 0.112]
+                ? [0.108, 0.110, 0.112, 0.114, 0.116]
                 : needsExpandedDamageSweep
                     ? [0.096, 0.098, 0.100, 0.102, 0.104, 0.106]
                     : [0.096, 0.098, 0.100];
