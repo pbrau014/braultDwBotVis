@@ -15,7 +15,7 @@ This section supersedes the historical `pop1` target and older transfer instruct
 
 ## Discord readiness implementation
 
-The latest implementation adds Gateway shard lifecycle logging, a read-only target-channel permission preflight, six isolated unit tests, and an updated live-test quickstart. It does not perform a live login or send a test message.
+The latest implementation adds Gateway shard lifecycle logging, a read-only target-channel permission preflight, four command-policy checks, and six channel-preflight checks (10 focused tests total), and an updated live-test quickstart. It does not perform a live login or send a test message.
 
 ## OCR.space source discrepancy
 

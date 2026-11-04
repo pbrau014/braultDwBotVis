@@ -86,3 +86,11 @@ The synthetic full-system test now also asserts that a non-admin is denied both 
 ## Static HTML webhook exposure remediation — 2026-11-04
 
 A hard-coded Discord webhook URL was detected in `dwbotStuff/scoreReport_dark_clipboard (1).html`. The current branch version removes the credential assignment and the direct HTTP POST function. The OCR page now keeps results local for review, copy and download; manual submission through DWBOT is required. No request was made to the webhook. The URL remains in prior Git history, so the webhook owner must revoke/delete it in Discord; a source edit alone does not revoke a webhook. History rewriting was not performed, preserving repository history and avoiding a force-push.
+
+
+## Combined focused Discord test run — 2026-11-04
+
+- Command: `npm run test:discord-preflight` (executed in an isolated temporary package using the committed script definition).
+- Result: **10 passed / 0 failed / 0 skipped**.
+- Breakdown: six channel/permission preflight cases and four admin-command policy cases.
+- The run uses no Discord token, makes no network request, and does not import the full bot. It does not replace the unrun `full-system.test.js` integration suite or a live Discord role test.
