@@ -71,6 +71,7 @@ function normalizeTournament(raw) {
     })),
     registrations: Array.isArray(raw.registrations) ? raw.registrations.map(clone) : [],
     teams: Array.isArray(raw.teams) ? raw.teams.map(clone) : [],
+    eventNights: Array.isArray(raw.eventNights) ? raw.eventNights.map(clone) : [],
     fixtures: Array.isArray(raw.fixtures) ? raw.fixtures.map(clone) : [],
     matches: Array.isArray(raw.matches) ? raw.matches.map(clone) : [],
     evidence: Array.isArray(raw.evidence) ? raw.evidence.map(clone) : [],
@@ -267,9 +268,33 @@ function registerEvidence(tournament, input, actor = 'organizer') {
   return record;
 }
 
+function createEventNight(tournament, input, actor = 'organizer') {
+  const stage = tournament.stages.find(item => item.key === input.stageKey);
+  if (!stage || ![STATUS.PUBLISHED, STATUS.ACTIVE, STATUS.DRAFT].includes(stage.status) ||
+      ![STATUS.PUBLISHED, STATUS.ACTIVE].includes(tournament.status))
+    throw new Error('Event night must belong to a published tournament stage.');
+  if (tournament.format === FORMAT.PILOT && input.stageKey !== STAGES.PILOT_EVENT)
+    throw new Error('Pilot YOLO supports only its single Pilot Event stage.');
+  const startsAt = Date.parse(String(input.startsAt || ''));
+  const endsAt = Date.parse(String(input.endsAt || ''));
+  if (!Number.isFinite(startsAt) || !Number.isFinite(endsAt) || endsAt <= startsAt)
+    throw new Error('Event night requires valid start/end timestamps with end after start.');
+  const id = cleanText(input.id, 'Event night ID');
+  if (tournament.eventNights.some(item => item.id === id)) throw new Error('Event night ID already exists.');
+  const eventNight = { id, stageKey: input.stageKey, name: cleanText(input.name, 'Event night name'),
+    startsAt: new Date(startsAt).toISOString(), endsAt: new Date(endsAt).toISOString(),
+    timezone: cleanText(input.timezone || tournament.config.timezone, 'Event night timezone'),
+    status: 'scheduled', fixtureIds: [], attendance: [], createdAt: now() };
+  tournament.eventNights.push(eventNight);
+  audit(tournament, 'event_night_scheduled', { eventNightId: id, stageKey: eventNight.stageKey, startsAt: eventNight.startsAt }, actor);
+  return eventNight;
+}
+
 function createFixture(tournament, input, actor = 'organizer') {
   const stage = tournament.stages.find(s => s.key === input.stageKey);
   if (!stage || stage.status !== STATUS.ACTIVE) throw new Error('Fixtures can only be created for an active stage.');
+  const eventNight = tournament.eventNights.find(item => item.id === String(input.eventNightId) && item.stageKey === input.stageKey);
+  if (!eventNight) throw new Error('Fixture must be attached to a scheduled event night in the same stage.');
   const home = tournament.teams.find(t => t.id === String(input.homeTeamId));
   const away = tournament.teams.find(t => t.id === String(input.awayTeamId));
   if (!home || !away || home.id === away.id) throw new Error('Fixture requires two distinct registered teams.');
@@ -278,10 +303,11 @@ function createFixture(tournament, input, actor = 'organizer') {
       (!stage.qualifiedTeamIds.includes(home.id) || !stage.qualifiedTeamIds.includes(away.id)))
     throw new Error('Postseason and Grand Finale fixtures may include only published qualifiers.');
   if (tournament.fixtures.some(f => f.id === String(input.id))) throw new Error('Fixture ID already exists.');
-  const fixture = { id: cleanText(input.id, 'Fixture ID'), stageKey: input.stageKey,
-    homeTeamId: home.id, awayTeamId: away.id, scheduledAt: input.scheduledAt || null,
+  const fixture = { id: cleanText(input.id, 'Fixture ID'), stageKey: input.stageKey, eventNightId: eventNight.id,
+    homeTeamId: home.id, awayTeamId: away.id, scheduledAt: input.scheduledAt || eventNight.startsAt,
     status: 'scheduled', matchId: null };
   tournament.fixtures.push(fixture);
+  eventNight.fixtureIds.push(fixture.id);
   audit(tournament, 'fixture_created', { fixtureId: fixture.id, stageKey: fixture.stageKey }, actor);
   return fixture;
 }
@@ -451,6 +477,6 @@ function freezeSettings(tournament, changes, actor = 'organizer') {
 module.exports = {
   FORMAT, STAGES, STAGE_ORDER, STATUS, normalizeCompetition, normalizeTournament,
   createTournament, getTournament, registerParticipant, closeRegistration, withdrawParticipant, assignTeam, lockRoster,
-  publishTournament, setStageQualifiers, activateStage, completeStage, registerEvidence, createFixture, createMatch,
+  publishTournament, setStageQualifiers, activateStage, completeStage, createEventNight, registerEvidence, createFixture, createMatch,
   recordGame, aggregateMatchMetrics, resolveMatch, completeMatch, resolveForfeit, recordBye, recordRaceSideEvent, freezeSettings, audit,
 };
