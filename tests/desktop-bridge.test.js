@@ -1,0 +1,139 @@
+'use strict';
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const {createDesktopBridge,detectImageMime,safeFilename}=require('../src/desktop-bridge');
+
+function response(body,status=200){return new Response(JSON.stringify(body),{status,headers:{'Content-Type':'application/json'}});}
+function cookieHeader(res,name){
+  const values=typeof res.headers.getSetCookie==='function'?res.headers.getSetCookie():[res.headers.get('set-cookie')||''];
+  const value=values.find(x=>String(x).startsWith(name+'='));
+  assert.ok(value,'expected '+name+' cookie');
+  return String(value).split(';')[0];
+}
+async function fixture(t,options={}){
+  const actions=[];
+  const service={
+    async resolvePrincipal(user){
+      if(user.id==='12345678901234567')return{role:'player',discordUserId:user.id,player:{id:4,name:'Player Four'}};
+      if(user.id==='22345678901234567')return{role:'admin',discordUserId:user.id};
+      return{role:'unlinked',discordUserId:user.id};
+    },
+    async getOverview(p){return{role:p.role};},
+    async listSubmissions(p){return{items:[{owner:p.discordUserId}]};},
+    async submitImage(p,file){actions.push({name:'upload',role:p.role,filename:file.filename,mime:file.contentType,bytes:file.buffer.length});return{submissionId:'a'.repeat(24),status:'processing'};},
+    async correctSubmission(p,id,body){actions.push({name:'correct',id,body});return{status:'corrected'};},
+    async mapSubmission(p,id,body){actions.push({name:'map',id,body});return{status:'mapped'};},
+    async addPlayer(p,body){actions.push({name:'add',body});return{id:7,name:body.name};},
+    async linkPlayer(p,id,body){actions.push({name:'link',id,body});return{linked:true};},
+    async unlinkPlayer(p,id){actions.push({name:'unlink',id});return{linked:false};},
+    async recordResult(p,body){actions.push({name:'score',body});return{ok:true};},
+    async setSetting(p,body){actions.push({name:'setting',body});return{ok:true};},
+    async exportBackup(){return JSON.stringify({format:'dwbot-test-archive'});},
+  };
+  const fetchImpl=async(url,init={})=>{
+    const u=String(url);
+    if(u.endsWith('/api/oauth2/token')){
+      const body=new URLSearchParams(init.body);
+      return response({access_token:body.get('code')==='admin-code'?'access-admin':'access-player',token_type:'Bearer'});
+    }
+    if(u.endsWith('/api/users/@me')){
+      const admin=init.headers?.Authorization==='Bearer access-admin';
+      return response({id:admin?'22345678901234567':'12345678901234567',username:admin?'Admin':'Player'});
+    }
+    throw new Error('Unexpected URL '+u);
+  };
+  const bridge=createDesktopBridge({
+    host:'127.0.0.1',port:0,service,fetchImpl,
+    oauth:{clientId:'test-client',clientSecret:'test-secret'},
+    maxUploadBytes:options.maxUploadBytes||1024,
+    publicDirectory:options.publicDirectory||'/tmp/dwbot-desktop-static-test',
+  });
+  const info=await bridge.listen();
+  t.after(()=>bridge.close());
+  return{bridge,origin:info.origin,actions};
+}
+async function login(origin,who='player'){
+  const start=await fetch(origin+'/auth/discord',{redirect:'manual'});
+  assert.equal(start.status,302);
+  const auth=new URL(start.headers.get('location'));
+  assert.equal(auth.hostname,'discord.com');
+  assert.equal(auth.searchParams.get('scope'),'identify');
+  const state=auth.searchParams.get('state');
+  const oauthCookie=cookieHeader(start,'dwbot_oauth');
+  const callback=await fetch(origin+'/auth/discord/callback?code='+(who==='admin'?'admin-code':'player-code')+'&state='+encodeURIComponent(state),{
+    headers:{Cookie:oauthCookie},redirect:'manual',
+  });
+  assert.equal(callback.status,303);
+  const sessionCookie=cookieHeader(callback,'dwbot_session');
+  const sessionResponse=await fetch(origin+'/api/session',{headers:{Cookie:sessionCookie}});
+  assert.equal(sessionResponse.status,200);
+  return{cookie:sessionCookie,session:await sessionResponse.json()};
+}
+
+test('bridge rejects public and non-loopback network bindings',()=>{
+  assert.throws(()=>createDesktopBridge({host:'0.0.0.0',service:{resolvePrincipal(){}}}),/loopback/);
+  assert.throws(()=>createDesktopBridge({host:'::1',service:{resolvePrincipal(){}}}),/loopback/);
+});
+test('image file signature detection and filename sanitation are bounded',()=>{
+  assert.equal(detectImageMime(Buffer.from([137,80,78,71,13,10,26,10,0,0,0,0])),'image/png');
+  assert.equal(detectImageMime(Buffer.from([255,216,255,0,0,0,0,0,0,0,0,0])),'image/jpeg');
+  assert.equal(detectImageMime(Buffer.from('RIFF0000WEBP')),'image/webp');
+  assert.equal(detectImageMime(Buffer.from('BM0000000000')),'image/bmp');
+  assert.equal(detectImageMime(Buffer.from([73,73,42,0,0,0,0,0,0,0,0,0])),'image/tiff');
+  assert.equal(detectImageMime(Buffer.from('plain text data')),null);
+  assert.equal(safeFilename('../../battle\\r\\n.png'),'battle__.png');
+});
+test('Discord OAuth state cookie and signed-in session are required',async t=>{
+  const f=await fixture(t),loginResult=await login(f.origin);
+  assert.equal(loginResult.session.role,'player');
+  assert.equal(loginResult.session.player.name,'Player Four');
+  assert.ok(loginResult.session.csrfToken);
+  const anonymous=await fetch(f.origin+'/api/overview');
+  assert.equal(anonymous.status,401);
+});
+test('upload requires same-origin session, CSRF, image signature and bounded body',async t=>{
+  const f=await fixture(t),auth=await login(f.origin);
+  const png=Buffer.from([137,80,78,71,13,10,26,10,0,0,0,0]);
+  const headers={Cookie:auth.cookie,Origin:f.origin,'X-CSRF-Token':auth.session.csrfToken,
+    'X-File-Name':'../battle.png','X-File-Content-Type':'image/png','Content-Type':'application/octet-stream'};
+  const noCsrf=await fetch(f.origin+'/api/upload',{method:'POST',headers:{...headers,'X-CSRF-Token':''},body:png});
+  assert.equal(noCsrf.status,403);
+  const uploaded=await fetch(f.origin+'/api/upload',{method:'POST',headers,body:png});
+  assert.equal(uploaded.status,202);
+  assert.equal(f.actions[0].filename,'battle.png');
+  const mismatch=await fetch(f.origin+'/api/upload',{method:'POST',headers:{...headers,'X-File-Content-Type':'image/jpeg'},body:png});
+  assert.equal(mismatch.status,415);
+  const invalid=await fetch(f.origin+'/api/upload',{method:'POST',headers,body:Buffer.from('not an image')});
+  assert.equal(invalid.status,415);
+  const wrongOrigin=await fetch(f.origin+'/api/upload',{method:'POST',headers:{...headers,Origin:'https://evil.example'},body:png});
+  assert.equal(wrongOrigin.status,403);
+});
+test('participant cannot access admin static page or call admin endpoints',async t=>{
+  const f=await fixture(t),auth=await login(f.origin);
+  const page=await fetch(f.origin+'/admin.html',{headers:{Cookie:auth.cookie}});
+  assert.equal(page.status,403);
+  const add=await fetch(f.origin+'/api/admin/players',{method:'POST',headers:{Cookie:auth.cookie,Origin:f.origin,'X-CSRF-Token':auth.session.csrfToken,'Content-Type':'application/json'},body:JSON.stringify({name:'Tamper'})});
+  assert.equal(add.status,403);
+  assert.equal(f.actions.length,0);
+});
+test('admin can invoke guarded roster, link, scoring, settings and backup routes',async t=>{
+  const f=await fixture(t),auth=await login(f.origin,'admin');
+  const headers={Cookie:auth.cookie,Origin:f.origin,'X-CSRF-Token':auth.session.csrfToken,'Content-Type':'application/json'};
+  const add=await fetch(f.origin+'/api/admin/players',{method:'POST',headers,body:JSON.stringify({name:'Charlie'})});
+  assert.equal(add.status,201);
+  const link=await fetch(f.origin+'/api/admin/players/7/discord-account',{method:'PUT',headers,body:JSON.stringify({discordUserId:'32345678901234567'})});
+  assert.equal(link.status,200);
+  const score=await fetch(f.origin+'/api/admin/results',{method:'POST',headers,body:JSON.stringify({playerId:7,event:'damage',gameNumber:1,shipClass:'DD',tier:5,damage:1000})});
+  assert.equal(score.status,200);
+  const setting=await fetch(f.origin+'/api/admin/settings',{method:'POST',headers,body:JSON.stringify({event:'grand',field:'tierWeight',value:0.9})});
+  assert.equal(setting.status,200);
+  const backup=await fetch(f.origin+'/api/admin/backup',{headers:{Cookie:auth.cookie}});
+  assert.equal(backup.status,200);
+  assert.match(await backup.text(),/dwbot-test-archive/);
+  assert.deepEqual(f.actions.map(x=>x.name),['add','link','score','setting']);
+});
+test('OAuth callback rejects missing transaction state',async t=>{
+  const f=await fixture(t);
+  const responseResult=await fetch(f.origin+'/auth/discord/callback?code=stolen&state=missing',{redirect:'manual'});
+  assert.equal(responseResult.status,400);
+});

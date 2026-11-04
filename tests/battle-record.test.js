@@ -302,6 +302,18 @@ test('tournament JSON export is stable, typed, and never invents missing tournam
     assert.equal(makeTournamentExport(record, { exportedAt: '2027-01-01T00:00:00.000Z' }).record_id, exported.record_id);
 });
 
+test('desktop upload evidence preserves its provenance marker and cryptographic digest', () => {
+    const record = buildBattleRecord('Victory!', completeFields());
+    const exported = makeTournamentExport(record, {
+        sourceFileName: 'desktop-upload.png',
+        sourceEvidence: { platform: 'desktop', sha256: 'b'.repeat(64), sizeBytes: 1234,
+            contentType: 'image/png', retrievedAt: '2026-11-04T18:00:00.000Z' },
+    });
+    assert.equal(exported.source.evidence.platform, 'desktop');
+    assert.equal(exported.source.evidence.sha256, 'b'.repeat(64));
+    assert.equal(exported.source.evidence.size_bytes, 1234);
+    assert.equal(exported.source.evidence.content_type, 'image/png');
+});
 test('ship tier suggestions support Roman numerals through tier XI without claiming class or time', () => {
     assert.equal(parseTierFromShip('XI SUPERSHIP'), 11);
     assert.equal(parseTierFromShip('VIII SHIP NAME'), 8);

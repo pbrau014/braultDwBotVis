@@ -578,7 +578,7 @@ function makeTournamentExport(record, options = {}) {
     const rawEvidence = options.sourceEvidence && typeof options.sourceEvidence === 'object'
         ? options.sourceEvidence : null;
     const sourceEvidence = rawEvidence ? {
-        platform: rawEvidence.platform === 'discord' ? 'discord' : null,
+        platform: ['discord', 'desktop'].includes(rawEvidence.platform) ? rawEvidence.platform : null,
         message_id: /^\d{5,30}$/.test(String(rawEvidence.messageId || '')) ? String(rawEvidence.messageId) : null,
         channel_id: /^\d{5,30}$/.test(String(rawEvidence.channelId || '')) ? String(rawEvidence.channelId) : null,
         message_url: /^https:\/\/discord\.com\/channels\/\d{5,30}\/\d{5,30}\/\d{5,30}$/.test(String(rawEvidence.messageUrl || ''))

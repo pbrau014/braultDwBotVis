@@ -21,8 +21,8 @@ function fixture(options={}) {
   const service=createDesktopService({
     getState:()=>state,saveState:async()=>{},
     isAdminId:id=>id===ADMIN,
-    extractImage:async()=>({attempts:[{text:'pass 1'},{text:'pass 2'}],fields:{}}),
-    validateScreenshot:()=>({record:record(options.player||'[WOLF]Alpha',options.complete!==false),missing:[],confidence:92,pageSegmentationMode:6}),
+    extractImage:async buffer=>({attempts:[{text:buffer.toString('utf8')},{text:buffer.toString('utf8')+' alternate'}],fields:{}}),
+    validateScreenshot:attempt=>({record:record(attempt.text.includes('[BEAR]Bravo')?'[BEAR]Bravo':(options.player||'[WOLF]Alpha'),options.complete!==false),missing:[],confidence:92,pageSegmentationMode:6}),
   });
   return {state,alpha,service};
 }
@@ -36,7 +36,7 @@ test('desktop role lookup trusts Discord account IDs and administrator-managed r
 test('player can view only owned submissions and only their own roster identity',async()=>{
   const f=fixture(),p=await f.service.resolvePrincipal({id:PLAYER}),a=await f.service.resolvePrincipal({id:ADMIN});
   const owned=await f.service.submitImage(p,{buffer:Buffer.from('synthetic screenshot'),filename:'one.png',contentType:'image/png'});
-  const admin=await f.service.submitImage(a,{buffer:Buffer.from('admin screenshot'),filename:'two.png',contentType:'image/png'});
+  const admin=await f.service.submitImage(a,{buffer:Buffer.from('[BEAR]Bravo admin screenshot'),filename:'two.png',contentType:'image/png'});
   assert.equal(owned.status,'awaiting-mapping');assert.equal(admin.status,'admin-review');
   assert.equal((await f.service.listSubmissions(p)).items.length,1);
   await assert.rejects(f.service.correctSubmission(p,admin.submissionId,{values:{xp:'100'}}),e=>e.status===404);
@@ -61,7 +61,7 @@ test('a player can map a complete record only to their linked player and valid s
 });
 test('admin can map a screenshot to a different roster player after review',async()=>{
   const f=fixture({player:'[BEAR]Bravo'}),a=await f.service.resolvePrincipal({id:ADMIN});
-  const upload=await f.service.submitImage(a,{buffer:Buffer.from('admin image'),filename:'admin.png',contentType:'image/png'});
+  const upload=await f.service.submitImage(a,{buffer:Buffer.from('[BEAR]Bravo admin image'),filename:'admin.png',contentType:'image/png'});
   assert.equal(upload.status,'admin-review');
   const result=await f.service.mapSubmission(a,upload.submissionId,{playerId:2,event:'kills',gameNumber:1,shipClass:'CA',tier:7,kills:2});
   assert.equal(result.status,'mapped');assert.equal(f.state.players[1].events.kills[0].metric,2);

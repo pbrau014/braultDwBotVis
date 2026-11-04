@@ -13,7 +13,7 @@ function identityMatches(record, player) {
 }
 function wholeNumber(value, label, minimum = 0) {
   const n = Number(value);
-  if (!Number.isSafeInteger(n) || n < minimum) throw new Error(label + ' must be a whole number of at least ' + minimum + '.');
+  if (!Number.isSafeInteger(n) || n < minimum) throw Object.assign(new Error(label + ' must be a whole number of at least ' + minimum + '.'), { status: 400, code: 'INVALID_MAPPING_VALUE' });
   return n;
 }
 function publicSubmission(entry) {
@@ -196,7 +196,13 @@ function createDesktopService(options = {}) {
         const destroyed=(battle.ribbons||[]).find(r=>String(r.label||'').toLowerCase()==='destroyed');
         const kills=body?.kills===''||body?.kills===undefined?(destroyed?.count==null?null:wholeNumber(destroyed.count,'Kills')):wholeNumber(body.kills,'Kills');
         const time=body?.time===''||body?.time===undefined?null:Number(body.time);
-        const result=Tournament.recordResult(current,{player:player.id,event,gameNumber,shipClass,tier,recordId:entry.record_id,damage,kills,time});
+        let result;
+        try {
+          result=Tournament.recordResult(current,{player:player.id,event,gameNumber,shipClass,tier,recordId:entry.record_id,damage,kills,time});
+        } catch(error) {
+          if(!error.status) { error.status=400; error.code='INVALID_MAPPING_VALUE'; }
+          throw error;
+        }
         entry.status='mapped';entry.mapped_at=new Date().toISOString();
         entry.tournament_mapping={player_id:result.player.id,player_name:result.player.name,event,game_number:gameNumber,ship_class:shipClass,tier,mapped_via:'desktop-ui'};
         await options.saveState();

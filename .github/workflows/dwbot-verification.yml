@@ -42,6 +42,10 @@ jobs:
       - name: Check JavaScript syntax
         run: |
           node --check src/bot.js
+          node --check src/desktop-service.js
+          node --check src/desktop-bridge.js
+          node --check tests/desktop-service.test.js
+          node --check tests/desktop-bridge.test.js
           node --check src/ocrspace-client.js
           node --check src/ocrspace-quota-ledger.js
           node --check src/ocrspace-field-evidence.js
@@ -55,6 +59,9 @@ jobs:
 
       - name: Verify Discord channel, admin policy and local test configuration
         run: npm run test:discord-preflight
+
+      - name: Verify authenticated desktop UI service and bridge
+        run: npm run test:desktop
 
       - name: Run the complete project test suite
         run: npm test
