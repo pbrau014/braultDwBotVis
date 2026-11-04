@@ -10,7 +10,7 @@ test('event-night registration prevents duplicates and closes after event',()=>{
 test('rules freeze after event starts',()=>{assert.deepEqual(Y.freezeRules({x:1},false),{x:1});assert.throws(()=>Y.freezeRules({x:2},true),/frozen/);});
 test('race metric differs from separately scheduled side-event',()=>{assert.equal(Y.raceMetric(60).normalizedMetric,1/60);assert.throws(()=>Y.raceMetric(0),/positive/);assert.equal(Y.createRaceSideEvent({id:'r',eventNightId:'n'}).type,'race-side-event');});
 test('Grand Yolo scoring category differs from Grand YOLO finale',()=>{assert.equal(Y.grandYoloScore({eventNightId:'n'}).type,'grand-yolo-score');assert.equal(Y.grandYoloFinale({stageId:'s',matchId:'m'}).type,'grand-yolo-finale');});
-test('official match outcome requires approved formula and accepted evidence',()=>{assert.throws(()=>Y.validateMatchOutcome({}),/approved scoring-method/);assert.equal(Y.validateMatchOutcome({approvedScoringMethodId:'v1',acceptedPerformanceRecordIds:['r1'],aggregation:'approved',rounding:'approved',tieBreakOrder:['head-to-head']}).status,'pending-calculation');});
+test('official match outcome requires approved formula and accepted evidence',()=>{assert.throws(()=>Y.validateMatchOutcome({}),/Approved scoring-method/);assert.equal(Y.validateMatchOutcome({approvedScoringMethodId:'v1',acceptedPerformanceRecordIds:['r1'],aggregation:'approved',rounding:'approved',tieBreakOrder:['head-to-head']}).status,'pending-calculation');});
 
 test('Full stages activate and complete in order; season cannot close early',()=>{
  let t=Y.createTournament({id:'full',name:'Full',format:'full',season:{id:'s',durationWeeks:12}});
@@ -29,7 +29,7 @@ test('Full stages activate and complete in order; season cannot close early',()=
 });
 
 test('lifecycle identifiers and event times are validated',()=>{
- assert.throws(()=>Y.createTournament({id:'bad/id',name:'Bad',format:'pilot'}),/identifier/);
+ assert.throws(()=>Y.createTournament({id:'bad/id',name:'Bad',format:'pilot'}),/must use/);
  assert.throws(()=>Y.createEventNight({id:'night',tournamentId:'p',startsAt:'2026-11-05T18:00:00Z',endsAt:'2026-11-05T17:00:00Z'}),/after its start/);
 });
 test('teams, fixtures, matches and games enforce distinct identities and valid structure',()=>{
