@@ -5,6 +5,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const TournamentLifecycle = require('./tournament-lifecycle');
 
 const EVENTS = ['damage', 'kills', 'race', 'grand'];
 const EVENT_LABELS = { damage: 'Damage', kills: 'Kills', race: 'Race', grand: 'Grand Yolo' };
@@ -84,6 +85,7 @@ function normalizeState(input = {}) {
   );
   return {
     version: 2,
+    lifecycle: TournamentLifecycle.normalizeLifecycleState({ ...(input.lifecycle || {}), battleRecords: Array.isArray(input.battleRecords) ? input.battleRecords : [] }),
     players,
     settings: normalizeSettings(input.settings),
     playerAccountLinks,
@@ -278,6 +280,7 @@ function makeArchiveSnapshot(state) {
     pending_submissions: clone(state.pendingSubmissions),
     pending_ocr_corrections: clone(state.pendingOcrCorrections || []),
     player_account_links: clone(state.playerAccountLinks || {}),
+    lifecycle: clone(state.lifecycle || TournamentLifecycle.createLifecycleState(state)),
   };
 }
 function makePublicArchiveSnapshot(state) {
@@ -289,7 +292,9 @@ function makePublicArchiveSnapshot(state) {
     'battle_records[].desktop_owner_role',
     'pending_submissions',
     'pending_ocr_corrections',
+    'lifecycle',
   ];
+  delete snapshot.lifecycle;
   snapshot.player_account_links = {};
   snapshot.battle_records = snapshot.battle_records.map(entry => {
     const { desktop_owner_id, desktop_owner_role, ...publicEntry } = entry || {};
@@ -313,6 +318,7 @@ function importBackup(raw) {
     state.pendingSubmissions = Array.isArray(raw.pending_submissions) ? raw.pending_submissions : [];
     state.pendingOcrCorrections = Array.isArray(raw.pending_ocr_corrections) ? raw.pending_ocr_corrections : [];
     state.playerAccountLinks = normalizePlayerAccountLinks(raw.player_account_links, state.players);
+    state.lifecycle = TournamentLifecycle.normalizeLifecycleState({ ...(raw.lifecycle || {}), battleRecords: state.battleRecords });
   }
   return state;
 }
@@ -494,7 +500,7 @@ function deterministicBattleId(record) {
 }
 
 module.exports = {
-  EVENTS, EVENT_LABELS, CLASSES, DEFAULT_SETTINGS, normalizeClass, classWeightFor,
+  EVENTS, EVENT_LABELS, CLASSES, DEFAULT_SETTINGS, normalizeClass, classWeightFor, TournamentLifecycle,
   MAX_PLAYERS, normalizeState, createState, findPlayer, findPlayerByDiscordUserId,
   linkPlayerDiscordAccount, unlinkPlayerDiscordAccount, addPlayer, removePlayer, renamePlayer,
   clearSlot, clearEvent, clearAllResults, eventTotal, eventScore, standings, getSlot, validateResult, recordResult, setSetting,
