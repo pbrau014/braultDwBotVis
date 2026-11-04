@@ -316,6 +316,8 @@ function completeMatch(tournament, matchId, options = {}, actor = 'organizer') {
     match.outcome = { ...outcome, completedAt: now(), methodVersion: method.version };
   }
   match.status = STATUS.COMPLETE;
+  const fixture = tournament.fixtures.find(item => item.id === match.fixtureId);
+  if (fixture) fixture.status = 'complete';
   audit(tournament, 'match_completed', { matchId, outcome: match.outcome }, actor);
   return match;
 }
@@ -328,6 +330,8 @@ function resolveForfeit(tournament, matchId, winnerTeamId, reason, evidenceId, a
   const proof = cleanText(evidenceId, 'Forfeit evidence reference');
   if (match.status === STATUS.COMPLETE || match.status === STATUS.FORFEIT) throw new Error('Match is already resolved.');
   match.status = STATUS.FORFEIT;
+  const fixture = tournament.fixtures.find(item => item.id === match.fixtureId);
+  if (fixture) fixture.status = 'forfeit';
   match.outcome = { winnerTeamId: String(winnerTeamId), decidedBy: 'forfeit', reason: cleanReason, evidenceId: proof, completedAt: now() };
   audit(tournament, 'match_forfeit_resolved', { matchId, winnerTeamId: String(winnerTeamId), reason: cleanReason, evidenceId: proof }, actor);
   return match;
