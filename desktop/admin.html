@@ -25,6 +25,30 @@
         <article class="metric-card"><span>ESTIMATED VALUE</span><strong id="admin-value">—</strong><small>workbook formula</small></article>
         <article class="metric-card"><span>UNMAPPED RECORDS</span><strong id="admin-pending">—</strong><small>require admin review</small></article>
       </div>
+      <section class="panel" aria-labelledby="competition-heading">
+        <div class="panel-heading"><div><p class="eyebrow">COMPETITION LIFECYCLE</p><h2 id="competition-heading">Create and manage Pilot / Full YOLO</h2><p class="muted">One system, two event lifecycles. Unknown event rules remain unpublished until approved.</p></div></div>
+        <form id="competition-create-form" class="form-grid">
+          <label>Tournament ID<input name="id" required maxlength="48" placeholder="pilot-winter-2026"></label>
+          <label>Tournament name<input name="name" required maxlength="100" placeholder="Winter YOLO"></label>
+          <label>Format<select name="format" required><option value="pilot">Pilot YOLO · single evening</option><option value="full">Full YOLO · season</option></select></label>
+          <label>Timezone<input name="timezone" required value="America/Chicago" placeholder="America/Chicago"></label>
+          <label id="pilot-start-field">Pilot start<input name="eventStart" type="datetime-local"></label>
+          <label id="season-weeks-field" class="hidden">Season duration (weeks)<input name="seasonWeeks" type="number" min="1" max="52" step="1" value="12"></label>
+          <button class="button primary span-all" type="submit">Create draft tournament</button>
+        </form>
+        <div class="review-block">
+          <h3>Full YOLO match-outcome approval</h3>
+          <p class="muted">Required before Full YOLO can be published. These values are organizer decisions, not assumed rules.</p>
+          <div class="form-grid compact-form">
+            <label>Approver name<input id="match-method-approver" placeholder="Organizer name"></label>
+            <label>Method version<input id="match-method-version" value="v1"></label>
+            <label>Aggregation<select id="match-method-aggregation"><option value="sum">Sum</option><option value="average">Average</option></select></label>
+            <label>Damage weight<input id="match-method-damage" type="number" min="0" step="any" value="1"></label>
+            <label>Kills weight<input id="match-method-kills" type="number" min="0" step="any" value="1000"></label>
+          </div>
+        </div>
+        <div id="competition-list" class="submission-list"><p class="muted">No tournaments created.</p></div>
+      </section>
       <div class="content-grid">
         <section class="panel">
           <div class="panel-heading"><div><p class="eyebrow">PARTICIPANTS</p><h2>Roster management</h2></div></div>
