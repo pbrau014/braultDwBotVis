@@ -9,12 +9,22 @@ function pilot() {
   return F.createTournament(state().competition, { id: 'pilot-1', name: 'Pilot Night', format: 'pilot',
     config: { timezone: 'America/Chicago', eventStart: '2026-12-01T18:00:00-06:00' } });
 }
+function playStage(t, stageKey) {
+  const suffix=stageKey.replace(/_/g,'-');
+  const fixture=F.createFixture(t,{id:'fixture-'+suffix,stageKey,homeTeamId:'home',awayTeamId:'away'});
+  const match=F.createMatch(t,fixture.id);
+  F.recordGame(match,{gameNumber:1,teamId:'home',playerId:'p1',metrics:{damage:9000,kills:2},evidenceId:'ev-'+suffix+'-h'},t.teams,t.registrations);
+  F.recordGame(match,{gameNumber:2,teamId:'away',playerId:'p2',metrics:{damage:4000,kills:1},evidenceId:'ev-'+suffix+'-a'},t.teams,t.registrations);
+  F.completeMatch(t,match.id);
+}
+
 function full() {
   const competition = state().competition;
   const t = F.createTournament(competition, { id: 'full-1', name: 'Full Season', format: 'full',
     config: { timezone: 'America/Chicago', seasonWeeks: 12 } });
   F.registerParticipant(t, { playerId: 'p1', displayName: 'Alpha' });
   F.registerParticipant(t, { playerId: 'p2', displayName: 'Bravo' });
+  F.closeRegistration(t);
   F.assignTeam(t, { id: 'home', name: 'Home', playerIds: ['p1'] });
   F.assignTeam(t, { id: 'away', name: 'Away', playerIds: ['p2'] });
   F.lockRoster(t, 'home'); F.lockRoster(t, 'away');
@@ -46,6 +56,7 @@ test('Pilot is one single-evening stage and does not create a season or carryove
   assert.deepEqual(t.stages.map(s => s.key), [F.STAGES.PILOT_EVENT]);
   assert.equal(t.config.seasonWeeks, null);
   F.publishTournament(t);
+  F.closeRegistration(t);
   F.activateStage(t, F.STAGES.PILOT_EVENT);
   F.completeStage(t, F.STAGES.PILOT_EVENT);
   assert.equal(t.status, F.STATUS.COMPLETE);
@@ -67,14 +78,16 @@ test('Full regular season advances in order through postseason and Grand Finale'
   F.activateStage(t, F.STAGES.REGULAR_SEASON);
   const fixture = F.createFixture(t, { id: 'f1', stageKey: F.STAGES.REGULAR_SEASON, homeTeamId: 'home', awayTeamId: 'away' });
   const match = F.createMatch(t, fixture.id);
-  F.recordGame(match, { gameNumber: 1, teamId: 'home', playerId: 'p1', metrics: { damage: 10000, kills: 2 }, evidenceId: 'ev1' }, t.teams);
-  F.recordGame(match, { gameNumber: 2, teamId: 'away', playerId: 'p2', metrics: { damage: 5000, kills: 1 }, evidenceId: 'ev2' }, t.teams);
+  F.recordGame(match, { gameNumber: 1, teamId: 'home', playerId: 'p1', metrics: { damage: 10000, kills: 2 }, evidenceId: 'ev1' }, t.teams,t.registrations);
+  F.recordGame(match, { gameNumber: 2, teamId: 'away', playerId: 'p2', metrics: { damage: 5000, kills: 1 }, evidenceId: 'ev2' }, t.teams,t.registrations);
   F.completeMatch(t, match.id);
   assert.equal(match.outcome.winnerTeamId, 'home');
   F.completeStage(t, F.STAGES.REGULAR_SEASON);
   F.activateStage(t, F.STAGES.POSTSEASON);
+  playStage(t,F.STAGES.POSTSEASON);
   F.completeStage(t, F.STAGES.POSTSEASON);
   F.activateStage(t, F.STAGES.GRAND_FINALE);
+  playStage(t,F.STAGES.GRAND_FINALE);
   F.completeStage(t, F.STAGES.GRAND_FINALE);
   assert.equal(t.status, F.STATUS.COMPLETE);
 });
@@ -107,13 +120,13 @@ test('Race side-event is a separate Full YOLO record using inverse elapsed secon
 test('active-stage settings freeze is prospective and audited', () => {
   const t = pilot();
   F.publishTournament(t); F.activateStage(t, F.STAGES.PILOT_EVENT);
-  assert.throws(() => F.freezeSettings(t, { damagePool: 600 }), /frozen for the active stage/);
+  assert.equal(F.freezeSettings(t, { damagePool: 600 }).blocked,true);
   assert.equal(t.audit.at(-1).action, 'settings_change_blocked');
 });
 
 test('registrations, team rosters and fixture references are validated', () => {
   const t = full();
-  assert.throws(() => F.registerParticipant(t, { playerId: 'p1', displayName: 'Alpha' }), /already registered/);
+  assert.throws(() => F.registerParticipant(t, { playerId: 'p1', displayName: 'Alpha' }), /Registration is closed/);
   assert.throws(() => F.assignTeam(t, { id: 'bad', name: 'Bad', playerIds: ['unknown'] }), /active registration/);
   assert.throws(() => F.createFixture(t, { id: 'f', stageKey: F.STAGES.REGULAR_SEASON, homeTeamId: 'home', awayTeamId: 'missing' }), /two distinct registered teams/);
 });
@@ -133,7 +146,7 @@ test('match game must be supported by locked team roster and non-empty match', (
   F.activateStage(t, F.STAGES.REGULAR_SEASON);
   const fixture = F.createFixture(t, { id: 'f1', stageKey: F.STAGES.REGULAR_SEASON, homeTeamId: 'home', awayTeamId: 'away' });
   const match = F.createMatch(t, fixture.id);
-  assert.throws(() => F.recordGame(match, { gameNumber: 1, teamId: 'home', playerId: 'p2', metrics: { damage: 1, kills: 0 }, evidenceId: 'ev' }, t.teams), /locked roster/);
+  assert.throws(() => F.recordGame(match, { gameNumber: 1, teamId: 'home', playerId: 'p2', metrics: { damage: 1, kills: 0 }, evidenceId: 'ev' }, t.teams,t.registrations), /locked roster/);
   assert.throws(() => F.completeMatch(t, match.id), /no recorded games/);
 });
 
