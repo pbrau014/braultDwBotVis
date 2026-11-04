@@ -2945,6 +2945,10 @@ async function handleTournamentCommand(message) {
             const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
             lifecycle.lockTeamRoster(item, input.teamId, { actor: message.author?.tag || message.author?.id });
             await saveTournamentState(); response = `Locked roster for team ${input.teamId}.`;
+        } else if (command === 'lifecycle-settings') {
+            const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
+            const revision = lifecycle.updateSettingsProspectively(item, { version: input.version, settings: input.settings, eventNightIds: input.eventNightIds, actor: message.author?.tag || message.author?.id });
+            await saveTournamentState(); response = `Applied settings revision ${revision.version} prospectively to ${revision.eventNightIds.length} future, unplayed event night(s). Existing/completed event settings remain unchanged.`;
         } else if (command === 'lifecycle-night') {
             const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
             const night = lifecycle.createEventNight(item, { ...input.night, actor: message.author?.tag || message.author?.id });
