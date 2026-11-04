@@ -21,7 +21,7 @@
 
       D.$('admin-roster-count').textContent=overview.roster.length+'/'+overview.maxPlayers;
       D.$('admin-total').textContent=D.number(overview.aggregate.doubloons);
-      D.$('admin-value').textContent=D.money(overview.aggregate.estimatedValue);
+      D.$('admin-value').textContent='Not published';
       D.$('admin-pending').textContent=String(overview.pendingCount);
       const roster=D.$('roster-body'),playerOptions=[['','Select player…'],...overview.roster.map(p=>[String(p.id),'#'+p.id+' · '+p.name])];
       roster.replaceChildren();
@@ -51,7 +51,7 @@
       const standings=D.$('admin-standings');standings.replaceChildren();
       for(const row of overview.standings){
         const tr=document.createElement('tr');
-        for(const value of [row.rank,row.name,D.number(row.events.damage),D.number(row.events.kills),D.number(row.events.race),D.number(row.events.grand),D.number(row.total),D.money(row.estimatedValue)]){
+        for(const value of [row.rank,row.name,D.number(row.events.damage),D.number(row.events.kills),D.number(row.events.race),D.number(row.events.grand),D.number(row.total),'Not published']){
           const td=document.createElement('td');td.textContent=String(value);tr.append(td);
         }
         standings.append(tr);
