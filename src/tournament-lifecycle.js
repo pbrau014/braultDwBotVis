@@ -29,6 +29,7 @@ function changeFormat(t,next){if(t.acceptedResultCount>0||t.status!=='draft')thr
 
 function registerPilotParticipant(tournament,input={}) {
   if(tournament.format!=='pilot') throw new Error('Pilot registration applies only to Pilot YOLO.');
+  if(tournament.registrations.length>=50) throw new Error('Pilot registration limit is 50 participants.');
   const participantId=text(input.participantId,'Participant id');
   if(tournament.registrations.some(x=>x.participantId===participantId)) throw new Error('Participant is already registered for this Pilot.');
   const row={participantId,displayName:text(input.displayName,'Display name'),status:'registered',registeredAt:new Date().toISOString()};
@@ -56,8 +57,11 @@ function recordScoreEntry(tournament,input={},season=null) {
   const tier=Number(input.tier);
   if(!Number.isInteger(tier)||tier<1||tier>11) throw new TypeError('Ship tier must be an integer from 1 to 11.');
   const evidenceId=text(input.evidenceId,'Evidence id');
-  if(tournament.scoreEntries.some(x=>x.participantId===participantId&&x.category===category&&x.gameNumber===gameNumber)) throw new Error('This participant/category/game slot already has a score entry.');
-  const entry={id:text(input.id||evidenceId,'Score entry id'),tournamentId:tournament.id,seasonId:season?.id||null,participantId,category,gameNumber,shipClass,tier,evidenceId,recordedAt:new Date().toISOString()};
+  const eventNightId=text(input.eventNightId,'Event night id');
+  const nights=tournament.format==='pilot'?tournament.eventNights:(season?.eventNights||[]);
+  if(!nights.some(x=>x.id===eventNightId)) throw new Error('Score entry must reference an event night in this tournament.');
+  if(tournament.scoreEntries.some(x=>x.participantId===participantId&&x.eventNightId===eventNightId&&x.category===category&&x.gameNumber===gameNumber)) throw new Error('This participant/category/game slot already has a score entry for this event night.');
+  const entry={id:text(input.id||evidenceId,'Score entry id'),tournamentId:tournament.id,seasonId:season?.id||null,eventNightId,participantId,category,gameNumber,shipClass,tier,evidenceId,recordedAt:new Date().toISOString()};
   if(category==='grand') {
     entry.damage=score(input.damage,'Damage');entry.kills=score(input.kills,'Kills');entry.time=Number(input.time);
     if(!Number.isFinite(entry.time)||entry.time<=0) throw new TypeError('Grand Yolo time must be positive.');
@@ -72,7 +76,7 @@ function createSeason(tournamentId,input={}){if(input.tournament?.format!=='full
 function createStage(seasonId,type,input={}){if(!Object.hasOwn(STAGE_ORDER,type))throw new TypeError('Unknown stage type.');return {id:text(input.id,'Stage id'),seasonId:text(seasonId,'Season id'),type,order:STAGE_ORDER[type],status:'planned'};}
 function activateStage(season,id){const s=season.stages.find(x=>x.id===id);if(!s)throw new Error('Stage is not registered in this season.');const prev=season.stages.find(x=>x.order===s.order-1);if(s.order>1&&!prev)throw new Error('A preceding stage must exist before this stage.');if(prev&&prev.status!=='completed')throw new Error('A preceding stage must be completed first.');if(s.status!=='planned')throw new Error('Only planned stages can be activated.');s.status='active';return s;}
 function completeStage(season,id){const s=season.stages.find(x=>x.id===id);if(!s||s.status!=='active')throw new Error('Only an active stage can be completed.');s.status='completed';return s;}
-function registerParticipant(season,p){const id=text(p.participantId,'Participant id');if(season.registrations.some(x=>x.participantId===id))throw new Error('Participant is already registered in this season.');const r={participantId:id,displayName:text(p.displayName,'Display name'),status:'registered'};season.registrations.push(r);return r;}
+function registerParticipant(season,p){const id=text(p.participantId,'Participant id');if(season.registrations.length>=50)throw new Error('Season registration limit is 50 participants.');if(season.registrations.some(x=>x.participantId===id))throw new Error('Participant is already registered in this season.');const r={participantId:id,displayName:text(p.displayName,'Display name'),status:'registered'};season.registrations.push(r);return r;}
 function assignRoster(season,a){const participantId=text(a.participantId,'Participant id'),teamId=text(a.teamId,'Team id'),eventNightId=text(a.eventNightId,'Event night id');if(!season.registrations.some(x=>x.participantId===participantId))throw new Error('Participant must be registered before roster assignment.');if(!season.eventNights?.some(x=>x.id===eventNightId))throw new Error('Roster assignment must reference an event night in this season.');if(!season.teams?.some(x=>x.id===teamId))throw new Error('Roster assignment must reference a team in this season.');if(season.rosterAssignments.some(x=>x.participantId===participantId&&x.eventNightId===eventNightId&&x.status==='active'))throw new Error('Participant is already assigned to a team for this event night.');const r={participantId,teamId,eventNightId,status:'active',assignedAt:new Date().toISOString()};season.rosterAssignments.push(r);return r;}
 
 function createEventNight(season,input={}) {
