@@ -24,7 +24,7 @@
       card.append(stages);
       if(tournament.format==='pilot'&&Array.isArray(tournament.pilotStandings)&&tournament.pilotStandings.length){
         const current=tournament.pilotStandings.find(row=>String(row.playerId)===String(overview.player.id));
-        if(current)card.append(D.node('p','muted','Your Pilot placement: #'+current.rank+' · '+D.number(current.totalDamage)+' Damage'));
+        if(current)card.append(D.node('p','muted','Your Pilot placement: #'+current.rank+' · '+Number(current.totalDamage).toLocaleString()+' Damage'));
       }
       if(tournament.registered)card.append(D.node('p','form-success','You are registered for this tournament.'));
       else if(tournament.registrationOpen&&['published','active'].includes(tournament.status)){
