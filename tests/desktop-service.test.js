@@ -123,3 +123,19 @@ test('Admin manages Pilot and Full lifecycles; match outcomes require a stored o
   assert.equal(outcome.winnerTeamId,a.id);
   await assert.rejects(f.service.createTournament(player,{id:'unauthorized',format:'pilot'}),e=>e.status===403);
 });
+
+test('Pilot scores are stored in a per-event ledger and do not alter legacy category totals',async()=>{
+  const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
+  const pilot=await f.service.createTournament(admin,{id:'pilot-ledger',name:'Pilot Ledger',format:'pilot'});
+  await f.service.registerPilotParticipant(admin,{tournamentId:pilot.id,participantId:String(f.alpha.id)});
+  await f.service.createPilotEventNight(admin,{tournamentId:pilot.id});
+  await f.service.transitionTournament(admin,{tournamentId:pilot.id,status:'registration_open'});
+  await f.service.transitionTournament(admin,{tournamentId:pilot.id,status:'locked'});
+  await f.service.transitionTournament(admin,{tournamentId:pilot.id,status:'active'});
+  const result=await f.service.recordTournamentScore(admin,{tournamentId:pilot.id,participantId:String(f.alpha.id),category:'damage',gameNumber:1,shipClass:'DD',tier:8,damage:12345,evidenceId:'pilot-evidence-1'});
+  assert.equal(result.entry.tournamentId,pilot.id);
+  assert.equal(f.state.players[0].events.damage[0].metric,0);
+  const overview=await f.service.getOverview(admin);
+  const summary=overview.tournaments.find(x=>x.id===pilot.id);
+  assert.equal(summary.standings[0].id,f.alpha.id);
+});
