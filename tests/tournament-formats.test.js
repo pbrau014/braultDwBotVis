@@ -204,7 +204,8 @@ test('head-to-head tie-break is explicit and has precedence over later criteria'
 test('public archive redacts Discord actor snowflakes but retains audit events', () => {
   const s = state();
   const t = F.createTournament(s.competition, { id: 'pilot-privacy', name: 'Pilot Privacy', format: 'pilot',
-    config: { timezone: 'America/Chicago', eventStart: '2026-12-01T18:00:00-06:00' } });
+    config: { timezone: 'America/Chicago', eventStart: '2026-12-01T18:00:00-06:00', eventEnd: '2026-12-01T22:00:00-06:00' } });
+  F.registerParticipant(t,{playerId:'p1',displayName:'Alpha'});F.publishTournament(t);F.closeRegistration(t);F.activateStage(t,F.STAGES.PILOT_EVENT);
   F.audit(t, 'sensitive-actor-check', {}, '12345678901234567');
   F.registerEvidence(t,{id:'private-evidence',sha256:'a'.repeat(64),sizeBytes:128,contentType:'image/png',sourceFile:'source.png',capturedAt:'2026-11-04T12:00:00Z',source:{platform:'discord',channelId:'12345678901234567',messageId:'22345678901234567'}},'12345678901234567');
   const archive = T.makePublicArchiveSnapshot(s);
