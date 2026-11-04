@@ -36,7 +36,8 @@
       const own=(tournament.standings||[]).find(row=>String(row.id)===String(overview.player.id));
       const row=D.node('div','event-row');
       const left=D.node('span','',tournament.name+' · '+(tournament.format==='pilot'?'Pilot YOLO':'Full YOLO')+' · '+tournament.status);
-      const teams=(tournament.myAssignments||[]).map(a=>a.teamName).join(', ');\n      const right=D.node('strong','', (own?'#'+own.rank+' · '+D.number(own.total):'Not registered')+(teams?' · Team: '+teams:''));
+      const teams=(tournament.myAssignments||[]).map(a=>a.teamName).join(', ');
+      const right=D.node('strong','', (own?'#'+own.rank+' · '+D.number(own.total):'Not registered')+(teams?' · Team: '+teams:''));
       row.append(left,right);tournamentList.append(row);
     }
     const tbody=D.$('standings-body');tbody.replaceChildren();
