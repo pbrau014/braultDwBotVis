@@ -79,12 +79,12 @@
       const tournamentSelect=D.$('yolo-event-tournament');tournamentSelect.replaceChildren();
       for(const item of yoloFormats.items){const option=document.createElement('option');option.value=item.id;option.textContent=item.name+' · '+item.format.toUpperCase();option.dataset.format=item.format;tournamentSelect.append(option);}
       const nightSelect=D.$('yolo-event-night-select');nightSelect.replaceChildren();
-      for(const id of ['yolo-team-night','yolo-fixture-night'])D.$(id).replaceChildren();
+      for(const id of ['yolo-team-night','yolo-fixture-night','yolo-race-night'])D.$(id).replaceChildren();
       const eventNightList=D.$('yolo-event-night-list');eventNightList.replaceChildren();
       for(const night of yoloFormats.eventNights||[]){
         const tournament=yoloFormats.items.find(item=>item.id===night.tournamentId);
         const option=document.createElement('option');option.value=night.id;option.textContent=(tournament?.name||night.tournamentId)+' · '+night.id;nightSelect.append(option);
-        for(const id of ['yolo-team-night','yolo-fixture-night']){const copy=document.createElement('option');copy.value=night.id;copy.textContent=option.textContent;D.$(id).append(copy);}
+        for(const id of ['yolo-team-night','yolo-fixture-night','yolo-race-night']){const copy=document.createElement('option');copy.value=night.id;copy.textContent=option.textContent;D.$(id).append(copy);}
         const row=D.node('div','event-row');
         row.append(D.node('strong','',night.id),D.node('span','',(night.stage||'Pilot event')+' · '+night.status+' · '+night.startsAt));
         const nextStatus={draft:'published',published:'active',active:'completed'}[night.status];
@@ -165,6 +165,18 @@
     D.$('yolo-evidence-review-form').addEventListener('submit',async e=>{
       e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
       try{await D.api('/api/admin/yolo-games/'+encodeURIComponent(form.elements.gameId.value.trim())+'/evidence-review',{method:'POST',body:{accepted:form.elements.accepted.value==='true',reason:form.elements.reason.value.trim()}});form.reset();await load();}
+      catch(error){status(error.message,'error');}finally{button.disabled=false;}
+    });
+    D.$('yolo-race-side-event-form').addEventListener('submit',async e=>{
+      e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
+      const body={id:form.elements.id.value.trim(),scheduleOffsetMinutes:Number(form.elements.scheduleOffsetMinutes.value),scoringPolicyId:form.elements.scoringPolicyId.value.trim(),approvedSettingsId:form.elements.approvedSettingsId.value.trim()};
+      try{await D.api('/api/admin/yolo-event-nights/'+encodeURIComponent(form.elements.eventNightId.value)+'/race-side-events',{method:'POST',body});form.reset();await load();}
+      catch(error){status(error.message,'error');}finally{button.disabled=false;}
+    });
+    D.$('yolo-race-time-form').addEventListener('submit',async e=>{
+      e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
+      const body={evidenceRecordId:form.elements.evidenceRecordId.value.trim(),elapsedSeconds:Number(form.elements.elapsedSeconds.value)};
+      try{await D.api('/api/admin/yolo-games/'+encodeURIComponent(form.elements.gameId.value.trim())+'/race-time',{method:'POST',body});form.reset();await load();}
       catch(error){status(error.message,'error');}finally{button.disabled=false;}
     });
     D.$('yolo-match-outcome-form').addEventListener('submit',async e=>{
