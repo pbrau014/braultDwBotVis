@@ -304,6 +304,9 @@ function makePublicArchiveSnapshot(state) {
     for (const entry of competition.audit || []) redactActor(entry);
     for (const tournament of competition.tournaments || []) {
       for (const entry of tournament.audit || []) redactActor(entry);
+      for (const result of tournament.pilotResults || []) {
+        if (/^\d{17,20}$/.test(String(result.recordedBy || ''))) result.recordedBy = 'redacted';
+      }
       for (const evidence of tournament.evidence || []) {
         if (evidence && /^\d{17,20}$/.test(String(evidence.registeredBy || ''))) evidence.registeredBy = 'redacted';
         if (evidence?.source && typeof evidence.source === 'object') {
