@@ -135,7 +135,16 @@ function createDesktopService(options = {}) {
       if(principal.role==='player') {
         const player=Tournament.findPlayer(current,principal.player.id);
         if(!player) throw Object.assign(new Error('Your linked roster entry no longer exists.'),{status:403,code:'PLAYER_UNLINKED'});
-        return {...base,role:'player',player,standing:rows.find(r=>r.id===player.id)?withoutPrizeEstimate(rows.find(r=>r.id===player.id)):null,
+        const playerTournaments=publicTournaments.map(summary=>{
+          const tournament=lifecycle.tournaments.find(x=>x.id===summary.id),season=lifecycle.seasons.find(x=>x.id===tournament?.seasonId)||null;
+          const assignments=tournament?.format==='pilot'?(tournament.rosterAssignments||[]):(season?.rosterAssignments||[]);
+          const visible=assignments.filter(a=>String(a.participantId)===String(player.id)).filter(a=>{
+            const night=tournament?.format==='pilot'?tournament.eventNights.find(n=>n.id===a.eventNightId):season?.eventNights.find(n=>n.id===a.eventNightId);
+            return tournament?.format==='pilot'||['locked','active','completed'].includes(night?.status);
+          }).map(a=>({eventNightId:a.eventNightId,teamName:tournament?.format==='pilot'?(tournament.teams.find(x=>x.id===a.teamId)?.name||'Assigned'):(season?.teams.find(x=>x.id===a.teamId)?.name||'Assigned')}));
+          return {...summary,myAssignments:visible};
+        });
+        return {...base,tournaments:playerTournaments,role:'player',player,standing:rows.find(r=>r.id===player.id)?withoutPrizeEstimate(rows.find(r=>r.id===player.id)):null,
           publicStandings:rows.map((r,i)=>({rank:i+1,...withoutPrizeEstimate(r)}))};
       }
       return {...base,role:'admin',roster:current.players,standings:rows.map((r,i)=>({rank:i+1,...withoutPrizeEstimate(r)})),
