@@ -315,6 +315,24 @@ function createDesktopService(options = {}) {
           case 'register_evidence':
             if(!tournament) throw new Error('Tournament ID is required.');
             result=TournamentFormats.registerEvidence(tournament,body.evidence||{},actor);break;
+          case 'register_battle_evidence': {
+            if(!tournament) throw new Error('Tournament ID is required.');
+            const entry=current.battleRecords.find(item=>item.record_id===String(body.recordId));
+            if(!entry) throw new Error('Source screenshot record was not found.');
+            const proof=entry.record?.source?.evidence||{};
+            const pick=(camel,snake)=>proof[camel]??proof[snake]??'';
+            result=TournamentFormats.registerEvidence(tournament,{
+              id:String(body.evidenceId||('battle:'+entry.record_id)),
+              sha256:pick('sha256','sha256'),
+              sizeBytes:pick('sizeBytes','size_bytes'),
+              contentType:pick('contentType','content_type'),
+              sourceFile:entry.source_file||('battle-'+entry.record_id+'.png'),
+              capturedAt:pick('retrievedAt','retrieved_at')||entry.captured_at,
+              source:{platform:proof.platform||'desktop',messageId:pick('messageId','message_id'),
+                channelId:pick('channelId','channel_id'),attachmentId:pick('attachmentId','attachment_id'),
+                messageUrl:pick('messageUrl','message_url'),recordId:entry.record_id},
+            },actor);break;
+          }
           case 'create_fixture':
             if(!tournament) throw new Error('Tournament ID is required.');
             result=TournamentFormats.createFixture(tournament,body.fixture||{},actor);break;
