@@ -5,7 +5,11 @@
 - [x] Keep Pilot seasonless; require a declared Full season duration and regular-season/postseason/finale stages.
 - [x] Add event-night and registration primitives, audited lifecycle transitions, settings freeze, and distinct Race/Grand Yolo concepts.
 - [x] Fail closed on official match outcome without approved scoring, accepted evidence IDs, aggregation, rounding and tie-break rules.
-- [ ] Integrate lifecycle entities into persisted tournament state and authenticated desktop/Admin/Discord workflows.
+- [x] Persist additive tournament/event-night metadata in private full archives; exclude registrations from public recovery snapshots.
+- [x] Add authenticated desktop Admin APIs for tournament creation, stage transitions, event-night scheduling and roster registration.
+- [x] Add participant self-registration and privacy-minimized event-night status in the Player workspace.
+- [ ] Add Discord command workflows for organizer lifecycle administration and participant registration.
+- [ ] Add Team/Fixture/Match/Game creation, roster locking, evidence association and review endpoints to desktop workflows.
 
 ## Phase 2 — data migration and persistence
 - [ ] Add additive schema migration preserving v2 player scores, account links, OCR records, pending submissions and corrections. Legacy events remain unclassified; never infer Pilot/Full.
@@ -27,11 +31,14 @@
 ## Phase 5 — desktop and documentation
 - [ ] Add format-aware Player/Admin views, schedule/season timeline and accessible hover + keyboard-focus quick tips.
 - [x] Create Markdown, text and HTML instruction sources. HTML is a concise companion; Markdown is maintained source.
-- [ ] Generate DOCX and PDF using reproducible build tooling; inspect rendered output.
-- [ ] Add context-sensitive help to desktop UI and verify keyboard/touch parity.
+- [x] Generate DOCX and PDF working drafts and visually inspect all rendered pages (DOCX 2 pages; PDF 3 pages).
+- [ ] Add DOCX/PDF generation to repository CI and commit reproducible sources/build instructions.
+- [x] Add hover and keyboard-focus quick tips plus persistent help panels to desktop Player/Admin pages.
+- [ ] Verify visual/browser behavior on Windows, including touch and screen-reader interaction.
 
 ## Phase 6 — acceptance and release
-- [ ] Unit/integration/regression suite on supported Node versions.
+- [x] Add focused unit/integration regression tests for the new domain, service, bridge and UI contracts.
+- [ ] Obtain green CI on Node 22 Linux and Node 24 Windows; first run exposed a JS syntax defect and existing workflow/package verification defects, now patched and awaiting rerun.
 - [ ] Test Pilot and Full lifecycle, stage gates, duplicate registration, withdrawals, forfeit/bye, ties and rule freeze.
 - [ ] Test legacy migration and all OCR exactness/evidence controls.
 - [ ] Real Windows/browser/OAuth/Discord/Excel/current-game-client acceptance and security/recovery checks.
