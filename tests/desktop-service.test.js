@@ -123,7 +123,7 @@ test('Admin manages Pilot and Full lifecycles; match outcomes require a stored o
   const outcome=await f.service.recordMatchOutcome(admin,{seasonId:season.id,matchId:match.id,id:'o1',teamA:a.id,teamB:b.id,scoreA:2,scoreB:1,methodId:approval.id});
   assert.equal(outcome.winnerTeamId,a.id);
   const c=await f.service.createTeam(admin,{seasonId:season.id,name:'Green'});
-  const nextFixture=await f.service.createFixture(admin,{seasonId:season.id,stageId:postseason.id,teamA:a.id,teamB:c.id});
+  const nextFixture=await f.service.createFixture(admin,{seasonId:season.id,stageId:postseason.id,eventNightId:night.id,teamA:a.id,teamB:c.id});
   const progression=await f.service.advanceBracket(admin,{seasonId:season.id,outcomeId:outcome.id,toFixtureId:nextFixture.id,methodId:approval.id});
   assert.equal(progression.winnerTeamId,a.id);
   await assert.rejects(f.service.createAward(admin,{id:'bad-award',tournamentId:full.id,recipientId:'p1',label:'Winner',approvalId:approval.id}),e=>e.code==='AWARD_APPROVAL_REQUIRED');
