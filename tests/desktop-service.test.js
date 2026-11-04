@@ -139,3 +139,18 @@ test('Pilot scores are stored in a per-event ledger and do not alter legacy cate
   const summary=overview.tournaments.find(x=>x.id===pilot.id);
   assert.equal(summary.standings[0].id,f.alpha.id);
 });
+
+test('screenshot mapping can target a Pilot ledger without altering legacy score buckets',async()=>{
+  const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
+  const pilot=await f.service.createTournament(admin,{id:'pilot-ocr',name:'Pilot OCR',format:'pilot'});
+  await f.service.registerPilotParticipant(admin,{tournamentId:pilot.id,participantId:String(f.alpha.id)});
+  await f.service.createPilotEventNight(admin,{tournamentId:pilot.id});
+  await f.service.transitionTournament(admin,{tournamentId:pilot.id,status:'registration_open'});
+  await f.service.transitionTournament(admin,{tournamentId:pilot.id,status:'locked'});
+  await f.service.transitionTournament(admin,{tournamentId:pilot.id,status:'active'});
+  const upload=await f.service.submitImage(admin,{buffer:Buffer.from('pilot synthetic evidence'),filename:'pilot.png',contentType:'image/png'});
+  const mapped=await f.service.mapSubmission(admin,upload.submissionId,{playerId:f.alpha.id,event:'damage',gameNumber:1,shipClass:'DD',tier:8,tournamentId:pilot.id});
+  assert.equal(mapped.tournamentId,pilot.id);
+  assert.equal(f.state.players[0].events.damage[0].metric,0);
+  assert.equal(f.state.lifecycle.tournaments.find(x=>x.id===pilot.id).scoreEntries.length,1);
+});
