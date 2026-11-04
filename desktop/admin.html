@@ -19,6 +19,18 @@
     <section class="page-heading"><div><p class="eyebrow">ADMIN WORKSPACE</p><h1>Tournament control</h1><p class="lede small">Roster, account links, scoring, OCR review and recovery exports. Every mutation is authorized again by the Node service.</p></div><a class="button secondary" href="/api/admin/backup">Download full recovery JSON</a></section>
     <section id="admin-denied" class="notice warning hidden"><h2>Administrator access required</h2><p>This page and its operations are restricted to Discord IDs listed in <code>TOURNAMENT_ADMIN_IDS</code> in the local bot environment.</p></section>
     <section id="admin-content" class="hidden">
+      <section class="panel" id="yolo-format-panel">
+        <div class="panel-heading"><div><p class="eyebrow">TOURNAMENT FORMAT</p><h2>Pilot YOLO or Full YOLO</h2><p class="muted">Both formats share participant workflows. Pilot is one evening; Full is a declared season with regular season, postseason and Grand YOLO finale.</p></div></div>
+        <details class="help-panel"><summary>Quick help - format differences</summary><p><strong>Pilot:</strong> no season or postseason. <strong>Full:</strong> declare season duration; the three stages are created automatically. Legacy Damage, Kills, Race and Grand Yolo remain score categories, not stages. Unapproved scoring and event values must remain blank.</p></details>
+        <form id="yolo-tournament-form" class="form-grid compact-form">
+          <label>Tournament ID <span class="quick-tip" tabindex="0" role="note" aria-label="Stable unique identifier" data-tip="Use a short stable ID, such as pilot-2026 or full-2026. It cannot be reused.">?</span><input name="id" maxlength="64" required placeholder="pilot-2026"></label>
+          <label>Tournament name<input name="name" maxlength="100" required placeholder="Grand YOLO"></label>
+          <label>Format <span class="quick-tip" tabindex="0" role="note" aria-label="Choose Pilot or Full" data-tip="Pilot is a one-evening event. Full creates regular-season, postseason and finale stages.">?</span><select name="format" id="yolo-format-select"><option value="pilot">Pilot YOLO</option><option value="full">Full YOLO</option></select></label>
+          <label id="yolo-duration-wrap" class="hidden">Season duration (weeks)<input name="durationWeeks" type="number" min="2" max="52" step="1" placeholder="12"></label>
+          <button class="button primary span-all" type="submit">Create tournament</button>
+        </form>
+        <div id="yolo-tournament-list" class="event-list"><p class="muted">Loading format records…</p></div>
+      </section>
       <div class="metric-grid">
         <article class="metric-card"><span>ACTIVE ROSTER</span><strong id="admin-roster-count">—</strong><small>of 50 supported slots</small></article>
         <article class="metric-card"><span>AGGREGATE TOTAL</span><strong id="admin-total">—</strong><small>doubloons</small></article>
