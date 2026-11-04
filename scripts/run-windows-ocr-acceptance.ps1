@@ -22,8 +22,11 @@ try {
  $Magick=Get-Command $MagickName -ErrorAction Stop
  $TessVersion=(& $Tess.Source --version 2>&1 | Select-Object -First 1).ToString().Trim()
  if($TessVersion -notmatch '^tesseract\s+v?5\.'){throw "Native Tesseract 5.x required; found $TessVersion"}
- $Languages=(& $Tess.Source --list-langs 2>&1) -join [Environment]::NewLine
- if($LASTEXITCODE -ne 0 -or $Languages -notmatch '(?m)^eng$'){throw 'Native Tesseract requires English traineddata.'}
+ $LanguageLines=@(& $Tess.Source --list-langs 2>&1)
+ $LanguageExit=$LASTEXITCODE
+ $Languages=($LanguageLines | ForEach-Object { $_.ToString().Trim() }) -join [Environment]::NewLine
+ $HasEnglish=@($LanguageLines | ForEach-Object { $_.ToString().Trim() } | Where-Object { $_ -eq 'eng' }).Count -gt 0
+ if($LanguageExit -ne 0 -or -not $HasEnglish){throw "Native Tesseract requires English traineddata; languages reported: $Languages"}
  $MagickVersion=(& $Magick.Source -version 2>&1 | Select-Object -First 2) -join [Environment]::NewLine
  if($LASTEXITCODE -ne 0){throw 'ImageMagick version check failed.'}
  $Stamp=(Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ')
