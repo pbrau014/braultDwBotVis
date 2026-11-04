@@ -1,0 +1,71 @@
+{
+  "release": "Grand Tournament Instruction Set v3.22 Production Documentation Release",
+  "prepared": "2026-10-29",
+  "release_status": "GO — PRODUCTION DOCUMENTATION RELEASE UNDER USER-DIRECTED GATE WAIVER; IMPLEMENTATION TESTS NOT TESTED",
+  "selected_policies": {
+    "C01": "Round 3 uses positive finite elapsed seconds and metric 1 / seconds; lower time scores better. Specification resolved; canonical implementation tests open.",
+    "C02": "Shared mapping DD=4, CA=3, BB=2; unknown classes block scoring. Specification resolved; implementation/parity tests open.",
+    "C03": "Retire/hide S10:S12 from participant controls, preserve historical cells; verify zero effect in canonical implementation.",
+    "C04": "Retire/hide Round 4 F8 control, preserve historical cell; Rounds 1–3 pool use stays unchanged.",
+    "C05": "No public-facing H12/dollar estimate by default. H12 remains internal historical QA; future display requires verified basis and separate approval.",
+    "C06": "Freeze ordinary rules after start; prospective-only changes to unplayed games; emergency changes documented with scope/authorizer/time/evidence and never rewrite completed results."
+  },
+  "outgoing_hyperlink_checks": "NOT PERFORMED; waived as a prerequisite for documentation-package publication",
+  "internal_navigation": "Current internal Markdown fragment links and rendered PDF destinations were checked after final rendering. No broken internal Markdown fragments, invalid internal PDF destinations, or missing Word bookmark targets were found. Outgoing hyperlink checks remain not performed by instruction.",
+  "source_conflicts_to_resolve_before_event": "Known policy ambiguities and blank event-specific settings remain event-operations follow-up, not blockers for publishing the reusable documentation package.",
+  "primary_files": [
+    "Grand_Tournament_Instruction_Set_v3.15_Policy_Resolved.docx",
+    "Grand_Tournament_Instruction_Set_v3.15_Policy_Resolved.md",
+    "Grand_Tournament_Instruction_Set_v3.15_Policy_Resolved.pdf",
+    "Grand_Tournament_Instruction_Set_v3.15_Completion_and_Open_Gates.md",
+    "Grand_Tournament_Instruction_Set_v3.15_Readme.md"
+  ],
+  "companion_documents": [
+    "Discord_Bot_Maintainer_Security_and_Release_Guide_v1.1_DRAFT.docx",
+    "Event_Settings_and_Publication_Approval_Record_v1.1_DRAFT.docx",
+    "Participant_Quick_Start_Evidence_and_Results_v1.1_DRAFT.docx",
+    "Pilot_Event_Ruleset_v1.1_DRAFT.docx",
+    "Recurring_Tournament_Ruleset_v1.1_DRAFT.docx",
+    "Release_Gate_Status_and_Reconciliation_Record_v1.1.docx",
+    "Scoring_Workbook_and_Validation_Guide_v1.1_DRAFT.docx",
+    "Training_Room_Host_and_Referee_Guide_v1.1_DRAFT.docx",
+    "Discord_Bot_Maintainer_Security_and_Release_Guide_v1.1_DRAFT.md",
+    "Event_Settings_and_Publication_Approval_Record_v1.1_DRAFT.md",
+    "Participant_Quick_Start_Evidence_and_Results_v1.1_DRAFT.md",
+    "Pilot_Event_Ruleset_v1.1_DRAFT.md",
+    "Recurring_Tournament_Ruleset_v1.1_DRAFT.md",
+    "Release_Gate_Status_and_Reconciliation_Record_v1.1.md",
+    "SOURCE_BUNDLE_STATUS_AND_ACQUISITION_RECORD.md",
+    "Scoring_Workbook_and_Validation_Guide_v1.1_DRAFT.md",
+    "Training_Room_Host_and_Referee_Guide_v1.1_DRAFT.md"
+  ],
+  "human_approval_status": "No event-specific approver name, signature timestamp, effective time, or event-specific values were supplied. This does not block documentation package publication under the waiver and does not constitute approval of a particular event.",
+  "source_conflict_dispositions": {
+    "Pilot armor mode": "Use verified 10-minute Standard Battle only by default; omit the special Ocean mode until the exact current-client label is confirmed.",
+    "Recurring Race": "Treat Race as a separate side-event on weeks 3,6,9 and finale if 12 weeks is adopted. Big Race in the map table is a map name. Needs organizer ratification and dated schedule.",
+    "Recurring team/bot composition": "Later stages use equal 6- or 9-slot teams with 2–3 humans per side and bots filling slots. Round 1 2v6 wording remains a blocking roster sign-off.",
+    "Allowed/banned ships": "Use a published explicit allowlist; unlisted ships are not approved. List must be filled before registration."
+  },
+  "current_publication_version": "v3.22 production documentation release; legacy publication filenames retained for stable references",
+  "historical_policy_baseline": "v3.15 Policy Resolved; retained unchanged in 05_QA for source traceability",
+  "cross_document_navigation": "Current cross-publication references are publication-qualified; outgoing hyperlink checks remain not performed by instruction.",
+  "match_outcome_rule": "Verified match outcome is calculated from published individual-performance metrics (including Damage and Kills) under the approved scoring method; the verified outcome governs bracket advancement, with published tie-breaks applied where needed. Participant outputs remain traceable; exact workbook/HTML implementation is not verified.",
+  "universal_command_rule": "All commands, messages, interface actions, and staff operations that publish or change bracket progression must use a verified match outcome calculated from accepted individual-performance metrics (including Damage and Kills) under the approved scoring method, aggregation, rounding, and published tie-break rules; hold unresolved cases for authorized review.",
+  "editorial_successor_version": "3.22",
+  "governing_match_outcome_rule": "Individual-performance metrics including Damage and Kills feed the approved scoring method to calculate the verified match outcome; that outcome governs bracket advancement under published tie-break rules. Implementation is unverified.",
+  "release_waiver": {
+    "disposition": "GO for publication of this documentation package and its reusable templates under the user-directed waiver",
+    "scope": "documentation package and reusable templates only",
+    "technical_validation": "NOT TESTED / NOT VERIFIED; no unrun test is represented as passed",
+    "event_instance": "No event-specific details, signature, effective time, or authorization is created by package publication"
+  },
+  "waived_release_gate_items_not_tested": [
+    "Canonical workbook and Score Reporter HTML were not available; no substitute used.",
+    "Excel/VBA/Office 2010 and full scoring formula parity were not run.",
+    "Browser reset, persistence, and full calculator regression were not run.",
+    "Exact RC3 source and Windows Node 24/native Tesseract acceptance were not run.",
+    "Live Discord smoke tests and credential rotation evidence were not available.",
+    "Current game-client walkthrough was not run.",
+    "Event-specific settings and human approval fields remain unfilled; no event instance is authorized by the blank templates."
+  ]
+}
