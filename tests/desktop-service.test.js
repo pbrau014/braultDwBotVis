@@ -95,3 +95,78 @@ test('authenticated Admin backup retains private roster links and pending correc
   assert.equal(backup.pending_submissions[0].userId,PLAYER);
   assert.equal(backup.pending_ocr_corrections.length,1);
 });
+
+test('admin can create and publish a Pilot tournament and a linked player can register',async()=>{
+  const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN}),player=await f.service.resolvePrincipal({id:PLAYER});
+  const created=await f.service.competitionAction(admin,{action:'create_tournament',tournament:{
+    id:'pilot-desktop',name:'Desktop Pilot',format:'pilot',config:{timezone:'America/Chicago',eventStart:'2026-12-01T18:00:00-06:00',eventEnd:'2026-12-01T22:00:00-06:00',eventEnd:'2026-12-01T22:00:00-06:00'},
+  }});
+  assert.equal(created.format,'pilot');
+  await f.service.competitionAction(admin,{action:'publish',tournamentId:'pilot-desktop',approval:{}});
+  const registration=await f.service.registerForTournament(player,'pilot-desktop');
+  assert.equal(registration.status,'registered');
+  const overview=await f.service.getOverview(player);
+  assert.equal(overview.tournaments.find(t=>t.id==='pilot-desktop').registered,true);
+});
+
+test('admin Full YOLO publication requires and persists an approved match method',async()=>{
+  const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
+  await f.service.competitionAction(admin,{action:'create_tournament',tournament:{
+    id:'full-desktop',name:'Desktop Full',format:'full',config:{timezone:'America/Chicago',seasonWeeks:10,eventStart:'2026-12-01T00:00:00-06:00',eventEnd:'2027-03-01T00:00:00-06:00'},
+  }});
+  await assert.rejects(f.service.competitionAction(admin,{action:'publish',tournamentId:'full-desktop',approval:{}}),/approved, published match-outcome/);
+  await f.service.competitionAction(admin,{action:'publish',tournamentId:'full-desktop',approval:{
+    approvedBy:'Organizer',matchOutcomeMethod:{approved:true,publishedAt:'2026-11-04T00:00:00Z',version:'v1',aggregation:'sum',weights:{damage:1,kills:1000}},
+  }});
+  const overview=await f.service.getOverview(admin);
+  assert.equal(overview.competition.tournaments.find(t=>t.id==='full-desktop').config.matchOutcomeMethod.version,'v1');
+});
+
+test('player cannot invoke admin lifecycle actions or register to a missing tournament',async()=>{
+  const f=fixture(),player=await f.service.resolvePrincipal({id:PLAYER});
+  await assert.rejects(f.service.competitionAction(player,{action:'create_tournament',tournament:{id:'x',name:'x',format:'pilot'}}),e=>e.status===403);
+  await assert.rejects(f.service.registerForTournament(player,'missing'),/not found/);
+});
+
+test('admin can link a real uploaded OCR screenshot as immutable competition evidence',async()=>{
+  const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
+  await f.service.competitionAction(admin,{action:'create_tournament',tournament:{
+    id:'pilot-evidence',name:'Evidence Pilot',format:'pilot',config:{timezone:'America/Chicago',eventStart:'2026-12-01T18:00:00-06:00'},
+  }});
+  const upload=await f.service.submitImage(admin,{buffer:Buffer.from('original screenshot bytes'),filename:'evidence.png',contentType:'image/png'});
+  const evidence=await f.service.competitionAction(admin,{action:'register_battle_evidence',tournamentId:'pilot-evidence',recordId:upload.submissionId});
+  assert.equal(evidence.sha256.length,64);
+  assert.equal(evidence.contentType,'image/png');
+  assert.equal(evidence.source.recordId,upload.submissionId);
+});
+
+test('desktop scoring-setting endpoint blocks changes during active Pilot/Full stages',async()=>{
+  const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
+  await f.service.competitionAction(admin,{action:'create_tournament',tournament:{
+    id:'pilot-freeze',name:'Freeze Pilot',format:'pilot',config:{timezone:'America/Chicago',eventStart:'2026-12-01T18:00:00-06:00',eventEnd:'2026-12-01T22:00:00-06:00'},
+  }});
+  await f.service.competitionAction(admin,{action:'publish',tournamentId:'pilot-freeze',approval:{}});
+  await f.service.competitionAction(admin,{action:'close_registration',tournamentId:'pilot-freeze'});
+  await f.service.competitionAction(admin,{action:'activate_stage',tournamentId:'pilot-freeze',stageKey:'pilot_event'});
+  const before=f.getState().settings.events.damage.multiplier;
+  const result=await f.service.setSetting(admin,{event:'damage',field:'multiplier',value:2});
+  assert.equal(result.blocked,true);
+  assert.equal(f.getState().settings.events.damage.multiplier,before);
+  assert.equal(f.getState().competition.tournaments[0].audit.at(-1).action,'settings_change_blocked');
+});
+
+test('admin can record Pilot Damage placement against registered screenshot evidence',async()=>{
+  const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
+  await f.service.competitionAction(admin,{action:'create_tournament',tournament:{
+    id:'pilot-score',name:'Pilot Score',format:'pilot',config:{timezone:'America/Chicago',eventStart:'2026-12-01T18:00:00-06:00',eventEnd:'2026-12-01T22:00:00-06:00'},
+  }});
+  await f.service.competitionAction(admin,{action:'register_participant',tournamentId:'pilot-score',participant:{playerId:'1',displayName:'Alpha'}});
+  await f.service.competitionAction(admin,{action:'publish',tournamentId:'pilot-score',approval:{}});
+  await f.service.competitionAction(admin,{action:'close_registration',tournamentId:'pilot-score'});
+  await f.service.competitionAction(admin,{action:'activate_stage',tournamentId:'pilot-score',stageKey:'pilot_event'});
+  const upload=await f.service.submitImage(admin,{buffer:Buffer.from('pilot screenshot bytes'),filename:'pilot.png',contentType:'image/png'});
+  const evidence=await f.service.competitionAction(admin,{action:'register_battle_evidence',tournamentId:'pilot-score',recordId:upload.submissionId});
+  await f.service.competitionAction(admin,{action:'record_pilot_result',tournamentId:'pilot-score',result:{playerId:'1',gameNumber:1,damage:12345,evidenceId:evidence.id}});
+  const overview=await f.service.getOverview(admin);
+  assert.equal(overview.tournaments.find(t=>t.id==='pilot-score').pilotStandings[0].totalDamage,12345);
+});

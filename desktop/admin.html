@@ -25,6 +25,58 @@
         <article class="metric-card"><span>ESTIMATED VALUE</span><strong id="admin-value">—</strong><small>workbook formula</small></article>
         <article class="metric-card"><span>UNMAPPED RECORDS</span><strong id="admin-pending">—</strong><small>require admin review</small></article>
       </div>
+      <section class="panel" aria-labelledby="competition-heading">
+        <div class="panel-heading"><div><p class="eyebrow">COMPETITION LIFECYCLE</p><h2 id="competition-heading">Create and manage Pilot / Full YOLO <button class="help-tip" type="button" data-tooltip="Create a draft first. Publish only after dates, timezone and format rules are approved. Full YOLO also requires an approved, versioned match-outcome method." aria-label="Help: creating and publishing tournaments">?</button></h2><p class="muted">One system, two event lifecycles. Unknown event rules remain unpublished until approved.</p></div></div>
+        <form id="competition-create-form" class="form-grid">
+          <label>Tournament ID<input name="id" required maxlength="48" placeholder="pilot-winter-2026"></label>
+          <label>Tournament name<input name="name" required maxlength="100" placeholder="Winter YOLO"></label>
+          <label>Format<select name="format" required><option value="pilot">Pilot YOLO · single evening</option><option value="full">Full YOLO · season</option></select></label>
+          <label>Timezone<input name="timezone" required value="America/Chicago" placeholder="America/Chicago"></label>
+          <label><span id="event-start-label">Pilot start</span><input name="eventStart" type="datetime-local" required></label>
+          <label><span id="event-end-label">Pilot end</span><input name="eventEnd" type="datetime-local" required></label>
+          <label id="season-weeks-field" class="hidden">Season duration (weeks)<input name="seasonWeeks" type="number" min="1" max="52" step="1" value="12"></label>
+          <button class="button primary span-all" type="submit">Create draft tournament</button>
+        </form>
+        <div class="review-block">
+          <h3>Full YOLO match-outcome approval</h3>
+          <p class="muted">Required before Full YOLO can be published. These values are organizer decisions, not assumed rules.</p>
+          <div class="form-grid compact-form">
+            <label>Approver name<input id="match-method-approver" placeholder="Organizer name"></label>
+            <label>Method version<input id="match-method-version" value="v1"></label>
+            <label>Aggregation<select id="match-method-aggregation"><option value="sum">Sum</option><option value="average">Average</option></select></label>
+            <label>Damage weight<input id="match-method-damage" type="number" min="0" step="any" value="1"></label>
+            <label>Kills weight<input id="match-method-kills" type="number" min="0" step="any" value="1000"></label>
+          </div>
+        </div>
+        <div id="competition-list" class="submission-list"><p class="muted">No tournaments created.</p></div>
+        <details class="review-block">
+          <summary>Advanced lifecycle operations <button class="help-tip" type="button" data-tooltip="Use a JSON payload for team creation, roster locks, fixtures, matches, evidence-linked games, tie-break resolution, withdrawals and forfeit records. Every operation is validated by the local server." aria-label="Help: advanced tournament operations">?</button></summary>
+          <p class="muted">The action payload must include the tournamentId where applicable. Team playerIds must refer to active tournament registrations.</p>
+          <form id="competition-action-form" class="form-grid">
+            <label>Operation<select name="action">
+              <option value="register_participant">Register participant (admin)</option>
+              <option value="create_team">Create team</option>
+              <option value="lock_roster">Lock team roster</option>
+              <option value="register_battle_evidence">Link uploaded screenshot as evidence</option>
+              <option value="register_evidence">Register original screenshot evidence (manual)</option>
+              <option value="create_event_night">Schedule event night</option>
+              <option value="create_fixture">Create fixture</option>
+              <option value="set_stage_qualifiers">Publish stage qualifiers</option>
+              <option value="create_match">Create match</option>
+              <option value="record_pilot_result">Record Pilot individual Damage result</option>
+              <option value="record_match_game">Record evidence-linked game</option>
+              <option value="complete_match">Complete match</option>
+              <option value="resolve_forfeit">Resolve forfeit</option>
+              <option value="record_bye">Record bye</option>
+              <option value="withdraw_participant">Withdraw participant</option>
+              <option value="race_side_event">Record Race side-event</option>
+              <option value="freeze_settings">Attempt settings change</option>
+            </select></label>
+            <label class="span-all">JSON payload<textarea name="payload" rows="5" spellcheck="false" placeholder='{"tournamentId":"full-season","team":{"id":"team-a","name":"Team A","playerIds":["1","2"]}}'></textarea></label>
+            <button class="button secondary span-all" type="submit">Run validated operation</button>
+          </form>
+        </details>
+      </section>
       <div class="content-grid">
         <section class="panel">
           <div class="panel-heading"><div><p class="eyebrow">PARTICIPANTS</p><h2>Roster management</h2></div></div>

@@ -239,6 +239,12 @@ function createDesktopBridge(options={}){
     if(req.method==='GET'&&p==='/api/submissions'){
       role(principal,['admin','player']);sendJson(res,200,await call('listSubmissions',principal));return true;
     }
+    const registration=p.match(/^\\/api\\/competition\\/([^/]+)\\/register$/);
+    if(req.method==='POST'&&registration){
+      csrf(req,session);role(principal,['player']);
+      const result=await call('registerForTournament',principal,decodeURIComponent(registration[1]));
+      audit(principal,'competition-registration');sendJson(res,201,result);return true;
+    }
     if(req.method==='POST'&&p==='/api/upload'){
       csrf(req,session);role(principal,['admin','player']);
       const buffer=await readBody(req,maxUploadBytes),mime=detectImageMime(buffer);
@@ -285,6 +291,10 @@ function createDesktopBridge(options={}){
       }
       if(req.method==='POST'&&p==='/api/admin/settings'){
         const result=await call('setSetting',principal,await readJson(req));audit(principal,'scoring-setting');sendJson(res,200,result);return true;
+      }
+      if(req.method==='POST'&&p==='/api/admin/competition'){
+        const result=await call('competitionAction',principal,await readJson(req));
+        audit(principal,'competition-lifecycle');sendJson(res,200,result);return true;
       }
     }
     return false;

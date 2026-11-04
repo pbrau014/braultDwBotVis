@@ -5,6 +5,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const TournamentFormats = require('./tournament-formats');
 
 const EVENTS = ['damage', 'kills', 'race', 'grand'];
 const EVENT_LABELS = { damage: 'Damage', kills: 'Kills', race: 'Race', grand: 'Grand Yolo' };
@@ -85,6 +86,8 @@ function normalizeState(input = {}) {
   return {
     version: 2,
     players,
+    // Format-aware lifecycle is additive. Legacy player scores remain unclassified.
+    competition: TournamentFormats.normalizeCompetition(input.competition),
     settings: normalizeSettings(input.settings),
     playerAccountLinks,
     importedBattleRecordIds: Array.isArray(input.importedBattleRecordIds) ? input.importedBattleRecordIds.filter(v => typeof v === 'string') : [],
@@ -266,7 +269,7 @@ function setSetting(state, event, field, value) {
   return n;
 }
 function makeWorkbookBackup(state) {
-  return { version: 2, exportedAt: new Date().toISOString(), players: clone(state.players), settings: clone(state.settings), importedBattleRecordIds: [...state.importedBattleRecordIds] };
+  return { version: 2, exportedAt: new Date().toISOString(), players: clone(state.players), settings: clone(state.settings), importedBattleRecordIds: [...state.importedBattleRecordIds], competition: clone(state.competition || TournamentFormats.normalizeCompetition()) };
 }
 function makeArchiveSnapshot(state) {
   return {
@@ -291,6 +294,29 @@ function makePublicArchiveSnapshot(state) {
     'pending_ocr_corrections',
   ];
   snapshot.player_account_links = {};
+  // Competition audit actors are Discord snowflakes; redact those from public
+  // channel snapshots while retaining event/action/timestamp evidence.
+  const competition = snapshot.workbook_backup?.competition;
+  if (competition) {
+    const redactActor = entry => {
+      if (entry && /^\d{17,20}$/.test(String(entry.actor || ''))) entry.actor = 'redacted';
+    };
+    for (const entry of competition.audit || []) redactActor(entry);
+    for (const tournament of competition.tournaments || []) {
+      for (const entry of tournament.audit || []) redactActor(entry);
+      for (const result of tournament.pilotResults || []) {
+        if (/^\d{17,20}$/.test(String(result.recordedBy || ''))) result.recordedBy = 'redacted';
+      }
+      for (const evidence of tournament.evidence || []) {
+        if (evidence && /^\d{17,20}$/.test(String(evidence.registeredBy || ''))) evidence.registeredBy = 'redacted';
+        if (evidence?.source && typeof evidence.source === 'object') {
+          for (const key of ['userId','discordUserId','messageId','channelId','attachmentId','messageUrl']) {
+            if (Object.hasOwn(evidence.source,key)) evidence.source[key] = 'redacted';
+          }
+        }
+      }
+    }
+  }
   snapshot.battle_records = snapshot.battle_records.map(entry => {
     const { desktop_owner_id, desktop_owner_role, ...publicEntry } = entry || {};
     return publicEntry;
@@ -494,7 +520,7 @@ function deterministicBattleId(record) {
 }
 
 module.exports = {
-  EVENTS, EVENT_LABELS, CLASSES, DEFAULT_SETTINGS, normalizeClass, classWeightFor,
+  EVENTS, EVENT_LABELS, CLASSES, DEFAULT_SETTINGS, normalizeClass, classWeightFor, TournamentFormats,
   MAX_PLAYERS, normalizeState, createState, findPlayer, findPlayerByDiscordUserId,
   linkPlayerDiscordAccount, unlinkPlayerDiscordAccount, addPlayer, removePlayer, renamePlayer,
   clearSlot, clearEvent, clearAllResults, eventTotal, eventScore, standings, getSlot, validateResult, recordResult, setSetting,
