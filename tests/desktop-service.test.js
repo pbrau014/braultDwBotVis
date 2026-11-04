@@ -159,6 +159,7 @@ test('screenshot mapping can target a Pilot ledger without altering legacy score
   const pilot=await f.service.createTournament(admin,{id:'pilot-ocr',name:'Pilot OCR',format:'pilot'});
   await f.service.registerPilotParticipant(admin,{tournamentId:pilot.id,participantId:String(f.alpha.id)});
   const night=await f.service.createPilotEventNight(admin,{tournamentId:pilot.id});
+  for(const status of ['registration_open','locked','active'])await f.service.transitionEventNight(admin,{tournamentId:pilot.id,eventNightId:night.id,status});
   await f.service.transitionTournament(admin,{tournamentId:pilot.id,status:'registration_open'});
   await f.service.transitionTournament(admin,{tournamentId:pilot.id,status:'locked'});
   await f.service.transitionTournament(admin,{tournamentId:pilot.id,status:'active'});
