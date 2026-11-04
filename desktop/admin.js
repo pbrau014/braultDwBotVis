@@ -7,7 +7,8 @@
     D.$('admin-content').classList.remove('hidden');
     let overview=null;
     async function load(){
-      [overview]=await Promise.all([D.api('/api/overview')]);
+      let yoloTournaments=[];
+      [overview,yoloTournaments]=await Promise.all([D.api('/api/overview'),D.api('/api/admin/yolo-tournaments')]);
       const submissions=await D.api('/api/submissions');
       D.$('admin-roster-count').textContent=overview.roster.length+'/'+overview.maxPlayers;
       D.$('admin-total').textContent=D.number(overview.aggregate.doubloons);
@@ -46,12 +47,37 @@
         }
         standings.append(tr);
       }
+      const yoloList=D.$('yolo-tournament-list');yoloList.replaceChildren();
+      if(!yoloTournaments.items.length)yoloList.append(D.node('p','muted','No Pilot or Full YOLO tournaments have been created yet.'));
+      for(const item of yoloTournaments.items){
+        const card=D.node('article','submission-card'),head=D.node('div','submission-head'),title=D.node('div');
+        title.append(D.node('h3','',item.title));
+        title.append(D.node('p','submission-meta',item.format.toUpperCase()+' · '+item.lifecycle.toUpperCase()+(item.stage?' · '+item.stage:'')+' · '+item.registrationCount+' registrations · '+item.teamCount+' teams · '+item.fixtureCount+' fixtures'));
+        head.append(title,pill(item.lifecycle==='complete'?'Complete':item.lifecycle==='active'?'Active':item.lifecycle==='published'?'Published':'Draft'));card.append(head);
+        const actions=D.node('div','button-row');
+        const actionButton=(label,action,body={})=>{const button=D.node('button','button secondary small',label);button.type='button';button.addEventListener('click',async()=>{button.disabled=true;try{await D.api('/api/admin/yolo-tournaments/'+encodeURIComponent(item.id)+'/'+action,{method:'POST',body});await load();}catch(error){button.disabled=false;status(error.message,'error');}});actions.append(button);};
+        if(item.lifecycle==='draft')actionButton('Publish', 'publish', {approval:JSON.parse(D.$('yolo-approval-json').value||'{}')});
+        if(item.lifecycle==='published')actionButton('Start', 'start');
+        if(item.lifecycle==='active'&&item.format==='pilot')actionButton('Complete Pilot','finish-pilot');
+        card.append(actions);
+        if(item.format==='full'&&item.lifecycle==='active')card.append(D.node('p','muted','Full season stages, teams, fixtures, evidence-linked games and verified match outcomes are managed through the authenticated /api/admin/yolo-tournaments lifecycle actions. Stage progression remains blocked until all fixtures are resolved.'));
+        yoloList.append(card);
+      }
       const list=D.$('admin-submissions');list.replaceChildren();
       if(!submissions.items.length)list.append(D.node('p','muted','No screenshot records in the archive yet.'));
       for(const item of submissions.items)list.append(D.renderSubmission(item,{admin:true,roster:overview.roster,onDone:load}));
       status('Admin state loaded from the active tournament store.','success');
       updateSettingFields();
     }
+    D.$('yolo-tournament-form').addEventListener('submit',async e=>{
+      e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
+      try{
+        const settings=JSON.parse(form.elements.settings.value);
+        if(!settings||typeof settings!=='object'||Array.isArray(settings))throw new Error('Format settings must be a JSON object.');
+        await D.api('/api/admin/yolo-tournaments',{method:'POST',body:{title:form.elements.title.value.trim(),format:form.elements.format.value,settings}});
+        form.reset();await load();
+      }catch(error){status(error.message,'error');}finally{button.disabled=false;}
+    });
     D.$('add-player-form').addEventListener('submit',async e=>{
       e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
       try{await D.api('/api/admin/players',{method:'POST',body:{name:form.elements.name.value.trim()}});form.reset();await load();}
