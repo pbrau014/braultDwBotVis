@@ -55,7 +55,7 @@ test('format state persists in full archive round-trip while legacy scoring rema
   const s = state();
   T.addPlayer(s, 'Legacy');
   F.createTournament(s.competition, { id: 'pilot-1', name: 'Pilot', format: 'pilot',
-    config: { timezone: 'America/Chicago', eventStart: '2026-12-01T18:00:00-06:00' } });
+    config: { timezone: 'America/Chicago', eventStart: '2026-12-01T18:00:00-06:00', eventEnd: '2026-12-01T22:00:00-06:00' } });
   const restored = T.importBackup(T.makeArchiveSnapshot(s));
   assert.equal(restored.players[0].name, 'Legacy');
   assert.equal(restored.competition.tournaments[0].format, 'pilot');
