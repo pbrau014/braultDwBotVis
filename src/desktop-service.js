@@ -205,6 +205,11 @@ function createDesktopService(options = {}) {
         }
         entry.status='mapped';entry.mapped_at=new Date().toISOString();
         entry.tournament_mapping={player_id:result.player.id,player_name:result.player.name,event,game_number:gameNumber,ship_class:shipClass,tier,mapped_via:'desktop-ui'};
+        // A Discord attachment may already have an interactive mapping prompt.
+        // Desktop completion must remove that pending prompt before saving so a
+        // later Discord reply cannot race or duplicate the same battle result.
+        current.pendingSubmissions=(current.pendingSubmissions||[]).filter(item=>item?.record_id!==entry.record_id);
+        current.pendingOcrCorrections=(current.pendingOcrCorrections||[]).filter(item=>item?.record_id!==entry.record_id&&item?.recordId!==entry.record_id);
         await options.saveState();
         const standing=result.scores.find(r=>r.id===player.id);
         const total=result.scores.reduce((s,r)=>s+r.total,0);

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#091321">
+  <title>DWBOT · Admin</title>
+  <link rel="stylesheet" href="/desktop.css">
+  <script src="/desktop.js" defer></script>
+  <script src="/admin.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/player.html">DWBOT <span>YOLO TOURNEY</span></a>
+    <nav><a href="/player.html">Player</a><a href="/upload.html">Submit screenshot</a><a class="active" href="/admin.html">Admin</a></nav>
+    <div class="user-area"><span id="signed-in-user">Checking Discord…</span><button id="logout" class="button quiet small">Sign out</button></div>
+  </header>
+  <main class="page">
+    <section class="page-heading"><div><p class="eyebrow">ADMIN WORKSPACE</p><h1>Tournament control</h1><p class="lede small">Roster, account links, scoring, OCR review and recovery exports. Every mutation is authorized again by the Node service.</p></div><a class="button secondary" href="/api/admin/backup">Download full recovery JSON</a></section>
+    <section id="admin-denied" class="notice warning hidden"><h2>Administrator access required</h2><p>This page and its operations are restricted to Discord IDs listed in <code>TOURNAMENT_ADMIN_IDS</code> in the local bot environment.</p></section>
+    <section id="admin-content" class="hidden">
+      <div class="metric-grid">
+        <article class="metric-card"><span>ACTIVE ROSTER</span><strong id="admin-roster-count">—</strong><small>of 50 supported slots</small></article>
+        <article class="metric-card"><span>AGGREGATE TOTAL</span><strong id="admin-total">—</strong><small>doubloons</small></article>
+        <article class="metric-card"><span>ESTIMATED VALUE</span><strong id="admin-value">—</strong><small>workbook formula</small></article>
+        <article class="metric-card"><span>UNMAPPED RECORDS</span><strong id="admin-pending">—</strong><small>require admin review</small></article>
+      </div>
+      <div class="content-grid">
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">PARTICIPANTS</p><h2>Roster management</h2></div></div>
+          <form id="add-player-form" class="inline-form"><label>New player name<input name="name" maxlength="80" required placeholder="[CLAN]PlayerName"></label><button class="button primary" type="submit">Add player</button></form>
+          <div class="table-wrap"><table><thead><tr><th>ID</th><th>Player</th><th>Discord account link</th></tr></thead><tbody id="roster-body"></tbody></table></div>
+          <form id="link-player-form" class="form-grid compact-form">
+            <label>Roster player<select name="playerId" id="link-player-select" required></select></label>
+            <label>Discord user ID<input name="discordUserId" inputmode="numeric" pattern="[0-9]{17,20}" maxlength="20" required placeholder="17–20 digit account ID"></label>
+            <button class="button secondary" type="submit">Link account</button>
+          </form>
+        </section>
+        <section class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">MANUAL ENTRY</p><h2>Record a tournament result</h2></div></div>
+          <form id="manual-result-form" class="form-grid">
+            <label>Player<select name="playerId" id="score-player-select" required></select></label>
+            <label>Event<select name="event" required><option value="damage">Damage</option><option value="kills">Kills</option><option value="race">Race</option><option value="grand">Grand Yolo</option></select></label>
+            <label>Game number<input name="gameNumber" type="number" min="1" max="7" step="1" required></label>
+            <label>Ship class<select name="shipClass" required><option value="">Select…</option><option>DD</option><option>CA</option><option>BB</option></select></label>
+            <label>Ship tier<input name="tier" type="number" min="1" max="11" step="1" required></label>
+            <label>Damage<input name="damage" type="number" min="0" step="1" placeholder="Required for Damage/Grand"></label>
+            <label>Kills<input name="kills" type="number" min="0" step="1" placeholder="Required for Kills/Grand"></label>
+            <label>Time (seconds)<input name="time" type="number" min="0.01" step="0.01" placeholder="Required for Race/Grand"></label>
+            <button class="button primary span-all" type="submit">Save result</button>
+          </form>
+        </section>
+      </div>
+      <section class="panel">
+        <div class="panel-heading"><div><p class="eyebrow">SCORING CONFIGURATION</p><h2>Event settings</h2><p class="muted">Grand Yolo defaults to tierWeight 0.9. The workbook’s Totals!H12 formula remains =0.54*G12/100.</p></div></div>
+        <form id="settings-form" class="form-grid compact-form">
+          <label>Event<select name="event" id="setting-event"><option value="damage">Damage</option><option value="kills">Kills</option><option value="race">Race</option><option value="grand">Grand Yolo</option></select></label>
+          <label>Setting<select name="field" id="setting-field"></select></label>
+          <label>Value<input name="value" type="number" min="0" step="any" required></label>
+          <button type="submit" class="button secondary">Update setting</button>
+        </form>
+      </section>
+      <section class="panel">
+        <div class="panel-heading"><div><p class="eyebrow">SCREENSHOT QUEUE</p><h2>OCR submissions and approvals</h2><p class="muted">Admin can review all records. Participants cannot view another account’s submissions.</p></div><a class="button secondary small" href="/upload.html">Upload on behalf of player</a></div>
+        <div id="admin-submissions" class="submission-list"></div>
+      </section>
+      <section class="panel">
+        <div class="panel-heading"><div><p class="eyebrow">STANDINGS</p><h2>All-player totals</h2></div></div>
+        <div class="table-wrap"><table><thead><tr><th>Rank</th><th>Player</th><th>Damage</th><th>Kills</th><th>Race</th><th>Grand</th><th>Total</th><th>Value</th></tr></thead><tbody id="admin-standings"></tbody></table></div>
+      </section>
+    </section>
+    <p id="page-status" class="status-line" role="status" aria-live="polite"></p>
+  </main>
+</body>
+</html>

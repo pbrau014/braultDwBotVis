@@ -57,6 +57,8 @@ const {
 } = require('./battle-record');
 const { extractSpatialRibbons } = require('./ribbon-parser');
 const Tournament = require('./tournament');
+const { createDesktopService } = require('./desktop-service');
+const { createDesktopBridge } = require('./desktop-bridge');
 const { createSerialTaskQueue } = require('./serial-task-queue');
 const { selectDamageCandidates, hasUniqueDamageConsensus, extractFullScreenDamageCandidates } = require('./damage-consensus');
 const { FIELD_SPECS, findRewardBaseX, findRewardGeometryAnchor, buildRewardGeometryRects, rewardGeometryValueIsValid, rewardGeometryAnchorDigitsAreUsable, rewardValueMatchesAnchor, rewardGeometryQuorumCanResolveXpTrailingAdornment } = require('./reward-geometry');
@@ -76,6 +78,7 @@ const TOURNAMENT_STATE_PATH = process.env.TOURNAMENT_STATE_PATH || path.join(pro
 const TOURNAMENT_STORAGE = String(process.env.TOURNAMENT_STORAGE || (process.env.NODE_ENV === 'test' ? 'json' : 'sqlite')).toLowerCase();
 const TOURNAMENT_SQLITE_PATH = process.env.TOURNAMENT_SQLITE_PATH || path.join(process.cwd(), 'data', 'tournament-state.sqlite');
 const ENABLE_SLASH_COMMANDS = process.env.ENABLE_SLASH_COMMANDS === '1';
+const ENABLE_DESKTOP_UI = process.env.ENABLE_DESKTOP_UI === '1';
 const WORKBOOK_PATH = path.join(__dirname, '..', 'assets', 'YOLO-Tournament-Workbook.xlsm');
 // Every state change is persisted locally immediately. Discord recovery snapshots
 // are debounced into one same-channel attachment after a quiet period, preventing
@@ -85,6 +88,7 @@ const tournamentStore = TOURNAMENT_STORAGE === 'sqlite'
     ? Tournament.createSqliteStore(TOURNAMENT_SQLITE_PATH, { legacyJsonPath: TOURNAMENT_STATE_PATH, mirrorPath: TOURNAMENT_STATE_PATH })
     : Tournament.createStore(TOURNAMENT_STATE_PATH);
 let tournamentState = null;
+let desktopBridge = null;
 
 // Leave room below Discord's 2,000-character message limit for formatting.
 const DISCORD_MESSAGE_LIMIT = 1850;
@@ -3210,7 +3214,26 @@ async function postBattleRecord(message, record, fileName, note = '', sourceEvid
     const exportData = makeTournamentExport(record, { sourceFileName: fileName, sourceEvidence });
     if (tournamentState) {
         const exists = tournamentState.battleRecords.some(item => item.record_id === exportData.record_id);
-        if (!exists) tournamentState.battleRecords.push({ record_id: exportData.record_id, status: 'unmapped', captured_at: new Date().toISOString(), source_file: String(fileName || ''), record: exportData });
+        if (!exists) {
+            const discordUserId = String(message.author?.id || '');
+            const linkedPlayer = Tournament.findPlayerByDiscordUserId(tournamentState, discordUserId);
+            const archived = {
+                record_id: exportData.record_id,
+                status: 'unmapped',
+                captured_at: new Date().toISOString(),
+                source_file: String(fileName || ''),
+                record: exportData,
+                ocr_record: record,
+                missing_fields: [],
+            };
+            // Keep Discord-originated records visible to the same linked player in
+            // the desktop review page. Unlinked senders remain admin-review only.
+            if (linkedPlayer) {
+                archived.desktop_owner_id = discordUserId;
+                archived.desktop_owner_role = 'player';
+            }
+            tournamentState.battleRecords.push(archived);
+        }
         await saveTournamentState();
     }
     const exportAttachment = new AttachmentBuilder(
@@ -3607,6 +3630,40 @@ client.once(Events.ClientReady, async (readyClient) => {
     if (ENABLE_SLASH_COMMANDS) registerSlashCommands(readyClient).catch(error => console.error('Slash command registration failed:', error.message));
     else console.log('Slash command registration is disabled; use `!yolo panel` for public interactive controls.');
     console.log('The bot is online and the configured channel preflight passed. Missing or conflicting required fields trigger a correction prompt; missing ribbons never block posting.');
+    if (ENABLE_DESKTOP_UI) {
+        try {
+            const desktopService = createDesktopService({
+                getState: () => tournamentState,
+                saveState: () => saveTournamentState({ archive: true }),
+                // Browser uploads use the same bounded serial queue and supervised
+                // extraction path as Discord attachment buffers.
+                extractImage: (imageBuffer) => extractText(imageBuffer),
+                validateScreenshot: (attempt, fields) => validateWorldOfWarshipsScreenshot(attempt, fields),
+                // Desktop administrator authority is an explicit ID allowlist only.
+                isAdminId: (discordUserId) => TOURNAMENT_ADMIN_IDS.has(discordUserId),
+            });
+            desktopBridge = createDesktopBridge({
+                host: '127.0.0.1',
+                port: Number(process.env.DESKTOP_UI_PORT || 8787),
+                service: desktopService,
+                oauth: {
+                    clientId: process.env.DISCORD_OAUTH_CLIENT_ID,
+                    clientSecret: process.env.DISCORD_OAUTH_CLIENT_SECRET,
+                    redirectUri: process.env.DISCORD_OAUTH_REDIRECT_URI || undefined,
+                },
+                maxUploadBytes: MAX_IMAGE_BYTES,
+            });
+            const desktop = await desktopBridge.listen();
+            console.log('[Desktop UI] Listening locally at ' + desktop.origin + '.');
+            console.log('[Desktop UI] Discord OAuth redirect URI: ' + desktop.redirectUri);
+        } catch (error) {
+            console.error('[Desktop UI] Could not start the local interface; Discord bot remains online and desktop access is disabled:', error.message);
+            try { await desktopBridge?.close(); } catch {}
+            desktopBridge = null;
+        }
+    } else {
+        console.log('[Desktop UI] Disabled. Set ENABLE_DESKTOP_UI=1 and configure local Discord OAuth to enable it.');
+    }
 });
 
 async function terminateOcrWorker() {
@@ -3623,6 +3680,12 @@ async function shutdown(signal) {
     if (isShuttingDown) return;
     isShuttingDown = true;
     console.log(`Received ${signal}; shutting down...`);
+    try {
+        await desktopBridge?.close();
+        desktopBridge = null;
+    } catch (error) {
+        console.error('Error closing desktop bridge:', error);
+    }
     try {
         await terminateOcrWorker();
     } catch (error) {

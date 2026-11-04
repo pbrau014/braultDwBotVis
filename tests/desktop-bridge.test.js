@@ -81,7 +81,7 @@ test('image file signature detection and filename sanitation are bounded',()=>{
   assert.equal(detectImageMime(Buffer.from('BM0000000000')),'image/bmp');
   assert.equal(detectImageMime(Buffer.from([73,73,42,0,0,0,0,0,0,0,0,0])),'image/tiff');
   assert.equal(detectImageMime(Buffer.from('plain text data')),null);
-  assert.equal(safeFilename('../../battle\\r\\n.png'),'battle__.png');
+  assert.equal(safeFilename('../../battle\r\n.png'),'battle__.png');
 });
 test('Discord OAuth state cookie and signed-in session are required',async t=>{
   const f=await fixture(t),loginResult=await login(f.origin);

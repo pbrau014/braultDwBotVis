@@ -46,6 +46,10 @@ jobs:
           node --check src/desktop-bridge.js
           node --check tests/desktop-service.test.js
           node --check tests/desktop-bridge.test.js
+          node --check src/desktop-test-preflight.js
+          node --check scripts/preflight-desktop-test.js
+          node --check tests/desktop-test-preflight.test.js
+          node --check tests/desktop-ui-contract.test.js
           node --check src/ocrspace-client.js
           node --check src/ocrspace-quota-ledger.js
           node --check src/ocrspace-field-evidence.js
@@ -59,6 +63,9 @@ jobs:
 
       - name: Verify Discord channel, admin policy and local test configuration
         run: npm run test:discord-preflight
+
+      - name: Validate local desktop OAuth configuration without network calls
+        run: npm run preflight:desktop-test
 
       - name: Verify authenticated desktop UI service and bridge
         run: npm run test:desktop
