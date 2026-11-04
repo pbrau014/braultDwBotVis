@@ -11,7 +11,7 @@ test('desktop login, Player, Admin and upload HTML pages are present and link lo
   const pages = {
     'desktop/index.html': ['Continue with Discord', '/auth/discord'],
     'desktop/player.html': ['/desktop.css', '/desktop.js', '/player.js', 'standings-body', 'submission-list'],
-    'desktop/admin.html': ['/desktop.css', '/desktop.js', '/admin.js', 'add-player-form', 'settings-form', 'admin-submissions', 'yolo-tournament-form', 'yolo-format-select', 'Quick help', 'yolo-team-form', 'yolo-fixture-form', 'yolo-match-form', 'yolo-game-form', 'yolo-evidence-review-form'],
+    'desktop/admin.html': ['/desktop.css', '/desktop.js', '/admin.js', 'add-player-form', 'settings-form', 'admin-submissions', 'yolo-tournament-form', 'yolo-format-select', 'Quick help', 'yolo-team-form', 'yolo-fixture-form', 'yolo-match-form', 'yolo-game-form', 'yolo-evidence-review-form', 'yolo-match-outcome-form', 'yolo-race-side-event-form', 'yolo-race-time-form'],
     'desktop/upload.html': ['/desktop.css', '/desktop.js', '/upload.js', 'drop-zone', 'image-file', 'image-preview'],
   };
   for (const [file, needles] of Object.entries(pages)) {
@@ -89,7 +89,7 @@ test('Player desktop exposes public format summary and self-registration action 
 test('Admin workspace exposes team, fixture, match, game and evidence review actions',()=>{
  const html=read('desktop/admin.html'),script=read('desktop/admin.js');
  for(const id of ['yolo-team-form','yolo-fixture-form','yolo-match-form','yolo-game-form','yolo-evidence-link-form','yolo-evidence-review-form'])assert.ok(html.includes(id));
- for(const route of ['/teams','/fixtures','/matches','/games','/evidence-review'])assert.ok(script.includes(route));
+ for(const route of ['/teams','/fixtures','/matches','/games','/evidence-review','/outcome','/race-side-events','/race-time'])assert.ok(script.includes(route));
  assert.match(html,/Approved event settings record ID/);
  assert.match(script,/yolo-event-nights\/.*\/status/);
 });
