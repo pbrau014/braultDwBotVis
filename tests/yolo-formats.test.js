@@ -12,3 +12,19 @@ test('rules freeze after event starts',()=>{assert.deepEqual(Y.freezeRules({x:1}
 test('race metric differs from separately scheduled side-event',()=>{assert.equal(Y.raceMetric(60).normalizedMetric,1/60);assert.throws(()=>Y.raceMetric(0),/positive/);assert.equal(Y.createRaceSideEvent({id:'r',eventNightId:'n'}).type,'race-side-event');});
 test('Grand Yolo scoring category differs from Grand YOLO finale',()=>{assert.equal(Y.grandYoloScore({eventNightId:'n'}).type,'grand-yolo-score');assert.equal(Y.grandYoloFinale({stageId:'s',matchId:'m'}).type,'grand-yolo-finale');});
 test('official match outcome requires approved formula and accepted evidence',()=>{assert.throws(()=>Y.validateMatchOutcome({}),/approved scoring-method/);assert.equal(Y.validateMatchOutcome({approvedScoringMethodId:'v1',acceptedPerformanceRecordIds:['r1'],aggregation:'approved',rounding:'approved',tieBreakOrder:['head-to-head']}).status,'pending-calculation');});
+
+test('Full stages activate and complete in order; season cannot close early',()=>{
+ let t=Y.createTournament({id:'full',name:'Full',format:'full',season:{id:'s',durationWeeks:12}});
+ assert.throws(()=>Y.transitionStage(t,'postseason','active','admin'),/preceding/);
+ t=Y.transitionStage(t,'regular-season','published','admin');
+ t=Y.transitionStage(t,'regular-season','active','admin');
+ t=Y.transitionStage(t,'regular-season','completed','admin');
+ t=Y.transitionStage(t,'postseason','published','admin');
+ t=Y.transitionStage(t,'postseason','active','admin');
+ t=Y.transitionStage(t,'postseason','completed','admin');
+ t=Y.transitionStage(t,'grand-finale','published','admin');
+ t=Y.transitionStage(t,'grand-finale','active','admin');
+ assert.throws(()=>Y.transitionTournament({...t,status:'active'},'completed','admin'),/cannot complete/);
+ t=Y.transitionStage(t,'grand-finale','completed','admin');
+ assert.equal(t.stages.every(s=>s.status==='completed'),true);
+});
