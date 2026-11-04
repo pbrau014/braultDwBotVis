@@ -311,6 +311,15 @@ function createDesktopService(options = {}) {
       role(principal,['admin']);
       return mutate(async()=>{const current=state();const event=Lifecycle.createRaceSideEvent(body||{});const season=current.lifecycle?.seasons.find(x=>x.id===event.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});season.raceSideEvents||=[];season.raceSideEvents.push(event);current.lifecycle.raceSideEvents.push(event);await options.saveState();return event;});
     },
+
+    async transitionTournament(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();const t=current.lifecycle?.tournaments.find(x=>x.id===body?.tournamentId);if(!t)throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});Lifecycle.transitionTournament(t,body?.status,{actor:principal.discordUserId,reason:body?.reason});await options.saveState();return t;});
+    },
+    async completeStage(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();const season=current.lifecycle?.seasons.find(x=>x.id===body?.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});const stage=Lifecycle.completeStage(season,body?.stageId);await options.saveState();return stage;});
+    },
     async exportBackup(principal) {
       role(principal,['admin']);
       return JSON.stringify(Tournament.makeArchiveSnapshot(state()),null,2);
