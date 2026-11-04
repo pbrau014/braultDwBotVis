@@ -269,6 +269,9 @@ function createDesktopBridge(options={}){
           'Content-Disposition':'attachment; filename="dwbot-recovery.json"','Cache-Control':'no-store'});
         res.end(body);return true;
       }
+      if(req.method==='GET'&&p==='/api/admin/yolo-tournaments'){
+        const result=await call('listYoloTournaments',principal);sendJson(res,200,result);return true;
+      }
       csrf(req,session);
       if(req.method==='POST'&&p==='/api/admin/players'){
         const result=await call('addPlayer',principal,await readJson(req));audit(principal,'player-add');sendJson(res,201,result);return true;
@@ -285,6 +288,13 @@ function createDesktopBridge(options={}){
       }
       if(req.method==='POST'&&p==='/api/admin/settings'){
         const result=await call('setSetting',principal,await readJson(req));audit(principal,'scoring-setting');sendJson(res,200,result);return true;
+      }
+      if(req.method==='POST'&&p==='/api/admin/yolo-tournaments'){
+        const result=await call('createYoloTournament',principal,await readJson(req));audit(principal,'yolo-tournament-create');sendJson(res,201,result);return true;
+      }
+      const yoloAction=p.match(/^\\/api\\/admin\\/yolo-tournaments\\/([A-Za-z0-9-]+)\\/([a-z-]+)$/);
+      if(req.method==='POST'&&yoloAction){
+        const result=await call('updateYoloTournament',principal,yoloAction[1],yoloAction[2],await readJson(req));audit(principal,'yolo-tournament-'+yoloAction[2]);sendJson(res,200,result);return true;
       }
     }
     return false;
