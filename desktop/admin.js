@@ -115,7 +115,7 @@
       updateSettingFields();
     }
     function zonedInputToIso(value,timeZone){
-      const match=/^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2})$/.exec(value||'');
+      const match=/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value||'');
       if(!match)throw new Error('Enter a valid local date and time.');
       const target={year:Number(match[1]),month:Number(match[2]),day:Number(match[3]),hour:Number(match[4]),minute:Number(match[5])};
       const targetUtc=Date.UTC(target.year,target.month-1,target.day,target.hour,target.minute);
