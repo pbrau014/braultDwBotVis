@@ -208,10 +208,12 @@ test('public archive redacts Discord actor snowflakes but retains audit events',
   F.registerParticipant(t,{playerId:'p1',displayName:'Alpha'});F.publishTournament(t);F.closeRegistration(t);F.activateStage(t,F.STAGES.PILOT_EVENT);
   F.audit(t, 'sensitive-actor-check', {}, '12345678901234567');
   F.registerEvidence(t,{id:'private-evidence',sha256:'a'.repeat(64),sizeBytes:128,contentType:'image/png',sourceFile:'source.png',capturedAt:'2026-11-04T12:00:00Z',source:{platform:'discord',channelId:'12345678901234567',messageId:'22345678901234567'}},'12345678901234567');
+  F.recordPilotResult(t,{playerId:'p1',gameNumber:1,damage:500,evidenceId:'private-evidence'},'12345678901234567');
   const archive = T.makePublicArchiveSnapshot(s);
   const saved = archive.workbook_backup.competition.tournaments[0];
   assert.equal(saved.audit.at(-1).action, 'sensitive-actor-check');
   assert.equal(saved.audit.at(-1).actor, 'redacted');
+  assert.equal(saved.pilotResults[0].recordedBy,'redacted');
   assert.equal(saved.evidence[0].registeredBy,'redacted');
   assert.equal(saved.evidence[0].source.channelId,'redacted');
 });
