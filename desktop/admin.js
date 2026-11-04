@@ -58,15 +58,50 @@
         if(item.stages?.length){const stages=D.node('span','',item.stages.map(s=>s.type+': '+s.status).join(' · '));details.append(stages);}
         card.append(details);formatList.append(card);
       }
+      const tournamentSelect=D.$('yolo-event-tournament');tournamentSelect.replaceChildren();
+      for(const item of yoloFormats.items){const option=document.createElement('option');option.value=item.id;option.textContent=item.name+' · '+item.format.toUpperCase();option.dataset.format=item.format;tournamentSelect.append(option);}
+      const nightSelect=D.$('yolo-event-night-select');nightSelect.replaceChildren();
+      const eventNightList=D.$('yolo-event-night-list');eventNightList.replaceChildren();
+      for(const night of yoloFormats.eventNights||[]){
+        const tournament=yoloFormats.items.find(item=>item.id===night.tournamentId);
+        const option=document.createElement('option');option.value=night.id;option.textContent=(tournament?.name||night.tournamentId)+' · '+night.id;nightSelect.append(option);
+        const row=D.node('div','event-row');
+        row.append(D.node('strong','',night.id),D.node('span','',(night.stage||'Pilot event')+' · '+night.status+' · '+night.startsAt));
+        eventNightList.append(row);
+      }
+      if(!(yoloFormats.eventNights||[]).length)eventNightList.append(D.node('p','muted','No event nights scheduled.'));
+      const registrationPlayer=D.$('yolo-registration-player');registrationPlayer.replaceChildren();
+      for(const [value,label] of playerOptions){const option=document.createElement('option');option.value=value;option.textContent=label;registrationPlayer.append(option);}
       const list=D.$('admin-submissions');list.replaceChildren();
       if(!submissions.items.length)list.append(D.node('p','muted','No screenshot records in the archive yet.'));
       for(const item of submissions.items)list.append(D.renderSubmission(item,{admin:true,roster:overview.roster,onDone:load}));
       status('Admin state loaded from the active tournament store.','success');
-      updateSettingFields();
+      updateSettingFields();\n      updateStageFields();
     }
     const formatSelect=D.$('yolo-format-select'),durationWrap=D.$('yolo-duration-wrap');
     function updateFormatFields(){durationWrap.classList.toggle('hidden',formatSelect.value!=='full');}
     formatSelect.addEventListener('change',updateFormatFields);updateFormatFields();
+    function updateStageFields(){
+      const selected=D.$('yolo-event-tournament').selectedOptions[0];
+      const isFull=selected?.dataset.format==='full';
+      D.$('yolo-stage-wrap').classList.toggle('hidden',!isFull);
+      D.$('yolo-event-stage').required=Boolean(isFull);
+      if(!isFull)D.$('yolo-event-stage').value='';
+    }
+    D.$('yolo-event-tournament').addEventListener('change',updateStageFields);
+    D.$('yolo-event-night-form').addEventListener('submit',async e=>{
+      e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
+      const startsAt=new Date(form.elements.startsAt.value);
+      const body={id:form.elements.id.value.trim(),tournamentId:form.elements.tournamentId.value,startsAt:startsAt.toISOString()};
+      if(form.elements.stage.value)body.stage=form.elements.stage.value;
+      try{await D.api('/api/admin/yolo-event-nights',{method:'POST',body});form.reset();updateStageFields();await load();}
+      catch(error){status(error.message,'error');}finally{button.disabled=false;}
+    });
+    D.$('yolo-registration-form').addEventListener('submit',async e=>{
+      e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
+      try{await D.api('/api/admin/yolo-event-nights/'+encodeURIComponent(form.elements.eventNightId.value)+'/registrations',{method:'POST',body:{playerId:Number(form.elements.playerId.value)}});await load();}
+      catch(error){status(error.message,'error');}finally{button.disabled=false;}
+    });
     D.$('yolo-tournament-form').addEventListener('submit',async e=>{
       e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
       const id=form.elements.id.value.trim(),format=form.elements.format.value;
