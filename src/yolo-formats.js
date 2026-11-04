@@ -53,7 +53,8 @@ function createEventNight(input = {}) {
  const startsAt = timestamp(input.startsAt, 'Event-night start'); if (!startsAt) throw new Error('Event-night start time is required.');
  const endsAt = timestamp(input.endsAt, 'Event-night end'); if (endsAt && Date.parse(endsAt) <= Date.parse(startsAt)) throw new Error('Event-night end must be after its start.');
  const stage = input.stage || null; if (stage && !STAGES.includes(stage)) throw new Error('Unknown Full YOLO stage.');
- return { id: identifier(input.id, 'Event-night ID'), tournamentId: identifier(input.tournamentId, 'Tournament ID'), stage, sequence: Number.isInteger(input.sequence) && input.sequence > 0 ? input.sequence : 1, startsAt, endsAt, status: input.status || 'draft', registrations: [], teams: [], fixtures: [], matches: [], games: [], evidenceIds: [] };
+ const status=input.status || 'draft'; if(!STATUSES.includes(status)) throw new Error('Invalid event-night status.');
+ return { id: identifier(input.id, 'Event-night ID'), tournamentId: identifier(input.tournamentId, 'Tournament ID'), stage, sequence: Number.isInteger(input.sequence) && input.sequence > 0 ? input.sequence : 1, startsAt, endsAt, status, registrations: [], teams: [], fixtures: [], matches: [], games: [], evidenceIds: [], audit: [] };
 }
 function registerParticipant(n, participantId, at = new Date().toISOString()) {
  const id = requiredText(participantId, 'Participant ID'); if (!['draft', 'published'].includes(n.status)) throw new Error('Registration is closed for this event night.');
