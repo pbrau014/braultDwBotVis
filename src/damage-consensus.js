@@ -61,7 +61,6 @@ function extractFullScreenDamageCandidates(reads = []) {
         const afterHeading = text.slice(heading + 'battle performance'.length);
         const combatMissions = afterHeading.search(/combat\s+missions/i);
         const section = combatMissions >= 0 ? afterHeading.slice(0, combatMissions) : afterHeading;
-        const captionIndex = section.search(/\bdamage\b/i);
         // The damage number is positioned immediately below the performance
         // heading in the source UI, while OCR may place the "Damage" caption
         // several lines later after reading ribbon labels/icons. Looking only
@@ -69,9 +68,10 @@ function extractFullScreenDamageCandidates(reads = []) {
         // Keep the search bounded to the top of this section and stop at the
         // caption when it appears; do not scan medal/ribbon rows below it.
         const sectionLines = section.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
-        const candidateLines = captionIndex >= 0
-            ? sectionLines.slice(0, 7)
-            : sectionLines.slice(0, 7);
+        const captionLineIndex = sectionLines.findIndex(line => /\bdamage\b/i.test(line));
+        const candidateLines = sectionLines.slice(0, captionLineIndex >= 0
+            ? Math.min(7, captionLineIndex + 1)
+            : 7);
 
         let value = '';
         for (const line of candidateLines) {
