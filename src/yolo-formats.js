@@ -31,9 +31,22 @@ function assertTransition(from, to, format, stageType) {
  if (!allowed[from] || !allowed[from].includes(to)) throw new Error('Invalid lifecycle transition: ' + from + ' -> ' + to + '.');
  if (format === FORMATS.FULL && to === 'completed' && stageType === 'regular-season') throw new Error('A Full YOLO season cannot complete before postseason and Grand YOLO finale are resolved.');
 }
+function transitionStage(t, stageType, nextStatus, actor, at = new Date().toISOString()) {
+ if (!t || t.format !== FORMATS.FULL || !Array.isArray(t.stages)) throw new Error('Stage transitions apply only to Full YOLO.');
+ const index = t.stages.findIndex(stage => stage.type === stageType);
+ if (index < 0) throw new Error('Season stage was not found.');
+ const stage = t.stages[index];
+ assertTransition(stage.status, nextStatus, t.format, stageType);
+ if (nextStatus === 'active' && index > 0 && t.stages[index - 1].status !== 'completed')
+  throw new Error('The preceding Full YOLO stage must be completed first.');
+ const stages = t.stages.map((item,i)=>i===index?{...item,status:nextStatus}:item);
+ return { ...t, stages, audit:[...(t.audit||[]),{type:'stage-status',stageType,from:stage.status,to:nextStatus,actor:requiredText(actor,'Actor'),at:timestamp(at,'Transition time')}] };
+}
 function transitionTournament(t, nextStatus, actor, at = new Date().toISOString()) {
  if (!t || !STATUSES.includes(t.status) || !STATUSES.includes(nextStatus)) throw new Error('A valid tournament and status are required.');
  assertTransition(t.status, nextStatus, t.format, null);
+ if (t.format === FORMATS.FULL && nextStatus === 'completed' && t.stages.some(stage=>stage.status!=='completed'))
+  throw new Error('Full YOLO cannot complete until regular season, postseason and Grand YOLO finale are completed.');
  return { ...t, status: nextStatus, audit: [...(t.audit || []), { type: 'tournament-status', from: t.status, to: nextStatus, actor: requiredText(actor, 'Actor'), at: timestamp(at, 'Transition time') }] };
 }
 function createEventNight(input = {}) {
@@ -52,4 +65,4 @@ function createRaceSideEvent(input = {}) { return { id: requiredText(input.id, '
 function grandYoloScore(input = {}) { return { type: 'grand-yolo-score', scoringCategory: 'grand', eventNightId: requiredText(input.eventNightId, 'Event-night ID') }; }
 function grandYoloFinale(input = {}) { return { type: 'grand-yolo-finale', stageId: requiredText(input.stageId, 'Finale stage ID'), matchId: requiredText(input.matchId, 'Finale match ID') }; }
 function validateMatchOutcome(input = {}) { if (!input.approvedScoringMethodId) throw new Error('An approved scoring-method ID is required before calculating an official match outcome.'); if (!Array.isArray(input.acceptedPerformanceRecordIds) || !input.acceptedPerformanceRecordIds.length) throw new Error('Accepted individual-performance record IDs are required.'); if (!input.aggregation || !input.rounding || !Array.isArray(input.tieBreakOrder)) throw new Error('Published aggregation, rounding, and tie-break rules are required.'); return { status: 'pending-calculation', approvedScoringMethodId: input.approvedScoringMethodId, acceptedPerformanceRecordIds: [...input.acceptedPerformanceRecordIds], aggregation: input.aggregation, rounding: input.rounding, tieBreakOrder: [...input.tieBreakOrder] }; }
-module.exports = { FORMATS, STAGES, STATUSES, createTournament, assertTransition, transitionTournament, createEventNight, registerParticipant, freezeRules, raceMetric, createRaceSideEvent, grandYoloScore, grandYoloFinale, validateMatchOutcome };
+module.exports = { FORMATS, STAGES, STATUSES, createTournament, assertTransition, transitionTournament, transitionStage, createEventNight, registerParticipant, freezeRules, raceMetric, createRaceSideEvent, grandYoloScore, grandYoloFinale, validateMatchOutcome };
