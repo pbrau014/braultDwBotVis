@@ -47,6 +47,21 @@ function publicSubmission(entry) {
     tournamentMapping:entry.tournament_mapping || null,
   };
 }
+
+function tournamentStandings(current,tournament,season=null) {
+  const registrations=tournament.format==='pilot'?tournament.registrations:(season?.registrations||[]);
+  const ids=new Set(registrations.map(x=>String(x.participantId)));
+  const players=current.players.filter(p=>ids.has(String(p.id))).map(p=>({...JSON.parse(JSON.stringify(p)),events:Object.fromEntries(Tournament.EVENTS.map(key=>[key,Array.from({length:7},()=>key==='grand'?{class:'-',classWeight:0,tier:1,damage:0,kills:0,time:0}:{class:'-',classWeight:0,tier:1,metric:0})]))}));
+  const byId=new Map(players.map(p=>[String(p.id),p]));
+  for(const entry of tournament.scoreEntries||[]){
+    const player=byId.get(String(entry.participantId));if(!player)continue;
+    const game=player.events[entry.category][entry.gameNumber-1];
+    game.class=entry.shipClass;game.classWeight=Tournament.classWeightFor(entry.shipClass);game.tier=entry.tier;
+    if(entry.category==='grand')Object.assign(game,{damage:entry.damage,kills:entry.kills,time:entry.time});
+    else game.metric=entry.metric;
+  }
+  return Tournament.standings({...current,players});
+}
 function createDesktopService(options = {}) {
   for (const name of ['getState','saveState','extractImage','isAdminId','validateScreenshot']) {
     if (typeof options[name] !== 'function') throw new TypeError('Desktop service requires ' + name + '().');
@@ -109,7 +124,7 @@ function createDesktopService(options = {}) {
       const current=state(), rows=Tournament.standings(current);
       const total=rows.reduce((s,r)=>s+r.total,0);
       const aggregate={doubloons:total,estimatedValue:total*0.54/100};
-      const lifecycle=current.lifecycle||Lifecycle.createLifecycleState(current);\n      const publicTournaments=lifecycle.tournaments.map(t=>({id:t.id,name:t.name,format:t.format,status:t.status,seasonId:t.seasonId||null}));\n      const base={aggregate,maxPlayers:Tournament.MAX_PLAYERS,events: Tournament.EVENTS,eventLabels:Tournament.EVENT_LABELS,formats:Lifecycle.FORMATS,scoringCategories:Lifecycle.SCORING_CATEGORIES,tournaments:publicTournaments};
+      const lifecycle=current.lifecycle||Lifecycle.createLifecycleState(current);\n      const publicTournaments=lifecycle.tournaments.map(t=>{const season=lifecycle.seasons.find(x=>x.id===t.seasonId)||null;return{id:t.id,name:t.name,format:t.format,status:t.status,seasonId:t.seasonId||null,standings:tournamentStandings(current,t,season).map((r,i)=>({rank:i+1,...r}))};});\n      const base={aggregate,maxPlayers:Tournament.MAX_PLAYERS,events: Tournament.EVENTS,eventLabels:Tournament.EVENT_LABELS,formats:Lifecycle.FORMATS,scoringCategories:Lifecycle.SCORING_CATEGORIES,tournaments:publicTournaments};
       if(principal.role==='player') {
         const player=Tournament.findPlayer(current,principal.player.id);
         if(!player) throw Object.assign(new Error('Your linked roster entry no longer exists.'),{status:403,code:'PLAYER_UNLINKED'});
@@ -217,25 +232,35 @@ function createDesktopService(options = {}) {
         const destroyed=(battle.ribbons||[]).find(r=>String(r.label||'').toLowerCase()==='destroyed');
         const kills=body?.kills===''||body?.kills===undefined?(destroyed?.count==null?null:wholeNumber(destroyed.count,'Kills')):wholeNumber(body.kills,'Kills');
         const time=body?.time===''||body?.time===undefined?null:Number(body.time);
-        let result;
+        let result,scopedTournament=null,scopedStanding=null;
         try {
-          result=Tournament.recordResult(current,{player:player.id,event,gameNumber,shipClass,tier,recordId:entry.record_id,damage,kills,time});
+          if(body?.tournamentId){
+            current.lifecycle||=Lifecycle.createLifecycleState(current);
+            scopedTournament=current.lifecycle.tournaments.find(x=>x.id===body.tournamentId);
+            if(!scopedTournament)throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});
+            const season=scopedTournament.format==='full'?current.lifecycle.seasons.find(x=>x.id===scopedTournament.seasonId):null;
+            const scoreEntry=Lifecycle.recordScoreEntry(scopedTournament,{participantId:String(player.id),category:event,gameNumber,shipClass,tier,evidenceId:entry.record_id,damage,kills,time},season);
+            scopedStanding=tournamentStandings(current,scopedTournament,season).find(x=>String(x.id)===String(player.id))||null;
+            result={player,event,gameNumber,game:scoreEntry,scores:tournamentStandings(current,scopedTournament,season)};
+          }else{
+            result=Tournament.recordResult(current,{player:player.id,event,gameNumber,shipClass,tier,recordId:entry.record_id,damage,kills,time});
+          }
         } catch(error) {
           if(!error.status) { error.status=400; error.code='INVALID_MAPPING_VALUE'; }
           throw error;
         }
         entry.status='mapped';entry.mapped_at=new Date().toISOString();
-        entry.tournament_mapping={player_id:result.player.id,player_name:result.player.name,event,game_number:gameNumber,ship_class:shipClass,tier,mapped_via:'desktop-ui'};
+        entry.tournament_mapping={player_id:result.player.id,player_name:result.player.name,tournament_id:scopedTournament?.id||null,event,game_number:gameNumber,ship_class:shipClass,tier,mapped_via:'desktop-ui'};
         // A Discord attachment may already have an interactive mapping prompt.
         // Desktop completion must remove that pending prompt before saving so a
         // later Discord reply cannot race or duplicate the same battle result.
         current.pendingSubmissions=(current.pendingSubmissions||[]).filter(item=>item?.record_id!==entry.record_id);
         current.pendingOcrCorrections=(current.pendingOcrCorrections||[]).filter(item=>item?.record_id!==entry.record_id&&item?.recordId!==entry.record_id);
         await options.saveState();
-        const standing=result.scores.find(r=>r.id===player.id);
+        const standing=scopedTournament?scopedStanding:result.scores.find(r=>r.id===player.id);
         const total=result.scores.reduce((s,r)=>s+r.total,0);
         return {status:'mapped',player:{id:player.id,name:player.name},event,gameNumber,standing,
-          aggregate:{doubloons:total,estimatedValue:total*0.54/100}};
+          aggregate:{doubloons:total,estimatedValue:total*0.54/100},tournamentId:scopedTournament?.id||null};
       });
     },
     async addPlayer(principal,body) {
@@ -259,6 +284,19 @@ function createDesktopService(options = {}) {
       return mutate(async()=>{const value=Tournament.setSetting(state(),String(body?.event||''),String(body?.field||''),body?.value);await options.saveState();return{event:body.event,field:body.field,value};});
     },
 
+
+    async registerPilotParticipant(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();const t=current.lifecycle?.tournaments.find(x=>x.id===body?.tournamentId);if(!t)throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});const player=Tournament.findPlayer(current,body?.participantId);if(!player)throw Object.assign(new Error('Participant must be an existing roster player.'),{status:400,code:'PLAYER_REQUIRED'});const row=Lifecycle.registerPilotParticipant(t,{participantId:String(player.id),displayName:player.name});await options.saveState();return row;});
+    },
+    async createPilotEventNight(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();const t=current.lifecycle?.tournaments.find(x=>x.id===body?.tournamentId);if(!t)throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});const row=Lifecycle.createPilotEventNight(t,{id:body?.id||crypto.randomUUID(),startsAt:body?.startsAt,settings:body?.settings});await options.saveState();return row;});
+    },
+    async recordTournamentScore(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();const t=current.lifecycle?.tournaments.find(x=>x.id===body?.tournamentId);if(!t)throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});const player=Tournament.findPlayer(current,body?.participantId);if(!player)throw Object.assign(new Error('Participant was not found.'),{status:404,code:'PLAYER_REQUIRED'});const season=t.format==='full'?current.lifecycle.seasons.find(x=>x.id===t.seasonId):null;const entry=Lifecycle.recordScoreEntry(t,{...body,participantId:String(player.id),evidenceId:body?.evidenceId||('manual-'+crypto.randomUUID())},season);await options.saveState();return{entry,standings:tournamentStandings(current,t,season)};});
+    },
     async createTournament(principal,body) {
       role(principal,['admin']);
       return mutate(async()=>{const current=state();current.lifecycle||=Lifecycle.createLifecycleState(current);const tournament=Lifecycle.createTournament({id:body?.id||crypto.randomUUID(),name:body?.name,format:body?.format});if(current.lifecycle.tournaments.some(x=>x.id===tournament.id))throw Object.assign(new Error('Tournament id already exists.'),{status:409,code:'TOURNAMENT_EXISTS'});current.lifecycle.tournaments.push(tournament);await options.saveState();return tournament;});
