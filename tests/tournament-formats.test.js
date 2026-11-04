@@ -9,6 +9,11 @@ function pilot() {
   return F.createTournament(state().competition, { id: 'pilot-1', name: 'Pilot Night', format: 'pilot',
     config: { timezone: 'America/Chicago', eventStart: '2026-12-01T18:00:00-06:00' } });
 }
+function qualify(t, stageKey) {
+  return F.setStageQualifiers(t,stageKey,['home','away'],{
+    approved:true,approvedBy:'Organizer',methodVersion:'qualification-v1',publishedAt:'2026-11-04T00:00:00Z',
+  });
+}
 function playStage(t, stageKey) {
   const suffix=stageKey.replace(/_/g,'-');
   const fixture=F.createFixture(t,{id:'fixture-'+suffix,stageKey,homeTeamId:'home',awayTeamId:'away'});
@@ -83,9 +88,11 @@ test('Full regular season advances in order through postseason and Grand Finale'
   F.completeMatch(t, match.id);
   assert.equal(match.outcome.winnerTeamId, 'home');
   F.completeStage(t, F.STAGES.REGULAR_SEASON);
+  qualify(t,F.STAGES.POSTSEASON);
   F.activateStage(t, F.STAGES.POSTSEASON);
   playStage(t,F.STAGES.POSTSEASON);
   F.completeStage(t, F.STAGES.POSTSEASON);
+  qualify(t,F.STAGES.GRAND_FINALE);
   F.activateStage(t, F.STAGES.GRAND_FINALE);
   playStage(t,F.STAGES.GRAND_FINALE);
   F.completeStage(t, F.STAGES.GRAND_FINALE);
@@ -183,4 +190,24 @@ test('public archive redacts Discord actor snowflakes but retains audit events',
   const saved = archive.workbook_backup.competition.tournaments[0];
   assert.equal(saved.audit.at(-1).action, 'sensitive-actor-check');
   assert.equal(saved.audit.at(-1).actor, 'redacted');
+});
+
+test('Full YOLO cannot activate postseason without approved published qualifiers', () => {
+  const t=full();
+  F.activateStage(t,F.STAGES.REGULAR_SEASON);
+  playStage(t,F.STAGES.REGULAR_SEASON);
+  F.completeStage(t,F.STAGES.REGULAR_SEASON);
+  assert.throws(()=>F.activateStage(t,F.STAGES.POSTSEASON),/qualification list/);
+  assert.throws(()=>F.setStageQualifiers(t,F.STAGES.POSTSEASON,['home','away'],{}),/approved, versioned and published/);
+  qualify(t,F.STAGES.POSTSEASON);
+  F.activateStage(t,F.STAGES.POSTSEASON);
+});
+
+test('stage bye requires a valid team, reason and evidence and resolves a fixture', () => {
+  const t=full();
+  F.activateStage(t,F.STAGES.REGULAR_SEASON);
+  const bye=F.recordBye(t,F.STAGES.REGULAR_SEASON,'home','Odd number of teams','bye-evidence');
+  assert.equal(bye.status,'bye');
+  assert.equal(bye.outcome.decidedBy,'bye');
+  F.completeStage(t,F.STAGES.REGULAR_SEASON);
 });
