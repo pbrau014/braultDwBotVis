@@ -94,6 +94,13 @@ test('parseModeMap strips malformed banner fragments and trailing OCR punctuatio
     assert.deepEqual(parseModeMap('Crash Zone Alpha —'), { map: 'Crash Zone Alpha', mode: NOT_DETECTED });
 });
 
+test('parseModeMap recovers a trailing-separator map line inside multiline OCR text', () => {
+    assert.deepEqual(
+        parseModeMap('Victory!\nCrash Zone Alpha —\nBattle start time: 28.08.2025 20:06'),
+        { map: 'Crash Zone Alpha', mode: NOT_DETECTED },
+    );
+});
+
 test('parseModeMap removes an inserted lowercase i at a fused title-case map boundary', () => {
     assert.deepEqual(parseModeMap('MountainiRange — RandomBattle'), {
         map: 'Mountain Range', mode: 'Random Battle',
