@@ -284,6 +284,7 @@ function createDesktopBridge(options={}){
         '/api/admin/registrations':'registerParticipant',
         '/api/admin/rosters':'assignRoster',
         '/api/admin/event-nights':'createEventNight',
+        '/api/admin/event-nights/transition':'transitionEventNight',
         '/api/admin/fixtures':'createFixture',
         '/api/admin/matches':'createMatch',
         '/api/admin/match-outcomes':'recordMatchOutcome',
