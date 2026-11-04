@@ -122,3 +122,20 @@ After adding the local configuration validator, the combined `npm run test:disco
 ## Default-branch webhook exposure remains outstanding
 
 The sanitized HTML reader is committed on dwbotVis, but a read-only check confirmed that the current main branch still contains the exposed webhook in its current HTML file. The owner must revoke/delete it in Discord immediately. No main-branch modification or history rewrite was performed.
+
+
+## Verified GitHub Actions run — 2026-11-04 (current branch)
+
+The new `.github/workflows/dwbot-verification.yml` workflow ran against commit `572f95b27cfa0b769f56cecd0cc82ff59ab6ce52` on Node.js 22.16.0. Run: https://github.com/pbrau014/braultDwBotVis/actions/runs/41800956774
+
+- `npm ci --no-audit --no-fund`: PASS (39 packages installed).
+- Syntax checks for `src/bot.js`, the three OCR.space modules, and `src/discord-test-preflight.js`: PASS.
+- `npm run test:ocrspace`: **15/15 PASS**. Mocked provider/crop/quota tests only; no OCR.space network request or image transmission.
+- `npm run test:discord-preflight`: **21/21 PASS**. Offline unit tests only; no Discord login or message.
+- `npm test`: **36 PASS / 29 FAIL / 65 total**. Failures are real repository completeness/path defects, not dependency-install failures. The test files are currently flattened into the repository root although many use `../src` and `../scripts` imports; the expected `tests/` directory is absent. Multiple referenced source modules and test fixtures are also absent from the current branch, including `src/battle-record.js`, `src/damage-consensus.js`, `src/image-processor.js`, `src/number-parser.js`, `src/ocr-worker.js`, `src/ocr-process-supervisor.js`, `src/ocr-report-metadata.js`, `src/ocr-watchdog.js`, `src/opencv-field-isolation.js`, `src/paddleocr-field-fallback.js`, `src/reward-geometry.js`, `src/ribbon-parser.js`, `src/serial-task-queue.js`, `src/acceptance-checks.js`, and several testdata JSON fixtures. The helper `scripts/preflight-discord-test.js` is also auto-discovered as a test by `node --test` due its filename. Do not weaken or delete these tests to manufacture a green run; recover the missing original modules/fixtures and correct the intended test layout first.
+
+This CI result supersedes any older claim that the current branch has no OCR.space source. The current branch contains `src/ocrspace-client.js`, `src/ocrspace-quota-ledger.js`, `src/ocrspace-field-evidence.js`, bot wiring, `ocrspace.test.js`, and `test:ocrspace`. The integration is optional and disabled unless explicitly enabled with a server-side key. No real OCR.space request has been made.
+
+Workbook correction: a prior conversational assessment incorrectly claimed the current scoring baseline used Grand Yolo `tierWeight=1` and H12 $12.56. The current source-of-truth audit/test instead specifies `tierWeight=0.9` and H12 $12.49. That earlier claim was wrong; no scoring code or workbook formula should be changed on its basis. Preserve the existing 0.9/$12.49 contract unless a newer verified workbook artifact proves otherwise.
+
+Production remains NO-GO.

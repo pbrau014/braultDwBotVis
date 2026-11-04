@@ -1324,3 +1324,42 @@ Current phase disposition:
 ================================================================================
 END DWBOT-UPD-2026-11-04-005
 ================================================================================
+
+
+================================================================================
+DWBOT-UPD-2026-11-04-006 — CURRENT CI, OCR.SPACE RECONCILIATION, AND DESKTOP UI WORKSTREAM
+================================================================================
+
+Current verified branch before this addendum: dwbotVis @ 572f95b27cfa0b769f56cecd0cc82ff59ab6ce52. GitHub Actions run: https://github.com/pbrau014/braultDwBotVis/actions/runs/41800956774.
+
+CI results on Node 22.16.0:
+- npm ci --no-audit --no-fund: PASS (39 packages installed).
+- Syntax checks for src/bot.js and OCR.space/Discord preflight modules: PASS.
+- npm run test:ocrspace: 15/15 PASS (mocked only; no live OCR.space request).
+- npm run test:discord-preflight: 21/21 PASS (offline only; no Discord login).
+- npm test: 36 PASS / 29 FAIL / 65 total. This is an actual current-branch full-suite failure. Many root-level test files resolve ../src and ../scripts while the tests/ directory is absent; required source modules and fixtures are missing; scripts/preflight-discord-test.js is auto-discovered as a test. Restore the exact historical source/test/fixture package before modifying tests or rewriting modules. Do not weaken exact-value acceptance or remove failing coverage.
+
+OCR.space correction: contrary to older transfer text, current dwbotVis contains and wires src/ocrspace-client.js, src/ocrspace-quota-ledger.js and src/ocrspace-field-evidence.js, plus ocrspace.test.js and npm test:ocrspace. It remains optional/disabled by default and evidence-only. CI verifies 15 mocked tests. No live POST or screenshot transmission was made.
+
+Workbook assessment correction: the earlier statement that the current workbook/HTML uses tierWeight 1 and H12 $12.56 was incorrect. Current full-system test/source audit expects Grand Yolo tierWeight 0.9 and H12 $12.49. No scoring changes are authorized or needed based on the erroneous statement.
+
+New parallel major workstream: build the Player/Admin desktop HTML interface using the user's two Library-linked HTML files as baselines. Inspect the full files first; preserve useful UI behavior; keep secrets/webhooks out of HTML. Build/preview while OCR and Discord work continue, then integrate before the live Discord smoke test where practicable. A static HTML page cannot impersonate a Discord slash-command interaction or safely hold a bot token; use a local trusted Node bridge/service layer. Actual slash commands are registered Discord application commands and invoked by a Discord client; the desktop UI can call the same authenticated service methods and request bot actions through the local bridge. Prepare guild-scoped slash-command integration with registration disabled until offline tests pass and the test guild is ready.
+
+Reuse-before-rework and assume-correct-unless-proven-wrong are standing rules. Search Library, historical archives/reports, current source, tests and manifests; restore/adapt/retest existing work before rewriting. Only correct a requirement/baseline when current source, authoritative documentation or reproducible tests prove it wrong; document evidence and preserve provenance.
+
+Next order:
+1. Recover the exact 472-file historical source package using the verified SHA/manifest; inspect manifest and compare current branch. Also recover the OCR progress checkpoint archive if available.
+2. Restore missing source modules, test fixtures, docs and the intended tests/ layout from the archive. Keep current branch improvements where they are newer; reconcile conflicts explicitly.
+3. Fix test discovery and npm script paths; run focused tests, npm ci, full npm test; repeat CI until full suite is green.
+4. Review OCR.space integration, quota ledger and crop isolation; test Windows atomic file/lock behavior. Keep feature disabled by default and do not transmit images without explicit permission/key.
+5. Resume local OCR acceptance only with the recovered OCR.space path integrated; preserve nine exact fields, XP mandatory, Tesseract baseline, exact ground truth. Complete full/holdout additional-image acceptance and native Windows Tesseract gate.
+6. Inspect both user-supplied HTML baselines from Library; develop a safe Player interface and a separate Admin derivative; add image upload page; build local Node bridge and shared service API; preview and test locally.
+7. Prepare slash commands as guild-scoped application commands and test command handlers/permissions offline. Keep live registration disabled until the isolated test setup is ready. Do not claim the HTML itself can inject slash commands into Discord.
+8. Integrate UI + image upload + Discord bot before live smoke where practicable. Then follow the isolated Discord quickstart and capture READY, permission, participant/admin, image receipt, persistence, restart and recovery evidence.
+9. Complete security, backup/restore, docs, one-PDF manual, complete candidate package, SHA-256, clean extraction and final release review. Production remains NO-GO until all required gates pass.
+
+See docs/continuation/NEXT_CHAT_HANDOFF_2026-11-04.md for full rules, links, tool/branch details and continuation checklist.
+
+================================================================================
+END DWBOT-UPD-2026-11-04-006
+================================================================================

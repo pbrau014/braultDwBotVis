@@ -12,7 +12,7 @@ The bot ingests WoWS battle-result screenshots, extracts structured battle evide
 - Tesseract.js remains the primary OCR engine.
 - OpenCV-assisted field localization is opt-in; it proposes image geometry/crops and is not an authority for recognized values.
 - PaddleOCR is an optional locally benchmarked secondary candidate, disabled by default.
-- OCR.space is documented as a possible optional crop-evidence provider, but the current `dwbotVis` source tree does not contain its adapter module, orchestration call site, or adapter test file. Do not enable or describe it as integrated until those files are restored and verified.
+- OCR.space is implemented as an optional localized-crop evidence stage (`src/ocrspace-client.js`, `src/ocrspace-quota-ledger.js`, `src/ocrspace-field-evidence.js`) and is wired into the bot. It remains disabled by default; evidence is kept separate from exact-value candidates and cannot accept or rewrite mandatory fields. Current CI: 15/15 mocked OCR.space contract/quota tests pass; no real provider request or image transmission has been made.
 - Nine required battle fields remain strict and exact. The parser must abstain on conflicts or uncertainty rather than fuzzy-correcting player names, IDs, ships, or numbers.
 
 ## Runtime and tests
@@ -21,9 +21,9 @@ The bot ingests WoWS battle-result screenshots, extracts structured battle evide
 - Install with `npm ci`.
 - Run offline tests with `npm test`.
 - Run the combined Discord channel-preflight and command-policy unit tests with `npm run test:discord-preflight`.
-- OCR.space live/dry-run commands are not present in this branch's `package.json`; the provider is not currently integrated here.
+- Run `npm run test:ocrspace` for the offline mocked provider/crop/quota contract tests. The optional provider remains disabled by default; no live OCR.space POST has been performed.
 
-The current captured verification status is documented in `GITHUB_TRANSFER_STATUS.md` and `docs/iteration23/PHASE9_DISCORD_INTEGRATION_STATUS_2026-11-04.md`.
+The current captured verification status is documented in `GITHUB_TRANSFER_STATUS.md`, `docs/iteration23/PHASE9_DISCORD_INTEGRATION_STATUS_2026-11-04.md`, and `docs/continuation/NEXT_CHAT_HANDOFF_2026-11-04.md`. The 2026-11-04 GitHub Actions run passed clean install, syntax, OCR.space (15/15) and Discord preflight (21/21), but the full suite failed 29/65 due missing source modules/fixtures and incorrect test placement. Production remains NO-GO.
 
 ## Release status
 
