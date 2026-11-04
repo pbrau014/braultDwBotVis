@@ -79,14 +79,14 @@ jobs:
       - name: Install native OCR prerequisites
         shell: powershell
         run: |
-          choco install tesseract imagemagick.app --yes --no-progress
+          choco install tesseract --version=5.5.3.20260724 --yes --no-progress
           Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
           refreshenv
           $tesseract = Get-Command tesseract.exe -ErrorAction Stop
           $magick = Get-Command magick.exe -ErrorAction Stop
           $version = (& $tesseract.Source --version | Select-Object -First 1).Trim()
           Write-Host "Native Tesseract: $version"
-          if ($version -notmatch '^tesseract 5\.') { throw "Expected native Tesseract 5.x: $version" }
+          if ($version -notmatch '^tesseract\s+v?5\.') { throw "Expected native Tesseract 5.x: $version" }
           & $tesseract.Source --list-langs
           & $magick.Source -version | Select-Object -First 2
           "TESSERACT_BIN=$($tesseract.Source)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8

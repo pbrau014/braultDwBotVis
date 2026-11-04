@@ -19,7 +19,7 @@ try {
  $Tess=Get-Command $TessName -ErrorAction Stop
  $Magick=Get-Command $MagickName -ErrorAction Stop
  $TessVersion=(& $Tess.Source --version 2>&1 | Select-Object -First 1).ToString().Trim()
- if($TessVersion -notmatch '^tesseract 5\.'){throw "Native Tesseract 5.x required; found $TessVersion"}
+ if($TessVersion -notmatch '^tesseract\s+v?5\.'){throw "Native Tesseract 5.x required; found $TessVersion"}
  $Languages=(& $Tess.Source --list-langs 2>&1) -join [Environment]::NewLine
  if($LASTEXITCODE -ne 0 -or $Languages -notmatch '(?m)^eng$'){throw 'Native Tesseract requires English traineddata.'}
  $MagickVersion=(& $Magick.Source -version 2>&1 | Select-Object -First 2) -join [Environment]::NewLine
