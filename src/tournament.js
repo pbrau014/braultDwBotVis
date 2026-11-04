@@ -294,6 +294,18 @@ function makePublicArchiveSnapshot(state) {
     'pending_ocr_corrections',
   ];
   snapshot.player_account_links = {};
+  // Competition audit actors are Discord snowflakes; redact those from public
+  // channel snapshots while retaining event/action/timestamp evidence.
+  const competition = snapshot.workbook_backup?.competition;
+  if (competition) {
+    const redactActor = entry => {
+      if (entry && /^\\d{17,20}$/.test(String(entry.actor || ''))) entry.actor = 'redacted';
+    };
+    for (const entry of competition.audit || []) redactActor(entry);
+    for (const tournament of competition.tournaments || []) {
+      for (const entry of tournament.audit || []) redactActor(entry);
+    }
+  }
   snapshot.battle_records = snapshot.battle_records.map(entry => {
     const { desktop_owner_id, desktop_owner_role, ...publicEntry } = entry || {};
     return publicEntry;
