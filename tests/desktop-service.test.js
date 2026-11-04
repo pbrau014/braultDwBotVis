@@ -146,6 +146,8 @@ test('Pilot scores are stored in a per-event ledger and do not alter legacy cate
   assert.equal(result.entry.tournamentId,pilot.id);
   assert.equal(f.state.players[0].events.damage[0].metric,0);
   const overview=await f.service.getOverview(admin);
+  assert.equal(Object.hasOwn(overview.aggregate,'estimatedValue'),false);
+  assert.equal(Object.hasOwn(overview.standings[0]||{},'estimatedValue'),false);
   const summary=overview.tournaments.find(x=>x.id===pilot.id);
   assert.equal(summary.standings[0].id,f.alpha.id);
 });
