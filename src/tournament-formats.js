@@ -308,8 +308,11 @@ function createFixture(tournament, input, actor = 'organizer') {
       (!stage.qualifiedTeamIds.includes(home.id) || !stage.qualifiedTeamIds.includes(away.id)))
     throw new Error('Postseason and Grand Finale fixtures may include only published qualifiers.');
   if (tournament.fixtures.some(f => f.id === String(input.id))) throw new Error('Fixture ID already exists.');
+  const scheduledAt = Date.parse(String(input.scheduledAt || eventNight.startsAt));
+  if (!Number.isFinite(scheduledAt) || scheduledAt < Date.parse(eventNight.startsAt) || scheduledAt > Date.parse(eventNight.endsAt))
+    throw new Error('Fixture scheduledAt must fall within its event-night time window.');
   const fixture = { id: cleanText(input.id, 'Fixture ID'), stageKey: input.stageKey, eventNightId: eventNight.id,
-    homeTeamId: home.id, awayTeamId: away.id, scheduledAt: input.scheduledAt || eventNight.startsAt,
+    homeTeamId: home.id, awayTeamId: away.id, scheduledAt: new Date(scheduledAt).toISOString(),
     status: 'scheduled', matchId: null };
   tournament.fixtures.push(fixture);
   eventNight.fixtureIds.push(fixture.id);
