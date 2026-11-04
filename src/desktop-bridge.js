@@ -287,6 +287,11 @@ function createDesktopBridge(options={}){
         const result=await call('createYoloTournament',principal,await readJson(req));
         audit(principal,'yolo-tournament-create');sendJson(res,201,result);return true;
       }
+      const stageTransition=p.match(/^\/api\/admin\/yolo-tournaments\/([A-Za-z0-9._-]+)\/stages$/);
+      if(req.method==='POST'&&stageTransition){
+        const result=await call('transitionYoloStage',principal,stageTransition[1],await readJson(req));
+        audit(principal,'yolo-stage-status');sendJson(res,200,result);return true;
+      }
       const tournamentTransition=p.match(/^\/api\/admin\/yolo-tournaments\/([A-Za-z0-9._-]+)\/status$/);
       if(req.method==='POST'&&tournamentTransition){
         const result=await call('transitionYoloTournament',principal,tournamentTransition[1],await readJson(req));
