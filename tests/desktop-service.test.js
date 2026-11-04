@@ -121,6 +121,10 @@ test('Admin manages Pilot and Full lifecycles; match outcomes require a stored o
   const approval=await f.service.createApprovalRecord(admin,{id:'D21-v1',scope:'match outcome scoring',version:'1',approvedAt:'2026-11-04T12:00:00.000Z'});
   const outcome=await f.service.recordMatchOutcome(admin,{seasonId:season.id,matchId:match.id,id:'o1',teamA:a.id,teamB:b.id,scoreA:2,scoreB:1,methodId:approval.id});
   assert.equal(outcome.winnerTeamId,a.id);
+  const c=await f.service.createTeam(admin,{seasonId:season.id,name:'Green'});
+  const nextFixture=await f.service.createFixture(admin,{seasonId:season.id,stageId:postseason.id,teamA:a.id,teamB:c.id});
+  const progression=await f.service.advanceBracket(admin,{seasonId:season.id,outcomeId:outcome.id,toFixtureId:nextFixture.id,methodId:approval.id});
+  assert.equal(progression.winnerTeamId,a.id);
   await assert.rejects(f.service.createTournament(player,{id:'unauthorized',format:'pilot'}),e=>e.status===403);
 });
 
