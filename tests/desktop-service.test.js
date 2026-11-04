@@ -95,3 +95,31 @@ test('authenticated Admin backup retains private roster links and pending correc
   assert.equal(backup.pending_submissions[0].userId,PLAYER);
   assert.equal(backup.pending_ocr_corrections.length,1);
 });
+
+test('admin can create Pilot and Full YOLO records; players cannot administer formats',async()=>{
+ const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN}),player=await f.service.resolvePrincipal({id:PLAYER});
+ const pilot=await f.service.createYoloTournament(admin,{id:'pilot-2026',name:'Pilot',format:'pilot'});
+ assert.equal(pilot.season,null);
+ const full=await f.service.createYoloTournament(admin,{id:'full-2026',name:'Full',format:'full',season:{id:'season-2026',durationWeeks:12}});
+ assert.deepEqual(full.stages.map(s=>s.type),['regular-season','postseason','grand-finale']);
+ await assert.rejects(f.service.createYoloTournament(player,{id:'bad',name:'Bad',format:'pilot'}),e=>e.status===403);
+ await assert.rejects(f.service.createYoloTournament(admin,{id:'pilot-2026',name:'Duplicate',format:'pilot'}),e=>e.code==='DUPLICATE_TOURNAMENT');
+});
+test('event-night stage association is format-validated and registration is identity-scoped',async()=>{
+ const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN}),player=await f.service.resolvePrincipal({id:PLAYER});
+ await f.service.createYoloTournament(admin,{id:'pilot',name:'Pilot',format:'pilot'});
+ await assert.rejects(f.service.createYoloEventNight(admin,{id:'bad-night',tournamentId:'pilot',startsAt:'2026-11-05T18:00:00Z',stage:'regular-season'}),e=>e.code==='PILOT_HAS_NO_STAGES');
+ await f.service.createYoloEventNight(admin,{id:'pilot-night',tournamentId:'pilot',startsAt:'2026-11-05T18:00:00Z'});
+ const result=await f.service.registerYoloParticipant(player,'pilot-night');
+ assert.equal(result.participantId,f.alpha.id);
+ await assert.rejects(f.service.registerYoloParticipant(player,'pilot-night'),/already registered/);
+});
+test('Full YOLO event nights require a declared stage and full private archive preserves it',async()=>{
+ const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
+ await f.service.createYoloTournament(admin,{id:'full',name:'Full',format:'full',season:{id:'s',durationWeeks:12}});
+ await assert.rejects(f.service.createYoloEventNight(admin,{id:'bad',tournamentId:'full',startsAt:'2026-11-05T18:00:00Z'}),e=>e.code==='FULL_STAGE_REQUIRED');
+ await f.service.createYoloEventNight(admin,{id:'night',tournamentId:'full',stage:'regular-season',startsAt:'2026-11-05T18:00:00Z'});
+ const backup=JSON.parse(await f.service.exportBackup(admin));
+ assert.equal(backup.yolo_tournaments[0].format,'full');
+ assert.equal(backup.event_nights[0].stage,'regular-season');
+});
