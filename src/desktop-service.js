@@ -81,6 +81,10 @@ function createDesktopService(options = {}) {
   function ownPlayer(principal,current=state()) {
     return principal.role==='player' ? Tournament.findPlayer(current,principal.player.id) : null;
   }
+  function auditLifecycle(record,principal,action,details={}) {
+    record.audit ||= [];
+    record.audit.push({action,actor:String(principal?.discordUserId||'unknown'),at:new Date().toISOString(),...details});
+  }
   function evidence(buffer,mime) {
     return {platform:'desktop',attachmentId:'',messageId:'',channelId:'',messageUrl:'',
       sha256:crypto.createHash('sha256').update(buffer).digest('hex'),sizeBytes:buffer.length,
@@ -281,6 +285,7 @@ function createDesktopService(options = {}) {
         if((current.yoloTournaments || []).some(item=>item.id===tournament.id))
           throw Object.assign(new Error('Tournament ID already exists.'),{status:409,code:'DUPLICATE_TOURNAMENT'});
         current.yoloTournaments ||= [];
+        tournament.audit.push({type:'tournament-created',actor:String(principal.discordUserId),at:new Date().toISOString()});
         current.yoloTournaments.push(tournament);
         await options.saveState();
         return tournament;
@@ -303,6 +308,7 @@ function createDesktopService(options = {}) {
         if((current.eventNights || []).some(item=>item.id===night.id))
           throw Object.assign(new Error('Event-night ID already exists.'),{status:409,code:'DUPLICATE_EVENT_NIGHT'});
         current.eventNights ||= [];
+        auditLifecycle(night,principal,'event-night-created');
         current.eventNights.push(night);
         tournament.eventNights ||= [];
         tournament.eventNights.push(night.id);
@@ -324,7 +330,7 @@ function createDesktopService(options = {}) {
           throw Object.assign(new Error('A participant can belong to only one team in this event night.'),{status:409,code:'PARTICIPANT_ALREADY_ASSIGNED'});
         const team=YoloFormats.createTeam({...body,eventNightId});
         if((night.teams || []).some(item=>item.id===team.id)) throw Object.assign(new Error('Team ID already exists.'),{status:409,code:'DUPLICATE_TEAM'});
-        night.teams.push(team);await options.saveState();return team;
+        night.teams.push(team);auditLifecycle(night,principal,'team-created',{teamId:team.id,participantIds:team.participantIds});await options.saveState();return team;
       });
     },
     async createYoloFixture(principal,eventNightId,body={}) {
@@ -337,7 +343,7 @@ function createDesktopService(options = {}) {
           throw Object.assign(new Error('Both fixture teams must belong to this event night.'),{status:400,code:'FIXTURE_TEAM_SCOPE'});
         const fixture=YoloFormats.createFixture({...body,eventNightId});
         if(night.fixtures.some(item=>item.id===fixture.id)) throw Object.assign(new Error('Fixture ID already exists.'),{status:409,code:'DUPLICATE_FIXTURE'});
-        night.fixtures.push(fixture);await options.saveState();return fixture;
+        night.fixtures.push(fixture);auditLifecycle(night,principal,'fixture-created',{fixtureId:fixture.id,homeTeamId:fixture.homeTeamId,awayTeamId:fixture.awayTeamId});await options.saveState();return fixture;
       });
     },
     async createYoloMatch(principal,fixtureId,body={}) {
@@ -350,7 +356,7 @@ function createDesktopService(options = {}) {
         if((night.matches || []).some(item=>item.id===match.id)||fixture.matchIds.includes(match.id))
           throw Object.assign(new Error('Match ID already exists.'),{status:409,code:'DUPLICATE_MATCH'});
         if(fixture.matchIds.length>=fixture.seriesLength) throw Object.assign(new Error('Fixture already has its full series of matches.'),{status:409,code:'SERIES_COMPLETE'});
-        night.matches.push(match);fixture.matchIds.push(match.id);await options.saveState();return match;
+        night.matches.push(match);fixture.matchIds.push(match.id);auditLifecycle(night,principal,'match-created',{matchId:match.id,fixtureId:fixture.id});await options.saveState();return match;
       });
     },
     async createYoloGame(principal,matchId,body={}) {
@@ -364,7 +370,7 @@ function createDesktopService(options = {}) {
           throw Object.assign(new Error('Game ID already exists.'),{status:409,code:'DUPLICATE_GAME'});
         if(match.gameIds.some(id=>night.games.find(item=>item.id===id)?.gameNumber===game.gameNumber))
           throw Object.assign(new Error('Game number already exists in this match.'),{status:409,code:'DUPLICATE_GAME_NUMBER'});
-        night.games.push(game);match.gameIds.push(game.id);await options.saveState();return game;
+        night.games.push(game);match.gameIds.push(game.id);auditLifecycle(night,principal,'game-created',{gameId:game.id,matchId:match.id});await options.saveState();return game;
       });
     },
     async linkYoloGameEvidence(principal,gameId,body={}) {
@@ -381,6 +387,7 @@ function createDesktopService(options = {}) {
         if(!game.evidenceRecordIds.includes(entry.record_id))game.evidenceRecordIds.push(entry.record_id);
         game.status='awaiting-evidence-review';
         game.evidenceReview={status:'pending',linkedBy:principal.discordUserId,linkedAt:new Date().toISOString()};
+        auditLifecycle(night,principal,'game-evidence-linked',{gameId:game.id,recordId:entry.record_id});
         await options.saveState();return {gameId,evidenceRecordId:entry.record_id,status:game.status};
       });
     },
@@ -393,8 +400,11 @@ function createDesktopService(options = {}) {
         if(game.status!=='awaiting-evidence-review'||!game.evidenceRecordIds?.length)
           throw Object.assign(new Error('Game has no evidence awaiting review.'),{status:409,code:'EVIDENCE_NOT_PENDING'});
         const accepted=body.accepted===true;
-        game.evidenceReview={status:accepted?'accepted':'rejected',reviewedBy:principal.discordUserId,reviewedAt:new Date().toISOString(),reason:String(body.reason||'').trim()||null};
+        const reason=String(body.reason||'').trim();
+        if(!accepted&&!reason) throw Object.assign(new Error('A rejection reason is required.'),{status:400,code:'EVIDENCE_REJECTION_REASON_REQUIRED'});
+        game.evidenceReview={status:accepted?'accepted':'rejected',reviewedBy:principal.discordUserId,reviewedAt:new Date().toISOString(),reason:reason||null};
         game.status=accepted?'evidence-accepted':'evidence-rejected';
+        auditLifecycle(night,principal,'game-evidence-reviewed',{gameId:game.id,reviewStatus:game.status,reason:reason||null});
         await options.saveState();return {gameId,status:game.status,evidenceReview:game.evidenceReview};
       });
     },
@@ -407,6 +417,7 @@ function createDesktopService(options = {}) {
         if(!participant) throw Object.assign(new Error('A valid linked roster participant is required.'),{status:400,code:'PARTICIPANT_REQUIRED'});
         const updated=YoloFormats.registerParticipant(night,String(participant.id));
         night.registrations=updated.registrations;
+        auditLifecycle(night,principal,'participant-registered',{participantId:String(participant.id)});
         await options.saveState();
         return {eventNightId,participantId:participant.id,registered:true};
       });
