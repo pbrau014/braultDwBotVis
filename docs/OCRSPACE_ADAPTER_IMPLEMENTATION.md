@@ -19,10 +19,10 @@ This is a hybrid, fail-open architecture: remote evidence is attempted when enab
 
 ## Configuration
 
-Copy .env.discord-test.example to a local .env, then replace the placeholder with a real OCR.space Free API key obtained directly from the provider. The example enables the optional stage for an isolated test, but a placeholder is not a credential and cannot authenticate a request.
+Copy .env.discord-test.example to a local .env, then replace the placeholder with a real OCR.space Free API key obtained directly from the provider. The example enables the stage for an isolated test, but a placeholder is not a credential and cannot authenticate a request. In normal configuration, a non-empty OCRSPACE_API_KEY enables OCR.space automatically unless OCRSPACE_ENABLED=0 is explicitly set.
 
-    OCRSPACE_ENABLED=1
     OCRSPACE_API_KEY=your_private_free_tier_key
+    # Optional: set OCRSPACE_ENABLED=0 to disable explicitly
     OCRSPACE_MAX_CROPS=2
     OCRSPACE_STAGE_BUDGET_MS=20000
     OCRSPACE_MAX_PER_DAY=450
@@ -56,4 +56,4 @@ A live smoke test requires:
 4. Recording HTTP/provider status, elapsed time, engine, crop dimensions/size, returned text/overlay, and quota reservation without storing the API key.
 5. Separate comparison against the local result and known ground truth. Do not change exact validation based on a single provider response.
 
-Until that live test is performed, report the integration as implemented and mock-tested, but live API operation and accuracy gain as unverified.
+A configured key enables the remote stage by default; OCRSPACE_ENABLED=0 is the explicit opt-out. Until a live test is performed, report the integration as implemented and mock-tested, but live API operation and accuracy gain as unverified.
