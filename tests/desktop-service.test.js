@@ -1,0 +1,73 @@
+'use strict';
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const Tournament=require('../src/tournament');
+const {createDesktopService}=require('../src/desktop-service');
+const ADMIN='12345678901234567', PLAYER='22345678901234567', OTHER='32345678901234567';
+
+function record(player='[WOLF]Alpha',complete=true) {
+  return {
+    result:'Victory',player,ship:'X Yamato',description:'Our team won by points.',
+    map:'Estuary',mode:'Random Battle',battleStart:'04.11.2026 18:20',
+    credits:'123456',xp:complete?'7890':'Not detected',freeXp:'123',damage:'45678',
+    ribbons:[{label:'Destroyed',count:2}],ambiguities:{},
+  };
+}
+function fixture(options={}) {
+  const state=Tournament.createState();
+  const alpha=Tournament.addPlayer(state,'[WOLF]Alpha');
+  Tournament.addPlayer(state,'[BEAR]Bravo');
+  Tournament.linkPlayerDiscordAccount(state,alpha.id,PLAYER);
+  const service=createDesktopService({
+    getState:()=>state,saveState:async()=>{},
+    isAdminId:id=>id===ADMIN,
+    extractImage:async()=>({attempts:[{text:'pass 1'},{text:'pass 2'}],fields:{}}),
+    validateScreenshot:()=>({record:record(options.player||'[WOLF]Alpha',options.complete!==false),missing:[],confidence:92,pageSegmentationMode:6}),
+  });
+  return {state,alpha,service};
+}
+test('desktop role lookup trusts Discord account IDs and administrator-managed roster links',async()=>{
+  const f=fixture();
+  assert.equal((await f.service.resolvePrincipal({id:ADMIN})).role,'admin');
+  const p=await f.service.resolvePrincipal({id:PLAYER});
+  assert.equal(p.role,'player');assert.equal(p.player.name,'[WOLF]Alpha');
+  assert.equal((await f.service.resolvePrincipal({id:OTHER})).role,'unlinked');
+});
+test('player can view only owned submissions and only their own roster identity',async()=>{
+  const f=fixture(),p=await f.service.resolvePrincipal({id:PLAYER}),a=await f.service.resolvePrincipal({id:ADMIN});
+  const owned=await f.service.submitImage(p,{buffer:Buffer.from('synthetic screenshot'),filename:'one.png',contentType:'image/png'});
+  const admin=await f.service.submitImage(a,{buffer:Buffer.from('admin screenshot'),filename:'two.png',contentType:'image/png'});
+  assert.equal(owned.status,'awaiting-mapping');assert.equal(admin.status,'admin-review');
+  assert.equal((await f.service.listSubmissions(p)).items.length,1);
+  await assert.rejects(f.service.correctSubmission(p,admin.submissionId,{values:{xp:'100'}}),e=>e.status===404);
+  await assert.rejects(f.service.correctSubmission(p,owned.submissionId,{values:{player:'[BEAR]Bravo'}}),e=>e.status===403&&e.code==='PLAYER_IDENTITY_MISMATCH');
+});
+test('mandatory OCR fields remain exact and corrections only fill unresolved values',async()=>{
+  const f=fixture({complete:false}),p=await f.service.resolvePrincipal({id:PLAYER});
+  const upload=await f.service.submitImage(p,{buffer:Buffer.from('incomplete screenshot'),filename:'missing.png',contentType:'image/png'});
+  assert.equal(upload.status,'needs-correction');
+  assert.ok(upload.missingFields.some(x=>x.key==='xp'));
+  const corrected=await f.service.correctSubmission(p,upload.submissionId,{values:{xp:'7890'}});
+  assert.equal(corrected.status,'awaiting-mapping');
+  assert.equal(corrected.missingFields.length,0);
+});
+test('a player can map a complete record only to their linked player and valid slot',async()=>{
+  const f=fixture(),p=await f.service.resolvePrincipal({id:PLAYER});
+  const upload=await f.service.submitImage(p,{buffer:Buffer.from('valid screenshot'),filename:'valid.png',contentType:'image/png'});
+  const mapped=await f.service.mapSubmission(p,upload.submissionId,{event:'damage',gameNumber:1,shipClass:'DD',tier:8});
+  assert.equal(mapped.status,'mapped');assert.equal(mapped.player.name,'[WOLF]Alpha');
+  assert.equal(f.state.players[0].events.damage[0].metric,45678);
+  await assert.rejects(f.service.mapSubmission(p,upload.submissionId,{event:'damage',gameNumber:2,shipClass:'DD',tier:8}),e=>e.code==='RECORD_ALREADY_MAPPED');
+});
+test('admin can map a screenshot to a different roster player after review',async()=>{
+  const f=fixture({player:'[BEAR]Bravo'}),a=await f.service.resolvePrincipal({id:ADMIN});
+  const upload=await f.service.submitImage(a,{buffer:Buffer.from('admin image'),filename:'admin.png',contentType:'image/png'});
+  assert.equal(upload.status,'admin-review');
+  const result=await f.service.mapSubmission(a,upload.submissionId,{playerId:2,event:'kills',gameNumber:1,shipClass:'CA',tier:7,kills:2});
+  assert.equal(result.status,'mapped');assert.equal(f.state.players[1].events.kills[0].metric,2);
+});
+test('participant is denied admin-only roster and scoring changes',async()=>{
+  const f=fixture(),p=await f.service.resolvePrincipal({id:PLAYER});
+  await assert.rejects(f.service.addPlayer(p,{name:'Charlie'}),e=>e.status===403);
+  await assert.rejects(f.service.setSetting(p,{event:'grand',field:'tierWeight',value:0.9}),e=>e.status===403);
+});
