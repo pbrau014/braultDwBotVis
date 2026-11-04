@@ -17,7 +17,7 @@
     D.$('player-subtitle').textContent='Roster entry #'+overview.player.id+' · signed in as '+session.user.username;
     const standing=overview.standing||{};
     D.$('player-total').textContent=D.number(standing.total)+' 🪙';
-    D.$('player-value').textContent=D.money(standing.estimatedValue);
+    D.$('player-value').textContent='Not published';
     const rank=overview.publicStandings.findIndex(x=>x.id===overview.player.id)+1;
     D.$('player-rank').textContent=rank?('#'+rank):'—';
     D.$('roster-count').textContent=overview.publicStandings.length+' active participants';
@@ -42,7 +42,7 @@
     const tbody=D.$('standings-body');tbody.replaceChildren();
     for(const row of overview.publicStandings){
       const tr=document.createElement('tr');
-      for(const value of [row.rank,row.name,D.number(row.total),D.money(row.estimatedValue)]){
+      for(const value of [row.rank,row.name,D.number(row.total)]){
         const td=document.createElement('td');td.textContent=String(value);tr.append(td);
       }
       if(row.id===overview.player.id)tr.classList.add('current-player');
