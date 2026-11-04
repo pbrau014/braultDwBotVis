@@ -87,6 +87,19 @@
           <label>Reason (required for rejection)<input name="reason" maxlength="500"></label>
           <button class="button secondary" type="submit">Review evidence</button>
         </form>
+        <h3>Certify a match outcome</h3>
+        <p class="muted">The bot does not invent or calculate a scoring formula. Enter the externally reconciled result and the approved method/evidence references.</p>
+        <form id="yolo-match-outcome-form" class="form-grid compact-form">
+          <label>Match ID<input name="matchId" required></label>
+          <label>Winning team ID<input name="winnerTeamId" required></label>
+          <label>Approved scoring method ID<input name="approvedScoringMethodId" required></label>
+          <label>Accepted evidence record IDs (comma-separated)<input name="acceptedPerformanceRecordIds" required></label>
+          <label>Aggregation rule/reference<input name="aggregation" required></label>
+          <label>Rounding rule/reference<input name="rounding" required></label>
+          <label>Tie-break order (comma-separated)<input name="tieBreakOrder" required placeholder="head-to-head, team-record, point-differential"></label>
+          <label>Decision reference<input name="decisionReference" required></label>
+          <button class="button secondary span-all" type="submit">Certify outcome</button>
+        </form>
       </section>
       <div class="metric-grid">
         <article class="metric-card"><span>ACTIVE ROSTER</span><strong id="admin-roster-count">—</strong><small>of 50 supported slots</small></article>
