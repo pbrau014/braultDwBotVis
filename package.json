@@ -6,7 +6,7 @@
   "main": "src/bot.js",
   "scripts": {
     "start": "node src/bot.js",
-    "test": "node --test tests",
+    "test": "node --test \"tests/*.test.js\"",
     "corpus:fetch": "node scripts/fetch-reference-corpus.js",
     "corpus:test": "node scripts/run-reference-regression.js",
     "test:four-images": "node scripts/run-four-screenshot-pipeline.js",

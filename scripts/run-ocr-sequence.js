@@ -124,6 +124,7 @@ let activeProgressPath = null;
             await writeJsonAtomically(progressPath, progress);
             let supervision = null;
             let childTempDir = null;
+            let resultRecorded = false;
             try {
                 const buffer = await fs.readFile(spec.path);
                 const imageSha256 = crypto.createHash('sha256').update(buffer).digest('hex');
@@ -233,10 +234,15 @@ let activeProgressPath = null;
                 };
                 results.push(row);
                 recordJobResult(progress, row);
+                resultRecorded = true;
                 await writeJsonAtomically(progressPath, progress);
                 console.log(`[OCR-SEQUENCE] ${row.allRequiredFieldsPass && row.requiredMissing.length === 0 ? 'PASS' : 'FAIL'} ${spec.key} ${row.elapsedMs}ms (mandatoryExact=${row.allRequiredFieldsPass}, allComparedExact=${row.allExpectedFieldsPass}, missing=${row.requiredMissing.length})`);
                 if (!row.allRequiredFieldsPass || row.requiredMissing.length) process.exitCode = 1;
             } catch (error) {
+                // Once a successful row has been added to the in-memory report,
+                // checkpoint failures must abort the sequence rather than add a
+                // second, contradictory failure row for the same image.
+                if (resultRecorded) throw error;
                 const errorRow = {
                     fixtureKey: spec.key, filename: spec.filename, elapsedMs: Date.now() - start,
                     pipelineCompleted: false, error: error.message, code: error.code || null,
