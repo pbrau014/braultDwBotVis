@@ -73,3 +73,12 @@ test('format help is accessible by keyboard focus and hover, with a persistent d
  assert.match(script,/\/api\/admin\/yolo-tournaments/);
  assert.match(script,/durationWeeks/);
 });
+
+test('Player desktop exposes public format summary and self-registration action without private identifiers',()=>{
+ const html=read('desktop/player.html'),script=read('desktop/player.js');
+ assert.match(html,/player-format-list/);
+ assert.match(html,/player-event-night-list/);
+ assert.match(script,/\/api\/yolo-event-nights\//);
+ assert.match(script,/registration/);
+ assert.match(script,/night\.isRegistered/);
+});
