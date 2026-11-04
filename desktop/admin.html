@@ -48,6 +48,27 @@
           </div>
         </div>
         <div id="competition-list" class="submission-list"><p class="muted">No tournaments created.</p></div>
+        <details class="review-block">
+          <summary>Advanced lifecycle operations <button class="help-tip" type="button" data-tooltip="Use a JSON payload for team creation, roster locks, fixtures, matches, evidence-linked games, tie-break resolution, withdrawals and forfeit records. Every operation is validated by the local server." aria-label="Help: advanced tournament operations">?</button></summary>
+          <p class="muted">The action payload must include the tournamentId where applicable. Team playerIds must refer to active tournament registrations.</p>
+          <form id="competition-action-form" class="form-grid">
+            <label>Operation<select name="action">
+              <option value="register_participant">Register participant (admin)</option>
+              <option value="create_team">Create team</option>
+              <option value="lock_roster">Lock team roster</option>
+              <option value="create_fixture">Create fixture</option>
+              <option value="create_match">Create match</option>
+              <option value="record_match_game">Record evidence-linked game</option>
+              <option value="complete_match">Complete match</option>
+              <option value="resolve_forfeit">Resolve forfeit</option>
+              <option value="withdraw_participant">Withdraw participant</option>
+              <option value="race_side_event">Record Race side-event</option>
+              <option value="freeze_settings">Attempt settings change</option>
+            </select></label>
+            <label class="span-all">JSON payload<textarea name="payload" rows="5" spellcheck="false" placeholder='{"tournamentId":"full-season","team":{"id":"team-a","name":"Team A","playerIds":["1","2"]}}'></textarea></label>
+            <button class="button secondary span-all" type="submit">Run validated operation</button>
+          </form>
+        </details>
       </section>
       <div class="content-grid">
         <section class="panel">
