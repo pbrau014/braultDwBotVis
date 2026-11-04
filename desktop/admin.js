@@ -78,6 +78,8 @@
         eventNights:[...(lifecycle.seasons||[]).flatMap(x=>(x.eventNights||[]).map(y=>[y.id,(x.name||x.id)+' · '+y.id])),...(lifecycle.tournaments||[]).filter(x=>x.format==='pilot').flatMap(x=>(x.eventNights||[]).map(y=>[y.id,(x.name||x.id)+' · '+y.id]))],
         raceSideEvents:(lifecycle.seasons||[]).flatMap(x=>(x.raceSideEvents||[]).map(y=>[y.id,(x.name||x.id)+' · '+y.map])),
         approvals:(lifecycle.approvals||[]).filter(x=>x.status==='approved').map(x=>[x.id,x.scope+' · '+x.version]),
+        matchApprovals:(lifecycle.approvals||[]).filter(x=>x.status==='approved'&&String(x.scope).toLowerCase().includes('match outcome')).map(x=>[x.id,x.scope+' · '+x.version]),
+        awardApprovals:(lifecycle.approvals||[]).filter(x=>x.status==='approved'&&String(x.scope).toLowerCase().includes('award')).map(x=>[x.id,x.scope+' · '+x.version]),
       };
       for(const select of document.querySelectorAll('select[data-entity]')){
         const values=groups[select.dataset.entity]||[];
