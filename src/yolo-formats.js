@@ -4,6 +4,7 @@
 const FORMATS = Object.freeze({ PILOT: 'pilot', FULL: 'full' });
 const STAGES = Object.freeze(['regular-season', 'postseason', 'grand-finale']);
 const STATUSES = Object.freeze(['draft', 'published', 'active', 'completed', 'cancelled']);
+const D21_TIE_BREAK_ORDER = Object.freeze(['head-to-head','team-record','point-differential','extra-deciding-game','auditable-random-draw']);
 function requiredText(value, label) { const text = String(value ?? '').trim(); if (!text) throw new Error(label + ' is required.'); return text; }
 function identifier(value, label) { const id = requiredText(value, label); if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/.test(id)) throw new Error(label + ' must use 1-64 letters, numbers, dots, underscores or hyphens.'); return id; }
 function timestamp(value, label) { if (value == null || value === '') return null; const n = Date.parse(value); if (!Number.isFinite(n)) throw new Error(label + ' must be a valid ISO date/time.'); return new Date(n).toISOString(); }
@@ -113,8 +114,14 @@ function validateMatchOutcome(input = {}) {
   throw new Error('Unique accepted individual-performance record IDs are required.');
  if (!requiredText(input.aggregation, 'Published aggregation') || !requiredText(input.rounding, 'Published rounding'))
   throw new Error('Published aggregation and rounding rules are required.');
- if (!Array.isArray(input.tieBreakOrder) || !input.tieBreakOrder.length || input.tieBreakOrder.some(rule=>!String(rule||'').trim()))
-  throw new Error('A non-empty published tie-break order is required.');
- return { status:'pending-calculation',approvedScoringMethodId,acceptedPerformanceRecordIds:[...ids],aggregation:input.aggregation,rounding:input.rounding,tieBreakOrder:[...input.tieBreakOrder] };
+ if (!Array.isArray(input.tieBreakOrder) || input.tieBreakOrder.length<3 || input.tieBreakOrder.length>5 ||
+  input.tieBreakOrder.some((rule,i)=>rule!==D21_TIE_BREAK_ORDER[i]) ||
+  input.tieBreakOrder[0]!=='head-to-head'||input.tieBreakOrder[1]!=='team-record'||input.tieBreakOrder[2]!=='point-differential')
+  throw new Error('The approved D21 tie-break order must begin head-to-head, team-record, point-differential and may then include extra-deciding-game and auditable-random-draw in that order.');
+ if(input.tieBreakOrder.includes('extra-deciding-game')&&input.extraDecidingGameFeasible!==true)
+  throw new Error('Extra deciding game may be included only when feasible and predeclared.');
+ if(input.tieBreakOrder.includes('auditable-random-draw')&&input.randomDrawAuthorized!==true)
+  throw new Error('Auditable random draw requires explicit authorization.');
+ return { status:'pending-calculation',approvedScoringMethodId,acceptedPerformanceRecordIds:[...ids],aggregation:input.aggregation,rounding:input.rounding,tieBreakOrder:[...input.tieBreakOrder],extraDecidingGameFeasible:input.extraDecidingGameFeasible===true,randomDrawAuthorized:input.randomDrawAuthorized===true };
 }
-module.exports = { FORMATS, STAGES, STATUSES, createTournament, assertTransition, transitionTournament, transitionStage, transitionEventNight, createEventNight, registerParticipant, freezeRules, raceMetric, createTeam, createFixture, createMatch, createGame, createRaceSideEvent, grandYoloScore, grandYoloFinale, validateMatchOutcome };
+module.exports = { FORMATS, STAGES, STATUSES, D21_TIE_BREAK_ORDER, createTournament, assertTransition, transitionTournament, transitionStage, transitionEventNight, createEventNight, registerParticipant, freezeRules, raceMetric, createTeam, createFixture, createMatch, createGame, createRaceSideEvent, grandYoloScore, grandYoloFinale, validateMatchOutcome };
