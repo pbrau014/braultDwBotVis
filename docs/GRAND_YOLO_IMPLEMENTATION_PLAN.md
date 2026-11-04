@@ -79,3 +79,6 @@ Pilot and Full publication now require valid start/end timestamps and a configur
 
 ### A8 - Event-night scheduling and Discord registration
 Added event-night records and requires each Full YOLO fixture to belong to a scheduled event night in the same stage. Discord now has read-only format discovery and linked-player registration commands. Admin lifecycle actions remain server-authorized through the desktop service; live Discord scheduled-event publication and production permission testing remain unrun.
+
+### A9 - Pilot individual results
+Added tournament-scoped Pilot Damage result records with active-registration checks, unique player/game slots, exact non-negative values and original screenshot evidence references. Pilot placement standings aggregate Damage per registered player and Pilot stage closure now requires at least one recorded result. Existing global workbook score buckets remain separate.
