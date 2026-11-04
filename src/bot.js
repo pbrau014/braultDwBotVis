@@ -2513,7 +2513,7 @@ async function extractTextCore(imageBuffer) {
     // OCR.space is an explicitly opted-in external evidence provider. Only unresolved
     // mandatory fields are eligible. Crops are sent sequentially; full screenshots
     // are never uploaded by this stage. Provider output remains diagnostics only.
-    if (process.env.OCRSPACE_ENABLED === '1') {
+    if (process.env.OCRSPACE_ENABLED !== '0' && Boolean(String(process.env.OCRSPACE_API_KEY || '').trim())) {
         try {
             const previewRecord = buildBattleRecord(combined.text, extractedFields);
             const missingLabels = new Set(getMissingRequiredFields(previewRecord).map((item) => String(item.label)));
@@ -2556,7 +2556,7 @@ async function extractTextCore(imageBuffer) {
             extractedFields.ocrSpaceEvidence = { status: 'failed', reason: String(error && error.code || 'OCRSPACE_STAGE_ERROR'), requests: 0, evidence: [] };
         }
     } else {
-        extractedFields.ocrSpaceEvidence = { status: 'disabled', reason: 'OCRSPACE_ENABLED is not 1', requests: 0, evidence: [] };
+        extractedFields.ocrSpaceEvidence = { status: 'disabled', reason: String(process.env.OCRSPACE_ENABLED || '').trim() === '0' ? 'OCRSPACE_ENABLED is explicitly disabled' : 'OCRSPACE_API_KEY is not configured', requests: 0, evidence: [] };
     }
 
     await worker.setParameters({ tessedit_pageseg_mode: '3' });
