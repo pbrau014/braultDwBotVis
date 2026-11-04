@@ -30,7 +30,7 @@ test('desktop browser scripts use only same-origin local APIs and do not contain
     assert.doesNotMatch(source, /localStorage|indexedDB/i, file);
   }
   assert.match(read('desktop/upload.js'), /\/api\/upload/);
-  assert.match(read('desktop/desktop.js'), /\/api\/overview/);
+  assert.match(read('desktop/player.js'), /\/api\/overview/);
   assert.match(read('desktop/admin.js'), /\/api\/admin\/settings/);
   assert.match(read('desktop/desktop.js'), /submission.requiredValues/);
   assert.match(read('desktop/desktop.js'), /submission.status==='awaiting-mapping'/);
