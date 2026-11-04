@@ -1,7 +1,7 @@
 # YOLO format implementation plan and append-only decisions
 
 Updated: 2026-11-04
-Status: Phase 1 domain model and persistence integration implemented on feature/grand-yolo-format-lifecycle; verification pending CI.
+Status: Lifecycle foundation, Discord command surface, desktop format-help panels and offline CI workflow implemented on feature/grand-yolo-format-lifecycle. PR #7 open. Current-head CI revalidation pending.
 
 ## Governing model
 One tournament system supports two distinct formats:
@@ -18,6 +18,11 @@ Shared participant identity, evidence, scoring validation, referee review, corre
 5. Added append-only audit entries for lifecycle mutations.
 6. Integrated `yoloTournaments` into the existing normalized tournament state and workbook/full archive backup round trips. Legacy version-2 records default to an empty lifecycle collection; no historic score is assigned to Pilot or Full.
 7. Added lifecycle tests and legacy migration/archive round-trip tests.
+8. Added Pilot attendance check-in (separate from Full-season registration), screenshot-hash-backed Pilot individual Damage results, duplicate player/game prevention and individual standings.
+9. Added stage-bounded Full event-night scheduling; each fixture must reference a scheduled event night in the current stage and fit its published time window. Full publication now requires explicit date windows for all three stages.
+10. Added Discord commands for format discovery, lifecycle status, creation/publication/start, self-service Full registration and Pilot check-in, teams, roster locks, event nights, fixtures, game/evidence recording, outcome verification, explicit resolution, stage advancement, Pilot results, Race side-event records and Pilot completion. Mutating organizer commands are admin-gated; participant registration/check-in derives identity from the existing Discord-to-roster link.
+11. Added a hash-pinned qualification report requirement before postseason/finale advancement. Raw individual scores do not independently advance a team.
+12. Added Player/Admin format reference panels and hover/keyboard-focus quick notes with visible descriptions.
 
 ## Appendment A - safety and provenance
 - Match outcomes cannot be derived from raw individual totals by this module. The organizer must publish a scoring method ID, version and SHA-256 hash; a completed fixture must reference that exact method and evidence.
@@ -29,9 +34,11 @@ Shared participant identity, evidence, scoring validation, referee review, corre
 
 ## Remaining plan
 ### Phase 2 - service and UI integration
-- Add authenticated organizer APIs for tournament creation, publication, registration, team assignment, roster lock, fixture/game administration, stage transition and audit views.
-- Enforce administrator/referee permissions server-side; participant operations must resolve the caller's authenticated Discord ID to the linked roster entry.
-- Add Pilot/Full format selection and contextual help in desktop UI. Tips must work on hover and keyboard focus; critical instructions must remain visible.
+- The Discord command surface now supports lifecycle operations, but it is a JSON-argument admin workflow rather than a guided control panel. Add validated command payload schemas, clearer error examples, referee-specific authorization and end-to-end command tests.
+- Add authenticated desktop APIs for tournament creation/publication, registration, team assignment, roster lock, event-night/fixture/game administration, stage transition and audit views.
+- Add Player self-service registration/check-in and Admin lifecycle forms in the desktop UI; current panels are explanatory reference only.
+- Keep every mutation server-authorized; participant operations must resolve the caller's authenticated Discord ID to the linked roster entry.
+- Add complete lifecycle state visualizations (stage timeline, schedule, roster/fixture status, evidence and audit history). Tips already work on hover and keyboard focus; essential descriptions remain visible.
 - Do not change Discord channel privacy, command registration defaults or live permissions before isolated development-guild testing.
 
 ### Phase 3 - scoring and workbook reconciliation
@@ -51,12 +58,29 @@ Shared participant identity, evidence, scoring validation, referee review, corre
 - Production remains NO-GO until every mandatory real-environment gate has evidence.
 
 ## Current verification record
-- Local isolated domain suite: 6/6 PASS on the earlier implementation prototype (not the exact remote branch source).
-- Remote branch CI/status for the current integration: not yet reported.
+- GitHub Actions offline regression on the lifecycle branch's initial integrated source (commit `b7be1981bef9c261146f1320928c11b5d63aa4a3`): Node 22.16.0 and Node 24 both PASS; 269 passed, 0 failed, 2 skipped. The skips are optional OpenCV-dependent checks because the Linux runner lacks `cv2`.
+- A subsequent source-evidence lookup correction (commit `6cc23d13ec17d6d50980075a78c7f250ccc5fa2b`) was added after that run. A validation-only PR was opened to run CI against this exact latest source; result pending at this plan revision.
+- The earlier local isolated domain prototype suite was 6/6 PASS, but it is not the same code as the remote branch and is not used as current branch acceptance.
 - Windows/native OCR, current game-client, live Discord, local OAuth/browser visual testing, and organizer publication approvals: NOT RUN / OPEN.
 - This increment is not production certification.
 
 ## Append-only change log
+### 2026-11-04 - implementation expansion A1: Pilot attendance and result evidence
+- Added separate Pilot attendance check-in instead of Full-season registration; linked Discord identity is required.
+- Added Pilot individual Damage result records with game-slot uniqueness and screenshot evidence hash.
+- Pilot completion is blocked until at least one result is recorded.
+
+### 2026-11-04 - implementation expansion A2: Full event nights and qualification
+- Added stage-specific date windows and scheduled event-night records.
+- Fixtures must bind to the current stage's event night and remain inside its time window.
+- Stage advancement now requires a qualification report whose approval, method ID/version/hash and evidence hash match the published method.
+
+### 2026-11-04 - implementation expansion A3: Discord operations and desktop help
+- Added public format/status discovery and administrator-gated lifecycle commands.
+- Added authenticated linked-player self-registration/check-in.
+- Added desktop quick-help panels and keyboard-focus support.
+- Added offline regression workflow for Node 22.16 and Node 24.
+
 ### 2026-11-04 - initial Pilot/Full lifecycle implementation
 - Added separate lifecycle module and persistence field.
 - Added tests for format-specific publication, identity/roster constraints, evidence-bound outcomes, stage progression, Race side-event isolation, and legacy migration.
