@@ -379,7 +379,7 @@ function createDesktopService(options = {}) {
 
     async createApprovalRecord(principal,body) {
       role(principal,['admin']);
-      return mutate(async()=>{const current=state();current.lifecycle||=Lifecycle.createLifecycleState(current);const record=Lifecycle.createApprovalRecord({...body,approvedBy:principal.discordUserId});if(current.lifecycle.approvals.some(x=>x.id===record.id))throw Object.assign(new Error('Approval id already exists.'),{status:409,code:'APPROVAL_EXISTS'});current.lifecycle.approvals.push(record);auditLifecycle(current,principal,'organizer-approval.recorded',{approvalId:record.id,scope:record.scope,version:record.version});await options.saveState();return record;});
+      return mutate(async()=>{const current=state();current.lifecycle||=Lifecycle.createLifecycleState(current);const record=Lifecycle.createApprovalRecord({...body,approvedBy:principal.discordUserId,confirmed:body?.confirmed===true});if(current.lifecycle.approvals.some(x=>x.id===record.id))throw Object.assign(new Error('Approval id already exists.'),{status:409,code:'APPROVAL_EXISTS'});current.lifecycle.approvals.push(record);auditLifecycle(current,principal,'organizer-approval.recorded',{approvalId:record.id,scope:record.scope,version:record.version});await options.saveState();return record;});
     },
     async createAward(principal,body) {
       role(principal,['admin']);
