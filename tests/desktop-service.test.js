@@ -139,3 +139,18 @@ test('admin can link a real uploaded OCR screenshot as immutable competition evi
   assert.equal(evidence.contentType,'image/png');
   assert.equal(evidence.source.recordId,upload.submissionId);
 });
+
+test('desktop scoring-setting endpoint blocks changes during active Pilot/Full stages',async()=>{
+  const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
+  await f.service.competitionAction(admin,{action:'create_tournament',tournament:{
+    id:'pilot-freeze',name:'Freeze Pilot',format:'pilot',config:{timezone:'America/Chicago',eventStart:'2026-12-01T18:00:00-06:00',eventEnd:'2026-12-01T22:00:00-06:00'},
+  }});
+  await f.service.competitionAction(admin,{action:'publish',tournamentId:'pilot-freeze',approval:{}});
+  await f.service.competitionAction(admin,{action:'close_registration',tournamentId:'pilot-freeze'});
+  await f.service.competitionAction(admin,{action:'activate_stage',tournamentId:'pilot-freeze',stageKey:'pilot_event'});
+  const before=f.getState().settings.events.damage.multiplier;
+  const result=await f.service.setSetting(admin,{event:'damage',field:'multiplier',value:2});
+  assert.equal(result.blocked,true);
+  assert.equal(f.getState().settings.events.damage.multiplier,before);
+  assert.equal(f.getState().competition.tournaments[0].audit.at(-1).action,'settings_change_blocked');
+});
