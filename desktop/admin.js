@@ -61,10 +61,12 @@
       const tournamentSelect=D.$('yolo-event-tournament');tournamentSelect.replaceChildren();
       for(const item of yoloFormats.items){const option=document.createElement('option');option.value=item.id;option.textContent=item.name+' · '+item.format.toUpperCase();option.dataset.format=item.format;tournamentSelect.append(option);}
       const nightSelect=D.$('yolo-event-night-select');nightSelect.replaceChildren();
+      for(const id of ['yolo-team-night','yolo-fixture-night'])D.$(id).replaceChildren();
       const eventNightList=D.$('yolo-event-night-list');eventNightList.replaceChildren();
       for(const night of yoloFormats.eventNights||[]){
         const tournament=yoloFormats.items.find(item=>item.id===night.tournamentId);
         const option=document.createElement('option');option.value=night.id;option.textContent=(tournament?.name||night.tournamentId)+' · '+night.id;nightSelect.append(option);
+        for(const id of ['yolo-team-night','yolo-fixture-night']){const copy=document.createElement('option');copy.value=night.id;copy.textContent=option.textContent;D.$(id).append(copy);}
         const row=D.node('div','event-row');
         row.append(D.node('strong','',night.id),D.node('span','',(night.stage||'Pilot event')+' · '+night.status+' · '+night.startsAt));
         eventNightList.append(row);
@@ -101,6 +103,38 @@
     D.$('yolo-registration-form').addEventListener('submit',async e=>{
       e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
       try{await D.api('/api/admin/yolo-event-nights/'+encodeURIComponent(form.elements.eventNightId.value)+'/registrations',{method:'POST',body:{playerId:Number(form.elements.playerId.value)}});await load();}
+      catch(error){status(error.message,'error');}finally{button.disabled=false;}
+    });
+    D.$('yolo-team-form').addEventListener('submit',async e=>{
+      e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
+      const body={id:form.elements.id.value.trim(),name:form.elements.name.value.trim(),participantIds:form.elements.participantIds.value.split(',').map(x=>x.trim()).filter(Boolean)};
+      try{await D.api('/api/admin/yolo-event-nights/'+encodeURIComponent(form.elements.eventNightId.value)+'/teams',{method:'POST',body});form.reset();await load();}
+      catch(error){status(error.message,'error');}finally{button.disabled=false;}
+    });
+    D.$('yolo-fixture-form').addEventListener('submit',async e=>{
+      e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
+      const body={id:form.elements.id.value.trim(),homeTeamId:form.elements.homeTeamId.value.trim(),awayTeamId:form.elements.awayTeamId.value.trim(),scheduledAt:new Date(form.elements.scheduledAt.value).toISOString(),seriesLength:Number(form.elements.seriesLength.value)};
+      try{await D.api('/api/admin/yolo-event-nights/'+encodeURIComponent(form.elements.eventNightId.value)+'/fixtures',{method:'POST',body});form.reset();await load();}
+      catch(error){status(error.message,'error');}finally{button.disabled=false;}
+    });
+    D.$('yolo-match-form').addEventListener('submit',async e=>{
+      e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
+      try{await D.api('/api/admin/yolo-fixtures/'+encodeURIComponent(form.elements.fixtureId.value.trim())+'/matches',{method:'POST',body:{id:form.elements.id.value.trim(),matchNumber:Number(form.elements.matchNumber.value)}});form.reset();await load();}
+      catch(error){status(error.message,'error');}finally{button.disabled=false;}
+    });
+    D.$('yolo-game-form').addEventListener('submit',async e=>{
+      e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
+      try{await D.api('/api/admin/yolo-matches/'+encodeURIComponent(form.elements.matchId.value.trim())+'/games',{method:'POST',body:{id:form.elements.id.value.trim(),gameNumber:Number(form.elements.gameNumber.value)}});form.reset();await load();}
+      catch(error){status(error.message,'error');}finally{button.disabled=false;}
+    });
+    D.$('yolo-evidence-link-form').addEventListener('submit',async e=>{
+      e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
+      try{await D.api('/api/admin/yolo-games/'+encodeURIComponent(form.elements.gameId.value.trim())+'/evidence',{method:'POST',body:{recordId:form.elements.recordId.value.trim()}});form.reset();await load();}
+      catch(error){status(error.message,'error');}finally{button.disabled=false;}
+    });
+    D.$('yolo-evidence-review-form').addEventListener('submit',async e=>{
+      e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
+      try{await D.api('/api/admin/yolo-games/'+encodeURIComponent(form.elements.gameId.value.trim())+'/evidence-review',{method:'POST',body:{accepted:form.elements.accepted.value==='true',reason:form.elements.reason.value.trim()}});form.reset();await load();}
       catch(error){status(error.message,'error');}finally{button.disabled=false;}
     });
     D.$('yolo-tournament-form').addEventListener('submit',async e=>{
