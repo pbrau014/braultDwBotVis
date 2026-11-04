@@ -132,7 +132,8 @@ jobs:
       - name: Install Pandoc and MiKTeX
         shell: powershell
         run: |
-          choco install pandoc miktex --yes --no-progress
+          choco install pandoc --yes --no-progress
+          choco install miktex --yes --no-progress --execution-timeout=2700 --retrycount=5 --retryinterval=10
           Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
           refreshenv
           pandoc --version
