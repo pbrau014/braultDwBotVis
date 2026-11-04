@@ -25,6 +25,26 @@
       if(item.stages?.length)info.append(D.node('span','',item.stages.map(s=>s.type.replaceAll('-',' ')+': '+s.status).join(' · ')));
       card.append(info);formatList.append(card);
     }
+    const nightList=D.$('player-event-night-list');nightList.replaceChildren();
+    if(!(overview.eventNights||[]).length)nightList.append(D.node('p','muted','No event nights are currently scheduled.'));
+    for(const night of overview.eventNights||[]){
+      const card=D.node('article','event-row');
+      const info=document.createElement('div');
+      info.append(D.node('strong','',night.id+' · '+(night.stage||'Pilot event')));
+      info.append(D.node('span','',night.status+' · '+night.startsAt+' · '+night.registrationCount+' registered'));
+      card.append(info);
+      if(!night.isRegistered&&['draft','published'].includes(night.status)){
+        const button=D.node('button','button secondary small','Register');
+        button.type='button';
+        button.addEventListener('click',async()=>{
+          button.disabled=true;
+          try{await D.api('/api/yolo-event-nights/'+encodeURIComponent(night.id)+'/registration',{method:'POST',body:{}});location.reload();}
+          catch(error){button.disabled=false;status(error.message,'error');}
+        });
+        card.append(button);
+      }else if(night.isRegistered)card.append(D.node('span','status-pill good','Registered'));
+      nightList.append(card);
+    }
     const standing=overview.standing||{};
     D.$('player-total').textContent=D.number(standing.total)+' 🪙';
     D.$('player-value').textContent=D.money(standing.estimatedValue);
