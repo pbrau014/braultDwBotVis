@@ -371,6 +371,37 @@ function createDesktopService(options = {}) {
         night.matches.push(match);fixture.matchIds.push(match.id);auditLifecycle(night,principal,'match-created',{matchId:match.id,fixtureId:fixture.id});await options.saveState();return match;
       });
     },
+    async certifyYoloMatchOutcome(principal,matchId,body={}) {
+      role(principal,['admin']);
+      return mutate(async()=>{
+        const current=state(),night=(current.eventNights || []).find(item=>(item.matches || []).some(m=>m.id===matchId));
+        if(!night) throw Object.assign(new Error('Match was not found.'),{status:404,code:'MATCH_NOT_FOUND'});
+        const match=night.matches.find(item=>item.id===matchId);
+        if(match.outcome?.status==='certified') throw Object.assign(new Error('Match outcome is already certified.'),{status:409,code:'OUTCOME_ALREADY_CERTIFIED'});
+        const fixture=(night.fixtures || []).find(item=>item.id===match.fixtureId);
+        if(!fixture) throw Object.assign(new Error('Fixture for this match was not found.'),{status:409,code:'FIXTURE_NOT_FOUND'});
+        const winnerTeamId=String(body.winnerTeamId||'');
+        if(![fixture.homeTeamId,fixture.awayTeamId].includes(winnerTeamId))
+          throw Object.assign(new Error('Winner must be one of the two teams in this fixture.'),{status:400,code:'INVALID_MATCH_WINNER'});
+        const validated=YoloFormats.validateMatchOutcome(body);
+        const acceptedEvidence=new Set((match.gameIds || []).flatMap(id=>{
+          const game=(night.games || []).find(item=>item.id===id);
+          return game?.status==='evidence-accepted'?(game.evidenceRecordIds || []):[];
+        }));
+        if(validated.acceptedPerformanceRecordIds.some(id=>!acceptedEvidence.has(id)))
+          throw Object.assign(new Error('Every accepted performance record must be linked to an evidence-accepted game in this match.'),{status:409,code:'MATCH_EVIDENCE_NOT_ACCEPTED'});
+        const decisionReference=String(body.decisionReference||'').trim();
+        if(!decisionReference) throw Object.assign(new Error('An external decision reference is required; the bot does not calculate an unapproved scoring formula.'),{status:400,code:'DECISION_REFERENCE_REQUIRED'});
+        match.outcome={status:'certified',winnerTeamId,approvedScoringMethodId:validated.approvedScoringMethodId,
+          acceptedPerformanceRecordIds:validated.acceptedPerformanceRecordIds,aggregation:validated.aggregation,
+          rounding:validated.rounding,tieBreakOrder:validated.tieBreakOrder,decisionReference,
+          certifiedBy:principal.discordUserId,certifiedAt:new Date().toISOString()};
+        match.status='completed';
+        auditLifecycle(night,principal,'match-outcome-certified',{matchId,winnerTeamId,approvedScoringMethodId:validated.approvedScoringMethodId,decisionReference});
+        await options.saveState();
+        return {matchId,outcome:match.outcome};
+      });
+    },
     async createYoloGame(principal,matchId,body={}) {
       role(principal,['admin']);
       return mutate(async()=>{
