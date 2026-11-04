@@ -2977,6 +2977,10 @@ async function handleTournamentCommand(message) {
             const { evidenceRecordId, ...result } = input.result;
             const saved = lifecycle.recordPilotResult(item, { ...result, evidenceSha256: evidenceHash(evidenceRecordId), actor: message.author?.tag || message.author?.id });
             await saveTournamentState(); response = `Recorded Pilot Damage result for player #${saved.playerId}, game ${saved.gameNumber}.`;
+        } else if (command === 'lifecycle-race-schedule') {
+            const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
+            const scheduled = lifecycle.scheduleRaceSideEvent(item, { ...input.schedule, actor: message.author?.tag || message.author?.id });
+            await saveTournamentState(); response = `Scheduled Race side-event **${scheduled.occurrence}** (${scheduled.id}).`;
         } else if (command === 'lifecycle-race') {
             const input = parseLifecycle(), item = findLifecycle(input.tournamentId);
             const { evidenceRecordId, ...result } = input.result;
