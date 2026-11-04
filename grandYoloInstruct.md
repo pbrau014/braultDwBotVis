@@ -233,3 +233,20 @@ Automated domain, migration, UI-contract, scoring and regression tests must pass
 - final PDF/manual/package manifest, checksums, ZIP integrity and clean extraction.
 
 A green Linux/offline suite does not close these gates. Production status remains **NO-GO** until all required gates are evidenced and reviewed.
+
+
+## 15. Historical source reconciliation notes
+
+The source archive contains useful draft rules, but several items conflict or remain incomplete. They are not silently promoted to current policy.
+
+- **Pilot entry model:** historical Pilot materials conflict between drop-in attendance and a pre-event entry/registration process. One source mentions entry closing one hour before start and final lineup 30 minutes before start. The event-specific publication must select the authoritative entry model and exact deadlines.
+- **Pilot lineup visibility:** historical Pilot guidance indicates visible lineups. Do not apply the Full YOLO hidden-lineup rule to Pilot unless the event publication expressly changes it.
+- **Full weekly teams:** recurring-format notes indicate weekly individual signup, hidden lineups until ready-up, and one team per participant per weekly event. Team assignment may vary between event nights. DWBOT roster assignments are therefore scoped to an event night, not frozen across the entire season.
+- **Recurring event shape:** historical notes suggest three rounds per event night and approximately seven games per player. The historic side-size wording includes two or three humans per side with equal total teams of six or nine; an example is ambiguous. These are proposals to ratify, not fixed settings.
+- **Race side-event calendar:** a selected historical template schedules Race side-events in weeks 3, 6, 9 and the finale, one hour before the regular event night; week 12 applies only when the season is a 12-week schedule. Organizers must ratify or replace this calendar before publication. Race side-event scoring must remain separate from ordinary match score unless the approved rules explicitly define a contribution.
+- **Special mode:** archived wording conflicts between “Armor Resilience” and “Armor Resilient Test.” Do not publish the special-mode game until the exact current-client label and availability are verified. Omit it and use the approved standard battle in the interim.
+- **Ship restrictions:** historical sources leave the ship allowlist/banned list incomplete. No missing ship list is inferred.
+- **Workbook controls:** historical workbook guidance calls for retiring/hiding unused S10:S12 class-preference controls and the unused Round 4 F8 pool control while retaining the active rounds 1–3 pool inputs. The canonical v3.22 workbook is not present in the audited Library, so these workbook edits remain blocked pending the exact canonical workbook.
+- **Prize display:** participant-facing H12/dollar display remains OFF. The historic 0.54 × dblns / 100 calculation is not a verified prize conversion.
+- **Settings freeze:** ordinary rules/settings freeze at event start; changes apply prospectively to future/unplayed games only. Completed games are not retroactively changed. Emergency safety/security/platform actions require an incident record and participant notice/review.
+
