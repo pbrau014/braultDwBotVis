@@ -47,3 +47,38 @@ test('removing a player removes the associated account link and malformed or dup
     player_account_links: { 2: discordAlpha },
   }), /unknown tournament player/);
 });
+
+
+test('public recovery snapshots omit private account links and per-user pending identities while full admin archives retain them', () => {
+  const state = T.createState();
+  const alpha = T.addPlayer(state, 'Alpha');
+  const discordId = '12345678901234567';
+  T.linkPlayerDiscordAccount(state, alpha.id, discordId);
+  state.battleRecords.push({
+    record_id: 'public-safe-record',
+    status: 'awaiting-mapping',
+    desktop_owner_id: discordId,
+    desktop_owner_role: 'player',
+    record: {},
+  });
+  state.pendingSubmissions.push({ record_id: 'public-safe-record', userId: discordId, channelId: '22345678901234567' });
+  state.pendingOcrCorrections.push({ key: '22345678901234567:12345678901234567', userId: discordId });
+  const full = T.makeArchiveSnapshot(state);
+  assert.equal(full.player_account_links[String(alpha.id)], discordId);
+  assert.equal(full.battle_records[0].desktop_owner_id, discordId);
+  assert.equal(full.pending_submissions[0].userId, discordId);
+  const safe = T.makePublicArchiveSnapshot(state);
+  assert.equal(safe.public_snapshot, true);
+  assert.deepEqual(safe.player_account_links, {});
+  assert.equal(Object.hasOwn(safe.battle_records[0], 'desktop_owner_id'), false);
+  assert.equal(Object.hasOwn(safe.battle_records[0], 'desktop_owner_role'), false);
+  assert.deepEqual(safe.pending_submissions, []);
+  assert.deepEqual(safe.pending_ocr_corrections, []);
+  assert.deepEqual(safe.pending_workflow_counts, { pending_submissions: 1, pending_ocr_corrections: 1 });
+  assert.ok(safe.private_data_omitted.includes('player_account_links'));
+  assert.match(safe.public_snapshot_note, /authenticated local Admin backup/);
+  const restoredPublic = T.importBackup(safe);
+  assert.equal(Object.keys(restoredPublic.playerAccountLinks).length, 0);
+  const restoredFull = T.importBackup(full);
+  assert.equal(T.findPlayerByDiscordUserId(restoredFull, discordId).name, 'Alpha');
+});

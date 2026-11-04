@@ -280,6 +280,30 @@ function makeArchiveSnapshot(state) {
     player_account_links: clone(state.playerAccountLinks || {}),
   };
 }
+function makePublicArchiveSnapshot(state) {
+  const snapshot = makeArchiveSnapshot(state);
+  snapshot.public_snapshot = true;
+  snapshot.private_data_omitted = [
+    'player_account_links',
+    'battle_records[].desktop_owner_id',
+    'battle_records[].desktop_owner_role',
+    'pending_submissions',
+    'pending_ocr_corrections',
+  ];
+  snapshot.player_account_links = {};
+  snapshot.battle_records = snapshot.battle_records.map(entry => {
+    const { desktop_owner_id, desktop_owner_role, ...publicEntry } = entry || {};
+    return publicEntry;
+  });
+  snapshot.pending_workflow_counts = {
+    pending_submissions: snapshot.pending_submissions.length,
+    pending_ocr_corrections: snapshot.pending_ocr_corrections.length,
+  };
+  snapshot.pending_submissions = [];
+  snapshot.pending_ocr_corrections = [];
+  snapshot.public_snapshot_note = 'Public-channel recovery copy. Private Discord account-to-roster links, per-user ownership identifiers, and resumable per-user correction associations are intentionally omitted. Use the authenticated local Admin backup for a complete private recovery archive.';
+  return snapshot;
+}
 function importBackup(raw) {
   const source = raw?.workbook_backup || raw;
   if (!source || !Array.isArray(source.players) || !source.settings) throw new Error('JSON must contain a YOLO Tourney backup with players and settings.');
@@ -474,5 +498,5 @@ module.exports = {
   MAX_PLAYERS, normalizeState, createState, findPlayer, findPlayerByDiscordUserId,
   linkPlayerDiscordAccount, unlinkPlayerDiscordAccount, addPlayer, removePlayer, renamePlayer,
   clearSlot, clearEvent, clearAllResults, eventTotal, eventScore, standings, getSlot, validateResult, recordResult, setSetting,
-  makeWorkbookBackup, makeArchiveSnapshot, importBackup, createStore, createSqliteStore, deterministicBattleId,
+  makeWorkbookBackup, makeArchiveSnapshot, makePublicArchiveSnapshot, importBackup, createStore, createSqliteStore, deterministicBattleId,
 };

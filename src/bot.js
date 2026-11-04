@@ -2824,7 +2824,7 @@ async function flushArchiveSnapshot() {
             // and screenshots. No second/private archive channel is supported.
             const channel = await client.channels.fetch(TARGET_CHANNEL_ID);
             if (!channel?.isTextBased()) throw new Error('Configured target channel is not text-based.');
-            const snapshot = await tournamentStore.exportSnapshot(tournamentState);
+            const snapshot = JSON.stringify(Tournament.makePublicArchiveSnapshot(tournamentState), null, 2);
             const name = `yolo-tourney-snapshot-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
             await channel.send({ content: `Tournament recovery snapshot · ${tournamentState.players.length} players · ${new Date().toISOString()}`, files: [new AttachmentBuilder(Buffer.from(snapshot, 'utf8'), { name })], allowedMentions: { parse: [] } });
             return true;
@@ -2981,7 +2981,7 @@ async function handleTournamentCommand(message) {
             const totalSlots = tournamentState.players.length * Tournament.EVENTS.length * 7;
             let filledSlots = 0;
             for (const player of tournamentState.players) for (const event of Tournament.EVENTS) for (const game of player.events[event]) if (slotIsFilled(event, game)) filledSlots += 1;
-            const finalExport = JSON.parse(await tournamentStore.exportSnapshot(tournamentState));
+            const finalExport = Tournament.makePublicArchiveSnapshot(tournamentState);
             finalExport.export_purpose = 'final-tournament-export';
             finalExport.final_summary = {
                 player_count: tournamentState.players.length,
@@ -2997,9 +2997,9 @@ async function handleTournamentCommand(message) {
             await message.reply({ content: summary, files: [new AttachmentBuilder(Buffer.from(JSON.stringify(finalExport, null, 2), 'utf8'), { name: `yolo-tourney-final-${timestamp}.json` })], allowedMentions: { repliedUser: false, parse: [] } });
             return true;
         } else if (command === 'export' || command === 'export-workbook') {
-            const data = command === 'export' ? await tournamentStore.exportSnapshot(tournamentState) : JSON.stringify(Tournament.makeWorkbookBackup(tournamentState), null, 2);
+            const data = command === 'export' ? JSON.stringify(Tournament.makePublicArchiveSnapshot(tournamentState), null, 2) : JSON.stringify(Tournament.makeWorkbookBackup(tournamentState), null, 2);
             const filename = command === 'export' ? 'yolo-tourney-full-archive.json' : 'yolo-tourney-workbook-backup.json';
-            await message.reply({ content: command === 'export' ? 'Full tournament archive attached. It includes workbook-compatible state, OCR battle records, and pending submission metadata.' : 'Workbook-compatible JSON backup attached.', files: [new AttachmentBuilder(Buffer.from(data, 'utf8'), { name: filename })], allowedMentions: { repliedUser: false, parse: [] } });
+            await message.reply({ content: command === 'export' ? 'Public-safe tournament archive attached. Private account links and per-user pending correction associations are omitted; use the authenticated local Admin backup for complete private recovery.' : 'Workbook-compatible JSON backup attached.', files: [new AttachmentBuilder(Buffer.from(data, 'utf8'), { name: filename })], allowedMentions: { repliedUser: false, parse: [] } });
             return true;
         } else if (command === 'import') {
             const attachment = [...message.attachments.values()].find(a => /\.json$/i.test(a.name || '') || /json/i.test(a.contentType || ''));
