@@ -113,8 +113,8 @@ test('Admin manages Pilot and Full lifecycles; match outcomes require a stored o
   const a=await f.service.createTeam(admin,{seasonId:season.id,name:'Red'});
   const b=await f.service.createTeam(admin,{seasonId:season.id,name:'Blue'});
   await f.service.registerParticipant(admin,{seasonId:season.id,participantId:'p1',displayName:'Alpha'});
-  await f.service.assignRoster(admin,{seasonId:season.id,participantId:'p1',teamId:a.id});
-  await f.service.createEventNight(admin,{seasonId:season.id,stageId:postseason.id});
+  const night=await f.service.createEventNight(admin,{seasonId:season.id,stageId:postseason.id});
+  await f.service.assignRoster(admin,{seasonId:season.id,participantId:'p1',teamId:a.id,eventNightId:night.id});
   const fixture=await f.service.createFixture(admin,{seasonId:season.id,stageId:postseason.id,teamA:a.id,teamB:b.id});
   const match=await f.service.createMatch(admin,{seasonId:season.id,fixtureId:fixture.id});
   await assert.rejects(f.service.recordMatchOutcome(admin,{seasonId:season.id,matchId:match.id,id:'o0',teamA:a.id,teamB:b.id,scoreA:2,scoreB:1,methodId:'missing'}),e=>e.code==='SCORING_APPROVAL_REQUIRED');
