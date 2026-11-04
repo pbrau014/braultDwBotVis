@@ -1,0 +1,11 @@
+# OCR.space adapter test results — 2026-11-03
+
+- Runtime: Node.js v22.16.0
+- Command: `npm run test:ocrspace-adapter`
+- Result: **6 passed, 0 failed, 0 skipped**
+- Syntax checks: `node --check src/ocrspace-adapter.js` and `node --check tests/ocrspace-adapter.test.js` passed.
+- Test mode: offline contract tests with injected fetch responses; no external OCR request and no screenshot transmission.
+
+Coverage: disabled-by-default behavior; required key; official HTTPS endpoint restriction; Engine 3 player routing; Engine 2 general-field routing; evidence-only return contract; empty/invalid/oversized input; provider errors; empty OCR result; malformed JSON; HTTP failure.
+
+Limitations: the adapter is standalone and not connected to the bot's live OCR orchestration. `node_modules` is not present in this extracted package, so the complete project suite was not run. Windows/native-Tesseract, OCR.space live-provider, PaddleOCR comparative accuracy, and Discord smoke-test gates remain unverified. Production remains NO-GO.

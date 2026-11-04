@@ -1,0 +1,12 @@
+{
+  "record_type": "sanitized_derivative_provenance",
+  "original_archive_name": "DWBOT_RC3_CURRENT_SOURCE.zip",
+  "original_outer_package_sha256": "7f5984ecbcd8009110b98f283e20b7d5fc5b840e2a5c08a5ad4f436959387c25",
+  "original_archive_sha256": "c02f5bee9bf5a2b02294736c4ddf4dc520fe3841e264562c6fa9398b3f4e9fb5",
+  "published_derivative_name": "DWBOT_RC3_CURRENT_SOURCE_SANITIZED_NO_NODE_MODULES.zip",
+  "published_derivative_sha256": "dd3f54116ec6089076cf812227ccf46c44f7c8c1870011c90d4eb72b32bd4c9d",
+  "transformation": "Repacked original archive after excluding nested node_modules, .git, data, .cache, and coverage directories. All other files were retained.",
+  "reason": "Avoid publishing disposable runtime dependencies, VCS metadata, live data, and caches inside a nested archive.",
+  "original_archive_preserved": true,
+  "note": "The unmodified original archive remains in the original local download kit; this repository receives only the distinctly named derivative."
+}

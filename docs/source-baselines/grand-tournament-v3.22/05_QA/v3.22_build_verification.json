@@ -1,0 +1,178 @@
+{
+  "version": "3.22",
+  "package": "Grand_Tournament_Instruction_Set_v3.22_Production_Documentation_Release",
+  "package_status": "PRODUCTION_DOCUMENTATION_RELEASE_USER_DIRECTED_GATE_WAIVER",
+  "release_disposition": "GO_FOR_DOCUMENTATION_PACKAGE_ONLY",
+  "waiver_applied": true,
+  "waiver_scope": "Documentation package and reusable templates only; not live runtime certification or event-specific authorization.",
+  "prepared_utc": "2026-10-29T22:00:03.944774+00:00",
+  "zip_path": "/mnt/data/Grand_Tournament_Instruction_Set_v3.22_Production_Documentation_Release.zip",
+  "zip_integrity": "PASS — final archive tested with zipfile.testzip() after creation",
+  "manifest": {
+    "self_hash_excluded": true,
+    "entries": 167,
+    "failures": [],
+    "algorithm": "SHA-256",
+    "verification_method": "Recomputed every package file hash and compared against MANIFEST.sha256.",
+    "verification_status": "PASS if final manifest check below reports no mismatches."
+  },
+  "file_counts": {
+    "pdfs": 20,
+    "pdf_pages_total": 217,
+    "docx_total_including_historical_baseline": 12,
+    "active_docx": 11,
+    "markdown": 33,
+    "json": 39,
+    "accessibility_audit_jsons": 19
+  },
+  "pdf_structural_validation": {
+    "errors": [],
+    "inventory": [
+      {
+        "path": "01_Participant/Grand_Tournament_Participant_Guide_v3.19.pdf",
+        "pages": 17
+      },
+      {
+        "path": "02_Operations/Grand_Tournament_Event_Operations_Manual_v3.19.pdf",
+        "pages": 24
+      },
+      {
+        "path": "03_Technical_Reference/Grand_Tournament_Technical_Reference_v3.19.pdf",
+        "pages": 29
+      },
+      {
+        "path": "04_Companion_Materials/Discord_Bot_Maintainer_Security_and_Release_Guide_v1.1_DRAFT.pdf",
+        "pages": 4
+      },
+      {
+        "path": "04_Companion_Materials/Event_Settings_and_Publication_Approval_Record_v1.1_DRAFT.pdf",
+        "pages": 7
+      },
+      {
+        "path": "04_Companion_Materials/Participant_Quick_Start_Evidence_and_Results_v1.1_DRAFT.pdf",
+        "pages": 3
+      },
+      {
+        "path": "04_Companion_Materials/Pilot_Event_Ruleset_v1.1_DRAFT.pdf",
+        "pages": 4
+      },
+      {
+        "path": "04_Companion_Materials/Recurring_Tournament_Ruleset_v1.1_DRAFT.pdf",
+        "pages": 4
+      },
+      {
+        "path": "04_Companion_Materials/Release_Gate_Status_and_Reconciliation_Record_v1.1.pdf",
+        "pages": 5
+      },
+      {
+        "path": "04_Companion_Materials/Scoring_Workbook_and_Validation_Guide_v1.1_DRAFT.pdf",
+        "pages": 4
+      },
+      {
+        "path": "04_Companion_Materials/Training_Room_Host_and_Referee_Guide_v1.1_DRAFT.pdf",
+        "pages": 4
+      },
+      {
+        "path": "04_Companion_Materials/pdf/Discord_Bot_Maintainer_Security_and_Release_Guide_v1.1_DRAFT.pdf",
+        "pages": 4
+      },
+      {
+        "path": "04_Companion_Materials/pdf/Event_Settings_and_Publication_Approval_Record_v1.1_DRAFT.pdf",
+        "pages": 7
+      },
+      {
+        "path": "04_Companion_Materials/pdf/Participant_Quick_Start_Evidence_and_Results_v1.1_DRAFT.pdf",
+        "pages": 3
+      },
+      {
+        "path": "04_Companion_Materials/pdf/Pilot_Event_Ruleset_v1.1_DRAFT.pdf",
+        "pages": 4
+      },
+      {
+        "path": "04_Companion_Materials/pdf/Recurring_Tournament_Ruleset_v1.1_DRAFT.pdf",
+        "pages": 4
+      },
+      {
+        "path": "04_Companion_Materials/pdf/Release_Gate_Status_and_Reconciliation_Record_v1.1.pdf",
+        "pages": 5
+      },
+      {
+        "path": "04_Companion_Materials/pdf/Scoring_Workbook_and_Validation_Guide_v1.1_DRAFT.pdf",
+        "pages": 4
+      },
+      {
+        "path": "04_Companion_Materials/pdf/Training_Room_Host_and_Referee_Guide_v1.1_DRAFT.pdf",
+        "pages": 4
+      },
+      {
+        "path": "05_QA/Grand_Tournament_Instruction_Set_v3.15_Policy_Resolved_Source_Baseline.pdf",
+        "pages": 77
+      }
+    ]
+  },
+  "companion_pdf_mirrors": {
+    "count_checked": 8,
+    "failures": [],
+    "all_byte_identical": true
+  },
+  "required_files": {
+    "checked": 12,
+    "missing": []
+  },
+  "release_index_disposition": "GO_FOR_DOCUMENTATION_PACKAGE_UNDER_USER_DIRECTED_WAIVER; technical checks remain not tested and event-specific approval is not implied",
+  "document_visual_qa": {
+    "status": "FOCUSED_REVIEW_COMPLETE_NOT_EXHAUSTIVE",
+    "inspected": [
+      "first page contact sheet for all 11 active DOCX-derived PDFs",
+      "all 5 pages of Release Gate Status and Reconciliation Record",
+      "selected changed technical-reference and operations-manual pages"
+    ],
+    "latest_operations_manual_page_24": "PASS — companion hand-off and both Done when callouts visible without clipping",
+    "not_claimed": "Not every page was individually visually inspected."
+  },
+  "accessibility_screen": {
+    "files": 11,
+    "high": 0,
+    "medium": 101,
+    "low": 0,
+    "interpretation": "medium findings are table-header warnings including layout/callout tables; not a manual WCAG/legal review"
+  },
+  "technical_tests": {
+    "canonical_workbook": "WAIVED_AS_DOCUMENTATION_RELEASE_PREREQUISITE; NOT TESTED / NOT AVAILABLE IN ACTIVE PACKAGE",
+    "authoritative_score_reporter_html": "WAIVED_AS_DOCUMENTATION_RELEASE_PREREQUISITE; NOT TESTED / NOT AVAILABLE IN ACTIVE PACKAGE",
+    "excel_vba_office_2010": "WAIVED_AS_DOCUMENTATION_RELEASE_PREREQUISITE; NOT TESTED",
+    "full_browser_scoring_reset_persistence_regression": "WAIVED_AS_DOCUMENTATION_RELEASE_PREREQUISITE; NOT TESTED",
+    "exact_RC3_source_and_Windows_Node24_OCR": "WAIVED_AS_DOCUMENTATION_RELEASE_PREREQUISITE; NOT TESTED / EXACT SOURCE NOT SUPPLIED",
+    "native_Tesseract_comparison": "WAIVED_AS_DOCUMENTATION_RELEASE_PREREQUISITE; NOT TESTED",
+    "live_Discord_smoke_and_credential_rotation": "WAIVED_AS_DOCUMENTATION_RELEASE_PREREQUISITE; NOT TESTED / EVIDENCE NOT SUPPLIED",
+    "current_game_client_walkthrough": "WAIVED_AS_DOCUMENTATION_RELEASE_PREREQUISITE; NOT TESTED",
+    "outgoing_hyperlinks": "NOT CHECKED BY INSTRUCTION; excluded from package release gate",
+    "event_specific_approval": "NOT IMPLIED; reusable event fields and sign-off remain blank"
+  },
+  "known_boundary": "The GO disposition publishes the documents/templates only. It does not report waived tests as passing, certify runtime behavior, fill event-specific settings, or approve a particular event.",
+  "limitations": [
+    "Automated PDF parser checks are structural, not full visual inspection.",
+    "Automated accessibility scan is not a full manual WCAG/legal review.",
+    "Historical source evidence does not certify absent release-candidate software."
+  ],
+  "zip_archive_file_count": 168,
+  "zip_root_prefix_valid": true,
+  "zip_bad_member": null,
+  "generated_at_utc": "2026-10-29T21:58:53.260407+00:00",
+  "json_embedded_record_note": "Final archive CRC and manifest validation are run immediately after archive creation; the exact archive size is recorded in the external verification report to avoid self-reference.",
+  "internal_navigation": {
+    "report": "05_QA/v3.22_Internal_Navigation_Check.json",
+    "summary": {
+      "pdfs": 20,
+      "pdf_pages": 217,
+      "pdf_internal_destinations_invalid": 0,
+      "docx_documents": 11,
+      "docx_internal_anchors_missing": 0,
+      "markdown_documents": 33,
+      "markdown_internal_fragments_checked": 50,
+      "markdown_missing_internal_fragments": 0,
+      "markdown_missing_local_files": 0
+    },
+    "external_hyperlinks": "NOT CHECKED BY INSTRUCTION"
+  }
+}

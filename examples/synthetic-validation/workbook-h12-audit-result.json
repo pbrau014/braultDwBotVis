@@ -1,0 +1,15 @@
+{
+  "audit": "Excel source workbook Totals!H12 validation",
+  "workbook": "YOLO-Tournament-Workbook-Expanded-50.xlsm",
+  "sha256": "12ad80209ef77451b3586b52359a06b5361a68bc9926fc81a9da3d6c4b586397",
+  "cell": "Totals!H12",
+  "formula": "=0.54*G12/100",
+  "input_formula": "=SUM(G3:G11,G14:G54)",
+  "input_cached_value": 2312.5598233298197,
+  "raw_cached_h12_value": 12.487823045981026,
+  "currency_format": "$#,##0.00",
+  "display_value": "$12.49",
+  "default_grand_yolo_tier_weight": 0.9,
+  "result": "PASS",
+  "expanded_max_players": 50
+}

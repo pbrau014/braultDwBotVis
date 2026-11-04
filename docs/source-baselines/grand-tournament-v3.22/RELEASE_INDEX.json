@@ -1,0 +1,73 @@
+{
+  "package": "Grand Tournament Instruction Set — v3.22 Production Documentation Release",
+  "baseline": "v3.18 reorganized package preserved as original source ZIP; embedded v3.17 archive and v3.15 policy-resolved baseline preserved unchanged",
+  "version": "3.22",
+  "prepared": "2026-10-29",
+  "status": "PRODUCTION_DOCUMENTATION_RELEASE_USER_DIRECTED_GATE_WAIVER",
+  "selected_design_decisions": {
+    "A": "Option A2 retained: repeated anchor icons across chapter divider lines, explicitly excepted from the ordinary one-icon-per-text-unit rule.",
+    "B": "Word/PDF table shading and borders retained; the canonical HTML source was unavailable, so its CSS/effects were not edited or verified. This is outside the user-waived documentation-package release gate.",
+    "C": "Appendix font hierarchy and readable table wrapping preserved; callout text raised to 8.5 pt per Stage 2 authorization.",
+    "D": "Contents/index hierarchy retained.",
+    "E": "Style-based spacing and subsection separators retained; no repeated blank-paragraph layout hacks."
+  },
+  "publications": {
+    "participant": {
+      "md": "01_Participant/Grand_Tournament_Participant_Guide_v3.19.md",
+      "docx": "01_Participant/Grand_Tournament_Participant_Guide_v3.19.docx",
+      "pdf": "01_Participant/Grand_Tournament_Participant_Guide_v3.19.pdf"
+    },
+    "operations": {
+      "md": "02_Operations/Grand_Tournament_Event_Operations_Manual_v3.19.md",
+      "docx": "02_Operations/Grand_Tournament_Event_Operations_Manual_v3.19.docx",
+      "pdf": "02_Operations/Grand_Tournament_Event_Operations_Manual_v3.19.pdf"
+    },
+    "technical": {
+      "md": "03_Technical_Reference/Grand_Tournament_Technical_Reference_v3.19.md",
+      "docx": "03_Technical_Reference/Grand_Tournament_Technical_Reference_v3.19.docx",
+      "pdf": "03_Technical_Reference/Grand_Tournament_Technical_Reference_v3.19.pdf"
+    }
+  },
+  "companion_materials": {
+    "directory": "04_Companion_Materials",
+    "word_document_count": 8,
+    "pdf_count": 8,
+    "markdown_count": 10,
+    "gate_record": "04_Companion_Materials/Release_Gate_Status_and_Reconciliation_Record_v1.1.docx"
+  },
+  "editorial_status": {
+    "bracket_advancement_contradiction": "v3.21 governing rule: applicable accepted individual-performance metrics (including Damage and Kills) feed the approved scoring method that calculates the verified match outcome; the verified outcome governs bracket advancement subject to published tie-breaks. The result/output/award records remain traceable; implementation not verified.",
+    "cross_publication_references": "qualified by target publication for mapped chapter/appendix references",
+    "done_when_callout_font_pt": 8.5,
+    "icon_rule": "one pictographic icon per text paragraph/list item/table cell; repeated-anchor divider is explicit exception",
+    "release_gate_disposition": "GO_FOR_DOCUMENTATION_PACKAGE_UNDER_USER_DIRECTED_WAIVER; implementation and event-specific gates remain untested/open",
+    "m06_claim": "grammar-normalized because no verbatim source attribution was supplied; retained as testable hypothesis",
+    "quick_hint_border": "Active Word Quick hint callouts match Done when callout: #0070C0 1.5pt border, 6pt spacing, #DFF2FF fill; rows keep together. Markdown boxes use equivalent blue/light-blue styling.",
+    "contents_index_heading_size": "Contents title and chapter/appendix entry styles all set to 11 pt in active Word documents, matching Heading 3; duplicate Appendix P Contents entry removed while preserving its hyperlink",
+    "policy_status": "performance-based match-outcome policy specified; formula/runtime implementation not verified",
+    "universal_command_rule": "Every command, response, message, announcement, interface action, and staff operation that calculates, reports, or changes bracket progression must rely on a verified match outcome calculated under the approved method and published aggregation, rounding, and tie-break rules; conflicts require pause, evidence preservation, and authorized ruling."
+  },
+  "score_reporter_assets": {
+    "status": "NOT_TESTED_NOT_INCLUDED_WAIVED_FOR_DOCUMENTATION_RELEASE",
+    "reason": "Canonical Score Reporter HTML and designated Excel workbook were unavailable in the active package; no substitute was used. This does not block documentation-package publication under the user-directed waiver."
+  },
+  "outgoing_hyperlinks_checked": false,
+  "qa_report": "05_QA/v3.22_Production_Readiness_and_Waiver_Report.md",
+  "integrity_report": "05_QA/v3.22_build_verification.json",
+  "internal_navigation_check": "05_QA/v3.22_Internal_Navigation_Check.json",
+  "editorial_successor_version": "3.22",
+  "editorial_successor_status": "PRODUCTION_DOCUMENTATION_RELEASE_USER_DIRECTED_GATE_WAIVER",
+  "editorial_review": "05_QA/v3.20_Three_Perspective_Editorial_Review.md",
+  "implementation_audit": "05_QA/v3.21_Editorial_Implementation_Audit.json",
+  "technical_test_status": "WAIVED AS PACKAGE-RELEASE PREREQUISITES AT USER DIRECTION; NOT TESTED/NOT VERIFIED: canonical workbook, Score Reporter HTML, Excel/VBA/Office 2010, full browser/scoring regression, Windows OCR/Tesseract, live Discord, credential rotation, and current-client walkthrough.",
+  "release_decision": "GO_FOR_DOCUMENTATION_PACKAGE_ONLY",
+  "release_waiver": {
+    "instruction": "User directed that prior release blockers be disregarded as prerequisites for this package release.",
+    "scope": "Publication of documentation and reusable templates only.",
+    "technical_checks": "Waived as release prerequisites; remain NOT TESTED / NOT VERIFIED and are not reported as passed.",
+    "event_specific_approval": "Not implied. Empty event settings, signatures, approval timestamps, and effective times remain unfilled.",
+    "runtime_certification": "Not granted. No scoring workbook/HTML parity, Excel/VBA, OCR, Windows, or live Discord certification is claimed."
+  },
+  "release_gate_disposition": "GO_FOR_DOCUMENTATION_PACKAGE_UNDER_USER_DIRECTED_WAIVER; technical checks remain not tested and event-specific approval is not implied",
+  "event_specific_status": "Reusable templates are released; no particular event is approved or announced by this package."
+}
