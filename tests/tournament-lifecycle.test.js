@@ -158,3 +158,17 @@ test('event-night status locks roster and only accepts results while active',()=
  L.transitionEventNight(night,'active',{actor:'admin'});
  assert.equal(L.recordScoreEntry(t,{participantId:'u',category:'damage',gameNumber:1,shipClass:'DD',tier:8,evidenceId:'e',eventNightId:night.id,damage:10},season).metric,10);
 });
+
+test('Race side-event evidence remains separate from ordinary match score',()=>{
+ const t=L.createTournament({id:'race-side',format:'full'}),season=L.createSeason(t.id,{id:'race-side-season',tournament:t});
+ L.registerParticipant(season,{participantId:'u1',displayName:'Alpha'});
+ const stage=L.createStage(season.id,'regular_season',{id:'rs'});season.stages.push(stage);
+ const night=L.createEventNight(season,{id:'night-race',stageId:stage.id});
+ const event=L.createRaceSideEvent({id:'race-side-1',seasonId:season.id,eventNightId:night.id,map:'Big Race'});
+ season.raceSideEvents=[event];
+ const result=L.recordRaceSideEventResult(season,event.id,{participantId:'u1',damage:45000,evidenceId:'race-evidence'});
+ assert.equal(result.damage,45000);
+ assert.equal(event.ordinaryMatchScoreContribution,0);
+ assert.equal(event.seasonContribution,null);
+ assert.throws(()=>L.recordRaceSideEventResult(season,event.id,{participantId:'u1',damage:50000,evidenceId:'race-evidence-2'}),/already has/);
+});
