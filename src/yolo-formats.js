@@ -5,11 +5,12 @@ const FORMATS = Object.freeze({ PILOT: 'pilot', FULL: 'full' });
 const STAGES = Object.freeze(['regular-season', 'postseason', 'grand-finale']);
 const STATUSES = Object.freeze(['draft', 'published', 'active', 'completed', 'cancelled']);
 function requiredText(value, label) { const text = String(value ?? '').trim(); if (!text) throw new Error(label + ' is required.'); return text; }
+function identifier(value, label) { const id = requiredText(value, label); if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/.test(id)) throw new Error(label + ' must use 1-64 letters, numbers, dots, underscores or hyphens.'); return id; }
 function timestamp(value, label) { if (value == null || value === '') return null; const n = Date.parse(value); if (!Number.isFinite(n)) throw new Error(label + ' must be a valid ISO date/time.'); return new Date(n).toISOString(); }
 function createTournament(input = {}) {
  const format = String(input.format || '').toLowerCase();
  if (!Object.values(FORMATS).includes(format)) throw new Error('Format must be pilot or full.');
- const id = requiredText(input.id, 'Tournament ID'), name = requiredText(input.name, 'Tournament name');
+ const id = identifier(input.id, 'Tournament ID'), name = requiredText(input.name, 'Tournament name');
  const startsAt = timestamp(input.startsAt, 'Start time'), endsAt = timestamp(input.endsAt, 'End time');
  if (startsAt && endsAt && Date.parse(endsAt) <= Date.parse(startsAt)) throw new Error('End time must be after start time.');
  const settings = { timezone: input.settings?.timezone || null, participantCap: input.settings?.participantCap ?? 50, rosterLockAt: timestamp(input.settings?.rosterLockAt, 'Roster lock time'), rulesVersion: input.settings?.rulesVersion || null, approvedSettingsId: input.settings?.approvedSettingsId || null };
@@ -21,7 +22,7 @@ function createTournament(input = {}) {
   if (!Number.isInteger(durationWeeks) || durationWeeks < 2 || durationWeeks > 52) throw new Error('Full YOLO requires a declared season duration from 2 to 52 weeks.');
   const seasonStart = timestamp(s.startsAt, 'Season start'), seasonEnd = timestamp(s.endsAt, 'Season end');
   if (seasonStart && seasonEnd && Date.parse(seasonEnd) <= Date.parse(seasonStart)) throw new Error('Season end must be after season start.');
-  t.season = { id: requiredText(s.id, 'Season ID'), startsAt: seasonStart, endsAt: seasonEnd, durationWeeks, regularSeasonEventCount: s.regularSeasonEventCount ?? null, postseasonFormat: s.postseasonFormat || null, finaleFormat: s.finaleFormat || null };
+  t.season = { id: identifier(s.id, 'Season ID'), startsAt: seasonStart, endsAt: seasonEnd, durationWeeks, regularSeasonEventCount: s.regularSeasonEventCount ?? null, postseasonFormat: s.postseasonFormat || null, finaleFormat: s.finaleFormat || null };
   t.stages = STAGES.map((type, i) => ({ id: t.season.id + ':' + type, type, order: i + 1, status: 'draft' }));
  }
  return t;
@@ -50,8 +51,9 @@ function transitionTournament(t, nextStatus, actor, at = new Date().toISOString(
 }
 function createEventNight(input = {}) {
  const startsAt = timestamp(input.startsAt, 'Event-night start'); if (!startsAt) throw new Error('Event-night start time is required.');
+ const endsAt = timestamp(input.endsAt, 'Event-night end'); if (endsAt && Date.parse(endsAt) <= Date.parse(startsAt)) throw new Error('Event-night end must be after its start.');
  const stage = input.stage || null; if (stage && !STAGES.includes(stage)) throw new Error('Unknown Full YOLO stage.');
- return { id: requiredText(input.id, 'Event-night ID'), tournamentId: requiredText(input.tournamentId, 'Tournament ID'), stage, sequence: Number.isInteger(input.sequence) && input.sequence > 0 ? input.sequence : 1, startsAt, endsAt: timestamp(input.endsAt, 'Event-night end'), status: input.status || 'draft', registrations: [], teams: [], fixtures: [], matches: [], games: [], evidenceIds: [] };
+ return { id: identifier(input.id, 'Event-night ID'), tournamentId: identifier(input.tournamentId, 'Tournament ID'), stage, sequence: Number.isInteger(input.sequence) && input.sequence > 0 ? input.sequence : 1, startsAt, endsAt, status: input.status || 'draft', registrations: [], teams: [], fixtures: [], matches: [], games: [], evidenceIds: [] };
 }
 function registerParticipant(n, participantId, at = new Date().toISOString()) {
  const id = requiredText(participantId, 'Participant ID'); if (!['draft', 'published'].includes(n.status)) throw new Error('Registration is closed for this event night.');
@@ -60,8 +62,18 @@ function registerParticipant(n, participantId, at = new Date().toISOString()) {
 }
 function freezeRules(settings, eventStarted) { if (eventStarted) throw new Error('Published event rules are frozen after event start; changes apply prospectively to future/unplayed games only.'); return structuredClone(settings); }
 function raceMetric(seconds) { const n = Number(seconds); if (!Number.isFinite(n) || n <= 0) throw new Error('Race elapsed time must be a positive number of seconds.'); return { type: 'race-time-metric', elapsedSeconds: n, normalizedMetric: 1 / n, ordering: 'lower-elapsed-time-is-better' }; }
-function createRaceSideEvent(input = {}) { return { id: requiredText(input.id, 'Race side-event ID'), type: 'race-side-event', eventNightId: requiredText(input.eventNightId, 'Event-night ID'), scheduleOffsetMinutes: Number.isInteger(input.scheduleOffsetMinutes) ? input.scheduleOffsetMinutes : 60, scoringPolicyId: input.scoringPolicyId || null, approved: input.approved === true }; }
+function createRaceSideEvent(input = {}) { const offset = input.scheduleOffsetMinutes ?? 60; if (!Number.isInteger(offset) || offset < 0 || offset > 1440) throw new Error('Race side-event offset must be from 0 to 1440 minutes.'); return { id: identifier(input.id, 'Race side-event ID'), type: 'race-side-event', eventNightId: identifier(input.eventNightId, 'Event-night ID'), scheduleOffsetMinutes: offset, scoringPolicyId: input.scoringPolicyId || null, approved: input.approved === true }; }
 function grandYoloScore(input = {}) { return { type: 'grand-yolo-score', scoringCategory: 'grand', eventNightId: requiredText(input.eventNightId, 'Event-night ID') }; }
 function grandYoloFinale(input = {}) { return { type: 'grand-yolo-finale', stageId: requiredText(input.stageId, 'Finale stage ID'), matchId: requiredText(input.matchId, 'Finale match ID') }; }
-function validateMatchOutcome(input = {}) { if (!input.approvedScoringMethodId) throw new Error('An approved scoring-method ID is required before calculating an official match outcome.'); if (!Array.isArray(input.acceptedPerformanceRecordIds) || !input.acceptedPerformanceRecordIds.length) throw new Error('Accepted individual-performance record IDs are required.'); if (!input.aggregation || !input.rounding || !Array.isArray(input.tieBreakOrder)) throw new Error('Published aggregation, rounding, and tie-break rules are required.'); return { status: 'pending-calculation', approvedScoringMethodId: input.approvedScoringMethodId, acceptedPerformanceRecordIds: [...input.acceptedPerformanceRecordIds], aggregation: input.aggregation, rounding: input.rounding, tieBreakOrder: [...input.tieBreakOrder] }; }
+function validateMatchOutcome(input = {}) {
+ const approvedScoringMethodId = requiredText(input.approvedScoringMethodId, 'Approved scoring-method ID');
+ const ids = input.acceptedPerformanceRecordIds;
+ if (!Array.isArray(ids) || !ids.length || ids.some(id=>!String(id||'').trim()) || new Set(ids).size!==ids.length)
+  throw new Error('Unique accepted individual-performance record IDs are required.');
+ if (!requiredText(input.aggregation, 'Published aggregation') || !requiredText(input.rounding, 'Published rounding'))
+  throw new Error('Published aggregation and rounding rules are required.');
+ if (!Array.isArray(input.tieBreakOrder) || !input.tieBreakOrder.length || input.tieBreakOrder.some(rule=>!String(rule||'').trim()))
+  throw new Error('A non-empty published tie-break order is required.');
+ return { status:'pending-calculation',approvedScoringMethodId,acceptedPerformanceRecordIds:[...ids],aggregation:input.aggregation,rounding:input.rounding,tieBreakOrder:[...input.tieBreakOrder] };
+}
 module.exports = { FORMATS, STAGES, STATUSES, createTournament, assertTransition, transitionTournament, transitionStage, createEventNight, registerParticipant, freezeRules, raceMetric, createRaceSideEvent, grandYoloScore, grandYoloFinale, validateMatchOutcome };
