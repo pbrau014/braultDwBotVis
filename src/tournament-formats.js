@@ -373,6 +373,11 @@ function completeMatch(tournament, matchId, options = {}, actor = 'organizer') {
   if (tournament.format === FORMAT.FULL) {
     const method = tournament.config.matchOutcomeMethod;
     const outcome = resolveMatch(match, method, options);
+    if (outcome.decidedBy !== 'approved_metric') {
+      const evidenceId = options.tieBreak?.evidenceId;
+      if (!tournament.evidence.some(item => item.id === evidenceId)) throw new Error('A non-metric tie-break requires registered evidence.');
+      outcome.tieBreakEvidenceId = evidenceId;
+    }
     match.outcome = { ...outcome, completedAt: now(), methodVersion: method.version };
   }
   match.status = STATUS.COMPLETE;
