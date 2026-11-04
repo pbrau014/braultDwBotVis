@@ -57,6 +57,8 @@ const {
 } = require('./battle-record');
 const { extractSpatialRibbons } = require('./ribbon-parser');
 const Tournament = require('./tournament');
+const { createDesktopService } = require('./desktop-service');
+const { createDesktopBridge } = require('./desktop-bridge');
 const { createSerialTaskQueue } = require('./serial-task-queue');
 const { selectDamageCandidates, hasUniqueDamageConsensus, extractFullScreenDamageCandidates } = require('./damage-consensus');
 const { FIELD_SPECS, findRewardBaseX, findRewardGeometryAnchor, buildRewardGeometryRects, rewardGeometryValueIsValid, rewardGeometryAnchorDigitsAreUsable, rewardValueMatchesAnchor, rewardGeometryQuorumCanResolveXpTrailingAdornment } = require('./reward-geometry');
@@ -76,6 +78,7 @@ const TOURNAMENT_STATE_PATH = process.env.TOURNAMENT_STATE_PATH || path.join(pro
 const TOURNAMENT_STORAGE = String(process.env.TOURNAMENT_STORAGE || (process.env.NODE_ENV === 'test' ? 'json' : 'sqlite')).toLowerCase();
 const TOURNAMENT_SQLITE_PATH = process.env.TOURNAMENT_SQLITE_PATH || path.join(process.cwd(), 'data', 'tournament-state.sqlite');
 const ENABLE_SLASH_COMMANDS = process.env.ENABLE_SLASH_COMMANDS === '1';
+const ENABLE_DESKTOP_UI = process.env.ENABLE_DESKTOP_UI === '1';
 const WORKBOOK_PATH = path.join(__dirname, '..', 'assets', 'YOLO-Tournament-Workbook.xlsm');
 // Every state change is persisted locally immediately. Discord recovery snapshots
 // are debounced into one same-channel attachment after a quiet period, preventing
@@ -85,6 +88,7 @@ const tournamentStore = TOURNAMENT_STORAGE === 'sqlite'
     ? Tournament.createSqliteStore(TOURNAMENT_SQLITE_PATH, { legacyJsonPath: TOURNAMENT_STATE_PATH, mirrorPath: TOURNAMENT_STATE_PATH })
     : Tournament.createStore(TOURNAMENT_STATE_PATH);
 let tournamentState = null;
+let desktopBridge = null;
 
 // Leave room below Discord's 2,000-character message limit for formatting.
 const DISCORD_MESSAGE_LIMIT = 1850;
@@ -2820,7 +2824,7 @@ async function flushArchiveSnapshot() {
             // and screenshots. No second/private archive channel is supported.
             const channel = await client.channels.fetch(TARGET_CHANNEL_ID);
             if (!channel?.isTextBased()) throw new Error('Configured target channel is not text-based.');
-            const snapshot = await tournamentStore.exportSnapshot(tournamentState);
+            const snapshot = JSON.stringify(Tournament.makePublicArchiveSnapshot(tournamentState), null, 2);
             const name = `yolo-tourney-snapshot-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
             await channel.send({ content: `Tournament recovery snapshot · ${tournamentState.players.length} players · ${new Date().toISOString()}`, files: [new AttachmentBuilder(Buffer.from(snapshot, 'utf8'), { name })], allowedMentions: { parse: [] } });
             return true;
@@ -2977,7 +2981,7 @@ async function handleTournamentCommand(message) {
             const totalSlots = tournamentState.players.length * Tournament.EVENTS.length * 7;
             let filledSlots = 0;
             for (const player of tournamentState.players) for (const event of Tournament.EVENTS) for (const game of player.events[event]) if (slotIsFilled(event, game)) filledSlots += 1;
-            const finalExport = JSON.parse(await tournamentStore.exportSnapshot(tournamentState));
+            const finalExport = Tournament.makePublicArchiveSnapshot(tournamentState);
             finalExport.export_purpose = 'final-tournament-export';
             finalExport.final_summary = {
                 player_count: tournamentState.players.length,
@@ -2993,9 +2997,9 @@ async function handleTournamentCommand(message) {
             await message.reply({ content: summary, files: [new AttachmentBuilder(Buffer.from(JSON.stringify(finalExport, null, 2), 'utf8'), { name: `yolo-tourney-final-${timestamp}.json` })], allowedMentions: { repliedUser: false, parse: [] } });
             return true;
         } else if (command === 'export' || command === 'export-workbook') {
-            const data = command === 'export' ? await tournamentStore.exportSnapshot(tournamentState) : JSON.stringify(Tournament.makeWorkbookBackup(tournamentState), null, 2);
+            const data = command === 'export' ? JSON.stringify(Tournament.makePublicArchiveSnapshot(tournamentState), null, 2) : JSON.stringify(Tournament.makeWorkbookBackup(tournamentState), null, 2);
             const filename = command === 'export' ? 'yolo-tourney-full-archive.json' : 'yolo-tourney-workbook-backup.json';
-            await message.reply({ content: command === 'export' ? 'Full tournament archive attached. It includes workbook-compatible state, OCR battle records, and pending submission metadata.' : 'Workbook-compatible JSON backup attached.', files: [new AttachmentBuilder(Buffer.from(data, 'utf8'), { name: filename })], allowedMentions: { repliedUser: false, parse: [] } });
+            await message.reply({ content: command === 'export' ? 'Public-safe tournament archive attached. Private account links and per-user pending correction associations are omitted; use the authenticated local Admin backup for complete private recovery.' : 'Workbook-compatible JSON backup attached.', files: [new AttachmentBuilder(Buffer.from(data, 'utf8'), { name: filename })], allowedMentions: { repliedUser: false, parse: [] } });
             return true;
         } else if (command === 'import') {
             const attachment = [...message.attachments.values()].find(a => /\.json$/i.test(a.name || '') || /json/i.test(a.contentType || ''));
@@ -3210,7 +3214,28 @@ async function postBattleRecord(message, record, fileName, note = '', sourceEvid
     const exportData = makeTournamentExport(record, { sourceFileName: fileName, sourceEvidence });
     if (tournamentState) {
         const exists = tournamentState.battleRecords.some(item => item.record_id === exportData.record_id);
-        if (!exists) tournamentState.battleRecords.push({ record_id: exportData.record_id, status: 'unmapped', captured_at: new Date().toISOString(), source_file: String(fileName || ''), record: exportData });
+        if (!exists) {
+            const discordUserId = String(message.author?.id || '');
+            const linkedPlayer = Tournament.findPlayerByDiscordUserId(tournamentState, discordUserId);
+            const identityMatches = Boolean(linkedPlayer && String(record?.player || '').trim().toLowerCase() === String(linkedPlayer.name).trim().toLowerCase());
+            const archived = {
+                record_id: exportData.record_id,
+                status: identityMatches ? 'awaiting-mapping' : 'admin-review',
+                captured_at: new Date().toISOString(),
+                source_file: String(fileName || ''),
+                record: exportData,
+                ocr_record: record,
+                missing_fields: [],
+            };
+            // Preserve ownership for roster-linked Discord submitters. The same
+            // record then appears in that player's desktop review queue. Identity
+            // mismatch is still admin-review and cannot be remapped by the player.
+            if (linkedPlayer) {
+                archived.desktop_owner_id = discordUserId;
+                archived.desktop_owner_role = 'player';
+            }
+            tournamentState.battleRecords.push(archived);
+        }
         await saveTournamentState();
     }
     const exportAttachment = new AttachmentBuilder(
@@ -3607,6 +3632,40 @@ client.once(Events.ClientReady, async (readyClient) => {
     if (ENABLE_SLASH_COMMANDS) registerSlashCommands(readyClient).catch(error => console.error('Slash command registration failed:', error.message));
     else console.log('Slash command registration is disabled; use `!yolo panel` for public interactive controls.');
     console.log('The bot is online and the configured channel preflight passed. Missing or conflicting required fields trigger a correction prompt; missing ribbons never block posting.');
+    if (ENABLE_DESKTOP_UI) {
+        try {
+            const desktopService = createDesktopService({
+                getState: () => tournamentState,
+                saveState: () => saveTournamentState({ archive: true }),
+                // Browser uploads use the same bounded serial queue and supervised
+                // extraction path as Discord attachment buffers.
+                extractImage: (imageBuffer) => extractText(imageBuffer),
+                validateScreenshot: (attempt, fields) => validateWorldOfWarshipsScreenshot(attempt, fields),
+                // Desktop administrator authority is an explicit ID allowlist only.
+                isAdminId: (discordUserId) => TOURNAMENT_ADMIN_IDS.has(discordUserId),
+            });
+            desktopBridge = createDesktopBridge({
+                host: '127.0.0.1',
+                port: Number(process.env.DESKTOP_UI_PORT || 8787),
+                service: desktopService,
+                oauth: {
+                    clientId: process.env.DISCORD_OAUTH_CLIENT_ID,
+                    clientSecret: process.env.DISCORD_OAUTH_CLIENT_SECRET,
+                    redirectUri: process.env.DISCORD_OAUTH_REDIRECT_URI || undefined,
+                },
+                maxUploadBytes: MAX_IMAGE_BYTES,
+            });
+            const desktop = await desktopBridge.listen();
+            console.log('[Desktop UI] Listening locally at ' + desktop.origin + '.');
+            console.log('[Desktop UI] Discord OAuth redirect URI: ' + desktop.redirectUri);
+        } catch (error) {
+            console.error('[Desktop UI] Could not start the local interface; Discord bot remains online and desktop access is disabled:', error.message);
+            try { await desktopBridge?.close(); } catch {}
+            desktopBridge = null;
+        }
+    } else {
+        console.log('[Desktop UI] Disabled. Set ENABLE_DESKTOP_UI=1 and configure local Discord OAuth to enable it.');
+    }
 });
 
 async function terminateOcrWorker() {
@@ -3623,6 +3682,12 @@ async function shutdown(signal) {
     if (isShuttingDown) return;
     isShuttingDown = true;
     console.log(`Received ${signal}; shutting down...`);
+    try {
+        await desktopBridge?.close();
+        desktopBridge = null;
+    } catch (error) {
+        console.error('Error closing desktop bridge:', error);
+    }
     try {
         await terminateOcrWorker();
     } catch (error) {

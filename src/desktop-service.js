@@ -18,13 +18,27 @@ function wholeNumber(value, label, minimum = 0) {
 }
 function publicSubmission(entry) {
   const battle = entry.record?.battle || {};
+  const ocr = entry.ocr_record || {};
+  const rewards = battle.rewards || {};
+  const metrics = battle.metrics || {};
+  const requiredValues = {
+    result: String(ocr.result ?? battle.result ?? ''),
+    player: String(ocr.player ?? battle.player_name ?? ''),
+    map: String(ocr.map ?? battle.map ?? ''),
+    mode: String(ocr.mode ?? battle.mode ?? ''),
+    battleStart: String(ocr.battleStart ?? battle.battle_start_time ?? ''),
+    credits: String(ocr.credits ?? rewards.credits ?? ''),
+    freeXp: String(ocr.freeXp ?? rewards.free_xp ?? ''),
+    damage: String(ocr.damage ?? metrics.damage ?? ''),
+    xp: String(ocr.xp ?? rewards.xp ?? ''),
+  };
   return {
     recordId:entry.record_id, status:entry.status, capturedAt:entry.captured_at,
     sourceFile:entry.source_file, playerName:battle.player_name || 'Not detected',
     ship:battle.ship || 'Not detected', result:battle.result || 'Not detected',
     map:battle.map || 'Not detected', mode:battle.mode || 'Not detected',
     battleStart:battle.battle_start_time || 'Not detected',
-    rewards:battle.rewards || {}, metrics:battle.metrics || {},
+    rewards, metrics, requiredValues,
     requiredFieldsComplete:entry.record?.verification?.required_fields_complete === true,
     missingFields:entry.missing_fields || [], confidence:Number(entry.ocr_confidence) || 0,
     pageSegmentationMode:entry.page_segmentation_mode || null,
@@ -165,9 +179,15 @@ function createDesktopService(options = {}) {
         const exported=makeExport(corrected.record,entry.source_file,proof);
         if(current.battleRecords.some(r=>r!==entry&&r.record_id===exported.record_id)||current.importedBattleRecordIds.includes(exported.record_id))
           throw Object.assign(new Error('Corrected screenshot identity duplicates another battle record.'),{status:409,code:'DUPLICATE_RECORD'});
+        const previousRecordId=entry.record_id;
         refreshEntry(entry,corrected.record,exported);
         const stillOwn=principal.role==='admin'||identityMatches(corrected.record,player);
         entry.status=entry.missing_fields.length?'needs-correction':(stillOwn?'awaiting-mapping':'admin-review');
+        // Corrections can change the deterministic battle-record ID. Cancel any
+        // older Discord-side guided mapping so the next mapping uses this exact
+        // corrected record and no stale prompt can save the previous identity.
+        current.pendingSubmissions=(current.pendingSubmissions||[]).filter(item=>item?.record_id!==previousRecordId&&item?.record_id!==entry.record_id);
+        current.pendingOcrCorrections=(current.pendingOcrCorrections||[]).filter(item=>item?.record_id!==previousRecordId&&item?.recordId!==previousRecordId&&item?.record_id!==entry.record_id&&item?.recordId!==entry.record_id);
         await options.saveState();
         return {submissionId:entry.record_id,status:entry.status,missingFields:entry.missing_fields,
           invalidCorrections:corrected.invalid,record:publicSubmission(entry)};
@@ -205,6 +225,11 @@ function createDesktopService(options = {}) {
         }
         entry.status='mapped';entry.mapped_at=new Date().toISOString();
         entry.tournament_mapping={player_id:result.player.id,player_name:result.player.name,event,game_number:gameNumber,ship_class:shipClass,tier,mapped_via:'desktop-ui'};
+        // A Discord attachment may already have an interactive mapping prompt.
+        // Desktop completion must remove that pending prompt before saving so a
+        // later Discord reply cannot race or duplicate the same battle result.
+        current.pendingSubmissions=(current.pendingSubmissions||[]).filter(item=>item?.record_id!==entry.record_id);
+        current.pendingOcrCorrections=(current.pendingOcrCorrections||[]).filter(item=>item?.record_id!==entry.record_id&&item?.recordId!==entry.record_id);
         await options.saveState();
         const standing=result.scores.find(r=>r.id===player.id);
         const total=result.scores.reduce((s,r)=>s+r.total,0);

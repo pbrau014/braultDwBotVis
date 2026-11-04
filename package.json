@@ -29,7 +29,9 @@
     "test:ocrspace": "node --test tests/ocrspace.test.js",
     "test:ocr": "npm run test:ocrspace && npm run test:ocr-sequence-checkpoint && npm run test:ocr-watchdog && npm run test:paddleocr-fallback",
     "test:ocr-sequence-checkpoint": "node --test tests/ocr-sequence-checkpoint.test.js",
-    "test:desktop": "node --test tests/desktop-service.test.js tests/desktop-bridge.test.js tests/desktop-account-links.test.js"
+    "test:desktop": "node --test tests/desktop-service.test.js tests/desktop-bridge.test.js tests/desktop-account-links.test.js tests/desktop-test-preflight.test.js tests/desktop-ui-contract.test.js",
+    "preflight:desktop-test": "node scripts/preflight-desktop-test.js",
+    "test:prelive": "npm run test:discord-preflight && npm run preflight:desktop-test && npm run test:desktop && npm run test:ocr"
   },
   "engines": {
     "node": ">=22.16.0"

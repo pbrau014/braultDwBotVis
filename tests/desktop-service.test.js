@@ -38,7 +38,10 @@ test('player can view only owned submissions and only their own roster identity'
   const owned=await f.service.submitImage(p,{buffer:Buffer.from('synthetic screenshot'),filename:'one.png',contentType:'image/png'});
   const admin=await f.service.submitImage(a,{buffer:Buffer.from('[BEAR]Bravo admin screenshot'),filename:'two.png',contentType:'image/png'});
   assert.equal(owned.status,'awaiting-mapping');assert.equal(admin.status,'admin-review');
-  assert.equal((await f.service.listSubmissions(p)).items.length,1);
+  const ownRows=await f.service.listSubmissions(p);
+  assert.equal(ownRows.items.length,1);
+  assert.equal(ownRows.items[0].requiredValues.player,'[WOLF]Alpha');
+  assert.equal(ownRows.items[0].requiredValues.xp,'7890');
   await assert.rejects(f.service.correctSubmission(p,admin.submissionId,{values:{xp:'100'}}),e=>e.status===404);
   await assert.rejects(f.service.correctSubmission(p,owned.submissionId,{values:{player:'[BEAR]Bravo'}}),e=>e.status===403&&e.code==='PLAYER_IDENTITY_MISMATCH');
 });
@@ -58,6 +61,16 @@ test('a player can map a complete record only to their linked player and valid s
   assert.equal(mapped.status,'mapped');assert.equal(mapped.player.name,'[WOLF]Alpha');
   assert.equal(f.state.players[0].events.damage[0].metric,45678);
   await assert.rejects(f.service.mapSubmission(p,upload.submissionId,{event:'damage',gameNumber:2,shipClass:'DD',tier:8}),e=>e.code==='RECORD_ALREADY_MAPPED');
+});
+test('desktop mapping clears a matching pending Discord-guided submission',async()=>{
+  const f=fixture(),p=await f.service.resolvePrincipal({id:PLAYER});
+  const upload=await f.service.submitImage(p,{buffer:Buffer.from('pending Discord path'),filename:'discord.png',contentType:'image/png'});
+  f.state.pendingSubmissions.push({record_id:upload.submissionId,userId:PLAYER,channelId:'33333333333333333'});
+  f.state.pendingOcrCorrections.push({record_id:upload.submissionId});
+  const result=await f.service.mapSubmission(p,upload.submissionId,{event:'damage',gameNumber:1,shipClass:'DD',tier:8});
+  assert.equal(result.status,'mapped');
+  assert.equal(f.state.pendingSubmissions.length,0);
+  assert.equal(f.state.pendingOcrCorrections.length,0);
 });
 test('admin can map a screenshot to a different roster player after review',async()=>{
   const f=fixture({player:'[BEAR]Bravo'}),a=await f.service.resolvePrincipal({id:ADMIN});

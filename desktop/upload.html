@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#091321">
+  <title>DWBOT · Screenshot Upload</title>
+  <link rel="stylesheet" href="/desktop.css">
+  <script src="/desktop.js" defer></script>
+  <script src="/upload.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/player.html">DWBOT <span>YOLO TOURNEY</span></a>
+    <nav><a href="/player.html">Player</a><a class="active" href="/upload.html">Submit screenshot</a><a id="admin-link" class="hidden" href="/admin.html">Admin</a></nav>
+    <div class="user-area"><span id="signed-in-user">Checking Discord…</span><button id="logout" class="button quiet small">Sign out</button></div>
+  </header>
+  <main class="page narrow">
+    <section class="page-heading"><div><p class="eyebrow">IMAGE SUBMISSION</p><h1>Upload a battle result</h1><p class="lede small">Select one original World of Warships results screenshot. The local bot will process it through the same serialized OCR queue used for Discord attachments.</p></div></section>
+    <section class="panel upload-panel">
+      <input id="image-file" type="file" accept="image/png,image/jpeg,image/webp,image/bmp,image/tiff,.png,.jpg,.jpeg,.webp,.bmp,.tif,.tiff" hidden>
+      <div id="drop-zone" class="drop-zone" tabindex="0" role="button" aria-label="Choose or drop a screenshot">
+        <div class="upload-glyph">↑</div>
+        <h2>Drop a screenshot here</h2>
+        <p>or choose one from your computer</p>
+        <button id="browse-button" type="button" class="button secondary">Choose image</button>
+        <small>PNG, JPG, WEBP, BMP or TIFF · maximum 10 MB · one image per submission</small>
+      </div>
+      <div id="preview-panel" class="preview-panel hidden">
+        <div class="panel-heading"><div><p class="eyebrow">SELECTED FILE</p><h2 id="file-name">—</h2><p id="file-meta" class="muted"></p></div><button id="remove-file" class="button quiet small" type="button">Remove</button></div>
+        <img id="image-preview" alt="Selected battle screenshot preview">
+        <button id="upload-button" class="button primary wide" type="button">Submit screenshot for OCR</button>
+      </div>
+      <div id="upload-progress" class="progress-panel hidden" role="status" aria-live="polite">
+        <div class="progress-head"><strong id="progress-label">Uploading…</strong><span id="progress-percent">0%</span></div>
+        <div class="progress-track"><div id="progress-bar" class="progress-bar"></div></div>
+        <p id="progress-detail" class="muted">The original image is sent only to the local bot service.</p>
+      </div>
+      <div id="upload-result" class="notice hidden"></div>
+    </section>
+    <section class="notice info">
+      <h2>What happens next?</h2>
+      <p>The screenshot is checked against the nine mandatory fields: result, player, map, mode, battle start, credits, Free XP, damage and XP. No fuzzy value repair is applied. Missing or conflicting values require an exact correction before mapping.</p>
+      <p>Desktop uploads use the same Tesseract-first pipeline as Discord attachments. OCR.space remains disabled unless separately configured and authorized; no image is sent to an external OCR provider by this page.</p>
+    </section>
+    <p id="page-status" class="status-line" role="status" aria-live="polite"></p>
+  </main>
+</body>
+</html>
