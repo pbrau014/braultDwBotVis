@@ -133,16 +133,16 @@ jobs:
         shell: powershell
         run: |
           choco install pandoc --yes --no-progress
-          choco install miktex --yes --no-progress --execution-timeout=2700 --retrycount=5 --retryinterval=10
+          choco install typst --yes --no-progress --execution-timeout=900 --retrycount=3 --retryinterval=10
           Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
           refreshenv
           pandoc --version
-          xelatex --version
+          typst --version
       - name: Render PDF manual
         shell: powershell
         run: |
           New-Item -ItemType Directory -Force release-artifacts | Out-Null
-          pandoc docs/iteration23/DWBOT_LOCAL_OPERATIONS_AND_RELEASE_VERIFICATION_MANUAL_2026-11-04.md -o release-artifacts/DWBOT_LOCAL_OPERATIONS_AND_RELEASE_VERIFICATION_MANUAL_2026-11-04.pdf --pdf-engine=xelatex --toc --number-sections -V geometry:margin=0.75in -V colorlinks=true
+          pandoc docs/iteration23/DWBOT_LOCAL_OPERATIONS_AND_RELEASE_VERIFICATION_MANUAL_2026-11-04.md -o release-artifacts/DWBOT_LOCAL_OPERATIONS_AND_RELEASE_VERIFICATION_MANUAL_2026-11-04.pdf --pdf-engine=typst --toc --number-sections -V geometry:margin=0.75in -V colorlinks=true
           if ($LASTEXITCODE -ne 0) { throw "PDF render failed: $LASTEXITCODE" }
           if ((Get-Item release-artifacts/DWBOT_LOCAL_OPERATIONS_AND_RELEASE_VERIFICATION_MANUAL_2026-11-04.pdf).Length -lt 10000) { throw 'PDF output unexpectedly small' }
       - name: Package tracked source and verify clean extraction
