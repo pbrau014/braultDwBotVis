@@ -322,6 +322,9 @@ function createDesktopService(options = {}) {
           case 'complete_stage':
             if(!tournament) throw new Error('Tournament ID is required.');
             result=TournamentFormats.completeStage(tournament,body.stageKey,actor);break;
+          case 'create_event_night':
+            if(!tournament) throw new Error('Tournament ID is required.');
+            result=TournamentFormats.createEventNight(tournament,body.eventNight||{},actor);break;
           case 'register_evidence':
             if(!tournament) throw new Error('Tournament ID is required.');
             result=TournamentFormats.registerEvidence(tournament,body.evidence||{},actor);break;
