@@ -25,6 +25,8 @@ Shared participant identity, evidence, scoring validation, referee review, corre
 12. Added Player/Admin format reference panels and hover/keyboard-focus quick notes with visible descriptions.
 13. Added Full YOLO stage-specific non-overlapping date-window validation and Pilot single-evening/entry-close/lineup-lock ordering checks.
 14. Added separately approved Full Race side-event schedule records; each result must reference a scheduled event, positive elapsed seconds and archived evidence. Side-event results remain separate from match outcomes.
+15. Added stage-start settings snapshots with version and SHA-256; event nights hold their own snapshots. Added versioned prospective revisions for selected future event nights with no fixtures; published outcome/qualification/tie-break method settings remain frozen.
+16. Tightened Pilot game-number bounds to the published game count, retained tied individual placements as shared ranks rather than inventing a tiebreak, and added additive normalization for older lifecycle records.
 
 ## Appendment A - safety and provenance
 - Match outcomes cannot be derived from raw individual totals by this module. The organizer must publish a scoring method ID, version and SHA-256 hash; a completed fixture must reference that exact method and evidence.
@@ -62,7 +64,8 @@ Shared participant identity, evidence, scoring validation, referee review, corre
 ## Current verification record
 - GitHub Actions offline regression on the lifecycle branch's initial integrated source (commit `b7be1981bef9c261146f1320928c11b5d63aa4a3`): Node 22.16.0 and Node 24 both PASS; 269 passed, 0 failed, 2 skipped. The skips are optional OpenCV-dependent checks because the Linux runner lacks `cv2`.
 - Source-evidence lookup corrections and method-hash-pinned qualification evidence were validated by a second GitHub Actions run (PR #9 head `6697f6f94387f8d57e023f6eebfb74d44e29d857`): Node 22.16.0 and Node 24 both PASS; 269 passed, 0 failed, 2 optional OpenCV-dependent skips.
-- Subsequent stage-window and Race side-event schedule changes are included in PR #7 head `954dcea2f405ed16639d72c729335f85b809ea97`. A final-source validation-only PR #10 has a GitHub Actions run in progress; do not count those latest changes as passed until that run completes.
+- Stage-window and Race side-event schedule changes passed the revalidation run at commit `4cc3baac10a9ea6ea0ad31f504a4ccd67c9e9289` (Node 22.16 and 24; 272 passed, 0 failed, 2 optional OpenCV skips).
+- Further settings-freeze, prospective revision, Pilot game-limit/tie-rank and additive-normalization changes are included in PR #7 head `cf450206439020412d5291780fe9cd65db9449af`. The final-source revalidation run must be repeated after these additions; do not count them as passed yet.
 - The earlier local isolated domain prototype suite was 6/6 PASS, but it is not the same code as the remote branch and is not used as current branch acceptance.
 - Windows/native OCR, current game-client, live Discord, local OAuth/browser visual testing, and organizer publication approvals: NOT RUN / OPEN.
 - This increment is not production certification.
@@ -88,6 +91,12 @@ Shared participant identity, evidence, scoring validation, referee review, corre
 - Added chronological, non-overlapping stage windows for Regular Season, Postseason and Grand Finale; Pilot event timing is constrained to one evening and ordered entry/lineup deadlines.
 - Added organizer-approved Full Race side-event schedule records and linked result records with positive elapsed-time and evidence requirements.
 - Added tests for invalid duration/date windows, missing side-event approval and missing schedule references.
+
+### 2026-11-04 - implementation expansion A5: frozen settings and prospective updates
+- Stage start and each Full stage transition snapshot settings, version and hash.
+- Event nights retain their own versioned settings snapshot.
+- Prospective settings revisions are limited to selected future event nights with no fixtures; outcome method, qualification and tie-break policy remain frozen.
+- Added Pilot game-count validation, shared rank for tied Damage totals, and additive normalization for older lifecycle objects.
 
 ### 2026-11-04 - initial Pilot/Full lifecycle implementation
 - Added separate lifecycle module and persistence field.
