@@ -2668,6 +2668,8 @@ function tournamentHelp() {
         '**YOLO Tourney commands**',
         '`!yolo help` — show this help',
         '`!yolo players` — list roster players and IDs',
+        '`!yolo formats` — list Pilot and Full YOLO competitions, stage status and registration state',
+        '`!yolo register <tournament ID>` — register the linked player account for an open event',
         '`!yolo panel` — public interactive totals, standings, roster and event leaderboard panel',
         '`!yolo download-workbook` / `!yolo workbook` — download the Excel source workbook',
         '`!yolo export-workbook` — export workbook-compatible JSON (admin)',
@@ -2909,6 +2911,20 @@ async function handleTournamentCommand(message) {
             response = sent ? 'Full-state recovery snapshot attached to the configured public channel.' : 'Snapshot could not be attached. Check that TARGET_CHANNEL_ID is set and the bot has View Channel, Send Messages, and Attach Files permissions.';
         } else if (command === 'players') {
             response = tournamentState.players.length ? `**Tournament roster**\n${tournamentState.players.map(p => `#${p.id} — ${p.name}`).join('\n')}` : 'No players yet. An admin can use `!yolo add-player <name>`.';
+        } else if (command === 'formats') {
+            const competitions = tournamentState.competition?.tournaments || [];
+            response = competitions.length ? competitions.map(item => {
+                const stages = item.stages.map(stage => stage.key.replace(/_/g, ' ') + ': ' + stage.status).join(' · ');
+                return '**' + item.name + '** (' + (item.format === 'pilot' ? 'Pilot YOLO' : 'Full YOLO') + ') — ' + item.status + '\n' + stages + '\nRegistration: ' + (item.config.registrationOpen ? 'open' : 'closed');
+            }).join('\n\n') : 'No Pilot or Full YOLO competitions have been created.';
+        } else if (command === 'register') {
+            if (!args) throw new Error('Usage: !yolo register <tournament ID>. Use !yolo formats to list events.');
+            const player = Tournament.findPlayerByDiscordUserId(tournamentState, message.author.id);
+            if (!player) throw new Error('Your Discord account is not linked to a tournament roster entry. Ask an admin to link your account first.');
+            const competition = Tournament.TournamentFormats.getTournament(tournamentState.competition, args.trim());
+            const registration = Tournament.TournamentFormats.registerParticipant(competition, { playerId: String(player.id), displayName: player.name }, message.author.id);
+            await saveTournamentState();
+            response = 'Registered **' + player.name + '** for **' + competition.name + '** (' + registration.id + ').';
         } else if (command === 'player') {
             if (!args) throw new Error('Usage: `!yolo player <name or ID>`.');
             response = playerDetailText(args);
