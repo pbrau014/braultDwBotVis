@@ -166,6 +166,8 @@ function lockRoster(tournament, teamId, actor = 'organizer') {
 function publishTournament(tournament, approval = {}, actor = 'organizer') {
   if (tournament.status !== STATUS.DRAFT) throw new Error('Only a draft tournament can be published.');
   if (!tournament.config.timezone) throw new Error('Set the event/season timezone before publication.');
+  try { new Intl.DateTimeFormat('en-US', { timeZone: tournament.config.timezone }); }
+  catch { throw new Error('Set a valid IANA event/season timezone before publication.'); }
   const start = Date.parse(tournament.config.eventStart || '');
   const end = Date.parse(tournament.config.eventEnd || '');
   if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start)
