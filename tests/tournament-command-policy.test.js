@@ -2,7 +2,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { isAdminOnlyCommand } = require('./src/tournament-command-policy');
+const { isAdminOnlyCommand } = require('../src/tournament-command-policy');
 
 test('read-only settings inspection is restricted to tournament admins', () => {
     assert.equal(isAdminOnlyCommand('settings'), true);

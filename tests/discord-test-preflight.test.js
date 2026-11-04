@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { validateDiscordTestConfig, nodeVersionSupported, isWithinDirectory } = require('./src/discord-test-preflight');
+const { validateDiscordTestConfig, nodeVersionSupported, isWithinDirectory } = require('../src/discord-test-preflight');
 function validConfig(overrides = {}) {
     return { NODE_ENV:'development', DISCORD_BOT_TOKEN:'test-bot-token-with-sufficient-length-123456789', TARGET_CHANNEL_ID:'123456789012345678', TOURNAMENT_ADMIN_IDS:'234567890123456789', TOURNAMENT_STORAGE:'json', TOURNAMENT_STATE_PATH:'./testdata/live-discord-state/tournament-state.json', TOURNAMENT_SQLITE_PATH:'./testdata/live-discord-state/tournament-state.sqlite', ENABLE_SLASH_COMMANDS:'0', OCRSPACE_ENABLED:'0', PADDLEOCR_FIELD_FALLBACK:'0', OCR_CV_ASSIST:'0', ...overrides };
 }

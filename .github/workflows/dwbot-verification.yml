@@ -46,6 +46,9 @@ jobs:
           node --check src/ocrspace-quota-ledger.js
           node --check src/ocrspace-field-evidence.js
           node --check src/discord-test-preflight.js
+          node --check src/ocr-sequence-checkpoint.js
+          node --check scripts/run-ocr-sequence.js
+          node --check tests/ocr-sequence-checkpoint.test.js
 
       - name: Verify OCR.space contract, quotas and crop isolation
         run: npm run test:ocrspace

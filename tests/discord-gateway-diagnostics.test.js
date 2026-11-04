@@ -2,7 +2,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { inspectTargetChannelPermissions } = require('./src/discord-gateway-diagnostics');
+const { inspectTargetChannelPermissions } = require('../src/discord-gateway-diagnostics');
 
 const required = [
     { name: 'ViewChannel', flag: 1 },

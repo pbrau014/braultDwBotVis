@@ -4,9 +4,9 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
-const { recognizeCrop, API_URL, MAX_FREE_FILE_BYTES } = require('./src/ocrspace-client');
-const { OcrSpaceQuotaLedger, PROVIDER_LIMITS } = require('./src/ocrspace-quota-ledger');
-const { collectOcrSpaceFieldEvidence, parseCropCap } = require('./src/ocrspace-field-evidence');
+const { recognizeCrop, API_URL, MAX_FREE_FILE_BYTES } = require('../src/ocrspace-client');
+const { OcrSpaceQuotaLedger, PROVIDER_LIMITS } = require('../src/ocrspace-quota-ledger');
+const { collectOcrSpaceFieldEvidence, parseCropCap } = require('../src/ocrspace-field-evidence');
 
 function payload(text = '43110', engine = 2) {
     return { OCRExitCode: 1, IsErroredOnProcessing: false, ProcessingTimeInMilliseconds: '143',
