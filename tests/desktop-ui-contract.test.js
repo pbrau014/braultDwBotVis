@@ -83,12 +83,15 @@ test('Admin lifecycle forms use same-origin protected API routes and cover Pilot
   const html = read('desktop/admin.html');
   const script = read('desktop/admin.js');
   const bridge = read('src/desktop-bridge.js');
-  for (const route of ['/api/admin/tournaments','/api/admin/seasons','/api/admin/stages','/api/admin/teams','/api/admin/registrations','/api/admin/rosters','/api/admin/event-nights','/api/admin/fixtures','/api/admin/matches','/api/admin/match-outcomes','/api/admin/bracket/advance','/api/admin/approvals']) {
+  for (const route of ['/api/admin/tournaments','/api/admin/seasons','/api/admin/stages','/api/admin/teams','/api/admin/registrations','/api/admin/rosters','/api/admin/event-nights','/api/admin/fixtures','/api/admin/matches','/api/admin/match-outcomes','/api/admin/bracket/advance','/api/admin/approvals','/api/admin/pilot/registrations','/api/admin/pilot/event-nights','/api/admin/tournament-scores','/api/admin/awards']) {
     assert.ok(html.includes('data-lifecycle-endpoint="'+route+'"'), 'Admin form missing '+route);
     assert.ok(bridge.includes("'"+route+"'"), 'Bridge route missing '+route);
   }
   assert.match(script, /data-lifecycle-endpoint/);
   assert.match(script, /data-entity/);
+  assert.match(script, /pilotTournaments/);
+  assert.match(read('desktop/player.js'), /player-tournament-list/);
+  assert.match(read('desktop/admin.js'), /admin-tournament-list/);
   assert.match(bridge, /csrf\(req,session\)/);
   assert.match(bridge, /role\(principal,\['admin'\]\)/);
 });
