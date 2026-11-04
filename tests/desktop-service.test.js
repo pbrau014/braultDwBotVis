@@ -174,6 +174,10 @@ test('Full operations preserve registered roster, fixture, match, game and revie
  assert.equal(linked.status,'awaiting-evidence-review');
  const reviewed=await f.service.reviewYoloGameEvidence(admin,game.id,{accepted:true});
  assert.equal(reviewed.status,'evidence-accepted');
+ const sideEvent=await f.service.createYoloRaceSideEvent(admin,'ops-night',{id:'race-side-1',scheduleOffsetMinutes:60,scoringPolicyId:'approved-race-policy',approvedSettingsId:'approved-race-settings'});
+ assert.equal(sideEvent.type,'race-side-event');
+ const raceTime=await f.service.recordYoloRaceTime(admin,game.id,{evidenceRecordId:upload.submissionId,elapsedSeconds:42});
+ assert.equal(raceTime.normalizedMetric,1/42);
  const certified=await f.service.certifyYoloMatchOutcome(admin,match.id,{winnerTeamId:teamA.id,approvedScoringMethodId:'approved-match-method',
   acceptedPerformanceRecordIds:[upload.submissionId],aggregation:'approved aggregate rule v1',rounding:'approved rounding rule v1',
   tieBreakOrder:['head-to-head','team-record','point-differential'],decisionReference:'signed-match-result-2026-11-07'});
@@ -192,4 +196,12 @@ test('event-night publication requires signed settings and activation locks regi
  assert.ok(active.rosterLockedAt);
  await assert.rejects(f.service.registerYoloParticipant(player,'night-approved'),/Registration is closed/);
  assert.ok(active.audit.some(entry=>entry.action==='event-night-transitioned'));
+});
+
+test('Race side-event requires approval and Race-time metric requires accepted game evidence',async()=>{
+ const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
+ await f.service.createYoloTournament(admin,{id:'race-test',name:'Race Test',format:'pilot'});
+ await f.service.createYoloEventNight(admin,{id:'race-night',tournamentId:'race-test',startsAt:'2026-11-11T18:00:00Z'});
+ await assert.rejects(f.service.createYoloRaceSideEvent(admin,'race-night',{id:'race-side',scoringPolicyId:'policy'}),e=>e.code==='RACE_SIDE_EVENT_APPROVAL_REQUIRED');
+ await assert.rejects(f.service.recordYoloRaceTime(admin,'unknown-game',{elapsedSeconds:30,evidenceRecordId:'missing'}),e=>e.code==='GAME_NOT_FOUND');
 });
