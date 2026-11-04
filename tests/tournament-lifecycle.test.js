@@ -172,3 +172,19 @@ test('Race side-event evidence remains separate from ordinary match score',()=>{
  assert.equal(event.seasonContribution,null);
  assert.throws(()=>L.recordRaceSideEventResult(season,event.id,{participantId:'u1',damage:50000,evidenceId:'race-evidence-2'}),/already has/);
 });
+
+test('Pilot event supports teams, visible roster assignment, fixtures and matches without a season',()=>{
+ const t=L.createTournament({id:'pilot-ops',format:'pilot'});
+ L.registerPilotParticipant(t,{participantId:'p1',displayName:'Alpha'});
+ L.registerPilotParticipant(t,{participantId:'p2',displayName:'Bravo'});
+ const night=L.createPilotEventNight(t,{id:'pilot-night'});
+ const home=L.createPilotTeam(t,{id:'home',name:'Home'});
+ const away=L.createPilotTeam(t,{id:'away',name:'Away'});
+ L.assignPilotRoster(t,{participantId:'p1',teamId:home.id,eventNightId:night.id});
+ L.assignPilotRoster(t,{participantId:'p2',teamId:away.id,eventNightId:night.id});
+ const fixture=L.createPilotFixture(t,{id:'pilot-fixture',eventNightId:night.id,teamA:home.id,teamB:away.id});
+ const match=L.createPilotMatch(t,fixture.id,{id:'pilot-match',gameNumber:1});
+ assert.equal(match.fixtureId,fixture.id);
+ assert.equal(t.seasonId,null);
+ assert.equal(t.matches.length,1);
+});
