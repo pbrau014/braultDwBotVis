@@ -62,7 +62,9 @@
 5. Create fixtures only between teams assigned to the same event night. Create matches within the declared series length and games within each match.
 6. Link only complete, mapped screenshot records to games. Linking places evidence into review; it does not automatically accept the evidence or determine a match outcome. An administrator records acceptance or rejection, with a reason required for rejection.
 7. Every tournament, stage, event-night, registration, team, fixture, match, game and evidence decision should retain actor/time/action audit history. Private full recovery archives retain roster details; public recovery snapshots omit participant registrations and private roster metadata.
-8. Tournament and stage progression is ordered. Full YOLO cannot complete until regular season, postseason and Grand YOLO finale are all completed.
+8. Before a Full stage can close, its event nights must be completed and every match outcome must be certified. Certification records the approved scoring method, accepted evidence IDs, aggregation, rounding, tie-break order and an external decision reference. The bot does not calculate an unapproved formula or invent a winner.
+9. Race side-events require a separate approved scoring policy and event-settings record. Race-time metrics are attached to an evidence-accepted game as positive elapsed seconds and reciprocal 1/seconds; they are not the side-event or a bracket outcome.
+10. Tournament and stage progression is ordered. Full YOLO cannot complete until regular season, postseason and Grand YOLO finale are all completed.
 
 ## 8. Organizer publication checklist
 
