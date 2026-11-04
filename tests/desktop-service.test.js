@@ -116,10 +116,10 @@ test('Admin manages Pilot and Full lifecycles; match outcomes require a stored o
   await f.service.assignRoster(admin,{seasonId:season.id,participantId:'p1',teamId:a.id});
   await f.service.createEventNight(admin,{seasonId:season.id,stageId:postseason.id});
   const fixture=await f.service.createFixture(admin,{seasonId:season.id,stageId:postseason.id,teamA:a.id,teamB:b.id});
-  await f.service.createMatch(admin,{seasonId:season.id,fixtureId:fixture.id});
-  await assert.rejects(f.service.recordMatchOutcome(admin,{seasonId:season.id,id:'o0',teamA:a.id,teamB:b.id,scoreA:2,scoreB:1,methodId:'missing'}),e=>e.code==='SCORING_APPROVAL_REQUIRED');
+  const match=await f.service.createMatch(admin,{seasonId:season.id,fixtureId:fixture.id});
+  await assert.rejects(f.service.recordMatchOutcome(admin,{seasonId:season.id,matchId:match.id,id:'o0',teamA:a.id,teamB:b.id,scoreA:2,scoreB:1,methodId:'missing'}),e=>e.code==='SCORING_APPROVAL_REQUIRED');
   const approval=await f.service.createApprovalRecord(admin,{id:'D21-v1',scope:'match outcome scoring',version:'1',approvedAt:'2026-11-04T12:00:00.000Z'});
-  const outcome=await f.service.recordMatchOutcome(admin,{seasonId:season.id,id:'o1',teamA:a.id,teamB:b.id,scoreA:2,scoreB:1,methodId:approval.id});
+  const outcome=await f.service.recordMatchOutcome(admin,{seasonId:season.id,matchId:match.id,id:'o1',teamA:a.id,teamB:b.id,scoreA:2,scoreB:1,methodId:approval.id});
   assert.equal(outcome.winnerTeamId,a.id);
   await assert.rejects(f.service.createTournament(player,{id:'unauthorized',format:'pilot'}),e=>e.status===403);
 });
