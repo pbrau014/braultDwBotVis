@@ -6,7 +6,7 @@
   "main": "src/bot.js",
   "scripts": {
     "start": "node src/bot.js",
-    "test": "node --test",
+    "test": "node --test tests",
     "corpus:fetch": "node scripts/fetch-reference-corpus.js",
     "corpus:test": "node scripts/run-reference-regression.js",
     "test:four-images": "node scripts/run-four-screenshot-pipeline.js",
@@ -22,11 +22,11 @@
     "summarize:ocr": "node scripts/summarize-ocr-acceptance.js",
     "test:paddleocr-fallback": "node --test tests/paddleocr-field-fallback.test.js",
     "acceptance:paddleocr": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/run-paddleocr-integrated-acceptance.ps1",
-    "test:discord-gateway-diagnostics": "node --test discord-gateway-diagnostics.test.js",
-    "test:discord-command-policy": "node --test tournament-command-policy.test.js",
-    "test:discord-preflight": "node --test discord-gateway-diagnostics.test.js tournament-command-policy.test.js discord-test-preflight.test.js",
+    "test:discord-gateway-diagnostics": "node --test tests/discord-gateway-diagnostics.test.js",
+    "test:discord-command-policy": "node --test tests/tournament-command-policy.test.js",
+    "test:discord-preflight": "node --test tests/discord-gateway-diagnostics.test.js tests/tournament-command-policy.test.js tests/discord-test-preflight.test.js",
     "preflight:discord-test": "node scripts/preflight-discord-test.js",
-    "test:ocrspace": "node --test ocrspace.test.js",
+    "test:ocrspace": "node --test tests/ocrspace.test.js",
     "test:ocr": "npm run test:ocrspace && npm run test:ocr-watchdog && npm run test:paddleocr-fallback"
   },
   "engines": {
