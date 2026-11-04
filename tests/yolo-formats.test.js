@@ -14,11 +14,11 @@ test('official match outcome requires approved formula and accepted evidence',()
 
 test('Full stages activate and complete in order; season cannot close early',()=>{
  let t=Y.createTournament({id:'full',name:'Full',format:'full',season:{id:'s',durationWeeks:12}});
- t=Y.transitionStage(t,'postseason','published','admin');\n assert.throws(()=>Y.transitionStage(t,'postseason','active','admin'),/preceding/);
+ t=Y.transitionStage(t,'postseason','published','admin');
+ assert.throws(()=>Y.transitionStage(t,'postseason','active','admin'),/preceding/);
  t=Y.transitionStage(t,'regular-season','published','admin');
  t=Y.transitionStage(t,'regular-season','active','admin');
  t=Y.transitionStage(t,'regular-season','completed','admin');
- t=Y.transitionStage(t,'postseason','published','admin');
  t=Y.transitionStage(t,'postseason','active','admin');
  t=Y.transitionStage(t,'postseason','completed','admin');
  t=Y.transitionStage(t,'grand-finale','published','admin');
