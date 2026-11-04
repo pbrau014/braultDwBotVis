@@ -254,7 +254,7 @@ function recordGame(match, game, teams = [], registrations = []) {
   if (!Number.isInteger(gameNumber) || gameNumber < 1) throw new Error('Game number must be a positive integer.');
   if (match.games.some(g => g.gameNumber === gameNumber)) throw new Error('Game number already recorded for this match.');
   const metrics = game.metrics;
-  const explicit = value => value !== null && value !== undefined && value !== '' && Number.isFinite(Number(value)) && Number(value) >= 0;
+  const explicit = value => value !== null && value !== undefined && !(typeof value === 'string' && value.trim() === '') && Number.isFinite(Number(value)) && Number(value) >= 0;
   if (!metrics || !explicit(metrics.damage) || !explicit(metrics.kills)) {
     throw new Error('Match game requires explicit non-negative Damage and Kills values.');
   }
