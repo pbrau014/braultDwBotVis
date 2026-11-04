@@ -5,33 +5,34 @@
 **Runtime:** Node v22.16.0 / npm 10.9.2 / Linux x64  
 **Disposition:** Phase 9 partially implemented; production NO-GO.
 
-## Verified locally
+## Historical working-copy verification (not current-branch results)
 
-- Full `npm test`: **214 passed / 0 failed / 0 skipped** after the preflight and OCR metadata corrections.
-- Synthetic Discord system suite: **7/7**. It covers a synthetic command tour, admin-only command checks, one-channel routing, public panel controls, state persistence/recovery, synthetic attachment/OCR paths, and 50-player scoring. It is not a live Discord test.
-- SQLite persistence: **5/5**.
-- OCR watchdog/process cancellation/damage consensus: **21/21**.
+The following results were recorded in a prior local working copy. They are preserved as provenance only; the corresponding complete workspace is not available in this execution environment, and these results have not been reproduced from the current `dwbotVis` branch.
+
+- Historical full `npm test`: **214 passed / 0 failed / 0 skipped** after the preflight and OCR metadata corrections.
+- Historical synthetic Discord system suite: **7/7**. It covers a synthetic command tour, admin-only command checks, one-channel routing, public panel controls, state persistence/recovery, synthetic attachment/OCR paths, and 50-player scoring. It is not a live Discord test.
+- Historical SQLite persistence: **5/5**.
+- Historical OCR watchdog/process cancellation/damage consensus: **21/21**.
 - Historical working-copy report: OCR.space client/quota/crop contracts **19/19**, mocked only; the current `dwbotVis` tree does not contain those adapter/quota source files or tests, so this result is not reproducible from the current branch.
 - Historical working-copy report: OCR sequence checkpoints **4/4**; the checkpoint module and sequence-runner changes are not present in the current branch tree, so this result is not reproducible from the current branch.
 - Historical working-copy report: secret-safe Discord preflight tests **5/5**; no matching standalone test file was found in the current branch tree. Do not count this as current-branch verification.
-- Native utilities present in this host: Tesseract 5.5.0, ImageMagick 7.1.2, Chromium 144. Node child-process execution and local file writes work.
-- Changed JavaScript syntax checks pass.
+- Historical host utilities: Tesseract 5.5.0, ImageMagick 7.1.2 and Chromium 144 were present in that prior host. This is not a current-host verification.
+- Historical changed-JavaScript syntax checks passed in that working copy.
 
-The preflight checks Discord snowflake syntax, development admin allowlisting, test-scoped JSON/SQLite paths and public read-only DNS/HTTPS reachability. It records credential presence only; it never logs token or ID values.
+The prior working-copy preflight script is not present in the current branch. The replacement offline preflight and its limits are documented below.
 
 ## Live/Windows blockers
 
 - No local `.env`, Discord bot token, target channel, test guild, test-admin identity or participant identity is configured.
-- Discord DNS failed with `EAI_AGAIN`; the public gateway HTTPS probe is unreachable.
-- npm registry DNS/HTTPS is unavailable. `discord.js`, `dotenv`, `tesseract.js` and `tesseract.js-core` are absent. The prior offline npm restore failed because `zlibjs@0.3.1` was not cached.
-- This is Linux, not Windows; PowerShell is unavailable. Windows dependency, launch, native-Tesseract, Desktop-browser and PaddleOCR PowerShell gates were not run.
+- In the prior working-copy environment, Discord DNS failed with `EAI_AGAIN`, the public gateway HTTPS probe was unreachable, npm registry DNS/HTTPS was unavailable, and the offline restore failed because `zlibjs@0.3.1` was not cached. These are historical environment observations, not a new live probe in this turn.
+- This execution has no configured local `.env` or Discord credentials. Windows dependency, launch, native-Tesseract, Desktop-browser and PaddleOCR PowerShell gates remain unverified here.
 - No live gateway login, real Discord command, live role test, Discord attachment receipt, live 429, live bot restart, screenshot OCR acceptance or provider transmission was performed.
 
 ## Required next evidence
 
 Create an isolated development bot/guild/channel and keep credentials only in a local `.env` based on `.env.discord-test.example`. Restore the exact dependencies with `npm ci` on a host with registry access. Follow the step-by-step matrix in `docs/iteration23/DISCORD_LIVE_TEST_QUICKSTART.md`. Capture full logs and exit codes, Ready identity, admin/participant allowed/denied outcomes, one synthetic attachment result, exact nine-field report, before/after isolated state and stop/restart logs. Never send credentials or private player data into chat.
 
-Status details and the repeatable Windows procedure are in the local working package at `docs/iteration23/PHASE9_DISCORD_INTEGRATION_TEST_REPORT_2026-11-04.md` and `docs/iteration23/DISCORD_LIVE_TEST_QUICKSTART.md`.
+The current branch contains `docs/iteration23/DISCORD_LIVE_TEST_QUICKSTART.md` and this status file. The previously referenced `PHASE9_DISCORD_INTEGRATION_TEST_REPORT_2026-11-04.md` is not present in the current branch and must not be treated as an available artifact.
 
 **No live result is claimed.** Production remains NO-GO until the required live Discord, Windows/native, current-source exact OCR, security, recovery and package gates pass.
 
@@ -39,7 +40,7 @@ Status details and the repeatable Windows procedure are in the local working pac
 
 The authorized `dwbotVis` branch now records discord.js shard lifecycle events (`shardReady`, `shardDisconnect`, `shardReconnecting`, `shardResume`, `shardError`) and client error/warning events. This is observability only; discord.js remains responsible for heartbeats, reconnects and session resume.
 
-After `ClientReady`, startup now fetches the configured target channel and performs a read-only preflight for a sendable guild text channel and the bot's required `ViewChannel`, `SendMessages` (or `SendMessagesInThreads` for a thread), and `AttachFiles` permissions. A failed preflight is logged as a failure and the bot does not print its normal online-success message or register slash commands. The bot identity and READY state are logged separately from channel readiness.
+After `ClientReady`, startup now fetches the configured target channel and performs a read-only preflight for a sendable guild text channel and the bot's required `ViewChannel`, `SendMessages` (or `SendMessagesInThreads` for a thread), and `AttachFiles` permissions. A failed preflight aborts startup, closes tournament storage, destroys the Discord client and sets a non-zero exit status; slash commands are not registered. The bot identity and READY state are logged separately from channel readiness.
 
 Added pure unit coverage for missing channels, unsupported channels, unresolved permissions, successful permission checks, missing permissions, and undefined permission flags. These tests are isolated from Discord credentials and do not contact Discord.
 
@@ -62,7 +63,7 @@ The bot now subscribes to discord.js REST `rateLimited` events and records metho
 
 ## Current-branch test and setup verification
 
-- The six pure Gateway/channel-preflight tests were run from the exact helper and test source committed to this branch: **6/6 passed** on Node.js v22.16.0.
+- The seven pure Gateway/channel-preflight tests passed in an isolated Node.js v22.16.0 runtime: **7/7**. The full project checkout was not available for a full test run.
 - The package script name and command were exercised in an isolated temporary npm package with the same script definition; the full project dependency tree was not installed in this environment.
 - The committed `.gitignore` behavior was checked with Git: `.env`, `node_modules/`, local SQLite files and `testdata/live-discord-state/` are ignored; `.env.discord-test.example` is not ignored.
 - The modified `src/bot.js` has been reviewed at the changed import, client setup, REST rate-limit listener and READY/preflight sections, but a full-project `node --check src/bot.js` and full `npm test` have not been run from a complete local checkout in this environment.
@@ -116,3 +117,8 @@ The current repository did not contain the previously described standalone prefl
 ## Combined 21-test offline preflight suite
 
 After adding the local configuration validator, the combined `npm run test:discord-preflight` command was executed in an isolated Node.js v22.16.0 environment using the committed script definition and corresponding pure helper/test logic. Result: **21 passed / 0 failed / 0 skipped**: seven channel-permission tests, four command-policy tests, and ten local-configuration tests. No Discord credentials or network calls were used. The script wrapper itself and the full application dependencies have not been exercised in the complete project checkout.
+
+
+## Default-branch webhook exposure remains outstanding
+
+The sanitized HTML reader is committed on dwbotVis, but a read-only check confirmed that the current main branch still contains the exposed webhook in its current HTML file. The owner must revoke/delete it in Discord immediately. No main-branch modification or history rewrite was performed.
