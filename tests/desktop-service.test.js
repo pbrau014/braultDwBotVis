@@ -18,7 +18,8 @@ const RULE_HASH='a'.repeat(64);
 function pilotSettings(){return{timezone:'America/Chicago',startAt:'2026-11-10T18:00:00-06:00',endAt:'2026-11-10T21:00:00-06:00',entryClosesAt:'2026-11-10T17:00:00-06:00',lineupLocksAt:'2026-11-10T17:30:00-06:00',gameCount:7,mapPolicy:'approved pool',modePolicy:'verified standard modes',shipPolicy:'approved list',prizePolicy:'approved awards',disputePolicy:'published review'};}
 function fullSettings(){return{timezone:'America/Chicago',duration:'8 weeks',cadence:'weekly',regularSeasonStart:'2026-11-01',regularSeasonEnd:'2026-12-27',postseasonStart:'2027-01-03',postseasonEnd:'2027-01-17',finaleStart:'2027-01-24',finaleEnd:'2027-01-31',postseasonPolicy:'top four by approved method',finalePolicy:'published final series',teamPolicy:'locked rosters',matchOutcomeMethodId:'M1',matchOutcomeMethodVersion:'1',matchOutcomeMethodHash:RULE_HASH,tieBreakPolicy:'published tie-breaks',disputePolicy:'published review'};}
 function approval(){return{approvedBy:'Organizer',approvedAt:'2026-10-30T12:00:00Z',rulesVersion:'1.0',rulesHash:RULE_HASH};}
-\nfunction fixture(options={}) {
+
+function fixture(options={}) {
   const state=Tournament.createState();
   const alpha=Tournament.addPlayer(state,'[WOLF]Alpha');
   Tournament.addPlayer(state,'[BEAR]Bravo');
