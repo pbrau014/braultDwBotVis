@@ -261,6 +261,12 @@ function createDesktopBridge(options={}){
       const result=await call('mapSubmission',principal,mapping[1],await readJson(req));
       audit(principal,'tournament-mapping');sendJson(res,200,result);return true;
     }
+    const selfRegistration=p.match(/^\/api\/yolo-event-nights\/([A-Za-z0-9._-]+)\/registration$/);
+    if(req.method==='POST'&&selfRegistration){
+      csrf(req,session);role(principal,['player']);
+      const result=await call('registerYoloParticipant',principal,selfRegistration[1],{});
+      audit(principal,'self-event-registration');sendJson(res,201,result);return true;
+    }
     if(p.startsWith('/api/admin/')){
       role(principal,['admin']);
       if(req.method==='GET'&&p==='/api/admin/backup'){
