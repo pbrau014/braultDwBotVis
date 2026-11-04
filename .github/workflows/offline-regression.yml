@@ -35,5 +35,9 @@ jobs:
           node --check src/bot.js
           node --check src/tournament.js
           node --check src/yolo-formats.js
+          node --check src/desktop-service.js
+          node --check src/desktop-bridge.js
+          node --check desktop/admin.js
+          node --check desktop/player.js
       - name: Complete offline test suite
         run: npm test
