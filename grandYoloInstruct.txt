@@ -1,0 +1,31 @@
+GRAND YOLO TOURNAMENT INSTRUCTIONS
+Implementation draft — Pilot YOLO and Full YOLO share one system.
+
+1. FORMAT
+Pilot YOLO is a compact single-evening event with one event lifecycle, roster lock and final result. It does not create a season, regular-season table, postseason bracket or season finale.
+Full YOLO is a season lasting the organizer-declared number of weeks/months. It contains a regular season, postseason and Grand YOLO tournament finale. Duration, dates, advancement capacity and series structure must be approved and published before registration.
+Both formats share registration, identity verification, rules, team/roster procedures, match operations, evidence, corrections, scoring review, disputes and awards. Format changes lifecycle and configured rules, not the participant journey.
+
+2. SHARED PARTICIPANT JOURNEY
+Read published eligibility, ship restrictions, schedule, scoring and evidence rules. Register before close. Confirm exact in-game and Discord identity; refer ambiguity to an organizer. Review roster and ready-up instructions. Join the designated Training Room. Capture required Personal Score evidence. OCR is candidate extraction only; exact validation and human review apply. Correct one unresolved field at a time. Never invent missing values or treat blanks as zero. Review results and use the published dispute route.
+
+3. PILOT OPERATIONS
+Publish date/time/timezone, signup close, lineup time, room/host, maps, ship eligibility, battle duration, games, breaks, no-show policy, evidence deadline, scoring and awards. Historical pilot source suggests signup closes one hour before start and final lineup 30 minutes before start; organizers must ratify these for each event. Historical pilot placement/prizes use individual Damage, not team win/loss. Pilot results do not seed Full YOLO absent an explicit approved transfer rule.
+
+4. FULL SEASON OPERATIONS
+Before signup publish season duration, event schedule, registration/roster lock, team formation, regular-season event count, match format, scoring method, aggregation/rounding, tie-breaks, qualification, bracket, byes/forfeits/withdrawals, finale, disputes and awards. Keep standings cumulative only within that season. Do not mix Pilot results absent an approved transfer rule. Reconcile regular season before postseason qualification. Run postseason and finale using the published bracket and tie-break sequence, recording every fixture, match, game, accepted performance record and decision. Grand YOLO finale is not the legacy Grand Yolo scoring category. Full season closes only after regular season, postseason and finale are reconciled and signed off.
+
+5. TERMINOLOGY
+Damage / Kills / Race / Grand Yolo are legacy scoring categories, not stages. Race-time metric stores positive elapsed seconds; if approved, reciprocal metric = 1 / seconds and lower elapsed time is better. Race side-event is separately scheduled and contributes to season totals only under an approved policy. Historical schedule weeks 3, 6, 9 and finale, one hour before regular event night, requires organizer ratification. Big Race is a map designation. Grand Yolo score is a scoring category; Grand YOLO finale is the Full format's final stage.
+
+6. INTEGRITY AND EVIDENCE
+Preserve original screenshot, hash, OCR candidates, accepted correction, reviewer, timestamp and record linkage. DWBOT's nine mandatory fields remain exact: result, player, map, mode, battleStart, credits, freeXp, damage, xp. This OCR contract does not define match outcome. Official match outcomes require approved scoring-method ID, accepted individual-performance records, published aggregation and rounding, and explicit tie-break order. Tie-break sequence: head-to-head; record among tied teams; predeclared team metric/point differential; extra deciding game if feasible; auditable random draw only when expressly authorized. Training Room rewards are not assumed; test actual screenshots and never fabricate missing Credits/XP as zero. Freeze ordinary rules at event start; changes apply prospectively to future/unplayed games. Emergency changes require reason, scope, approver, timestamp, affected games and participant notice/review. Never use unapproved workbook formulas for official advancement or awards.
+
+7. ORGANIZER CHECKLIST
+Format; organizer/approver; date/time/timezone; registration close; roster lock; cap; eligibility/ship list; room/password distribution; maps/modes; team composition; game count/duration; scoring/rounding; tie-breaks; no-show/forfeit/bye; evidence/dispute windows; awards; privacy/channel scope; accessibility/contact; emergency procedure. Blank values block publication; the bot must not guess.
+
+8. DESKTOP QUICK HELP
+Help must work on hover and keyboard focus, have visible labels and accessible descriptions, and be duplicated in an always-available help panel for touch/keyboard users. Tooltips supplement full instructions.
+
+9. KNOWN LIMITS
+This is a working operational draft, not event approval. Canonical v3.22 workbook and Score Reporter HTML were absent from audited sources. Ship allowlists, exact roster sizes, special-mode current-client label, dates, approver signatures, award amounts and some team/bot composition remain unresolved. Do not invent them. Organizer sign-off is required before live event approval.
