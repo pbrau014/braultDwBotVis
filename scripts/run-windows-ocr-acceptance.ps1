@@ -46,8 +46,13 @@ try {
   $Log=Join-Path $RunDir ($Label+'.log')
   Write-Host "[WINDOWS-OCR] START $Label"
   ("COMMAND: npm "+($Arguments -join ' ')) | Set-Content -LiteralPath $Log -Encoding utf8
-  & npm.cmd @Arguments 2>&1 | Tee-Object -FilePath $Log -Append
-  $Code=$LASTEXITCODE
+  $PreviousErrorActionPreference=$ErrorActionPreference
+  try {
+   $ErrorActionPreference='Continue'
+   & npm.cmd @Arguments *> $Log
+   $Code=$LASTEXITCODE
+  } finally { $ErrorActionPreference=$PreviousErrorActionPreference }
+  Get-Content -LiteralPath $Log | ForEach-Object { Write-Host $_ }
   $Outcome=if($Code -eq 0){'PASS'}else{'FAIL'}
   $script:Results += [pscustomobject]@{label=$Label;arguments=$Arguments;exitCode=$Code;log=[System.IO.Path]::GetFileName($Log);passed=($Code -eq 0)}
   Write-Host "[WINDOWS-OCR] $Outcome $Label exit=$Code"
