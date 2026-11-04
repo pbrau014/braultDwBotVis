@@ -92,6 +92,7 @@
           const body=Object.fromEntries(new FormData(form).entries());
           for(const key of ['scoreA','scoreB','gameNumber','elapsedSeconds','amount','time','damage','kills','tier'])if(body[key]!==undefined&&body[key]!=='')body[key]=Number(body[key]);
           for(const [key,value] of Object.entries(body))if(value==='')delete body[key];
+          if(body.confirmed!==undefined)body.confirmed=body.confirmed==='true';
           if(body.startsAt)body.startsAt=new Date(body.startsAt).toISOString();
           if(body.approvedAt)body.approvedAt=new Date(body.approvedAt).toISOString();
           await D.api(form.dataset.lifecycleEndpoint,{method:'POST',body});
