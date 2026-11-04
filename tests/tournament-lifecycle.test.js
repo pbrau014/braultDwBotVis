@@ -10,8 +10,8 @@ test('creates Pilot and Full tournaments with distinct lifecycle constraints', (
   assert.equal(pilot.seasonId, null);
   assert.equal(full.format, 'full');
   assert.equal(full.seasonId, null);
-  assert.throws(() => L.createSeason(pilot.id, {}), /Full YOLO/);
-  const season = L.createSeason(full.id, { id: 's1', name: '2027 Season' });
+  assert.throws(() => L.createSeason(pilot.id, { tournament: pilot }), /Full YOLO/);
+  const season = L.createSeason(full.id, { id: 's1', name: '2027 Season', tournament: full });
   assert.equal(season.id, 's1');
 });
 
@@ -29,13 +29,14 @@ test('validates tournament format and lifecycle transitions', () => {
 
 test('Full season stages progress in order and Grand Finale cannot be skipped', () => {
   const t = L.createTournament({ id: 'f2', format: 'full' });
-  const s = L.createSeason(t.id, { id: 's2' });
+  const s = L.createSeason(t.id, { id: 's2', tournament: t });
   const regular = L.createStage(s.id, 'regular_season', { id: 'r' });
   const post = L.createStage(s.id, 'postseason', { id: 'po' });
   const finale = L.createStage(s.id, 'grand_finale', { id: 'gf' });
   assert.equal(regular.order, 1);
   assert.equal(post.order, 2);
   assert.equal(finale.order, 3);
+  s.stages.push(regular, post, finale);
   assert.throws(() => L.activateStage(s, finale.id), /preceding/);
   L.activateStage(s, regular.id);
   L.completeStage(s, regular.id);
@@ -47,7 +48,7 @@ test('Full season stages progress in order and Grand Finale cannot be skipped', 
 
 test('roster assignments reject duplicates and cross-season references', () => {
   const t = L.createTournament({ id: 'f3', format: 'full' });
-  const s = L.createSeason(t.id, { id: 's3' });
+  const s = L.createSeason(t.id, { id: 's3', tournament: t });
   L.registerParticipant(s, { participantId: 'u1', displayName: 'Alpha' });
   L.assignRoster(s, { participantId: 'u1', teamId: 'red' });
   assert.throws(() => L.assignRoster(s, { participantId: 'u1', teamId: 'blue' }), /already assigned/);
@@ -56,7 +57,7 @@ test('roster assignments reject duplicates and cross-season references', () => {
 
 test('match outcomes require an approved, identified scoring method and exact positive inputs', () => {
   const t = L.createTournament({ id: 'f4', format: 'full' });
-  const s = L.createSeason(t.id, { id: 's4' });
+  const s = L.createSeason(t.id, { id: 's4', tournament: t });
   assert.throws(() => L.recordMatchOutcome(s, { id: 'm1', method: { approved: false }, teamA: 'a', teamB: 'b', scoreA: 1, scoreB: 0 }), /approved/);
   const result = L.recordMatchOutcome(s, { id: 'm2', method: { approved: true, methodId: 'D21-approved-v1' }, teamA: 'a', teamB: 'b', scoreA: 12.5, scoreB: 9 });
   assert.equal(result.winnerTeamId, 'a');
