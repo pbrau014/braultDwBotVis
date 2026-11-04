@@ -17,6 +17,14 @@
   </header>
   <main class="page">
     <section class="page-heading"><div><p class="eyebrow">ADMIN WORKSPACE</p><h1>Tournament control</h1><p class="lede small">Roster, account links, scoring, OCR review and recovery exports. Every mutation is authorized again by the Node service.</p></div><a class="button secondary" href="/api/admin/backup">Download full recovery JSON</a></section>
+    <section class="format-guide" aria-labelledby="admin-format-guide-title">
+      <div class="panel-heading"><div><p class="eyebrow">FORMAT CONTROL REFERENCE</p><h2 id="admin-format-guide-title">One system, two tournament lifecycles</h2><p class="muted">Create and publish each event only after its format-specific decisions are approved.</p></div></div>
+      <div class="format-guide-grid">
+        <article class="format-guide-card"><h3>Pilot YOLO <button type="button" class="quick-help" aria-label="Pilot YOLO organizer quick note" aria-describedby="admin-pilot-note" data-tip="Single-evening event; no season, postseason or carryover.">?</button></h3><p id="admin-pilot-note">Publish date/time, timezone, entry close, lineup lock, game count, maps/modes/ships, awards and dispute policy before signup.</p></article>
+        <article class="format-guide-card"><h3>Full YOLO <button type="button" class="quick-help" aria-label="Full YOLO organizer quick note" aria-describedby="admin-full-note" data-tip="Season length is organizer-selected; advancement requires the published outcome method.">?</button></h3><p id="admin-full-note">Publish season duration, cadence, dates, team/roster policy, match-outcome method, qualification, tie-breaks and Grand Finale rules.</p></article>
+      </div>
+      <p class="muted">This reference panel does not publish events or change tournament state. Lifecycle API and authenticated organizer controls remain a separate implementation gate.</p>
+    </section>
     <section id="admin-denied" class="notice warning hidden"><h2>Administrator access required</h2><p>This page and its operations are restricted to Discord IDs listed in <code>TOURNAMENT_ADMIN_IDS</code> in the local bot environment.</p></section>
     <section id="admin-content" class="hidden">
       <div class="metric-grid">
