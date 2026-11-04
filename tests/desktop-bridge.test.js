@@ -32,6 +32,12 @@ async function fixture(t,options={}){
     async createYoloTournament(p,body){actions.push({name:'yolo-create',body});return{id:body.id,format:body.format};},
     async createYoloEventNight(p,body){actions.push({name:'yolo-night',body});return{id:body.id};},
     async transitionYoloEventNight(p,id,body){actions.push({name:'yolo-night-status',id,body});return{status:body.status};},
+    async createYoloTeam(p,id,body){actions.push({name:'yolo-team',id,body});return{id:body.id};},
+    async createYoloFixture(p,id,body){actions.push({name:'yolo-fixture',id,body});return{id:body.id};},
+    async createYoloMatch(p,id,body){actions.push({name:'yolo-match',id,body});return{id:body.id};},
+    async createYoloGame(p,id,body){actions.push({name:'yolo-game',id,body});return{id:body.id};},
+    async linkYoloGameEvidence(p,id,body){actions.push({name:'yolo-evidence-link',id,body});return{status:'awaiting-evidence-review'};},
+    async reviewYoloGameEvidence(p,id,body){actions.push({name:'yolo-evidence-review',id,body});return{status:'evidence-accepted'};},
     async registerYoloParticipant(p,id,body){actions.push({name:'yolo-register',id,body,role:p.role});return{registered:true};},
     async transitionYoloStage(p,id,body){actions.push({name:'yolo-stage',id,body});return{status:body.status};},
     async transitionYoloTournament(p,id,body){actions.push({name:'yolo-status',id,body});return{status:body.status};},
@@ -174,4 +180,21 @@ test('linked participant can self-register only through authenticated player rou
  const registered=await fetch(f.origin+'/api/yolo-event-nights/night-1/registration',{method:'POST',headers,body:'{}'});
  assert.equal(registered.status,201);
  assert.equal(f.actions.at(-1).role,'player');
+});
+
+test('team match game and evidence review APIs are restricted to authenticated Admin',async t=>{
+ const f=await fixture(t),auth=await login(f.origin,'admin');
+ const headers={Cookie:auth.cookie,Origin:f.origin,'X-CSRF-Token':auth.session.csrfToken,'Content-Type':'application/json'};
+ const calls=[
+  ['/api/admin/yolo-event-nights/night-1/teams',{id:'team-a',name:'A',participantIds:['1']}],
+  ['/api/admin/yolo-event-nights/night-1/fixtures',{id:'fixture-a',homeTeamId:'team-a',awayTeamId:'team-b',scheduledAt:'2026-11-09T18:00:00Z'}],
+  ['/api/admin/yolo-fixtures/fixture-a/matches',{id:'match-a',matchNumber:1}],
+  ['/api/admin/yolo-matches/match-a/games',{id:'game-a',gameNumber:1}],
+  ['/api/admin/yolo-games/game-a/evidence',{recordId:'record-a'}],
+  ['/api/admin/yolo-games/game-a/evidence-review',{accepted:true}],
+ ];
+ for(const [url,body] of calls){const res=await fetch(f.origin+url,{method:'POST',headers,body:JSON.stringify(body)});assert.equal(res.status,body.scheduledAt?201:(url.endsWith('/evidence')?200:(url.endsWith('/evidence-review')?200:201)),url);}
+ const player=await login(f.origin,'player');
+ const denied=await fetch(f.origin+'/api/admin/yolo-event-nights/night-1/teams',{method:'POST',headers:{Cookie:player.cookie,Origin:f.origin,'X-CSRF-Token':player.session.csrfToken,'Content-Type':'application/json'},body:'{}'});
+ assert.equal(denied.status,403);
 });
