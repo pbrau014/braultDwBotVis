@@ -262,7 +262,17 @@ function createDesktopService(options = {}) {
     },
     async setSetting(principal,body) {
       role(principal,['admin']);
-      return mutate(async()=>{const value=Tournament.setSetting(state(),String(body?.event||''),String(body?.field||''),body?.value);await options.saveState();return{event:body.event,field:body.field,value};});
+      return mutate(async()=>{
+        const current=state();
+        const active=(current.competition?.tournaments||[]).filter(t=>t.stages.some(stage=>stage.status===TournamentFormats.STATUS.ACTIVE));
+        if(active.length){
+          for(const tournament of active) TournamentFormats.freezeSettings(tournament,{event:body?.event,field:body?.field,value:body?.value},principal.discordUserId);
+          await options.saveState();
+          return{blocked:true,reason:'Scoring settings are frozen while a competition stage is active. Apply changes prospectively to a future stage/event.',event:body?.event,field:body?.field};
+        }
+        const value=Tournament.setSetting(current,String(body?.event||''),String(body?.field||''),body?.value);
+        await options.saveState();return{event:body.event,field:body.field,value};
+      });
     },
     async registerForTournament(principal,tournamentId) {
       role(principal,['player']);
