@@ -127,3 +127,15 @@ test('player cannot invoke admin lifecycle actions or register to a missing tour
   await assert.rejects(f.service.competitionAction(player,{action:'create_tournament',tournament:{id:'x',name:'x',format:'pilot'}}),e=>e.status===403);
   await assert.rejects(f.service.registerForTournament(player,'missing'),/not found/);
 });
+
+test('admin can link a real uploaded OCR screenshot as immutable competition evidence',async()=>{
+  const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
+  await f.service.competitionAction(admin,{action:'create_tournament',tournament:{
+    id:'pilot-evidence',name:'Evidence Pilot',format:'pilot',config:{timezone:'America/Chicago',eventStart:'2026-12-01T18:00:00-06:00'},
+  }});
+  const upload=await f.service.submitImage(admin,{buffer:Buffer.from('original screenshot bytes'),filename:'evidence.png',contentType:'image/png'});
+  const evidence=await f.service.competitionAction(admin,{action:'register_battle_evidence',tournamentId:'pilot-evidence',recordId:upload.submissionId});
+  assert.equal(evidence.sha256.length,64);
+  assert.equal(evidence.contentType,'image/png');
+  assert.equal(evidence.source.recordId,upload.submissionId);
+});
