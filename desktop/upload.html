@@ -7,6 +7,7 @@
   <title>DWBOT · Screenshot Upload</title>
   <link rel="stylesheet" href="/desktop.css">
   <script src="/desktop.js" defer></script>
+  <script src="/help-tips.js" defer></script>
   <script src="/upload.js" defer></script>
 </head>
 <body>
@@ -16,10 +17,10 @@
     <div class="user-area"><span id="signed-in-user">Checking Discord…</span><button id="logout" class="button quiet small">Sign out</button></div>
   </header>
   <main class="page narrow">
-    <section class="page-heading"><div><p class="eyebrow">IMAGE SUBMISSION</p><h1>Upload a battle result</h1><p class="lede small">Select one original World of Warships results screenshot. The local bot will process it through the same serialized OCR queue used for Discord attachments.</p></div></section>
+    <section class="page-heading" data-help="Pilot and Full YOLO use the same original-evidence and exact OCR correction workflow. The format determines event or season mapping after the evidence is accepted."><div><p class="eyebrow">IMAGE SUBMISSION</p><h1>Upload a battle result</h1><p class="lede small">Select one original World of Warships results screenshot. The local bot will process it through the same serialized OCR queue used for Discord attachments.</p></div></section>
     <section class="panel upload-panel">
       <input id="image-file" type="file" accept="image/png,image/jpeg,image/webp,image/bmp,image/tiff,.png,.jpg,.jpeg,.webp,.bmp,.tif,.tiff" hidden>
-      <div id="drop-zone" class="drop-zone" tabindex="0" role="button" aria-label="Choose or drop a screenshot">
+      <div id="drop-zone" class="drop-zone" data-help="Upload the original post-battle screenshot. Do not crop, annotate, re-save, or alter the evidence before submission; the system records a SHA-256 hash. " tabindex="0" role="button" aria-label="Choose or drop a screenshot">
         <div class="upload-glyph">↑</div>
         <h2>Drop a screenshot here</h2>
         <p>or choose one from your computer</p>
@@ -38,7 +39,7 @@
       </div>
       <div id="upload-result" class="notice hidden"></div>
     </section>
-    <section class="notice info">
+    <section class="notice info" data-help="OCR output is not an official result until all required values are confirmed and the correct tournament mapping is reviewed.">
       <h2>What happens next?</h2>
       <p>The screenshot is checked against the nine mandatory fields: result, player, map, mode, battle start, credits, Free XP, damage and XP. No fuzzy value repair is applied. Missing or conflicting values require an exact correction before mapping.</p>
       <p>Desktop uploads use the same Tesseract-first pipeline as Discord attachments. OCR.space remains disabled unless separately configured and authorized; no image is sent to an external OCR provider by this page.</p>
