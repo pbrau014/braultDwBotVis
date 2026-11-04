@@ -11,7 +11,7 @@ function evidence(t,id) {
 }
 function pilot() {
   return F.createTournament(state().competition, { id: 'pilot-1', name: 'Pilot Night', format: 'pilot',
-    config: { timezone: 'America/Chicago', eventStart: '2026-12-01T18:00:00-06:00' } });
+    config: { timezone: 'America/Chicago', eventStart: '2026-12-01T18:00:00-06:00', eventEnd: '2026-12-01T22:00:00-06:00' } });
 }
 function qualify(t, stageKey) {
   return F.setStageQualifiers(t,stageKey,['home','away'],{
@@ -31,7 +31,7 @@ function playStage(t, stageKey) {
 function full() {
   const competition = state().competition;
   const t = F.createTournament(competition, { id: 'full-1', name: 'Full Season', format: 'full',
-    config: { timezone: 'America/Chicago', seasonWeeks: 12 } });
+    config: { timezone: 'America/Chicago', seasonWeeks: 12, eventStart: '2026-12-01T00:00:00-06:00', eventEnd: '2027-03-01T00:00:00-06:00' } });
   F.registerParticipant(t, { playerId: 'p1', displayName: 'Alpha' });
   F.registerParticipant(t, { playerId: 'p2', displayName: 'Bravo' });
   F.closeRegistration(t);
@@ -76,7 +76,7 @@ test('Pilot is one single-evening stage and does not create a season or carryove
 test('Full YOLO requires explicit season duration and approved published match method', () => {
   const s = state().competition;
   const t = F.createTournament(s, { id: 'full-1', name: 'Full', format: 'full',
-    config: { timezone: 'America/Chicago' } });
+    config: { timezone: 'America/Chicago', eventStart: '2026-12-01T00:00:00-06:00', eventEnd: '2027-03-01T00:00:00-06:00' } });
   assert.deepEqual(t.stages.map(x => x.key), [F.STAGES.REGULAR_SEASON, F.STAGES.POSTSEASON, F.STAGES.GRAND_FINALE]);
   assert.throws(() => F.publishTournament(t, {}), /season duration/);
   t.config.seasonWeeks = 12;
