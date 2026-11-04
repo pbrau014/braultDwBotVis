@@ -299,7 +299,7 @@ function makePublicArchiveSnapshot(state) {
   const competition = snapshot.workbook_backup?.competition;
   if (competition) {
     const redactActor = entry => {
-      if (entry && /^\\d{17,20}$/.test(String(entry.actor || ''))) entry.actor = 'redacted';
+      if (entry && /^\d{17,20}$/.test(String(entry.actor || ''))) entry.actor = 'redacted';
     };
     for (const entry of competition.audit || []) redactActor(entry);
     for (const tournament of competition.tournaments || []) {
