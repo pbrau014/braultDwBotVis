@@ -73,6 +73,7 @@ function normalizeTournament(raw) {
     teams: Array.isArray(raw.teams) ? raw.teams.map(clone) : [],
     fixtures: Array.isArray(raw.fixtures) ? raw.fixtures.map(clone) : [],
     matches: Array.isArray(raw.matches) ? raw.matches.map(clone) : [],
+    evidence: Array.isArray(raw.evidence) ? raw.evidence.map(clone) : [],
     raceSideEvents: Array.isArray(raw.raceSideEvents) ? raw.raceSideEvents.map(clone) : [],
     awards: Array.isArray(raw.awards) ? raw.awards.map(clone) : [],
     audit: Array.isArray(raw.audit) ? raw.audit.map(clone) : [],
@@ -242,6 +243,23 @@ function completeStage(tournament, stageKey, actor = 'organizer') {
   return stage;
 }
 
+function registerEvidence(tournament, input, actor = 'organizer') {
+  const id = cleanText(input.id, 'Evidence ID');
+  if (tournament.evidence.some(item => item.id === id)) throw new Error('Evidence ID already exists; original evidence records are immutable.');
+  const sha256 = String(input.sha256 || '').trim().toLowerCase();
+  if (!/^[a-f0-9]{64}$/.test(sha256)) throw new Error('Evidence requires a valid SHA-256 digest.');
+  const sizeBytes = Number(input.sizeBytes);
+  if (!Number.isSafeInteger(sizeBytes) || sizeBytes <= 0) throw new Error('Evidence size must be a positive whole number of bytes.');
+  const contentType = cleanText(input.contentType, 'Evidence content type');
+  if (!contentType.startsWith('image/')) throw new Error('Tournament screenshot evidence must have an image content type.');
+  const record = { id, sha256, sizeBytes, contentType, sourceFile: cleanText(input.sourceFile, 'Evidence source filename'),
+    capturedAt: cleanText(input.capturedAt, 'Evidence capture timestamp'), source: input.source ? clone(input.source) : null,
+    registeredAt: now(), registeredBy: String(actor) };
+  tournament.evidence.push(record);
+  audit(tournament, 'evidence_registered', { evidenceId: id, sha256, sizeBytes, contentType }, actor);
+  return record;
+}
+
 function createFixture(tournament, input, actor = 'organizer') {
   const stage = tournament.stages.find(s => s.key === input.stageKey);
   if (!stage || stage.status !== STATUS.ACTIVE) throw new Error('Fixtures can only be created for an active stage.');
@@ -274,7 +292,7 @@ function createMatch(tournament, fixtureId, actor = 'organizer') {
   return match;
 }
 
-function recordGame(match, game, teams = [], registrations = []) {
+function recordGame(match, game, teams = [], registrations = [], evidence = null) {
   if (match.status !== 'scheduled' && match.status !== 'active') throw new Error('Match is not open for game results.');
   const gameNumber = Number(game.gameNumber);
   if (!Number.isInteger(gameNumber) || gameNumber < 1) throw new Error('Game number must be a positive integer.');
@@ -288,6 +306,7 @@ function recordGame(match, game, teams = [], registrations = []) {
     playerId: cleanText(game.playerId, 'Player ID'), metrics: { damage: Number(metrics.damage), kills: Number(metrics.kills) },
     evidenceId: cleanText(game.evidenceId, 'Evidence reference'), recordedAt: now() };
   if (![match.homeTeamId, match.awayTeamId].includes(result.teamId)) throw new Error('Game result team is not part of this match.');
+  if (evidence && !evidence.some(item => item.id === result.evidenceId)) throw new Error('Game result must reference registered original screenshot evidence.');
   if (teams.length) {
     const team = teams.find(item => item.id === result.teamId);
     if (!team || !team.rosterLocked || !team.playerIds.includes(result.playerId)) throw new Error('Game player must belong to the locked roster of the recorded team.');
@@ -356,7 +375,7 @@ function completeMatch(tournament, matchId, options = {}, actor = 'organizer') {
   return match;
 }
 
-function recordBye(tournament, stageKey, teamId, reason, evidenceId, actor = 'organizer') {
+function recordBye(tournament, stageKey, teamId, reason, evidenceId, actor = 'organizer', evidence = tournament.evidence) {
   const stage = tournament.stages.find(item => item.key === stageKey && item.status === STATUS.ACTIVE);
   if (!stage) throw new Error('A bye can only be recorded in an active stage.');
   const team = tournament.teams.find(item => item.id === String(teamId));
@@ -365,6 +384,7 @@ function recordBye(tournament, stageKey, teamId, reason, evidenceId, actor = 'or
     throw new Error('Only a published qualifier can receive a stage bye.');
   const cleanReason = cleanText(reason, 'Bye reason');
   const proof = cleanText(evidenceId, 'Bye evidence reference');
+  if (!evidence.some(item => item.id === proof)) throw new Error('Bye requires registered original evidence.');
   const fixture = { id: tournament.id + ':bye:' + (tournament.fixtures.length + 1), stageKey,
     homeTeamId: team.id, awayTeamId: null, scheduledAt: null, status: 'bye', matchId: null,
     outcome: { winnerTeamId: team.id, decidedBy: 'bye', reason: cleanReason, evidenceId: proof, completedAt: now() } };
@@ -373,12 +393,13 @@ function recordBye(tournament, stageKey, teamId, reason, evidenceId, actor = 'or
   return fixture;
 }
 
-function resolveForfeit(tournament, matchId, winnerTeamId, reason, evidenceId, actor = 'organizer') {
+function resolveForfeit(tournament, matchId, winnerTeamId, reason, evidenceId, actor = 'organizer', evidence = tournament.evidence) {
   const match = tournament.matches.find(item => item.id === String(matchId));
   if (!match) throw new Error('Match was not found.');
   if (![match.homeTeamId, match.awayTeamId].includes(String(winnerTeamId))) throw new Error('Forfeit winner must be one of the teams in the match.');
   const cleanReason = cleanText(reason, 'Forfeit reason');
   const proof = cleanText(evidenceId, 'Forfeit evidence reference');
+  if (!evidence.some(item => item.id === proof)) throw new Error('Forfeit requires registered original evidence.');
   if (match.status === STATUS.COMPLETE || match.status === STATUS.FORFEIT) throw new Error('Match is already resolved.');
   match.status = STATUS.FORFEIT;
   const fixture = tournament.fixtures.find(item => item.id === match.fixtureId);
@@ -388,13 +409,15 @@ function resolveForfeit(tournament, matchId, winnerTeamId, reason, evidenceId, a
   return match;
 }
 
-function recordRaceSideEvent(tournament, input, actor = 'organizer') {
+function recordRaceSideEvent(tournament, input, actor = 'organizer', evidence = tournament.evidence) {
   if (tournament.format !== FORMAT.FULL) throw new Error('Race side-events are only configured for Full YOLO.');
   const seconds = Number(input.elapsedSeconds);
   if (!Number.isFinite(seconds) || seconds <= 0) throw new Error('Race elapsed time must be positive seconds.');
+  const evidenceId = cleanText(input.evidenceId, 'Evidence reference');
+  if (!evidence.some(item => item.id === evidenceId)) throw new Error('Race side-event requires registered original evidence.');
   const event = { id: cleanText(input.id, 'Race side-event ID'), seasonWeek: Number(input.seasonWeek),
     playerId: cleanText(input.playerId, 'Player ID'), elapsedSeconds: seconds,
-    raceMetric: 1 / seconds, evidenceId: cleanText(input.evidenceId, 'Evidence reference'), recordedAt: now() };
+    raceMetric: 1 / seconds, evidenceId, recordedAt: now() };
   if (!Number.isInteger(event.seasonWeek) || event.seasonWeek < 1) throw new Error('Race side-event week must be a positive integer.');
   if (tournament.raceSideEvents.some(e => e.id === event.id)) throw new Error('Race side-event ID already exists.');
   tournament.raceSideEvents.push(event);
@@ -415,6 +438,6 @@ function freezeSettings(tournament, changes, actor = 'organizer') {
 module.exports = {
   FORMAT, STAGES, STAGE_ORDER, STATUS, normalizeCompetition, normalizeTournament,
   createTournament, getTournament, registerParticipant, closeRegistration, withdrawParticipant, assignTeam, lockRoster,
-  publishTournament, setStageQualifiers, activateStage, completeStage, createFixture, createMatch,
+  publishTournament, setStageQualifiers, activateStage, completeStage, registerEvidence, createFixture, createMatch,
   recordGame, aggregateMatchMetrics, resolveMatch, completeMatch, resolveForfeit, recordBye, recordRaceSideEvent, freezeSettings, audit,
 };
