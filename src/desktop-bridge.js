@@ -273,6 +273,10 @@ function createDesktopBridge(options={}){
       const lifecycleRoutes={
         '/api/admin/tournaments':'createTournament',
         '/api/admin/pilot/registrations':'registerPilotParticipant',
+        '/api/admin/pilot/teams':'createPilotTeam',
+        '/api/admin/pilot/rosters':'assignPilotRoster',
+        '/api/admin/pilot/fixtures':'createPilotFixture',
+        '/api/admin/pilot/matches':'createPilotMatch',
         '/api/admin/pilot/event-nights':'createPilotEventNight',
         '/api/admin/tournament-scores':'recordTournamentScore',
         '/api/admin/tournaments/transition':'transitionTournament',
