@@ -1,0 +1,672 @@
+{
+  "schemaVersion": 2,
+  "manifestImageCount": 16,
+  "reportedImageCount": 16,
+  "comparedFields": [
+    "result",
+    "player",
+    "map",
+    "mode",
+    "battleStart",
+    "credits",
+    "xp",
+    "freeXp",
+    "damage"
+  ],
+  "requiredComparedFields": [
+    "result",
+    "player",
+    "map",
+    "mode",
+    "battleStart",
+    "credits",
+    "freeXp",
+    "damage"
+  ],
+  "optionalComparedFields": [
+    "xp"
+  ],
+  "metricDefinitions": {
+    "exactFieldAccuracy": "exact mandatory-field observations / all mandatory-field observations; unresolved mandatory values count as incorrect",
+    "completeRecordAccuracy": "records where all eight mandatory fields match the approved ground truth and requiredMissing is empty / all manifest records",
+    "allComparedCompleteRecordAccuracy": "records where every compared field, including optional XP, matches exactly / all manifest records; diagnostic only",
+    "criticalFalseAcceptanceRate": "wrong non-empty mandatory values / all resolved mandatory field outputs",
+    "optionalFields": "optional fields such as XP are compared and reported separately; they do not block mandatory-record acceptance",
+    "latency": "record elapsedMs from the supplied acceptance report; p95 uses nearest-rank ceil(0.95*n), do not over-interpret with fewer than 20 records"
+  },
+  "summary": {
+    "exactFieldAccuracy": 0.8671875,
+    "correctFieldObservations": 111,
+    "totalFieldObservations": 128,
+    "completeRecordAccuracy": 0.4375,
+    "completeRecords": 7,
+    "totalRecords": 16,
+    "criticalFalseAcceptanceRate": 0.017699115044247787,
+    "acceptedWrongFieldObservations": 2,
+    "unresolvedRate": 0.1171875,
+    "unresolvedFieldObservations": 15,
+    "falseRejectionProxy": 0.1171875,
+    "allComparedExactFieldAccuracy": 0.8611111111111112,
+    "allComparedCorrectFieldObservations": 124,
+    "allComparedTotalFieldObservations": 144,
+    "allComparedAcceptedWrongFieldObservations": 3,
+    "allComparedUnresolvedFieldObservations": 17,
+    "allComparedCompleteRecordAccuracy": 0.375,
+    "allComparedCompleteRecords": 6,
+    "allComparedAcceptedWrongRateAmongResolved": 0.023622047244094488,
+    "medianLatencyMs": 34898,
+    "p95LatencyMs": 41123,
+    "timedRecordCount": 16
+  },
+  "required": {
+    "fields": [
+      "result",
+      "player",
+      "map",
+      "mode",
+      "battleStart",
+      "credits",
+      "freeXp",
+      "damage"
+    ],
+    "totalFieldObservations": 128,
+    "correctFieldObservations": 111,
+    "exactFieldAccuracy": 0.8671875,
+    "acceptedWrongFieldObservations": 2,
+    "unresolvedFieldObservations": 15,
+    "criticalFalseAcceptanceRate": 0.017699115044247787,
+    "byField": [
+      {
+        "field": "result",
+        "required": true,
+        "total": 16,
+        "correct": 16,
+        "unresolved": 0,
+        "acceptedWrong": 0,
+        "exactAccuracy": 1,
+        "unresolvedRate": 0,
+        "acceptedWrongRateAmongResolved": 0
+      },
+      {
+        "field": "player",
+        "required": true,
+        "total": 16,
+        "correct": 12,
+        "unresolved": 2,
+        "acceptedWrong": 2,
+        "exactAccuracy": 0.75,
+        "unresolvedRate": 0.125,
+        "acceptedWrongRateAmongResolved": 0.14285714285714285
+      },
+      {
+        "field": "map",
+        "required": true,
+        "total": 16,
+        "correct": 12,
+        "unresolved": 4,
+        "acceptedWrong": 0,
+        "exactAccuracy": 0.75,
+        "unresolvedRate": 0.25,
+        "acceptedWrongRateAmongResolved": 0
+      },
+      {
+        "field": "mode",
+        "required": true,
+        "total": 16,
+        "correct": 14,
+        "unresolved": 2,
+        "acceptedWrong": 0,
+        "exactAccuracy": 0.875,
+        "unresolvedRate": 0.125,
+        "acceptedWrongRateAmongResolved": 0
+      },
+      {
+        "field": "battleStart",
+        "required": true,
+        "total": 16,
+        "correct": 13,
+        "unresolved": 3,
+        "acceptedWrong": 0,
+        "exactAccuracy": 0.8125,
+        "unresolvedRate": 0.1875,
+        "acceptedWrongRateAmongResolved": 0
+      },
+      {
+        "field": "credits",
+        "required": true,
+        "total": 16,
+        "correct": 16,
+        "unresolved": 0,
+        "acceptedWrong": 0,
+        "exactAccuracy": 1,
+        "unresolvedRate": 0,
+        "acceptedWrongRateAmongResolved": 0
+      },
+      {
+        "field": "freeXp",
+        "required": true,
+        "total": 16,
+        "correct": 16,
+        "unresolved": 0,
+        "acceptedWrong": 0,
+        "exactAccuracy": 1,
+        "unresolvedRate": 0,
+        "acceptedWrongRateAmongResolved": 0
+      },
+      {
+        "field": "damage",
+        "required": true,
+        "total": 16,
+        "correct": 12,
+        "unresolved": 4,
+        "acceptedWrong": 0,
+        "exactAccuracy": 0.75,
+        "unresolvedRate": 0.25,
+        "acceptedWrongRateAmongResolved": 0
+      }
+    ],
+    "completeRecords": 7,
+    "totalRecords": 16,
+    "completeRecordAccuracy": 0.4375
+  },
+  "optional": {
+    "fields": [
+      "xp"
+    ],
+    "totalFieldObservations": 16,
+    "correctFieldObservations": 13,
+    "exactFieldAccuracy": 0.8125,
+    "acceptedWrongFieldObservations": 1,
+    "unresolvedFieldObservations": 2,
+    "criticalFalseAcceptanceRate": 0.07142857142857142,
+    "byField": [
+      {
+        "field": "xp",
+        "required": false,
+        "total": 16,
+        "correct": 13,
+        "unresolved": 2,
+        "acceptedWrong": 1,
+        "exactAccuracy": 0.8125,
+        "unresolvedRate": 0.125,
+        "acceptedWrongRateAmongResolved": 0.07142857142857142
+      }
+    ]
+  },
+  "allCompared": {
+    "fields": [
+      "result",
+      "player",
+      "map",
+      "mode",
+      "battleStart",
+      "credits",
+      "xp",
+      "freeXp",
+      "damage"
+    ],
+    "totalFieldObservations": 144,
+    "correctFieldObservations": 124,
+    "exactFieldAccuracy": 0.8611111111111112,
+    "acceptedWrongFieldObservations": 3,
+    "unresolvedFieldObservations": 17,
+    "criticalFalseAcceptanceRate": 0.023622047244094488,
+    "byField": [
+      {
+        "field": "result",
+        "required": true,
+        "total": 16,
+        "correct": 16,
+        "unresolved": 0,
+        "acceptedWrong": 0,
+        "exactAccuracy": 1,
+        "unresolvedRate": 0,
+        "acceptedWrongRateAmongResolved": 0
+      },
+      {
+        "field": "player",
+        "required": true,
+        "total": 16,
+        "correct": 12,
+        "unresolved": 2,
+        "acceptedWrong": 2,
+        "exactAccuracy": 0.75,
+        "unresolvedRate": 0.125,
+        "acceptedWrongRateAmongResolved": 0.14285714285714285
+      },
+      {
+        "field": "map",
+        "required": true,
+        "total": 16,
+        "correct": 12,
+        "unresolved": 4,
+        "acceptedWrong": 0,
+        "exactAccuracy": 0.75,
+        "unresolvedRate": 0.25,
+        "acceptedWrongRateAmongResolved": 0
+      },
+      {
+        "field": "mode",
+        "required": true,
+        "total": 16,
+        "correct": 14,
+        "unresolved": 2,
+        "acceptedWrong": 0,
+        "exactAccuracy": 0.875,
+        "unresolvedRate": 0.125,
+        "acceptedWrongRateAmongResolved": 0
+      },
+      {
+        "field": "battleStart",
+        "required": true,
+        "total": 16,
+        "correct": 13,
+        "unresolved": 3,
+        "acceptedWrong": 0,
+        "exactAccuracy": 0.8125,
+        "unresolvedRate": 0.1875,
+        "acceptedWrongRateAmongResolved": 0
+      },
+      {
+        "field": "credits",
+        "required": true,
+        "total": 16,
+        "correct": 16,
+        "unresolved": 0,
+        "acceptedWrong": 0,
+        "exactAccuracy": 1,
+        "unresolvedRate": 0,
+        "acceptedWrongRateAmongResolved": 0
+      },
+      {
+        "field": "xp",
+        "required": false,
+        "total": 16,
+        "correct": 13,
+        "unresolved": 2,
+        "acceptedWrong": 1,
+        "exactAccuracy": 0.8125,
+        "unresolvedRate": 0.125,
+        "acceptedWrongRateAmongResolved": 0.07142857142857142
+      },
+      {
+        "field": "freeXp",
+        "required": true,
+        "total": 16,
+        "correct": 16,
+        "unresolved": 0,
+        "acceptedWrong": 0,
+        "exactAccuracy": 1,
+        "unresolvedRate": 0,
+        "acceptedWrongRateAmongResolved": 0
+      },
+      {
+        "field": "damage",
+        "required": true,
+        "total": 16,
+        "correct": 12,
+        "unresolved": 4,
+        "acceptedWrong": 0,
+        "exactAccuracy": 0.75,
+        "unresolvedRate": 0.25,
+        "acceptedWrongRateAmongResolved": 0
+      }
+    ],
+    "completeRecords": 6,
+    "totalRecords": 16,
+    "completeRecordAccuracy": 0.375
+  },
+  "byField": [
+    {
+      "field": "result",
+      "required": true,
+      "total": 16,
+      "correct": 16,
+      "unresolved": 0,
+      "acceptedWrong": 0,
+      "exactAccuracy": 1,
+      "unresolvedRate": 0,
+      "acceptedWrongRateAmongResolved": 0
+    },
+    {
+      "field": "player",
+      "required": true,
+      "total": 16,
+      "correct": 12,
+      "unresolved": 2,
+      "acceptedWrong": 2,
+      "exactAccuracy": 0.75,
+      "unresolvedRate": 0.125,
+      "acceptedWrongRateAmongResolved": 0.14285714285714285
+    },
+    {
+      "field": "map",
+      "required": true,
+      "total": 16,
+      "correct": 12,
+      "unresolved": 4,
+      "acceptedWrong": 0,
+      "exactAccuracy": 0.75,
+      "unresolvedRate": 0.25,
+      "acceptedWrongRateAmongResolved": 0
+    },
+    {
+      "field": "mode",
+      "required": true,
+      "total": 16,
+      "correct": 14,
+      "unresolved": 2,
+      "acceptedWrong": 0,
+      "exactAccuracy": 0.875,
+      "unresolvedRate": 0.125,
+      "acceptedWrongRateAmongResolved": 0
+    },
+    {
+      "field": "battleStart",
+      "required": true,
+      "total": 16,
+      "correct": 13,
+      "unresolved": 3,
+      "acceptedWrong": 0,
+      "exactAccuracy": 0.8125,
+      "unresolvedRate": 0.1875,
+      "acceptedWrongRateAmongResolved": 0
+    },
+    {
+      "field": "credits",
+      "required": true,
+      "total": 16,
+      "correct": 16,
+      "unresolved": 0,
+      "acceptedWrong": 0,
+      "exactAccuracy": 1,
+      "unresolvedRate": 0,
+      "acceptedWrongRateAmongResolved": 0
+    },
+    {
+      "field": "xp",
+      "required": false,
+      "total": 16,
+      "correct": 13,
+      "unresolved": 2,
+      "acceptedWrong": 1,
+      "exactAccuracy": 0.8125,
+      "unresolvedRate": 0.125,
+      "acceptedWrongRateAmongResolved": 0.07142857142857142
+    },
+    {
+      "field": "freeXp",
+      "required": true,
+      "total": 16,
+      "correct": 16,
+      "unresolved": 0,
+      "acceptedWrong": 0,
+      "exactAccuracy": 1,
+      "unresolvedRate": 0,
+      "acceptedWrongRateAmongResolved": 0
+    },
+    {
+      "field": "damage",
+      "required": true,
+      "total": 16,
+      "correct": 12,
+      "unresolved": 4,
+      "acceptedWrong": 0,
+      "exactAccuracy": 0.75,
+      "unresolvedRate": 0.25,
+      "acceptedWrongRateAmongResolved": 0
+    }
+  ],
+  "recordFailures": [
+    {
+      "key": "Screenshot_16.jpg",
+      "elapsedMs": 38011,
+      "pipelineCompleted": true,
+      "missingReportRow": false,
+      "requiredMissing": [
+        "damage"
+      ],
+      "mismatches": [
+        {
+          "field": "player",
+          "expected": "[HO-FL]VeritechCEO",
+          "actual": "[HO-FL]VeritechCEQ",
+          "kind": "accepted-wrong-value"
+        },
+        {
+          "field": "damage",
+          "expected": 401597,
+          "actual": null,
+          "kind": "unresolved"
+        }
+      ],
+      "error": null
+    },
+    {
+      "key": "Screenshot_2024-11-14_133326.png",
+      "elapsedMs": 29957,
+      "pipelineCompleted": true,
+      "missingReportRow": false,
+      "requiredMissing": [
+        "player",
+        "map",
+        "battleStart",
+        "damage"
+      ],
+      "mismatches": [
+        {
+          "field": "player",
+          "expected": "[HO-FL]gtrain25465",
+          "actual": "Not detected",
+          "kind": "unresolved"
+        },
+        {
+          "field": "map",
+          "expected": "Sea of Fortune",
+          "actual": "Not detected",
+          "kind": "unresolved"
+        },
+        {
+          "field": "battleStart",
+          "expected": "14.11.2024 13:26",
+          "actual": "Not detected",
+          "kind": "unresolved"
+        },
+        {
+          "field": "damage",
+          "expected": 58673,
+          "actual": null,
+          "kind": "unresolved"
+        }
+      ],
+      "error": null
+    },
+    {
+      "key": "WTF.jpg",
+      "elapsedMs": 41021,
+      "pipelineCompleted": true,
+      "missingReportRow": false,
+      "requiredMissing": [
+        "player",
+        "map"
+      ],
+      "mismatches": [
+        {
+          "field": "player",
+          "expected": "[HO-FL]VeritechCEO",
+          "actual": "Not detected",
+          "kind": "unresolved"
+        },
+        {
+          "field": "map",
+          "expected": "North",
+          "actual": "Not detected",
+          "kind": "unresolved"
+        }
+      ],
+      "error": null
+    },
+    {
+      "key": "imag7e.png",
+      "elapsedMs": 28803,
+      "pipelineCompleted": true,
+      "missingReportRow": false,
+      "requiredMissing": [
+        "battleStart"
+      ],
+      "mismatches": [
+        {
+          "field": "battleStart",
+          "expected": "15.09.2024 11:56",
+          "actual": "Not detected",
+          "kind": "unresolved"
+        }
+      ],
+      "error": null
+    },
+    {
+      "key": "image1.png",
+      "elapsedMs": 36339,
+      "pipelineCompleted": true,
+      "missingReportRow": false,
+      "requiredMissing": [
+        "damage"
+      ],
+      "mismatches": [
+        {
+          "field": "damage",
+          "expected": 289577,
+          "actual": null,
+          "kind": "unresolved"
+        }
+      ],
+      "error": null
+    },
+    {
+      "key": "image3.png",
+      "elapsedMs": 34569,
+      "pipelineCompleted": true,
+      "missingReportRow": false,
+      "requiredMissing": [],
+      "mismatches": [
+        {
+          "field": "player",
+          "expected": "[W-G]Tbone87_Scott_TS",
+          "actual": "[W-G]Thone87_Scott_TS",
+          "kind": "accepted-wrong-value"
+        }
+      ],
+      "error": null
+    },
+    {
+      "key": "image4.png",
+      "elapsedMs": 31766,
+      "pipelineCompleted": true,
+      "missingReportRow": false,
+      "requiredMissing": [
+        "map",
+        "mode",
+        "battleStart"
+      ],
+      "mismatches": [
+        {
+          "field": "map",
+          "expected": "Hotspot",
+          "actual": "Not detected",
+          "kind": "unresolved"
+        },
+        {
+          "field": "mode",
+          "expected": "Random Battle",
+          "actual": "Not detected",
+          "kind": "unresolved"
+        },
+        {
+          "field": "battleStart",
+          "expected": "28.09.2024 17:04",
+          "actual": "Not detected",
+          "kind": "unresolved"
+        }
+      ],
+      "error": null
+    },
+    {
+      "key": "image5.png",
+      "elapsedMs": 35679,
+      "pipelineCompleted": true,
+      "missingReportRow": false,
+      "requiredMissing": [
+        "damage"
+      ],
+      "mismatches": [
+        {
+          "field": "damage",
+          "expected": 166183,
+          "actual": null,
+          "kind": "unresolved"
+        }
+      ],
+      "error": null
+    },
+    {
+      "key": "shot-26.08.31_16.22.19-0048.jpg",
+      "elapsedMs": 38114,
+      "pipelineCompleted": true,
+      "missingReportRow": false,
+      "requiredMissing": [
+        "map",
+        "mode"
+      ],
+      "mismatches": [
+        {
+          "field": "map",
+          "expected": "Big Race",
+          "actual": "Not detected",
+          "kind": "unresolved"
+        },
+        {
+          "field": "mode",
+          "expected": "Random Battle",
+          "actual": "Not detected",
+          "kind": "unresolved"
+        }
+      ],
+      "error": null
+    }
+  ],
+  "optionalMismatches": [
+    {
+      "key": "imag8e.png",
+      "mismatches": [
+        {
+          "field": "xp",
+          "expected": 5247,
+          "actual": null,
+          "kind": "unresolved"
+        }
+      ]
+    },
+    {
+      "key": "image1.png",
+      "mismatches": [
+        {
+          "field": "xp",
+          "expected": 9250,
+          "actual": 92505,
+          "kind": "accepted-wrong-value"
+        }
+      ]
+    },
+    {
+      "key": "image3.png",
+      "mismatches": [
+        {
+          "field": "xp",
+          "expected": 6646,
+          "actual": null,
+          "kind": "unresolved"
+        }
+      ]
+    }
+  ]
+}

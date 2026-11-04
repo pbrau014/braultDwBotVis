@@ -1,0 +1,24 @@
+COMMAND: /opt/nvm/versions/node/v22.16.0/bin/node scripts/run-ocr-sequence.js
+EXIT: 0
+ERROR: 
+
+--- stdout ---
+[OCR-SEQUENCE] 1/5 START reported
+[OCR-SEQUENCE] PASS reported 29800ms (exact=true, missing=0)
+[OCR-SEQUENCE] 2/5 START hoffmann-victory.png
+[OCR-SEQUENCE] PASS hoffmann-victory.png 29769ms (exact=true, missing=0)
+[OCR-SEQUENCE] 3/5 START asashio-defeat.jpg
+[OCR-SEQUENCE] PASS asashio-defeat.jpg 27039ms (exact=true, missing=0)
+[OCR-SEQUENCE] 4/5 START libertad-victory.jpg
+[OCR-SEQUENCE] PASS libertad-victory.jpg 29798ms (exact=true, missing=0)
+[OCR-SEQUENCE] 5/5 START schlieffen-defeat.jpg
+[OCR-SEQUENCE] PASS schlieffen-defeat.jpg 33880ms (exact=true, missing=0)
+[OCR-SEQUENCE] Report: /mnt/data/phase1_work/wows-yolo-tournament-discord-bot/testdata/ocr-acceptance/2026-10-25T02-57-30-282Z-40824/five-image-sequence-2.json
+[OCR-SEQUENCE] Summary 5/5 completed, 5/5 exact, 5/5 complete-required-fields
+
+--- stderr ---
+[OCR-SUPERVISOR] child pid=42499 close code=0 signal=
+[OCR-SUPERVISOR] child pid=42703 close code=0 signal=
+[OCR-SUPERVISOR] child pid=42932 close code=0 signal=
+[OCR-SUPERVISOR] child pid=43136 close code=0 signal=
+[OCR-SUPERVISOR] child pid=43672 close code=0 signal=

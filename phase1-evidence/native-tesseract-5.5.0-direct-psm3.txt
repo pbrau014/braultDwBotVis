@@ -1,0 +1,303 @@
+NATIVE TESSERACT DIRECT CLI DIAGNOSTIC
+Date UTC: 2026-10-25T02:15:15Z
+tesseract 5.5.0
+Languages:
+List of available languages in "/usr/share/tesseract-ocr/5/tessdata/" (161):
+Arabic
+Armenian
+Bengali
+Canadian_Aboriginal
+Cherokee
+Cyrillic
+Devanagari
+Ethiopic
+Fraktur
+Georgian
+Greek
+Gujarati
+Gurmukhi
+HanS
+HanS_vert
+HanT
+HanT_vert
+Hangul
+Hangul_vert
+Hebrew
+Japanese
+Japanese_vert
+Kannada
+Khmer
+Lao
+Latin
+Malayalam
+Myanmar
+Oriya
+Sinhala
+Syriac
+Tamil
+Telugu
+Thaana
+Thai
+Tibetan
+Vietnamese
+afr
+amh
+ara
+asm
+aze
+aze_cyrl
+bel
+ben
+bod
+bos
+bre
+bul
+cat
+ceb
+ces
+chi_sim
+chi_sim_vert
+chi_tra
+chi_tra_vert
+chr
+cos
+cym
+dan
+deu
+div
+dzo
+ell
+eng
+enm
+epo
+est
+eus
+fao
+fas
+fil
+fin
+fra
+frk
+frm
+fry
+gla
+gle
+glg
+grc
+guj
+hat
+heb
+hin
+hrv
+hun
+hye
+iku
+ind
+isl
+ita
+ita_old
+jav
+jpn
+jpn_vert
+kan
+kat
+kat_old
+kaz
+khm
+kir
+kmr
+kor
+kor_vert
+lao
+lat
+lav
+lit
+ltz
+mal
+mar
+mkd
+mlt
+mon
+mri
+msa
+mya
+nep
+nld
+nor
+oci
+ori
+osd
+pan
+pol
+por
+pus
+que
+ron
+rus
+san
+sin
+slk
+slv
+snd
+spa
+spa_old
+sqi
+srp
+srp_latn
+sun
+swa
+swe
+syr
+tam
+tat
+tel
+tgk
+tha
+tir
+ton
+tur
+uig
+ukr
+urd
+uzb
+uzb_cyrl
+vie
+yid
+yor
+
+===== REPORTED :: fixtures/reported-issue/Screenshot_2026-10-22_201950.png :: PSM 3 :: eng =====
+Detected 4 diacritics
+PERSONAL SCORE TAILED REPORT _ CREDITS AND XP
+
+New Dawn — Battle
+Battle start time: 30.09.2026 14:46
+
+—_— »
+11808 49
+
+Battle performance
+
+= ae
+
+87373 FS FE PP Oe Pw eh et ed
+Damage Destroyed Citadel hits Incapacitations Spotted, Target hits Target hits Aircraft shot down, Defended)
+Captured
+
+Combat Missions
+
+1S Eam 3 000 Base XP © Earn Commander XP © Get ribbons & Ean Base XP
+
+BATTLE ON!
+
+
+===== HOFFMANN :: fixtures/four-screenshots/hoffmann-victory.png :: PSM 3 :: eng =====
+Estimating resolution as 189
+PERSONAL SCORE TEAM SCORE DETAILED REPORT CREDITS AND XP
+
+n completed the mission.
+[-SEN-]WorldSpown
+
+Received for the
+
+Damage Target hits Target hits Destroyed Selon fire Caused flooding
+
+Citadel hits Defended
+eet 2 | ‘=
+=| bed - _
+Captured Spotted
+Combat Missions
+
+ra) ey Win a battle ® Weekly Mission 3 MISSIONS IN TOTAL
+
+BACK TO PORT
+| enla —F
+
+===== ASASHIO :: fixtures/four-screenshots/asashio-defeat.jpg :: PSM 3 :: eng =====
+Estimating resolution as 173
+PERSONAL SCORE TEAM SCORE DETAILED REPORT CREDITS AND XP
+
+Defeat oo
+Battle start time: 14.07.2024 22:51
+
+The enemy team completed the mission.
+
+[OVF]OldschoolGaming_YouTube ™ Vill ASASHIO Destroyed by main battery [EFLOL|Khaedr #4 1X AZUMA
+
+Received for the Battle
+1650 259@ 4059%* 2110%*  @
+
+Battle performance
+
+Damage Target hits Target hits Incapacitations Destroyed Set on fire Caused floading
+
+conned 7 Spotted
+Combat Missions
+
+y
+> Personal Challenges
+
+Get ribbons
+Earn 2 000 base XP — 4 MISSION IN TOTAL
+3/7(:3)
+
+===== LIBERTAD :: fixtures/four-screenshots/libertad-victory.jpg :: PSM 3 :: eng =====
+Estimating resolution as 182
+PERSONAL SCORE
+
+Sea of Fortune — Random Battle
+Battle start time: 27.12.2024 23:30
+
+[OVF]OldschoolGaming_YouTube ” XLI _
+
+Received for the Battle
+
+511113@ 4509 68h 2 & & 2 © ©
+
+Battle performance
+Damage : Target hits Incapacitations Destroyed Set on fire Caused flooding Citadel hits Target hits Spotted
+Target hits
+Combat Missions
+" vs i *p
+A Eam achievements 39% Get ribbons ie ee vy) Nine Waves Crashing 6 MISSIONS IN TOTAL
+
+Earn achievements.
+Completed
+
+Earn § achievements
+
+y Reward received:
+
+| . Credits SSS)
+——— | ie |
+10.000 ————
+
+===== SCHLIEFFEN :: fixtures/four-screenshots/schlieffen-defeat.jpg :: PSM 3 :: eng =====
+Estimating resolution as 161
+PERSONAL SCORE TEAM SCORE DETAILED REPORT CREDITS AND XP Lesc
+
+Defeat a
+
+All allied warships destroyed.
+[ARGSY]Ensign_Cthulhu ”™ X SCHLIEFFEN atfeny [0_S_D]|uickygunner “4)XGIKURFUROT
+
+317 943@ 2653: 325:r
+
+Battle performance
+
+131 828 Fan T—t ! ica I, —E F aS Tv I | Sab 3
+
+EY Sua)
+
+i @!
+
+Combat Missions = © oe Defended
+
+S| Ear 3 000 Base XP. Earn Commander XP & cas 5 MISSIONS IN TOTAL Hit an enemy ship that is capturing a Key Area of
+== 2 the friendly base
+
+yw © FO@oOorwerw#
+
+@ B @ A ©) = %) ENG
+
+&12PM
+2025-08-28 “TI

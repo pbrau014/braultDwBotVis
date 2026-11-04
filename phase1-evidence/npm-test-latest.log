@@ -1,0 +1,630 @@
+
+> wows-yolo-tourney-discord-bot@2.5.0 test
+> node --test
+
+TAP version 13
+# Subtest: recognizes Victory/Defeat and visible result descriptions
+ok 1 - recognizes Victory/Defeat and visible result descriptions
+  ---
+  duration_ms: 1.628434
+  type: 'test'
+  ...
+# Subtest: reads player and ship from the dedicated identity line and stops before adjacent UI text
+ok 2 - reads player and ship from the dedicated identity line and stops before adjacent UI text
+  ---
+  duration_ms: 1.018355
+  type: 'test'
+  ...
+# Subtest: extracts map/mode and validates calendar-correct battle timestamps
+ok 3 - extracts map/mode and validates calendar-correct battle timestamps
+  ---
+  duration_ms: 1.399699
+  type: 'test'
+  ...
+# Subtest: builds a complete record from agreeing OCR candidates and does not require ribbons
+ok 4 - builds a complete record from agreeing OCR candidates and does not require ribbons
+  ---
+  duration_ms: 2.333626
+  type: 'test'
+  ...
+# Subtest: disagreement marks only the affected field as missing instead of silently choosing one OCR value
+ok 5 - disagreement marks only the affected field as missing instead of silently choosing one OCR value
+  ---
+  duration_ms: 0.846095
+  type: 'test'
+  ...
+# Subtest: conflicting result, map or identity readings are sent for correction
+ok 6 - conflicting result, map or identity readings are sent for correction
+  ---
+  duration_ms: 1.218076
+  type: 'test'
+  ...
+# Subtest: manual corrections can fill just the missing fields and valid short damage values
+ok 7 - manual corrections can fill just the missing fields and valid short damage values
+  ---
+  duration_ms: 0.70334
+  type: 'test'
+  ...
+# Subtest: correction prompts ask for exactly one missing value at a time
+ok 8 - correction prompts ask for exactly one missing value at a time
+  ---
+  duration_ms: 1.08865
+  type: 'test'
+  ...
+# Subtest: correction prompts never show sample field values or ask for a bulk correction
+ok 9 - correction prompts never show sample field values or ask for a bulk correction
+  ---
+  duration_ms: 0.710731
+  type: 'test'
+  ...
+# Subtest: correction parser accepts labelled fields and rejects malformed values
+ok 10 - correction parser accepts labelled fields and rejects malformed values
+  ---
+  duration_ms: 0.562007
+  type: 'test'
+  ...
+# Subtest: a single high-confidence OCR reading may pass, but a single weak reading is requested for correction
+ok 11 - a single high-confidence OCR reading may pass, but a single weak reading is requested for correction
+  ---
+  duration_ms: 0.436007
+  type: 'test'
+  ...
+# Subtest: missing ribbons are not part of the exact required-field list
+ok 12 - missing ribbons are not part of the exact required-field list
+  ---
+  duration_ms: 1.429724
+  type: 'test'
+  ...
+# Subtest: an invalid manual correction cannot leave a prior guessed required value in place
+ok 13 - an invalid manual correction cannot leave a prior guessed required value in place
+  ---
+  duration_ms: 0.274814
+  type: 'test'
+  ...
+# Subtest: tournament JSON export is stable, typed, and never invents missing tournament inputs
+ok 14 - tournament JSON export is stable, typed, and never invents missing tournament inputs
+  ---
+  duration_ms: 1.126046
+  type: 'test'
+  ...
+# Subtest: ship tier suggestions support Roman numerals through tier XI without claiming class or time
+ok 15 - ship tier suggestions support Roman numerals through tier XI without claiming class or time
+  ---
+  duration_ms: 0.087352
+  type: 'test'
+  ...
+# Subtest: weighted player and cleaned map candidates resolve only OCR debris and common glyph confusion
+ok 16 - weighted player and cleaned map candidates resolve only OCR debris and common glyph confusion
+  ---
+  duration_ms: 0.42468
+  type: 'test'
+  ...
+# Subtest: regression corpus contains only the three user-approved image URLs
+ok 17 - regression corpus contains only the three user-approved image URLs
+  ---
+  duration_ms: 1.259398
+  type: 'test'
+  ...
+# Subtest: each reference defines every required ground-truth key and marks unconfirmed values honestly
+ok 18 - each reference defines every required ground-truth key and marks unconfirmed values honestly
+  ---
+  duration_ms: 0.313593
+  type: 'test'
+  ...
+# Subtest: reference corpus downloader and runner are present and syntax-testable
+ok 19 - reference corpus downloader and runner are present and syntax-testable
+  ---
+  duration_ms: 0.164047
+  type: 'test'
+  ...
+# Subtest: agreeing independent full-screen damage reads override a conflicting focused-crop value
+ok 20 - agreeing independent full-screen damage reads override a conflicting focused-crop value
+  ---
+  duration_ms: 2.020395
+  type: 'test'
+  ...
+# Subtest: conflicting full-screen reads are not resolved by confidence alone
+ok 21 - conflicting full-screen reads are not resolved by confidence alone
+  ---
+  duration_ms: 0.472582
+  type: 'test'
+  ...
+# Subtest: missing full-screen evidence preserves the focused candidate for validation
+ok 22 - missing full-screen evidence preserves the focused candidate for validation
+  ---
+  duration_ms: 0.1392
+  type: 'test'
+  ...
+# Subtest: one extra final digit in a single full-screen read repairs unanimous clipped focused prefixes
+ok 23 - one extra final digit in a single full-screen read repairs unanimous clipped focused prefixes
+  ---
+  duration_ms: 0.195865
+  type: 'test'
+  ...
+# Subtest: prefix repair does not accept low-confidence or non-prefix damage values
+ok 24 - prefix repair does not accept low-confidence or non-prefix damage values
+  ---
+  duration_ms: 0.227794
+  type: 'test'
+  ...
+# Subtest: geometry-bounded crops that stop before adjacent ribbon icons override one appended full-screen icon digit
+ok 25 - geometry-bounded crops that stop before adjacent ribbon icons override one appended full-screen icon digit
+  ---
+  duration_ms: 0.170106
+  type: 'test'
+  ...
+# Subtest: focused crop cannot trim a full-screen digit unless it is explicitly marked isolated
+ok 26 - focused crop cannot trim a full-screen digit unless it is explicitly marked isolated
+  ---
+  duration_ms: 0.208815
+  type: 'test'
+  ...
+# Subtest: unique isolated crop quorum can resolve a divergent full-screen read
+ok 27 - unique isolated crop quorum can resolve a divergent full-screen read
+  ---
+  duration_ms: 0.348836
+  type: 'test'
+  ...
+# Subtest: isolated crop quorum rejects repeats that do not span multiple widths and PSMs
+ok 28 - isolated crop quorum rejects repeats that do not span multiple widths and PSMs
+  ---
+  duration_ms: 0.280502
+  type: 'test'
+  ...
+# Subtest: Excel Totals!H12 source-of-truth audit matches the clean browser seed and packaged workbook
+ok 29 - Excel Totals!H12 source-of-truth audit matches the clean browser seed and packaged workbook
+  ---
+  duration_ms: 24.444347
+  type: 'test'
+  ...
+# Attempting OCR extraction from large.png by SyntheticTester\#0001.
+# Subtest: complete synthetic Discord tour: all commands, every slot, formulas, persistence, OCR recovery, exports, and clearing
+ok 30 - complete synthetic Discord tour: all commands, every slot, formulas, persistence, OCR recovery, exports, and clearing
+  ---
+  duration_ms: 173.690911
+  type: 'test'
+  ...
+# Executed 25 documented command families; generated 84 slot results and 2 same-channel snapshots.
+# Subtest: 50-player randomized tournament: roster cap, all-player aggregates, dollars and public same-channel commands stay consistent
+ok 31 - 50-player randomized tournament: roster cap, all-player aggregates, dollars and public same-channel commands stay consistent
+  ---
+  duration_ms: 39.401897
+  type: 'test'
+  ...
+# Subtest: public interactive panel renders controls, responds to totals/event selection, and ignores other channels
+ok 32 - public interactive panel renders controls, responds to totals/event selection, and ignores other channels
+  ---
+  duration_ms: 5.431926
+  type: 'test'
+  ...
+# Subtest: interactive panel ignores unsupported and malformed interaction payloads safely
+ok 33 - interactive panel ignores unsupported and malformed interaction payloads safely
+  ---
+  duration_ms: 0.300483
+  type: 'test'
+  ...
+# Subtest: runtime gate accepts Node 24.17+ and rejects stale Node 20/22 runtimes
+ok 34 - runtime gate accepts Node 24.17+ and rejects stale Node 20/22 runtimes
+  ---
+  duration_ms: 0.142995
+  type: 'test'
+  ...
+# Subtest: ImageMagick timeout kills the child and waits for confirmed process close
+ok 35 - ImageMagick timeout kills the child and waits for confirmed process close
+  ---
+  duration_ms: 1014.613908
+  type: 'test'
+  ...
+# Subtest: image dimension guard accepts ordinary WoWS screenshots
+ok 36 - image dimension guard accepts ordinary WoWS screenshots
+  ---
+  duration_ms: 1.601283
+  type: 'test'
+  ...
+# Subtest: image dimension guard rejects invalid, oversized, and decompression-bomb dimensions
+ok 37 - image dimension guard rejects invalid, oversized, and decompression-bomb dimensions
+  ---
+  duration_ms: 12.264453
+  type: 'test'
+  ...
+# Subtest: image dimension limits can be configured explicitly
+ok 38 - image dimension limits can be configured explicitly
+  ---
+  duration_ms: 0.195885
+  type: 'test'
+  ...
+# Subtest: localized parser combines only conventional thousands groups
+ok 39 - localized parser combines only conventional thousands groups
+  ---
+  duration_ms: 0.960848
+  type: 'test'
+  ...
+# Subtest: localized XP parser rejects appended icon digits rather than accepting a false value
+ok 40 - localized XP parser rejects appended icon digits rather than accepting a false value
+  ---
+  duration_ms: 0.20546
+  type: 'test'
+  ...
+# Subtest: localized parser accepts a single isolated field but not ambiguous equally ranked values
+ok 41 - localized parser accepts a single isolated field but not ambiguous equally ranked values
+  ---
+  duration_ms: 0.118038
+  type: 'test'
+  ...
+# Subtest: localized parser rejects unknown fields and invalid reward sizes
+ok 42 - localized parser rejects unknown fields and invalid reward sizes
+  ---
+  duration_ms: 0.415947
+  type: 'test'
+  ...
+# Subtest: reward selection uses localized agreement and never accepts XP from legacy broad candidates alone
+ok 43 - reward selection uses localized agreement and never accepts XP from legacy broad candidates alone
+  ---
+  duration_ms: 1.263584
+  type: 'test'
+  ...
+# Subtest: complete reward tuple fallback requires two distinct agreeing OCR sources
+ok 44 - complete reward tuple fallback requires two distinct agreeing OCR sources
+  ---
+  duration_ms: 0.78981
+  type: 'test'
+  ...
+# Subtest: Credits prefix recovery requires isolated plus two independent broad supports
+ok 45 - Credits prefix recovery requires isolated plus two independent broad supports
+  ---
+  duration_ms: 0.47734
+  type: 'test'
+  ...
+# Subtest: Credits prefix recovery can use a matching reward-band token plus two distinct broad modes when a crop clips the last digit
+ok 46 - Credits prefix recovery can use a matching reward-band token plus two distinct broad modes when a crop clips the last digit
+  ---
+  duration_ms: 0.208804
+  type: 'test'
+  ...
+# Subtest: native Tesseract worker termination aborts the active child process promptly
+ok 47 - native Tesseract worker termination aborts the active child process promptly
+  ---
+  duration_ms: 112.75016
+  type: 'test'
+  ...
+# Subtest: normalizes thousands separators only after isolating a value
+ok 48 - normalizes thousands separators only after isolating a value
+  ---
+  duration_ms: 1.214119
+  type: 'test'
+  ...
+# Subtest: reads the three reward columns without treating medal counts as rewards
+ok 49 - reads the three reward columns without treating medal counts as rewards
+  ---
+  duration_ms: 0.680876
+  type: 'test'
+  ...
+# Subtest: repairs a Credits chunk contaminated by the coin icon
+ok 50 - repairs a Credits chunk contaminated by the coin icon
+  ---
+  duration_ms: 0.194082
+  type: 'test'
+  ...
+# Subtest: refuses malformed or incomplete reward rows instead of shifting values
+ok 51 - refuses malformed or incomplete reward rows instead of shifting values
+  ---
+  duration_ms: 0.164909
+  type: 'test'
+  ...
+# Subtest: reads damage from a dedicated crop and rejects obviously tiny/incomplete OCR fragments
+ok 52 - reads damage from a dedicated crop and rejects obviously tiny/incomplete OCR fragments
+  ---
+  duration_ms: 0.961518
+  type: 'test'
+  ...
+# Subtest: reward groups ignore following medal / award numbers after the first three values
+ok 53 - reward groups ignore following medal / award numbers after the first three values
+  ---
+  duration_ms: 0.183516
+  type: 'test'
+  ...
+# Subtest: Tesseract.js fallback resolves language, Node worker, and every core asset from local paths
+ok 54 - Tesseract.js fallback resolves language, Node worker, and every core asset from local paths
+  ---
+  duration_ms: 8.183401
+  type: 'test'
+  ...
+# Subtest: Tesseract.js fallback errors clearly when a local language model is unavailable
+ok 55 - Tesseract.js fallback errors clearly when a local language model is unavailable
+  ---
+  duration_ms: 1.501513
+  type: 'test'
+  ...
+# Subtest: independent supervisor timeout kills child tree and waits for close confirmation
+ok 56 - independent supervisor timeout kills child tree and waits for close confirmation
+  ---
+  duration_ms: 260.461336
+  type: 'test'
+  ...
+# Subtest: serial queue starts recovery task only after timed-out supervised child closes
+ok 57 - serial queue starts recovery task only after timed-out supervised child closes
+  ---
+  duration_ms: 284.071902
+  type: 'test'
+  ...
+# Subtest: OCR operation watchdog confirms thread exit before creating a recovery worker
+ok 58 - OCR operation watchdog confirms thread exit before creating a recovery worker
+  ---
+  duration_ms: 112.60087
+  type: 'test'
+  ...
+# Subtest: OCR watchdog fails closed when worker thread termination cannot be confirmed
+ok 59 - OCR watchdog fails closed when worker thread termination cannot be confirmed
+  ---
+  duration_ms: 200.962791
+  type: 'test'
+  ...
+# Subtest: assigns spatial xN ribbon counts to the closest label, including x101
+ok 60 - assigns spatial xN ribbon counts to the closest label, including x101
+  ---
+  duration_ms: 2.731787
+  type: 'test'
+  ...
+# Subtest: supports x and number rendered as separate OCR tokens
+ok 61 - supports x and number rendered as separate OCR tokens
+  ---
+  duration_ms: 0.199361
+  type: 'test'
+  ...
+# Subtest: missing or ambiguous ribbon counts stay blank; no ribbon data is treated as required-field failure
+ok 62 - missing or ambiguous ribbon counts stay blank; no ribbon data is treated as required-field failure
+  ---
+  duration_ms: 0.313152
+  type: 'test'
+  ...
+# Subtest: ignores count tokens outside the Battle Performance-to-missions strip
+ok 63 - ignores count tokens outside the Battle Performance-to-missions strip
+  ---
+  duration_ms: 0.47115
+  type: 'test'
+  ...
+# Subtest: serial task queue never overlaps jobs and continues after a rejected task
+ok 64 - serial task queue never overlaps jobs and continues after a rejected task
+  ---
+  duration_ms: 48.233205
+  type: 'test'
+  ...
+# Subtest: serial task queue rejects excess pending work explicitly
+ok 65 - serial task queue rejects excess pending work explicitly
+  ---
+  duration_ms: 2.504364
+  type: 'test'
+  ...
+# Subtest: serial task timeout runs cleanup, waits for task cancellation, then allows the next job
+ok 66 - serial task timeout runs cleanup, waits for task cancellation, then allows the next job
+  ---
+  duration_ms: 36.181954
+  type: 'test'
+  ...
+# Subtest: serial task queue fails closed rather than overlapping an operation that ignores timeout cleanup
+ok 67 - serial task queue fails closed rather than overlapping an operation that ignores timeout cleanup
+  ---
+  duration_ms: 71.9918
+  type: 'test'
+  ...
+# Subtest: serial task queue fails closed if timeout cleanup itself never settles
+ok 68 - serial task queue fails closed if timeout cleanup itself never settles
+  ---
+  duration_ms: 66.258368
+  type: 'test'
+  ...
+# (node:40733) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: SQLite store creates schema, persists atomically, mirrors JSON, and reopens
+ok 69 - SQLite store creates schema, persists atomically, mirrors JSON, and reopens
+  ---
+  duration_ms: 19.604057
+  type: 'test'
+  ...
+# Subtest: SQLite store migrates a legacy JSON tournament state without deleting the source
+ok 70 - SQLite store migrates a legacy JSON tournament state without deleting the source
+  ---
+  duration_ms: 7.493953
+  type: 'test'
+  ...
+# Subtest: SQLite store refuses to open a database created by a newer schema
+ok 71 - SQLite store refuses to open a database created by a newer schema
+  ---
+  duration_ms: 8.651869
+  type: 'test'
+  ...
+# Subtest: SQLite queued saves preserve invocation-time snapshots and full 50-player archive round-trips
+ok 72 - SQLite queued saves preserve invocation-time snapshots and full 50-player archive round-trips
+  ---
+  duration_ms: 82.220453
+  type: 'test'
+  ...
+# Subtest: SQLite durable commit succeeds and remains recoverable when the optional JSON mirror cannot be written
+ok 73 - SQLite durable commit succeeds and remains recoverable when the optional JSON mirror cannot be written
+  ---
+  duration_ms: 7.956781
+  type: 'test'
+  ...
+# Subtest: exact-match acceptance rejects a deliberately incorrect expected value
+ok 74 - exact-match acceptance rejects a deliberately incorrect expected value
+  ---
+  duration_ms: 0.859285
+  type: 'test'
+  ...
+# Subtest: exact-match acceptance rejects missing or incomplete required fields
+ok 75 - exact-match acceptance rejects missing or incomplete required fields
+  ---
+  duration_ms: 0.151618
+  type: 'test'
+  ...
+# Subtest: acceptance gate passes only complete exact-match rows
+ok 76 - acceptance gate passes only complete exact-match rows
+  ---
+  duration_ms: 0.098779
+  type: 'test'
+  ...
+# Subtest: new state has all four rounds with seven empty slots and workbook defaults
+ok 77 - new state has all four rounds with seven empty slots and workbook defaults
+  ---
+  duration_ms: 1.83752
+  type: 'test'
+  ...
+# Subtest: Grand Yolo tier-weight default matches Excel d4!F10 and old tierPower imports preserve 0.9
+ok 78 - Grand Yolo tier-weight default matches Excel d4!F10 and old tierPower imports preserve 0.9
+  ---
+  duration_ms: 0.271559
+  type: 'test'
+  ...
+# Subtest: damage scoring follows workbook formula and recalculates against the whole roster
+ok 79 - damage scoring follows workbook formula and recalculates against the whole roster
+  ---
+  duration_ms: 1.328542
+  type: 'test'
+  ...
+# Subtest: manual result entry validates fields and blocks accidental overwrites
+ok 80 - manual result entry validates fields and blocks accidental overwrites
+  ---
+  duration_ms: 0.59735
+  type: 'test'
+  ...
+# Subtest: Grand Yolo requires positive time and scores using the workbook Grand formula
+ok 81 - Grand Yolo requires positive time and scores using the workbook Grand formula
+  ---
+  duration_ms: 0.813476
+  type: 'test'
+  ...
+# Subtest: settings, standings, and workbook backup round-trip
+ok 82 - settings, standings, and workbook backup round-trip
+  ---
+  duration_ms: 0.865113
+  type: 'test'
+  ...
+# Subtest: persistent JSON store saves and reloads state
+ok 83 - persistent JSON store saves and reloads state
+  ---
+  duration_ms: 12.613709
+  type: 'test'
+  ...
+# Subtest: rename preserves score data and rejects duplicate names
+ok 84 - rename preserves score data and rejects duplicate names
+  ---
+  duration_ms: 0.423428
+  type: 'test'
+  ...
+# Subtest: clear event and all-results reset preserve roster and settings while making slots empty
+ok 85 - clear event and all-results reset preserve roster and settings while making slots empty
+  ---
+  duration_ms: 0.652383
+  type: 'test'
+  ...
+# Subtest: full archive round-trip preserves OCR pending corrections and mapping queue
+ok 86 - full archive round-trip preserves OCR pending corrections and mapping queue
+  ---
+  duration_ms: 0.501746
+  type: 'test'
+  ...
+# Subtest: store can recover from a full Discord archive snapshot file
+ok 87 - store can recover from a full Discord archive snapshot file
+  ---
+  duration_ms: 3.87592
+  type: 'test'
+  ...
+# Subtest: randomized 50-player tournament aggregate matches Excel-style G12/H12 unrounded aggregation
+ok 88 - randomized 50-player tournament aggregate matches Excel-style G12/H12 unrounded aggregation
+  ---
+  duration_ms: 5.88603
+  type: 'test'
+  ...
+# Subtest: cross-platform ImageMagick process timeout confirms child close
+ok 89 - cross-platform ImageMagick process timeout confirms child close
+  ---
+  duration_ms: 260.233895
+  type: 'test'
+  ...
+# Subtest: cross-platform native OCR cancellation confirms child close
+ok 90 - cross-platform native OCR cancellation confirms child close
+  ---
+  duration_ms: 106.355712
+  type: 'test'
+  ...
+# Subtest: only the eight user-designated fields are required; ribbons and XP are optional
+ok 91 - only the eight user-designated fields are required; ribbons and XP are optional
+  ---
+  duration_ms: 1.231356
+  type: 'test'
+  ...
+# Subtest: bot uses OCR-value validation and has no visual-color or signature accept/reject gate
+ok 92 - bot uses OCR-value validation and has no visual-color or signature accept/reject gate
+  ---
+  duration_ms: 0.738092
+  type: 'test'
+  ...
+# Subtest: result and damage recovery crops include left-edge values on scaled result screens
+ok 93 - result and damage recovery crops include left-edge values on scaled result screens
+  ---
+  duration_ms: 0.266622
+  type: 'test'
+  ...
+# Subtest: optional ship, result description, XP and ribbon data do not hold up an otherwise complete report
+ok 94 - optional ship, result description, XP and ribbon data do not hold up an otherwise complete report
+  ---
+  duration_ms: 4.407171
+  type: 'test'
+  ...
+# Subtest: live bot asks for one plain correction value at a time
+ok 95 - live bot asks for one plain correction value at a time
+  ---
+  duration_ms: 0.771823
+  type: 'test'
+  ...
+# Subtest: each corrected required value advances to the next missing field
+ok 96 - each corrected required value advances to the next missing field
+  ---
+  duration_ms: 2.215048
+  type: 'test'
+  ...
+# Subtest: completed OCR reports export a structured JSON attachment for the tournament importer
+ok 97 - completed OCR reports export a structured JSON attachment for the tournament importer
+  ---
+  duration_ms: 0.367364
+  type: 'test'
+  ...
+# Subtest: unified bot includes tournament admin, result, missing-slot, standings, and recovery commands
+ok 98 - unified bot includes tournament admin, result, missing-slot, standings, and recovery commands
+  ---
+  duration_ms: 0.726885
+  type: 'test'
+  ...
+# Subtest: unfinished OCR correction state is persisted and rehydrated at startup
+ok 99 - unfinished OCR correction state is persisted and rehydrated at startup
+  ---
+  duration_ms: 0.47749
+  type: 'test'
+  ...
+# Subtest: bot serializes screenshot and tournament-mapping conversations to avoid mixing answers
+ok 100 - bot serializes screenshot and tournament-mapping conversations to avoid mixing answers
+  ---
+  duration_ms: 0.38513
+  type: 'test'
+  ...
+# Subtest: OCR extraction is serialized end-to-end with bounded backlog and explicit timeout handling
+ok 101 - OCR extraction is serialized end-to-end with bounded backlog and explicit timeout handling
+  ---
+  duration_ms: 0.323919
+  type: 'test'
+  ...
+# Subtest: OCR attachment download is inside the bounded queue and unsafe timeout recovery fails closed
+ok 102 - OCR attachment download is inside the bounded queue and unsafe timeout recovery fails closed
+  ---
+  duration_ms: 0.595688
+  type: 'test'
+  ...
+1..102
+# tests 102
+# suites 0
+# pass 102
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4261.666168

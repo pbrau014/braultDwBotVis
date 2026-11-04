@@ -1,0 +1,6 @@
+wows-yolo-tourney-discord-bot@2.5.0 /mnt/data/phase0_work/wows_yolo_tournament_discord_bot_v2_5_0_phase0_reconciled/wows-yolo-tournament-discord-bot
++-- discord.js@14.27.0
++-- dotenv@16.6.1
++-- tesseract.js-core@6.1.2
+`-- tesseract.js@6.0.1
+

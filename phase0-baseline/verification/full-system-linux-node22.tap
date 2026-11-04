@@ -1,0 +1,42 @@
+TAP version 13
+# Subtest: Excel Totals!H12 source-of-truth audit matches the clean browser seed and packaged workbook
+ok 1 - Excel Totals!H12 source-of-truth audit matches the clean browser seed and packaged workbook
+  ---
+  duration_ms: 23.068388
+  type: 'test'
+  ...
+# Attempting OCR extraction from large.png by SyntheticTester\#0001.
+# Subtest: complete synthetic Discord tour: all commands, every slot, formulas, persistence, OCR recovery, exports, and clearing
+ok 2 - complete synthetic Discord tour: all commands, every slot, formulas, persistence, OCR recovery, exports, and clearing
+  ---
+  duration_ms: 189.894247
+  type: 'test'
+  ...
+# Executed 25 documented command families; generated 84 slot results and 2 same-channel snapshots.
+# Subtest: 50-player randomized tournament: roster cap, all-player aggregates, dollars and public same-channel commands stay consistent
+ok 3 - 50-player randomized tournament: roster cap, all-player aggregates, dollars and public same-channel commands stay consistent
+  ---
+  duration_ms: 30.333451
+  type: 'test'
+  ...
+# Subtest: public interactive panel renders controls, responds to totals/event selection, and ignores other channels
+ok 4 - public interactive panel renders controls, responds to totals/event selection, and ignores other channels
+  ---
+  duration_ms: 5.305916
+  type: 'test'
+  ...
+# Subtest: runtime gate accepts Node 24.17+ and rejects stale Node 20/22 runtimes
+ok 5 - runtime gate accepts Node 24.17+ and rejects stale Node 20/22 runtimes
+  ---
+  duration_ms: 0.167012
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 601.419205
