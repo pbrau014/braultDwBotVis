@@ -25,7 +25,9 @@
     "test:discord-gateway-diagnostics": "node --test discord-gateway-diagnostics.test.js",
     "test:discord-command-policy": "node --test tournament-command-policy.test.js",
     "test:discord-preflight": "node --test discord-gateway-diagnostics.test.js tournament-command-policy.test.js discord-test-preflight.test.js",
-    "preflight:discord-test": "node scripts/preflight-discord-test.js"
+    "preflight:discord-test": "node scripts/preflight-discord-test.js",
+    "test:ocrspace": "node --test ocrspace.test.js",
+    "test:ocr": "npm run test:ocrspace && npm run test:ocr-watchdog && npm run test:paddleocr-fallback"
   },
   "engines": {
     "node": ">=22.16.0"

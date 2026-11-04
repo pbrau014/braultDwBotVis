@@ -20,6 +20,7 @@ const {
 const { createWorker } = require('./ocr-worker');
 const { inspectTargetChannelPermissions } = require('./discord-gateway-diagnostics');
 const { isAdminOnlyCommand } = require('./tournament-command-policy');
+const { collectOcrSpaceFieldEvidence } = require('./ocrspace-field-evidence');
 const path = require('node:path');
 const { createHash } = require('node:crypto');
 const os = require('node:os');
@@ -1379,6 +1380,7 @@ async function extractTextCore(imageBuffer) {
     // the damage value. All crop sizes are proportional to the detected image size.
     let damageFieldOcr = { text: '', lines: [], words: [], confidence: 0 };
     let damageFieldOcrCandidates = [];
+    let damageProviderRect = null;
     if (performanceAnchor?.bbox && missionsAnchor?.bbox) {
         const performanceHeadingHeight = Math.max(1, performanceAnchor.bbox.y1 - performanceAnchor.bbox.y0);
         const effectivePerformanceHeadingHeight = Math.min(performanceHeadingHeight, imageHeight * 0.035);
@@ -1394,6 +1396,7 @@ async function extractTextCore(imageBuffer) {
         // consensus when a ribbon edge still contaminates the cropped read.
         const narrowWidth = Math.min(imageWidth - left, Math.ceil(imageWidth * (compactLeftLayout ? 0.09 : 0.075)));
         const narrowRect = { left, top, width: narrowWidth, height: bottom - top };
+        damageProviderRect = { ...narrowRect };
         if (bottom - top >= imageHeight * 0.018 && narrowWidth > 15) {
             const psm7 = await runCrop('damage-value-psm7', { ...narrowRect }, 1400, 7);
             const psm6 = await runCrop('damage-value-psm6', { ...narrowRect }, 1400, 6);
@@ -2474,6 +2477,55 @@ async function extractTextCore(imageBuffer) {
         imageHeight,
         pageSegmentationMode: 'combined',
     };
+
+    // OCR.space is an explicitly opted-in external evidence provider. Only unresolved
+    // mandatory fields are eligible. Crops are sent sequentially; full screenshots
+    // are never uploaded by this stage. Provider output remains diagnostics only.
+    if (process.env.OCRSPACE_ENABLED === '1') {
+        try {
+            const previewRecord = buildBattleRecord(combined.text, extractedFields);
+            const missingLabels = new Set(getMissingRequiredFields(previewRecord).map((item) => String(item.label)));
+            const cropPlan = [];
+            const addCrop = (field, engine, rect, source, imageSource, outputWidth) => {
+                if (rect && Number(rect.width) >= 8 && Number(rect.height) >= 6) {
+                    cropPlan.push({ field, engine, rect: { ...rect }, source, imageSource, outputWidth });
+                }
+            };
+            if (missingLabels.has('Player')) addCrop('player', 3, identityTightRescueRect, 'localized-player-identity', 'original', 1800);
+            for (const field of ['xp', 'freeXp', 'credits']) {
+                const label = field === 'freeXp' ? 'Free XP' : field === 'xp' ? 'XP' : 'Credits';
+                if (!missingLabels.has(label)) continue;
+                const rect = localizedRewardEvidence.rects[field + '-psm7'] || localizedRewardEvidence.rects[field + '-psm8'];
+                if (rect) addCrop(field, 2, rect, 'localized-reward-column', 'prepared', Math.max(420, Math.min(1400, Math.round(rect.width * 3.5))));
+            }
+            if (missingLabels.has('Damage')) addCrop('damage', 2, damageProviderRect, 'localized-damage-column', 'prepared', 1400);
+            if (missingLabels.has('Battle Result')) addCrop('result', 2, resultTitleRect, 'localized-result-title', 'original', 1700);
+            if (missingLabels.has('Map') || missingLabels.has('Battle Mode') || missingLabels.has('Battle Start Time')) {
+                addCrop('battleMetadata', 2, sourceMetadataTightRect, 'localized-battle-metadata', 'original', 1700);
+            }
+            const remainingBudget = OCR_IMAGE_TIMEOUT_MS - (Date.now() - imageStartedAt) - 1500;
+            if (remainingBudget >= 1500) {
+                extractedFields.ocrSpaceEvidence = await collectOcrSpaceFieldEvidence({
+                    env: { ...process.env, OCRSPACE_STAGE_BUDGET_MS: String(Math.min(20000, remainingBudget)) },
+                    cropPlan,
+                    buildCrop: async (spec) => imageProcessor.cropResize(
+                        spec.imageSource === 'prepared' ? preparedBuffer : imageBuffer,
+                        spec.rect,
+                        spec.outputWidth,
+                        { grayscale: true, contrastStretch: '0.5%x0.5%', sharpen: '0x1+1+0.02' },
+                    ),
+                });
+            } else {
+                extractedFields.ocrSpaceEvidence = { status: 'skipped', reason: 'insufficient remaining per-image time budget', requests: 0, evidence: [] };
+            }
+        } catch (error) {
+            // Third-party OCR errors never fail or mutate local Tesseract results.
+            console.warn('[OCR.space] Optional evidence stage failed; local OCR remains authoritative:', String(error && error.message || error).slice(0, 240));
+            extractedFields.ocrSpaceEvidence = { status: 'failed', reason: String(error && error.code || 'OCRSPACE_STAGE_ERROR'), requests: 0, evidence: [] };
+        }
+    } else {
+        extractedFields.ocrSpaceEvidence = { status: 'disabled', reason: 'OCRSPACE_ENABLED is not 1', requests: 0, evidence: [] };
+    }
 
     await worker.setParameters({ tessedit_pageseg_mode: '3' });
     // Optional second-engine field-crop fallback. Disabled by default and strictly
