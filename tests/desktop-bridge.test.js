@@ -32,7 +32,6 @@ async function fixture(t,options={}){
     async createYoloTournament(p,body){actions.push({name:'yolo-create',body});return{id:body.id,format:body.format};},
     async createYoloEventNight(p,body){actions.push({name:'yolo-night',body});return{id:body.id};},
     async registerYoloParticipant(p,id,body){actions.push({name:'yolo-register',id,body,role:p.role});return{registered:true};},
-    async registerYoloParticipant(p,id,body){actions.push({name:'yolo-register',id,body});return{registered:true};},
     async transitionYoloStage(p,id,body){actions.push({name:'yolo-stage',id,body});return{status:body.status};},
     async transitionYoloTournament(p,id,body){actions.push({name:'yolo-status',id,body});return{status:body.status};},
     async exportBackup(){return JSON.stringify({format:'dwbot-test-archive'});},
