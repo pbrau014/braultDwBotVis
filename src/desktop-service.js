@@ -321,7 +321,14 @@ function createDesktopService(options = {}) {
       return mutate(async()=>{
         const current=state(),index=(current.eventNights || []).findIndex(item=>item.id===eventNightId);
         if(index<0) throw Object.assign(new Error('Event night was not found.'),{status:404,code:'EVENT_NIGHT_NOT_FOUND'});
-        const updated=YoloFormats.transitionEventNight(current.eventNights[index],body?.status,principal.discordUserId);
+        const night=current.eventNights[index];
+        if(body?.status==='completed'){
+          if((night.games || []).some(game=>!['evidence-accepted','evidence-rejected'].includes(game.status)))
+            throw Object.assign(new Error('Every game must have evidence accepted or rejected before event closeout.'),{status:409,code:'EVENT_EVIDENCE_UNRESOLVED'});
+          if((night.matches || []).some(match=>match.outcome?.status!=='certified'))
+            throw Object.assign(new Error('Every match outcome must be certified before event closeout.'),{status:409,code:'EVENT_MATCH_UNRESOLVED'});
+        }
+        const updated=YoloFormats.transitionEventNight(night,body?.status,principal.discordUserId);
         current.eventNights[index]=updated;
         auditLifecycle(updated,principal,'event-night-transitioned',{status:updated.status});
         await options.saveState();
