@@ -1,0 +1,113 @@
+World of Warships YOLO Tournament Discord Bot — Current State Summary
+Generated: 2026-10-26
+Current working iteration: 20
+Bot/package version: 2.5.0
+Bundle to deliver: updated_discord_bot_and_latest_artifactsV4.zip
+
+EXECUTIVE SUMMARY
+
+The iteration-20 implementation adds a local-only PaddleOCR field-crop fallback to the existing Tesseract.js pipeline. The fallback is disabled by default, activates only for unresolved, ambiguous, or contradictory required fields, uses only explicitly configured local model directories, and never writes raw PaddleOCR text directly to the tournament record. Candidate strings pass through the same field parsers and record consensus. Merged reward values are rejected; OCR-confusable O/0-style player conflicts are preserved as unresolved for human review. Crop count, geometry, and time budgets are bounded, and the Python worker blocks socket connections before importing PaddleOCR.
+
+Unit and focused safety tests pass. However, the completed Tesseract-only broad acceptance still produces 10/16 exact records, and the targeted four-image suite produces 2/4 exact records. PaddleOCR installed and ran locally on the user's Windows machine; its raw full-screen benchmark completed, but the integrated field-crop fallback benchmark has not yet been run on that Windows machine. Production remains NO-GO.
+
+IMPLEMENTED IN ITERATION 20
+
+- src/paddleocr-field-fallback.js: disabled-by-default field fallback gate, unresolved/ambiguous/conflicting field selection, local helper invocation, bounded field crops, remaining-deadline handling, strict parsing through existing parsers, consensus-only admission, player-conflict preservation, and diagnostics.
+- scripts/paddleocr_field_crops.py: local PP-OCR worker; explicit local detection/recognition model directories; network socket guard before Paddle imports; OpenCV in-memory bounded crops; offline-only behavior; per-crop result, latency, and error telemetry; oneDNN disabled for the installed Paddle 3.3.1 CPU workaround.
+- scripts/compare-paddleocr-integrated-acceptance.js: approved-manifest hash checks and metrics for exact-field accuracy, complete-record accuracy, accepted-wrong values, unresolved/false rejection, human-review rate, whole-pipeline latency, field-crop latency, failures and network attempts.
+- scripts/run-paddleocr-integrated-acceptance.ps1: Windows Node.js 24 runner that performs a Tesseract-only control and a Tesseract-plus-local-Paddle candidate on the same Windows host, same Node runtime, same ordered fixtures, same expected-value manifest, and with network blocking. It compares the reports without altering ground truth. It does not install packages or download models.
+- Tests for feature gating, strict reward parsing, merged-number rejection, O/0 identity conflict handling, deadline exhaustion, crop bounds, local helper failures and network-attempt handling, and metric denominators/latency aggregation.
+- .env.example: PADDLEOCR_FIELD_FALLBACK=0 by default, empty explicit local model path settings, crop-count and timeout limits.
+- package-lock.json remains unchanged; SHA-256: efad3621991b05aaa53a793636d713040f40ad9ae404cbadac02b7401cbff3eb.
+- No cloud OCR, remote vision model, or external OCR API integration is enabled. The runtime fallback requires local model files and blocks socket connections.
+
+NODE 24 TEST RESULTS
+
+Executed in the development container on Node.js v24.17.0:
+- npm test: 174 passed, 0 failed, 0 skipped.
+- npm run test:ocr-watchdog: 21 passed, 0 failed, 0 skipped.
+- npm run test:opencv: 5 passed, 0 failed, 0 skipped.
+- npm run test:paddleocr-fallback: 16 passed, 0 failed, 0 skipped.
+- node --test tests/paddleocr-comparison.test.js: 1 passed, 0 failed.
+- JavaScript syntax checks across src/, scripts/ and tests/: passed.
+- Python py_compile for scripts/paddleocr_field_crops.py and scripts/benchmark_paddleocr_local.py: passed.
+- Comparator self-test (same report used as baseline and candidate): all deltas zero; fixture hash checks passed.
+
+The comprehensive scripts/accept-tesseractjs.js wrapper was attempted previously but did not complete within its command time limit during a long negative-control recognition stage. It is explicitly not claimed as a pass. The separately completed screenshot runs below are recorded independently.
+
+TESSERACT-ONLY 16-IMAGE DEVELOPMENT ACCEPTANCE
+
+The full, sequential 16-image acceptance run completed 16/16 images with Paddle fallback explicitly disabled and the Node network guard enabled. The acceptance gate FAILED:
+- Exact fields: 135 / 144 = 93.75%.
+- Complete exact records: 10 / 16 = 62.5%.
+- Records with all production-required fields present: 12 / 16 = 75%.
+- Accepted-wrong required values: 3.
+- Unresolved required values: 6.
+- Human-review records by the comparator's convention: 5 / 16 = 31.25%.
+- Critical false acceptance, using accepted-wrong / (all labeled required fields minus unresolved fields): 3 / 138 = 2.17%.
+- False-rejection rate, using unresolved / all labeled required fields: 6 / 144 = 4.17%.
+- End-to-end latency: mean 44.557 s, median 44.807 s, p95 58.223 s (16 timings); full run 713.019 s.
+
+These exactness results match the previous iteration-19 baseline: 10/16 exact records and 135/144 exact fields. Iteration 20 did not improve Tesseract-only accuracy; observed latency was modestly slower in this run. Since PADDLEOCR_FIELD_FALLBACK was disabled, this run measures the existing primary pipeline only.
+
+Remaining exact-value failures in the 16-image corpus:
+- Screenshot_2024-11-14_133326.png: player unresolved (expected [HO-FL]gtrain25465).
+- WTF.jpg: player and map unresolved, XP unresolved (expected player [HO-FL]VeritechCEO, map North, XP 6649).
+- image1.png: accepted XP 92505 vs expected 9250.
+- image2.png: damage unresolved due conflicting candidates 13495 vs 1349538 (expected 134953).
+- image5.png: accepted player [HO-FL]VeritechCEQ vs expected [HO-FL]VeritechCEO; damage unresolved due conflicting damage candidates (expected 166183).
+- image6.png: accepted XP 4714 vs expected 7146.
+
+TARGETED TESSERACT FIXTURE RESULTS
+
+- Reported issue screenshot: 9/9 compared fields exact, no required fields missing.
+- Four original reward/identity fixtures: 2/4 full exact records (Hoffmann and Libertad); 3/4 records had all production-required fields present. Asashio still returned [OVF]O0ldschoolGaming_YouTube instead of [OVF]OldschoolGaming_YouTube. Schlieffen had Credits unresolved and XP unresolved; Free XP and damage were exact. These fixtures do not meet the complete exact-match gate.
+
+WINDOWS PADDLEOCR INSTALLATION AND RAW BENCHMARK EVIDENCE
+
+The user-provided Windows logs verify:
+- Python 3.12 isolated virtual environment created under %LOCALAPPDATA%\WoWSYOLO\PaddleOCR.
+- PaddlePaddle 3.3.1 CPU and PaddleOCR 3.7.0 installed.
+- Local PP-OCRv6_medium_det and PP-OCRv6_medium_rec model directories downloaded and staged.
+- Synthetic offline smoke passed; recognized text was "WOWS XP 123456 FREE XP 7890" and networkAttemptCount was 0.
+- Raw full-screen PaddleOCR benchmark completed 16/16 screenshots, failedCount 0, networkAttemptCount 0. Reported median was about 39.7 s, mean about 43.0 s and p95 about 83.5 s. This is raw full-screen OCR, not field-crop or integrated accuracy.
+
+The raw Paddle output supplies useful candidate text for some Tesseract failures, but it sometimes merges neighboring rewards and has O/0-like player identity disagreements. These conflicts must remain ambiguous; the raw full-screen benchmark alone does not justify automatic acceptance or replacement of Tesseract.
+
+WINDOWS INTEGRATED BENCHMARK COMMAND
+
+From the project root on the user's Windows Node.js 24 machine with the local PaddleOCR environment and models already installed, run:
+
+    .\scripts\run-paddleocr-integrated-acceptance.ps1 -ProjectRoot (Get-Location).Path
+
+The runner executes two passes over the same 16 ordered screenshots: Tesseract only, then the local PaddleOCR field-crop fallback. It uses only the already installed local model folders and does not reinstall/download anything. The network guard is enabled for both runs. The fallback flag is enabled only for the candidate benchmark process. It writes:
+- testdata\ocr-acceptance\tesseract-only-baseline-windows-node24.json
+- testdata\ocr-acceptance\paddleocr-integrated-acceptance-windows-node24.json
+- testdata\ocr-acceptance\paddleocr-integrated-comparison-windows-node24.json
+
+The comparison includes per-field and complete-record deltas, wrong accepted/unresolved values, human review, fallback and per-crop latency, failed crops, network attempts, and fixture hash verification. The 16-image set is development/tuning data and not a fresh holdout. The runner may exit nonzero when the known OCR exact-match failures remain; a completed comparison is not a release pass.
+
+PROVENANCE NOTE
+
+The 16-image Tesseract-only JSON reports sourceBuild SHA-256 6ffe93caa7d495532dad79b641af182a0515ac0d6cc13c5d6cb11fe7405e7d45 over 74 files at the time of that run. After it completed, the PowerShell benchmark runner was revised to produce a same-host Tesseract-only control and hybrid candidate. The Tesseract extraction/runtime source and ground-truth fixtures were not changed after the run, but the report's embedded source fingerprint is not the fingerprint of the final packaged tree. Generated Python __pycache__ files used during validation are excluded from the distributable source. SOURCE-SHA256-MANIFEST.json is the authoritative per-file manifest for this V4 package.
+
+OUTSTANDING RELEASE GATES
+
+- Run the paired local-only Windows benchmark and evaluate actual crop latency and integrated exact-field / complete-record delta.
+- Fix remaining Tesseract failures without weakening exact-match acceptance or changing approved ground truth.
+- Preserve O/0 and other ambiguous player candidates for human review; do not use roster proximity to silently rewrite a name.
+- Keep merged reward values rejected unless field geometry and independent evidence establish a valid candidate.
+- Evaluate on a new, independently labeled holdout; the current 16 images have already been used for debugging.
+- Run native Windows Tesseract checks and the real Discord smoke test on the intended Windows host. These are not claimed complete.
+
+PRODUCTION STATUS: NO-GO. The implementation and safety tests pass, but broad OCR acceptance fails, the integrated Paddle field-crop accuracy/latency is not measured yet, and Windows/native Tesseract plus Discord smoke-test gates remain outstanding.
+
+RECOMMENDED DIRECTIONS (CHOOSE ONE)
+
+A — RECOMMENDED NEXT STEP: Run the paired Windows integrated benchmark above and upload its Tesseract-only, hybrid-candidate and comparison JSON reports. This answers whether local Paddle field crops improve accuracy and what they cost in latency on the actual deployment host.
+
+B — Tesseract-first: Hold Paddle disabled and repair the remaining baseline defect categories one at a time: XP truncation/column association (image1, image6, WTF), damage crop conflict (image2, image5), and player identity/metadata ambiguity (Screenshot_2024-11-14, WTF, Asashio). Re-run the same approved corpus after each source change.
+
+C — Evaluation-first: Freeze the current development corpus and assemble a fresh labeled holdout of 25–50 or more representative screenshots before tuning further. Run Tesseract-only and the hybrid pipeline against that holdout after the Windows paired benchmark is stable.
+
+Do not enable PaddleOCR in production until integrated measurements show a defensible improvement without increasing incorrect accepted critical values, crop latency fits the processing budget, and the remaining platform/integration gates pass.

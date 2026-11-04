@@ -1,0 +1,13 @@
+DWBOT ITERATION 22 MILESTONE RELEASE RECORD
+Date: 2026-11-03
+Package: DWBOT_ITERATION22_MILESTONE_CANDIDATE_2026-11-03.zip
+Status: Candidate / production blocked; no deployment or remote publication.
+ZIP size bytes: 86684275
+ZIP SHA-256: dc2c4720b892d7792f610cac94ff968da1a89bd34e756255720015dea641f266
+Members: 449 unique paths
+Manifest: 448 member entries plus README_BUNDLE_CONTENTS.txt (manifest self-hash omitted to avoid circularity)
+Verification: unzip integrity PASS; no duplicate member names; .git/node_modules/.env excluded; manifest sizes and SHA-256 values verified; clean extraction compared byte-for-byte to staging.
+Runtime verification: npm test 183/183 PASS under Node v22.16.0 (diagnostic only; project requires Node >=24.17.0); Tesseract local assets PASS; syntax and git diff checks PASS.
+OCR acceptance: not passed. The full four-fixture and bounded Asashio live runs timed out before reports. They are not accuracy passes or failures.
+Remaining gates: Node >=24.17 clean install/full suite; Windows/native Tesseract; current-source four-image/16-image suite; independent labeled holdout; live Discord staging; security/secret scan; backup/restore rehearsal.
+The package's internal plan is a pre-checksum snapshot. The active project plan at /mnt/data/wows-yolo-tournament-discord-bot-ocr/plan1.txt is the post-build record.

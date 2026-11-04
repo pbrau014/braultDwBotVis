@@ -1,0 +1,356 @@
+TAP version 13
+# Subtest: additional OCR corpus contains all 16 attached images with complete exact-match annotations
+ok 1 - additional OCR corpus contains all 16 attached images with complete exact-match annotations
+  ---
+  duration_ms: 32.821652
+  type: 'test'
+  ...
+# Subtest: XP is mandatory, and missing or invalid XP blocks record acceptance
+ok 2 - XP is mandatory, and missing or invalid XP blocks record acceptance
+  ---
+  duration_ms: 8.445101
+  type: 'test'
+  ...
+# Subtest: recognizes Victory/Defeat and visible result descriptions
+ok 3 - recognizes Victory/Defeat and visible result descriptions
+  ---
+  duration_ms: 0.644659
+  type: 'test'
+  ...
+# Subtest: reads player and ship from the dedicated identity line and stops before adjacent UI text
+ok 4 - reads player and ship from the dedicated identity line and stops before adjacent UI text
+  ---
+  duration_ms: 0.184657
+  type: 'test'
+  ...
+# Subtest: extracts map/mode and validates calendar-correct battle timestamps
+ok 5 - extracts map/mode and validates calendar-correct battle timestamps
+  ---
+  duration_ms: 0.405379
+  type: 'test'
+  ...
+# Subtest: parseBattleStartTime accepts a labeled nine-digit compact date only after strict calendar validation
+ok 6 - parseBattleStartTime accepts a labeled nine-digit compact date only after strict calendar validation
+  ---
+  duration_ms: 1.041255
+  type: 'test'
+  ...
+# Subtest: parseModeMap strips malformed banner fragments and trailing OCR punctuation
+ok 7 - parseModeMap strips malformed banner fragments and trailing OCR punctuation
+  ---
+  duration_ms: 0.252339
+  type: 'test'
+  ...
+# Subtest: parseModeMap removes an inserted lowercase i at a fused title-case map boundary
+ok 8 - parseModeMap removes an inserted lowercase i at a fused title-case map boundary
+  ---
+  duration_ms: 0.171287
+  type: 'test'
+  ...
+# Subtest: normalizes known OCR spacing/truncation artifacts in battle modes and map separators
+ok 9 - normalizes known OCR spacing/truncation artifacts in battle modes and map separators
+  ---
+  duration_ms: 0.559531
+  type: 'test'
+  ...
+# Subtest: builds a complete record from agreeing OCR candidates and does not require ribbons
+ok 10 - builds a complete record from agreeing OCR candidates and does not require ribbons
+  ---
+  duration_ms: 1.076678
+  type: 'test'
+  ...
+# Subtest: disagreement marks only the affected field as missing instead of silently choosing one OCR value
+ok 11 - disagreement marks only the affected field as missing instead of silently choosing one OCR value
+  ---
+  duration_ms: 0.770928
+  type: 'test'
+  ...
+# Subtest: conflicting result, map or identity readings are sent for correction
+ok 12 - conflicting result, map or identity readings are sent for correction
+  ---
+  duration_ms: 0.473081
+  type: 'test'
+  ...
+# Subtest: manual corrections can fill just the missing fields and valid short damage values
+ok 13 - manual corrections can fill just the missing fields and valid short damage values
+  ---
+  duration_ms: 0.390206
+  type: 'test'
+  ...
+# Subtest: correction prompts ask for exactly one missing value at a time
+ok 14 - correction prompts ask for exactly one missing value at a time
+  ---
+  duration_ms: 0.81133
+  type: 'test'
+  ...
+# Subtest: correction prompts never show sample field values or ask for a bulk correction
+ok 15 - correction prompts never show sample field values or ask for a bulk correction
+  ---
+  duration_ms: 0.423236
+  type: 'test'
+  ...
+# Subtest: correction parser accepts labelled fields and rejects malformed values
+not ok 16 - correction parser accepts labelled fields and rejects malformed values
+  ---
+  duration_ms: 1.581687
+  type: 'test'
+  location: '/mnt/data/dwbot_resume/continuation/wows-yolo-tournament-discord-bot/tests/battle-record.test.js:208:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+    + [
+    +   {
+    +     hint: 'the complete XP amount shown in the screenshot',
+    +     key: 'xp',
+    +     label: 'XP',
+    +     reason: 'OCR could not confidently read XP'
+    +   }
+    + ]
+    - []
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+    0:
+      key: 'xp'
+      label: 'XP'
+      hint: 'the complete XP amount shown in the screenshot'
+      reason: 'OCR could not confidently read XP'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/mnt/data/dwbot_resume/continuation/wows-yolo-tournament-discord-bot/tests/battle-record.test.js:221:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a single high-confidence OCR reading may pass, but a single weak reading is requested for correction
+ok 17 - a single high-confidence OCR reading may pass, but a single weak reading is requested for correction
+  ---
+  duration_ms: 1.106513
+  type: 'test'
+  ...
+# Subtest: missing ribbons are not part of the exact required-field list
+ok 18 - missing ribbons are not part of the exact required-field list
+  ---
+  duration_ms: 0.282855
+  type: 'test'
+  ...
+# Subtest: an invalid manual correction cannot leave a prior guessed required value in place
+ok 19 - an invalid manual correction cannot leave a prior guessed required value in place
+  ---
+  duration_ms: 0.384588
+  type: 'test'
+  ...
+# Subtest: tournament JSON export is stable, typed, and never invents missing tournament inputs
+ok 20 - tournament JSON export is stable, typed, and never invents missing tournament inputs
+  ---
+  duration_ms: 1.921889
+  type: 'test'
+  ...
+# Subtest: ship tier suggestions support Roman numerals through tier XI without claiming class or time
+ok 21 - ship tier suggestions support Roman numerals through tier XI without claiming class or time
+  ---
+  duration_ms: 0.088072
+  type: 'test'
+  ...
+# Subtest: map consensus strips leading result-banner and all-caps OCR debris without using ground-truth map names
+ok 22 - map consensus strips leading result-banner and all-caps OCR debris without using ground-truth map names
+  ---
+  duration_ms: 0.458339
+  type: 'test'
+  ...
+# Subtest: weighted player and cleaned map candidates resolve only OCR debris and common glyph confusion
+ok 23 - weighted player and cleaned map candidates resolve only OCR debris and common glyph confusion
+  ---
+  duration_ms: 0.476726
+  type: 'test'
+  ...
+# Subtest: operation result descriptions identify a primary-task victory without a readable Victory title
+ok 24 - operation result descriptions identify a primary-task victory without a readable Victory title
+  ---
+  duration_ms: 0.229525
+  type: 'test'
+  ...
+# Subtest: a result-description line stating that our team won by points is a victory
+ok 25 - a result-description line stating that our team won by points is a victory
+  ---
+  duration_ms: 0.084777
+  type: 'test'
+  ...
+# Subtest: map cleanup discards leading parenthesized numeric OCR debris
+ok 26 - map cleanup discards leading parenthesized numeric OCR debris
+  ---
+  duration_ms: 0.864138
+  type: 'test'
+  ...
+# Subtest: rejects undecodable replacement characters in OCR metadata and manual corrections
+ok 27 - rejects undecodable replacement characters in OCR metadata and manual corrections
+  ---
+  duration_ms: 0.618439
+  type: 'test'
+  ...
+# Subtest: regression corpus contains only the three user-approved image URLs
+ok 28 - regression corpus contains only the three user-approved image URLs
+  ---
+  duration_ms: 1.355777
+  type: 'test'
+  ...
+# Subtest: each reference defines every required ground-truth key and marks unconfirmed values honestly
+ok 29 - each reference defines every required ground-truth key and marks unconfirmed values honestly
+  ---
+  duration_ms: 0.284939
+  type: 'test'
+  ...
+# Subtest: reference corpus downloader and runner are present and syntax-testable
+ok 30 - reference corpus downloader and runner are present and syntax-testable
+  ---
+  duration_ms: 0.21334
+  type: 'test'
+  ...
+# Subtest: OCR benchmark metric definitions count unresolved fields as incorrect and wrong accepted values separately
+ok 31 - OCR benchmark metric definitions count unresolved fields as incorrect and wrong accepted values separately
+  ---
+  duration_ms: 1.758202
+  type: 'test'
+  ...
+# Subtest: missing rows are incomplete and ground truth comes from the approved manifest
+ok 32 - missing rows are incomplete and ground truth comes from the approved manifest
+  ---
+  duration_ms: 0.686261
+  type: 'test'
+  ...
+# Subtest: XP is a mandatory field and an unresolved XP makes the record fail
+ok 33 - XP is a mandatory field and an unresolved XP makes the record fail
+  ---
+  duration_ms: 0.248464
+  type: 'test'
+  ...
+# Subtest: comparison metrics report exactness, false acceptance, false rejection, review, and crop latency
+ok 34 - comparison metrics report exactness, false acceptance, false rejection, review, and crop latency
+  ---
+  duration_ms: 3.458537
+  type: 'test'
+  ...
+# Subtest: unresolved XP blocks mandatory completeness and requires human review
+ok 35 - unresolved XP blocks mandatory completeness and requires human review
+  ---
+  duration_ms: 0.298448
+  type: 'test'
+  ...
+# Subtest: exact-match acceptance rejects a deliberately incorrect expected value
+ok 36 - exact-match acceptance rejects a deliberately incorrect expected value
+  ---
+  duration_ms: 1.148425
+  type: 'test'
+  ...
+# Subtest: exact-match acceptance rejects missing or incomplete required fields
+ok 37 - exact-match acceptance rejects missing or incomplete required fields
+  ---
+  duration_ms: 0.16003
+  type: 'test'
+  ...
+# Subtest: acceptance gate passes only complete exact-match rows
+ok 38 - acceptance gate passes only complete exact-match rows
+  ---
+  duration_ms: 0.102794
+  type: 'test'
+  ...
+# Subtest: real negative control requires an exact baseline and the injected damage expectation as the sole mismatch
+ok 39 - real negative control requires an exact baseline and the injected damage expectation as the sole mismatch
+  ---
+  duration_ms: 0.443217
+  type: 'test'
+  ...
+# Subtest: required-field comparison rejects a mismatch in XP
+ok 40 - required-field comparison rejects a mismatch in XP
+  ---
+  duration_ms: 0.369305
+  type: 'test'
+  ...
+# Subtest: all nine user-designated fields are required; ribbons and auxiliary metadata are optional
+ok 41 - all nine user-designated fields are required; ribbons and auxiliary metadata are optional
+  ---
+  duration_ms: 1.366214
+  type: 'test'
+  ...
+# Subtest: bot uses OCR-value validation and has no visual-color or signature accept/reject gate
+ok 42 - bot uses OCR-value validation and has no visual-color or signature accept/reject gate
+  ---
+  duration_ms: 0.696557
+  type: 'test'
+  ...
+# Subtest: result and damage recovery crops include left-edge values on scaled result screens
+ok 43 - result and damage recovery crops include left-edge values on scaled result screens
+  ---
+  duration_ms: 0.535595
+  type: 'test'
+  ...
+# Subtest: optional ship, result description, and ribbon data do not hold up a complete nine-field report
+ok 44 - optional ship, result description, and ribbon data do not hold up a complete nine-field report
+  ---
+  duration_ms: 4.634455
+  type: 'test'
+  ...
+# Subtest: live bot asks for one plain correction value at a time
+ok 45 - live bot asks for one plain correction value at a time
+  ---
+  duration_ms: 1.579504
+  type: 'test'
+  ...
+# Subtest: each corrected required value advances to the next missing field
+ok 46 - each corrected required value advances to the next missing field
+  ---
+  duration_ms: 2.536442
+  type: 'test'
+  ...
+# Subtest: completed OCR reports export a structured JSON attachment for the tournament importer
+ok 47 - completed OCR reports export a structured JSON attachment for the tournament importer
+  ---
+  duration_ms: 0.530137
+  type: 'test'
+  ...
+# Subtest: unified bot includes tournament admin, result, missing-slot, standings, and recovery commands
+ok 48 - unified bot includes tournament admin, result, missing-slot, standings, and recovery commands
+  ---
+  duration_ms: 1.068466
+  type: 'test'
+  ...
+# Subtest: unfinished OCR correction state is persisted and rehydrated at startup
+ok 49 - unfinished OCR correction state is persisted and rehydrated at startup
+  ---
+  duration_ms: 0.479992
+  type: 'test'
+  ...
+# Subtest: bot serializes screenshot and tournament-mapping conversations to avoid mixing answers
+ok 50 - bot serializes screenshot and tournament-mapping conversations to avoid mixing answers
+  ---
+  duration_ms: 0.413171
+  type: 'test'
+  ...
+# Subtest: OCR extraction is serialized end-to-end with bounded backlog and explicit timeout handling
+ok 51 - OCR extraction is serialized end-to-end with bounded backlog and explicit timeout handling
+  ---
+  duration_ms: 0.3858
+  type: 'test'
+  ...
+# Subtest: OCR attachment download is inside the bounded queue and unsafe timeout recovery fails closed
+ok 52 - OCR attachment download is inside the bounded queue and unsafe timeout recovery fails closed
+  ---
+  duration_ms: 0.837919
+  type: 'test'
+  ...
+1..52
+# tests 52
+# suites 0
+# pass 51
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 481.12883

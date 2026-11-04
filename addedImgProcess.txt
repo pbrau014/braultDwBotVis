@@ -1,0 +1,325 @@
+do the following:
+1. consider the attachment, pause the plan for now, stop making changes and stop doing testing for now, implement the attached command now. 
+2. then, review the plan considering the new additions, revise anything necessary, reconcile all completed done suggested required tests with new available data. 
+3. continue the plan, with the new additions in consideration, once this implementation has been completed fully and successfully - review test review implement review test implement ... until a desirable outcome has been reached.
+4. keep it all local, don't use any external api.# TASK: Implement and Validate a More Accurate, Computer-Vision-Assisted OCR Pipeline 
+ 
+## 1. Objective 
+ 
+Improve the existing World of Warships screenshot-recognition pipeline to achieve demonstrably higher accuracy, especially for numeric fields, player identification, and battle metadata. 
+ 
+Do not replace the existing OCR engine without evidence that the replacement performs better. Begin with a local-first architecture that combines: 
+ 
+- The existing Tesseract.js OCR pipeline. 
+- OpenCV-based image-region detection and field isolation. 
+- A benchmarked second OCR engine, preferably a compatible PaddleOCR implementation using the best suitable current PP-OCR model. 
+- Field-specific validation and evidence-based candidate selection. 
+- Selective fallback to additional OCR or vision services only when necessary. 
+- Human review when the available evidence cannot establish a reliable result. 
+ 
+The goal is not merely to increase the number of fields recognized. The goal is to increase exact-field accuracy and complete-record accuracy while preventing incorrect values from being silently accepted. 
+ 
+**Work on the existing project, not a new implementation that ignores its architecture.** Inspect the latest authoritative source package, test fixtures, acceptance evidence, configuration, and documentation before deciding how to modify the pipeline. 
+ 
+Do not assume a proposed change is implemented, working, or an improvement until it has been tested. 
+ 
+## 2. Phase One: Inspect and establish the baseline 
+ 
+Before modifying code: 
+ 
+1. Identify the latest authoritative project ZIP and source version. Check available manifests, source files, dependencies, test fixtures, expected values, previous acceptance reports, and known failure cases. 
+2. Confirm the supported runtime and target platform. Use the project's required Node.js 24 environment and verify Windows compatibility. Do not treat a Node.js 22 run or Linux-only result as proof of Windows acceptance. 
+3. Trace the existing pipeline from screenshot ingestion through image preprocessing, OCR, parsing, candidate selection, validation, record creation, and scoring. 
+4. Identify where field boundaries are determined, how recognition candidates are selected, and how missing or conflicting values are handled. 
+5. Run the existing tests and acceptance suite before making changes, recording the exact source revision, environment, commands, results, failures, and known limitations. 
+6. Establish a reproducible baseline against the approved expected values. Do not modify ground truth to make the existing pipeline or a new implementation pass. 
+7. Preserve the original source, fixtures, reports, and release artifacts. Perform development in a separate working copy or branch. 
+ 
+If the required runtime or dependencies are unavailable, document the limitation and arrange the correct test environment. Do not substitute a different environment silently. 
+ 
+## 3. Phase Two: Introduce field-specific computer vision 
+ 
+Investigate OpenCV or an appropriate compatible computer-vision library to locate and isolate relevant screenshot regions before OCR. 
+ 
+Prefer stable interface anchors, known geometry, template matching, and carefully validated crop boundaries when the screenshot layout is consistent. 
+ 
+Do not introduce a trained object detector unless measurements show that fixed geometry or anchor-based detection is insufficient. 
+ 
+For every recognized field, retain the relevant evidence: 
+ 
+- Original screenshot reference and dimensions. 
+- Field identifier and crop coordinates. 
+- Crop image or a reproducible crop reference. 
+- Preprocessing operations and parameters. 
+- OCR engine, model, version, and configuration. 
+- Raw OCR text and available alternative candidates. 
+- Parsed candidate value. 
+- Validation results and reasons for rejection. 
+- Final selected value, confidence information, and acceptance or review decision. 
+ 
+Ensure crop boundaries do not clip leading or trailing digits, include neighboring fields, or omit necessary contextual information. 
+ 
+Keep original images unchanged. Create derived crops and processed images as separate artifacts. 
+ 
+## 4. Phase Three: Use field-specific recognition strategies 
+ 
+Do not apply the same OCR configuration indiscriminately to every field. 
+ 
+### Numeric fields 
+ 
+Handle damage, XP, Free XP, credits, and other numeric rewards using appropriately isolated crops, suitable scaling and preprocessing, numeric recognition constraints where supported, and strict parsing. 
+ 
+Detect and test for: 
+ 
+- Missing leading digits. 
+- Missing trailing digits. 
+- Extra or duplicated digits. 
+- Confusion between visually similar digits. 
+- Crops that omit part of a digit. 
+- Incorrect separators or formatting. 
+- Incorrect selection between competing numeric candidates. 
+ 
+Do not automatically prefer the largest number, the most common candidate, or the candidate with the highest generic confidence score. 
+ 
+### Player identity 
+ 
+Recognize player names and clan tags separately from numeric fields. Use the approved roster as validation evidence where appropriate. 
+ 
+Do not silently replace an unfamiliar or ambiguous name with the nearest roster entry. Preserve competing candidates and request review when identity cannot be established reliably. 
+ 
+### Battle metadata 
+ 
+Handle map, battle mode, battle-start time, ship identity, victory or defeat, and other required metadata using appropriate recognition and validation rules. 
+ 
+Validate recognized values against applicable known-value lists and strict date/time formats where appropriate. Ensure validation rules account for game updates and legitimate changes in available maps, modes, and ships. 
+ 
+Do not infer a missing field solely because another field or screenshot appears similar. 
+ 
+## 5. Phase Four: Benchmark PaddleOCR as a second engine 
+ 
+Evaluate PaddleOCR against the existing Tesseract.js implementation using the same approved screenshots and expected values. 
+ 
+Before integration: 
+ 
+1. Verify the current suitable PaddleOCR release, model availability, licensing, platform support, dependencies, and resource requirements. 
+2. Determine whether a Python worker, local service, or another integration method fits the existing architecture best. 
+3. Keep the existing Tesseract implementation available as the baseline and retain a way to disable the second engine. 
+4. Benchmark raw recognition and the integrated field-specific pipeline separately. 
+5. Measure accuracy, latency, resource consumption, failure behavior, and deployment complexity. 
+6. Integrate PaddleOCR only if the results justify the additional operational cost and complexity. 
+ 
+Do not assume two OCR engines are independent merely because they use different package names. Investigate shared model families, preprocessing, and common failure modes. 
+ 
+If PaddleOCR cannot be installed or executed in the available environment, report that honestly and provide a reproducible benchmark procedure. Do not fabricate measurements. 
+ 
+## 6. Phase Five: Implement evidence-based validation and selective fallback 
+ 
+Use the existing local OCR pipeline for normal processing. 
+ 
+Invoke additional recognition only when a critical field is missing, invalid, ambiguous, or in conflict with other evidence. 
+ 
+The preferred sequence is: 
+ 
+1. Locate and isolate the field. 
+2. Run the primary local OCR engine. 
+3. Apply field-specific parsing and validation. 
+4. Use the second local OCR engine when the field remains uncertain. 
+5. Compare the resulting candidates and their supporting evidence. 
+6. If uncertainty remains, optionally invoke a configured cloud OCR or vision-model fallback. 
+7. Accept the result only if it satisfies explicit acceptance criteria. 
+8. Otherwise, mark the field unresolved and request human review. 
+ 
+Evaluate Google Cloud Vision and Azure AI Vision as possible cloud OCR fallbacks. A vision-capable AI model may also be evaluated for difficult cases, but it must not be treated as inherently more accurate than dedicated OCR. 
+ 
+Cloud services must be optional, explicitly configured, disabled by default unless authorized, and never required for ordinary local processing. 
+ 
+Before sending any image externally: 
+ 
+- Require explicit configuration and authorization. 
+- Send only the minimum necessary crop when appropriate. 
+- Do not transmit Discord credentials, unrelated screenshots, or unnecessary personal information. 
+- Document service costs, retention considerations, network requirements, and failure behavior. 
+- Ensure that unavailable credentials or a failed cloud request cannot crash the normal local pipeline. 
+ 
+Never accept a value simply because a fallback service returned a plausible answer. 
+ 
+### Candidate-selection rules 
+ 
+Define explicit, field-specific rules for: 
+ 
+- Valid syntax and ranges. 
+- Agreement between genuinely independent recognition paths. 
+- Recognition of the correct field boundaries. 
+- Contradictions between candidate values. 
+- Missing or insufficient evidence. 
+- Confidence calibration and acceptance thresholds. 
+- Escalation to human review. 
+ 
+Do not count repeated processing of the same pixels as independent corroboration without justification. 
+ 
+Do not force a single answer when the evidence conflicts. Preserve ambiguity, record the reason, and prevent an unresolved critical field from silently entering an accepted scoring record. 
+ 
+## 7. Phase Six: Evaluate customized recognition 
+ 
+Because the screenshot layout is relatively consistent, investigate whether customized recognition for troublesome digits or fields would provide a measurable benefit. 
+ 
+First identify which errors are caused by: 
+ 
+- Incorrect crop geometry. 
+- Poor image quality or scaling. 
+- OCR character-recognition errors. 
+- Parsing or candidate-selection logic. 
+- Incorrect field association. 
+ 
+Correct upstream geometry and parsing problems before training a custom model to compensate for them. 
+ 
+If sufficient labeled examples are available, evaluate a suitable custom-trained recognizer for the most problematic fields. Split training, tuning, and evaluation data correctly, prevent screenshot leakage between sets, and compare the custom model against the existing OCR and PaddleOCR baselines. 
+ 
+Do not commit to custom training unless the measured improvement justifies the labeling effort, maintenance burden, inference cost, and deployment requirements. 
+ 
+## 8. Phase Seven: Create a reproducible accuracy benchmark 
+ 
+Assemble approximately 100–200 representative, labeled screenshots where available. Include different result types, ships, player names, image resolutions, layout variations, and all known failure cases. 
+ 
+If fewer labeled screenshots exist, use the available corpus, report the sample-size limitation, and identify the additional data needed. Do not invent screenshots or expected values. 
+ 
+Create a versioned dataset manifest containing each fixture's identifier, approved expected fields, source, and relevant metadata. 
+ 
+Keep separate datasets for: 
+ 
+- Development and debugging. 
+- Threshold and configuration tuning. 
+- Final holdout evaluation. 
+ 
+Do not repeatedly tune against the holdout set and then report the same set as independent proof of improvement. 
+ 
+Run the same eligible fixtures through: 
+ 
+A. Existing OCR pipeline. 
+ 
+B. Existing OCR plus improved field isolation and validation. 
+ 
+C. Existing OCR plus field isolation, with PaddleOCR as a second engine. 
+ 
+D. Selective local fallback and candidate selection. 
+ 
+E. Optional cloud OCR or vision-model fallback, when credentials and authorization are available. 
+ 
+F. Customized recognition, if implemented and justified. 
+ 
+Compare both individual engines and complete end-to-end pipelines. Use identical approved inputs and expected values. 
+ 
+### Required metrics 
+ 
+Report: 
+ 
+- Exact-field accuracy for every required field. 
+- Complete-record accuracy: the percentage of screenshots for which all required fields are correct. 
+- Critical-field false-acceptance rate: the rate at which incorrect critical values are accepted as valid. 
+- Unresolved-field rate and human-review rate. 
+- False-rejection rate where a correct value is unnecessarily rejected. 
+- Accuracy by field, screenshot type, and known failure category. 
+- Processing latency, including median and 95th-percentile latency where sample size supports it. 
+- Throughput and resource consumption. 
+- Cloud usage and estimated cost per screenshot, where applicable. 
+- Test failures, exceptions, timeouts, and inconsistent results across repeated runs. 
+ 
+Define each metric's numerator and denominator explicitly. Do not mix unresolved records into the accuracy denominator without explaining the convention. 
+ 
+Run repeated sequential batches and repeat selected tests with different input orders to check consistency, resource leaks, and recovery behavior. 
+ 
+Provide an error analysis showing which failure types improved, which regressed, and which remain unresolved. 
+ 
+## 9. Phase Eight: Add regression tests and safety checks 
+ 
+Create a regression test for every observed OCR defect and every new behavior introduced. 
+ 
+Include tests for: 
+ 
+- Leading- and trailing-digit loss. 
+- Extra digits and visually similar characters. 
+- Conflicting OCR candidates. 
+- Incorrect field boundaries and clipped glyphs. 
+- Invalid or unknown player names. 
+- Missing metadata. 
+- Legitimately missing fields. 
+- Empty or corrupted images. 
+- Different resolutions and supported screenshot layouts. 
+- OCR engine crashes, timeouts, and unavailable dependencies. 
+- PaddleOCR worker failure or termination. 
+- Cloud credentials missing, requests timing out, rate limits, and service unavailability. 
+- Ambiguity preservation and human-review escalation. 
+- Preventing incorrect critical values from being marked accepted. 
+- Sequential processing, cleanup, and recovery. 
+- Compatibility with the established scoring and record-generation behavior. 
+ 
+Use independently approved expected values. Ensure negative controls actually reject deliberately incorrect candidates. 
+ 
+Preserve the existing scoring rules, event behavior, Discord integration, data contracts, and other functionality unrelated to OCR accuracy. Any necessary interface or schema changes must be documented and tested. 
+ 
+Do not weaken acceptance tests, remove failing fixtures, or change approved expected values to make the new pipeline appear successful. 
+ 
+## 10. Phase Nine: Validate and package the final implementation 
+ 
+After implementation: 
+ 
+1. Run all relevant unit, integration, regression, and OCR acceptance tests. 
+2. Run the complete established acceptance suite against the exact final source revision. 
+3. Run the required Node.js 24 and Windows-targeted checks. 
+4. Verify any native OCR engine and external process behavior on the intended deployment platform. 
+5. Confirm that the new pipeline does not regress previously passing fixtures or alter scoring behavior. 
+6. Confirm that optional services can be disabled and that local operation remains functional without network access when configured for offline use. 
+7. Generate a final benchmark report with baseline-versus-candidate results, failure analysis, configuration details, and unresolved limitations. 
+8. Record the exact source revision, dependency versions, model versions, dataset manifest, test commands, and checksums. 
+9. Package only the source that passed the required gates and verify that the packaged files match the tested revision. 
+10. Preserve previous releases and reports; do not overwrite historical evidence. 
+ 
+Do not declare success merely because the unit tests pass or the package builds. The full acceptance results must demonstrate whether accuracy improved. 
+ 
+## 11. Implementation priorities 
+ 
+Work in this order: 
+ 
+P0 — Establish the baseline and fix field isolation, candidate precedence, and false acceptance of incorrect critical values. 
+ 
+P1 — Benchmark PaddleOCR, add explicit validation and ambiguity handling, and create regression coverage for every observed failure. 
+ 
+P2 — Evaluate selective cloud or vision-model fallback without making external services mandatory. 
+ 
+P3 — Evaluate customized recognition only where the error analysis demonstrates a remaining need. 
+ 
+P4 — Complete the final acceptance suite, Windows-targeted validation, reporting, and release packaging. 
+ 
+At each stage, explain what changed, why it was needed, what tests were run, and whether the results support keeping the change. 
+ 
+If a phase cannot be completed, report the blocker and provide the next reproducible action instead of claiming completion. 
+ 
+## 12. Required deliverables 
+ 
+Provide: 
+ 
+1. A concise baseline and architecture review. 
+2. A prioritized implementation plan. 
+3. The implemented changes, with a clear file-level summary. 
+4. The benchmark dataset manifest and evaluation methodology. 
+5. Baseline-versus-candidate accuracy tables. 
+6. Field-level error analysis and a list of remaining known failures. 
+7. Regression-test results and complete acceptance-suite results. 
+8. Runtime, platform, dependency, latency, and cost findings. 
+9. Setup and configuration instructions, including optional external-service configuration. 
+10. A release ZIP containing the tested source and necessary supporting files. 
+11. A final report stating what was actually executed, what improved, what did not improve, and whether the release gates passed. 
+ 
+Never fabricate results, claim that an unexecuted test passed, or label an unverified fix as complete. 
+ 
+## 13. Final architectural recommendation 
+ 
+The intended architecture is: 
+ 
+**OpenCV field isolation → existing Tesseract OCR → field-specific validation → selective PaddleOCR fallback → optional authorized cloud/vision fallback → explicit acceptance or human review.** 
+ 
+Use a customized recognizer only if the benchmark demonstrates a need. 
+ 
+The primary success criterion is measurable improvement in complete-record accuracy and critical-field reliability, without unacceptable regressions, excessive latency, or mandatory external-service dependencies. 
+ 
+deployment should remain entirely local and offline on Windows. however, consider whether authorized external APIs are acceptable. If this is not specified, use local-only processing as the default, keep cloud integrations optional, and do not block baseline work while awaiting a cloud-service decision.
