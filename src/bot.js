@@ -10,6 +10,7 @@ const {
     GatewayIntentBits,
     Events,
     Partials,
+    PermissionFlagsBits,
     AttachmentBuilder,
     ActionRowBuilder,
     ButtonBuilder,
@@ -17,6 +18,7 @@ const {
     StringSelectMenuBuilder,
 } = require('discord.js');
 const { createWorker } = require('./ocr-worker');
+const { inspectTargetChannelPermissions } = require('./discord-gateway-diagnostics');
 const path = require('node:path');
 const { createHash } = require('node:crypto');
 const os = require('node:os');
@@ -3487,13 +3489,53 @@ async function handleInteraction(interaction) {
 }
 
 client.on(Events.InteractionCreate || 'interactionCreate', handleInteraction);
-client.once(Events.ClientReady, (readyClient) => {
-    console.log(`Logged in as ${readyClient.user.tag}.`);
-    console.log(`Watching channel ID: ${TARGET_CHANNEL_ID}`);
+// discord.js owns Gateway heartbeats, reconnects and session resumption. These
+// listeners record lifecycle evidence without creating a competing Gateway loop.
+client.on('shardReady', (shardId) => {
+    console.log(`[Discord Gateway] shard ${shardId} READY.`);
+});
+client.on('shardDisconnect', (closeEvent, shardId) => {
+    const code = Number(closeEvent?.code);
+    const reason = String(closeEvent?.reason || '').slice(0, 160);
+    console.warn(`[Discord Gateway] shard ${shardId} disconnected (code ${Number.isFinite(code) ? code : 'unknown'}): ${reason || 'no reason supplied'}`);
+});
+client.on('shardReconnecting', (shardId) => {
+    console.warn(`[Discord Gateway] shard ${shardId} reconnecting; discord.js is managing recovery.`);
+});
+client.on('shardResume', (shardId, replayedEvents) => {
+    console.log(`[Discord Gateway] shard ${shardId} resumed; replayed ${Number(replayedEvents) || 0} event(s).`);
+});
+client.on('shardError', (error, shardId) => {
+    console.error(`[Discord Gateway] shard ${shardId} error:`, error?.message || error);
+});
+client.on(Events.Error, (error) => console.error('[Discord client] error:', error?.message || error));
+client.on(Events.Warn, (warning) => console.warn('[Discord client] warning:', warning));
+
+client.once(Events.ClientReady, async (readyClient) => {
+    console.log(`[Discord Gateway] READY as ${readyClient.user.tag} (bot user ID ${readyClient.user.id}).`);
+    console.log(`[Discord Gateway] Connected shard count: ${readyClient.ws.shards.size}.`);
+    console.log(`[Discord] Checking configured target channel ${TARGET_CHANNEL_ID}...`);
+    let targetChannel = null;
+    try {
+        targetChannel = await readyClient.channels.fetch(TARGET_CHANNEL_ID);
+    } catch (error) {
+        console.error('[Discord preflight] FAILED: target channel fetch failed:', error?.message || error);
+    }
+    const channelCheck = inspectTargetChannelPermissions(targetChannel, readyClient.user, [
+        { name: 'ViewChannel', flag: PermissionFlagsBits.ViewChannel },
+        { name: targetChannel?.isThread?.() ? 'SendMessagesInThreads' : 'SendMessages', flag: targetChannel?.isThread?.() ? PermissionFlagsBits.SendMessagesInThreads : PermissionFlagsBits.SendMessages },
+        { name: 'AttachFiles', flag: PermissionFlagsBits.AttachFiles },
+    ]);
+    if (!channelCheck.ok) {
+        console.error(`[Discord preflight] FAILED: ${channelCheck.reason}. Missing permissions: ${channelCheck.missingPermissions.join(', ') || 'none reported'}.`);
+        console.error('[Discord preflight] Bot Gateway READY, but channel readiness is not verified; live-test gate remains blocked.');
+        return;
+    }
+    console.log(`[Discord preflight] PASS: guild ${channelCheck.guildId}, channel #${channelCheck.channelName} (${channelCheck.channelId}); required permissions: ${channelCheck.requiredPermissions.join(', ')}.`);
     console.log(`Tournament storage: ${tournamentStore.engine || 'JSON'} (${tournamentStore.path}).`);
     if (ENABLE_SLASH_COMMANDS) registerSlashCommands(readyClient).catch(error => console.error('Slash command registration failed:', error.message));
     else console.log('Slash command registration is disabled; use `!yolo panel` for public interactive controls.');
-    console.log('The bot is online. Missing or conflicting required fields trigger a correction prompt; missing ribbons never block posting.');
+    console.log('The bot is online and the configured channel preflight passed. Missing or conflicting required fields trigger a correction prompt; missing ribbons never block posting.');
 });
 
 async function terminateOcrWorker() {

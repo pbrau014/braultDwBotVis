@@ -77,3 +77,18 @@ Never flood Discord or deliberately trigger a global limit. A mocked 429 test is
 ## Return for review
 
 Provide redacted `npm ci`/`npm test` logs and exit codes; runtime version; bot Ready/start/stop logs; screenshots or transcripts of admin/participant and wrong-channel behavior; synthetic attachment metadata/hash and resulting report JSON; before/after state exports; and any error/retry/recovery logs. Do not provide `.env`, tokens, webhook URLs, private screenshots or real tournament databases.
+
+## Gateway lifecycle evidence (required)
+
+The bot uses discord.js to own the Gateway heartbeat, reconnect and session-resume protocol. Do not add a second raw WebSocket heartbeat/reconnect loop beside discord.js.
+
+A live connection PASS requires all of the following evidence from the same test run:
+
+1. A `[Discord Gateway] READY` line showing the expected bot tag and bot user ID. `client.login()` resolving or a token being configured is not a READY pass.
+2. A `[Discord preflight] PASS` line showing the expected test guild ID, target channel name/ID, and required channel permissions. The preflight is read-only and sends no test message.
+3. If a disconnect occurs during the test, preserve the shard disconnect code/reason and subsequent reconnect/resume or fresh READY log. A resume is not a fresh READY event; record the actual event.
+4. A clean Ctrl+C shutdown and subsequent fresh READY after restart, followed by an unchanged state/export check.
+
+The runtime preflight checks a sendable guild text channel and the bot's `ViewChannel`, `SendMessages` (or `SendMessagesInThreads` for a thread), and `AttachFiles` permissions. The bot does not request Guild Members or Presence intents. It requests Guilds, Guild Messages, and Message Content; Message Content must be enabled in the Developer Portal for prefix commands and attachment metadata/content to be available.
+
+Gateway event limits and HTTP REST rate limits are distinct. Do not flood either surface. Capture naturally occurring retry/backoff logs; a mocked 429 remains simulated evidence only.
