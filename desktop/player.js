@@ -15,6 +15,16 @@
     D.$('player-content').classList.remove('hidden');
     D.$('player-title').textContent=overview.player.name;
     D.$('player-subtitle').textContent='Roster entry #'+overview.player.id+' · signed in as '+session.user.username;
+    const formatList=D.$('player-format-list');formatList.replaceChildren();
+    if(!(overview.formats||[]).length)formatList.append(D.node('p','muted','No published Pilot or Full YOLO events are available yet.'));
+    for(const item of overview.formats||[]){
+      const card=D.node('article','event-row');
+      const info=document.createElement('div');
+      info.append(D.node('strong','',item.name+' · '+(item.format==='pilot'?'PILOT YOLO':'FULL YOLO')));
+      info.append(D.node('span','',item.status+(item.season?' · '+item.season.durationWeeks+' week season':' · single-evening format')));
+      if(item.stages?.length)info.append(D.node('span','',item.stages.map(s=>s.type.replaceAll('-',' ')+': '+s.status).join(' · ')));
+      card.append(info);formatList.append(card);
+    }
     const standing=overview.standing||{};
     D.$('player-total').textContent=D.number(standing.total)+' 🪙';
     D.$('player-value').textContent=D.money(standing.estimatedValue);
