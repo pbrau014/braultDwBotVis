@@ -62,8 +62,8 @@ Observe `[Discord Gateway] READY as ...` with the expected bot user ID, then `[D
 
 In the one configured test channel:
 1. As the participant, run `!yolo help`, `!yolo standings`, and `!yolo totals`; they should respond.
-2. As the test admin, run a harmless read-only admin command such as `!yolo settings`.
-3. As the participant, try `!yolo add-player Live Test Must Be Denied`; it must be rejected and must not change the roster.
+2. As the test admin, run the harmless read-only admin command `!yolo settings`.
+3. As the participant, try both `!yolo settings` and `!yolo add-player Live Test Must Be Denied`; both must be rejected and must not change settings or the roster.
 4. In another channel, run `!yolo totals`; the bot must ignore it.
 
 Record actor role, channel, command, response and an isolated before/after state export. Avoid destructive tests.

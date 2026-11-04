@@ -71,3 +71,10 @@ The bot now subscribes to discord.js REST `rateLimited` events and records metho
 ## Fail-closed startup behavior
 
 The channel permission preflight now aborts startup if the configured channel cannot be fetched, is not a sendable guild text channel, or lacks any required permission. It closes tournament storage, destroys the Discord client and sets a non-zero process exit status. This prevents the bot from remaining connected in a degraded state that could generate repeated permission failures. The behavior is code-reviewed but has not yet been exercised in a complete installed application or live Discord test.
+
+
+## Admin command authorization correction — 2026-11-04
+
+Code review found that the read-only `!yolo settings` command was handled under the plural name but the admin-only allowlist contained only the singular `setting` mutation command. The plural settings command could therefore be reached by an ordinary participant. This is corrected by centralizing the admin-only command policy in `src/tournament-command-policy.js`; both `setting` and `settings` are now restricted. Added pure regression tests for all admin-only and public command families. The live quickstart now explicitly verifies that a participant is denied both `!yolo settings` and `!yolo add-player`.
+
+This is a code-level authorization fix. The new policy unit tests are run separately; the complete synthetic Discord integration suite and live role/permission test still need to be rerun.

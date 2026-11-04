@@ -19,6 +19,7 @@ const {
 } = require('discord.js');
 const { createWorker } = require('./ocr-worker');
 const { inspectTargetChannelPermissions } = require('./discord-gateway-diagnostics');
+const { isAdminOnlyCommand } = require('./tournament-command-policy');
 const path = require('node:path');
 const { createHash } = require('node:crypto');
 const os = require('node:os');
@@ -2808,8 +2809,7 @@ async function handleTournamentCommand(message) {
     const firstSpace = rest.search(/\s/);
     const command = (firstSpace < 0 ? rest : rest.slice(0, firstSpace)).toLowerCase();
     const args = firstSpace < 0 ? '' : rest.slice(firstSpace).trim();
-    const adminOnly = new Set(['add-player', 'rename-player', 'remove-player', 'result', 'setting', 'import', 'map', 'clear-slot', 'clear-event', 'clear-results', 'finalize', 'export', 'export-workbook', 'snapshot']);
-    if (adminOnly.has(command) && !isTournamentAdmin(message)) {
+    if (isAdminOnlyCommand(command) && !isTournamentAdmin(message)) {
         await message.reply({ content: 'That command is restricted to tournament admins (Manage Server permission or an ID in `TOURNAMENT_ADMIN_IDS`).', allowedMentions: { repliedUser: false, parse: [] } });
         return true;
     }
