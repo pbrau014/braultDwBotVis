@@ -126,7 +126,7 @@ test('Full YOLO event nights require a declared stage and full private archive p
 
 test('Full YOLO cannot close until every season stage is completed in order',async()=>{
  const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
- await f.service.createYoloTournament(admin,{id:'full-stage',name:'Full Stage',format:'full',season:{id:'season',durationWeeks:8}});
+ await f.service.createYoloTournament(admin,{id:'full-stage',name:'Full Stage',format:'full',season:{id:'season',durationWeeks:8},settings:{approvedSettingsId:'approved-season'}});
  await f.service.transitionYoloTournament(admin,'full-stage',{status:'published'});
  await f.service.transitionYoloTournament(admin,'full-stage',{status:'active'});
  await assert.rejects(f.service.transitionYoloTournament(admin,'full-stage',{status:'completed'}),/cannot complete/);
