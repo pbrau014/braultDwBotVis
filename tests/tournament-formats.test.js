@@ -5,6 +5,10 @@ const T = require('../src/tournament');
 const F = T.TournamentFormats;
 
 function state() { return T.createState(); }
+function evidence(t,id) {
+  const digest=Buffer.from(id).toString('hex').padEnd(64,'0').slice(0,64);
+  return F.registerEvidence(t,{id,sha256:digest,sizeBytes:128,contentType:'image/png',sourceFile:id+'.png',capturedAt:'2026-11-04T12:00:00Z',source:{platform:'test'}});
+}
 function pilot() {
   return F.createTournament(state().competition, { id: 'pilot-1', name: 'Pilot Night', format: 'pilot',
     config: { timezone: 'America/Chicago', eventStart: '2026-12-01T18:00:00-06:00' } });
@@ -18,7 +22,8 @@ function playStage(t, stageKey) {
   const suffix=stageKey.replace(/_/g,'-');
   const fixture=F.createFixture(t,{id:'fixture-'+suffix,stageKey,homeTeamId:'home',awayTeamId:'away'});
   const match=F.createMatch(t,fixture.id);
-  F.recordGame(match,{gameNumber:1,teamId:'home',playerId:'p1',metrics:{damage:9000,kills:2},evidenceId:'ev-'+suffix+'-h'},t.teams,t.registrations);
+  evidence(t,'ev-'+suffix+'-h');evidence(t,'ev-'+suffix+'-a');
+  F.recordGame(match,{gameNumber:1,teamId:'home',playerId:'p1',metrics:{damage:9000,kills:2},evidenceId:'ev-'+suffix+'-h'},t.teams,t.registrations,t.evidence);
   F.recordGame(match,{gameNumber:2,teamId:'away',playerId:'p2',metrics:{damage:4000,kills:1},evidenceId:'ev-'+suffix+'-a'},t.teams,t.registrations);
   F.completeMatch(t,match.id);
 }
@@ -83,7 +88,8 @@ test('Full regular season advances in order through postseason and Grand Finale'
   F.activateStage(t, F.STAGES.REGULAR_SEASON);
   const fixture = F.createFixture(t, { id: 'f1', stageKey: F.STAGES.REGULAR_SEASON, homeTeamId: 'home', awayTeamId: 'away' });
   const match = F.createMatch(t, fixture.id);
-  F.recordGame(match, { gameNumber: 1, teamId: 'home', playerId: 'p1', metrics: { damage: 10000, kills: 2 }, evidenceId: 'ev1' }, t.teams,t.registrations);
+  evidence(t,'ev1');evidence(t,'ev2');
+  F.recordGame(match, { gameNumber: 1, teamId: 'home', playerId: 'p1', metrics: { damage: 10000, kills: 2 }, evidenceId: 'ev1' }, t.teams,t.registrations,t.evidence);
   F.recordGame(match, { gameNumber: 2, teamId: 'away', playerId: 'p2', metrics: { damage: 5000, kills: 1 }, evidenceId: 'ev2' }, t.teams,t.registrations);
   F.completeMatch(t, match.id);
   assert.equal(match.outcome.winnerTeamId, 'home');
@@ -117,6 +123,7 @@ test('tie-break order is explicit and unresolved ties block advancement', () => 
 
 test('Race side-event is a separate Full YOLO record using inverse elapsed seconds', () => {
   const t = full();
+  evidence(t,'ev-race');
   const race = F.recordRaceSideEvent(t, { id: 'race-1', seasonWeek: 3, playerId: 'p1', elapsedSeconds: 120, evidenceId: 'ev-race' });
   assert.equal(race.raceMetric, 1 / 120);
   assert.equal(t.matches.length, 0);
@@ -153,6 +160,7 @@ test('match game must be supported by locked team roster and non-empty match', (
   F.activateStage(t, F.STAGES.REGULAR_SEASON);
   const fixture = F.createFixture(t, { id: 'f1', stageKey: F.STAGES.REGULAR_SEASON, homeTeamId: 'home', awayTeamId: 'away' });
   const match = F.createMatch(t, fixture.id);
+  evidence(t,'ev-roster');
   assert.throws(() => F.recordGame(match, { gameNumber: 1, teamId: 'home', playerId: 'p2', metrics: { damage: 1, kills: 0 }, evidenceId: 'ev' }, t.teams,t.registrations), /locked roster/);
   assert.throws(() => F.completeMatch(t, match.id), /no recorded games/);
 });
@@ -162,6 +170,7 @@ test('forfeit requires a team winner, reason and evidence and is auditable', () 
   F.activateStage(t, F.STAGES.REGULAR_SEASON);
   const fixture = F.createFixture(t, { id: 'f1', stageKey: F.STAGES.REGULAR_SEASON, homeTeamId: 'home', awayTeamId: 'away' });
   const match = F.createMatch(t, fixture.id);
+  evidence(t,'evidence-1');
   const result = F.resolveForfeit(t, match.id, 'home', 'Opponent no-show', 'evidence-1');
   assert.equal(result.status, F.STATUS.FORFEIT);
   assert.equal(result.outcome.decidedBy, 'forfeit');
@@ -206,8 +215,17 @@ test('Full YOLO cannot activate postseason without approved published qualifiers
 test('stage bye requires a valid team, reason and evidence and resolves a fixture', () => {
   const t=full();
   F.activateStage(t,F.STAGES.REGULAR_SEASON);
+  evidence(t,'bye-evidence');
   const bye=F.recordBye(t,F.STAGES.REGULAR_SEASON,'home','Odd number of teams','bye-evidence');
   assert.equal(bye.status,'bye');
   assert.equal(bye.outcome.decidedBy,'bye');
   F.completeStage(t,F.STAGES.REGULAR_SEASON);
+});
+
+test('evidence registry rejects invalid digests and duplicate IDs and preserves immutable references', () => {
+  const t=full();
+  assert.throws(()=>F.registerEvidence(t,{id:'bad',sha256:'abc',sizeBytes:1,contentType:'image/png',sourceFile:'x.png',capturedAt:'now'}),/SHA-256/);
+  evidence(t,'unique-evidence');
+  assert.throws(()=>evidence(t,'unique-evidence'),/immutable/);
+  assert.equal(t.evidence[0].sha256.length,64);
 });
