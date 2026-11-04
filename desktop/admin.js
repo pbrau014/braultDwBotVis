@@ -55,7 +55,25 @@
         const heading=D.node('strong','',item.name+' · '+item.format.toUpperCase());
         const meta=D.node('span','',item.status+' · '+(item.season?item.season.durationWeeks+' week season':'single-evening event'));
         details.append(heading,meta);
-        if(item.stages?.length){const stages=D.node('span','',item.stages.map(s=>s.type+': '+s.status).join(' · '));details.append(stages);}
+        const tournamentNext={draft:'published',published:'active',active:'completed'}[item.status];
+        if(tournamentNext){
+          const action=D.node('button','button secondary small','Tournament: '+tournamentNext);action.type='button';
+          action.addEventListener('click',async()=>{action.disabled=true;try{await D.api('/api/admin/yolo-tournaments/'+encodeURIComponent(item.id)+'/status',{method:'POST',body:{status:tournamentNext}});await load();}catch(error){action.disabled=false;status(error.message,'error');}});
+          details.append(action);
+        }
+        if(item.stages?.length){
+          for(const stage of item.stages){
+            const stageRow=D.node('div','event-row');
+            stageRow.append(D.node('span','',stage.type.replaceAll('-',' ')+' · '+stage.status));
+            const stageNext={draft:'published',published:'active',active:'completed'}[stage.status];
+            if(stageNext){
+              const stageButton=D.node('button','button quiet small',stageNext);stageButton.type='button';
+              stageButton.addEventListener('click',async()=>{stageButton.disabled=true;try{await D.api('/api/admin/yolo-tournaments/'+encodeURIComponent(item.id)+'/stages',{method:'POST',body:{stage:stage.type,status:stageNext}});await load();}catch(error){stageButton.disabled=false;status(error.message,'error');}});
+              stageRow.append(stageButton);
+            }
+            details.append(stageRow);
+          }
+        }
         card.append(details);formatList.append(card);
       }
       const tournamentSelect=D.$('yolo-event-tournament');tournamentSelect.replaceChildren();
