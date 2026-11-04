@@ -31,6 +31,7 @@ async function fixture(t,options={}){
     async listYoloTournaments(){return{items:[]};},
     async createYoloTournament(p,body){actions.push({name:'yolo-create',body});return{id:body.id,format:body.format};},
     async createYoloEventNight(p,body){actions.push({name:'yolo-night',body});return{id:body.id};},
+    async transitionYoloEventNight(p,id,body){actions.push({name:'yolo-night-status',id,body});return{status:body.status};},
     async registerYoloParticipant(p,id,body){actions.push({name:'yolo-register',id,body,role:p.role});return{registered:true};},
     async transitionYoloStage(p,id,body){actions.push({name:'yolo-stage',id,body});return{status:body.status};},
     async transitionYoloTournament(p,id,body){actions.push({name:'yolo-status',id,body});return{status:body.status};},
@@ -153,11 +154,13 @@ test('admin format lifecycle endpoints require session, CSRF and admin role',asy
  assert.equal(created.status,201);
  const night=await fetch(f.origin+'/api/admin/yolo-event-nights',{method:'POST',headers,body:JSON.stringify({id:'night-1',tournamentId:'pilot-1'})});
  assert.equal(night.status,201);
+ const nightStatus=await fetch(f.origin+'/api/admin/yolo-event-nights/night-1/status',{method:'POST',headers,body:JSON.stringify({status:'published'})});
+ assert.equal(nightStatus.status,200);
  const stage=await fetch(f.origin+'/api/admin/yolo-tournaments/full-1/stages',{method:'POST',headers,body:JSON.stringify({stage:'regular-season',status:'published'})});
  assert.equal(stage.status,200);
  const status=await fetch(f.origin+'/api/admin/yolo-tournaments/pilot-1/status',{method:'POST',headers,body:JSON.stringify({status:'published'})});
  assert.equal(status.status,200);
- assert.deepEqual(f.actions.filter(x=>x.name.startsWith('yolo-')).map(x=>x.name),['yolo-create','yolo-night','yolo-stage','yolo-status']);
+ assert.deepEqual(f.actions.filter(x=>x.name.startsWith('yolo-')).map(x=>x.name),['yolo-create','yolo-night','yolo-night-status','yolo-stage','yolo-status']);
  const player=await login(f.origin,'player');
  const denied=await fetch(f.origin+'/api/admin/yolo-tournaments',{headers:{Cookie:player.cookie}});
  assert.equal(denied.status,403);
