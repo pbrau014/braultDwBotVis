@@ -83,7 +83,7 @@ test('Admin lifecycle forms use same-origin protected API routes and cover Pilot
   const html = read('desktop/admin.html');
   const script = read('desktop/admin.js');
   const bridge = read('src/desktop-bridge.js');
-  for (const route of ['/api/admin/tournaments','/api/admin/seasons','/api/admin/stages','/api/admin/teams','/api/admin/registrations','/api/admin/rosters','/api/admin/event-nights','/api/admin/fixtures','/api/admin/matches','/api/admin/match-outcomes','/api/admin/bracket/advance','/api/admin/approvals','/api/admin/pilot/registrations','/api/admin/pilot/event-nights','/api/admin/tournament-scores','/api/admin/awards']) {
+  for (const route of ['/api/admin/tournaments','/api/admin/seasons','/api/admin/stages','/api/admin/teams','/api/admin/registrations','/api/admin/rosters','/api/admin/event-nights','/api/admin/fixtures','/api/admin/matches','/api/admin/match-outcomes','/api/admin/bracket/advance','/api/admin/approvals','/api/admin/pilot/registrations','/api/admin/pilot/event-nights','/api/admin/pilot/teams','/api/admin/pilot/rosters','/api/admin/pilot/fixtures','/api/admin/pilot/matches','/api/admin/event-nights/transition','/api/admin/tournament-scores','/api/admin/awards']) {
     assert.ok(html.includes('data-lifecycle-endpoint="'+route+'"'), 'Admin form missing '+route);
     assert.ok(bridge.includes("'"+route+"'"), 'Bridge route missing '+route);
   }
