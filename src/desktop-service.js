@@ -477,7 +477,15 @@ function createDesktopService(options = {}) {
       return mutate(async()=>{
         const current=state(),index=(current.yoloTournaments || []).findIndex(item=>item.id===tournamentId);
         if(index<0) throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});
-        const updated=YoloFormats.transitionStage(current.yoloTournaments[index],body?.stage,body?.status,principal.discordUserId);
+        const tournament=current.yoloTournaments[index];
+        if(body?.status==='completed'){
+          const nights=(current.eventNights || []).filter(night=>night.tournamentId===tournament.id&&night.stage===body.stage);
+          if(!nights.length||nights.some(night=>!['completed','cancelled'].includes(night.status)))
+            throw Object.assign(new Error('Every event night in this stage must be completed or cancelled first.'),{status:409,code:'STAGE_EVENT_NIGHTS_OPEN'});
+          if(nights.some(night=>(night.matches || []).some(match=>match.outcome?.status!=='certified')))
+            throw Object.assign(new Error('Every match in this stage requires a certified outcome.'),{status:409,code:'STAGE_MATCHES_UNRESOLVED'});
+        }
+        const updated=YoloFormats.transitionStage(tournament,body?.stage,body?.status,principal.discordUserId);
         current.yoloTournaments[index]=updated;
         await options.saveState();
         return updated;
@@ -488,7 +496,10 @@ function createDesktopService(options = {}) {
       return mutate(async()=>{
         const current=state(),index=(current.yoloTournaments || []).findIndex(item=>item.id===tournamentId);
         if(index<0) throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});
-        const updated=YoloFormats.transitionTournament(current.yoloTournaments[index],body?.status,principal.discordUserId);
+        const tournament=current.yoloTournaments[index];
+        if(body?.status==='completed'&&(current.eventNights || []).some(night=>night.tournamentId===tournament.id&&!['completed','cancelled'].includes(night.status)))
+          throw Object.assign(new Error('All tournament event nights must be completed or cancelled before season closeout.'),{status:409,code:'TOURNAMENT_EVENT_NIGHTS_OPEN'});
+        const updated=YoloFormats.transitionTournament(tournament,body?.status,principal.discordUserId);
         current.yoloTournaments[index]=updated;
         await options.saveState();
         return updated;
