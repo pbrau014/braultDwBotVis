@@ -62,7 +62,7 @@ function recordScoreEntry(tournament,input={},season=null) {
     entry.damage=score(input.damage,'Damage');entry.kills=score(input.kills,'Kills');entry.time=Number(input.time);
     if(!Number.isFinite(entry.time)||entry.time<=0) throw new TypeError('Grand Yolo time must be positive.');
   } else if(category==='race') {
-    entry.metric=Number(input.time);if(!Number.isFinite(entry.metric)||entry.metric<=0)throw new TypeError('Race elapsed time must be positive.');
+    entry.elapsedSeconds=Number(input.time);if(!Number.isFinite(entry.elapsedSeconds)||entry.elapsedSeconds<=0)throw new TypeError('Race elapsed time must be positive.');entry.metric=1/entry.elapsedSeconds;
   } else {
     entry.metric=score(category==='damage'?input.damage:input.kills,category==='damage'?'Damage':'Kills');
   }
