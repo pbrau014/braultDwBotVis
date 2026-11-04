@@ -2,8 +2,8 @@
 ## Pilot and Full YOLO Tournament System
 **Implementation and operations manual - organizer publication required**
 
-Revision: 1.2
-Status: lifecycle foundation and Discord command operations implemented; guided desktop lifecycle controls and final production gates remain open.
+Revision: 1.3
+Status: lifecycle foundation, Discord command operations, authenticated desktop lifecycle service/bridge, Player/Admin lifecycle controls and accessible quick-help implemented; guided form refinement and final production gates remain open.
 
 ## 1. Governing model
 
@@ -264,7 +264,7 @@ Forfeit/withdrawal/bye resolutions require an explicit reason, winner where appl
 
 ## 10. Desktop and Discord safety
 
-The Player/Admin desktop pages now explain the two formats and provide quick notes on mouse hover and keyboard focus. The help descriptions are also present in visible text. The lifecycle creation/management controls are currently exposed through the Discord admin JSON commands; a complete guided desktop lifecycle interface and authenticated lifecycle API remain planned work.
+The Player/Admin desktop pages explain both formats and provide quick notes on mouse hover and keyboard focus; the descriptions are also available as visible text for touch and assistive technology. The authenticated desktop lifecycle service and CSRF-protected bridge expose draft creation, publication, start, participant self-registration/check-in and administrator lifecycle actions. The Admin UI currently uses a generic lifecycle action payload for several operations rather than complete guided forms; detailed timeline, roster, fixture, evidence and audit visualizations plus referee-specific authorization remain follow-on work. Discord lifecycle JSON commands remain available in the configured channel. Live permissions, channel scope and slash-command defaults have not been changed.
 
 Do not change channel privacy, enable slash commands, or conduct live Discord actions outside an isolated development-guild test. Public replies and snapshots remain subject to the current configured-channel behavior.
 
@@ -309,3 +309,8 @@ Linux/offline CI cannot certify Windows, current game-client, browser, live Disc
 Legacy version-2 score data is preserved and not retroactively assigned to Pilot or Full. The designated canonical scoring workbook and Score Reporter HTML were absent from the audited Library. The repository workbook is not proven canonical; workbook formula changes remain blocked until the designated source is identified.
 
 This manual is an implementation baseline, not a signed event publication. Add append-only amendments with version, date, approver, affected sections, reason, test evidence and effective scope.
+
+
+## 15. Amendment 1.3 - implementation and verification update (2026-11-04)
+
+The authenticated desktop lifecycle API and Player/Admin lifecycle controls are implemented in the lifecycle candidate branch. The generic Admin lifecycle action form is functional but not yet a fully guided workflow for every operation. Hover and keyboard-focus quick notes supplement visible instructions; they are not the only help channel. The active implementation PR is #7 against main. Its verified CI source commit is `4c2cef91446cae13403a7e487c8cb160d54bb714`; the Node 22.16.0 and Node 24 jobs completed successfully with 275 passed, 0 failed and 2 optional OpenCV-dependent skips because `cv2` was unavailable on Ubuntu. This is offline regression evidence, not live or production certification. Windows/native OCR, current screenshot accuracy, local OAuth/browser visual and upload testing, isolated development-guild Discord smoke, canonical workbook parity, signed event settings and final clean-extraction packaging remain open. No event-specific values or organizer approvals are inferred.
