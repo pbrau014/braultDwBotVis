@@ -72,6 +72,9 @@ test('format help is accessible by keyboard focus and hover, with a persistent d
  assert.match(css,/\.quick-tip:hover::after/);
  assert.match(script,/\/api\/admin\/yolo-tournaments/);
  assert.match(script,/durationWeeks/);
+ assert.match(script,/\/stages/);
+ assert.match(script,/Tournament: /);
+ assert.match(html,/Approved tournament settings record ID/);
 });
 
 test('Player desktop exposes public format summary and self-registration action without private identifiers',()=>{
