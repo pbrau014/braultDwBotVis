@@ -62,3 +62,18 @@ test('desktop styles provide narrow-screen layouts without a third-party style d
   assert.match(css, /@media\(max-width:620px\)/);
   assert.match(css, /:root/);
 });
+
+test('Pilot and Full YOLO desktop controls expose registration, lifecycle actions and keyboard-accessible help', () => {
+  const player=read('desktop/player.html'),admin=read('desktop/admin.html');
+  const playerScript=read('desktop/player.js'),adminScript=read('desktop/admin.js'),css=read('desktop/desktop.css');
+  assert.match(player,/tournament-format-list/);
+  assert.match(playerScript,/\/api\/competition\//);
+  assert.match(admin,/competition-create-form/);
+  assert.match(admin,/competition-action-form/);
+  assert.match(admin,/set_stage_qualifiers/);
+  assert.match(adminScript,/\/api\/admin\/competition/);
+  assert.match(css,/:focus-visible::after/);
+  assert.match(css,/:hover::after/);
+  assert.match(player,/data-tooltip=/);
+  assert.match(admin,/data-tooltip=/);
+});
