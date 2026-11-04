@@ -1,0 +1,360 @@
+{
+  "version": "3.18",
+  "overall": "IN_PROGRESS",
+  "main_documents": {
+    "participant": {
+      "docx": "01_Participant/Grand_Tournament_Participant_Guide_v3.18.docx",
+      "paragraphs": 256,
+      "tables": 1,
+      "bookmarks": 68,
+      "internal_anchor_links": 7,
+      "broken_internal_anchor_links": [],
+      "content_token_diff_after_icon_version_normalization": {
+        "extra_tokens": {},
+        "missing_tokens": {},
+        "pass": true
+      },
+      "icon_audit": {
+        "unique_paragraphs": 274,
+        "done_when_count": 25,
+        "anchor_divider_count": 3,
+        "paragraph_violations": [],
+        "multi_icon_table_rows": [],
+        "pass": true
+      },
+      "blank_paragraphs": 8,
+      "max_consecutive_blank_paragraphs": 1,
+      "styles": {
+        "Title": 28.0,
+        "Chapter Title": 25.0,
+        "Appendix Title": 24.0,
+        "Contents Main Heading": 27.0,
+        "Contents Chapter Entry": 24.0,
+        "Contents Appendix Entry": 23.0,
+        "Done When": 6.5
+      },
+      "min_chapter_title_size_pt": 25.0,
+      "max_chapter_title_size_pt": 25.0,
+      "min_numbered_subsection_size_pt": null,
+      "title_runs_with_shadow": 13,
+      "title_runs_total": 13,
+      "shadow_pass": true,
+      "table_font_min_pt": 8.5,
+      "table_font_max_pt": 8.5
+    },
+    "operations": {
+      "docx": "02_Operations/Grand_Tournament_Event_Operations_Manual_v3.18.docx",
+      "paragraphs": 375,
+      "tables": 7,
+      "bookmarks": 103,
+      "internal_anchor_links": 8,
+      "broken_internal_anchor_links": [],
+      "content_token_diff_after_icon_version_normalization": {
+        "extra_tokens": {},
+        "missing_tokens": {},
+        "pass": true
+      },
+      "icon_audit": {
+        "unique_paragraphs": 498,
+        "done_when_count": 21,
+        "anchor_divider_count": 1,
+        "paragraph_violations": [],
+        "multi_icon_table_rows": [],
+        "pass": true
+      },
+      "blank_paragraphs": 9,
+      "max_consecutive_blank_paragraphs": 1,
+      "styles": {
+        "Title": 28.0,
+        "Chapter Title": 25.0,
+        "Appendix Title": 24.0,
+        "Contents Main Heading": 27.0,
+        "Contents Chapter Entry": 24.0,
+        "Contents Appendix Entry": 23.0,
+        "Done When": 6.5
+      },
+      "min_chapter_title_size_pt": 25.0,
+      "max_chapter_title_size_pt": 25.0,
+      "min_numbered_subsection_size_pt": null,
+      "title_runs_with_shadow": 12,
+      "title_runs_total": 12,
+      "shadow_pass": true,
+      "table_font_min_pt": 7.5,
+      "table_font_max_pt": 8.5
+    },
+    "technical": {
+      "docx": "03_Technical_Reference/Grand_Tournament_Technical_Reference_v3.18.docx",
+      "paragraphs": 483,
+      "tables": 11,
+      "bookmarks": 128,
+      "internal_anchor_links": 10,
+      "broken_internal_anchor_links": [],
+      "content_token_diff_after_icon_version_normalization": {
+        "extra_tokens": {},
+        "missing_tokens": {},
+        "pass": true
+      },
+      "icon_audit": {
+        "unique_paragraphs": 852,
+        "done_when_count": 10,
+        "anchor_divider_count": 1,
+        "paragraph_violations": [],
+        "multi_icon_table_rows": [],
+        "pass": true
+      },
+      "blank_paragraphs": 11,
+      "max_consecutive_blank_paragraphs": 1,
+      "styles": {
+        "Title": 28.0,
+        "Chapter Title": 25.0,
+        "Appendix Title": 24.0,
+        "Contents Main Heading": 27.0,
+        "Contents Chapter Entry": 24.0,
+        "Contents Appendix Entry": 23.0,
+        "Done When": 6.5
+      },
+      "min_chapter_title_size_pt": 25.0,
+      "max_chapter_title_size_pt": 25.0,
+      "min_numbered_subsection_size_pt": null,
+      "title_runs_with_shadow": 15,
+      "title_runs_total": 15,
+      "shadow_pass": true,
+      "table_font_min_pt": 7.5,
+      "table_font_max_pt": 7.5
+    }
+  },
+  "companions": {
+    "Discord_Bot_Maintainer_Security_and_Release_Guide_v1.1_DRAFT.docx": {
+      "paragraphs": 34,
+      "tables": 5,
+      "paragraph_icon_violations": [],
+      "multi_icon_table_rows": [],
+      "blank_paragraphs": 6,
+      "max_consecutive_blank_paragraphs": 1
+    },
+    "Event_Settings_and_Publication_Approval_Record_v1.1_DRAFT.docx": {
+      "paragraphs": 30,
+      "tables": 9,
+      "paragraph_icon_violations": [],
+      "multi_icon_table_rows": [],
+      "blank_paragraphs": 8,
+      "max_consecutive_blank_paragraphs": 1
+    },
+    "Participant_Quick_Start_Evidence_and_Results_v1.1_DRAFT.docx": {
+      "paragraphs": 32,
+      "tables": 3,
+      "paragraph_icon_violations": [],
+      "multi_icon_table_rows": [],
+      "blank_paragraphs": 4,
+      "max_consecutive_blank_paragraphs": 1
+    },
+    "Pilot_Event_Ruleset_v1.1_DRAFT.docx": {
+      "paragraphs": 43,
+      "tables": 4,
+      "paragraph_icon_violations": [],
+      "multi_icon_table_rows": [],
+      "blank_paragraphs": 5,
+      "max_consecutive_blank_paragraphs": 1
+    },
+    "Recurring_Tournament_Ruleset_v1.1_DRAFT.docx": {
+      "paragraphs": 52,
+      "tables": 3,
+      "paragraph_icon_violations": [],
+      "multi_icon_table_rows": [],
+      "blank_paragraphs": 4,
+      "max_consecutive_blank_paragraphs": 1
+    },
+    "Release_Gate_Closure_Record_v1.1.docx": {
+      "paragraphs": 22,
+      "tables": 5,
+      "paragraph_icon_violations": [],
+      "multi_icon_table_rows": [],
+      "blank_paragraphs": 6,
+      "max_consecutive_blank_paragraphs": 1
+    },
+    "Scoring_Workbook_and_Validation_Guide_v1.1_DRAFT.docx": {
+      "paragraphs": 35,
+      "tables": 7,
+      "paragraph_icon_violations": [],
+      "multi_icon_table_rows": [],
+      "blank_paragraphs": 8,
+      "max_consecutive_blank_paragraphs": 1
+    },
+    "Training_Room_Host_and_Referee_Guide_v1.1_DRAFT.docx": {
+      "paragraphs": 39,
+      "tables": 4,
+      "paragraph_icon_violations": [],
+      "multi_icon_table_rows": [],
+      "blank_paragraphs": 5,
+      "max_consecutive_blank_paragraphs": 1
+    }
+  },
+  "internal_links": {
+    "pdf": {
+      "participant": {
+        "pages": 15,
+        "internal_destination_links": 14,
+        "broken_internal_destinations": [],
+        "pass": true
+      },
+      "operations": {
+        "pages": 22,
+        "internal_destination_links": 14,
+        "broken_internal_destinations": [],
+        "pass": true
+      },
+      "technical": {
+        "pages": 28,
+        "internal_destination_links": 19,
+        "broken_internal_destinations": [],
+        "pass": true
+      }
+    },
+    "markdown": [
+      {
+        "file": "README.md",
+        "internal_links_checked": 0,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 0
+      },
+      {
+        "file": "07_Score_Reporter_Assets/ASSET_INTAKE_REQUIRED.md",
+        "internal_links_checked": 0,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 0
+      },
+      {
+        "file": "01_Participant/Grand_Tournament_Participant_Guide_v3.18.md",
+        "internal_links_checked": 7,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 0
+      },
+      {
+        "file": "03_Technical_Reference/Grand_Tournament_Technical_Reference_v3.18.md",
+        "internal_links_checked": 10,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 0
+      },
+      {
+        "file": "02_Operations/Grand_Tournament_Event_Operations_Manual_v3.18.md",
+        "internal_links_checked": 8,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 0
+      },
+      {
+        "file": "05_QA/Grand_Tournament_Instruction_Set_v3.15_Package_Manifest.md",
+        "internal_links_checked": 0,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 0
+      },
+      {
+        "file": "05_QA/Fresh_Visual_Inspection_Report_v3.18.md",
+        "internal_links_checked": 0,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 0
+      },
+      {
+        "file": "05_QA/Grand_Tournament_Instruction_Set_v3.15_Readme.md",
+        "internal_links_checked": 0,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 0
+      },
+      {
+        "file": "05_QA/Grand_Tournament_Instruction_Set_v3.15_Policy_Resolved_Source_Baseline.md",
+        "internal_links_checked": 25,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 6
+      },
+      {
+        "file": "05_QA/Reorganization_and_QA_Report.md",
+        "internal_links_checked": 0,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 0
+      },
+      {
+        "file": "05_QA/Grand_Tournament_Instruction_Set_v3.15_Completion_and_Open_Gates.md",
+        "internal_links_checked": 0,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 0
+      },
+      {
+        "file": "05_QA/v3.18_Change_Log_and_Style_Specification.md",
+        "internal_links_checked": 0,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 0
+      },
+      {
+        "file": "05_QA/Fresh_Visual_Inspection_Report_v3.17.md",
+        "internal_links_checked": 0,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 0
+      },
+      {
+        "file": "04_Companion_Materials/Event_Settings_and_Publication_Approval_Record_v1.1_DRAFT.md",
+        "internal_links_checked": 0,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 0
+      },
+      {
+        "file": "04_Companion_Materials/Pilot_Event_Ruleset_v1.1_DRAFT.md",
+        "internal_links_checked": 0,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 0
+      },
+      {
+        "file": "04_Companion_Materials/Scoring_Workbook_and_Validation_Guide_v1.1_DRAFT.md",
+        "internal_links_checked": 0,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 0
+      },
+      {
+        "file": "04_Companion_Materials/Recurring_Tournament_Ruleset_v1.1_DRAFT.md",
+        "internal_links_checked": 0,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 0
+      },
+      {
+        "file": "04_Companion_Materials/Release_Gate_Closure_Record_v1.1.md",
+        "internal_links_checked": 0,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 0
+      },
+      {
+        "file": "04_Companion_Materials/Training_Room_Host_and_Referee_Guide_v1.1_DRAFT.md",
+        "internal_links_checked": 0,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 0
+      },
+      {
+        "file": "04_Companion_Materials/SOURCE_BUNDLE_STATUS_AND_ACQUISITION_RECORD.md",
+        "internal_links_checked": 0,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 0
+      },
+      {
+        "file": "04_Companion_Materials/Participant_Quick_Start_Evidence_and_Results_v1.1_DRAFT.md",
+        "internal_links_checked": 0,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 0
+      },
+      {
+        "file": "04_Companion_Materials/Discord_Bot_Maintainer_Security_and_Release_Guide_v1.1_DRAFT.md",
+        "internal_links_checked": 0,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 0
+      },
+      {
+        "file": "04_Companion_Materials/Companion_Material_Crosswalk_v3.18.md",
+        "internal_links_checked": 0,
+        "broken_internal_links": [],
+        "runs_of_multiple_blank_lines": 0
+      }
+    ]
+  },
+  "icon_audit": {},
+  "typography": {},
+  "blank_line_audit": {},
+  "content_preservation": {},
+  "package": {},
+  "asset_status": "BLOCKED / NOT TESTED"
+}

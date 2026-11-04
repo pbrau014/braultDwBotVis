@@ -1,0 +1,21 @@
+{
+  "version": "3.21",
+  "supplemental_markdown_changed": {
+    "04_Companion_Materials/Recurring_Tournament_Ruleset_v1.1_DRAFT.md": 1,
+    "04_Companion_Materials/Scoring_Workbook_and_Validation_Guide_v1.1_DRAFT.md": 1,
+    "01_Participant/Grand_Tournament_Participant_Guide_v3.19.md": 1
+  },
+  "supplemental_word_changed": {
+    "03_Technical_Reference/Grand_Tournament_Technical_Reference_v3.19.docx": 1,
+    "02_Operations/Grand_Tournament_Event_Operations_Manual_v3.19.docx": 0,
+    "04_Companion_Materials/Discord_Bot_Maintainer_Security_and_Release_Guide_v1.1_DRAFT.docx": 0,
+    "04_Companion_Materials/Participant_Quick_Start_Evidence_and_Results_v1.1_DRAFT.docx": 0,
+    "04_Companion_Materials/Recurring_Tournament_Ruleset_v1.1_DRAFT.docx": 1,
+    "04_Companion_Materials/Training_Room_Host_and_Referee_Guide_v1.1_DRAFT.docx": 0,
+    "04_Companion_Materials/Release_Gate_Status_and_Reconciliation_Record_v1.1.docx": 0,
+    "04_Companion_Materials/Event_Settings_and_Publication_Approval_Record_v1.1_DRAFT.docx": 2,
+    "04_Companion_Materials/Scoring_Workbook_and_Validation_Guide_v1.1_DRAFT.docx": 0,
+    "04_Companion_Materials/Pilot_Event_Ruleset_v1.1_DRAFT.docx": 0,
+    "01_Participant/Grand_Tournament_Participant_Guide_v3.19.docx": 0
+  }
+}

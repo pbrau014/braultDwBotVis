@@ -1,0 +1,138 @@
+{
+  "main": [
+    {
+      "file": "01_Participant/Grand_Tournament_Participant_Guide_v3.18.docx",
+      "stats": {
+        "paragraphs": 257,
+        "tables": 1,
+        "done_when": 25,
+        "chapters": 4,
+        "appendices": 3,
+        "subsection_separators": 19,
+        "tables_formatted": 1
+      }
+    },
+    {
+      "file": "02_Operations/Grand_Tournament_Event_Operations_Manual_v3.18.docx",
+      "stats": {
+        "paragraphs": 375,
+        "tables": 7,
+        "done_when": 21,
+        "chapters": 2,
+        "appendices": 6,
+        "subsection_separators": 10,
+        "tables_formatted": 7
+      }
+    },
+    {
+      "file": "03_Technical_Reference/Grand_Tournament_Technical_Reference_v3.18.docx",
+      "stats": {
+        "paragraphs": 483,
+        "tables": 11,
+        "done_when": 10,
+        "chapters": 2,
+        "appendices": 8,
+        "subsection_separators": 8,
+        "tables_formatted": 11
+      }
+    }
+  ],
+  "companions": [
+    {
+      "file": "04_Companion_Materials/Participant_Quick_Start_Evidence_and_Results_v1.1_DRAFT.docx",
+      "stats": {
+        "paragraphs": 32,
+        "tables": 3,
+        "done_when": 0,
+        "chapters": 0,
+        "appendices": 0,
+        "subsection_separators": 0,
+        "tables_formatted": 3
+      }
+    },
+    {
+      "file": "04_Companion_Materials/Release_Gate_Closure_Record_v1.1.docx",
+      "stats": {
+        "paragraphs": 22,
+        "tables": 5,
+        "done_when": 0,
+        "chapters": 0,
+        "appendices": 0,
+        "subsection_separators": 0,
+        "tables_formatted": 5
+      }
+    },
+    {
+      "file": "04_Companion_Materials/Discord_Bot_Maintainer_Security_and_Release_Guide_v1.1_DRAFT.docx",
+      "stats": {
+        "paragraphs": 34,
+        "tables": 5,
+        "done_when": 0,
+        "chapters": 0,
+        "appendices": 0,
+        "subsection_separators": 0,
+        "tables_formatted": 5
+      }
+    },
+    {
+      "file": "04_Companion_Materials/Recurring_Tournament_Ruleset_v1.1_DRAFT.docx",
+      "stats": {
+        "paragraphs": 52,
+        "tables": 3,
+        "done_when": 0,
+        "chapters": 0,
+        "appendices": 0,
+        "subsection_separators": 0,
+        "tables_formatted": 3
+      }
+    },
+    {
+      "file": "04_Companion_Materials/Event_Settings_and_Publication_Approval_Record_v1.1_DRAFT.docx",
+      "stats": {
+        "paragraphs": 32,
+        "tables": 9,
+        "done_when": 0,
+        "chapters": 0,
+        "appendices": 0,
+        "subsection_separators": 0,
+        "tables_formatted": 9
+      }
+    },
+    {
+      "file": "04_Companion_Materials/Training_Room_Host_and_Referee_Guide_v1.1_DRAFT.docx",
+      "stats": {
+        "paragraphs": 39,
+        "tables": 4,
+        "done_when": 0,
+        "chapters": 0,
+        "appendices": 0,
+        "subsection_separators": 0,
+        "tables_formatted": 4
+      }
+    },
+    {
+      "file": "04_Companion_Materials/Pilot_Event_Ruleset_v1.1_DRAFT.docx",
+      "stats": {
+        "paragraphs": 43,
+        "tables": 4,
+        "done_when": 0,
+        "chapters": 0,
+        "appendices": 0,
+        "subsection_separators": 0,
+        "tables_formatted": 4
+      }
+    },
+    {
+      "file": "04_Companion_Materials/Scoring_Workbook_and_Validation_Guide_v1.1_DRAFT.docx",
+      "stats": {
+        "paragraphs": 35,
+        "tables": 7,
+        "done_when": 0,
+        "chapters": 0,
+        "appendices": 0,
+        "subsection_separators": 0,
+        "tables_formatted": 7
+      }
+    }
+  ]
+}

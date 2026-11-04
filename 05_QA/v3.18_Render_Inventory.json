@@ -1,0 +1,79 @@
+[
+  {
+    "document": "Grand_Tournament_Participant_Guide_v3.18",
+    "pdf": "01_Participant/Grand_Tournament_Participant_Guide_v3.18.pdf",
+    "pages": 15,
+    "fresh_render_source": "DOCX rendered 2026-10-29 using render_docx.py at 110 DPI",
+    "rendered_page_images": 15
+  },
+  {
+    "document": "Grand_Tournament_Event_Operations_Manual_v3.18",
+    "pdf": "02_Operations/Grand_Tournament_Event_Operations_Manual_v3.18.pdf",
+    "pages": 22,
+    "fresh_render_source": "DOCX rendered 2026-10-29 using render_docx.py at 110 DPI",
+    "rendered_page_images": 22
+  },
+  {
+    "document": "Grand_Tournament_Technical_Reference_v3.18",
+    "pdf": "03_Technical_Reference/Grand_Tournament_Technical_Reference_v3.18.pdf",
+    "pages": 28,
+    "fresh_render_source": "DOCX rendered 2026-10-29 using render_docx.py at 110 DPI",
+    "rendered_page_images": 28
+  },
+  {
+    "document": "Discord_Bot_Maintainer_Security_and_Release_Guide_v1.1_DRAFT",
+    "pdf": "04_Companion_Materials/pdf/Discord_Bot_Maintainer_Security_and_Release_Guide_v1.1_DRAFT.pdf",
+    "pages": 4,
+    "fresh_render_source": "DOCX rendered 2026-10-29 using render_docx.py at 110 DPI",
+    "rendered_page_images": 4
+  },
+  {
+    "document": "Event_Settings_and_Publication_Approval_Record_v1.1_DRAFT",
+    "pdf": "04_Companion_Materials/pdf/Event_Settings_and_Publication_Approval_Record_v1.1_DRAFT.pdf",
+    "pages": 7,
+    "fresh_render_source": "DOCX rendered 2026-10-29 using render_docx.py at 110 DPI",
+    "rendered_page_images": 7
+  },
+  {
+    "document": "Participant_Quick_Start_Evidence_and_Results_v1.1_DRAFT",
+    "pdf": "04_Companion_Materials/pdf/Participant_Quick_Start_Evidence_and_Results_v1.1_DRAFT.pdf",
+    "pages": 3,
+    "fresh_render_source": "DOCX rendered 2026-10-29 using render_docx.py at 110 DPI",
+    "rendered_page_images": 3
+  },
+  {
+    "document": "Pilot_Event_Ruleset_v1.1_DRAFT",
+    "pdf": "04_Companion_Materials/pdf/Pilot_Event_Ruleset_v1.1_DRAFT.pdf",
+    "pages": 4,
+    "fresh_render_source": "DOCX rendered 2026-10-29 using render_docx.py at 110 DPI",
+    "rendered_page_images": 4
+  },
+  {
+    "document": "Recurring_Tournament_Ruleset_v1.1_DRAFT",
+    "pdf": "04_Companion_Materials/pdf/Recurring_Tournament_Ruleset_v1.1_DRAFT.pdf",
+    "pages": 4,
+    "fresh_render_source": "DOCX rendered 2026-10-29 using render_docx.py at 110 DPI",
+    "rendered_page_images": 4
+  },
+  {
+    "document": "Release_Gate_Closure_Record_v1.1",
+    "pdf": "04_Companion_Materials/pdf/Release_Gate_Closure_Record_v1.1.pdf",
+    "pages": 5,
+    "fresh_render_source": "DOCX rendered 2026-10-29 using render_docx.py at 110 DPI",
+    "rendered_page_images": 5
+  },
+  {
+    "document": "Scoring_Workbook_and_Validation_Guide_v1.1_DRAFT",
+    "pdf": "04_Companion_Materials/pdf/Scoring_Workbook_and_Validation_Guide_v1.1_DRAFT.pdf",
+    "pages": 4,
+    "fresh_render_source": "DOCX rendered 2026-10-29 using render_docx.py at 110 DPI",
+    "rendered_page_images": 4
+  },
+  {
+    "document": "Training_Room_Host_and_Referee_Guide_v1.1_DRAFT",
+    "pdf": "04_Companion_Materials/pdf/Training_Room_Host_and_Referee_Guide_v1.1_DRAFT.pdf",
+    "pages": 4,
+    "fresh_render_source": "DOCX rendered 2026-10-29 using render_docx.py at 110 DPI",
+    "rendered_page_images": 4
+  }
+]

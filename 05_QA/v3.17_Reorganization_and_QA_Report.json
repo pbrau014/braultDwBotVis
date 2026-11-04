@@ -1,0 +1,165 @@
+{
+  "version": "3.17",
+  "source": "Grand_Tournament_Instruction_Set_v3.15_Policy_Resolved.md",
+  "source_top_level_sections": 25,
+  "assigned_sections": 25,
+  "missing_source_sections": [],
+  "duplicate_source_sections": [],
+  "outputs": {
+    "participant": {
+      "md": "/mnt/data/Grand_Tournament_Instruction_Set_v3.17_Reorganized/01_Participant/Grand_Tournament_Participant_Guide_v3.17.md",
+      "docx": "/mnt/data/Grand_Tournament_Instruction_Set_v3.17_Reorganized/01_Participant/Grand_Tournament_Participant_Guide_v3.17.docx",
+      "pdf": "/mnt/data/Grand_Tournament_Instruction_Set_v3.17_Reorganized/01_Participant/Grand_Tournament_Participant_Guide_v3.17.pdf",
+      "sections": [
+        "# 📘 Chapter 1 — General Tournament Rules & Procedures",
+        "# 🎯 Chapter 5 — Individual Game-Strategy Guide",
+        "# ⚓ Chapter 6 — Competitive Tactics Procedure",
+        "# 💥 Chapter 8 — Damage & Combat Mechanics Procedure",
+        "# Appendix I — Competitive tactics reference I01–I13",
+        "# Appendix M — Performance-claim evidence cards M01–M07",
+        "# Appendix P — Damage, fires, flooding, and secondary brawling mechanics P01–P11"
+      ],
+      "bytes": {
+        "md": 41786,
+        "docx": 28782,
+        "pdf": 370291
+      }
+    },
+    "operations": {
+      "md": "/mnt/data/Grand_Tournament_Instruction_Set_v3.17_Reorganized/02_Operations/Grand_Tournament_Event_Operations_Manual_v3.17.md",
+      "docx": "/mnt/data/Grand_Tournament_Instruction_Set_v3.17_Reorganized/02_Operations/Grand_Tournament_Event_Operations_Manual_v3.17.docx",
+      "pdf": "/mnt/data/Grand_Tournament_Instruction_Set_v3.17_Reorganized/02_Operations/Grand_Tournament_Event_Operations_Manual_v3.17.pdf",
+      "sections": [
+        "# 🤖 Chapter 2 — Discord & Bot Operations Manual",
+        "# ⚙️ Chapter 4 — Training Room Setup & Match Operations Guide",
+        "# Appendix A — Decision register D01–D52",
+        "# Appendix C — Exclusion register X01–X07",
+        "# Appendix D — Operating templates and checklists T01–T07",
+        "# Appendix G — Release gates and outstanding work RG01–RG24",
+        "# Appendix H — Publication approval PUB01–PUB09",
+        "# Appendix Q — Organizer and Technical-Maintainer Instructions"
+      ],
+      "bytes": {
+        "md": 72058,
+        "docx": 40397,
+        "pdf": 483987
+      }
+    },
+    "technical": {
+      "md": "/mnt/data/Grand_Tournament_Instruction_Set_v3.17_Reorganized/03_Technical_Reference/Grand_Tournament_Technical_Reference_v3.17.md",
+      "docx": "/mnt/data/Grand_Tournament_Instruction_Set_v3.17_Reorganized/03_Technical_Reference/Grand_Tournament_Technical_Reference_v3.17.docx",
+      "pdf": "/mnt/data/Grand_Tournament_Instruction_Set_v3.17_Reorganized/03_Technical_Reference/Grand_Tournament_Technical_Reference_v3.17.pdf",
+      "sections": [
+        "# 🧮 Chapter 3 — Scoring & Workbook Operations Manual",
+        "# 🧮 Chapter 7 — Scoring Equation & Workbook Verification Procedure",
+        "# Appendix B — Situational examples S01–S31",
+        "# Appendix E — Glossary G01–G26",
+        "# Appendix F — Sources and evidence register SRC-01–SRC-32",
+        "# Appendix J — Reconciliation register RC01–RC33 (status and action)",
+        "# Appendix K — Scoring equation, inputs, and multiplier reference K01–K13",
+        "# Appendix L — WoWS Numbers individual ship-statistics benchmarks L01–L05",
+        "# Appendix N — Resolved scoring policies and implementation checks C01–C06",
+        "# Appendix O — Validation results, release status, and completed work"
+      ],
+      "bytes": {
+        "md": 90100,
+        "docx": 51800,
+        "pdf": 639081
+      }
+    }
+  },
+  "markdown_internal_link_audit": {
+    "participant": {
+      "local_anchor_links": 7,
+      "broken_local_anchors": []
+    },
+    "operations": {
+      "local_anchor_links": 8,
+      "broken_local_anchors": []
+    },
+    "technical": {
+      "local_anchor_links": 10,
+      "broken_local_anchors": []
+    }
+  },
+  "status": "DRAFT_NOT_APPROVED",
+  "scope_notes": [
+    "Policy content reorganized; no new event values or approvals added.",
+    "Waived items are not represented as passed tests.",
+    "Fresh visual inspection of the newly generated PDFs is a separate required QA step."
+  ],
+  "fresh_visual_inspection": {
+    "pdf_pages_inspected": 67,
+    "pdf_count": 3,
+    "contact_sheet_count": 9,
+    "report": "05_QA/Fresh_Visual_Inspection_Report_v3.17.md"
+  },
+  "final_link_audits": {
+    "docx": [
+      {
+        "file": "01_Participant/Grand_Tournament_Participant_Guide_v3.17.docx",
+        "bookmarks": 68,
+        "internal_links": 7,
+        "broken_internal_links": []
+      },
+      {
+        "file": "02_Operations/Grand_Tournament_Event_Operations_Manual_v3.17.docx",
+        "bookmarks": 103,
+        "internal_links": 8,
+        "broken_internal_links": []
+      },
+      {
+        "file": "03_Technical_Reference/Grand_Tournament_Technical_Reference_v3.17.docx",
+        "bookmarks": 128,
+        "internal_links": 10,
+        "broken_internal_links": []
+      }
+    ],
+    "markdown": [
+      {
+        "file": "01_Participant/Grand_Tournament_Participant_Guide_v3.17.md",
+        "internal_links": 7,
+        "defined_section_anchors": 7,
+        "broken_internal_links": []
+      },
+      {
+        "file": "02_Operations/Grand_Tournament_Event_Operations_Manual_v3.17.md",
+        "internal_links": 8,
+        "defined_section_anchors": 8,
+        "broken_internal_links": []
+      },
+      {
+        "file": "03_Technical_Reference/Grand_Tournament_Technical_Reference_v3.17.md",
+        "internal_links": 10,
+        "defined_section_anchors": 10,
+        "broken_internal_links": []
+      }
+    ],
+    "pdf": [
+      {
+        "file": "01_Participant/Grand_Tournament_Participant_Guide_v3.17.pdf",
+        "pages": 14,
+        "bytes": 370291,
+        "text_chars": 40727,
+        "internal_pdf_links": 7,
+        "broken_pdf_internal_links": []
+      },
+      {
+        "file": "02_Operations/Grand_Tournament_Event_Operations_Manual_v3.17.pdf",
+        "pages": 23,
+        "bytes": 483987,
+        "text_chars": 67801,
+        "internal_pdf_links": 8,
+        "broken_pdf_internal_links": []
+      },
+      {
+        "file": "03_Technical_Reference/Grand_Tournament_Technical_Reference_v3.17.pdf",
+        "pages": 30,
+        "bytes": 639081,
+        "text_chars": 82163,
+        "internal_pdf_links": 10,
+        "broken_pdf_internal_links": []
+      }
+    ]
+  }
+}
