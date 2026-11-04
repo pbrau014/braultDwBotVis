@@ -2932,9 +2932,19 @@ async function handleTournamentCommand(message) {
         else if (command === 'setting') {
             const [event, field, value, ...extra] = args.split(/\s+/);
             if (!event || !field || value === undefined || extra.length) throw new Error('Usage: `!yolo setting <event> <field> <number>`.');
-            const result = Tournament.setSetting(tournamentState, event.toLowerCase(), field, value);
-            await saveTournamentState();
-            response = `Updated ${Tournament.EVENT_LABELS[event.toLowerCase()] || event} setting **${field}** to **${result}**.`;
+            const activeCompetitions = (tournamentState.competition?.tournaments || [])
+                .filter(item => item.stages.some(stage => stage.status === Tournament.TournamentFormats.STATUS.ACTIVE));
+            if (activeCompetitions.length) {
+                for (const competition of activeCompetitions) {
+                    Tournament.TournamentFormats.freezeSettings(competition, { event, field, value }, message.author.id);
+                }
+                await saveTournamentState();
+                response = 'Scoring setting change blocked: an active Pilot/Full YOLO stage has frozen settings. Changes can be applied prospectively to a future stage/event.';
+            } else {
+                const result = Tournament.setSetting(tournamentState, event.toLowerCase(), field, value);
+                await saveTournamentState();
+                response = `Updated ${Tournament.EVENT_LABELS[event.toLowerCase()] || event} setting **${field}** to **${result}**.`;
+            }
         } else if (command === 'result') {
             const replace = /(?:^|\s)--replace\s*$/i.test(args);
             const cleanArgs = args.replace(/(?:^|\s)--replace\s*$/i, '').trim();
