@@ -91,6 +91,19 @@ jobs:
           & $magick.Source -version | Select-Object -First 2
           "TESSERACT_BIN=$($tesseract.Source)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           "IMAGEMAGICK_BIN=$($magick.Source)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+      - name: Install isolated OpenCV geometry runtime
+        shell: powershell
+        run: |
+          $python = Get-Command python.exe -ErrorAction Stop
+          $venv = Join-Path $env:RUNNER_TEMP 'dwbot-opencv'
+          & $python.Source -m venv $venv
+          if ($LASTEXITCODE -ne 0) { throw 'Could not create the isolated OpenCV environment.' }
+          $opencvPython = Join-Path $venv 'Scripts\\python.exe'
+          & $opencvPython -m pip install --disable-pip-version-check --no-warn-script-location --only-binary=:all: opencv-python-headless==4.10.0.84
+          if ($LASTEXITCODE -ne 0) { throw 'Could not install the pinned OpenCV wheel.' }
+          & $opencvPython -c 'import cv2, numpy; print("OpenCV", cv2.__version__, "NumPy", numpy.__version__)'
+          if ($LASTEXITCODE -ne 0) { throw 'OpenCV geometry runtime failed its import check.' }
+          "OPENCV_PYTHON_BIN=$opencvPython" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
       - name: Install locked dependencies
         run: |
           node --version
