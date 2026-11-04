@@ -5,6 +5,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const TournamentFormats = require('./tournament-formats');
 
 const EVENTS = ['damage', 'kills', 'race', 'grand'];
 const EVENT_LABELS = { damage: 'Damage', kills: 'Kills', race: 'Race', grand: 'Grand Yolo' };
@@ -85,6 +86,8 @@ function normalizeState(input = {}) {
   return {
     version: 2,
     players,
+    // Format-aware lifecycle is additive. Legacy player scores remain unclassified.
+    competition: TournamentFormats.normalizeCompetition(input.competition),
     settings: normalizeSettings(input.settings),
     playerAccountLinks,
     importedBattleRecordIds: Array.isArray(input.importedBattleRecordIds) ? input.importedBattleRecordIds.filter(v => typeof v === 'string') : [],
@@ -266,7 +269,7 @@ function setSetting(state, event, field, value) {
   return n;
 }
 function makeWorkbookBackup(state) {
-  return { version: 2, exportedAt: new Date().toISOString(), players: clone(state.players), settings: clone(state.settings), importedBattleRecordIds: [...state.importedBattleRecordIds] };
+  return { version: 2, exportedAt: new Date().toISOString(), players: clone(state.players), settings: clone(state.settings), importedBattleRecordIds: [...state.importedBattleRecordIds], competition: clone(state.competition || TournamentFormats.normalizeCompetition()) };
 }
 function makeArchiveSnapshot(state) {
   return {
@@ -494,7 +497,7 @@ function deterministicBattleId(record) {
 }
 
 module.exports = {
-  EVENTS, EVENT_LABELS, CLASSES, DEFAULT_SETTINGS, normalizeClass, classWeightFor,
+  EVENTS, EVENT_LABELS, CLASSES, DEFAULT_SETTINGS, normalizeClass, classWeightFor, TournamentFormats,
   MAX_PLAYERS, normalizeState, createState, findPlayer, findPlayerByDiscordUserId,
   linkPlayerDiscordAccount, unlinkPlayerDiscordAccount, addPlayer, removePlayer, renamePlayer,
   clearSlot, clearEvent, clearAllResults, eventTotal, eventScore, standings, getSlot, validateResult, recordResult, setSetting,
