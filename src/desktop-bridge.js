@@ -292,7 +292,7 @@ function createDesktopBridge(options={}){
       if(req.method==='POST'&&p==='/api/admin/yolo-tournaments'){
         const result=await call('createYoloTournament',principal,await readJson(req));audit(principal,'yolo-tournament-create');sendJson(res,201,result);return true;
       }
-      const yoloAction=p.match(/^\\/api\\/admin\\/yolo-tournaments\\/([A-Za-z0-9-]+)\\/([a-z-]+)$/);
+      const yoloAction=p.match(/^\/api\/admin\/yolo-tournaments\/([A-Za-z0-9-]+)\/([a-z-]+)$/);
       if(req.method==='POST'&&yoloAction){
         const result=await call('updateYoloTournament',principal,yoloAction[1],yoloAction[2],await readJson(req));audit(principal,'yolo-tournament-'+yoloAction[2]);sendJson(res,200,result);return true;
       }
