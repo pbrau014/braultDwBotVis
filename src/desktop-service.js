@@ -128,7 +128,8 @@ function createDesktopService(options = {}) {
       const current=state(), rows=Tournament.standings(current);
       const total=rows.reduce((s,r)=>s+r.total,0);
       const aggregate={doubloons:total,estimatedValue:total*0.54/100};
-      const lifecycle=current.lifecycle||Lifecycle.createLifecycleState(current);\n      const publicTournaments=lifecycle.tournaments.map(t=>{const season=lifecycle.seasons.find(x=>x.id===t.seasonId)||null;return{id:t.id,name:t.name,format:t.format,status:t.status,seasonId:t.seasonId||null,eventNights:(t.format==='pilot'?t.eventNights:(season?.eventNights||[])).map(n=>({id:n.id,startsAt:n.startsAt,status:n.status})),standings:tournamentStandings(current,t,season).map((r,i)=>({rank:i+1,...r}))};});\n      const base={aggregate,maxPlayers:Tournament.MAX_PLAYERS,events: Tournament.EVENTS,eventLabels:Tournament.EVENT_LABELS,formats:Lifecycle.FORMATS,scoringCategories:Lifecycle.SCORING_CATEGORIES,tournaments:publicTournaments};
+      const lifecycle=current.lifecycle||Lifecycle.createLifecycleState(current);
+      const publicTournaments=lifecycle.tournaments.map(t=>{const season=lifecycle.seasons.find(x=>x.id===t.seasonId)||null;return{id:t.id,name:t.name,format:t.format,status:t.status,seasonId:t.seasonId||null,eventNights:(t.format==='pilot'?t.eventNights:(season?.eventNights||[])).map(n=>({id:n.id,startsAt:n.startsAt,status:n.status})),standings:tournamentStandings(current,t,season).map((r,i)=>({rank:i+1,...r}))};});\n      const base={aggregate,maxPlayers:Tournament.MAX_PLAYERS,events: Tournament.EVENTS,eventLabels:Tournament.EVENT_LABELS,formats:Lifecycle.FORMATS,scoringCategories:Lifecycle.SCORING_CATEGORIES,tournaments:publicTournaments};
       if(principal.role==='player') {
         const player=Tournament.findPlayer(current,principal.player.id);
         if(!player) throw Object.assign(new Error('Your linked roster entry no longer exists.'),{status:403,code:'PLAYER_UNLINKED'});
@@ -244,7 +245,8 @@ function createDesktopService(options = {}) {
             if(!scopedTournament)throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});
             const season=scopedTournament.format==='full'?current.lifecycle.seasons.find(x=>x.id===scopedTournament.seasonId):null;
             const scoreEntry=Lifecycle.recordScoreEntry(scopedTournament,{participantId:String(player.id),category:event,gameNumber,shipClass,tier,evidenceId:entry.record_id,eventNightId:body?.eventNightId,damage,kills,time},season);
-            auditLifecycle(current,principal,'tournament.score.mapped',{tournamentId:scopedTournament.id,eventNightId:scoreEntry.eventNightId,participantId:String(player.id),category:event,gameNumber,evidenceId:entry.record_id});\n            scopedStanding=tournamentStandings(current,scopedTournament,season).find(x=>String(x.id)===String(player.id))||null;
+            auditLifecycle(current,principal,'tournament.score.mapped',{tournamentId:scopedTournament.id,eventNightId:scoreEntry.eventNightId,participantId:String(player.id),category:event,gameNumber,evidenceId:entry.record_id});
+            scopedStanding=tournamentStandings(current,scopedTournament,season).find(x=>String(x.id)===String(player.id))||null;
             result={player,event,gameNumber,game:scoreEntry,scores:tournamentStandings(current,scopedTournament,season)};
           }else{
             result=Tournament.recordResult(current,{player:player.id,event,gameNumber,shipClass,tier,recordId:entry.record_id,damage,kills,time});
