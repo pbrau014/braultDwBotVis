@@ -118,7 +118,8 @@
     const formatSelect=competitionForm.elements.format;
     function updateFormatFields(){
       const pilot=formatSelect.value==='pilot';
-      D.$('pilot-start-field').classList.toggle('hidden',!pilot);
+      D.$('event-start-label').textContent=pilot?'Pilot start':'Season start';
+      D.$('event-end-label').textContent=pilot?'Pilot end':'Season end';
       D.$('season-weeks-field').classList.toggle('hidden',pilot);
     }
     formatSelect.addEventListener('change',updateFormatFields);updateFormatFields();
@@ -126,10 +127,10 @@
       e.preventDefault();const button=competitionForm.querySelector('button');button.disabled=true;
       const format=formatSelect.value;
       const config={timezone:competitionForm.elements.timezone.value.trim()};
-      if(format==='pilot'){
-        const start=competitionForm.elements.eventStart.value;
-        if(start)config.eventStart=new Date(start).toISOString();
-      }else config.seasonWeeks=Number(competitionForm.elements.seasonWeeks.value);
+      const start=competitionForm.elements.eventStart.value,end=competitionForm.elements.eventEnd.value;
+      if(start)config.eventStart=new Date(start).toISOString();
+      if(end)config.eventEnd=new Date(end).toISOString();
+      if(format==='full')config.seasonWeeks=Number(competitionForm.elements.seasonWeeks.value);
       try{
         await competitionAction({action:'create_tournament',tournament:{
           id:competitionForm.elements.id.value.trim(),name:competitionForm.elements.name.value.trim(),format,config,
