@@ -53,14 +53,25 @@
 - Ordinary rules/settings freeze when an event starts. Changes apply prospectively to future/unplayed games only. Emergency safety/security/platform changes require documented reason, scope, approver, timestamp, affected games and participant notice/review.
 - Never calculate official bracket progression, monetary awards or season advancement from unapproved workbook formulas.
 
-## 7. Organizer publication checklist
+## 7. Organizer and match operations
+
+1. Create the tournament as a draft. Pilot has no season; Full declares duration and receives regular-season, postseason and finale stages.
+2. Attach the organizer-approved settings record ID before publishing the tournament or any Full stage. Blank approval references keep records in draft.
+3. Create event nights with their own approved settings record. Publish only after the settings record is attached; starting the event locks its registration roster.
+4. Register participants by their linked roster identity. A participant may be registered once per event night. Team assignment requires registration and prevents duplicate team membership in that event night.
+5. Create fixtures only between teams assigned to the same event night. Create matches within the declared series length and games within each match.
+6. Link only complete, mapped screenshot records to games. Linking places evidence into review; it does not automatically accept the evidence or determine a match outcome. An administrator records acceptance or rejection, with a reason required for rejection.
+7. Every tournament, stage, event-night, registration, team, fixture, match, game and evidence decision should retain actor/time/action audit history. Private full recovery archives retain roster details; public recovery snapshots omit participant registrations and private roster metadata.
+8. Tournament and stage progression is ordered. Full YOLO cannot complete until regular season, postseason and Grand YOLO finale are all completed.
+
+## 8. Organizer publication checklist
 
 Required before a live event: format; organizer/approver; date/time/timezone; registration close; roster lock; participant cap; eligibility and ship list; room/password distribution; maps/modes; team composition; game count/duration; scoring and rounding; tie-breaks; no-show/forfeit/bye rules; evidence and dispute windows; award amounts; privacy/channel scope; accessibility/contact; emergency procedure. Blank values are blocking, not invitations for the bot to guess.
 
-## 8. Mouseover and keyboard quick help
+## 9. Mouseover and keyboard quick help
 
 Desktop help must be available on hover and keyboard focus, with visible labels and accessible descriptions. Tooltips supplement—not replace—complete instructions. Provide the same explanation in an always-available help panel for touch and keyboard users.
 
-## 9. Release status and known limits
+## 10. Release status and known limits
 
 This instruction set is a working operational draft, not an event approval record. The canonical v3.22 workbook and canonical Score Reporter HTML were not available in the audited source set. Historical ship allowlists, exact roster sizes, special-mode current-client label, event dates, approver signatures, award amounts and some team/bot composition details remain unresolved. Do not invent them. Production event approval requires organizer completion and sign-off of the event settings record.
