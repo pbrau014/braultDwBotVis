@@ -62,6 +62,7 @@ function createDesktopService(options = {}) {
     current.battleRecords ||= [];
     current.importedBattleRecordIds ||= [];
     current.playerAccountLinks ||= {};
+    current.yoloTournaments ||= [];
     return current;
   }
   function role(principal, allowed) {
@@ -256,6 +257,58 @@ function createDesktopService(options = {}) {
     async setSetting(principal,body) {
       role(principal,['admin']);
       return mutate(async()=>{const value=Tournament.setSetting(state(),String(body?.event||''),String(body?.field||''),body?.value);await options.saveState();return{event:body.event,field:body.field,value};});
+    },
+    async listYoloTournaments(principal) {
+      role(principal,['admin']);
+      return { items: state().yoloTournaments.map(t => ({
+        id:t.id,title:t.title,format:t.format,lifecycle:t.lifecycle,stage:t.stage,
+        registrationCount:(t.registrations||[]).filter(r=>r.status==='active').length,
+        teamCount:(t.teams||[]).length,fixtureCount:(t.fixtures||[]).length,
+        publishedAt:t.publishedAt,startedAt:t.startedAt,completedAt:t.completedAt,
+      })) };
+    },
+    async createYoloTournament(principal, body) {
+      role(principal,['admin']);
+      return mutate(async()=>{
+        const current=state();
+        const tournament=Tournament.YoloFormats.createTournament({
+          id:crypto.randomUUID(),title:body?.title,format:body?.format,settings:body?.settings||{},
+        });
+        current.yoloTournaments.push(tournament);
+        await options.saveState();
+        return {id:tournament.id,title:tournament.title,format:tournament.format,lifecycle:tournament.lifecycle,stage:tournament.stage};
+      });
+    },
+    async updateYoloTournament(principal, id, action, body) {
+      role(principal,['admin']);
+      return mutate(async()=>{
+        const current=state(),t=current.yoloTournaments.find(x=>x.id===id);
+        if(!t) throw Object.assign(new Error('YOLO tournament was not found.'),{status:404,code:'YOLO_TOURNAMENT_NOT_FOUND'});
+        const Y=Tournament.YoloFormats, actor=principal.discordUserId;
+        let result;
+        switch(action) {
+          case 'publish': result=Y.publishTournament(t,body?.approval,actor); break;
+          case 'start': result=Y.startTournament(t,actor); break;
+          case 'register': {
+            const discordUserId=current.playerAccountLinks[String(body?.playerId)];
+            result=Y.registerPlayer(t,{playerId:body?.playerId,discordUserId,identityVerified:Boolean(discordUserId),actor});
+            break;
+          }
+          case 'create-team': result=Y.createTeam(t,{id:body?.teamId,name:body?.name,actor}); break;
+          case 'assign-player': result=Y.assignPlayerToTeam(t,body?.playerId,body?.teamId,{actor}); break;
+          case 'lock-roster': result=Y.lockTeamRoster(t,body?.teamId,{actor}); break;
+          case 'schedule-fixture': result=Y.scheduleFixture(t,{...body,actor}); break;
+          case 'record-game': result=Y.recordGame(t,{...body,actor}); break;
+          case 'complete-fixture': result=Y.completeFixture(t,body?.fixtureId,{outcome:body?.outcome,actor}); break;
+          case 'race-side-event': result=Y.recordRaceSideEvent(t,{...body,actor}); break;
+          case 'transition-stage': result=Y.transitionFullStage(t,body?.nextStage,{qualifiedTeamIds:body?.qualifiedTeamIds||[],actor}); break;
+          case 'withdraw': result=Y.withdrawRegistration(t,body?.playerId,{reason:body?.reason,actor}); break;
+          case 'finish-pilot': result=Y.finishPilot(t,{actor}); break;
+          default: throw Object.assign(new Error('Unsupported YOLO tournament action.'),{status:400,code:'INVALID_YOLO_ACTION'});
+        }
+        await options.saveState();
+        return {id:t.id,action,lifecycle:t.lifecycle,stage:t.stage,result};
+      });
     },
     async exportBackup(principal) {
       role(principal,['admin']);
