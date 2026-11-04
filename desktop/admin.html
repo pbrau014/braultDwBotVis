@@ -45,6 +45,46 @@
           <button class="button secondary" type="submit">Register participant</button>
         </form>
         <div id="yolo-event-night-list" class="event-list"></div>
+        <h3>Teams and match operations</h3>
+        <form id="yolo-team-form" class="form-grid compact-form">
+          <label>Event night<select name="eventNightId" id="yolo-team-night" required></select></label>
+          <label>Team ID<input name="id" maxlength="64" required placeholder="team-blue"></label>
+          <label>Team name<input name="name" maxlength="80" required placeholder="Blue Team"></label>
+          <label>Registered participant IDs <span class="quick-tip" tabindex="0" role="note" aria-label="Participant IDs" data-tip="Enter roster player IDs separated by commas. Every participant must already be registered for this event night and may be assigned to only one team.">?</span><input name="participantIds" required placeholder="1, 2, 3"></label>
+          <button class="button secondary span-all" type="submit">Create team</button>
+        </form>
+        <form id="yolo-fixture-form" class="form-grid compact-form">
+          <label>Event night<select name="eventNightId" id="yolo-fixture-night" required></select></label>
+          <label>Fixture ID<input name="id" required placeholder="fixture-01"></label>
+          <label>Home team ID<input name="homeTeamId" required></label>
+          <label>Away team ID<input name="awayTeamId" required></label>
+          <label>Scheduled at<input name="scheduledAt" type="datetime-local" required></label>
+          <label>Series length (odd)<input name="seriesLength" type="number" min="1" max="9" step="2" value="1" required></label>
+          <button class="button secondary span-all" type="submit">Create fixture</button>
+        </form>
+        <form id="yolo-match-form" class="form-grid compact-form">
+          <label>Fixture ID<input name="fixtureId" required></label>
+          <label>Match ID<input name="id" required></label>
+          <label>Match number<input name="matchNumber" type="number" min="1" max="9" value="1" required></label>
+          <button class="button secondary" type="submit">Create match</button>
+        </form>
+        <form id="yolo-game-form" class="form-grid compact-form">
+          <label>Match ID<input name="matchId" required></label>
+          <label>Game ID<input name="id" required></label>
+          <label>Game number<input name="gameNumber" type="number" min="1" max="99" value="1" required></label>
+          <button class="button secondary" type="submit">Create game</button>
+        </form>
+        <form id="yolo-evidence-link-form" class="form-grid compact-form">
+          <label>Game ID<input name="gameId" required></label>
+          <label>Mapped screenshot record ID<input name="recordId" required></label>
+          <button class="button secondary" type="submit">Link evidence for review</button>
+        </form>
+        <form id="yolo-evidence-review-form" class="form-grid compact-form">
+          <label>Game ID<input name="gameId" required></label>
+          <label>Decision<select name="accepted"><option value="true">Accept evidence</option><option value="false">Reject evidence</option></select></label>
+          <label>Reason (required for rejection)<input name="reason" maxlength="500"></label>
+          <button class="button secondary" type="submit">Review evidence</button>
+        </form>
       </section>
       <div class="metric-grid">
         <article class="metric-card"><span>ACTIVE ROSTER</span><strong id="admin-roster-count">—</strong><small>of 50 supported slots</small></article>
