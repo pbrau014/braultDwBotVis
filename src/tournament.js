@@ -297,6 +297,7 @@ function makePublicArchiveSnapshot(state) {
   ];
   snapshot.player_account_links = {};
   snapshot.yolo_tournaments = (snapshot.yolo_tournaments || []).map(YoloFormats.redactTournamentPrivateData);
+  if (snapshot.workbook_backup) snapshot.workbook_backup.yoloTournaments = (snapshot.workbook_backup.yoloTournaments || []).map(YoloFormats.redactTournamentPrivateData);
   snapshot.battle_records = snapshot.battle_records.map(entry => {
     const { desktop_owner_id, desktop_owner_role, ...publicEntry } = entry || {};
     return publicEntry;
