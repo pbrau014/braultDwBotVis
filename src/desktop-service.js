@@ -80,6 +80,23 @@ function createDesktopService(options = {}) {
   function ownPlayer(principal,current=state()) {
     return principal.role==='player' ? Tournament.findPlayer(current,principal.player.id) : null;
   }
+  function findLifecycle(current,id) {
+    const item=(current.yoloTournaments||[]).find(row=>row.id===String(id));
+    if(!item) throw Object.assign(new Error('YOLO tournament was not found.'),{status:404,code:'LIFECYCLE_NOT_FOUND'});
+    return item;
+  }
+  function evidenceHash(current,recordId) {
+    const row=current.battleRecords.find(item=>item.record_id===String(recordId));
+    const value=row?.record?.source?.evidence?.sha256 || row?.record?.sourceEvidence?.sha256 || row?.sourceEvidence?.sha256;
+    if(!/^[a-f0-9]{64}$/i.test(String(value||''))) throw Object.assign(new Error('Archived source evidence SHA-256 was not found.'),{status:400,code:'LIFECYCLE_EVIDENCE_REQUIRED'});
+    return String(value).toLowerCase();
+  }
+  function domainCall(fn) {
+    try { return fn(); } catch(error) {
+      if(!error.status){error.status=400;error.code='LIFECYCLE_INVALID';}
+      throw error;
+    }
+  }
   function evidence(buffer,mime) {
     return {platform:'desktop',attachmentId:'',messageId:'',channelId:'',messageUrl:'',
       sha256:crypto.createHash('sha256').update(buffer).digest('hex'),sizeBytes:buffer.length,
@@ -108,7 +125,8 @@ function createDesktopService(options = {}) {
       const current=state(), rows=Tournament.standings(current);
       const total=rows.reduce((s,r)=>s+r.total,0);
       const aggregate={doubloons:total,estimatedValue:total*0.54/100};
-      const base={aggregate,maxPlayers:Tournament.MAX_PLAYERS,events: Tournament.EVENTS,eventLabels:Tournament.EVENT_LABELS};
+      const lifecycleRows=(current.yoloTournaments||[]).filter(t=>principal.role==='admin'||t.lifecycle!=='draft'||t.createdByDiscordUserId===principal.discordUserId).map(t=>({id:t.id,title:t.title,format:t.format,lifecycle:t.lifecycle,stage:t.stage,registered:principal.role==='player'&&t.registrations?.some(r=>r.playerId===principal.player?.id&&r.status==='active'),checkedIn:principal.role==='player'&&t.pilotAttendance?.some(r=>r.playerId===principal.player?.id),settings:principal.role==='admin'?t.settings:undefined,stageSettingsSnapshots:principal.role==='admin'?t.stageSettingsSnapshots:undefined}));
+      const base={aggregate,maxPlayers:Tournament.MAX_PLAYERS,events: Tournament.EVENTS,eventLabels:Tournament.EVENT_LABELS,yoloTournaments:lifecycleRows};
       if(principal.role==='player') {
         const player=Tournament.findPlayer(current,principal.player.id);
         if(!player) throw Object.assign(new Error('Your linked roster entry no longer exists.'),{status:403,code:'PLAYER_UNLINKED'});
@@ -256,6 +274,65 @@ function createDesktopService(options = {}) {
     async setSetting(principal,body) {
       role(principal,['admin']);
       return mutate(async()=>{const value=Tournament.setSetting(state(),String(body?.event||''),String(body?.field||''),body?.value);await options.saveState();return{event:body.event,field:body.field,value};});
+    },
+    async createLifecycle(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state(),id=String(body?.id||crypto.randomUUID());if(current.yoloTournaments.some(item=>item.id===id))throw Object.assign(new Error('A YOLO tournament with that ID already exists.'),{status:409,code:'LIFECYCLE_ID_CONFLICT'});const item=domainCall(()=>Tournament.YoloFormats.createTournament({id,title:body?.title,format:body?.format,settings:body?.settings||{}}));item.createdByDiscordUserId=principal.discordUserId;current.yoloTournaments.push(item);await options.saveState();return{id:item.id,title:item.title,format:item.format,lifecycle:item.lifecycle,stage:item.stage};});
+    },
+    async publishLifecycle(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state(),item=findLifecycle(current,body?.tournamentId);domainCall(()=>Tournament.YoloFormats.publishTournament(item,body?.approval,principal.discordUserId));await options.saveState();return{id:item.id,lifecycle:item.lifecycle,publishedAt:item.publishedAt};});
+    },
+    async startLifecycle(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state(),item=findLifecycle(current,body?.tournamentId);domainCall(()=>Tournament.YoloFormats.startTournament(item,principal.discordUserId));await options.saveState();return{id:item.id,lifecycle:item.lifecycle,stage:item.stage,stageSettingsSnapshots:item.stageSettingsSnapshots};});
+    },
+    async registerLifecycle(principal,body) {
+      role(principal,['admin','player']);
+      return mutate(async()=>{const current=state(),item=findLifecycle(current,body?.tournamentId);let player,discordUserId;
+        if(principal.role==='player'){player=Tournament.findPlayer(current,principal.player.id);discordUserId=principal.discordUserId;}
+        else {player=Tournament.findPlayer(current,body?.playerId);discordUserId=current.playerAccountLinks[String(player?.id)]||'';}
+        if(!player||!discordUserId)throw Object.assign(new Error('A linked tournament roster identity is required.'),{status:400,code:'LINKED_PLAYER_REQUIRED'});
+        const result=domainCall(()=>Tournament.YoloFormats.registerPlayer(item,{playerId:player.id,discordUserId,identityVerified:true,actor:principal.discordUserId}));
+        await options.saveState();return{registrationId:result.id,player:{id:player.id,name:player.name},status:result.status};
+      });
+    },
+    async checkInPilotLifecycle(principal,body) {
+      role(principal,['admin','player']);
+      return mutate(async()=>{const current=state(),item=findLifecycle(current,body?.tournamentId);let player,discordUserId;
+        if(principal.role==='player'){player=Tournament.findPlayer(current,principal.player.id);discordUserId=principal.discordUserId;}
+        else {player=Tournament.findPlayer(current,body?.playerId);discordUserId=current.playerAccountLinks[String(player?.id)]||'';}
+        if(!player||!discordUserId)throw Object.assign(new Error('A linked tournament roster identity is required.'),{status:400,code:'LINKED_PLAYER_REQUIRED'});
+        const result=domainCall(()=>Tournament.YoloFormats.checkInPilotPlayer(item,{playerId:player.id,discordUserId,identityVerified:true,actor:principal.discordUserId}));
+        await options.saveState();return{playerId:result.playerId,checkedInAt:result.checkedInAt};
+      });
+    },
+    async lifecycleAction(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state(),item=findLifecycle(current,body?.tournamentId),input=body||{},action=String(input.action||'');
+        const actor=principal.discordUserId;let result;
+        result=domainCall(()=>{
+          const Y=Tournament.YoloFormats;
+          switch(action){
+            case 'team': return Y.createTeam(item,{...input.team,actor});
+            case 'assign': return Y.assignPlayerToTeam(item,input.playerId,input.teamId,{actor});
+            case 'lock-roster': return Y.lockTeamRoster(item,input.teamId,{actor});
+            case 'event-night': return Y.createEventNight(item,{...input.night,actor});
+            case 'settings': return Y.updateSettingsProspectively(item,{version:input.version,settings:input.settings,eventNightIds:input.eventNightIds,actor});
+            case 'fixture': return Y.scheduleFixture(item,{...input.fixture,actor});
+            case 'game': {const g={...input.game,evidenceSha256:evidenceHash(current,input.game?.evidenceRecordId),actor};delete g.evidenceRecordId;return Y.recordGame(item,g);}
+            case 'complete-fixture': {const o={...input.outcome,evidenceSha256:evidenceHash(current,input.outcome?.evidenceRecordId)};delete o.evidenceRecordId;return Y.completeFixture(item,input.fixtureId,{outcome:o,actor});}
+            case 'resolve-fixture': {const r={...input.resolution,evidenceSha256:input.resolution?.evidenceRecordId?evidenceHash(current,input.resolution.evidenceRecordId):null};delete r.evidenceRecordId;return Y.resolveFixture(item,input.fixtureId,{...r,actor});}
+            case 'advance-stage': {const q={...input.qualification,evidenceSha256:evidenceHash(current,input.qualification?.evidenceRecordId)};delete q.evidenceRecordId;return Y.transitionFullStage(item,input.nextStage,{qualification:q,actor});}
+            case 'pilot-result': {const r={...input.result,evidenceSha256:evidenceHash(current,input.result?.evidenceRecordId),actor};delete r.evidenceRecordId;return Y.recordPilotResult(item,r);}
+            case 'race-schedule': return Y.scheduleRaceSideEvent(item,{...input.schedule,actor});
+            case 'race-result': {const r={...input.result,evidenceSha256:evidenceHash(current,input.result?.evidenceRecordId),actor};delete r.evidenceRecordId;return Y.recordRaceSideEvent(item,r);}
+            case 'finish-pilot': return Y.finishPilot(item,{actor});
+            default: throw new Error('Unknown YOLO lifecycle action.');
+          }
+        });
+        await options.saveState();return{action,result,tournament:{id:item.id,lifecycle:item.lifecycle,stage:item.stage}};
+      });
     },
     async exportBackup(principal) {
       role(principal,['admin']);

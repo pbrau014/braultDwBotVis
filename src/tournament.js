@@ -5,6 +5,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const YoloFormats = require('./yolo-formats');
 
 const EVENTS = ['damage', 'kills', 'race', 'grand'];
 const EVENT_LABELS = { damage: 'Damage', kills: 'Kills', race: 'Race', grand: 'Grand Yolo' };
@@ -85,6 +86,8 @@ function normalizeState(input = {}) {
   return {
     version: 2,
     players,
+    // Separate format lifecycle; legacy version-2 score rows are never auto-assigned.
+    yoloTournaments: YoloFormats.normalizeTournamentCollection(input.yoloTournaments),
     settings: normalizeSettings(input.settings),
     playerAccountLinks,
     importedBattleRecordIds: Array.isArray(input.importedBattleRecordIds) ? input.importedBattleRecordIds.filter(v => typeof v === 'string') : [],
@@ -266,7 +269,7 @@ function setSetting(state, event, field, value) {
   return n;
 }
 function makeWorkbookBackup(state) {
-  return { version: 2, exportedAt: new Date().toISOString(), players: clone(state.players), settings: clone(state.settings), importedBattleRecordIds: [...state.importedBattleRecordIds] };
+  return { version: 2, exportedAt: new Date().toISOString(), players: clone(state.players), settings: clone(state.settings), importedBattleRecordIds: [...state.importedBattleRecordIds], yoloTournaments: clone(state.yoloTournaments || []) };
 }
 function makeArchiveSnapshot(state) {
   return {
@@ -499,4 +502,5 @@ module.exports = {
   linkPlayerDiscordAccount, unlinkPlayerDiscordAccount, addPlayer, removePlayer, renamePlayer,
   clearSlot, clearEvent, clearAllResults, eventTotal, eventScore, standings, getSlot, validateResult, recordResult, setSetting,
   makeWorkbookBackup, makeArchiveSnapshot, makePublicArchiveSnapshot, importBackup, createStore, createSqliteStore, deterministicBattleId,
+  YoloFormats,
 };

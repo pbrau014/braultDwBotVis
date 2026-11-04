@@ -13,6 +13,12 @@ function record(player='[WOLF]Alpha',complete=true) {
     ribbons:[{label:'Destroyed',count:2}],ambiguities:{},
   };
 }
+
+const RULE_HASH='a'.repeat(64);
+function pilotSettings(){return{timezone:'America/Chicago',startAt:'2026-11-10T18:00:00-06:00',endAt:'2026-11-10T21:00:00-06:00',entryClosesAt:'2026-11-10T17:00:00-06:00',lineupLocksAt:'2026-11-10T17:30:00-06:00',gameCount:7,mapPolicy:'approved pool',modePolicy:'verified standard modes',shipPolicy:'approved list',prizePolicy:'approved awards',disputePolicy:'published review'};}
+function fullSettings(){return{timezone:'America/Chicago',duration:'8 weeks',cadence:'weekly',regularSeasonStart:'2026-11-01',regularSeasonEnd:'2026-12-27',postseasonStart:'2027-01-03',postseasonEnd:'2027-01-17',finaleStart:'2027-01-24',finaleEnd:'2027-01-31',postseasonPolicy:'top four by approved method',finalePolicy:'published final series',teamPolicy:'locked rosters',matchOutcomeMethodId:'M1',matchOutcomeMethodVersion:'1',matchOutcomeMethodHash:RULE_HASH,tieBreakPolicy:'published tie-breaks',disputePolicy:'published review'};}
+function approval(){return{approvedBy:'Organizer',approvedAt:'2026-10-30T12:00:00Z',rulesVersion:'1.0',rulesHash:RULE_HASH};}
+
 function fixture(options={}) {
   const state=Tournament.createState();
   const alpha=Tournament.addPlayer(state,'[WOLF]Alpha');
@@ -94,4 +100,49 @@ test('authenticated Admin backup retains private roster links and pending correc
   assert.equal(backup.player_account_links[String(f.alpha.id)],PLAYER);
   assert.equal(backup.pending_submissions[0].userId,PLAYER);
   assert.equal(backup.pending_ocr_corrections.length,1);
+});
+
+test('desktop service creates Pilot drafts and binds check-in to the authenticated linked player',async()=>{
+  const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN}),player=await f.service.resolvePrincipal({id:PLAYER});
+  const created=await f.service.createLifecycle(admin,{title:'One-night Pilot',format:'pilot',settings:pilotSettings()});
+  await f.service.publishLifecycle(admin,{tournamentId:created.id,approval:approval()});
+  await assert.rejects(f.service.createLifecycle(admin,{id:created.id,title:'Duplicate',format:'pilot',settings:pilotSettings()}),e=>e.status===409&&e.code==='LIFECYCLE_ID_CONFLICT');
+  const overview=await f.service.getOverview(player);
+  assert.equal(overview.yoloTournaments[0].format,'pilot');
+  const checked=await f.service.checkInPilotLifecycle(player,{tournamentId:created.id});
+  assert.equal(checked.playerId,f.alpha.id);
+  await assert.rejects(f.service.registerLifecycle(player,{tournamentId:created.id}),e=>e.status===400);
+  await assert.rejects(f.service.createLifecycle(player,{title:'Nope',format:'pilot',settings:pilotSettings()}),e=>e.status===403);
+});
+
+test('desktop Full YOLO service supports linked registration, teams, fixtures, evidence and verified progression',async()=>{
+  const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
+  Tournament.linkPlayerDiscordAccount(f.state,2,OTHER);
+  const alpha=await f.service.resolvePrincipal({id:PLAYER}),bravo=await f.service.resolvePrincipal({id:OTHER});
+  const created=await f.service.createLifecycle(admin,{title:'Full season',format:'full',settings:fullSettings()});
+  await f.service.publishLifecycle(admin,{tournamentId:created.id,approval:approval()});
+  await f.service.registerLifecycle(alpha,{tournamentId:created.id});
+  await f.service.registerLifecycle(bravo,{tournamentId:created.id});
+  await f.service.startLifecycle(admin,{tournamentId:created.id});
+  for(const team of [{id:'A',name:'Alpha'},{id:'B',name:'Bravo'}]){
+    await f.service.lifecycleAction(admin,{tournamentId:created.id,action:'team',team});
+  }
+  await f.service.lifecycleAction(admin,{tournamentId:created.id,action:'assign',playerId:f.alpha.id,teamId:'A'});
+  await f.service.lifecycleAction(admin,{tournamentId:created.id,action:'assign',playerId:2,teamId:'B'});
+  await f.service.lifecycleAction(admin,{tournamentId:created.id,action:'lock-roster',teamId:'A'});
+  await f.service.lifecycleAction(admin,{tournamentId:created.id,action:'lock-roster',teamId:'B'});
+  const night=await f.service.lifecycleAction(admin,{tournamentId:created.id,action:'event-night',night:{id:'n1',title:'Week One',startsAt:'2026-11-10T18:00:00Z',endsAt:'2026-11-10T21:00:00Z'}});
+  await f.service.lifecycleAction(admin,{tournamentId:created.id,action:'fixture',fixture:{id:'f1',eventNightId:night.result.id,teamAId:'A',teamBId:'B',startsAt:'2026-11-10T18:30:00Z'}});
+  const uploaded=await f.service.submitImage(alpha,{buffer:Buffer.from('source evidence screenshot'),filename:'source.png',contentType:'image/png'});
+  await f.service.lifecycleAction(admin,{tournamentId:created.id,action:'game',game:{id:'g1',fixtureId:'f1',playerId:f.alpha.id,teamId:'A',evidenceRecordId:uploaded.submissionId,result:{damage:50000,kills:2}}});
+  const completed=await f.service.lifecycleAction(admin,{tournamentId:created.id,action:'complete-fixture',fixtureId:'f1',outcome:{status:'verified',methodId:'M1',methodVersion:'1',methodHash:RULE_HASH,winnerTeamId:'A',evidenceRecordId:uploaded.submissionId}});
+  assert.equal(completed.result.winnerTeamId,'A');
+  const advanced=await f.service.lifecycleAction(admin,{tournamentId:created.id,action:'advance-stage',nextStage:'postseason',qualification:{approved:true,methodId:'M1',methodVersion:'1',methodHash:RULE_HASH,evidenceRecordId:uploaded.submissionId,qualifiedTeamIds:['A','B']}});
+  assert.equal(advanced.tournament.stage,'postseason');
+  assert.equal(f.state.yoloTournaments[0].stageSettingsSnapshots.length,2);
+});
+
+test('desktop lifecycle admin actions reject unlinked or participant actors',async()=>{
+  const f=fixture(),player=await f.service.resolvePrincipal({id:PLAYER});
+  await assert.rejects(f.service.lifecycleAction(player,{tournamentId:'missing',action:'team'}),e=>e.status===403);
 });
