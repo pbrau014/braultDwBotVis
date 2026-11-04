@@ -69,6 +69,17 @@
         for(const id of ['yolo-team-night','yolo-fixture-night']){const copy=document.createElement('option');copy.value=night.id;copy.textContent=option.textContent;D.$(id).append(copy);}
         const row=D.node('div','event-row');
         row.append(D.node('strong','',night.id),D.node('span','',(night.stage||'Pilot event')+' · '+night.status+' · '+night.startsAt));
+        const nextStatus={draft:'published',published:'active',active:'completed'}[night.status];
+        if(nextStatus){
+          const actionLabel={published:'Publish',active:'Start / lock roster',completed:'Complete'}[nextStatus];
+          const action=D.node('button','button secondary small',actionLabel);action.type='button';
+          action.addEventListener('click',async()=>{
+            action.disabled=true;
+            try{await D.api('/api/admin/yolo-event-nights/'+encodeURIComponent(night.id)+'/status',{method:'POST',body:{status:nextStatus}});await load();}
+            catch(error){action.disabled=false;status(error.message,'error');}
+          });
+          row.append(action);
+        }
         eventNightList.append(row);
       }
       if(!(yoloFormats.eventNights||[]).length)eventNightList.append(D.node('p','muted','No event nights scheduled.'));
