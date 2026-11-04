@@ -344,7 +344,7 @@ function createDesktopService(options = {}) {
     },
     async createFixture(principal,body) {
       role(principal,['admin']);
-      return mutate(async()=>{const current=state();const season=current.lifecycle?.seasons.find(x=>x.id===body?.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});const fixture=Lifecycle.createFixture(season,{id:body?.id||crypto.randomUUID(),stageId:body?.stageId,teamA:body?.teamA,teamB:body?.teamB,scheduledAt:body?.scheduledAt});auditLifecycle(current,principal,'fixture.created',{seasonId:season.id,fixtureId:fixture.id});await options.saveState();return fixture;});
+      return mutate(async()=>{const current=state();const season=current.lifecycle?.seasons.find(x=>x.id===body?.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});const fixture=Lifecycle.createFixture(season,{id:body?.id||crypto.randomUUID(),stageId:body?.stageId,eventNightId:body?.eventNightId,teamA:body?.teamA,teamB:body?.teamB,scheduledAt:body?.scheduledAt});auditLifecycle(current,principal,'fixture.created',{seasonId:season.id,fixtureId:fixture.id});await options.saveState();return fixture;});
     },
     async createMatch(principal,body) {
       role(principal,['admin']);
