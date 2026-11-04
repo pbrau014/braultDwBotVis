@@ -151,3 +151,8 @@ CI run 41813315107: Node 22.16.0 Linux, clean install/syntax PASS, OCR.space 15/
 Implemented: Gateway lifecycle and target-channel preflight; role-based tournament commands; local Desktop Player/Admin/Upload pages; loopback OAuth bridge; account links; manual scores; shared bot state/scoring; shared Tesseract-first OCR queue; exact nine-field review; duplicate-safe mapping; public-safe backups and private Admin backup. Browser privileged actions are checked server-side.
 
 OPEN: actual Discord OAuth/login, browser visual QA, browser image upload against running bot, Windows/native Tesseract, current screenshot acceptance corpus, isolated live Discord smoke, PDF manual and clean final package. Keep ENABLE_SLASH_COMMANDS=0 and ENABLE_DESKTOP_UI=0 until the local test environment is configured. Production NO-GO.
+
+
+## Final documentation/package checkpoint — 2026-11-04
+
+Final package commit f6b60d45f647d09b60355c6460bb0554d20939ed and exact-commit CI run 41814316145 passed on Node 22.16.0 Linux: OCR.space 15/15, Discord preflight 21/21, desktop 28/28, full suite 254 / 253 pass / 0 fail / 1 optional OpenCV skip. Full log is at reports/ci/2026-11-04-41814316145-final-branch-log.txt. Complete handoff: DWBOT_PROJECT_COMPLETE_HANDOFF_2026-11-04.txt. Live/Windows/accuracy gates remain open.

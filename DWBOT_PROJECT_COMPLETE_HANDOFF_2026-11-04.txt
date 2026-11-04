@@ -236,3 +236,20 @@ Next:
 5. Produce PDF user manual, final SHA package and clean extraction proof.
 6. Reassess release gate only with current-source evidence.
 For a new session, fetch dwbotVis head, read this handoff and plan1.txt, then continue the open gates. Do not modify main.
+
+
+================================================================================
+FINAL DOCUMENTATION/PACKAGE VERIFICATION — 2026-11-04
+================================================================================
+Final docs/inventory package commit: f6b60d45f647d09b60355c6460bb0554d20939ed
+CI on that exact commit: https://github.com/pbrau014/braultDwBotVis/actions/runs/41814316145
+Result SUCCESS, Node.js 22.16.0 Linux:
+- Clean npm ci and syntax PASS.
+- OCR.space mocked 15/15.
+- Discord preflight 21/21.
+- Desktop suite 28/28.
+- Full npm test 254 total / 253 pass / 0 fail / 1 optional OpenCV skip (cv2 unavailable).
+Full decoded log: reports/ci/2026-11-04-41814316145-final-branch-log.txt.
+Latest main head observed at final check: e2fbcfbf680a8d40691a76d1be94aae29325016f. Main remains read-only; no changes by this work.
+The final branch includes the complete handoff, updated plan/status/README/quickstarts, path-by-path inventory, historical ZIP checksum sidecar and CI log. The original 175 MB historical ZIP remains in the File Library because it exceeds GitHub's 100 MB single-file limit.
+================================================================================

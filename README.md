@@ -77,3 +77,8 @@ Current branch source ZIP:
 https://github.com/pbrau014/braultDwBotVis/archive/refs/heads/dwbotVis.zip
 
 Production remains NO-GO until current-source OCR acceptance, Windows/native OCR, local UI/OAuth/browser upload, isolated live Discord, security/recovery, PDF manual and final clean extraction pass.
+
+
+## Final handoff package verification
+
+Final package commit: f6b60d45f647d09b60355c6460bb0554d20939ed. Exact-commit CI succeeded: https://github.com/pbrau014/braultDwBotVis/actions/runs/41814316145. Full CI log is committed at reports/ci/2026-11-04-41814316145-final-branch-log.txt. Complete plan-to-release handoff is DWBOT_PROJECT_COMPLETE_HANDOFF_2026-11-04.txt. Production remains NO-GO pending the Windows/native, current OCR acceptance, actual local browser/OAuth, live Discord and final user-manual/package gates.

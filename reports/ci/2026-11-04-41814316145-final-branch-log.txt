@@ -1,0 +1,2223 @@
+﻿2026-11-04T10:27:36.5034066Z Current runner version: '2.338.2'
+2026-11-04T10:27:36.5051594Z ##[group]Runner Image Provisioner
+2026-11-04T10:27:36.5052169Z Hosted Compute Agent
+2026-11-04T10:27:36.5052514Z Version: 20261028.624
+2026-11-04T10:27:36.5052945Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+2026-11-04T10:27:36.5053360Z Build Date: 2026-10-28T21:51:42Z
+2026-11-04T10:27:36.5053838Z Worker ID: {8368e531-6580-44b9-b5b2-e696d8cd68d7}
+2026-11-04T10:27:36.5054287Z Region: westus2
+2026-11-04T10:27:36.5054620Z Cloud: Azure
+2026-11-04T10:27:36.5054972Z ##[endgroup]
+2026-11-04T10:27:36.5055712Z ##[group]Operating System
+2026-11-04T10:27:36.5056058Z Ubuntu
+2026-11-04T10:27:36.5056450Z 24.04.5
+2026-11-04T10:27:36.5056757Z LTS
+2026-11-04T10:27:36.5057130Z ##[endgroup]
+2026-11-04T10:27:36.5057458Z ##[group]Runner Image
+2026-11-04T10:27:36.5057845Z Image: ubuntu-24.04
+2026-11-04T10:27:36.5058309Z Version: 20261101.360.1
+2026-11-04T10:27:36.5059168Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261101.360/images/ubuntu/Ubuntu2404-Readme.md
+2026-11-04T10:27:36.5060319Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261101.360
+2026-11-04T10:27:36.5060852Z ##[endgroup]
+2026-11-04T10:27:36.5061577Z ##[group]GITHUB_TOKEN Permissions
+2026-11-04T10:27:36.5062834Z Contents: read
+2026-11-04T10:27:36.5063235Z Metadata: read
+2026-11-04T10:27:36.5063567Z ##[endgroup]
+2026-11-04T10:27:36.5064931Z Secret source: Actions
+2026-11-04T10:27:36.5065497Z Cache mode: write
+2026-11-04T10:27:36.5065931Z Prepare workflow directory
+2026-11-04T10:27:36.5697514Z Prepare all required actions
+2026-11-04T10:27:36.5729380Z Getting action download info
+2026-11-04T10:27:36.8909898Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+2026-11-04T10:27:37.0029840Z Download action repository 'actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1' (SHA:949feb2413d6458794dcd2491c4babbbce0c15c1)
+2026-11-04T10:27:37.2102679Z Complete job name: Node.js 22.16.0 · Linux verification
+2026-11-04T10:27:37.3321899Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+2026-11-04T10:27:37.3322427Z with:
+2026-11-04T10:27:37.3322670Z   persist-credentials: false
+2026-11-04T10:27:37.3322965Z   repository: pbrau014/braultDwBotVis
+2026-11-04T10:27:37.3325100Z   token: ***
+2026-11-04T10:27:37.3325336Z   ssh-strict: true
+2026-11-04T10:27:37.3325577Z   ssh-user: git
+2026-11-04T10:27:37.3325808Z   clean: true
+2026-11-04T10:27:37.3326054Z   sparse-checkout-cone-mode: true
+2026-11-04T10:27:37.3326340Z   fetch-depth: 1
+2026-11-04T10:27:37.3326577Z   fetch-tags: false
+2026-11-04T10:27:37.3326824Z   show-progress: true
+2026-11-04T10:27:37.3327066Z   lfs: false
+2026-11-04T10:27:37.3327293Z   submodules: false
+2026-11-04T10:27:37.3327541Z   set-safe-directory: true
+2026-11-04T10:27:37.3327824Z   allow-unsafe-pr-checkout: false
+2026-11-04T10:27:37.3328177Z ##[endgroup]
+2026-11-04T10:27:37.5674550Z Syncing repository: pbrau014/braultDwBotVis
+2026-11-04T10:27:37.5675816Z ##[group]Getting Git version info
+2026-11-04T10:27:37.5676330Z Working directory is '/home/runner/work/braultDwBotVis/braultDwBotVis'
+2026-11-04T10:27:37.5677001Z [command]/usr/bin/git version
+2026-11-04T10:27:37.5775900Z git version 2.56.0
+2026-11-04T10:27:37.5790019Z ##[endgroup]
+2026-11-04T10:27:37.5803992Z Temporarily overriding HOME='/home/runner/work/_temp/b9ac5512-d33f-4043-bcf9-b597e2ee79f8' before making global git config changes
+2026-11-04T10:27:37.5805688Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-04T10:27:37.5811130Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/braultDwBotVis/braultDwBotVis
+2026-11-04T10:27:37.5867458Z Deleting the contents of '/home/runner/work/braultDwBotVis/braultDwBotVis'
+2026-11-04T10:27:37.5870964Z ##[group]Determining repository object format
+2026-11-04T10:27:37.5872231Z ##[endgroup]
+2026-11-04T10:27:37.5872970Z ##[group]Initializing the repository
+2026-11-04T10:27:37.5876455Z [command]/usr/bin/git init /home/runner/work/braultDwBotVis/braultDwBotVis
+2026-11-04T10:27:37.5965627Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-04T10:27:37.5966949Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-04T10:27:37.5967842Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-04T10:27:37.5968356Z hint: call:
+2026-11-04T10:27:37.5968891Z hint:
+2026-11-04T10:27:37.5969435Z hint: 	git config --global init.defaultBranch <name>
+2026-11-04T10:27:37.5969977Z hint:
+2026-11-04T10:27:37.5970571Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-04T10:27:37.5971292Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-04T10:27:37.5971967Z hint:
+2026-11-04T10:27:37.5972536Z hint: 	git branch -m <name>
+2026-11-04T10:27:37.5972970Z hint:
+2026-11-04T10:27:37.5973404Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-04T10:27:37.5979824Z Initialized empty Git repository in /home/runner/work/braultDwBotVis/braultDwBotVis/.git/
+2026-11-04T10:27:37.5995012Z [command]/usr/bin/git remote add origin https://github.com/pbrau014/braultDwBotVis
+2026-11-04T10:27:37.6050451Z ##[endgroup]
+2026-11-04T10:27:37.6051405Z ##[group]Disabling automatic garbage collection
+2026-11-04T10:27:37.6053841Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-04T10:27:37.6099695Z ##[endgroup]
+2026-11-04T10:27:37.6100487Z ##[group]Setting up auth
+2026-11-04T10:27:37.6101097Z Removing SSH command configuration
+2026-11-04T10:27:37.6101912Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-04T10:27:37.6167114Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-04T10:27:37.6547231Z Removing HTTP extra header
+2026-11-04T10:27:37.6557034Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-04T10:27:37.6611239Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-04T10:27:37.6805326Z Removing includeIf entries pointing to credentials config files
+2026-11-04T10:27:37.6809890Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-04T10:27:37.6854902Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-04T10:27:37.7057015Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-7d358f72-ce33-4ccd-b4a6-f30dbd5dd322.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-04T10:27:37.7102958Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/braultDwBotVis/braultDwBotVis/.git.path /home/runner/work/_temp/git-credentials-7d358f72-ce33-4ccd-b4a6-f30dbd5dd322.config
+2026-11-04T10:27:37.7142009Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/braultDwBotVis/braultDwBotVis/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-7d358f72-ce33-4ccd-b4a6-f30dbd5dd322.config
+2026-11-04T10:27:37.7180874Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-7d358f72-ce33-4ccd-b4a6-f30dbd5dd322.config
+2026-11-04T10:27:37.7220361Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-7d358f72-ce33-4ccd-b4a6-f30dbd5dd322.config
+2026-11-04T10:27:37.7258806Z ##[endgroup]
+2026-11-04T10:27:37.7259280Z ##[group]Fetching the repository
+2026-11-04T10:27:37.7263829Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +f6b60d45f647d09b60355c6460bb0554d20939ed:refs/remotes/origin/dwbotVis
+2026-11-04T10:27:45.2136876Z From https://github.com/pbrau014/braultDwBotVis
+2026-11-04T10:27:45.2138481Z  * [new ref]         f6b60d45f647d09b60355c6460bb0554d20939ed -> origin/dwbotVis
+2026-11-04T10:27:45.2142826Z [command]/usr/bin/git branch --list --remote origin/dwbotVis
+2026-11-04T10:27:45.2176989Z   origin/dwbotVis
+2026-11-04T10:27:45.2183490Z [command]/usr/bin/git rev-parse refs/remotes/origin/dwbotVis
+2026-11-04T10:27:45.2214737Z f6b60d45f647d09b60355c6460bb0554d20939ed
+2026-11-04T10:27:45.2218862Z ##[endgroup]
+2026-11-04T10:27:45.2220059Z ##[group]Determining the checkout info
+2026-11-04T10:27:45.2221430Z ##[endgroup]
+2026-11-04T10:27:45.2222565Z [command]/usr/bin/git sparse-checkout disable
+2026-11-04T10:27:45.2277151Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-04T10:27:45.2314451Z ##[group]Checking out the ref
+2026-11-04T10:27:45.2316689Z [command]/usr/bin/git checkout --progress --force -B dwbotVis refs/remotes/origin/dwbotVis
+2026-11-04T10:27:45.5522127Z Switched to a new branch 'dwbotVis'
+2026-11-04T10:27:45.5547623Z branch 'dwbotVis' set up to track 'origin/dwbotVis'.
+2026-11-04T10:27:45.5551784Z ##[endgroup]
+2026-11-04T10:27:45.5609716Z [command]/usr/bin/git log -1 --format=%H
+2026-11-04T10:27:45.5646650Z f6b60d45f647d09b60355c6460bb0554d20939ed
+2026-11-04T10:27:45.5655813Z ##[group]Removing auth
+2026-11-04T10:27:45.5656092Z Removing SSH command configuration
+2026-11-04T10:27:45.5660738Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-04T10:27:45.5704272Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-04T10:27:45.5921731Z Removing HTTP extra header
+2026-11-04T10:27:45.5925423Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-04T10:27:45.5963700Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-04T10:27:45.6154550Z Removing includeIf entries pointing to credentials config files
+2026-11-04T10:27:45.6157023Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-04T10:27:45.6196950Z includeif.gitdir:/home/runner/work/braultDwBotVis/braultDwBotVis/.git.path
+2026-11-04T10:27:45.6197472Z includeif.gitdir:/home/runner/work/braultDwBotVis/braultDwBotVis/.git/worktrees/*.path
+2026-11-04T10:27:45.6197946Z includeif.gitdir:/github/workspace/.git.path
+2026-11-04T10:27:45.6198314Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-04T10:27:45.6205086Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/braultDwBotVis/braultDwBotVis/.git.path
+2026-11-04T10:27:45.6235909Z /home/runner/work/_temp/git-credentials-7d358f72-ce33-4ccd-b4a6-f30dbd5dd322.config
+2026-11-04T10:27:45.6243826Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/braultDwBotVis/braultDwBotVis/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-7d358f72\-ce33\-4ccd\-b4a6\-f30dbd5dd322\.config
+2026-11-04T10:27:45.6288311Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/braultDwBotVis/braultDwBotVis/.git/worktrees/*.path
+2026-11-04T10:27:45.6318096Z /home/runner/work/_temp/git-credentials-7d358f72-ce33-4ccd-b4a6-f30dbd5dd322.config
+2026-11-04T10:27:45.6324421Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/braultDwBotVis/braultDwBotVis/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-7d358f72\-ce33\-4ccd\-b4a6\-f30dbd5dd322\.config
+2026-11-04T10:27:45.6366958Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-11-04T10:27:45.6398071Z /github/runner_temp/git-credentials-7d358f72-ce33-4ccd-b4a6-f30dbd5dd322.config
+2026-11-04T10:27:45.6403714Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-7d358f72\-ce33\-4ccd\-b4a6\-f30dbd5dd322\.config
+2026-11-04T10:27:45.6442431Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-04T10:27:45.6472766Z /github/runner_temp/git-credentials-7d358f72-ce33-4ccd-b4a6-f30dbd5dd322.config
+2026-11-04T10:27:45.6478241Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-7d358f72\-ce33\-4ccd\-b4a6\-f30dbd5dd322\.config
+2026-11-04T10:27:45.6517835Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-04T10:27:45.6708950Z Removing credentials config '/home/runner/work/_temp/git-credentials-7d358f72-ce33-4ccd-b4a6-f30dbd5dd322.config'
+2026-11-04T10:27:45.6717133Z ##[endgroup]
+2026-11-04T10:27:45.7293438Z ##[group]Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+2026-11-04T10:27:45.7293761Z with:
+2026-11-04T10:27:45.7293907Z   node-version: 22.16.0
+2026-11-04T10:27:45.7294037Z   cache: npm
+2026-11-04T10:27:45.7294163Z   package-manager-cache: false
+2026-11-04T10:27:45.7294312Z   check-latest: false
+2026-11-04T10:27:45.7295703Z   token: ***
+2026-11-04T10:27:45.7295822Z ##[endgroup]
+2026-11-04T10:27:45.8146201Z Attempting to download 22.16.0...
+2026-11-04T10:27:46.6539951Z Acquiring 22.16.0 - x64 from https://github.com/actions/node-versions/releases/download/22.16.0-15177438473/node-22.16.0-linux-x64.tar.gz
+2026-11-04T10:27:47.1046235Z Extracting ...
+2026-11-04T10:27:47.1156739Z [command]/usr/bin/tar xz --strip 1 --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/38bea508-b2cf-409b-9147-78ff54a6736a -f /home/runner/work/_temp/700ca2c1-483d-4780-a783-968cb5c5ce7a
+2026-11-04T10:27:47.9795818Z Adding to the cache ...
+2026-11-04T10:27:49.6156565Z ##[group]Environment details
+2026-11-04T10:27:49.7702819Z node: v22.16.0
+2026-11-04T10:27:49.7703062Z npm: 10.9.2
+2026-11-04T10:27:49.7703218Z yarn: 1.22.22
+2026-11-04T10:27:49.7703587Z ##[endgroup]
+2026-11-04T10:27:49.7713317Z [command]/opt/hostedtoolcache/node/22.16.0/x64/bin/npm config get cache
+2026-11-04T10:27:49.8315306Z /home/runner/.npm
+2026-11-04T10:27:50.0741815Z Cache hit for: node-cache-Linux-x64-npm-03486af4a95cade82a15fff375e011631c4d8cd06160f783366abc5596791eaf
+2026-11-04T10:27:51.2568171Z Received 16469134 of 16469134 (100.0%), 17.8 MBs/sec
+2026-11-04T10:27:51.2568506Z Cache Size: ~16 MB (16469134 B)
+2026-11-04T10:27:51.2582306Z [command]/usr/bin/tar -xf /home/runner/work/_temp/cd6bc211-431f-48fc-8fbc-8f4f3bae91e5/cache.tzst -P -C /home/runner/work/braultDwBotVis/braultDwBotVis --use-compress-program unzstd
+2026-11-04T10:27:51.2859696Z Cache restored successfully
+2026-11-04T10:27:51.2870979Z Cache restored from key: node-cache-Linux-x64-npm-03486af4a95cade82a15fff375e011631c4d8cd06160f783366abc5596791eaf
+2026-11-04T10:27:51.3253176Z ##[group]Run node --version
+2026-11-04T10:27:51.3253417Z node --version
+2026-11-04T10:27:51.3253559Z npm --version
+2026-11-04T10:27:51.3253703Z npm ci --no-audit --no-fund
+2026-11-04T10:27:51.3273466Z shell: /usr/bin/bash -e {0}
+2026-11-04T10:27:51.3273626Z ##[endgroup]
+2026-11-04T10:27:51.3349875Z v22.16.0
+2026-11-04T10:27:51.3810024Z 10.9.2
+2026-11-04T10:27:52.1420213Z 
+2026-11-04T10:27:52.1421207Z added 39 packages in 726ms
+2026-11-04T10:27:52.1888805Z ##[group]Run node --check src/bot.js
+2026-11-04T10:27:52.1889035Z node --check src/bot.js
+2026-11-04T10:27:52.1889208Z node --check src/desktop-service.js
+2026-11-04T10:27:52.1889389Z node --check src/desktop-bridge.js
+2026-11-04T10:27:52.1889574Z node --check tests/desktop-service.test.js
+2026-11-04T10:27:52.1889764Z node --check tests/desktop-bridge.test.js
+2026-11-04T10:27:52.1889958Z node --check src/desktop-test-preflight.js
+2026-11-04T10:27:52.1890353Z node --check scripts/preflight-desktop-test.js
+2026-11-04T10:27:52.1890565Z node --check tests/desktop-test-preflight.test.js
+2026-11-04T10:27:52.1890769Z node --check tests/desktop-ui-contract.test.js
+2026-11-04T10:27:52.1890954Z node --check src/ocrspace-client.js
+2026-11-04T10:27:52.1891131Z node --check src/ocrspace-quota-ledger.js
+2026-11-04T10:27:52.1891344Z node --check src/ocrspace-field-evidence.js
+2026-11-04T10:27:52.1891531Z node --check src/discord-test-preflight.js
+2026-11-04T10:27:52.1891718Z node --check src/ocr-sequence-checkpoint.js
+2026-11-04T10:27:52.1891904Z node --check scripts/run-ocr-sequence.js
+2026-11-04T10:27:52.1892103Z node --check tests/ocr-sequence-checkpoint.test.js
+2026-11-04T10:27:52.1908522Z shell: /usr/bin/bash -e {0}
+2026-11-04T10:27:52.1908785Z ##[endgroup]
+2026-11-04T10:27:52.4166517Z ##[group]Run npm run test:ocrspace
+2026-11-04T10:27:52.4166727Z npm run test:ocrspace
+2026-11-04T10:27:52.4183144Z shell: /usr/bin/bash -e {0}
+2026-11-04T10:27:52.4183292Z ##[endgroup]
+2026-11-04T10:27:52.4776824Z 
+2026-11-04T10:27:52.4777516Z > wows-yolo-tourney-discord-bot@2.5.0 test:ocrspace
+2026-11-04T10:27:52.4777826Z > node --test tests/ocrspace.test.js
+2026-11-04T10:27:52.4777945Z 
+2026-11-04T10:27:52.5043455Z TAP version 13
+2026-11-04T10:27:52.5398499Z # Subtest: Engine 2 uses HTTPS multipart, apikey header, auto language and word overlay
+2026-11-04T10:27:52.5408736Z ok 1 - Engine 2 uses HTTPS multipart, apikey header, auto language and word overlay
+2026-11-04T10:27:52.5409128Z   ---
+2026-11-04T10:27:52.5409360Z   duration_ms: 10.597299
+2026-11-04T10:27:52.5409581Z   type: 'test'
+2026-11-04T10:27:52.5409702Z   ...
+2026-11-04T10:27:52.5409982Z # Subtest: Engine 3 defaults overlay off and returns no fabricated confidence
+2026-11-04T10:27:52.5410495Z ok 2 - Engine 3 defaults overlay off and returns no fabricated confidence
+2026-11-04T10:27:52.5410712Z   ---
+2026-11-04T10:27:52.5410829Z   duration_ms: 0.243786
+2026-11-04T10:27:52.5411026Z   type: 'test'
+2026-11-04T10:27:52.5411142Z   ...
+2026-11-04T10:27:52.5411475Z # Subtest: client rejects missing key, invalid buffer, unsupported MIME, retired Engine 1 and oversized input before fetch
+2026-11-04T10:27:52.5412041Z ok 3 - client rejects missing key, invalid buffer, unsupported MIME, retired Engine 1 and oversized input before fetch
+2026-11-04T10:27:52.5412385Z   ---
+2026-11-04T10:27:52.5412498Z   duration_ms: 0.455662
+2026-11-04T10:27:52.5412634Z   type: 'test'
+2026-11-04T10:27:52.5412783Z   ...
+2026-11-04T10:27:52.5413022Z # Subtest: 429 is classified with Retry-After and is never retried by this client
+2026-11-04T10:27:52.5413351Z ok 4 - 429 is classified with Retry-After and is never retried by this client
+2026-11-04T10:27:52.5413554Z   ---
+2026-11-04T10:27:52.5413672Z   duration_ms: 0.245468
+2026-11-04T10:27:52.5413808Z   type: 'test'
+2026-11-04T10:27:52.5413938Z   ...
+2026-11-04T10:27:52.5414211Z # Subtest: HTTP, authentication, malformed JSON, provider errors and parse failures are classified
+2026-11-04T10:27:52.5414677Z ok 5 - HTTP, authentication, malformed JSON, provider errors and parse failures are classified
+2026-11-04T10:27:52.5414915Z   ---
+2026-11-04T10:27:52.5415028Z   duration_ms: 0.66793
+2026-11-04T10:27:52.5415157Z   type: 'test'
+2026-11-04T10:27:52.5415275Z   ...
+2026-11-04T10:27:52.5415487Z # Subtest: partial OCR parse returns only successfully parsed result text
+2026-11-04T10:27:52.5415785Z ok 6 - partial OCR parse returns only successfully parsed result text
+2026-11-04T10:27:52.5415980Z   ---
+2026-11-04T10:27:52.5416092Z   duration_ms: 0.237596
+2026-11-04T10:27:52.5416219Z   type: 'test'
+2026-11-04T10:27:52.5416335Z   ...
+2026-11-04T10:27:53.5407898Z # Subtest: timeout is classified without exposing the API key
+2026-11-04T10:27:53.5408479Z ok 7 - timeout is classified without exposing the API key
+2026-11-04T10:27:53.5409127Z   ---
+2026-11-04T10:27:53.5409340Z   duration_ms: 1002.094238
+2026-11-04T10:27:53.5409742Z   type: 'test'
+2026-11-04T10:27:53.5418921Z   ...
+2026-11-04T10:27:53.5419371Z # Subtest: local quotas remain below current provider-published free limits
+2026-11-04T10:27:53.5420001Z ok 8 - local quotas remain below current provider-published free limits
+2026-11-04T10:27:53.5420539Z   ---
+2026-11-04T10:27:53.5420707Z   duration_ms: 1.593998
+2026-11-04T10:27:53.5420911Z   type: 'test'
+2026-11-04T10:27:53.5421068Z   ...
+2026-11-04T10:27:53.6507542Z # Subtest: quota reservations serialize concurrent callers and enforce all quota buckets
+2026-11-04T10:27:53.6508120Z ok 9 - quota reservations serialize concurrent callers and enforce all quota buckets
+2026-11-04T10:27:53.6508435Z   ---
+2026-11-04T10:27:53.6508796Z   duration_ms: 108.539221
+2026-11-04T10:27:53.6509016Z   type: 'test'
+2026-11-04T10:27:53.6509204Z   ...
+2026-11-04T10:27:53.6539331Z # Subtest: corrupt quota ledger fails closed
+2026-11-04T10:27:53.6540399Z ok 10 - corrupt quota ledger fails closed
+2026-11-04T10:27:53.6547168Z   ---
+2026-11-04T10:27:53.6552442Z   duration_ms: 1.66702
+2026-11-04T10:27:53.6552692Z   type: 'test'
+2026-11-04T10:27:53.6552869Z   ...
+2026-11-04T10:27:53.6553141Z # Subtest: provider stays disabled without explicit enablement or a server-side key
+2026-11-04T10:27:53.6553499Z ok 11 - provider stays disabled without explicit enablement or a server-side key
+2026-11-04T10:27:53.6553714Z   ---
+2026-11-04T10:27:53.6553834Z   duration_ms: 0.428257
+2026-11-04T10:27:53.6553993Z   type: 'test'
+2026-11-04T10:27:53.6554218Z   ...
+2026-11-04T10:27:53.6554474Z # Subtest: field evidence submits bounded crops sequentially and stays outside candidates
+2026-11-04T10:27:53.6554842Z ok 12 - field evidence submits bounded crops sequentially and stays outside candidates
+2026-11-04T10:27:53.6555068Z   ---
+2026-11-04T10:27:53.6555180Z   duration_ms: 0.722806
+2026-11-04T10:27:53.6555310Z   type: 'test'
+2026-11-04T10:27:53.6555425Z   ...
+2026-11-04T10:27:53.6555662Z # Subtest: oversized crop is rejected before quota reservation and external request
+2026-11-04T10:27:53.6556075Z ok 13 - oversized crop is rejected before quota reservation and external request
+2026-11-04T10:27:53.6556416Z   ---
+2026-11-04T10:27:53.6556604Z   duration_ms: 0.28463
+2026-11-04T10:27:53.6556809Z   type: 'test'
+2026-11-04T10:27:53.6556955Z   ...
+2026-11-04T10:27:53.6557137Z # Subtest: quota exhaustion stops further provider calls
+2026-11-04T10:27:53.6557377Z ok 14 - quota exhaustion stops further provider calls
+2026-11-04T10:27:53.6557543Z   ---
+2026-11-04T10:27:53.6557656Z   duration_ms: 0.189954
+2026-11-04T10:27:53.6557782Z   type: 'test'
+2026-11-04T10:27:53.6557893Z   ...
+2026-11-04T10:27:53.6558045Z # Subtest: crop cap parser is bounded to seven
+2026-11-04T10:27:53.6558249Z ok 15 - crop cap parser is bounded to seven
+2026-11-04T10:27:53.6558404Z   ---
+2026-11-04T10:27:53.6558515Z   duration_ms: 0.0647
+2026-11-04T10:27:53.6558954Z   type: 'test'
+2026-11-04T10:27:53.6559074Z   ...
+2026-11-04T10:27:53.6622284Z 1..15
+2026-11-04T10:27:53.6622486Z # tests 15
+2026-11-04T10:27:53.6622675Z # suites 0
+2026-11-04T10:27:53.6622845Z # pass 15
+2026-11-04T10:27:53.6623013Z # fail 0
+2026-11-04T10:27:53.6623191Z # cancelled 0
+2026-11-04T10:27:53.6623376Z # skipped 0
+2026-11-04T10:27:53.6623548Z # todo 0
+2026-11-04T10:27:53.6623747Z # duration_ms 1164.887049
+2026-11-04T10:27:53.6778318Z ##[group]Run npm run test:discord-preflight
+2026-11-04T10:27:53.6778538Z npm run test:discord-preflight
+2026-11-04T10:27:53.6795198Z shell: /usr/bin/bash -e {0}
+2026-11-04T10:27:53.6795347Z ##[endgroup]
+2026-11-04T10:27:53.7389652Z 
+2026-11-04T10:27:53.7390431Z > wows-yolo-tourney-discord-bot@2.5.0 test:discord-preflight
+2026-11-04T10:27:53.7390983Z > node --test tests/discord-gateway-diagnostics.test.js tests/tournament-command-policy.test.js tests/discord-test-preflight.test.js
+2026-11-04T10:27:53.7391281Z 
+2026-11-04T10:27:53.7709589Z TAP version 13
+2026-11-04T10:27:53.7920421Z # Subtest: Discord preflight rejects an inaccessible or missing target channel
+2026-11-04T10:27:53.7939530Z ok 1 - Discord preflight rejects an inaccessible or missing target channel
+2026-11-04T10:27:53.7940052Z   ---
+2026-11-04T10:27:53.7940327Z   duration_ms: 0.522413
+2026-11-04T10:27:53.7940609Z   type: 'test'
+2026-11-04T10:27:53.7940853Z   ...
+2026-11-04T10:27:53.7941343Z # Subtest: Discord preflight rejects non-guild and non-sendable channels
+2026-11-04T10:27:53.7941926Z ok 2 - Discord preflight rejects non-guild and non-sendable channels
+2026-11-04T10:27:53.7942463Z   ---
+2026-11-04T10:27:53.7942714Z   duration_ms: 0.147474
+2026-11-04T10:27:53.7942986Z   type: 'test'
+2026-11-04T10:27:53.7943236Z   ...
+2026-11-04T10:27:53.7943615Z # Subtest: Discord preflight rejects unresolved permission state
+2026-11-04T10:27:53.7944102Z ok 3 - Discord preflight rejects unresolved permission state
+2026-11-04T10:27:53.7944442Z   ---
+2026-11-04T10:27:53.7944691Z   duration_ms: 0.076432
+2026-11-04T10:27:53.7966685Z   type: 'test'
+2026-11-04T10:27:53.8010015Z   ...
+2026-11-04T10:27:53.8039350Z # Subtest: Discord preflight passes when all required channel permissions are present
+2026-11-04T10:27:53.8055382Z ok 4 - Discord preflight passes when all required channel permissions are present
+2026-11-04T10:27:53.8055890Z   ---
+2026-11-04T10:27:53.8056093Z   duration_ms: 0.393873
+2026-11-04T10:27:53.8056359Z   type: 'test'
+2026-11-04T10:27:53.8056549Z   ...
+2026-11-04T10:27:53.8056973Z # Subtest: Discord preflight identifies each missing required permission without guessing
+2026-11-04T10:27:53.8057584Z ok 5 - Discord preflight identifies each missing required permission without guessing
+2026-11-04T10:27:53.8057964Z   ---
+2026-11-04T10:27:53.8058147Z   duration_ms: 0.129631
+2026-11-04T10:27:53.8058358Z   type: 'test'
+2026-11-04T10:27:53.8058535Z   ...
+2026-11-04T10:27:53.8059090Z # Subtest: Discord preflight fails closed when a required permission flag is undefined
+2026-11-04T10:27:53.8059649Z ok 6 - Discord preflight fails closed when a required permission flag is undefined
+2026-11-04T10:27:53.8059990Z   ---
+2026-11-04T10:27:53.8060180Z   duration_ms: 0.081793
+2026-11-04T10:27:53.8060379Z   type: 'test'
+2026-11-04T10:27:53.8060554Z   ...
+2026-11-04T10:27:53.8060924Z # Subtest: Discord preflight fails closed when the bot guild member is not resolved
+2026-11-04T10:27:53.8061457Z ok 7 - Discord preflight fails closed when the bot guild member is not resolved
+2026-11-04T10:27:53.8061794Z   ---
+2026-11-04T10:27:53.8061972Z   duration_ms: 0.619563
+2026-11-04T10:27:53.8062175Z   type: 'test'
+2026-11-04T10:27:53.8062355Z   ...
+2026-11-04T10:27:53.8062731Z # Subtest: offline Discord test preflight accepts isolated development configuration
+2026-11-04T10:27:53.8063298Z ok 8 - offline Discord test preflight accepts isolated development configuration
+2026-11-04T10:27:53.8063646Z   ---
+2026-11-04T10:27:53.8063827Z   duration_ms: 1.547462
+2026-11-04T10:27:53.8064053Z   type: 'test'
+2026-11-04T10:27:53.8064233Z   ...
+2026-11-04T10:27:53.8064598Z # Subtest: offline Discord test preflight rejects missing and placeholder tokens
+2026-11-04T10:27:53.8065136Z ok 9 - offline Discord test preflight rejects missing and placeholder tokens
+2026-11-04T10:27:53.8065471Z   ---
+2026-11-04T10:27:53.8065649Z   duration_ms: 0.480044
+2026-11-04T10:27:53.8065847Z   type: 'test'
+2026-11-04T10:27:53.8066030Z   ...
+2026-11-04T10:27:53.8066823Z # Subtest: offline Discord test preflight rejects malformed channel and admin snowflakes
+2026-11-04T10:27:53.8067427Z ok 10 - offline Discord test preflight rejects malformed channel and admin snowflakes
+2026-11-04T10:27:53.8067786Z   ---
+2026-11-04T10:27:53.8067963Z   duration_ms: 2.159923
+2026-11-04T10:27:53.8068165Z   type: 'test'
+2026-11-04T10:27:53.8068348Z   ...
+2026-11-04T10:27:53.8068905Z # Subtest: offline Discord test preflight rejects production and non-JSON storage
+2026-11-04T10:27:53.8069445Z ok 11 - offline Discord test preflight rejects production and non-JSON storage
+2026-11-04T10:27:53.8069787Z   ---
+2026-11-04T10:27:53.8069964Z   duration_ms: 0.262308
+2026-11-04T10:27:53.8070168Z   type: 'test'
+2026-11-04T10:27:53.8070524Z   ...
+2026-11-04T10:27:53.8070930Z # Subtest: offline Discord test preflight rejects state paths outside isolated test directory
+2026-11-04T10:27:53.8071509Z ok 12 - offline Discord test preflight rejects state paths outside isolated test directory
+2026-11-04T10:27:53.8071872Z   ---
+2026-11-04T10:27:53.8072061Z   duration_ms: 0.190756
+2026-11-04T10:27:53.8072255Z   type: 'test'
+2026-11-04T10:27:53.8072427Z   ...
+2026-11-04T10:27:53.8072844Z # Subtest: offline Discord test preflight rejects enabled slash commands and experimental features
+2026-11-04T10:27:53.8073470Z ok 13 - offline Discord test preflight rejects enabled slash commands and experimental features
+2026-11-04T10:27:53.8073854Z   ---
+2026-11-04T10:27:53.8074027Z   duration_ms: 0.200944
+2026-11-04T10:27:53.8074221Z   type: 'test'
+2026-11-04T10:27:53.8074392Z   ...
+2026-11-04T10:27:53.8074773Z # Subtest: offline Discord test preflight accepts comma-separated admins and false flags
+2026-11-04T10:27:53.8075342Z ok 14 - offline Discord test preflight accepts comma-separated admins and false flags
+2026-11-04T10:27:53.8075699Z   ---
+2026-11-04T10:27:53.8075877Z   duration_ms: 0.240458
+2026-11-04T10:27:53.8076076Z   type: 'test'
+2026-11-04T10:27:53.8076245Z   ...
+2026-11-04T10:27:53.8076582Z # Subtest: offline Discord test preflight does not return credential values
+2026-11-04T10:27:53.8077366Z ok 15 - offline Discord test preflight does not return credential values
+2026-11-04T10:27:53.8077878Z   ---
+2026-11-04T10:27:53.8078044Z   duration_ms: 0.191987
+2026-11-04T10:27:53.8078213Z   type: 'test'
+2026-11-04T10:27:53.8078331Z   ...
+2026-11-04T10:27:53.8078538Z # Subtest: Node runtime check follows application minimum
+2026-11-04T10:27:53.8079016Z ok 16 - Node runtime check follows application minimum
+2026-11-04T10:27:53.8079211Z   ---
+2026-11-04T10:27:53.8079345Z   duration_ms: 0.30074
+2026-11-04T10:27:53.8079476Z   type: 'test'
+2026-11-04T10:27:53.8079697Z   ...
+2026-11-04T10:27:53.8079901Z # Subtest: test path containment rejects parent traversal
+2026-11-04T10:27:53.8080167Z ok 17 - test path containment rejects parent traversal
+2026-11-04T10:27:53.8080358Z   ---
+2026-11-04T10:27:53.8080473Z   duration_ms: 0.334463
+2026-11-04T10:27:53.8080619Z   type: 'test'
+2026-11-04T10:27:53.8080733Z   ...
+2026-11-04T10:27:53.8103626Z # Subtest: read-only settings inspection is restricted to tournament admins
+2026-11-04T10:27:53.8104058Z ok 18 - read-only settings inspection is restricted to tournament admins
+2026-11-04T10:27:53.8104331Z   ---
+2026-11-04T10:27:53.8104512Z   duration_ms: 0.571184
+2026-11-04T10:27:53.8104664Z   type: 'test'
+2026-11-04T10:27:53.8104783Z   ...
+2026-11-04T10:27:53.8105110Z # Subtest: settings mutation and all score/state mutation commands are admin-only
+2026-11-04T10:27:53.8105529Z ok 19 - settings mutation and all score/state mutation commands are admin-only
+2026-11-04T10:27:53.8105825Z   ---
+2026-11-04T10:27:53.8106005Z   duration_ms: 0.144058
+2026-11-04T10:27:53.8106159Z   type: 'test'
+2026-11-04T10:27:53.8106314Z   ...
+2026-11-04T10:27:53.8106598Z # Subtest: public read-only commands remain available to participants
+2026-11-04T10:27:53.8107000Z ok 20 - public read-only commands remain available to participants
+2026-11-04T10:27:53.8107258Z   ---
+2026-11-04T10:27:53.8107427Z   duration_ms: 0.151442
+2026-11-04T10:27:53.8107904Z   type: 'test'
+2026-11-04T10:27:53.8108079Z   ...
+2026-11-04T10:27:53.8108284Z # Subtest: command policy normalizes case and surrounding whitespace
+2026-11-04T10:27:53.8108568Z ok 21 - command policy normalizes case and surrounding whitespace
+2026-11-04T10:27:53.8108944Z   ---
+2026-11-04T10:27:53.8109056Z   duration_ms: 0.09654
+2026-11-04T10:27:53.8109184Z   type: 'test'
+2026-11-04T10:27:53.8109295Z   ...
+2026-11-04T10:27:53.8109397Z 1..21
+2026-11-04T10:27:53.8109506Z # tests 21
+2026-11-04T10:27:53.8109616Z # suites 0
+2026-11-04T10:27:53.8109728Z # pass 21
+2026-11-04T10:27:53.8109836Z # fail 0
+2026-11-04T10:27:53.8109948Z # cancelled 0
+2026-11-04T10:27:53.8110061Z # skipped 0
+2026-11-04T10:27:53.8110169Z # todo 0
+2026-11-04T10:27:53.8110405Z # duration_ms 51.603884
+2026-11-04T10:27:53.8234281Z ##[group]Run npm run preflight:desktop-test
+2026-11-04T10:27:53.8234502Z npm run preflight:desktop-test
+2026-11-04T10:27:53.8251468Z shell: /usr/bin/bash -e {0}
+2026-11-04T10:27:53.8251621Z ##[endgroup]
+2026-11-04T10:27:53.8855481Z 
+2026-11-04T10:27:53.8855910Z > wows-yolo-tourney-discord-bot@2.5.0 preflight:desktop-test
+2026-11-04T10:27:53.8856297Z > node scripts/preflight-desktop-test.js
+2026-11-04T10:27:53.8856416Z 
+2026-11-04T10:27:53.9065307Z [Desktop preflight] PASS: desktop UI is disabled; no OAuth setup or browser listener is required.
+2026-11-04T10:27:53.9237567Z ##[group]Run npm run test:desktop
+2026-11-04T10:27:53.9237878Z npm run test:desktop
+2026-11-04T10:27:53.9254910Z shell: /usr/bin/bash -e {0}
+2026-11-04T10:27:53.9255070Z ##[endgroup]
+2026-11-04T10:27:53.9840210Z 
+2026-11-04T10:27:53.9840659Z > wows-yolo-tourney-discord-bot@2.5.0 test:desktop
+2026-11-04T10:27:53.9841300Z > node --test tests/desktop-service.test.js tests/desktop-bridge.test.js tests/desktop-account-links.test.js tests/desktop-test-preflight.test.js tests/desktop-ui-contract.test.js
+2026-11-04T10:27:53.9841721Z 
+2026-11-04T10:27:54.0170392Z TAP version 13
+2026-11-04T10:27:54.0510370Z # Subtest: Discord account links are unique, survive the private archive, and stay out of workbook exports
+2026-11-04T10:27:54.0545565Z ok 1 - Discord account links are unique, survive the private archive, and stay out of workbook exports
+2026-11-04T10:27:54.0546040Z   ---
+2026-11-04T10:27:54.0546248Z   duration_ms: 2.62604
+2026-11-04T10:27:54.0546468Z   type: 'test'
+2026-11-04T10:27:54.0546760Z   ...
+2026-11-04T10:27:54.0547129Z # Subtest: removing a player removes the associated account link and malformed or duplicate archive links fail closed
+2026-11-04T10:27:54.0547623Z ok 2 - removing a player removes the associated account link and malformed or duplicate archive links fail closed
+2026-11-04T10:27:54.0547921Z   ---
+2026-11-04T10:27:54.0548067Z   duration_ms: 0.551166
+2026-11-04T10:27:54.0548219Z   type: 'test'
+2026-11-04T10:27:54.0548350Z   ...
+2026-11-04T10:27:54.0548944Z # Subtest: public recovery snapshots omit private account links and per-user pending identities while full admin archives retain them
+2026-11-04T10:27:54.0549824Z ok 3 - public recovery snapshots omit private account links and per-user pending identities while full admin archives retain them
+2026-11-04T10:27:54.0550327Z   ---
+2026-11-04T10:27:54.0550513Z   duration_ms: 0.64411
+2026-11-04T10:27:54.0550724Z   type: 'test'
+2026-11-04T10:27:54.0550908Z   ...
+2026-11-04T10:27:54.0831326Z # Subtest: bridge rejects public and non-loopback network bindings
+2026-11-04T10:27:54.0832287Z ok 4 - bridge rejects public and non-loopback network bindings
+2026-11-04T10:27:54.0832758Z   ---
+2026-11-04T10:27:54.0833096Z   duration_ms: 1.209032
+2026-11-04T10:27:54.0833447Z   type: 'test'
+2026-11-04T10:27:54.0833770Z   ...
+2026-11-04T10:27:54.0834233Z # Subtest: image file signature detection and filename sanitation are bounded
+2026-11-04T10:27:54.0834870Z ok 5 - image file signature detection and filename sanitation are bounded
+2026-11-04T10:27:54.0835300Z   ---
+2026-11-04T10:27:54.0835605Z   duration_ms: 0.497606
+2026-11-04T10:27:54.0835939Z   type: 'test'
+2026-11-04T10:27:54.0836252Z   ...
+2026-11-04T10:27:54.1049714Z # Subtest: Discord OAuth state cookie and signed-in session are required
+2026-11-04T10:27:54.1051855Z ok 6 - Discord OAuth state cookie and signed-in session are required
+2026-11-04T10:27:54.1111016Z   ---
+2026-11-04T10:27:54.1149834Z   duration_ms: 52.240239
+2026-11-04T10:27:54.1179422Z   type: 'test'
+2026-11-04T10:27:54.1179753Z   ...
+2026-11-04T10:27:54.1193385Z # [desktop] actor=12345678901234567 role=player action=image-upload accepted
+2026-11-04T10:27:54.1351862Z # Subtest: upload requires same-origin session, CSRF, image signature and bounded body
+2026-11-04T10:27:54.1379834Z ok 7 - upload requires same-origin session, CSRF, image signature and bounded body
+2026-11-04T10:27:54.1409165Z   ---
+2026-11-04T10:27:54.1419277Z   duration_ms: 28.540753
+2026-11-04T10:27:54.1436501Z   type: 'test'
+2026-11-04T10:27:54.1436813Z   ...
+2026-11-04T10:27:54.1479575Z # Subtest: participant cannot access admin static page or call admin endpoints
+2026-11-04T10:27:54.1509492Z ok 8 - participant cannot access admin static page or call admin endpoints
+2026-11-04T10:27:54.1539206Z   ---
+2026-11-04T10:27:54.1569285Z   duration_ms: 20.065478
+2026-11-04T10:27:54.1599285Z   type: 'test'
+2026-11-04T10:27:54.1608471Z   ...
+2026-11-04T10:27:54.1609062Z # [desktop] actor=22345678901234567 role=admin action=player-add accepted
+2026-11-04T10:27:54.1610146Z # [desktop] actor=22345678901234567 role=admin action=player-account-link accepted
+2026-11-04T10:27:54.1610810Z # [desktop] actor=22345678901234567 role=admin action=manual-score-entry accepted
+2026-11-04T10:27:54.1611411Z # [desktop] actor=22345678901234567 role=admin action=scoring-setting accepted
+2026-11-04T10:27:54.1658172Z # Subtest: admin can invoke guarded roster, link, scoring, settings and backup routes
+2026-11-04T10:27:54.1680059Z ok 9 - admin can invoke guarded roster, link, scoring, settings and backup routes
+2026-11-04T10:27:54.1699036Z   ---
+2026-11-04T10:27:54.1699293Z   duration_ms: 16.891908
+2026-11-04T10:27:54.1702588Z   type: 'test'
+2026-11-04T10:27:54.1702785Z   ...
+2026-11-04T10:27:54.1703083Z # Subtest: OAuth callback rejects missing transaction state
+2026-11-04T10:27:54.1703475Z ok 10 - OAuth callback rejects missing transaction state
+2026-11-04T10:27:54.1703738Z   ---
+2026-11-04T10:27:54.1703913Z   duration_ms: 2.90501
+2026-11-04T10:27:54.1704109Z   type: 'test'
+2026-11-04T10:27:54.1704292Z   ...
+2026-11-04T10:27:54.1809927Z # Subtest: desktop role lookup trusts Discord account IDs and administrator-managed roster links
+2026-11-04T10:27:54.1810664Z ok 11 - desktop role lookup trusts Discord account IDs and administrator-managed roster links
+2026-11-04T10:27:54.1811037Z   ---
+2026-11-04T10:27:54.1811227Z   duration_ms: 1.583348
+2026-11-04T10:27:54.1811440Z   type: 'test'
+2026-11-04T10:27:54.1811652Z   ...
+2026-11-04T10:27:54.1812028Z # Subtest: player can view only owned submissions and only their own roster identity
+2026-11-04T10:27:54.1812564Z ok 12 - player can view only owned submissions and only their own roster identity
+2026-11-04T10:27:54.1812900Z   ---
+2026-11-04T10:27:54.1813077Z   duration_ms: 5.575483
+2026-11-04T10:27:54.1813271Z   type: 'test'
+2026-11-04T10:27:54.1813452Z   ...
+2026-11-04T10:27:54.1813838Z # Subtest: mandatory OCR fields remain exact and corrections only fill unresolved values
+2026-11-04T10:27:54.1814420Z ok 13 - mandatory OCR fields remain exact and corrections only fill unresolved values
+2026-11-04T10:27:54.1814776Z   ---
+2026-11-04T10:27:54.1814951Z   duration_ms: 2.848379
+2026-11-04T10:27:54.1815150Z   type: 'test'
+2026-11-04T10:27:54.1815333Z   ...
+2026-11-04T10:27:54.1815716Z # Subtest: a player can map a complete record only to their linked player and valid slot
+2026-11-04T10:27:54.1816258Z ok 14 - a player can map a complete record only to their linked player and valid slot
+2026-11-04T10:27:54.1816587Z   ---
+2026-11-04T10:27:54.1816748Z   duration_ms: 2.321173
+2026-11-04T10:27:54.1816936Z   type: 'test'
+2026-11-04T10:27:54.1817103Z   ...
+2026-11-04T10:27:54.1817439Z # Subtest: desktop mapping clears a matching pending Discord-guided submission
+2026-11-04T10:27:54.1817918Z ok 15 - desktop mapping clears a matching pending Discord-guided submission
+2026-11-04T10:27:54.1818217Z   ---
+2026-11-04T10:27:54.1818382Z   duration_ms: 0.813114
+2026-11-04T10:27:54.1818567Z   type: 'test'
+2026-11-04T10:27:54.1820120Z   ...
+2026-11-04T10:27:54.1820508Z # Subtest: admin can map a screenshot to a different roster player after review
+2026-11-04T10:27:54.1821182Z ok 16 - admin can map a screenshot to a different roster player after review
+2026-11-04T10:27:54.1821598Z   ---
+2026-11-04T10:27:54.1821820Z   duration_ms: 0.604967
+2026-11-04T10:27:54.1822135Z   type: 'test'
+2026-11-04T10:27:54.1822324Z   ...
+2026-11-04T10:27:54.1822655Z # Subtest: participant is denied admin-only roster and scoring changes
+2026-11-04T10:27:54.1823586Z ok 17 - participant is denied admin-only roster and scoring changes
+2026-11-04T10:27:54.1823898Z   ---
+2026-11-04T10:27:54.1824085Z   duration_ms: 0.408551
+2026-11-04T10:27:54.1824303Z   type: 'test'
+2026-11-04T10:27:54.1824495Z   ...
+2026-11-04T10:27:54.1824947Z # Subtest: authenticated Admin backup retains private roster links and pending correction workflows
+2026-11-04T10:27:54.1825645Z ok 18 - authenticated Admin backup retains private roster links and pending correction workflows
+2026-11-04T10:27:54.1826066Z   ---
+2026-11-04T10:27:54.1826482Z   duration_ms: 0.451441
+2026-11-04T10:27:54.1826793Z   type: 'test'
+2026-11-04T10:27:54.1827019Z   ...
+2026-11-04T10:27:54.1827476Z # Subtest: desktop UI is opt-in and disabled configuration needs no OAuth credentials
+2026-11-04T10:27:54.1828087Z ok 19 - desktop UI is opt-in and disabled configuration needs no OAuth credentials
+2026-11-04T10:27:54.1828432Z   ---
+2026-11-04T10:27:54.1828746Z   duration_ms: 0.790301
+2026-11-04T10:27:54.1828960Z   type: 'test'
+2026-11-04T10:27:54.1829135Z   ...
+2026-11-04T10:27:54.1829537Z # Subtest: valid enabled local OAuth configuration passes without exposing credentials
+2026-11-04T10:27:54.1830173Z ok 20 - valid enabled local OAuth configuration passes without exposing credentials
+2026-11-04T10:27:54.1830530Z   ---
+2026-11-04T10:27:54.1830702Z   duration_ms: 0.374427
+2026-11-04T10:27:54.1830913Z   type: 'test'
+2026-11-04T10:27:54.1831127Z   ...
+2026-11-04T10:27:54.1831544Z # Subtest: desktop UI rejects placeholder credentials and missing explicit admins
+2026-11-04T10:27:54.1832083Z ok 21 - desktop UI rejects placeholder credentials and missing explicit admins
+2026-11-04T10:27:54.1832424Z   ---
+2026-11-04T10:27:54.1832617Z   duration_ms: 0.224528
+2026-11-04T10:27:54.1832808Z   type: 'test'
+2026-11-04T10:27:54.1833000Z   ...
+2026-11-04T10:27:54.1833362Z # Subtest: desktop UI rejects non-loopback, mismatched, or query-bearing OAuth redirects
+2026-11-04T10:27:54.1833900Z ok 22 - desktop UI rejects non-loopback, mismatched, or query-bearing OAuth redirects
+2026-11-04T10:27:54.1834192Z   ---
+2026-11-04T10:27:54.1834300Z   duration_ms: 0.234968
+2026-11-04T10:27:54.1834442Z   type: 'test'
+2026-11-04T10:27:54.1834615Z   ...
+2026-11-04T10:27:54.1834925Z # Subtest: desktop UI validates port and every administrator snowflake
+2026-11-04T10:27:54.1835368Z ok 23 - desktop UI validates port and every administrator snowflake
+2026-11-04T10:27:54.1835640Z   ---
+2026-11-04T10:27:54.1835751Z   duration_ms: 0.15033
+2026-11-04T10:27:54.1835903Z   type: 'test'
+2026-11-04T10:27:54.1836019Z   ...
+2026-11-04T10:27:54.1836277Z # Subtest: desktop login, Player, Admin and upload HTML pages are present and link local assets only
+2026-11-04T10:27:54.1836665Z ok 24 - desktop login, Player, Admin and upload HTML pages are present and link local assets only
+2026-11-04T10:27:54.1836898Z   ---
+2026-11-04T10:27:54.1837009Z   duration_ms: 1.31568
+2026-11-04T10:27:54.1837131Z   type: 'test'
+2026-11-04T10:27:54.1837248Z   ...
+2026-11-04T10:27:54.1837523Z # Subtest: desktop browser scripts use only same-origin local APIs and do not contain credentials or webhooks
+2026-11-04T10:27:54.1837950Z ok 25 - desktop browser scripts use only same-origin local APIs and do not contain credentials or webhooks
+2026-11-04T10:27:54.1838200Z   ---
+2026-11-04T10:27:54.1838305Z   duration_ms: 1.65376
+2026-11-04T10:27:54.1838428Z   type: 'test'
+2026-11-04T10:27:54.1838560Z   ...
+2026-11-04T10:27:54.1838995Z # Subtest: upload page supports one image preview, drag and drop, type/size validation and progress
+2026-11-04T10:27:54.1839388Z ok 26 - upload page supports one image preview, drag and drop, type/size validation and progress
+2026-11-04T10:27:54.1839626Z   ---
+2026-11-04T10:27:54.1839737Z   duration_ms: 0.258993
+2026-11-04T10:27:54.1839859Z   type: 'test'
+2026-11-04T10:27:54.1839969Z   ...
+2026-11-04T10:27:54.1840258Z # Subtest: the original workbook and OCR reader HTML baselines remain present and unchanged by desktop derivatives
+2026-11-04T10:27:54.1840835Z ok 27 - the original workbook and OCR reader HTML baselines remain present and unchanged by desktop derivatives
+2026-11-04T10:27:54.1841095Z   ---
+2026-11-04T10:27:54.1841203Z   duration_ms: 0.328842
+2026-11-04T10:27:54.1841327Z   type: 'test'
+2026-11-04T10:27:54.1841437Z   ...
+2026-11-04T10:27:54.1841687Z # Subtest: desktop styles provide narrow-screen layouts without a third-party style dependency
+2026-11-04T10:27:54.1842059Z ok 28 - desktop styles provide narrow-screen layouts without a third-party style dependency
+2026-11-04T10:27:54.1842286Z   ---
+2026-11-04T10:27:54.1842486Z   duration_ms: 0.177451
+2026-11-04T10:27:54.1842610Z   type: 'test'
+2026-11-04T10:27:54.1842718Z   ...
+2026-11-04T10:27:54.1842823Z 1..28
+2026-11-04T10:27:54.1842927Z # tests 28
+2026-11-04T10:27:54.1843035Z # suites 0
+2026-11-04T10:27:54.1843141Z # pass 28
+2026-11-04T10:27:54.1843251Z # fail 0
+2026-11-04T10:27:54.1843360Z # cancelled 0
+2026-11-04T10:27:54.1843473Z # skipped 0
+2026-11-04T10:27:54.1843588Z # todo 0
+2026-11-04T10:27:54.1843705Z # duration_ms 175.197847
+2026-11-04T10:27:54.1946422Z ##[group]Run npm test
+2026-11-04T10:27:54.1946588Z npm test
+2026-11-04T10:27:54.1962523Z shell: /usr/bin/bash -e {0}
+2026-11-04T10:27:54.1962670Z ##[endgroup]
+2026-11-04T10:27:54.2563841Z 
+2026-11-04T10:27:54.2564331Z > wows-yolo-tourney-discord-bot@2.5.0 test
+2026-11-04T10:27:54.2564727Z > node --test "tests/*.test.js"
+2026-11-04T10:27:54.2564885Z 
+2026-11-04T10:27:54.2939673Z TAP version 13
+2026-11-04T10:27:54.3402533Z # Subtest: additional OCR corpus contains all 16 attached images with complete exact-match annotations
+2026-11-04T10:27:54.3426672Z ok 1 - additional OCR corpus contains all 16 attached images with complete exact-match annotations
+2026-11-04T10:27:54.3427142Z   ---
+2026-11-04T10:27:54.3427348Z   duration_ms: 24.31329
+2026-11-04T10:27:54.3427571Z   type: 'test'
+2026-11-04T10:27:54.3427760Z   ...
+2026-11-04T10:27:54.3549932Z # Subtest: XP is mandatory, and missing or invalid XP blocks record acceptance
+2026-11-04T10:27:54.3550781Z ok 2 - XP is mandatory, and missing or invalid XP blocks record acceptance
+2026-11-04T10:27:54.3551433Z   ---
+2026-11-04T10:27:54.3551705Z   duration_ms: 5.129653
+2026-11-04T10:27:54.3551987Z   type: 'test'
+2026-11-04T10:27:54.3552267Z   ...
+2026-11-04T10:27:54.3552681Z # Subtest: recognizes Victory/Defeat and visible result descriptions
+2026-11-04T10:27:54.3553248Z ok 3 - recognizes Victory/Defeat and visible result descriptions
+2026-11-04T10:27:54.3553636Z   ---
+2026-11-04T10:27:54.3553902Z   duration_ms: 0.471207
+2026-11-04T10:27:54.3554183Z   type: 'test'
+2026-11-04T10:27:54.3554519Z   ...
+2026-11-04T10:27:54.3555132Z # Subtest: reads player and ship from the dedicated identity line and stops before adjacent UI text
+2026-11-04T10:27:54.3555876Z ok 4 - reads player and ship from the dedicated identity line and stops before adjacent UI text
+2026-11-04T10:27:54.3556333Z   ---
+2026-11-04T10:27:54.3556591Z   duration_ms: 0.120174
+2026-11-04T10:27:54.3556887Z   type: 'test'
+2026-11-04T10:27:54.3557146Z   ...
+2026-11-04T10:27:54.3557642Z # Subtest: extracts map/mode and validates calendar-correct battle timestamps
+2026-11-04T10:27:54.3558247Z ok 5 - extracts map/mode and validates calendar-correct battle timestamps
+2026-11-04T10:27:54.3558775Z   ---
+2026-11-04T10:27:54.3559039Z   duration_ms: 0.271325
+2026-11-04T10:27:54.3559319Z   type: 'test'
+2026-11-04T10:27:54.3656748Z   ...
+2026-11-04T10:27:54.3657386Z # Subtest: parseBattleStartTime accepts a labeled nine-digit compact date only after strict calendar validation
+2026-11-04T10:27:54.3658167Z ok 6 - parseBattleStartTime accepts a labeled nine-digit compact date only after strict calendar validation
+2026-11-04T10:27:54.3658493Z   ---
+2026-11-04T10:27:54.3658752Z   duration_ms: 0.635784
+2026-11-04T10:27:54.3658910Z   type: 'test'
+2026-11-04T10:27:54.3659033Z   ...
+2026-11-04T10:27:54.3659282Z # Subtest: parseModeMap strips malformed banner fragments and trailing OCR punctuation
+2026-11-04T10:27:54.3659638Z ok 7 - parseModeMap strips malformed banner fragments and trailing OCR punctuation
+2026-11-04T10:27:54.3660253Z   ---
+2026-11-04T10:27:54.3660371Z   duration_ms: 0.196476
+2026-11-04T10:27:54.3660508Z   type: 'test'
+2026-11-04T10:27:54.3660625Z   ...
+2026-11-04T10:27:54.3660875Z # Subtest: parseModeMap removes an inserted lowercase i at a fused title-case map boundary
+2026-11-04T10:27:54.3661233Z ok 8 - parseModeMap removes an inserted lowercase i at a fused title-case map boundary
+2026-11-04T10:27:54.3661458Z   ---
+2026-11-04T10:27:54.3661577Z   duration_ms: 0.121957
+2026-11-04T10:27:54.3661706Z   type: 'test'
+2026-11-04T10:27:54.3661820Z   ...
+2026-11-04T10:27:54.3662080Z # Subtest: normalizes known OCR spacing/truncation artifacts in battle modes and map separators
+2026-11-04T10:27:54.3662587Z ok 9 - normalizes known OCR spacing/truncation artifacts in battle modes and map separators
+2026-11-04T10:27:54.3662939Z   ---
+2026-11-04T10:27:54.3663077Z   duration_ms: 0.421915
+2026-11-04T10:27:54.3663211Z   type: 'test'
+2026-11-04T10:27:54.3663332Z   ...
+2026-11-04T10:27:54.3663887Z # Subtest: builds a complete record from agreeing OCR candidates and does not require ribbons
+2026-11-04T10:27:54.3664260Z ok 10 - builds a complete record from agreeing OCR candidates and does not require ribbons
+2026-11-04T10:27:54.3664489Z   ---
+2026-11-04T10:27:54.3664604Z   duration_ms: 0.900236
+2026-11-04T10:27:54.3664741Z   type: 'test'
+2026-11-04T10:27:54.3664858Z   ...
+2026-11-04T10:27:54.3665137Z # Subtest: disagreement marks only the affected field as missing instead of silently choosing one OCR value
+2026-11-04T10:27:54.3665562Z ok 11 - disagreement marks only the affected field as missing instead of silently choosing one OCR value
+2026-11-04T10:27:54.3665811Z   ---
+2026-11-04T10:27:54.3665923Z   duration_ms: 0.695345
+2026-11-04T10:27:54.3666054Z   type: 'test'
+2026-11-04T10:27:54.3666170Z   ...
+2026-11-04T10:27:54.3666393Z # Subtest: conflicting result, map or identity readings are sent for correction
+2026-11-04T10:27:54.3666715Z ok 12 - conflicting result, map or identity readings are sent for correction
+2026-11-04T10:27:54.3666932Z   ---
+2026-11-04T10:27:54.3667047Z   duration_ms: 0.36515
+2026-11-04T10:27:54.3667185Z   type: 'test'
+2026-11-04T10:27:54.3667305Z   ...
+2026-11-04T10:27:54.3667551Z # Subtest: manual corrections can fill just the missing fields and valid short damage values
+2026-11-04T10:27:54.3667920Z ok 13 - manual corrections can fill just the missing fields and valid short damage values
+2026-11-04T10:27:54.3668153Z   ---
+2026-11-04T10:27:54.3668269Z   duration_ms: 0.344932
+2026-11-04T10:27:54.3668399Z   type: 'test'
+2026-11-04T10:27:54.3668518Z   ...
+2026-11-04T10:27:54.3668853Z # Subtest: correction prompts ask for exactly one missing value at a time
+2026-11-04T10:27:54.3669151Z ok 14 - correction prompts ask for exactly one missing value at a time
+2026-11-04T10:27:54.3669352Z   ---
+2026-11-04T10:27:54.3669464Z   duration_ms: 0.586192
+2026-11-04T10:27:54.3669594Z   type: 'test'
+2026-11-04T10:27:54.3669710Z   ...
+2026-11-04T10:27:54.3669965Z # Subtest: correction prompts never show sample field values or ask for a bulk correction
+2026-11-04T10:27:54.3670321Z ok 15 - correction prompts never show sample field values or ask for a bulk correction
+2026-11-04T10:27:54.3670546Z   ---
+2026-11-04T10:27:54.3670666Z   duration_ms: 0.286393
+2026-11-04T10:27:54.3670796Z   type: 'test'
+2026-11-04T10:27:54.3670914Z   ...
+2026-11-04T10:27:54.3671143Z # Subtest: correction parser accepts labelled fields and rejects malformed values
+2026-11-04T10:27:54.3671468Z ok 16 - correction parser accepts labelled fields and rejects malformed values
+2026-11-04T10:27:54.3671679Z   ---
+2026-11-04T10:27:54.3671794Z   duration_ms: 0.379858
+2026-11-04T10:27:54.3671927Z   type: 'test'
+2026-11-04T10:27:54.3672041Z   ...
+2026-11-04T10:27:54.3672333Z # Subtest: a single high-confidence OCR reading may pass, but a single weak reading is requested for correction
+2026-11-04T10:27:54.3672779Z ok 17 - a single high-confidence OCR reading may pass, but a single weak reading is requested for correction
+2026-11-04T10:27:54.3673154Z   ---
+2026-11-04T10:27:54.3673275Z   duration_ms: 0.815449
+2026-11-04T10:27:54.3673408Z   type: 'test'
+2026-11-04T10:27:54.3673526Z   ...
+2026-11-04T10:27:54.3673735Z # Subtest: missing ribbons are not part of the exact required-field list
+2026-11-04T10:27:54.3674035Z ok 18 - missing ribbons are not part of the exact required-field list
+2026-11-04T10:27:54.3674229Z   ---
+2026-11-04T10:27:54.3674343Z   duration_ms: 0.234657
+2026-11-04T10:27:54.3674474Z   type: 'test'
+2026-11-04T10:27:54.3674592Z   ...
+2026-11-04T10:27:54.3674842Z # Subtest: an invalid manual correction cannot leave a prior guessed required value in place
+2026-11-04T10:27:54.3675211Z ok 19 - an invalid manual correction cannot leave a prior guessed required value in place
+2026-11-04T10:27:54.3675444Z   ---
+2026-11-04T10:27:54.3675557Z   duration_ms: 0.263049
+2026-11-04T10:27:54.3675686Z   type: 'test'
+2026-11-04T10:27:54.3675861Z   ...
+2026-11-04T10:27:54.3676428Z # Subtest: tournament JSON export is stable, typed, and never invents missing tournament inputs
+2026-11-04T10:27:54.3677050Z ok 20 - tournament JSON export is stable, typed, and never invents missing tournament inputs
+2026-11-04T10:27:54.3677439Z   ---
+2026-11-04T10:27:54.3677621Z   duration_ms: 1.349934
+2026-11-04T10:27:54.3677831Z   type: 'test'
+2026-11-04T10:27:54.3678058Z   ...
+2026-11-04T10:27:54.3678473Z # Subtest: desktop upload evidence preserves its provenance marker and cryptographic digest
+2026-11-04T10:27:54.3679205Z ok 21 - desktop upload evidence preserves its provenance marker and cryptographic digest
+2026-11-04T10:27:54.3679577Z   ---
+2026-11-04T10:27:54.3679767Z   duration_ms: 0.205623
+2026-11-04T10:27:54.3679977Z   type: 'test'
+2026-11-04T10:27:54.3680165Z   ...
+2026-11-04T10:27:54.3680617Z # Subtest: ship tier suggestions support Roman numerals through tier XI without claiming class or time
+2026-11-04T10:27:54.3681119Z ok 22 - ship tier suggestions support Roman numerals through tier XI without claiming class or time
+2026-11-04T10:27:54.3681381Z   ---
+2026-11-04T10:27:54.3681510Z   duration_ms: 0.047117
+2026-11-04T10:27:54.3681642Z   type: 'test'
+2026-11-04T10:27:54.3681759Z   ...
+2026-11-04T10:27:54.3682063Z # Subtest: map consensus strips leading result-banner and all-caps OCR debris without using ground-truth map names
+2026-11-04T10:27:54.3682526Z ok 23 - map consensus strips leading result-banner and all-caps OCR debris without using ground-truth map names
+2026-11-04T10:27:54.3682793Z   ---
+2026-11-04T10:27:54.3682907Z   duration_ms: 0.223716
+2026-11-04T10:27:54.3683044Z   type: 'test'
+2026-11-04T10:27:54.3683159Z   ...
+2026-11-04T10:27:54.3683434Z # Subtest: weighted player and cleaned map candidates resolve only OCR debris and common glyph confusion
+2026-11-04T10:27:54.3683852Z ok 24 - weighted player and cleaned map candidates resolve only OCR debris and common glyph confusion
+2026-11-04T10:27:54.3684097Z   ---
+2026-11-04T10:27:54.3684212Z   duration_ms: 0.387992
+2026-11-04T10:27:54.3684345Z   type: 'test'
+2026-11-04T10:27:54.3684463Z   ...
+2026-11-04T10:27:54.3684748Z # Subtest: operation result descriptions identify a primary-task victory without a readable Victory title
+2026-11-04T10:27:54.3685168Z ok 25 - operation result descriptions identify a primary-task victory without a readable Victory title
+2026-11-04T10:27:54.3685416Z   ---
+2026-11-04T10:27:54.3685534Z   duration_ms: 0.179244
+2026-11-04T10:27:54.3685666Z   type: 'test'
+2026-11-04T10:27:54.3685781Z   ...
+2026-11-04T10:27:54.3686018Z # Subtest: a result-description line stating that our team won by points is a victory
+2026-11-04T10:27:54.3686368Z ok 26 - a result-description line stating that our team won by points is a victory
+2026-11-04T10:27:54.3686583Z   ---
+2026-11-04T10:27:54.3686697Z   duration_ms: 0.048851
+2026-11-04T10:27:54.3686828Z   type: 'test'
+2026-11-04T10:27:54.3686941Z   ...
+2026-11-04T10:27:54.3687146Z # Subtest: map cleanup discards leading parenthesized numeric OCR debris
+2026-11-04T10:27:54.3687439Z ok 27 - map cleanup discards leading parenthesized numeric OCR debris
+2026-11-04T10:27:54.3687791Z   ---
+2026-11-04T10:27:54.3687907Z   duration_ms: 0.48314
+2026-11-04T10:27:54.3688038Z   type: 'test'
+2026-11-04T10:27:54.3688157Z   ...
+2026-11-04T10:27:54.3688410Z # Subtest: rejects undecodable replacement characters in OCR metadata and manual corrections
+2026-11-04T10:27:54.3689046Z ok 28 - rejects undecodable replacement characters in OCR metadata and manual corrections
+2026-11-04T10:27:54.3689428Z   ---
+2026-11-04T10:27:54.3689609Z   duration_ms: 0.495412
+2026-11-04T10:27:54.3689817Z   type: 'test'
+2026-11-04T10:27:54.3690006Z   ...
+2026-11-04T10:27:54.3690485Z # Subtest: numeric conversion preserves legitimate zero-valued fields and rejects malformed or unsafe values
+2026-11-04T10:27:54.3691213Z ok 29 - numeric conversion preserves legitimate zero-valued fields and rejects malformed or unsafe values
+2026-11-04T10:27:54.3691645Z   ---
+2026-11-04T10:27:54.3691830Z   duration_ms: 0.080439
+2026-11-04T10:27:54.3692041Z   type: 'test'
+2026-11-04T10:27:54.3692235Z   ...
+2026-11-04T10:27:54.3692791Z # Subtest: regression corpus contains only the three user-approved image URLs
+2026-11-04T10:27:54.3693338Z ok 30 - regression corpus contains only the three user-approved image URLs
+2026-11-04T10:27:54.3693686Z   ---
+2026-11-04T10:27:54.3693874Z   duration_ms: 1.014028
+2026-11-04T10:27:54.3694085Z   type: 'test'
+2026-11-04T10:27:54.3694271Z   ...
+2026-11-04T10:27:54.3694733Z # Subtest: each reference defines every required ground-truth key and marks unconfirmed values honestly
+2026-11-04T10:27:54.3695434Z ok 31 - each reference defines every required ground-truth key and marks unconfirmed values honestly
+2026-11-04T10:27:54.3695838Z   ---
+2026-11-04T10:27:54.3696026Z   duration_ms: 0.23086
+2026-11-04T10:27:54.3696239Z   type: 'test'
+2026-11-04T10:27:54.3696428Z   ...
+2026-11-04T10:27:54.3696819Z # Subtest: reference corpus downloader and runner are present and syntax-testable
+2026-11-04T10:27:54.3697379Z ok 32 - reference corpus downloader and runner are present and syntax-testable
+2026-11-04T10:27:54.3697743Z   ---
+2026-11-04T10:27:54.3697935Z   duration_ms: 0.16683
+2026-11-04T10:27:54.3698147Z   type: 'test'
+2026-11-04T10:27:54.3698335Z   ...
+2026-11-04T10:27:54.3714883Z # Subtest: sparse PSM 11 keeps an independent damage read when the Damage caption is omitted
+2026-11-04T10:27:54.3715760Z ok 33 - sparse PSM 11 keeps an independent damage read when the Damage caption is omitted
+2026-11-04T10:27:54.3716255Z   ---
+2026-11-04T10:27:54.3716562Z   duration_ms: 3.570119
+2026-11-04T10:27:54.3716891Z   type: 'test'
+2026-11-04T10:27:54.3717200Z   ...
+2026-11-04T10:27:54.3717760Z # Subtest: agreeing independent full-screen damage reads override a conflicting focused-crop value
+2026-11-04T10:27:54.3718539Z ok 34 - agreeing independent full-screen damage reads override a conflicting focused-crop value
+2026-11-04T10:27:54.3719227Z   ---
+2026-11-04T10:27:54.3719534Z   duration_ms: 0.297584
+2026-11-04T10:27:54.3719867Z   type: 'test'
+2026-11-04T10:27:54.3720185Z   ...
+2026-11-04T10:27:54.3720680Z # Subtest: conflicting full-screen reads are not resolved by confidence alone
+2026-11-04T10:27:54.3721369Z ok 35 - conflicting full-screen reads are not resolved by confidence alone
+2026-11-04T10:27:54.3721852Z   ---
+2026-11-04T10:27:54.3722165Z   duration_ms: 0.223376
+2026-11-04T10:27:54.3722506Z   type: 'test'
+2026-11-04T10:27:54.3722824Z   ...
+2026-11-04T10:27:54.3723358Z # Subtest: missing full-screen evidence preserves the focused candidate for validation
+2026-11-04T10:27:54.3733241Z ok 36 - missing full-screen evidence preserves the focused candidate for validation
+2026-11-04T10:27:54.3748888Z   ---
+2026-11-04T10:27:54.3749160Z   duration_ms: 0.164156
+2026-11-04T10:27:54.3749401Z   type: 'test'
+2026-11-04T10:27:54.3749597Z   ...
+2026-11-04T10:27:54.3750095Z # Subtest: one extra final digit in a single full-screen read repairs unanimous clipped focused prefixes
+2026-11-04T10:27:54.3750809Z ok 37 - one extra final digit in a single full-screen read repairs unanimous clipped focused prefixes
+2026-11-04T10:27:54.3751548Z   ---
+2026-11-04T10:27:54.3755949Z   duration_ms: 0.205864
+2026-11-04T10:27:54.3756189Z   type: 'test'
+2026-11-04T10:27:54.3756382Z   ...
+2026-11-04T10:27:54.3757638Z # Subtest: prefix repair does not accept low-confidence or non-prefix damage values
+2026-11-04T10:27:54.3758235Z ok 38 - prefix repair does not accept low-confidence or non-prefix damage values
+2026-11-04T10:27:54.3758586Z   ---
+2026-11-04T10:27:54.3761401Z   duration_ms: 0.179805
+2026-11-04T10:27:54.3763065Z   type: 'test'
+2026-11-04T10:27:54.3763262Z   ...
+2026-11-04T10:27:54.3763791Z # Subtest: geometry-bounded crops that stop before adjacent ribbon icons override one appended full-screen icon digit
+2026-11-04T10:27:54.3764562Z ok 39 - geometry-bounded crops that stop before adjacent ribbon icons override one appended full-screen icon digit
+2026-11-04T10:27:54.3765007Z   ---
+2026-11-04T10:27:54.3765194Z   duration_ms: 0.235989
+2026-11-04T10:27:54.3765402Z   type: 'test'
+2026-11-04T10:27:54.3765596Z   ...
+2026-11-04T10:27:54.3766354Z # Subtest: a unique isolated six-digit crop prefix is checked before unanimous seven-digit icon-contaminated full-screen reads
+2026-11-04T10:27:54.3767249Z ok 40 - a unique isolated six-digit crop prefix is checked before unanimous seven-digit icon-contaminated full-screen reads
+2026-11-04T10:27:54.3767741Z   ---
+2026-11-04T10:27:54.3767930Z   duration_ms: 0.130623
+2026-11-04T10:27:54.3768139Z   type: 'test'
+2026-11-04T10:27:54.3768322Z   ...
+2026-11-04T10:27:54.3768907Z # Subtest: focused crop cannot trim a full-screen digit unless it is explicitly marked isolated
+2026-11-04T10:27:54.3769508Z ok 41 - focused crop cannot trim a full-screen digit unless it is explicitly marked isolated
+2026-11-04T10:27:54.3770125Z   ---
+2026-11-04T10:27:54.3770309Z   duration_ms: 0.382703
+2026-11-04T10:27:54.3789350Z   type: 'test'
+2026-11-04T10:27:54.3799363Z   ...
+2026-11-04T10:27:54.3799883Z # Subtest: unique isolated crop quorum can resolve a divergent full-screen read
+2026-11-04T10:27:54.3800552Z ok 42 - unique isolated crop quorum can resolve a divergent full-screen read
+2026-11-04T10:27:54.3800982Z   ---
+2026-11-04T10:27:54.3801274Z   duration_ms: 0.446201
+2026-11-04T10:27:54.3801565Z   type: 'test'
+2026-11-04T10:27:54.3801783Z   ...
+2026-11-04T10:27:54.3802137Z # Subtest: isolated crop quorum rejects repeats that do not span multiple widths and PSMs
+2026-11-04T10:27:54.3802604Z ok 43 - isolated crop quorum rejects repeats that do not span multiple widths and PSMs
+2026-11-04T10:27:54.3802934Z   ---
+2026-11-04T10:27:54.3803153Z   duration_ms: 0.227503
+2026-11-04T10:27:54.3803388Z   type: 'test'
+2026-11-04T10:27:54.3803605Z   ...
+2026-11-04T10:27:54.3804018Z # Subtest: unique isolated crop quorum can recover damage when full-screen OCR has no candidate
+2026-11-04T10:27:54.3804502Z ok 44 - unique isolated crop quorum can recover damage when full-screen OCR has no candidate
+2026-11-04T10:27:54.3804838Z   ---
+2026-11-04T10:27:54.3805059Z   duration_ms: 0.167913
+2026-11-04T10:27:54.3805296Z   type: 'test'
+2026-11-04T10:27:54.3805748Z   ...
+2026-11-04T10:27:54.3806100Z # Subtest: no-full-screen crop quorum stays fail-closed for multiple competing values
+2026-11-04T10:27:54.3806546Z ok 45 - no-full-screen crop quorum stays fail-closed for multiple competing values
+2026-11-04T10:27:54.3806864Z   ---
+2026-11-04T10:27:54.3807100Z   duration_ms: 0.15022
+2026-11-04T10:27:54.3807339Z   type: 'test'
+2026-11-04T10:27:54.3807558Z   ...
+2026-11-04T10:27:54.3807931Z # Subtest: a conflicting valid damage crop prevents the initial plurality from suppressing a sweep
+2026-11-04T10:27:54.3808434Z ok 46 - a conflicting valid damage crop prevents the initial plurality from suppressing a sweep
+2026-11-04T10:27:54.3809014Z   ---
+2026-11-04T10:27:54.3809191Z   duration_ms: 0.232894
+2026-11-04T10:27:54.3809392Z   type: 'test'
+2026-11-04T10:27:54.3809566Z   ...
+2026-11-04T10:27:54.3809926Z # Subtest: unique isolated crop family recovers a leading digit omitted by agreeing full-screen reads
+2026-11-04T10:27:54.3810494Z ok 47 - unique isolated crop family recovers a leading digit omitted by agreeing full-screen reads
+2026-11-04T10:27:54.3810735Z   ---
+2026-11-04T10:27:54.3810845Z   duration_ms: 0.210722
+2026-11-04T10:27:54.3810973Z   type: 'test'
+2026-11-04T10:27:54.3811088Z   ...
+2026-11-04T10:27:54.3811316Z # Subtest: leading-digit recovery stays fail-closed when full-screen values conflict
+2026-11-04T10:27:54.3811658Z ok 48 - leading-digit recovery stays fail-closed when full-screen values conflict
+2026-11-04T10:27:54.3811874Z   ---
+2026-11-04T10:27:54.3811983Z   duration_ms: 0.165598
+2026-11-04T10:27:54.3812146Z   type: 'test'
+2026-11-04T10:27:54.3812324Z   ...
+2026-11-04T10:27:54.3980070Z # Subtest: Discord account links are unique, survive the private archive, and stay out of workbook exports
+2026-11-04T10:27:54.4009715Z ok 49 - Discord account links are unique, survive the private archive, and stay out of workbook exports
+2026-11-04T10:27:54.4024085Z   ---
+2026-11-04T10:27:54.4049361Z   duration_ms: 2.573593
+2026-11-04T10:27:54.4049906Z   type: 'test'
+2026-11-04T10:27:54.4050142Z   ...
+2026-11-04T10:27:54.4051195Z # Subtest: removing a player removes the associated account link and malformed or duplicate archive links fail closed
+2026-11-04T10:27:54.4079761Z ok 50 - removing a player removes the associated account link and malformed or duplicate archive links fail closed
+2026-11-04T10:27:54.4080349Z   ---
+2026-11-04T10:27:54.4080623Z   duration_ms: 0.50471
+2026-11-04T10:27:54.4080931Z   type: 'test'
+2026-11-04T10:27:54.4081190Z   ...
+2026-11-04T10:27:54.4081847Z # Subtest: public recovery snapshots omit private account links and per-user pending identities while full admin archives retain them
+2026-11-04T10:27:54.4082845Z ok 51 - public recovery snapshots omit private account links and per-user pending identities while full admin archives retain them
+2026-11-04T10:27:54.4083437Z   ---
+2026-11-04T10:27:54.4083704Z   duration_ms: 0.676159
+2026-11-04T10:27:54.4083993Z   type: 'test'
+2026-11-04T10:27:54.4084246Z   ...
+2026-11-04T10:27:54.4240490Z # Subtest: bridge rejects public and non-loopback network bindings
+2026-11-04T10:27:54.4307294Z ok 52 - bridge rejects public and non-loopback network bindings
+2026-11-04T10:27:54.4309968Z   ---
+2026-11-04T10:27:54.4310325Z   duration_ms: 1.007517
+2026-11-04T10:27:54.4310722Z   type: 'test'
+2026-11-04T10:27:54.4311026Z   ...
+2026-11-04T10:27:54.4311505Z # Subtest: image file signature detection and filename sanitation are bounded
+2026-11-04T10:27:54.4312135Z ok 53 - image file signature detection and filename sanitation are bounded
+2026-11-04T10:27:54.4312589Z   ---
+2026-11-04T10:27:54.4312890Z   duration_ms: 0.396458
+2026-11-04T10:27:54.4313222Z   type: 'test'
+2026-11-04T10:27:54.4313520Z   ...
+2026-11-04T10:27:54.4570690Z # Subtest: Discord OAuth state cookie and signed-in session are required
+2026-11-04T10:27:54.4630093Z ok 54 - Discord OAuth state cookie and signed-in session are required
+2026-11-04T10:27:54.4679437Z   ---
+2026-11-04T10:27:54.4709479Z   duration_ms: 52.029681
+2026-11-04T10:27:54.4769402Z   type: 'test'
+2026-11-04T10:27:54.4799340Z   ...
+2026-11-04T10:27:54.4898054Z # [desktop] actor=12345678901234567 role=player action=image-upload accepted
+2026-11-04T10:27:54.4992865Z # Subtest: upload requires same-origin session, CSRF, image signature and bounded body
+2026-11-04T10:27:54.5032081Z ok 55 - upload requires same-origin session, CSRF, image signature and bounded body
+2026-11-04T10:27:54.5086918Z   ---
+2026-11-04T10:27:54.5090373Z   duration_ms: 47.165052
+2026-11-04T10:27:54.5149464Z   type: 'test'
+2026-11-04T10:27:54.5159657Z   ...
+2026-11-04T10:27:54.5202971Z # Subtest: participant cannot access admin static page or call admin endpoints
+2026-11-04T10:27:54.5203802Z ok 56 - participant cannot access admin static page or call admin endpoints
+2026-11-04T10:27:54.5244684Z   ---
+2026-11-04T10:27:54.5249756Z   duration_ms: 15.017058
+2026-11-04T10:27:54.5275222Z   type: 'test'
+2026-11-04T10:27:54.5299080Z   ...
+2026-11-04T10:27:54.5329453Z # [desktop] actor=22345678901234567 role=admin action=player-add accepted
+2026-11-04T10:27:54.5333004Z # [desktop] actor=22345678901234567 role=admin action=player-account-link accepted
+2026-11-04T10:27:54.5359315Z # [desktop] actor=22345678901234567 role=admin action=manual-score-entry accepted
+2026-11-04T10:27:54.5360007Z # [desktop] actor=22345678901234567 role=admin action=scoring-setting accepted
+2026-11-04T10:27:54.5459955Z # Subtest: admin can invoke guarded roster, link, scoring, settings and backup routes
+2026-11-04T10:27:54.5461355Z ok 57 - admin can invoke guarded roster, link, scoring, settings and backup routes
+2026-11-04T10:27:54.5475169Z   ---
+2026-11-04T10:27:54.5499272Z   duration_ms: 29.843924
+2026-11-04T10:27:54.5515818Z   type: 'test'
+2026-11-04T10:27:54.5539196Z   ...
+2026-11-04T10:27:54.5569237Z # Subtest: OAuth callback rejects missing transaction state
+2026-11-04T10:27:54.5599360Z ok 58 - OAuth callback rejects missing transaction state
+2026-11-04T10:27:54.5619048Z   ---
+2026-11-04T10:27:54.5646787Z   duration_ms: 9.582206
+2026-11-04T10:27:54.5647222Z   type: 'test'
+2026-11-04T10:27:54.5669532Z   ...
+2026-11-04T10:27:54.5820670Z # Subtest: desktop role lookup trusts Discord account IDs and administrator-managed roster links
+2026-11-04T10:27:54.5849846Z ok 59 - desktop role lookup trusts Discord account IDs and administrator-managed roster links
+2026-11-04T10:27:54.5850489Z   ---
+2026-11-04T10:27:54.5850804Z   duration_ms: 1.275014
+2026-11-04T10:27:54.5851123Z   type: 'test'
+2026-11-04T10:27:54.5851414Z   ...
+2026-11-04T10:27:54.5851876Z # Subtest: player can view only owned submissions and only their own roster identity
+2026-11-04T10:27:54.5852483Z ok 60 - player can view only owned submissions and only their own roster identity
+2026-11-04T10:27:54.5852917Z   ---
+2026-11-04T10:27:54.5853202Z   duration_ms: 3.65679
+2026-11-04T10:27:54.5853515Z   type: 'test'
+2026-11-04T10:27:54.5853813Z   ...
+2026-11-04T10:27:54.5854328Z # Subtest: mandatory OCR fields remain exact and corrections only fill unresolved values
+2026-11-04T10:27:54.5855070Z ok 61 - mandatory OCR fields remain exact and corrections only fill unresolved values
+2026-11-04T10:27:54.5855540Z   ---
+2026-11-04T10:27:54.5855835Z   duration_ms: 2.208713
+2026-11-04T10:27:54.5856153Z   type: 'test'
+2026-11-04T10:27:54.5856437Z   ...
+2026-11-04T10:27:54.5856929Z # Subtest: a player can map a complete record only to their linked player and valid slot
+2026-11-04T10:27:54.5857583Z ok 62 - a player can map a complete record only to their linked player and valid slot
+2026-11-04T10:27:54.5858031Z   ---
+2026-11-04T10:27:54.5858319Z   duration_ms: 1.490856
+2026-11-04T10:27:54.5858788Z   type: 'test'
+2026-11-04T10:27:54.5859078Z   ...
+2026-11-04T10:27:54.5859535Z # Subtest: desktop mapping clears a matching pending Discord-guided submission
+2026-11-04T10:27:54.5860187Z ok 63 - desktop mapping clears a matching pending Discord-guided submission
+2026-11-04T10:27:54.5860622Z   ---
+2026-11-04T10:27:54.5860917Z   duration_ms: 0.712977
+2026-11-04T10:27:54.5861276Z   type: 'test'
+2026-11-04T10:27:54.5861614Z   ...
+2026-11-04T10:27:54.5862121Z # Subtest: admin can map a screenshot to a different roster player after review
+2026-11-04T10:27:54.5862741Z ok 64 - admin can map a screenshot to a different roster player after review
+2026-11-04T10:27:54.5863168Z   ---
+2026-11-04T10:27:54.5863458Z   duration_ms: 0.505031
+2026-11-04T10:27:54.5863774Z   type: 'test'
+2026-11-04T10:27:54.5864064Z   ...
+2026-11-04T10:27:54.5864500Z # Subtest: participant is denied admin-only roster and scoring changes
+2026-11-04T10:27:54.5865078Z ok 65 - participant is denied admin-only roster and scoring changes
+2026-11-04T10:27:54.5865492Z   ---
+2026-11-04T10:27:54.5865784Z   duration_ms: 0.440661
+2026-11-04T10:27:54.5866099Z   type: 'test'
+2026-11-04T10:27:54.5866386Z   ...
+2026-11-04T10:27:54.5866928Z # Subtest: authenticated Admin backup retains private roster links and pending correction workflows
+2026-11-04T10:27:54.5867709Z ok 66 - authenticated Admin backup retains private roster links and pending correction workflows
+2026-11-04T10:27:54.5868569Z   ---
+2026-11-04T10:27:54.5869176Z   duration_ms: 0.411616
+2026-11-04T10:27:54.5870289Z   type: 'test'
+2026-11-04T10:27:54.5870584Z   ...
+2026-11-04T10:27:54.5871066Z # Subtest: desktop UI is opt-in and disabled configuration needs no OAuth credentials
+2026-11-04T10:27:54.5871712Z ok 67 - desktop UI is opt-in and disabled configuration needs no OAuth credentials
+2026-11-04T10:27:54.5872159Z   ---
+2026-11-04T10:27:54.5872506Z   duration_ms: 0.787116
+2026-11-04T10:27:54.5872806Z   type: 'test'
+2026-11-04T10:27:54.5873083Z   ...
+2026-11-04T10:27:54.5873571Z # Subtest: valid enabled local OAuth configuration passes without exposing credentials
+2026-11-04T10:27:54.5874239Z ok 68 - valid enabled local OAuth configuration passes without exposing credentials
+2026-11-04T10:27:54.5874691Z   ---
+2026-11-04T10:27:54.5874983Z   duration_ms: 0.39219
+2026-11-04T10:27:54.5875288Z   type: 'test'
+2026-11-04T10:27:54.5875579Z   ...
+2026-11-04T10:27:54.5876055Z # Subtest: desktop UI rejects placeholder credentials and missing explicit admins
+2026-11-04T10:27:54.5876963Z ok 69 - desktop UI rejects placeholder credentials and missing explicit admins
+2026-11-04T10:27:54.5877432Z   ---
+2026-11-04T10:27:54.5877721Z   duration_ms: 0.203679
+2026-11-04T10:27:54.5878028Z   type: 'test'
+2026-11-04T10:27:54.5878261Z   ...
+2026-11-04T10:27:54.5878751Z # Subtest: desktop UI rejects non-loopback, mismatched, or query-bearing OAuth redirects
+2026-11-04T10:27:54.5879385Z ok 70 - desktop UI rejects non-loopback, mismatched, or query-bearing OAuth redirects
+2026-11-04T10:27:54.5879722Z   ---
+2026-11-04T10:27:54.5879890Z   duration_ms: 0.241069
+2026-11-04T10:27:54.5880078Z   type: 'test'
+2026-11-04T10:27:54.5880250Z   ...
+2026-11-04T10:27:54.5880513Z # Subtest: desktop UI validates port and every administrator snowflake
+2026-11-04T10:27:54.5880783Z ok 71 - desktop UI validates port and every administrator snowflake
+2026-11-04T10:27:54.5880966Z   ---
+2026-11-04T10:27:54.5881078Z   duration_ms: 0.164426
+2026-11-04T10:27:54.5881204Z   type: 'test'
+2026-11-04T10:27:54.5881311Z   ...
+2026-11-04T10:27:54.5881576Z # Subtest: desktop login, Player, Admin and upload HTML pages are present and link local assets only
+2026-11-04T10:27:54.5881954Z ok 72 - desktop login, Player, Admin and upload HTML pages are present and link local assets only
+2026-11-04T10:27:54.5882204Z   ---
+2026-11-04T10:27:54.5882311Z   duration_ms: 1.423271
+2026-11-04T10:27:54.5882432Z   type: 'test'
+2026-11-04T10:27:54.5882542Z   ...
+2026-11-04T10:27:54.5882814Z # Subtest: desktop browser scripts use only same-origin local APIs and do not contain credentials or webhooks
+2026-11-04T10:27:54.5883223Z ok 73 - desktop browser scripts use only same-origin local APIs and do not contain credentials or webhooks
+2026-11-04T10:27:54.5883467Z   ---
+2026-11-04T10:27:54.5883575Z   duration_ms: 1.882646
+2026-11-04T10:27:54.5883695Z   type: 'test'
+2026-11-04T10:27:54.5883805Z   ...
+2026-11-04T10:27:54.5884053Z # Subtest: upload page supports one image preview, drag and drop, type/size validation and progress
+2026-11-04T10:27:54.5884438Z ok 74 - upload page supports one image preview, drag and drop, type/size validation and progress
+2026-11-04T10:27:54.5884666Z   ---
+2026-11-04T10:27:54.5884772Z   duration_ms: 0.221923
+2026-11-04T10:27:54.5884927Z   type: 'test'
+2026-11-04T10:27:54.5885034Z   ...
+2026-11-04T10:27:54.5885318Z # Subtest: the original workbook and OCR reader HTML baselines remain present and unchanged by desktop derivatives
+2026-11-04T10:27:54.5885766Z ok 75 - the original workbook and OCR reader HTML baselines remain present and unchanged by desktop derivatives
+2026-11-04T10:27:54.5886013Z   ---
+2026-11-04T10:27:54.5886119Z   duration_ms: 0.290792
+2026-11-04T10:27:54.5886240Z   type: 'test'
+2026-11-04T10:27:54.5886347Z   ...
+2026-11-04T10:27:54.5886593Z # Subtest: desktop styles provide narrow-screen layouts without a third-party style dependency
+2026-11-04T10:27:54.5886954Z ok 76 - desktop styles provide narrow-screen layouts without a third-party style dependency
+2026-11-04T10:27:54.5887295Z   ---
+2026-11-04T10:27:54.5887408Z   duration_ms: 0.173624
+2026-11-04T10:27:54.5887530Z   type: 'test'
+2026-11-04T10:27:54.5887637Z   ...
+2026-11-04T10:27:54.5887848Z # Subtest: Discord preflight rejects an inaccessible or missing target channel
+2026-11-04T10:27:54.5888147Z ok 77 - Discord preflight rejects an inaccessible or missing target channel
+2026-11-04T10:27:54.5888342Z   ---
+2026-11-04T10:27:54.5888447Z   duration_ms: 0.779242
+2026-11-04T10:27:54.5888572Z   type: 'test'
+2026-11-04T10:27:54.5888841Z   ...
+2026-11-04T10:27:54.5889146Z # Subtest: Discord preflight rejects non-guild and non-sendable channels
+2026-11-04T10:27:54.5889598Z ok 78 - Discord preflight rejects non-guild and non-sendable channels
+2026-11-04T10:27:54.5889894Z   ---
+2026-11-04T10:27:54.5890067Z   duration_ms: 0.228546
+2026-11-04T10:27:54.5890266Z   type: 'test'
+2026-11-04T10:27:54.5890441Z   ...
+2026-11-04T10:27:54.5890739Z # Subtest: Discord preflight rejects unresolved permission state
+2026-11-04T10:27:54.5891168Z ok 79 - Discord preflight rejects unresolved permission state
+2026-11-04T10:27:54.5891617Z   ---
+2026-11-04T10:27:54.5891788Z   duration_ms: 0.129201
+2026-11-04T10:27:54.5891979Z   type: 'test'
+2026-11-04T10:27:54.5892182Z   ...
+2026-11-04T10:27:54.5892552Z # Subtest: Discord preflight passes when all required channel permissions are present
+2026-11-04T10:27:54.5893104Z ok 80 - Discord preflight passes when all required channel permissions are present
+2026-11-04T10:27:54.5893438Z   ---
+2026-11-04T10:27:54.5893609Z   duration_ms: 0.557378
+2026-11-04T10:27:54.5893809Z   type: 'test'
+2026-11-04T10:27:54.5893990Z   ...
+2026-11-04T10:27:54.5894376Z # Subtest: Discord preflight identifies each missing required permission without guessing
+2026-11-04T10:27:54.5895070Z ok 81 - Discord preflight identifies each missing required permission without guessing
+2026-11-04T10:27:54.5895430Z   ---
+2026-11-04T10:27:54.5895605Z   duration_ms: 0.836238
+2026-11-04T10:27:54.5895802Z   type: 'test'
+2026-11-04T10:27:54.5895986Z   ...
+2026-11-04T10:27:54.5896371Z # Subtest: Discord preflight fails closed when a required permission flag is undefined
+2026-11-04T10:27:54.5896916Z ok 82 - Discord preflight fails closed when a required permission flag is undefined
+2026-11-04T10:27:54.5897250Z   ---
+2026-11-04T10:27:54.5897430Z   duration_ms: 0.13989
+2026-11-04T10:27:54.5897629Z   type: 'test'
+2026-11-04T10:27:54.5897809Z   ...
+2026-11-04T10:27:54.5898177Z # Subtest: Discord preflight fails closed when the bot guild member is not resolved
+2026-11-04T10:27:54.5898922Z ok 83 - Discord preflight fails closed when the bot guild member is not resolved
+2026-11-04T10:27:54.5899260Z   ---
+2026-11-04T10:27:54.5899438Z   duration_ms: 1.075272
+2026-11-04T10:27:54.5899640Z   type: 'test'
+2026-11-04T10:27:54.5899818Z   ...
+2026-11-04T10:27:54.5900185Z # Subtest: offline Discord test preflight accepts isolated development configuration
+2026-11-04T10:27:54.5900731Z ok 84 - offline Discord test preflight accepts isolated development configuration
+2026-11-04T10:27:54.5901075Z   ---
+2026-11-04T10:27:54.5901255Z   duration_ms: 4.866796
+2026-11-04T10:27:54.5901459Z   type: 'test'
+2026-11-04T10:27:54.5901635Z   ...
+2026-11-04T10:27:54.5901987Z # Subtest: offline Discord test preflight rejects missing and placeholder tokens
+2026-11-04T10:27:54.5902511Z ok 85 - offline Discord test preflight rejects missing and placeholder tokens
+2026-11-04T10:27:54.5902837Z   ---
+2026-11-04T10:27:54.5903011Z   duration_ms: 0.511807
+2026-11-04T10:27:54.5903208Z   type: 'test'
+2026-11-04T10:27:54.5903390Z   ...
+2026-11-04T10:27:54.5903772Z # Subtest: offline Discord test preflight rejects malformed channel and admin snowflakes
+2026-11-04T10:27:54.5904353Z ok 86 - offline Discord test preflight rejects malformed channel and admin snowflakes
+2026-11-04T10:27:54.5904707Z   ---
+2026-11-04T10:27:54.5904884Z   duration_ms: 4.636752
+2026-11-04T10:27:54.5905086Z   type: 'test'
+2026-11-04T10:27:54.5905268Z   ...
+2026-11-04T10:27:54.5905625Z # Subtest: offline Discord test preflight rejects production and non-JSON storage
+2026-11-04T10:27:54.5906520Z ok 87 - offline Discord test preflight rejects production and non-JSON storage
+2026-11-04T10:27:54.5906854Z   ---
+2026-11-04T10:27:54.5907030Z   duration_ms: 0.235672
+2026-11-04T10:27:54.5907222Z   type: 'test'
+2026-11-04T10:27:54.5907395Z   ...
+2026-11-04T10:27:54.5907785Z # Subtest: offline Discord test preflight rejects state paths outside isolated test directory
+2026-11-04T10:27:54.5908367Z ok 88 - offline Discord test preflight rejects state paths outside isolated test directory
+2026-11-04T10:27:54.5908999Z   ---
+2026-11-04T10:27:54.5909179Z   duration_ms: 0.194401
+2026-11-04T10:27:54.5909376Z   type: 'test'
+2026-11-04T10:27:54.5909548Z   ...
+2026-11-04T10:27:54.5909966Z # Subtest: offline Discord test preflight rejects enabled slash commands and experimental features
+2026-11-04T10:27:54.5910605Z ok 89 - offline Discord test preflight rejects enabled slash commands and experimental features
+2026-11-04T10:27:54.5910980Z   ---
+2026-11-04T10:27:54.5911167Z   duration_ms: 0.205788
+2026-11-04T10:27:54.5911538Z   type: 'test'
+2026-11-04T10:27:54.5911714Z   ...
+2026-11-04T10:27:54.5912099Z # Subtest: offline Discord test preflight accepts comma-separated admins and false flags
+2026-11-04T10:27:54.5912675Z ok 90 - offline Discord test preflight accepts comma-separated admins and false flags
+2026-11-04T10:27:54.5913024Z   ---
+2026-11-04T10:27:54.5913196Z   duration_ms: 0.249954
+2026-11-04T10:27:54.5913396Z   type: 'test'
+2026-11-04T10:27:54.5913570Z   ...
+2026-11-04T10:27:54.5913912Z # Subtest: offline Discord test preflight does not return credential values
+2026-11-04T10:27:54.5914405Z ok 91 - offline Discord test preflight does not return credential values
+2026-11-04T10:27:54.5914721Z   ---
+2026-11-04T10:27:54.5914890Z   duration_ms: 0.172389
+2026-11-04T10:27:54.5915090Z   type: 'test'
+2026-11-04T10:27:54.5915260Z   ...
+2026-11-04T10:27:54.5915535Z # Subtest: Node runtime check follows application minimum
+2026-11-04T10:27:54.5915913Z ok 92 - Node runtime check follows application minimum
+2026-11-04T10:27:54.5916190Z   ---
+2026-11-04T10:27:54.5916368Z   duration_ms: 0.281251
+2026-11-04T10:27:54.5916564Z   type: 'test'
+2026-11-04T10:27:54.5916743Z   ...
+2026-11-04T10:27:54.5917018Z # Subtest: test path containment rejects parent traversal
+2026-11-04T10:27:54.5917396Z ok 93 - test path containment rejects parent traversal
+2026-11-04T10:27:54.5917670Z   ---
+2026-11-04T10:27:54.5917841Z   duration_ms: 0.348642
+2026-11-04T10:27:54.5918040Z   type: 'test'
+2026-11-04T10:27:54.5918215Z   ...
+2026-11-04T10:27:54.7891228Z # Subtest: source evidence hashes the original uploaded bytes and records only compact Discord provenance
+2026-11-04T10:27:54.7891939Z ok 94 - source evidence hashes the original uploaded bytes and records only compact Discord provenance
+2026-11-04T10:27:54.7892250Z   ---
+2026-11-04T10:27:54.7892375Z   duration_ms: 1.343011
+2026-11-04T10:27:54.7892505Z   type: 'test'
+2026-11-04T10:27:54.7892619Z   ...
+2026-11-04T10:27:54.7993118Z # Subtest: Excel Totals!H12 source-of-truth audit matches the clean browser seed and packaged workbook
+2026-11-04T10:27:54.7993883Z ok 95 - Excel Totals!H12 source-of-truth audit matches the clean browser seed and packaged workbook
+2026-11-04T10:27:54.7994291Z   ---
+2026-11-04T10:27:54.7994492Z   duration_ms: 20.937195
+2026-11-04T10:27:54.7994706Z   type: 'test'
+2026-11-04T10:27:54.7994885Z   ...
+2026-11-04T10:27:54.8053492Z # Attempting OCR extraction from large.png by SyntheticTester\#0001.
+2026-11-04T10:27:55.0099643Z # Subtest: complete synthetic Discord tour: all commands, every slot, formulas, persistence, OCR recovery, exports, and clearing
+2026-11-04T10:27:55.0101002Z ok 96 - complete synthetic Discord tour: all commands, every slot, formulas, persistence, OCR recovery, exports, and clearing
+2026-11-04T10:27:55.0101643Z   ---
+2026-11-04T10:27:55.0101973Z   duration_ms: 207.306757
+2026-11-04T10:27:55.0102328Z   type: 'test'
+2026-11-04T10:27:55.0102640Z   ...
+2026-11-04T10:27:55.0103226Z # Executed 25 documented command families; generated 84 slot results and 2 same-channel snapshots.
+2026-11-04T10:27:55.0421938Z # Subtest: 50-player randomized tournament: roster cap, all-player aggregates, dollars and public same-channel commands stay consistent
+2026-11-04T10:27:55.0427979Z ok 97 - 50-player randomized tournament: roster cap, all-player aggregates, dollars and public same-channel commands stay consistent
+2026-11-04T10:27:55.0428795Z   ---
+2026-11-04T10:27:55.0429158Z   duration_ms: 32.091275
+2026-11-04T10:27:55.0429507Z   type: 'test'
+2026-11-04T10:27:55.0430534Z   ...
+2026-11-04T10:27:55.0431374Z # Subtest: public interactive panel renders controls, responds to totals/event selection, and ignores other channels
+2026-11-04T10:27:55.0437707Z ok 98 - public interactive panel renders controls, responds to totals/event selection, and ignores other channels
+2026-11-04T10:27:55.0450364Z   ---
+2026-11-04T10:27:55.0450657Z   duration_ms: 3.739719
+2026-11-04T10:27:55.0450872Z   type: 'test'
+2026-11-04T10:27:55.0451056Z   ...
+2026-11-04T10:27:55.0451704Z # Subtest: interactive panel ignores unsupported and malformed interaction payloads safely
+2026-11-04T10:27:55.0452148Z ok 99 - interactive panel ignores unsupported and malformed interaction payloads safely
+2026-11-04T10:27:55.0452437Z   ---
+2026-11-04T10:27:55.0452625Z   duration_ms: 0.20726
+2026-11-04T10:27:55.0452818Z   type: 'test'
+2026-11-04T10:27:55.0452991Z   ...
+2026-11-04T10:27:55.0453255Z # Subtest: runtime gate accepts Node 22.16.0 and newer stable releases
+2026-11-04T10:27:55.0453599Z ok 100 - runtime gate accepts Node 22.16.0 and newer stable releases
+2026-11-04T10:27:55.0462762Z   ---
+2026-11-04T10:27:55.0463224Z   duration_ms: 0.246178
+2026-11-04T10:27:55.0463451Z   type: 'test'
+2026-11-04T10:27:55.0463641Z   ...
+2026-11-04T10:27:55.6085449Z # Subtest: ImageMagick timeout kills the child and waits for confirmed process close
+2026-11-04T10:27:55.6086380Z ok 101 - ImageMagick timeout kills the child and waits for confirmed process close
+2026-11-04T10:27:55.6087077Z   ---
+2026-11-04T10:27:55.6087359Z   duration_ms: 1015.675195
+2026-11-04T10:27:55.6087624Z   type: 'test'
+2026-11-04T10:27:55.6087816Z   ...
+2026-11-04T10:27:55.6166059Z # Subtest: image dimension guard accepts ordinary WoWS screenshots
+2026-11-04T10:27:55.6195288Z ok 102 - image dimension guard accepts ordinary WoWS screenshots
+2026-11-04T10:27:55.6209866Z   ---
+2026-11-04T10:27:55.6229147Z   duration_ms: 1.314678
+2026-11-04T10:27:55.6247479Z   type: 'test'
+2026-11-04T10:27:55.6247881Z   ...
+2026-11-04T10:27:55.6248526Z # Subtest: image dimension guard rejects invalid, oversized, and decompression-bomb dimensions
+2026-11-04T10:27:55.6249438Z ok 103 - image dimension guard rejects invalid, oversized, and decompression-bomb dimensions
+2026-11-04T10:27:55.6249986Z   ---
+2026-11-04T10:27:55.6250326Z   duration_ms: 13.31198
+2026-11-04T10:27:55.6250689Z   type: 'test'
+2026-11-04T10:27:55.6251019Z   ...
+2026-11-04T10:27:55.6251493Z # Subtest: image dimension limits can be configured explicitly
+2026-11-04T10:27:55.6252070Z ok 104 - image dimension limits can be configured explicitly
+2026-11-04T10:27:55.6252567Z   ---
+2026-11-04T10:27:55.6252903Z   duration_ms: 0.216024
+2026-11-04T10:27:55.6253260Z   type: 'test'
+2026-11-04T10:27:55.6253589Z   ...
+2026-11-04T10:27:55.6254083Z # Subtest: localized parser combines only conventional thousands groups
+2026-11-04T10:27:55.6254723Z ok 105 - localized parser combines only conventional thousands groups
+2026-11-04T10:27:55.6255189Z   ---
+2026-11-04T10:27:55.6255521Z   duration_ms: 0.77489
+2026-11-04T10:27:55.6255870Z   type: 'test'
+2026-11-04T10:27:55.6256194Z   ...
+2026-11-04T10:27:55.6256773Z # Subtest: localized XP parser rejects appended icon digits rather than accepting a false value
+2026-11-04T10:27:55.6257564Z ok 106 - localized XP parser rejects appended icon digits rather than accepting a false value
+2026-11-04T10:27:55.6258104Z   ---
+2026-11-04T10:27:55.6258437Z   duration_ms: 0.131757
+2026-11-04T10:27:55.6258868Z   type: 'test'
+2026-11-04T10:27:55.6259203Z   ...
+2026-11-04T10:27:55.6260161Z # Subtest: localized parser accepts a single isolated field but not ambiguous equally ranked values
+2026-11-04T10:27:55.6261007Z ok 107 - localized parser accepts a single isolated field but not ambiguous equally ranked values
+2026-11-04T10:27:55.6261551Z   ---
+2026-11-04T10:27:55.6261879Z   duration_ms: 0.074371
+2026-11-04T10:27:55.6262227Z   type: 'test'
+2026-11-04T10:27:55.6262550Z   ...
+2026-11-04T10:27:55.6263053Z # Subtest: localized parser rejects unknown fields and invalid reward sizes
+2026-11-04T10:27:55.6263707Z ok 108 - localized parser rejects unknown fields and invalid reward sizes
+2026-11-04T10:27:55.6264183Z   ---
+2026-11-04T10:27:55.6264515Z   duration_ms: 0.225397
+2026-11-04T10:27:55.6264863Z   type: 'test'
+2026-11-04T10:27:55.6265191Z   ...
+2026-11-04T10:27:55.6265816Z # Subtest: reward selection uses localized agreement and never accepts XP from legacy broad candidates alone
+2026-11-04T10:27:55.6266687Z ok 109 - reward selection uses localized agreement and never accepts XP from legacy broad candidates alone
+2026-11-04T10:27:55.6267254Z   ---
+2026-11-04T10:27:55.6267780Z   duration_ms: 0.356043
+2026-11-04T10:27:55.6268128Z   type: 'test'
+2026-11-04T10:27:55.6268455Z   ...
+2026-11-04T10:27:55.6269072Z # Subtest: complete reward tuple fallback requires two distinct agreeing OCR sources
+2026-11-04T10:27:55.6269793Z ok 110 - complete reward tuple fallback requires two distinct agreeing OCR sources
+2026-11-04T10:27:55.6270313Z   ---
+2026-11-04T10:27:55.6270632Z   duration_ms: 0.587329
+2026-11-04T10:27:55.6270983Z   type: 'test'
+2026-11-04T10:27:55.6271306Z   ...
+2026-11-04T10:27:55.6271843Z # Subtest: Credits prefix recovery requires isolated plus two independent broad supports
+2026-11-04T10:27:55.6272556Z ok 111 - Credits prefix recovery requires isolated plus two independent broad supports
+2026-11-04T10:27:55.6273073Z   ---
+2026-11-04T10:27:55.6273397Z   duration_ms: 0.309072
+2026-11-04T10:27:55.6273745Z   type: 'test'
+2026-11-04T10:27:55.6274073Z   ...
+2026-11-04T10:27:55.6274770Z # Subtest: Credits prefix recovery can use a matching reward-band token plus two distinct broad modes when a crop clips the last digit
+2026-11-04T10:27:55.6275740Z ok 112 - Credits prefix recovery can use a matching reward-band token plus two distinct broad modes when a crop clips the last digit
+2026-11-04T10:27:55.6276376Z   ---
+2026-11-04T10:27:55.6276703Z   duration_ms: 0.121602
+2026-11-04T10:27:55.6277060Z   type: 'test'
+2026-11-04T10:27:55.6277384Z   ...
+2026-11-04T10:27:55.6278011Z # Subtest: reward conflict detection requires independent field support and never accepts a value by itself
+2026-11-04T10:27:55.6279775Z ok 113 - reward conflict detection requires independent field support and never accepts a value by itself
+2026-11-04T10:27:55.6280490Z   ---
+2026-11-04T10:27:55.6280840Z   duration_ms: 0.305377
+2026-11-04T10:27:55.6281198Z   type: 'test'
+2026-11-04T10:27:55.6281525Z   ...
+2026-11-04T10:27:55.6282129Z # Subtest: one-digit reward prefix conflicts require independently supported longer or shorter values
+2026-11-04T10:27:55.6282980Z ok 114 - one-digit reward prefix conflicts require independently supported longer or shorter values
+2026-11-04T10:27:55.6283538Z   ---
+2026-11-04T10:27:55.6283861Z   duration_ms: 0.348572
+2026-11-04T10:27:55.6284218Z   type: 'test'
+2026-11-04T10:27:55.6284543Z   ...
+2026-11-04T10:27:55.6285083Z # Subtest: native Tesseract worker termination aborts the active child process promptly
+2026-11-04T10:27:55.6285824Z ok 115 - native Tesseract worker termination aborts the active child process promptly
+2026-11-04T10:27:55.6286336Z   ---
+2026-11-04T10:27:55.6286666Z   duration_ms: 109.56297
+2026-11-04T10:27:55.6287025Z   type: 'test'
+2026-11-04T10:27:55.6287352Z   ...
+2026-11-04T10:27:55.6287899Z # Subtest: NODE_OPTIONS preload paths are quoted and normalized for Windows
+2026-11-04T10:27:55.6288553Z ok 116 - NODE_OPTIONS preload paths are quoted and normalized for Windows
+2026-11-04T10:27:55.6289159Z   ---
+2026-11-04T10:27:55.6289485Z   duration_ms: 0.564816
+2026-11-04T10:27:55.6290031Z   type: 'test'
+2026-11-04T10:27:55.6290354Z   ...
+2026-11-04T10:27:55.6290856Z # Subtest: existing Windows preload is detected with either slash convention
+2026-11-04T10:27:55.6291515Z ok 117 - existing Windows preload is detected with either slash convention
+2026-11-04T10:27:55.6291992Z   ---
+2026-11-04T10:27:55.6292321Z   duration_ms: 0.12709
+2026-11-04T10:27:55.6292673Z   type: 'test'
+2026-11-04T10:27:55.6293005Z   ...
+2026-11-04T10:27:55.6293495Z # Subtest: normalizes thousands separators only after isolating a value
+2026-11-04T10:27:55.6294124Z ok 118 - normalizes thousands separators only after isolating a value
+2026-11-04T10:27:55.6294592Z   ---
+2026-11-04T10:27:55.6294912Z   duration_ms: 1.096061
+2026-11-04T10:27:55.6295257Z   type: 'test'
+2026-11-04T10:27:55.6295583Z   ...
+2026-11-04T10:27:55.6296099Z # Subtest: reads the three reward columns without treating medal counts as rewards
+2026-11-04T10:27:55.6296779Z ok 119 - reads the three reward columns without treating medal counts as rewards
+2026-11-04T10:27:55.6297275Z   ---
+2026-11-04T10:27:55.6297752Z   duration_ms: 0.632987
+2026-11-04T10:27:55.6298102Z   type: 'test'
+2026-11-04T10:27:55.6298426Z   ...
+2026-11-04T10:27:55.6298972Z # Subtest: repairs a Credits chunk contaminated by the coin icon
+2026-11-04T10:27:55.6299545Z ok 120 - repairs a Credits chunk contaminated by the coin icon
+2026-11-04T10:27:55.6299987Z   ---
+2026-11-04T10:27:55.6300310Z   duration_ms: 0.196705
+2026-11-04T10:27:55.6300654Z   type: 'test'
+2026-11-04T10:27:55.6300977Z   ...
+2026-11-04T10:27:55.6301504Z # Subtest: refuses malformed or incomplete reward rows instead of shifting values
+2026-11-04T10:27:55.6302198Z ok 121 - refuses malformed or incomplete reward rows instead of shifting values
+2026-11-04T10:27:55.6302694Z   ---
+2026-11-04T10:27:55.6303016Z   duration_ms: 0.166029
+2026-11-04T10:27:55.6303361Z   type: 'test'
+2026-11-04T10:27:55.6303683Z   ...
+2026-11-04T10:27:55.6304256Z # Subtest: reads damage from a dedicated crop and rejects obviously tiny/incomplete OCR fragments
+2026-11-04T10:27:55.6305052Z ok 122 - reads damage from a dedicated crop and rejects obviously tiny/incomplete OCR fragments
+2026-11-04T10:27:55.6305578Z   ---
+2026-11-04T10:27:55.6305893Z   duration_ms: 0.910754
+2026-11-04T10:27:55.6306239Z   type: 'test'
+2026-11-04T10:27:55.6306554Z   ...
+2026-11-04T10:27:55.6307097Z # Subtest: reward groups ignore following medal / award numbers after the first three values
+2026-11-04T10:27:55.6307811Z ok 123 - reward groups ignore following medal / award numbers after the first three values
+2026-11-04T10:27:55.6308338Z   ---
+2026-11-04T10:27:55.6310921Z   duration_ms: 0.18686
+2026-11-04T10:27:55.6311324Z   type: 'test'
+2026-11-04T10:27:55.6311646Z   ...
+2026-11-04T10:27:55.6312237Z # Subtest: Tesseract.js fallback resolves language, Node worker, and every core asset from local paths
+2026-11-04T10:27:55.6313157Z ok 124 - Tesseract.js fallback resolves language, Node worker, and every core asset from local paths
+2026-11-04T10:27:55.6313712Z   ---
+2026-11-04T10:27:55.6314043Z   duration_ms: 6.882974
+2026-11-04T10:27:55.6314389Z   type: 'test'
+2026-11-04T10:27:55.6314721Z   ...
+2026-11-04T10:27:55.6315255Z # Subtest: Tesseract.js fallback errors clearly when a local language model is unavailable
+2026-11-04T10:27:55.6315987Z ok 125 - Tesseract.js fallback errors clearly when a local language model is unavailable
+2026-11-04T10:27:55.6316497Z   ---
+2026-11-04T10:27:55.6316820Z   duration_ms: 1.294077
+2026-11-04T10:27:55.6317165Z   type: 'test'
+2026-11-04T10:27:55.6317493Z   ...
+2026-11-04T10:27:55.6318110Z # Subtest: OCR benchmark metric definitions count unresolved fields as incorrect and wrong accepted values separately
+2026-11-04T10:27:55.6319174Z ok 126 - OCR benchmark metric definitions count unresolved fields as incorrect and wrong accepted values separately
+2026-11-04T10:27:55.6319764Z   ---
+2026-11-04T10:27:55.6320098Z   duration_ms: 1.370051
+2026-11-04T10:27:55.6320449Z   type: 'test'
+2026-11-04T10:27:55.6320776Z   ...
+2026-11-04T10:27:55.6321317Z # Subtest: missing rows are incomplete and ground truth comes from the approved manifest
+2026-11-04T10:27:55.6322260Z ok 127 - missing rows are incomplete and ground truth comes from the approved manifest
+2026-11-04T10:27:55.6322742Z   ---
+2026-11-04T10:27:55.6323069Z   duration_ms: 0.346558
+2026-11-04T10:27:55.6323417Z   type: 'test'
+2026-11-04T10:27:55.6323739Z   ...
+2026-11-04T10:27:55.6324196Z # Subtest: XP is a mandatory field and an unresolved XP makes the record fail
+2026-11-04T10:27:55.6324829Z ok 128 - XP is a mandatory field and an unresolved XP makes the record fail
+2026-11-04T10:27:55.6325293Z   ---
+2026-11-04T10:27:55.6335411Z   duration_ms: 0.290014
+2026-11-04T10:27:55.6359194Z   type: 'test'
+2026-11-04T10:27:55.6379313Z   ...
+2026-11-04T10:27:55.6380005Z # Subtest: independent supervisor timeout kills child tree and waits for close confirmation
+2026-11-04T10:27:55.6380862Z ok 129 - independent supervisor timeout kills child tree and waits for close confirmation
+2026-11-04T10:27:55.6381413Z   ---
+2026-11-04T10:27:55.6381746Z   duration_ms: 262.034512
+2026-11-04T10:27:55.6382646Z   type: 'test'
+2026-11-04T10:27:55.6382952Z   ...
+2026-11-04T10:27:55.6383475Z # Subtest: serial queue starts recovery task only after timed-out supervised child closes
+2026-11-04T10:27:55.6384307Z ok 130 - serial queue starts recovery task only after timed-out supervised child closes
+2026-11-04T10:27:55.6384791Z   ---
+2026-11-04T10:27:55.6385094Z   duration_ms: 273.169147
+2026-11-04T10:27:55.6385501Z   type: 'test'
+2026-11-04T10:27:55.6385865Z   ...
+2026-11-04T10:27:55.6386424Z # Subtest: OCR reports include reproducible build, engine, language-model and local asset identity
+2026-11-04T10:27:55.6387248Z ok 131 - OCR reports include reproducible build, engine, language-model and local asset identity
+2026-11-04T10:27:55.6387761Z   ---
+2026-11-04T10:27:55.6388068Z   duration_ms: 42.318723
+2026-11-04T10:27:55.6388399Z   type: 'test'
+2026-11-04T10:27:55.6388901Z   ...
+2026-11-04T10:27:55.6389415Z # Subtest: OCR configuration metadata makes optional engine and network feature flags explicit
+2026-11-04T10:27:55.6390075Z ok 132 - OCR configuration metadata makes optional engine and network feature flags explicit
+2026-11-04T10:27:55.6390470Z   ---
+2026-11-04T10:27:55.6390658Z   duration_ms: 0.525006
+2026-11-04T10:27:55.6390874Z   type: 'test'
+2026-11-04T10:27:55.6391055Z   ...
+2026-11-04T10:27:55.6391461Z # Subtest: atomic JSON writer creates nested checkpoint paths and writes parseable JSON
+2026-11-04T10:27:55.6392060Z ok 133 - atomic JSON writer creates nested checkpoint paths and writes parseable JSON
+2026-11-04T10:27:55.6392423Z   ---
+2026-11-04T10:27:55.6392606Z   duration_ms: 6.340713
+2026-11-04T10:27:55.6392814Z   type: 'test'
+2026-11-04T10:27:55.6392995Z   ...
+2026-11-04T10:27:55.6393340Z # Subtest: atomic JSON replacement publishes the newest complete document
+2026-11-04T10:27:55.6393830Z ok 134 - atomic JSON replacement publishes the newest complete document
+2026-11-04T10:27:55.6394154Z   ---
+2026-11-04T10:27:55.6394334Z   duration_ms: 3.772709
+2026-11-04T10:27:55.6394544Z   type: 'test'
+2026-11-04T10:27:55.6394729Z   ...
+2026-11-04T10:27:55.6395143Z # Subtest: serialization failure preserves the previous checkpoint and leaves no temp file
+2026-11-04T10:27:55.6395770Z ok 135 - serialization failure preserves the previous checkpoint and leaves no temp file
+2026-11-04T10:27:55.6396155Z   ---
+2026-11-04T10:27:55.6396336Z   duration_ms: 2.347204
+2026-11-04T10:27:55.6396538Z   type: 'test'
+2026-11-04T10:27:55.6396715Z   ...
+2026-11-04T10:27:55.6397151Z # Subtest: progress record records per-image outcomes without claiming acceptance or resumability
+2026-11-04T10:27:55.6397820Z ok 136 - progress record records per-image outcomes without claiming acceptance or resumability
+2026-11-04T10:27:55.6398212Z   ---
+2026-11-04T10:27:55.6398396Z   duration_ms: 0.513799
+2026-11-04T10:27:55.6398748Z   type: 'test'
+2026-11-04T10:27:55.6398926Z   ...
+2026-11-04T10:27:55.6399325Z # Subtest: OCR operation watchdog confirms thread exit before creating a recovery worker
+2026-11-04T10:27:55.6400151Z ok 137 - OCR operation watchdog confirms thread exit before creating a recovery worker
+2026-11-04T10:27:55.6400517Z   ---
+2026-11-04T10:27:55.6400708Z   duration_ms: 111.805528
+2026-11-04T10:27:55.6400917Z   type: 'test'
+2026-11-04T10:27:55.6401093Z   ...
+2026-11-04T10:27:55.6401480Z # Subtest: OCR watchdog fails closed when worker thread termination cannot be confirmed
+2026-11-04T10:27:55.6402072Z ok 138 - OCR watchdog fails closed when worker thread termination cannot be confirmed
+2026-11-04T10:27:55.6402419Z   ---
+2026-11-04T10:27:55.6402601Z   duration_ms: 199.38075
+2026-11-04T10:27:55.6402818Z   type: 'test'
+2026-11-04T10:27:55.6402999Z   ...
+2026-11-04T10:27:55.6403471Z # Subtest: parameter-update timeout is logged, terminates the old worker, and gates replacement until exit
+2026-11-04T10:27:55.6404177Z ok 139 - parameter-update timeout is logged, terminates the old worker, and gates replacement until exit
+2026-11-04T10:27:55.6404603Z   ---
+2026-11-04T10:27:55.6404783Z   duration_ms: 111.0178
+2026-11-04T10:27:55.6405001Z   type: 'test'
+2026-11-04T10:27:55.6405356Z   ...
+2026-11-04T10:27:56.5963415Z # Subtest: Engine 2 uses HTTPS multipart, apikey header, auto language and word overlay
+2026-11-04T10:27:56.5964037Z ok 140 - Engine 2 uses HTTPS multipart, apikey header, auto language and word overlay
+2026-11-04T10:27:56.5964380Z   ---
+2026-11-04T10:27:56.5964549Z   duration_ms: 11.074735
+2026-11-04T10:27:56.5964683Z   type: 'test'
+2026-11-04T10:27:56.5964800Z   ...
+2026-11-04T10:27:56.5965023Z # Subtest: Engine 3 defaults overlay off and returns no fabricated confidence
+2026-11-04T10:27:56.5965324Z ok 141 - Engine 3 defaults overlay off and returns no fabricated confidence
+2026-11-04T10:27:56.5965524Z   ---
+2026-11-04T10:27:56.5965638Z   duration_ms: 0.261191
+2026-11-04T10:27:56.5965765Z   type: 'test'
+2026-11-04T10:27:56.5965876Z   ...
+2026-11-04T10:27:56.5966186Z # Subtest: client rejects missing key, invalid buffer, unsupported MIME, retired Engine 1 and oversized input before fetch
+2026-11-04T10:27:56.5966699Z ok 142 - client rejects missing key, invalid buffer, unsupported MIME, retired Engine 1 and oversized input before fetch
+2026-11-04T10:27:56.5967342Z   ---
+2026-11-04T10:27:56.5967547Z   duration_ms: 0.488872
+2026-11-04T10:27:56.5967806Z   type: 'test'
+2026-11-04T10:27:56.5967989Z   ...
+2026-11-04T10:27:56.5968358Z # Subtest: 429 is classified with Retry-After and is never retried by this client
+2026-11-04T10:27:56.5969030Z ok 143 - 429 is classified with Retry-After and is never retried by this client
+2026-11-04T10:27:56.5969408Z   ---
+2026-11-04T10:27:56.5969589Z   duration_ms: 0.250255
+2026-11-04T10:27:56.5969828Z   type: 'test'
+2026-11-04T10:27:56.5970004Z   ...
+2026-11-04T10:27:56.5970402Z # Subtest: HTTP, authentication, malformed JSON, provider errors and parse failures are classified
+2026-11-04T10:27:56.5971012Z ok 144 - HTTP, authentication, malformed JSON, provider errors and parse failures are classified
+2026-11-04T10:27:56.5971307Z   ---
+2026-11-04T10:27:56.5971473Z   duration_ms: 0.682342
+2026-11-04T10:27:56.5971680Z   type: 'test'
+2026-11-04T10:27:56.5971816Z   ...
+2026-11-04T10:27:56.5972018Z # Subtest: partial OCR parse returns only successfully parsed result text
+2026-11-04T10:27:56.5972305Z ok 145 - partial OCR parse returns only successfully parsed result text
+2026-11-04T10:27:56.5972496Z   ---
+2026-11-04T10:27:56.5972603Z   duration_ms: 0.243064
+2026-11-04T10:27:56.5972727Z   type: 'test'
+2026-11-04T10:27:56.5972841Z   ...
+2026-11-04T10:27:56.5973028Z # Subtest: timeout is classified without exposing the API key
+2026-11-04T10:27:56.5973271Z ok 146 - timeout is classified without exposing the API key
+2026-11-04T10:27:56.5973443Z   ---
+2026-11-04T10:27:56.5973553Z   duration_ms: 1001.772471
+2026-11-04T10:27:56.5973689Z   type: 'test'
+2026-11-04T10:27:56.5973798Z   ...
+2026-11-04T10:27:56.5980978Z # Subtest: local quotas remain below current provider-published free limits
+2026-11-04T10:27:56.5981290Z ok 147 - local quotas remain below current provider-published free limits
+2026-11-04T10:27:56.5981737Z   ---
+2026-11-04T10:27:56.5981866Z   duration_ms: 1.961441
+2026-11-04T10:27:56.5982004Z   type: 'test'
+2026-11-04T10:27:56.6253991Z   ...
+2026-11-04T10:27:56.6254286Z # Subtest: quota reservations serialize concurrent callers and enforce all quota buckets
+2026-11-04T10:27:56.6254661Z ok 148 - quota reservations serialize concurrent callers and enforce all quota buckets
+2026-11-04T10:27:56.6255070Z   ---
+2026-11-04T10:27:56.6255200Z   duration_ms: 27.332109
+2026-11-04T10:27:56.6255338Z   type: 'test'
+2026-11-04T10:27:56.6255491Z   ...
+2026-11-04T10:27:56.6283652Z # Subtest: corrupt quota ledger fails closed
+2026-11-04T10:27:56.6283994Z ok 149 - corrupt quota ledger fails closed
+2026-11-04T10:27:56.6284236Z   ---
+2026-11-04T10:27:56.6284412Z   duration_ms: 1.630047
+2026-11-04T10:27:56.6284610Z   type: 'test'
+2026-11-04T10:27:56.6284780Z   ...
+2026-11-04T10:27:56.6295044Z # Subtest: provider stays disabled without explicit enablement or a server-side key
+2026-11-04T10:27:56.6295871Z ok 150 - provider stays disabled without explicit enablement or a server-side key
+2026-11-04T10:27:56.6296203Z   ---
+2026-11-04T10:27:56.6296379Z   duration_ms: 0.345748
+2026-11-04T10:27:56.6296576Z   type: 'test'
+2026-11-04T10:27:56.6296748Z   ...
+2026-11-04T10:27:56.6297119Z # Subtest: field evidence submits bounded crops sequentially and stays outside candidates
+2026-11-04T10:27:56.6297671Z ok 151 - field evidence submits bounded crops sequentially and stays outside candidates
+2026-11-04T10:27:56.6297956Z   ---
+2026-11-04T10:27:56.6298071Z   duration_ms: 0.486448
+2026-11-04T10:27:56.6298197Z   type: 'test'
+2026-11-04T10:27:56.6298305Z   ...
+2026-11-04T10:27:56.6298527Z # Subtest: oversized crop is rejected before quota reservation and external request
+2026-11-04T10:27:56.6298992Z ok 152 - oversized crop is rejected before quota reservation and external request
+2026-11-04T10:27:56.6299193Z   ---
+2026-11-04T10:27:56.6299300Z   duration_ms: 0.237505
+2026-11-04T10:27:56.6299421Z   type: 'test'
+2026-11-04T10:27:56.6299537Z   ...
+2026-11-04T10:27:56.6299709Z # Subtest: quota exhaustion stops further provider calls
+2026-11-04T10:27:56.6299937Z ok 153 - quota exhaustion stops further provider calls
+2026-11-04T10:27:56.6300101Z   ---
+2026-11-04T10:27:56.6300206Z   duration_ms: 0.228172
+2026-11-04T10:27:56.6300327Z   type: 'test'
+2026-11-04T10:27:56.6300438Z   ...
+2026-11-04T10:27:56.6300583Z # Subtest: crop cap parser is bounded to seven
+2026-11-04T10:27:56.6300782Z ok 154 - crop cap parser is bounded to seven
+2026-11-04T10:27:56.6300930Z   ---
+2026-11-04T10:27:56.6301041Z   duration_ms: 0.08018
+2026-11-04T10:27:56.6301162Z   type: 'test'
+2026-11-04T10:27:56.6301268Z   ...
+2026-11-04T10:27:56.6354104Z # Subtest: OpenCV geometry rectangles require finite in-bounds integer geometry
+2026-11-04T10:27:56.6354673Z ok 155 - OpenCV geometry rectangles require finite in-bounds integer geometry
+2026-11-04T10:27:56.6355017Z   ---
+2026-11-04T10:27:56.6355201Z   duration_ms: 0.643223
+2026-11-04T10:27:56.6355404Z   type: 'test'
+2026-11-04T10:27:56.6355592Z   ...
+2026-11-04T10:27:56.6356033Z # Subtest: OpenCV proposals are sanitized and invalid, unbounded or weak candidates are discarded
+2026-11-04T10:27:56.6356676Z ok 156 - OpenCV proposals are sanitized and invalid, unbounded or weak candidates are discarded
+2026-11-04T10:27:56.6357056Z   ---
+2026-11-04T10:27:56.6357236Z   duration_ms: 0.880729
+2026-11-04T10:27:56.6357435Z   type: 'test'
+2026-11-04T10:27:56.6357614Z   ...
+2026-11-04T10:27:56.6358030Z # Subtest: OpenCV geometry scaling maps source coordinates proportionally and preserves bounds
+2026-11-04T10:27:56.6358841Z ok 157 - OpenCV geometry scaling maps source coordinates proportionally and preserves bounds
+2026-11-04T10:27:56.6359244Z   ---
+2026-11-04T10:27:56.6359423Z   duration_ms: 0.158928
+2026-11-04T10:27:56.6359625Z   type: 'test'
+2026-11-04T10:27:56.6359803Z   ...
+2026-11-04T10:27:56.6360197Z # Subtest: OpenCV assist is disabled by default without spawning Python or requiring cv2
+2026-11-04T10:27:56.6360779Z ok 158 - OpenCV assist is disabled by default without spawning Python or requiring cv2
+2026-11-04T10:27:56.6361355Z   ---
+2026-11-04T10:27:56.6361532Z   duration_ms: 0.237295
+2026-11-04T10:27:56.6361733Z   type: 'test'
+2026-11-04T10:27:56.6361911Z   ...
+2026-11-04T10:27:56.6362207Z # Subtest: OpenCV assist accepts only explicit opt-in value 1
+2026-11-04T10:27:56.6362624Z ok 159 - OpenCV assist accepts only explicit opt-in value 1
+2026-11-04T10:27:56.6362909Z   ---
+2026-11-04T10:27:56.6363087Z   duration_ms: 30.086154
+2026-11-04T10:27:56.6363298Z   type: 'test'
+2026-11-04T10:27:56.6363472Z   ...
+2026-11-04T10:27:56.6363919Z # Subtest: local OpenCV helper proposes only bounded geometry on an approved screenshot when available
+2026-11-04T10:27:56.6365170Z ok 160 - local OpenCV helper proposes only bounded geometry on an approved screenshot when available # SKIP Optional local Python/OpenCV unavailable: Local OpenCV helper exited (3): OpenCV unavailable: ModuleNotFoundError: No module named 'cv2'
+2026-11-04T10:27:56.6366016Z   ---
+2026-11-04T10:27:56.6366199Z   duration_ms: 21.954235
+2026-11-04T10:27:56.6366538Z   type: 'test'
+2026-11-04T10:27:56.6366724Z   ...
+2026-11-04T10:27:56.6367154Z # Subtest: PaddleOCR benchmark fails closed without local dependencies/models and never tries network
+2026-11-04T10:27:56.6367820Z ok 161 - PaddleOCR benchmark fails closed without local dependencies/models and never tries network
+2026-11-04T10:27:56.6368215Z   ---
+2026-11-04T10:27:56.6368392Z   duration_ms: 50.859552
+2026-11-04T10:27:56.6368814Z   type: 'test'
+2026-11-04T10:27:56.6368993Z   ...
+2026-11-04T10:27:56.6369447Z # Subtest: comparison metrics report exactness, false acceptance, false rejection, review, and crop latency
+2026-11-04T10:27:56.6370141Z ok 162 - comparison metrics report exactness, false acceptance, false rejection, review, and crop latency
+2026-11-04T10:27:56.6370547Z   ---
+2026-11-04T10:27:56.6370723Z   duration_ms: 2.149829
+2026-11-04T10:27:56.6370920Z   type: 'test'
+2026-11-04T10:27:56.6371099Z   ...
+2026-11-04T10:27:56.6371474Z # Subtest: unresolved XP blocks mandatory completeness and requires human review
+2026-11-04T10:27:56.6371980Z ok 163 - unresolved XP blocks mandatory completeness and requires human review
+2026-11-04T10:27:56.6372298Z   ---
+2026-11-04T10:27:56.6372476Z   duration_ms: 0.254851
+2026-11-04T10:27:56.6372678Z   type: 'test'
+2026-11-04T10:27:56.6372853Z   ...
+2026-11-04T10:27:56.6373162Z # Subtest: field-crop PaddleOCR fallback is disabled by default
+2026-11-04T10:27:56.6373605Z ok 164 - field-crop PaddleOCR fallback is disabled by default
+2026-11-04T10:27:56.6373937Z   ---
+2026-11-04T10:27:56.6374114Z   duration_ms: 0.84803
+2026-11-04T10:27:56.6374315Z   type: 'test'
+2026-11-04T10:27:56.6374493Z   ...
+2026-11-04T10:27:56.6374907Z # Subtest: field need selection triggers on unresolved, ambiguous, or contradictory evidence
+2026-11-04T10:27:56.6375525Z ok 165 - field need selection triggers on unresolved, ambiguous, or contradictory evidence
+2026-11-04T10:27:56.6375903Z   ---
+2026-11-04T10:27:56.6376088Z   duration_ms: 4.832797
+2026-11-04T10:27:56.6376289Z   type: 'test'
+2026-11-04T10:27:56.6376470Z   ...
+2026-11-04T10:27:56.6376915Z # Subtest: crop-specific helper errors are preserved in diagnostics rather than hidden as empty OCR
+2026-11-04T10:27:56.6377581Z ok 166 - crop-specific helper errors are preserved in diagnostics rather than hidden as empty OCR
+2026-11-04T10:27:56.6377977Z   ---
+2026-11-04T10:27:56.6378155Z   duration_ms: 0.294842
+2026-11-04T10:27:56.6378359Z   type: 'test'
+2026-11-04T10:27:56.6378537Z   ...
+2026-11-04T10:27:56.6379197Z # Subtest: invalid or non-finite proposed rectangles fail closed
+2026-11-04T10:27:56.6379636Z ok 167 - invalid or non-finite proposed rectangles fail closed
+2026-11-04T10:27:56.6379922Z   ---
+2026-11-04T10:27:56.6380094Z   duration_ms: 0.203445
+2026-11-04T10:27:56.6380330Z   type: 'test'
+2026-11-04T10:27:56.6380505Z   ...
+2026-11-04T10:27:56.6380883Z # Subtest: fallback skips model startup when the image deadline is already exhausted
+2026-11-04T10:27:56.6381465Z ok 168 - fallback skips model startup when the image deadline is already exhausted
+2026-11-04T10:27:56.6382009Z   ---
+2026-11-04T10:27:56.6382183Z   duration_ms: 1.911622
+2026-11-04T10:27:56.6382393Z   type: 'test'
+2026-11-04T10:27:56.6382570Z   ...
+2026-11-04T10:27:56.6382916Z # Subtest: per-crop latency summary reports median, p95, mean, and total
+2026-11-04T10:27:56.6383399Z ok 169 - per-crop latency summary reports median, p95, mean, and total
+2026-11-04T10:27:56.6383722Z   ---
+2026-11-04T10:27:56.6383900Z   duration_ms: 0.499568
+2026-11-04T10:27:56.6384101Z   type: 'test'
+2026-11-04T10:27:56.6384283Z   ...
+2026-11-04T10:27:56.6384674Z # Subtest: helper-reported blocked network attempts fail closed and retain diagnostics
+2026-11-04T10:27:56.6385263Z ok 170 - helper-reported blocked network attempts fail closed and retain diagnostics
+2026-11-04T10:27:56.6385640Z   ---
+2026-11-04T10:27:56.6385816Z   duration_ms: 26.173204
+2026-11-04T10:27:56.6386029Z   type: 'test'
+2026-11-04T10:27:56.6386211Z   ...
+2026-11-04T10:27:56.6386747Z # Subtest: PaddleOCR candidates without a usable score or below the conservative floor are rejected
+2026-11-04T10:27:56.6387383Z ok 171 - PaddleOCR candidates without a usable score or below the conservative floor are rejected
+2026-11-04T10:27:56.6387765Z   ---
+2026-11-04T10:27:56.6387929Z   duration_ms: 0.208833
+2026-11-04T10:27:56.6388112Z   type: 'test'
+2026-11-04T10:27:56.6388275Z   ...
+2026-11-04T10:27:56.6388743Z # Subtest: PaddleOCR raw output cannot independently authorize a result
+2026-11-04T10:27:56.6389235Z ok 172 - PaddleOCR raw output cannot independently authorize a result
+2026-11-04T10:27:56.6389538Z   ---
+2026-11-04T10:27:56.6389710Z   duration_ms: 0.644024
+2026-11-04T10:27:56.6389903Z   type: 'test'
+2026-11-04T10:27:56.6390074Z   ...
+2026-11-04T10:27:56.6390535Z # Subtest: PaddleOCR may corroborate an identical Tesseract candidate through existing parser consensus
+2026-11-04T10:27:56.6391209Z ok 173 - PaddleOCR may corroborate an identical Tesseract candidate through existing parser consensus
+2026-11-04T10:27:56.6391598Z   ---
+2026-11-04T10:27:56.6391778Z   duration_ms: 0.572227
+2026-11-04T10:27:56.6391971Z   type: 'test'
+2026-11-04T10:27:56.6392143Z   ...
+2026-11-04T10:27:56.6392543Z # Subtest: player-only rescue cannot silently change optional ship identity from the same crop
+2026-11-04T10:27:56.6393136Z ok 174 - player-only rescue cannot silently change optional ship identity from the same crop
+2026-11-04T10:27:56.6393495Z   ---
+2026-11-04T10:27:56.6393661Z   duration_ms: 0.22041
+2026-11-04T10:27:56.6393858Z   type: 'test'
+2026-11-04T10:27:56.6394026Z   ...
+2026-11-04T10:27:56.6394398Z # Subtest: PaddleOCR O/0 identity conflict is preserved for human review, not rewritten
+2026-11-04T10:27:56.6394965Z ok 175 - PaddleOCR O/0 identity conflict is preserved for human review, not rewritten
+2026-11-04T10:27:56.6395330Z   ---
+2026-11-04T10:27:56.6395505Z   duration_ms: 0.276524
+2026-11-04T10:27:56.6395709Z   type: 'test'
+2026-11-04T10:27:56.6395879Z   ...
+2026-11-04T10:27:56.6396256Z # Subtest: merged adjacent reward numbers are rejected by the existing field parser
+2026-11-04T10:27:56.6396819Z ok 176 - merged adjacent reward numbers are rejected by the existing field parser
+2026-11-04T10:27:56.6397180Z   ---
+2026-11-04T10:27:56.6397363Z   duration_ms: 0.318918
+2026-11-04T10:27:56.6397575Z   type: 'test'
+2026-11-04T10:27:56.6397760Z   ...
+2026-11-04T10:27:56.6398123Z # Subtest: field crop plan stays bounded and every crop fits the source image
+2026-11-04T10:27:56.6398759Z ok 177 - field crop plan stays bounded and every crop fits the source image
+2026-11-04T10:27:56.6399098Z   ---
+2026-11-04T10:27:56.6399274Z   duration_ms: 0.343434
+2026-11-04T10:27:56.6399476Z   type: 'test'
+2026-11-04T10:27:56.6399656Z   ...
+2026-11-04T10:27:56.6400145Z # Subtest: numeric PaddleOCR candidate only resolves when it agrees with a Tesseract candidate
+2026-11-04T10:27:56.6400788Z ok 178 - numeric PaddleOCR candidate only resolves when it agrees with a Tesseract candidate
+2026-11-04T10:27:56.6401178Z   ---
+2026-11-04T10:27:56.6401506Z   duration_ms: 0.484235
+2026-11-04T10:27:56.6401713Z   type: 'test'
+2026-11-04T10:27:56.6401900Z   ...
+2026-11-04T10:27:56.6402326Z # Subtest: PaddleOCR reward conflict is left unresolved rather than arbitrated by confidence
+2026-11-04T10:27:56.6402962Z ok 179 - PaddleOCR reward conflict is left unresolved rather than arbitrated by confidence
+2026-11-04T10:27:56.6403354Z   ---
+2026-11-04T10:27:56.6403539Z   duration_ms: 0.242343
+2026-11-04T10:27:56.6403748Z   type: 'test'
+2026-11-04T10:27:56.6403933Z   ...
+2026-11-04T10:27:56.6404336Z # Subtest: reward geometry anchors fragmented Hoffmann XP and Free XP to the first fragment
+2026-11-04T10:27:56.6404971Z ok 180 - reward geometry anchors fragmented Hoffmann XP and Free XP to the first fragment
+2026-11-04T10:27:56.6405356Z   ---
+2026-11-04T10:27:56.6405536Z   duration_ms: 2.32394
+2026-11-04T10:27:56.6405745Z   type: 'test'
+2026-11-04T10:27:56.6405923Z   ...
+2026-11-04T10:27:56.6406366Z # Subtest: reward geometry anchors split Libertad rewards and ignores a split Credits tail for XP
+2026-11-04T10:27:56.6407164Z ok 181 - reward geometry anchors split Libertad rewards and ignores a split Credits tail for XP
+2026-11-04T10:27:56.6407572Z   ---
+2026-11-04T10:27:56.6407750Z   duration_ms: 0.31391
+2026-11-04T10:27:56.6407958Z   type: 'test'
+2026-11-04T10:27:56.6408137Z   ...
+2026-11-04T10:27:56.6408512Z # Subtest: reward geometry keeps the XP split separate from Free XP on Schlieffen
+2026-11-04T10:27:56.6409186Z ok 182 - reward geometry keeps the XP split separate from Free XP on Schlieffen
+2026-11-04T10:27:56.6409534Z   ---
+2026-11-04T10:27:56.6409711Z   duration_ms: 0.244106
+2026-11-04T10:27:56.6409915Z   type: 'test'
+2026-11-04T10:27:56.6410099Z   ...
+2026-11-04T10:27:56.6410520Z # Subtest: geometry crops are bounded, distinct, and retain the numeric group
+2026-11-04T10:27:56.6411040Z ok 183 - geometry crops are bounded, distinct, and retain the numeric group
+2026-11-04T10:27:56.6411376Z   ---
+2026-11-04T10:27:56.6411551Z   duration_ms: 0.45397
+2026-11-04T10:27:56.6411757Z   type: 'test'
+2026-11-04T10:27:56.6411944Z   ...
+2026-11-04T10:27:56.6412371Z # Subtest: reward candidate value validation enforces Credits width and numeric XP/Free XP bounds
+2026-11-04T10:27:56.6413034Z ok 184 - reward candidate value validation enforces Credits width and numeric XP/Free XP bounds
+2026-11-04T10:27:56.6413419Z   ---
+2026-11-04T10:27:56.6413593Z   duration_ms: 0.130886
+2026-11-04T10:27:56.6413787Z   type: 'test'
+2026-11-04T10:27:56.6413960Z   ...
+2026-11-04T10:27:56.6414288Z # Subtest: complete Credits token never groups the following XP column
+2026-11-04T10:27:56.6414752Z ok 185 - complete Credits token never groups the following XP column
+2026-11-04T10:27:56.6415059Z   ---
+2026-11-04T10:27:56.6415239Z   duration_ms: 0.097175
+2026-11-04T10:27:56.6415444Z   type: 'test'
+2026-11-04T10:27:56.6415621Z   ...
+2026-11-04T10:27:56.6416074Z # Subtest: single-token Credits adornment gets tighter crop widths without changing acceptance bounds
+2026-11-04T10:27:56.6416753Z ok 186 - single-token Credits adornment gets tighter crop widths without changing acceptance bounds
+2026-11-04T10:27:56.6417153Z   ---
+2026-11-04T10:27:56.6417338Z   duration_ms: 0.268942
+2026-11-04T10:27:56.6417539Z   type: 'test'
+2026-11-04T10:27:56.6417711Z   ...
+2026-11-04T10:27:56.6418151Z # Subtest: split Credits anchor uses grouped adornment text to keep icon digits outside geometry crops
+2026-11-04T10:27:56.6419062Z ok 187 - split Credits anchor uses grouped adornment text to keep icon digits outside geometry crops
+2026-11-04T10:27:56.6419471Z   ---
+2026-11-04T10:27:56.6419648Z   duration_ms: 0.117436
+2026-11-04T10:27:56.6419853Z   type: 'test'
+2026-11-04T10:27:56.6420033Z   ...
+2026-11-04T10:27:56.6420402Z # Subtest: row geometry ignores oversized panel boxes that overlap the reward row
+2026-11-04T10:27:56.6420929Z ok 188 - row geometry ignores oversized panel boxes that overlap the reward row
+2026-11-04T10:27:56.6421237Z   ---
+2026-11-04T10:27:56.6421413Z   duration_ms: 0.213249
+2026-11-04T10:27:56.6421785Z   type: 'test'
+2026-11-04T10:27:56.6421953Z   ...
+2026-11-04T10:27:56.6422346Z # Subtest: misaligned adorned XP geometry expands left while keeping three bounded crop widths
+2026-11-04T10:27:56.6422943Z ok 189 - misaligned adorned XP geometry expands left while keeping three bounded crop widths
+2026-11-04T10:27:56.6423345Z   ---
+2026-11-04T10:27:56.6423517Z   duration_ms: 0.319919
+2026-11-04T10:27:56.6423735Z   type: 'test'
+2026-11-04T10:27:56.6423910Z   ...
+2026-11-04T10:27:56.6424301Z # Subtest: row geometry preserves a reward token that extends below the heading boundary
+2026-11-04T10:27:56.6424920Z ok 190 - row geometry preserves a reward token that extends below the heading boundary
+2026-11-04T10:27:56.6425271Z   ---
+2026-11-04T10:27:56.6425469Z   duration_ms: 0.181081
+2026-11-04T10:27:56.6425665Z   type: 'test'
+2026-11-04T10:27:56.6425860Z   ...
+2026-11-04T10:27:56.6426301Z # Subtest: five-digit XP anchor stays near its measured token and probes narrow icon-boundary widths
+2026-11-04T10:27:56.6427094Z ok 191 - five-digit XP anchor stays near its measured token and probes narrow icon-boundary widths
+2026-11-04T10:27:56.6427498Z   ---
+2026-11-04T10:27:56.6427692Z   duration_ms: 0.129524
+2026-11-04T10:27:56.6427887Z   type: 'test'
+2026-11-04T10:27:56.6428082Z   ...
+2026-11-04T10:27:56.6428575Z # Subtest: misaligned four-digit XP anchor also probes target-aligned crops without widening accepted XP bounds
+2026-11-04T10:27:56.6429522Z ok 192 - misaligned four-digit XP anchor also probes target-aligned crops without widening accepted XP bounds
+2026-11-04T10:27:56.6429959Z   ---
+2026-11-04T10:27:56.6430157Z   duration_ms: 0.633229
+2026-11-04T10:27:56.6430372Z   type: 'test'
+2026-11-04T10:27:56.6430549Z   ...
+2026-11-04T10:27:56.6431024Z # Subtest: Free XP geometry joins a separate leading digit only beside the target-aligned Free XP token
+2026-11-04T10:27:56.6431749Z ok 193 - Free XP geometry joins a separate leading digit only beside the target-aligned Free XP token
+2026-11-04T10:27:56.6432181Z   ---
+2026-11-04T10:27:56.6432388Z   duration_ms: 0.276143
+2026-11-04T10:27:56.6432614Z   type: 'test'
+2026-11-04T10:27:56.6432788Z   ...
+2026-11-04T10:27:56.6433275Z # Subtest: Free XP does not prepend a nearby one-digit token outside the tighter target alignment band
+2026-11-04T10:27:56.6433956Z ok 194 - Free XP does not prepend a nearby one-digit token outside the tighter target alignment band
+2026-11-04T10:27:56.6434356Z   ---
+2026-11-04T10:27:56.6434554Z   duration_ms: 0.077506
+2026-11-04T10:27:56.6434779Z   type: 'test'
+2026-11-04T10:27:56.6434951Z   ...
+2026-11-04T10:27:56.6435378Z # Subtest: short localized XP fragment falls back to a complete adjacent row token group
+2026-11-04T10:27:56.6435987Z ok 195 - short localized XP fragment falls back to a complete adjacent row token group
+2026-11-04T10:27:56.6436358Z   ---
+2026-11-04T10:27:56.6436527Z   duration_ms: 0.049594
+2026-11-04T10:27:56.6436751Z   type: 'test'
+2026-11-04T10:27:56.6436946Z   ...
+2026-11-04T10:27:56.6437331Z # Subtest: short localized Credits fragment can group adjacent thousands-row tokens
+2026-11-04T10:27:56.6437924Z ok 196 - short localized Credits fragment can group adjacent thousands-row tokens
+2026-11-04T10:27:56.6438310Z   ---
+2026-11-04T10:27:56.6438512Z   duration_ms: 0.04649
+2026-11-04T10:27:56.6438828Z   type: 'test'
+2026-11-04T10:27:56.6439029Z   ...
+2026-11-04T10:27:56.6439430Z # Subtest: split four-digit Free XP crops retain the full joined token across three widths
+2026-11-04T10:27:56.6440036Z ok 197 - split four-digit Free XP crops retain the full joined token across three widths
+2026-11-04T10:27:56.6440431Z   ---
+2026-11-04T10:27:56.6440610Z   duration_ms: 0.075973
+2026-11-04T10:27:56.6440831Z   type: 'test'
+2026-11-04T10:27:56.6441009Z   ...
+2026-11-04T10:27:56.6441467Z # Subtest: truncated XP prefixes trigger a geometry repair instead of masquerading as full values
+2026-11-04T10:27:56.6442134Z ok 198 - truncated XP prefixes trigger a geometry repair instead of masquerading as full values
+2026-11-04T10:27:56.6442542Z   ---
+2026-11-04T10:27:56.6450704Z   duration_ms: 0.039139
+2026-11-04T10:27:56.6450951Z   type: 'test'
+2026-11-04T10:27:56.6451130Z   ...
+2026-11-04T10:27:56.6451542Z # Subtest: four-digit XP crop quorum may remove one trailing icon digit from a five-digit anchor
+2026-11-04T10:27:56.6452154Z ok 199 - four-digit XP crop quorum may remove one trailing icon digit from a five-digit anchor
+2026-11-04T10:27:56.6452520Z   ---
+2026-11-04T10:27:56.6452697Z   duration_ms: 0.063144
+2026-11-04T10:27:56.6452895Z   type: 'test'
+2026-11-04T10:27:56.6453074Z   ...
+2026-11-04T10:27:56.6453412Z # Subtest: prefix mismatches in other reward fields remain repair candidates
+2026-11-04T10:27:56.6453897Z ok 200 - prefix mismatches in other reward fields remain repair candidates
+2026-11-04T10:27:56.6454220Z   ---
+2026-11-04T10:27:56.6454388Z   duration_ms: 0.036064
+2026-11-04T10:27:56.6454581Z   type: 'test'
+2026-11-04T10:27:56.6454759Z   ...
+2026-11-04T10:27:56.6455163Z # Subtest: grouped-only fallback prefers fragmented XP geometry over an overlong whole-row token
+2026-11-04T10:27:56.6455946Z ok 201 - grouped-only fallback prefers fragmented XP geometry over an overlong whole-row token
+2026-11-04T10:27:56.6456330Z   ---
+2026-11-04T10:27:56.6456508Z   duration_ms: 0.120911
+2026-11-04T10:27:56.6456707Z   type: 'test'
+2026-11-04T10:27:56.6456883Z   ...
+2026-11-04T10:27:56.6457329Z # Subtest: a six-digit grouped XP anchor keeps the full measured crop extent but remains invalid as a value
+2026-11-04T10:27:56.6457990Z ok 202 - a six-digit grouped XP anchor keeps the full measured crop extent but remains invalid as a value
+2026-11-04T10:27:56.6458377Z   ---
+2026-11-04T10:27:56.6458554Z   duration_ms: 0.185288
+2026-11-04T10:27:56.6458869Z   type: 'test'
+2026-11-04T10:27:56.6459044Z   ...
+2026-11-04T10:27:56.6459403Z # Subtest: six-digit XP is allowed only as geometry, never as an accepted reward value
+2026-11-04T10:27:56.6459930Z ok 203 - six-digit XP is allowed only as geometry, never as an accepted reward value
+2026-11-04T10:27:56.6460259Z   ---
+2026-11-04T10:27:56.6460436Z   duration_ms: 0.085999
+2026-11-04T10:27:56.6460640Z   type: 'test'
+2026-11-04T10:27:56.6460817Z   ...
+2026-11-04T10:27:56.6461217Z # Subtest: split XP geometry keeps adjacent numeric fragments inside two independent crop widths
+2026-11-04T10:27:56.6461866Z ok 204 - split XP geometry keeps adjacent numeric fragments inside two independent crop widths
+2026-11-04T10:27:56.6462238Z   ---
+2026-11-04T10:27:56.6462414Z   duration_ms: 0.080962
+2026-11-04T10:27:56.6462616Z   type: 'test'
+2026-11-04T10:27:56.6462792Z   ...
+2026-11-04T10:27:56.6463242Z # Subtest: split Credits geometry can group a short numeric fragment with an adjacent icon-contaminated tail
+2026-11-04T10:27:56.6463961Z ok 205 - split Credits geometry can group a short numeric fragment with an adjacent icon-contaminated tail
+2026-11-04T10:27:56.6464359Z   ---
+2026-11-04T10:27:56.6464527Z   duration_ms: 0.069594
+2026-11-04T10:27:56.6464744Z   type: 'test'
+2026-11-04T10:27:56.6464922Z   ...
+2026-11-04T10:27:56.6465265Z # Subtest: assigns spatial xN ribbon counts to the closest label, including x101
+2026-11-04T10:27:56.6465751Z ok 206 - assigns spatial xN ribbon counts to the closest label, including x101
+2026-11-04T10:27:56.6465965Z   ---
+2026-11-04T10:27:56.6466077Z   duration_ms: 1.926365
+2026-11-04T10:27:56.6466202Z   type: 'test'
+2026-11-04T10:27:56.6466318Z   ...
+2026-11-04T10:27:56.6466508Z # Subtest: supports x and number rendered as separate OCR tokens
+2026-11-04T10:27:56.6466772Z ok 207 - supports x and number rendered as separate OCR tokens
+2026-11-04T10:27:56.6466957Z   ---
+2026-11-04T10:27:56.6467068Z   duration_ms: 0.15416
+2026-11-04T10:27:56.6467194Z   type: 'test'
+2026-11-04T10:27:56.6467306Z   ...
+2026-11-04T10:27:56.6467594Z # Subtest: missing or ambiguous ribbon counts stay blank; no ribbon data is treated as required-field failure
+2026-11-04T10:27:56.6468026Z ok 208 - missing or ambiguous ribbon counts stay blank; no ribbon data is treated as required-field failure
+2026-11-04T10:27:56.6468282Z   ---
+2026-11-04T10:27:56.6468502Z   duration_ms: 0.244697
+2026-11-04T10:27:56.6468788Z   type: 'test'
+2026-11-04T10:27:56.6468918Z   ...
+2026-11-04T10:27:56.6469147Z # Subtest: ignores count tokens outside the Battle Performance-to-missions strip
+2026-11-04T10:27:56.6469474Z ok 209 - ignores count tokens outside the Battle Performance-to-missions strip
+2026-11-04T10:27:56.6469683Z   ---
+2026-11-04T10:27:56.6469802Z   duration_ms: 0.304596
+2026-11-04T10:27:56.6469929Z   type: 'test'
+2026-11-04T10:27:56.6470043Z   ...
+2026-11-04T10:27:56.6470268Z # Subtest: serial task queue never overlaps jobs and continues after a rejected task
+2026-11-04T10:27:56.6470608Z ok 210 - serial task queue never overlaps jobs and continues after a rejected task
+2026-11-04T10:27:56.6470819Z   ---
+2026-11-04T10:27:56.6470932Z   duration_ms: 47.088514
+2026-11-04T10:27:56.6471067Z   type: 'test'
+2026-11-04T10:27:56.6471182Z   ...
+2026-11-04T10:27:56.6471378Z # Subtest: serial task queue rejects excess pending work explicitly
+2026-11-04T10:27:56.6471658Z ok 211 - serial task queue rejects excess pending work explicitly
+2026-11-04T10:27:56.6471998Z   ---
+2026-11-04T10:27:56.6472112Z   duration_ms: 1.92984
+2026-11-04T10:27:56.6472244Z   type: 'test'
+2026-11-04T10:27:56.6472360Z   ...
+2026-11-04T10:27:56.6472613Z # Subtest: serial task timeout runs cleanup, waits for task cancellation, then allows the next job
+2026-11-04T10:27:56.6472995Z ok 212 - serial task timeout runs cleanup, waits for task cancellation, then allows the next job
+2026-11-04T10:27:56.6473233Z   ---
+2026-11-04T10:27:56.6473347Z   duration_ms: 36.088413
+2026-11-04T10:27:56.6473478Z   type: 'test'
+2026-11-04T10:27:56.6473595Z   ...
+2026-11-04T10:27:56.6473874Z # Subtest: serial task queue fails closed rather than overlapping an operation that ignores timeout cleanup
+2026-11-04T10:27:56.6474294Z ok 213 - serial task queue fails closed rather than overlapping an operation that ignores timeout cleanup
+2026-11-04T10:27:56.6474546Z   ---
+2026-11-04T10:27:56.6474657Z   duration_ms: 70.95859
+2026-11-04T10:27:56.6474787Z   type: 'test'
+2026-11-04T10:27:56.6474904Z   ...
+2026-11-04T10:27:56.6475129Z # Subtest: serial task queue fails closed if timeout cleanup itself never settles
+2026-11-04T10:27:56.6475450Z ok 214 - serial task queue fails closed if timeout cleanup itself never settles
+2026-11-04T10:27:56.6475660Z   ---
+2026-11-04T10:27:56.6475773Z   duration_ms: 65.439124
+2026-11-04T10:27:56.6475902Z   type: 'test'
+2026-11-04T10:27:56.6476017Z   ...
+2026-11-04T10:27:56.6476295Z # (node:3138) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+2026-11-04T10:27:56.6476650Z # (Use `node --trace-warnings ...` to show where the warning was created)
+2026-11-04T10:27:56.6476982Z # Subtest: SQLite store creates schema, persists atomically, mirrors JSON, and reopens
+2026-11-04T10:27:56.6477330Z ok 215 - SQLite store creates schema, persists atomically, mirrors JSON, and reopens
+2026-11-04T10:27:56.6477550Z   ---
+2026-11-04T10:27:56.6477669Z   duration_ms: 225.300258
+2026-11-04T10:27:56.6477812Z   type: 'test'
+2026-11-04T10:27:56.6477928Z   ...
+2026-11-04T10:27:56.6478178Z # Subtest: SQLite store migrates a legacy JSON tournament state without deleting the source
+2026-11-04T10:27:56.6478546Z ok 216 - SQLite store migrates a legacy JSON tournament state without deleting the source
+2026-11-04T10:27:56.6478910Z   ---
+2026-11-04T10:27:56.6479022Z   duration_ms: 6.13952
+2026-11-04T10:27:56.6479150Z   type: 'test'
+2026-11-04T10:27:56.6479268Z   ...
+2026-11-04T10:27:56.6479479Z # Subtest: SQLite store refuses to open a database created by a newer schema
+2026-11-04T10:27:56.6479780Z ok 217 - SQLite store refuses to open a database created by a newer schema
+2026-11-04T10:27:56.6479984Z   ---
+2026-11-04T10:27:56.6480095Z   duration_ms: 4.069874
+2026-11-04T10:27:56.6480223Z   type: 'test'
+2026-11-04T10:27:56.6480341Z   ...
+2026-11-04T10:27:56.6480622Z # Subtest: SQLite queued saves preserve invocation-time snapshots and full 50-player archive round-trips
+2026-11-04T10:27:56.6481046Z ok 218 - SQLite queued saves preserve invocation-time snapshots and full 50-player archive round-trips
+2026-11-04T10:27:56.6481398Z   ---
+2026-11-04T10:27:56.6481510Z   duration_ms: 56.627632
+2026-11-04T10:27:56.6481640Z   type: 'test'
+2026-11-04T10:27:56.6481756Z   ...
+2026-11-04T10:27:56.6482047Z # Subtest: SQLite durable commit succeeds and remains recoverable when the optional JSON mirror cannot be written
+2026-11-04T10:27:56.6482489Z ok 219 - SQLite durable commit succeeds and remains recoverable when the optional JSON mirror cannot be written
+2026-11-04T10:27:56.6482755Z   ---
+2026-11-04T10:27:56.6482865Z   duration_ms: 6.754444
+2026-11-04T10:27:56.6482992Z   type: 'test'
+2026-11-04T10:27:56.6483105Z   ...
+2026-11-04T10:27:56.6483330Z # Subtest: exact-match acceptance rejects a deliberately incorrect expected value
+2026-11-04T10:27:56.6483834Z ok 220 - exact-match acceptance rejects a deliberately incorrect expected value
+2026-11-04T10:27:56.6484174Z   ---
+2026-11-04T10:27:56.6484363Z   duration_ms: 0.556503
+2026-11-04T10:27:56.6484541Z   type: 'test'
+2026-11-04T10:27:56.6484653Z   ...
+2026-11-04T10:27:56.6484966Z # Subtest: exact-match acceptance rejects missing or incomplete required fields
+2026-11-04T10:27:56.6485285Z ok 221 - exact-match acceptance rejects missing or incomplete required fields
+2026-11-04T10:27:56.6485490Z   ---
+2026-11-04T10:27:56.6485603Z   duration_ms: 0.129945
+2026-11-04T10:27:56.6485730Z   type: 'test'
+2026-11-04T10:27:56.6485840Z   ...
+2026-11-04T10:27:56.6486031Z # Subtest: acceptance gate passes only complete exact-match rows
+2026-11-04T10:27:56.6486298Z ok 222 - acceptance gate passes only complete exact-match rows
+2026-11-04T10:27:56.6486479Z   ---
+2026-11-04T10:27:56.6486589Z   duration_ms: 0.161331
+2026-11-04T10:27:56.6486716Z   type: 'test'
+2026-11-04T10:27:56.6486827Z   ...
+2026-11-04T10:27:56.6487147Z # Subtest: real negative control requires an exact nine-field baseline and the injected damage expectation as the sole mismatch
+2026-11-04T10:27:56.6487652Z ok 223 - real negative control requires an exact nine-field baseline and the injected damage expectation as the sole mismatch
+2026-11-04T10:27:56.6487937Z   ---
+2026-11-04T10:27:56.6488049Z   duration_ms: 0.405137
+2026-11-04T10:27:56.6488177Z   type: 'test'
+2026-11-04T10:27:56.6488288Z   ...
+2026-11-04T10:27:56.6488546Z # Subtest: all nine fields are required; an XP mismatch or omitted XP fails the mandatory comparison
+2026-11-04T10:27:56.6489396Z ok 224 - all nine fields are required; an XP mismatch or omitted XP fails the mandatory comparison
+2026-11-04T10:27:56.6489777Z   ---
+2026-11-04T10:27:56.6489955Z   duration_ms: 0.642763
+2026-11-04T10:27:56.6490154Z   type: 'test'
+2026-11-04T10:27:56.6490413Z   ...
+2026-11-04T10:27:56.6490796Z # Subtest: read-only settings inspection is restricted to tournament admins
+2026-11-04T10:27:56.6491428Z ok 225 - read-only settings inspection is restricted to tournament admins
+2026-11-04T10:27:56.6491700Z   ---
+2026-11-04T10:27:56.6491837Z   duration_ms: 0.64093
+2026-11-04T10:27:56.6491961Z   type: 'test'
+2026-11-04T10:27:56.6492080Z   ...
+2026-11-04T10:27:56.6492308Z # Subtest: settings mutation and all score/state mutation commands are admin-only
+2026-11-04T10:27:56.6492632Z ok 226 - settings mutation and all score/state mutation commands are admin-only
+2026-11-04T10:27:56.6492842Z   ---
+2026-11-04T10:27:56.6492951Z   duration_ms: 0.121472
+2026-11-04T10:27:56.6493076Z   type: 'test'
+2026-11-04T10:27:56.6493185Z   ...
+2026-11-04T10:27:56.6493389Z # Subtest: public read-only commands remain available to participants
+2026-11-04T10:27:56.6493670Z ok 227 - public read-only commands remain available to participants
+2026-11-04T10:27:56.6493856Z   ---
+2026-11-04T10:27:56.6493968Z   duration_ms: 0.103535
+2026-11-04T10:27:56.6494092Z   type: 'test'
+2026-11-04T10:27:56.6494203Z   ...
+2026-11-04T10:27:56.6494399Z # Subtest: command policy normalizes case and surrounding whitespace
+2026-11-04T10:27:56.6494675Z ok 228 - command policy normalizes case and surrounding whitespace
+2026-11-04T10:27:56.6494861Z   ---
+2026-11-04T10:27:56.6495082Z   duration_ms: 0.062414
+2026-11-04T10:27:56.6495210Z   type: 'test'
+2026-11-04T10:27:56.6495320Z   ...
+2026-11-04T10:27:56.6495541Z # Subtest: new state has all four rounds with seven empty slots and workbook defaults
+2026-11-04T10:27:56.6495872Z ok 229 - new state has all four rounds with seven empty slots and workbook defaults
+2026-11-04T10:27:56.6496082Z   ---
+2026-11-04T10:27:56.6496190Z   duration_ms: 1.286206
+2026-11-04T10:27:56.6496319Z   type: 'test'
+2026-11-04T10:27:56.6496429Z   ...
+2026-11-04T10:27:56.6496697Z # Subtest: Grand Yolo tier-weight default matches Excel d4!F10 and old tierPower imports preserve 0.9
+2026-11-04T10:27:56.6497100Z ok 230 - Grand Yolo tier-weight default matches Excel d4!F10 and old tierPower imports preserve 0.9
+2026-11-04T10:27:56.6497341Z   ---
+2026-11-04T10:27:56.6497486Z   duration_ms: 0.222263
+2026-11-04T10:27:56.6497683Z   type: 'test'
+2026-11-04T10:27:56.6497859Z   ...
+2026-11-04T10:27:56.6498259Z # Subtest: damage scoring follows workbook formula and recalculates against the whole roster
+2026-11-04T10:27:56.6499091Z ok 231 - damage scoring follows workbook formula and recalculates against the whole roster
+2026-11-04T10:27:56.6499507Z   ---
+2026-11-04T10:27:56.6499683Z   duration_ms: 0.725507
+2026-11-04T10:27:56.6499882Z   type: 'test'
+2026-11-04T10:27:56.6500064Z   ...
+2026-11-04T10:27:56.6500415Z # Subtest: manual result entry validates fields and blocks accidental overwrites
+2026-11-04T10:27:56.6500924Z ok 232 - manual result entry validates fields and blocks accidental overwrites
+2026-11-04T10:27:56.6501250Z   ---
+2026-11-04T10:27:56.6501419Z   duration_ms: 0.388582
+2026-11-04T10:27:56.6501615Z   type: 'test'
+2026-11-04T10:27:56.6501786Z   ...
+2026-11-04T10:27:56.6502246Z # Subtest: Grand Yolo requires positive time and scores using the workbook Grand formula
+2026-11-04T10:27:56.6502797Z ok 233 - Grand Yolo requires positive time and scores using the workbook Grand formula
+2026-11-04T10:27:56.6503141Z   ---
+2026-11-04T10:27:56.6503316Z   duration_ms: 0.591125
+2026-11-04T10:27:56.6503515Z   type: 'test'
+2026-11-04T10:27:56.6503693Z   ...
+2026-11-04T10:27:56.6503981Z # Subtest: settings, standings, and workbook backup round-trip
+2026-11-04T10:27:56.6504378Z ok 234 - settings, standings, and workbook backup round-trip
+2026-11-04T10:27:56.6504651Z   ---
+2026-11-04T10:27:56.6504824Z   duration_ms: 0.603003
+2026-11-04T10:27:56.6505019Z   type: 'test'
+2026-11-04T10:27:56.6505192Z   ...
+2026-11-04T10:27:56.6505454Z # Subtest: persistent JSON store saves and reloads state
+2026-11-04T10:27:56.6505819Z ok 235 - persistent JSON store saves and reloads state
+2026-11-04T10:27:56.6506078Z   ---
+2026-11-04T10:27:56.6506246Z   duration_ms: 7.155285
+2026-11-04T10:27:56.6506443Z   type: 'test'
+2026-11-04T10:27:56.6506617Z   ...
+2026-11-04T10:27:56.6506915Z # Subtest: rename preserves score data and rejects duplicate names
+2026-11-04T10:27:56.6507336Z ok 236 - rename preserves score data and rejects duplicate names
+2026-11-04T10:27:56.6507622Z   ---
+2026-11-04T10:27:56.6507794Z   duration_ms: 0.345437
+2026-11-04T10:27:56.6507989Z   type: 'test'
+2026-11-04T10:27:56.6508167Z   ...
+2026-11-04T10:27:56.6508572Z # Subtest: clear event and all-results reset preserve roster and settings while making slots empty
+2026-11-04T10:27:56.6509302Z ok 237 - clear event and all-results reset preserve roster and settings while making slots empty
+2026-11-04T10:27:56.6509674Z   ---
+2026-11-04T10:27:56.6509846Z   duration_ms: 0.641601
+2026-11-04T10:27:56.6510043Z   type: 'test'
+2026-11-04T10:27:56.6510221Z   ...
+2026-11-04T10:27:56.6510626Z # Subtest: full archive round-trip preserves OCR pending corrections and mapping queue
+2026-11-04T10:27:56.6511181Z ok 238 - full archive round-trip preserves OCR pending corrections and mapping queue
+2026-11-04T10:27:56.6511532Z   ---
+2026-11-04T10:27:56.6511707Z   duration_ms: 0.469163
+2026-11-04T10:27:56.6511905Z   type: 'test'
+2026-11-04T10:27:56.6512080Z   ...
+2026-11-04T10:27:56.6512397Z # Subtest: store can recover from a full Discord archive snapshot file
+2026-11-04T10:27:56.6512969Z ok 239 - store can recover from a full Discord archive snapshot file
+2026-11-04T10:27:56.6513268Z   ---
+2026-11-04T10:27:56.6513443Z   duration_ms: 2.333965
+2026-11-04T10:27:56.6513640Z   type: 'test'
+2026-11-04T10:27:56.6513814Z   ...
+2026-11-04T10:27:56.6514251Z # Subtest: randomized 50-player tournament aggregate matches Excel-style G12/H12 unrounded aggregation
+2026-11-04T10:27:56.6514907Z ok 240 - randomized 50-player tournament aggregate matches Excel-style G12/H12 unrounded aggregation
+2026-11-04T10:27:56.6515296Z   ---
+2026-11-04T10:27:56.6515472Z   duration_ms: 5.005596
+2026-11-04T10:27:56.6515674Z   type: 'test'
+2026-11-04T10:27:56.6515849Z   ...
+2026-11-04T10:27:56.6516185Z # Subtest: cross-platform ImageMagick process timeout confirms child close
+2026-11-04T10:27:56.6516676Z ok 241 - cross-platform ImageMagick process timeout confirms child close
+2026-11-04T10:27:56.6516993Z   ---
+2026-11-04T10:27:56.6517169Z   duration_ms: 257.89635
+2026-11-04T10:27:56.6517408Z   type: 'test'
+2026-11-04T10:27:56.6517588Z   ...
+2026-11-04T10:27:56.6518003Z # Subtest: cross-platform native OCR cancellation confirms child close
+2026-11-04T10:27:56.6518452Z ok 242 - cross-platform native OCR cancellation confirms child close
+2026-11-04T10:27:56.6518884Z   ---
+2026-11-04T10:27:56.6519057Z   duration_ms: 103.418368
+2026-11-04T10:27:56.6519263Z   type: 'test'
+2026-11-04T10:27:56.6519441Z   ...
+2026-11-04T10:27:56.6519821Z # Subtest: all nine user-designated fields are required; ribbons and auxiliary metadata are optional
+2026-11-04T10:27:56.6520219Z ok 243 - all nine user-designated fields are required; ribbons and auxiliary metadata are optional
+2026-11-04T10:27:56.6520462Z   ---
+2026-11-04T10:27:56.6520572Z   duration_ms: 0.966216
+2026-11-04T10:27:56.6520695Z   type: 'test'
+2026-11-04T10:27:56.6520811Z   ...
+2026-11-04T10:27:56.6521058Z # Subtest: bot uses OCR-value validation and has no visual-color or signature accept/reject gate
+2026-11-04T10:27:56.6521432Z ok 244 - bot uses OCR-value validation and has no visual-color or signature accept/reject gate
+2026-11-04T10:27:56.6521679Z   ---
+2026-11-04T10:27:56.6521788Z   duration_ms: 0.461121
+2026-11-04T10:27:56.6521911Z   type: 'test'
+2026-11-04T10:27:56.6522022Z   ...
+2026-11-04T10:27:56.6522316Z # Subtest: result and damage recovery crops include left-edge values on scaled result screens
+2026-11-04T10:27:56.6522910Z ok 245 - result and damage recovery crops include left-edge values on scaled result screens
+2026-11-04T10:27:56.6523275Z   ---
+2026-11-04T10:27:56.6523450Z   duration_ms: 0.292128
+2026-11-04T10:27:56.6523595Z   type: 'test'
+2026-11-04T10:27:56.6523775Z   ...
+2026-11-04T10:27:56.6524215Z # Subtest: optional ship, result description, and ribbon data do not hold up a complete nine-field report
+2026-11-04T10:27:56.6524753Z ok 246 - optional ship, result description, and ribbon data do not hold up a complete nine-field report
+2026-11-04T10:27:56.6525001Z   ---
+2026-11-04T10:27:56.6525117Z   duration_ms: 3.443066
+2026-11-04T10:27:56.6525247Z   type: 'test'
+2026-11-04T10:27:56.6525358Z   ...
+2026-11-04T10:27:56.6525557Z # Subtest: live bot asks for one plain correction value at a time
+2026-11-04T10:27:56.6525824Z ok 247 - live bot asks for one plain correction value at a time
+2026-11-04T10:27:56.6526006Z   ---
+2026-11-04T10:27:56.6526118Z   duration_ms: 0.756222
+2026-11-04T10:27:56.6526244Z   type: 'test'
+2026-11-04T10:27:56.6526353Z   ...
+2026-11-04T10:27:56.6526559Z # Subtest: each corrected required value advances to the next missing field
+2026-11-04T10:27:56.6526862Z ok 248 - each corrected required value advances to the next missing field
+2026-11-04T10:27:56.6527060Z   ---
+2026-11-04T10:27:56.6527169Z   duration_ms: 1.770281
+2026-11-04T10:27:56.6527296Z   type: 'test'
+2026-11-04T10:27:56.6527405Z   ...
+2026-11-04T10:27:56.6527657Z # Subtest: completed OCR reports export a structured JSON attachment for the tournament importer
+2026-11-04T10:27:56.6528043Z ok 249 - completed OCR reports export a structured JSON attachment for the tournament importer
+2026-11-04T10:27:56.6528399Z   ---
+2026-11-04T10:27:56.6528516Z   duration_ms: 0.436854
+2026-11-04T10:27:56.6528783Z   type: 'test'
+2026-11-04T10:27:56.6528927Z   ...
+2026-11-04T10:27:56.6529201Z # Subtest: unified bot includes tournament admin, result, missing-slot, standings, and recovery commands
+2026-11-04T10:27:56.6529609Z ok 250 - unified bot includes tournament admin, result, missing-slot, standings, and recovery commands
+2026-11-04T10:27:56.6529852Z   ---
+2026-11-04T10:27:56.6529962Z   duration_ms: 0.906308
+2026-11-04T10:27:56.6530085Z   type: 'test'
+2026-11-04T10:27:56.6530195Z   ...
+2026-11-04T10:27:56.6530418Z # Subtest: unfinished OCR correction state is persisted and rehydrated at startup
+2026-11-04T10:27:56.6530745Z ok 251 - unfinished OCR correction state is persisted and rehydrated at startup
+2026-11-04T10:27:56.6530954Z   ---
+2026-11-04T10:27:56.6531061Z   duration_ms: 0.376744
+2026-11-04T10:27:56.6531188Z   type: 'test'
+2026-11-04T10:27:56.6531298Z   ...
+2026-11-04T10:27:56.6531650Z # Subtest: bot serializes screenshot and tournament-mapping conversations to avoid mixing answers
+2026-11-04T10:27:56.6532045Z ok 252 - bot serializes screenshot and tournament-mapping conversations to avoid mixing answers
+2026-11-04T10:27:56.6532284Z   ---
+2026-11-04T10:27:56.6532394Z   duration_ms: 0.302854
+2026-11-04T10:27:56.6532521Z   type: 'test'
+2026-11-04T10:27:56.6532632Z   ...
+2026-11-04T10:27:56.6532893Z # Subtest: OCR extraction is serialized end-to-end with bounded backlog and explicit timeout handling
+2026-11-04T10:27:56.6533291Z ok 253 - OCR extraction is serialized end-to-end with bounded backlog and explicit timeout handling
+2026-11-04T10:27:56.6533530Z   ---
+2026-11-04T10:27:56.6533637Z   duration_ms: 0.308502
+2026-11-04T10:27:56.6533762Z   type: 'test'
+2026-11-04T10:27:56.6533876Z   ...
+2026-11-04T10:27:56.6534154Z # Subtest: OCR attachment download is inside the bounded queue and unsafe timeout recovery fails closed
+2026-11-04T10:27:56.6534557Z ok 254 - OCR attachment download is inside the bounded queue and unsafe timeout recovery fails closed
+2026-11-04T10:27:56.6534807Z   ---
+2026-11-04T10:27:56.6534915Z   duration_ms: 0.729503
+2026-11-04T10:27:56.6535039Z   type: 'test'
+2026-11-04T10:27:56.6535149Z   ...
+2026-11-04T10:27:56.6535249Z 1..254
+2026-11-04T10:27:56.6535355Z # tests 254
+2026-11-04T10:27:56.6535466Z # suites 0
+2026-11-04T10:27:56.6535577Z # pass 253
+2026-11-04T10:27:56.6535685Z # fail 0
+2026-11-04T10:27:56.6535793Z # cancelled 0
+2026-11-04T10:27:56.6535908Z # skipped 1
+2026-11-04T10:27:56.6536017Z # todo 0
+2026-11-04T10:27:56.6536138Z # duration_ms 2358.761484
+2026-11-04T10:27:56.6716532Z Post job cleanup.
+2026-11-04T10:27:56.7459251Z Cache hit occurred on the primary key node-cache-Linux-x64-npm-03486af4a95cade82a15fff375e011631c4d8cd06160f783366abc5596791eaf, not saving cache.
+2026-11-04T10:27:56.7755400Z Post job cleanup.
+2026-11-04T10:27:56.8321018Z [command]/usr/bin/git version
+2026-11-04T10:27:56.8362733Z git version 2.56.0
+2026-11-04T10:27:56.8386850Z Temporarily overriding HOME='/home/runner/work/_temp/04047629-3806-44ba-8920-e40fcf39e0d8' before making global git config changes
+2026-11-04T10:27:56.8387575Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-04T10:27:56.8390476Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/braultDwBotVis/braultDwBotVis
+2026-11-04T10:27:56.8419622Z Removing SSH command configuration
+2026-11-04T10:27:56.8423951Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-04T10:27:56.8464004Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-04T10:27:56.8668751Z Removing HTTP extra header
+2026-11-04T10:27:56.8673743Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-04T10:27:56.8712775Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-04T10:27:56.8934870Z Removing includeIf entries pointing to credentials config files
+2026-11-04T10:27:56.8941655Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-04T10:27:56.8985801Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-04T10:27:56.9297159Z Cleaning up orphan processes

@@ -117,3 +117,10 @@ No real Discord login, OAuth flow, browser image upload, local visual QA, Window
 
 Historical package in File Library:
 DWBOT_COMPLETE_DOWNLOAD_KIT_2026-11-03.zip — 175,126,438 bytes; SHA-256 7f5984ecbcd8009110b98f283e20b7d5fc5b840e2a5c08a5ad4f436959387c25; 472-file manifest / 108,083,848 bytes; rehashed and unzip integrity tested. The original ZIP is not a GitHub blob because it exceeds the 100 MB single-file limit. Checksum sidecar and historical manifest remain in repository.
+
+
+## Final handoff package and CI verification — 2026-11-04
+
+Final docs/inventory package commit: f6b60d45f647d09b60355c6460bb0554d20939ed. CI on that exact commit succeeded: https://github.com/pbrau014/braultDwBotVis/actions/runs/41814316145. Node 22.16.0 Linux: OCR.space 15/15; Discord preflight 21/21; desktop 28/28; full test 254 total / 253 passed / 0 failed / 1 skipped (optional cv2 helper). Full job log: reports/ci/2026-11-04-41814316145-final-branch-log.txt.
+
+The full end-to-end current guide is DWBOT_PROJECT_COMPLETE_HANDOFF_2026-11-04.txt. The exact branch inventory is docs/inventory/DWBOT_GIT_TREE_INVENTORY_2026-11-04.json. Last main SHA observed: e2fbcfbf680a8d40691a76d1be94aae29325016f; no main write was made.
