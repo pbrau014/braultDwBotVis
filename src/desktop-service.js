@@ -310,6 +310,94 @@ function createDesktopService(options = {}) {
         return night;
       });
     },
+    async createYoloTeam(principal,eventNightId,body={}) {
+      role(principal,['admin']);
+      return mutate(async()=>{
+        const current=state(),night=(current.eventNights || []).find(item=>item.id===eventNightId);
+        if(!night) throw Object.assign(new Error('Event night was not found.'),{status:404,code:'EVENT_NIGHT_NOT_FOUND'});
+        const participantIds=(body.participantIds || []).map(id=>String(id));
+        const registered=new Set((night.registrations || []).map(item=>String(item.participantId)));
+        if(participantIds.some(id=>!registered.has(id)))
+          throw Object.assign(new Error('Every team member must be registered for this event night.'),{status:409,code:'TEAM_MEMBER_NOT_REGISTERED'});
+        const alreadyAssigned=new Set((night.teams || []).flatMap(team=>team.participantIds || []));
+        if(participantIds.some(id=>alreadyAssigned.has(id)))
+          throw Object.assign(new Error('A participant can belong to only one team in this event night.'),{status:409,code:'PARTICIPANT_ALREADY_ASSIGNED'});
+        const team=YoloFormats.createTeam({...body,eventNightId});
+        if((night.teams || []).some(item=>item.id===team.id)) throw Object.assign(new Error('Team ID already exists.'),{status:409,code:'DUPLICATE_TEAM'});
+        night.teams.push(team);await options.saveState();return team;
+      });
+    },
+    async createYoloFixture(principal,eventNightId,body={}) {
+      role(principal,['admin']);
+      return mutate(async()=>{
+        const current=state(),night=(current.eventNights || []).find(item=>item.id===eventNightId);
+        if(!night) throw Object.assign(new Error('Event night was not found.'),{status:404,code:'EVENT_NIGHT_NOT_FOUND'});
+        const teams=new Set((night.teams || []).map(team=>team.id));
+        if(!teams.has(body.homeTeamId)||!teams.has(body.awayTeamId))
+          throw Object.assign(new Error('Both fixture teams must belong to this event night.'),{status:400,code:'FIXTURE_TEAM_SCOPE'});
+        const fixture=YoloFormats.createFixture({...body,eventNightId});
+        if(night.fixtures.some(item=>item.id===fixture.id)) throw Object.assign(new Error('Fixture ID already exists.'),{status:409,code:'DUPLICATE_FIXTURE'});
+        night.fixtures.push(fixture);await options.saveState();return fixture;
+      });
+    },
+    async createYoloMatch(principal,fixtureId,body={}) {
+      role(principal,['admin']);
+      return mutate(async()=>{
+        const current=state(),night=(current.eventNights || []).find(item=>(item.fixtures || []).some(f=>f.id===fixtureId));
+        if(!night) throw Object.assign(new Error('Fixture was not found.'),{status:404,code:'FIXTURE_NOT_FOUND'});
+        const fixture=night.fixtures.find(item=>item.id===fixtureId);
+        const match=YoloFormats.createMatch({...body,fixtureId});
+        if((night.matches || []).some(item=>item.id===match.id)||fixture.matchIds.includes(match.id))
+          throw Object.assign(new Error('Match ID already exists.'),{status:409,code:'DUPLICATE_MATCH'});
+        if(fixture.matchIds.length>=fixture.seriesLength) throw Object.assign(new Error('Fixture already has its full series of matches.'),{status:409,code:'SERIES_COMPLETE'});
+        night.matches.push(match);fixture.matchIds.push(match.id);await options.saveState();return match;
+      });
+    },
+    async createYoloGame(principal,matchId,body={}) {
+      role(principal,['admin']);
+      return mutate(async()=>{
+        const current=state(),night=(current.eventNights || []).find(item=>(item.matches || []).some(m=>m.id===matchId));
+        if(!night) throw Object.assign(new Error('Match was not found.'),{status:404,code:'MATCH_NOT_FOUND'});
+        const match=night.matches.find(item=>item.id===matchId);
+        const game=YoloFormats.createGame({...body,matchId});
+        if((night.games || []).some(item=>item.id===game.id)||match.gameIds.includes(game.id))
+          throw Object.assign(new Error('Game ID already exists.'),{status:409,code:'DUPLICATE_GAME'});
+        if(match.gameIds.some(id=>night.games.find(item=>item.id===id)?.gameNumber===game.gameNumber))
+          throw Object.assign(new Error('Game number already exists in this match.'),{status:409,code:'DUPLICATE_GAME_NUMBER'});
+        night.games.push(game);match.gameIds.push(game.id);await options.saveState();return game;
+      });
+    },
+    async linkYoloGameEvidence(principal,gameId,body={}) {
+      role(principal,['admin']);
+      return mutate(async()=>{
+        const current=state(),night=(current.eventNights || []).find(item=>(item.games || []).some(g=>g.id===gameId));
+        if(!night) throw Object.assign(new Error('Game was not found.'),{status:404,code:'GAME_NOT_FOUND'});
+        const game=night.games.find(item=>item.id===gameId),entry=current.battleRecords.find(item=>item.record_id===body.recordId);
+        if(!entry||entry.status!=='mapped'||entry.missing_fields?.length)
+          throw Object.assign(new Error('Only complete, mapped screenshot records can be linked as game evidence.'),{status:409,code:'EVIDENCE_NOT_ACCEPTED'});
+        if(night.games.some(other=>other.id!==game.id&&(other.evidenceRecordIds || []).includes(entry.record_id)))
+          throw Object.assign(new Error('This evidence record is already linked to another game.'),{status:409,code:'EVIDENCE_ALREADY_LINKED'});
+        game.evidenceRecordIds ||= [];
+        if(!game.evidenceRecordIds.includes(entry.record_id))game.evidenceRecordIds.push(entry.record_id);
+        game.status='awaiting-evidence-review';
+        game.evidenceReview={status:'pending',linkedBy:principal.discordUserId,linkedAt:new Date().toISOString()};
+        await options.saveState();return {gameId,evidenceRecordId:entry.record_id,status:game.status};
+      });
+    },
+    async reviewYoloGameEvidence(principal,gameId,body={}) {
+      role(principal,['admin']);
+      return mutate(async()=>{
+        const current=state(),night=(current.eventNights || []).find(item=>(item.games || []).some(g=>g.id===gameId));
+        if(!night) throw Object.assign(new Error('Game was not found.'),{status:404,code:'GAME_NOT_FOUND'});
+        const game=night.games.find(item=>item.id===gameId);
+        if(game.status!=='awaiting-evidence-review'||!game.evidenceRecordIds?.length)
+          throw Object.assign(new Error('Game has no evidence awaiting review.'),{status:409,code:'EVIDENCE_NOT_PENDING'});
+        const accepted=body.accepted===true;
+        game.evidenceReview={status:accepted?'accepted':'rejected',reviewedBy:principal.discordUserId,reviewedAt:new Date().toISOString(),reason:String(body.reason||'').trim()||null};
+        game.status=accepted?'evidence-accepted':'evidence-rejected';
+        await options.saveState();return {gameId,status:game.status,evidenceReview:game.evidenceReview};
+      });
+    },
     async registerYoloParticipant(principal,eventNightId,body={}) {
       role(principal,['admin','player']);
       return mutate(async()=>{
