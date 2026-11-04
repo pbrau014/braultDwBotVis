@@ -1363,3 +1363,75 @@ See docs/continuation/NEXT_CHAT_HANDOFF_2026-11-04.md for full rules, links, too
 ================================================================================
 END DWBOT-UPD-2026-11-04-006
 ================================================================================
+
+
+
+================================================================================
+DWBOT-UPD-2026-11-04-007 — DESKTOP INTEGRATION, PUBLIC-SAFE BACKUPS, CURRENT CI
+================================================================================
+Snapshot branch: dwbotVis
+Implementation commit before this documentation package: 8494c05687494b5afd8cb18aeab96faceeb56620
+Repository: pbrau014/braultDwBotVis
+Read-only main head observed: ad34090f6dafebe558ab505dd6aebecc542f8c47
+Main was not modified. This differs from older historical baseline references; no inference is made about who moved it.
+
+CURRENT CI — RUN 41813315107
+https://github.com/pbrau014/braultDwBotVis/actions/runs/41813315107
+Node.js 22.16.0 / Linux x64:
+- npm ci --no-audit --no-fund: PASS.
+- Committed JavaScript syntax checks: PASS.
+- OCR.space mocked contract/crop/quota tests: 15/15 PASS.
+- Discord preflight and command-policy tests: 21/21 PASS.
+- Desktop OAuth preflight + bridge + service + account-link + UI contract tests: 28/28 PASS.
+- Full npm test: 254 total, 253 passed, 0 failed, 1 skipped.
+- Sole skip: optional local OpenCV helper; Python cv2 is not installed in the Linux CI image.
+- Full decoded job log: reports/ci/2026-11-04-41813315107-node22-linux-full-log.txt.
+- This is exact-commit Linux CI evidence, not Windows/native-Tesseract, screenshot accuracy acceptance, or live Discord evidence.
+
+TEST ORGANIZATION AND OCR PROGRESS
+The intended tests/ directory has been restored; tests are no longer flattened at repository root. npm test uses a Node-supported test-file glob. Canonical OCR fixtures have been restored under testdata/ using existing branch blobs. No tests or ground truth were deleted or weakened.
+The OCR sequence runner persists atomic per-image progress checkpoints. A checkpoint record does not claim release acceptance or automatic resumability.
+
+DESKTOP PLAYER / ADMIN / UPLOAD
+- desktop/index.html: Discord sign-in landing page.
+- desktop/player.html + player.js: player totals, standings, event totals, owned screenshot submissions, exact OCR review and mapping.
+- desktop/admin.html + admin.js: roster add, Discord account link/unlink, manual result entry, scoring settings, review, standings and full private backup.
+- desktop/upload.html + upload.js: one-image picker/drop target, preview, validation, upload progress and result.
+- desktop/desktop.css + desktop.js: shared responsive layout and browser API behavior.
+- Original dwbotStuff HTML assets remain source baselines; the new UI pages are derivatives.
+- Browser code uses same-origin /api endpoints only. No bot token, OAuth secret, OCR key or webhook is embedded.
+- No live browser/OAuth/image-upload visual acceptance has yet been performed.
+
+SERVER-SIDE DESKTOP BOUNDARY
+src/desktop-bridge.js is IPv4 loopback 127.0.0.1 only. It uses Discord OAuth identify scope only, state nonce, HttpOnly/SameSite session cookies, CSRF token, same-origin and Host checks, request/upload bounds, image magic-byte validation, safe filenames, rate limits, CSP/security headers and audit logging. The Admin page and /api/admin/* operations are protected server-side.
+src/desktop-service.js uses existing in-memory tournament state, save path, Tournament scoring, BattleRecord correction validation and the same extractText(imageBuffer) queue used for Discord attachments.
+Players see only owned screenshot records and may map only an exact linked roster identity. Mismatches remain admin-review.
+The bridge starts after Discord READY and configured-channel preflight only when ENABLE_DESKTOP_UI=1. Shutdown closes the bridge. Desktop Admin requires explicit TOURNAMENT_ADMIN_IDS; Manage Server alone is insufficient.
+
+SHARED IMAGE / OCR WORKFLOW
+Desktop image bytes enter extractText(imageBuffer), the same bounded serial/supervised Tesseract-first pipeline as Discord attachments. No separate OCR route is created and OCR.space remains disabled.
+Discord-originated records from roster-linked submitters are stored in shared state with ownership and OCR data. Desktop corrections update the deterministic record identity and clear stale matching Discord prompts. Desktop mapping clears matching pending Discord mapping/correction associations.
+
+PRIVATE VERSUS PUBLIC BACKUP CONTRACT
+The complete private local state contains player_account_links, per-record desktop owner IDs and pending per-user workflows. It is returned only through authenticated local Admin GET /api/admin/backup.
+Public Discord snapshots and public !yolo export / !yolo finalize use Tournament.makePublicArchiveSnapshot. They retain workbook-compatible scores and battle records but omit account links, per-record desktop owner identifiers, pending_submissions and pending_ocr_corrections. Public snapshots include omitted workflow counts and an explanatory note.
+A public snapshot is not a complete private backup. Use authenticated local Admin backup for complete private recovery. Importing a public snapshot requires account relinking and restarting omitted pending workflows.
+
+OCR / SCORING INVARIANTS
+Nine mandatory fields and order remain: result, player, map, mode, battleStart, credits, freeXp, damage, xp. XP remains mandatory and ninth. No fuzzy player/name/value repair or weakened exact validation.
+Tesseract.js remains baseline; OpenCV geometry only; PaddleOCR and OCR.space are secondary evidence. OCR.space remains disabled by default. No live OCR.space request or image transmission occurred.
+Grand Yolo tierWeight remains 0.9. Workbook Totals!H12 remains =0.54*G12/100; known default is $12.49.
+
+NEXT REQUIRED WORK
+1. Complete desktop visual/functional testing in a Windows browser with local development OAuth and synthetic images.
+2. Verify browser upload through the running bot and prove the same OCR queue/state without duplicate Discord/desktop mapping.
+3. Complete current-source four-/16-image and additional/holdout OCR acceptance.
+4. Complete Windows Node v24.22.1, native Tesseract 5.x comparison, cancellation and recovery tests.
+5. Prepare a separate development bot/guild/channel and run isolated Discord live smoke.
+6. Validate guild-scoped slash commands only in an isolated guild; keep ENABLE_SLASH_COMMANDS=0 until authorized.
+7. Produce PDF user manual, final package SHA-256 and clean extraction proof. Production remains NO-GO.
+
+See DWBOT_PROJECT_COMPLETE_HANDOFF_2026-11-04.txt for end-to-end project history, rules, architecture, setup, inventory and release gates.
+================================================================================
+END DWBOT-UPD-2026-11-04-007
+================================================================================

@@ -128,3 +128,33 @@ Do not hard-code Discord route limits. Discord recommends following dynamic resp
 
 
 The current Discord documentation lists up to 120 Gateway events per connection per 60 seconds and a global 1,000 IDENTIFY calls per 24 hours across shards. Do not create restart loops or attempt to test these limits. For HTTP REST requests, Discord publishes a 50 requests/second global bot limit plus dynamic per-route/shared buckets; do not hard-code route limits. On 429, use the documented `Retry-After` header or `retry_after` field. discord.js REST is responsible for its own queue/backoff.
+
+
+---
+
+## Desktop interface pre-live setup
+
+The bridge is integrated into the bot process and disabled by default. Use a separate development bot/guild/channel. Add variables from .env.desktop.example to the existing .env; do not overwrite bot settings:
+
+ENABLE_DESKTOP_UI=1
+DESKTOP_UI_PORT=8787
+DISCORD_OAUTH_CLIENT_ID
+DISCORD_OAUTH_CLIENT_SECRET
+DISCORD_OAUTH_REDIRECT_URI=http://127.0.0.1:8787/auth/discord/callback
+TOURNAMENT_ADMIN_IDS (comma-separated explicit admin IDs)
+ENABLE_SLASH_COMMANDS=0
+
+Configure the exact redirect in Discord OAuth2. Scope identify only. Never commit or paste the OAuth secret or bot token.
+
+Run from project root:
+node --version
+npm ci
+npm run preflight:desktop-test
+npm run test:prelive
+npm test
+
+Run npm start. The bridge starts only after Discord READY and channel preflight, and listens on http://127.0.0.1:8787. Admin links participant Discord IDs to roster entries. Players see only their own submissions and may map only an exact OCR identity match.
+
+Use synthetic/non-sensitive images. One image per upload; PNG/JPEG/WEBP/BMP/TIFF; max 10 MB. Desktop upload uses the same OCR queue as Discord attachments. No real OAuth or browser upload has been performed in this session.
+
+For complete private recovery use the authenticated local Admin download. Public channel exports intentionally omit private account links and per-user pending workflow identifiers.

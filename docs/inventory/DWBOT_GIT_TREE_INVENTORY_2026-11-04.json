@@ -1,0 +1,21 @@
+{
+  "schema": "dwbot-git-tree-inventory-v1",
+  "captured_date": "2026-11-04",
+  "repository": "pbrau014/braultDwBotVis",
+  "branch": "dwbotVis",
+  "commit": "8494c05687494b5afd8cb18aeab96faceeb56620",
+  "tree_sha": "700480a310ad9ec1716a9cc2af8d64a5bf48866f",
+  "tree_entry_count": 925,
+  "blob_count": 844,
+  "directory_count": 81,
+  "counts": {
+    "source": 26,
+    "tests": 38,
+    "fixtures": 7,
+    "desktop": 9,
+    "scripts": 28,
+    "docs": 46,
+    "root_test_files": 0
+  },
+  "note": "Exact Git object inventory at commit 8494c05687494b5afd8cb18aeab96faceeb56620, immediately before this documentation/package commit. Git blob SHA values are object IDs, not SHA-256."
+}
