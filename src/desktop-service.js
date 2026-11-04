@@ -378,6 +378,36 @@ function createDesktopService(options = {}) {
         night.matches.push(match);fixture.matchIds.push(match.id);auditLifecycle(night,principal,'match-created',{matchId:match.id,fixtureId:fixture.id});await options.saveState();return match;
       });
     },
+    async createYoloRaceSideEvent(principal,eventNightId,body={}) {
+      role(principal,['admin']);
+      return mutate(async()=>{
+        const night=(state().eventNights || []).find(item=>item.id===eventNightId);
+        if(!night) throw Object.assign(new Error('Event night was not found.'),{status:404,code:'EVENT_NIGHT_NOT_FOUND'});
+        if(!body.approvedSettingsId||!body.scoringPolicyId)
+          throw Object.assign(new Error('An approved event settings record and scoring policy ID are required for a Race side-event.'),{status:400,code:'RACE_SIDE_EVENT_APPROVAL_REQUIRED'});
+        const sideEvent=YoloFormats.createRaceSideEvent({...body,eventNightId});
+        night.raceSideEvents ||= [];
+        if(night.raceSideEvents.some(item=>item.id===sideEvent.id)) throw Object.assign(new Error('Race side-event ID already exists.'),{status:409,code:'DUPLICATE_RACE_SIDE_EVENT'});
+        night.raceSideEvents.push(sideEvent);
+        auditLifecycle(night,principal,'race-side-event-created',{sideEventId:sideEvent.id,approvedSettingsId:sideEvent.approvedSettingsId});
+        await options.saveState();return sideEvent;
+      });
+    },
+    async recordYoloRaceTime(principal,gameId,body={}) {
+      role(principal,['admin']);
+      return mutate(async()=>{
+        const night=(state().eventNights || []).find(item=>(item.games || []).some(game=>game.id===gameId));
+        if(!night) throw Object.assign(new Error('Game was not found.'),{status:404,code:'GAME_NOT_FOUND'});
+        const game=night.games.find(item=>item.id===gameId);
+        const evidenceRecordId=String(body.evidenceRecordId||'');
+        if(game.status!=='evidence-accepted'||!(game.evidenceRecordIds || []).includes(evidenceRecordId))
+          throw Object.assign(new Error('Race time must be tied to evidence already accepted for this game.'),{status:409,code:'RACE_TIME_EVIDENCE_REQUIRED'});
+        const metric=YoloFormats.raceMetric(body.elapsedSeconds);
+        game.raceTimeMetric={...metric,evidenceRecordId,recordedBy:principal.discordUserId,recordedAt:new Date().toISOString()};
+        auditLifecycle(night,principal,'race-time-recorded',{gameId,evidenceRecordId,elapsedSeconds:metric.elapsedSeconds});
+        await options.saveState();return game.raceTimeMetric;
+      });
+    },
     async certifyYoloMatchOutcome(principal,matchId,body={}) {
       role(principal,['admin']);
       return mutate(async()=>{
