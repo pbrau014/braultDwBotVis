@@ -36,3 +36,13 @@ Never commit a real Discord bot token, OCR provider key, `.env`, database, local
 ## Complete source package
 
 The current full checkpoint contains application source, scripts, tests, documentation, model assets, fixtures, expanded corpus inputs, and provenance records. The repository upload helper is `PUSH_COMPLETE_DWBOT_POP1.ps1`; it pushes only to branch `pop1` of this repository, using Git Credential Manager and a force-with-lease check against the verified initial branch head. It does not modify `main`.
+
+
+## Current DWBOT project rules and continuation status
+
+- Canonical repository: [pbrau014/braultDwBotVis](https://github.com/pbrau014/braultDwBotVis).
+- Authorized delivery branch: `dwbotVis` only. Keep `main` read-only; do not substitute `pop1` or another repository.
+- The authoritative continuation rule and security boundaries are in `docs/continuation/PROJECT_AUTHORITY_AND_IMPLEMENTATION_RULES.md`; the append-only roadmap is `plan1.txt`.
+- Phase 9 offline/simulated suite currently passes 214/214 on Node 22.16.0, but live Discord and Windows gates are not yet verified. See `docs/iteration23/PHASE9_DISCORD_INTEGRATION_STATUS_2026-11-04.md` and `docs/iteration23/DISCORD_LIVE_TEST_QUICKSTART.md`.
+- Phase 10 remains the final phase for Player/Admin HTML interfaces, bot integration, distribution and the one-PDF user manual. The user-pasted Image Text Reader and workbook calculator are the design baselines. The hard-coded webhook in the Image Text Reader example must never be reused.
+- Production remains **NO-GO** until all mandatory OCR, Windows/native, live Discord, security, recovery, interface and packaging gates have verified evidence.
