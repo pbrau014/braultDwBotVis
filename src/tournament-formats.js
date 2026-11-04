@@ -40,7 +40,7 @@ function normalizeTournament(raw) {
   if (!Object.values(FORMAT).includes(format)) throw new Error('Tournament format must be pilot or full.');
   const stages = Array.isArray(raw.stages) ? raw.stages : [];
   const expected = format === FORMAT.PILOT ? [STAGES.PILOT_EVENT] : [...STAGE_ORDER];
-  if (stages.length && stages.some((stage, index) => stage.key !== expected[index])) {
+  if (stages.length && (stages.length !== expected.length || stages.some((stage, index) => stage.key !== expected[index]))) {
     throw new Error(format === FORMAT.PILOT
       ? 'Pilot must contain exactly one Pilot Event stage.'
       : 'Full YOLO stages must be Regular Season, Postseason, then Grand Finale.');
@@ -168,6 +168,12 @@ function publishTournament(tournament, approval = {}, actor = 'organizer') {
     throw new Error('Full YOLO publication requires an approved, published match-outcome method and named approver.');
   }
   if (tournament.format === FORMAT.FULL) {
+    const method = approval.matchOutcomeMethod;
+    if (method.approved !== true || !method.version || !method.publishedAt || !['sum','average'].includes(method.aggregation))
+      throw new Error('Full YOLO match method must include approval, version, publication timestamp and explicit sum/average aggregation.');
+    if (!method.weights || !Number.isFinite(method.weights.damage) || !Number.isFinite(method.weights.kills) ||
+        method.weights.damage < 0 || method.weights.kills < 0 || method.weights.damage + method.weights.kills === 0)
+      throw new Error('Full YOLO match method must publish valid non-zero Damage/Kills weights.');
     tournament.config.matchOutcomeMethod = clone(approval.matchOutcomeMethod);
     tournament.config.matchOutcomeApprovedBy = cleanText(approval.approvedBy, 'Match outcome approver');
     tournament.config.matchOutcomeApprovedAt = now();
@@ -194,6 +200,9 @@ function activateStage(tournament, stageKey, actor = 'organizer') {
 function completeStage(tournament, stageKey, actor = 'organizer') {
   const stage = tournament.stages.find(s => s.key === stageKey);
   if (!stage || stage.status !== STATUS.ACTIVE) throw new Error('Only an active stage can be completed.');
+  if (tournament.fixtures.some(f => f.stageKey === stageKey && (!f.matchId || !['complete','forfeit','bye'].includes(f.status)))) {
+    throw new Error('All fixtures in the stage must have a resolved match or approved bye before completion.');
+  }
   if (tournament.matches.some(m => m.stageKey === stageKey && m.status !== STATUS.COMPLETE && m.status !== STATUS.FORFEIT)) {
     throw new Error('All fixtures in the stage must be resolved before completion.');
   }
@@ -239,8 +248,8 @@ function recordGame(match, game, teams = []) {
   if (!Number.isInteger(gameNumber) || gameNumber < 1) throw new Error('Game number must be a positive integer.');
   if (match.games.some(g => g.gameNumber === gameNumber)) throw new Error('Game number already recorded for this match.');
   const metrics = game.metrics;
-  if (!metrics || !Number.isFinite(Number(metrics.damage)) || Number(metrics.damage) < 0 ||
-      !Number.isFinite(Number(metrics.kills)) || Number(metrics.kills) < 0) {
+  const explicit = value => value !== null && value !== undefined && value !== '' && Number.isFinite(Number(value)) && Number(value) >= 0;
+  if (!metrics || !explicit(metrics.damage) || !explicit(metrics.kills)) {
     throw new Error('Match game requires explicit non-negative Damage and Kills values.');
   }
   const result = { gameNumber, teamId: cleanText(game.teamId, 'Performing team ID'),
@@ -257,7 +266,7 @@ function recordGame(match, game, teams = []) {
 }
 
 function aggregateMatchMetrics(match, method) {
-  if (!method || method.approved !== true || !method.publishedAt || !method.version) {
+  if (!method || method.approved !== true || !method.publishedAt || !method.version || !['sum','average'].includes(method.aggregation)) {
     throw new Error('Match-outcome method is not approved and published; advancement cannot be calculated.');
   }
   const weights = method.weights;
@@ -266,7 +275,14 @@ function aggregateMatchMetrics(match, method) {
     throw new Error('Approved match-outcome method requires valid Damage/Kills weights.');
   }
   const totals = { [match.homeTeamId]: 0, [match.awayTeamId]: 0 };
-  for (const game of match.games) totals[game.teamId] += game.metrics.damage * weights.damage + game.metrics.kills * weights.kills;
+  const counts = { [match.homeTeamId]: 0, [match.awayTeamId]: 0 };
+  for (const game of match.games) {
+    totals[game.teamId] += game.metrics.damage * weights.damage + game.metrics.kills * weights.kills;
+    counts[game.teamId] += 1;
+  }
+  if (method.aggregation === 'average') {
+    for (const teamId of Object.keys(totals)) if (counts[teamId]) totals[teamId] /= counts[teamId];
+  }
   return totals;
 }
 
