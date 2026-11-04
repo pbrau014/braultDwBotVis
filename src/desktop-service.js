@@ -293,6 +293,23 @@ function createDesktopService(options = {}) {
     },
 
 
+
+    async createPilotTeam(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();const t=current.lifecycle?.tournaments.find(x=>x.id===body?.tournamentId);if(!t)throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});const team=Lifecycle.createPilotTeam(t,{id:body?.id||crypto.randomUUID(),name:body?.name});auditLifecycle(current,principal,'pilot.team.created',{tournamentId:t.id,teamId:team.id});await options.saveState();return team;});
+    },
+    async assignPilotRoster(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();const t=current.lifecycle?.tournaments.find(x=>x.id===body?.tournamentId);if(!t)throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});const player=Tournament.findPlayer(current,body?.participantId);if(!player)throw Object.assign(new Error('Participant must be an existing roster player.'),{status:400,code:'PLAYER_REQUIRED'});const assignment=Lifecycle.assignPilotRoster(t,{participantId:String(player.id),teamId:body?.teamId,eventNightId:body?.eventNightId});auditLifecycle(current,principal,'pilot.roster.assigned',{tournamentId:t.id,participantId:assignment.participantId,teamId:assignment.teamId,eventNightId:assignment.eventNightId});await options.saveState();return assignment;});
+    },
+    async createPilotFixture(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();const t=current.lifecycle?.tournaments.find(x=>x.id===body?.tournamentId);if(!t)throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});const fixture=Lifecycle.createPilotFixture(t,{id:body?.id||crypto.randomUUID(),eventNightId:body?.eventNightId,teamA:body?.teamA,teamB:body?.teamB});auditLifecycle(current,principal,'pilot.fixture.created',{tournamentId:t.id,fixtureId:fixture.id});await options.saveState();return fixture;});
+    },
+    async createPilotMatch(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();const t=current.lifecycle?.tournaments.find(x=>x.id===body?.tournamentId);if(!t)throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});const match=Lifecycle.createPilotMatch(t,body?.fixtureId,{id:body?.id||crypto.randomUUID(),gameNumber:body?.gameNumber});auditLifecycle(current,principal,'pilot.match.created',{tournamentId:t.id,matchId:match.id,fixtureId:match.fixtureId});await options.saveState();return match;});
+    },
     async registerPilotParticipant(principal,body) {
       role(principal,['admin']);
       return mutate(async()=>{const current=state();const t=current.lifecycle?.tournaments.find(x=>x.id===body?.tournamentId);if(!t)throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});const player=Tournament.findPlayer(current,body?.participantId);if(!player)throw Object.assign(new Error('Participant must be an existing roster player.'),{status:400,code:'PLAYER_REQUIRED'});const row=Lifecycle.registerPilotParticipant(t,{participantId:String(player.id),displayName:player.name});auditLifecycle(current,principal,'pilot.participant.registered',{tournamentId:t.id,participantId:row.participantId});await options.saveState();return row;});
