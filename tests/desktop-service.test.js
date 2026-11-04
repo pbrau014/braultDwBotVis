@@ -129,6 +129,8 @@ test('Admin manages Pilot and Full lifecycles; match outcomes require a stored o
   const awardApproval=await f.service.createApprovalRecord(admin,{id:'award-v1',scope:'award authorization',version:'1',approvedAt:'2026-11-04T12:01:00.000Z'});
   const award=await f.service.createAward(admin,{id:'award-1',tournamentId:full.id,recipientId:'p1',label:'Winner',approvalId:awardApproval.id});
   assert.equal(award.status,'approved');
+  assert.ok(f.state.lifecycle.auditLog.some(x=>x.action==='tournament.created'&&x.actor===ADMIN));
+  assert.ok(f.state.lifecycle.auditLog.some(x=>x.action==='match.outcome.recorded'));
   await assert.rejects(f.service.createTournament(player,{id:'unauthorized',format:'pilot'}),e=>e.status===403);
 });
 
