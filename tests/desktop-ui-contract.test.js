@@ -11,7 +11,7 @@ test('desktop login, Player, Admin and upload HTML pages are present and link lo
   const pages = {
     'desktop/index.html': ['Continue with Discord', '/auth/discord'],
     'desktop/player.html': ['/desktop.css', '/desktop.js', '/player.js', 'standings-body', 'submission-list'],
-    'desktop/admin.html': ['/desktop.css', '/desktop.js', '/admin.js', 'add-player-form', 'settings-form', 'admin-submissions'],
+    'desktop/admin.html': ['/desktop.css', '/desktop.js', '/admin.js', 'add-player-form', 'settings-form', 'admin-submissions', 'yolo-tournament-form', 'yolo-format-select', 'Quick help', 'yolo-team-form', 'yolo-fixture-form', 'yolo-match-form', 'yolo-game-form', 'yolo-evidence-review-form', 'yolo-match-outcome-form', 'yolo-race-side-event-form', 'yolo-race-time-form'],
     'desktop/upload.html': ['/desktop.css', '/desktop.js', '/upload.js', 'drop-zone', 'image-file', 'image-preview'],
   };
   for (const [file, needles] of Object.entries(pages)) {
@@ -61,4 +61,35 @@ test('desktop styles provide narrow-screen layouts without a third-party style d
   assert.match(css, /@media\(max-width:950px\)/);
   assert.match(css, /@media\(max-width:620px\)/);
   assert.match(css, /:root/);
+});
+
+test('format help is accessible by keyboard focus and hover, with a persistent details panel',()=>{
+ const html=read('desktop/admin.html'),css=read('desktop/desktop.css'),script=read('desktop/admin.js');
+ assert.match(html,/class="quick-tip" tabindex="0"/);
+ assert.match(html,/data-tip=/);
+ assert.match(html,/<details class="help-panel">/);
+ assert.match(css,/\.quick-tip:focus-visible::after/);
+ assert.match(css,/\.quick-tip:hover::after/);
+ assert.match(script,/\/api\/admin\/yolo-tournaments/);
+ assert.match(script,/durationWeeks/);
+ assert.match(script,/\/stages/);
+ assert.match(script,/Tournament: /);
+ assert.match(html,/Approved tournament settings record ID/);
+});
+
+test('Player desktop exposes public format summary and self-registration action without private identifiers',()=>{
+ const html=read('desktop/player.html'),script=read('desktop/player.js');
+ assert.match(html,/player-format-list/);
+ assert.match(html,/player-event-night-list/);
+ assert.match(script,/\/api\/yolo-event-nights\//);
+ assert.match(script,/registration/);
+ assert.match(script,/night\.isRegistered/);
+});
+
+test('Admin workspace exposes team, fixture, match, game and evidence review actions',()=>{
+ const html=read('desktop/admin.html'),script=read('desktop/admin.js');
+ for(const id of ['yolo-team-form','yolo-fixture-form','yolo-match-form','yolo-game-form','yolo-evidence-link-form','yolo-evidence-review-form'])assert.ok(html.includes(id));
+ for(const route of ['/teams','/fixtures','/matches','/games','/evidence-review','/outcome','/race-side-events','/race-time'])assert.ok(script.includes(route));
+ assert.match(html,/Approved event settings record ID/);
+ assert.match(script,/yolo-event-nights\/.*\/status/);
 });

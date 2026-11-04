@@ -91,3 +91,15 @@ The user authorized making main the active implementation branch and synchronizi
 The following remain OPEN and require real environment evidence: current-source full screenshot OCR acceptance on Windows (including native Tesseract 5.x and the paired Tesseract.js baseline); local Discord OAuth and browser visual/upload testing using synthetic screenshots; isolated development-guild Discord smoke; Windows persistence and full recovery; PDF manual and final clean-extraction package verification. Linux/offline CI does not substitute for these gates. Production remains NO-GO.
 
 Automation: npm run test:persistence-recovery and npm run test:windows-native-ocr. See docs/iteration23/WINDOWS_OCR_AND_PERSISTENCE_ACCEPTANCE_2026-11-04.md.
+
+
+## Pilot YOLO and Full YOLO lifecycle
+
+The desktop tournament model now distinguishes two formats while reusing common participant and organizer procedures:
+
+- **Pilot YOLO**: a single-evening event with no season, postseason or automatic carryover.
+- **Full YOLO**: a declared season with regular-season, postseason and Grand YOLO finale stages.
+
+The additive lifecycle metadata is stored separately from the legacy Damage/Kills/Race/Grand score buckets and preserved in private recovery archives. Public recovery snapshots omit private registration and roster metadata. Desktop Admin can create formats and event nights, publish/start/complete events, register participants, create teams/fixtures/matches/games, and link/review screenshot evidence. Participant self-registration is identity-linked. Publishing requires an organizer-approved settings record; starting an event locks the roster. Official match outcomes remain blocked until an approved scoring method, accepted evidence, aggregation, rounding and tie-break rules are supplied.
+
+See [Grand YOLO implementation plan](docs/GRAND-YOLO-IMPLEMENTATION-PLAN.md) and [instruction set](docs/grandYoloInstruct.md). The Word/PDF working drafts are generated separately; production approval and real Windows/browser/Discord acceptance remain release gates.

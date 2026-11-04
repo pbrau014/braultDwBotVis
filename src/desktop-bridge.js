@@ -261,8 +261,17 @@ function createDesktopBridge(options={}){
       const result=await call('mapSubmission',principal,mapping[1],await readJson(req));
       audit(principal,'tournament-mapping');sendJson(res,200,result);return true;
     }
+    const selfRegistration=p.match(/^\/api\/yolo-event-nights\/([A-Za-z0-9._-]+)\/registration$/);
+    if(req.method==='POST'&&selfRegistration){
+      csrf(req,session);role(principal,['player']);
+      const result=await call('registerYoloParticipant',principal,selfRegistration[1],{});
+      audit(principal,'self-event-registration');sendJson(res,201,result);return true;
+    }
     if(p.startsWith('/api/admin/')){
       role(principal,['admin']);
+      if(req.method==='GET'&&p==='/api/admin/yolo-tournaments'){
+        sendJson(res,200,await call('listYoloTournaments',principal));return true;
+      }
       if(req.method==='GET'&&p==='/api/admin/backup'){
         const backup=await call('exportBackup',principal),body=Buffer.from(backup);
         res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Content-Length':body.length,
@@ -279,6 +288,79 @@ function createDesktopBridge(options={}){
       }
       if(link&&req.method==='DELETE'){
         const result=await call('unlinkPlayer',principal,Number(link[1]));audit(principal,'player-account-unlink');sendJson(res,200,result);return true;
+      }
+      if(req.method==='POST'&&p==='/api/admin/yolo-tournaments'){
+        const result=await call('createYoloTournament',principal,await readJson(req));
+        audit(principal,'yolo-tournament-create');sendJson(res,201,result);return true;
+      }
+      const stageTransition=p.match(/^\/api\/admin\/yolo-tournaments\/([A-Za-z0-9._-]+)\/stages$/);
+      if(req.method==='POST'&&stageTransition){
+        const result=await call('transitionYoloStage',principal,stageTransition[1],await readJson(req));
+        audit(principal,'yolo-stage-status');sendJson(res,200,result);return true;
+      }
+      const tournamentTransition=p.match(/^\/api\/admin\/yolo-tournaments\/([A-Za-z0-9._-]+)\/status$/);
+      if(req.method==='POST'&&tournamentTransition){
+        const result=await call('transitionYoloTournament',principal,tournamentTransition[1],await readJson(req));
+        audit(principal,'yolo-tournament-status');sendJson(res,200,result);return true;
+      }
+      if(req.method==='POST'&&p==='/api/admin/yolo-event-nights'){
+        const result=await call('createYoloEventNight',principal,await readJson(req));
+        audit(principal,'yolo-event-night-create');sendJson(res,201,result);return true;
+      }
+      const eventRegistration=p.match(/^\/api\/admin\/yolo-event-nights\/([A-Za-z0-9._-]+)\/registrations$/);
+      if(req.method==='POST'&&eventRegistration){
+        const result=await call('registerYoloParticipant',principal,eventRegistration[1],await readJson(req));
+        audit(principal,'yolo-participant-registration');sendJson(res,201,result);return true;
+      }
+      const eventNightStatus=p.match(/^\/api\/admin\/yolo-event-nights\/([A-Za-z0-9._-]+)\/status$/);
+      if(req.method==='POST'&&eventNightStatus){
+        const result=await call('transitionYoloEventNight',principal,eventNightStatus[1],await readJson(req));
+        audit(principal,'yolo-event-night-status');sendJson(res,200,result);return true;
+      }
+      const teamRoute=p.match(/^\/api\/admin\/yolo-event-nights\/([A-Za-z0-9._-]+)\/teams$/);
+      if(req.method==='POST'&&teamRoute){
+        const result=await call('createYoloTeam',principal,teamRoute[1],await readJson(req));
+        audit(principal,'yolo-team-create');sendJson(res,201,result);return true;
+      }
+      const fixtureRoute=p.match(/^\/api\/admin\/yolo-event-nights\/([A-Za-z0-9._-]+)\/fixtures$/);
+      if(req.method==='POST'&&fixtureRoute){
+        const result=await call('createYoloFixture',principal,fixtureRoute[1],await readJson(req));
+        audit(principal,'yolo-fixture-create');sendJson(res,201,result);return true;
+      }
+      const matchRoute=p.match(/^\/api\/admin\/yolo-fixtures\/([A-Za-z0-9._-]+)\/matches$/);
+      if(req.method==='POST'&&matchRoute){
+        const result=await call('createYoloMatch',principal,matchRoute[1],await readJson(req));
+        audit(principal,'yolo-match-create');sendJson(res,201,result);return true;
+      }
+      const raceSideEventRoute=p.match(/^\/api\/admin\/yolo-event-nights\/([A-Za-z0-9._-]+)\/race-side-events$/);
+      if(req.method==='POST'&&raceSideEventRoute){
+        const result=await call('createYoloRaceSideEvent',principal,raceSideEventRoute[1],await readJson(req));
+        audit(principal,'yolo-race-side-event-create');sendJson(res,201,result);return true;
+      }
+      const raceTimeRoute=p.match(/^\/api\/admin\/yolo-games\/([A-Za-z0-9._-]+)\/race-time$/);
+      if(req.method==='POST'&&raceTimeRoute){
+        const result=await call('recordYoloRaceTime',principal,raceTimeRoute[1],await readJson(req));
+        audit(principal,'yolo-race-time-record');sendJson(res,200,result);return true;
+      }
+      const matchOutcomeRoute=p.match(/^\/api\/admin\/yolo-matches\/([A-Za-z0-9._-]+)\/outcome$/);
+      if(req.method==='POST'&&matchOutcomeRoute){
+        const result=await call('certifyYoloMatchOutcome',principal,matchOutcomeRoute[1],await readJson(req));
+        audit(principal,'yolo-match-outcome-certify');sendJson(res,200,result);return true;
+      }
+      const gameRoute=p.match(/^\/api\/admin\/yolo-matches\/([A-Za-z0-9._-]+)\/games$/);
+      if(req.method==='POST'&&gameRoute){
+        const result=await call('createYoloGame',principal,gameRoute[1],await readJson(req));
+        audit(principal,'yolo-game-create');sendJson(res,201,result);return true;
+      }
+      const evidenceRoute=p.match(/^\/api\/admin\/yolo-games\/([A-Za-z0-9._-]+)\/evidence$/);
+      if(req.method==='POST'&&evidenceRoute){
+        const result=await call('linkYoloGameEvidence',principal,evidenceRoute[1],await readJson(req));
+        audit(principal,'yolo-game-evidence-link');sendJson(res,200,result);return true;
+      }
+      const evidenceReviewRoute=p.match(/^\/api\/admin\/yolo-games\/([A-Za-z0-9._-]+)\/evidence-review$/);
+      if(req.method==='POST'&&evidenceReviewRoute){
+        const result=await call('reviewYoloGameEvidence',principal,evidenceReviewRoute[1],await readJson(req));
+        audit(principal,'yolo-game-evidence-review');sendJson(res,200,result);return true;
       }
       if(req.method==='POST'&&p==='/api/admin/results'){
         const result=await call('recordResult',principal,await readJson(req));audit(principal,'manual-score-entry');sendJson(res,200,result);return true;

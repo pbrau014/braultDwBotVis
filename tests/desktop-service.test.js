@@ -95,3 +95,113 @@ test('authenticated Admin backup retains private roster links and pending correc
   assert.equal(backup.pending_submissions[0].userId,PLAYER);
   assert.equal(backup.pending_ocr_corrections.length,1);
 });
+
+test('admin can create Pilot and Full YOLO records; players cannot administer formats',async()=>{
+ const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN}),player=await f.service.resolvePrincipal({id:PLAYER});
+ const pilot=await f.service.createYoloTournament(admin,{id:'pilot-2026',name:'Pilot',format:'pilot'});
+ assert.equal(pilot.season,null);
+ const full=await f.service.createYoloTournament(admin,{id:'full-2026',name:'Full',format:'full',season:{id:'season-2026',durationWeeks:12}});
+ assert.deepEqual(full.stages.map(s=>s.type),['regular-season','postseason','grand-finale']);
+ await assert.rejects(f.service.createYoloTournament(player,{id:'bad',name:'Bad',format:'pilot'}),e=>e.status===403);
+ await assert.rejects(f.service.createYoloTournament(admin,{id:'pilot-2026',name:'Duplicate',format:'pilot'}),e=>e.code==='DUPLICATE_TOURNAMENT');
+});
+test('event-night stage association is format-validated and registration is identity-scoped',async()=>{
+ const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN}),player=await f.service.resolvePrincipal({id:PLAYER});
+ await f.service.createYoloTournament(admin,{id:'pilot',name:'Pilot',format:'pilot'});
+ await assert.rejects(f.service.createYoloEventNight(admin,{id:'bad-night',tournamentId:'pilot',startsAt:'2026-11-05T18:00:00Z',stage:'regular-season'}),e=>e.code==='PILOT_HAS_NO_STAGES');
+ await f.service.createYoloEventNight(admin,{id:'pilot-night',tournamentId:'pilot',startsAt:'2026-11-05T18:00:00Z'});
+ const result=await f.service.registerYoloParticipant(player,'pilot-night');
+ assert.equal(result.participantId,f.alpha.id);
+ await assert.rejects(f.service.registerYoloParticipant(player,'pilot-night'),/already registered/);
+});
+test('Full YOLO event nights require a declared stage and full private archive preserves it',async()=>{
+ const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
+ await f.service.createYoloTournament(admin,{id:'full',name:'Full',format:'full',season:{id:'s',durationWeeks:12}});
+ await assert.rejects(f.service.createYoloEventNight(admin,{id:'bad',tournamentId:'full',startsAt:'2026-11-05T18:00:00Z'}),e=>e.code==='FULL_STAGE_REQUIRED');
+ await f.service.createYoloEventNight(admin,{id:'night',tournamentId:'full',stage:'regular-season',startsAt:'2026-11-05T18:00:00Z'});
+ const backup=JSON.parse(await f.service.exportBackup(admin));
+ assert.equal(backup.yolo_tournaments[0].format,'full');
+ assert.equal(backup.event_nights[0].stage,'regular-season');
+});
+
+test('Full YOLO cannot close until every season stage is completed in order',async()=>{
+ const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
+ await f.service.createYoloTournament(admin,{id:'full-stage',name:'Full Stage',format:'full',season:{id:'season',durationWeeks:8},settings:{approvedSettingsId:'approved-season'}});
+ await f.service.transitionYoloTournament(admin,'full-stage',{status:'published'});
+ await f.service.transitionYoloTournament(admin,'full-stage',{status:'active'});
+ await assert.rejects(f.service.transitionYoloTournament(admin,'full-stage',{status:'completed'}),/cannot complete/);
+ for(const stage of ['regular-season','postseason','grand-finale']){
+  const nightId='night-'+stage;
+  await f.service.createYoloEventNight(admin,{id:nightId,tournamentId:'full-stage',stage,startsAt:'2026-11-10T18:00:00Z',approvedSettingsId:'approved-'+stage});
+  await f.service.transitionYoloEventNight(admin,nightId,{status:'published'});
+  await f.service.transitionYoloEventNight(admin,nightId,{status:'active'});
+  await f.service.transitionYoloEventNight(admin,nightId,{status:'completed'});
+  await f.service.transitionYoloStage(admin,'full-stage',{stage,status:'published'});
+  await f.service.transitionYoloStage(admin,'full-stage',{stage,status:'active'});
+  await f.service.transitionYoloStage(admin,'full-stage',{stage,status:'completed'});
+ }
+ const final=await f.service.transitionYoloTournament(admin,'full-stage',{status:'completed'});
+ assert.equal(final.status,'completed');
+});
+
+test('participant overview exposes only aggregate event registration state, not other roster identities',async()=>{
+ const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN}),player=await f.service.resolvePrincipal({id:PLAYER});
+ await f.service.createYoloTournament(admin,{id:'pilot-public',name:'Public Pilot',format:'pilot'});
+ await f.service.createYoloEventNight(admin,{id:'night-public',tournamentId:'pilot-public',startsAt:'2026-11-06T18:00:00Z'});
+ await f.service.registerYoloParticipant(player,'night-public');
+ const overview=await f.service.getOverview(player);
+ assert.equal(overview.eventNights[0].isRegistered,true);
+ assert.equal(overview.eventNights[0].registrationCount,1);
+ assert.equal(Object.hasOwn(overview.eventNights[0],'registrations'),false);
+});
+
+test('Full operations preserve registered roster, fixture, match, game and reviewed evidence relationships',async()=>{
+ const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
+ await f.service.createYoloTournament(admin,{id:'full-ops',name:'Full Ops',format:'full',season:{id:'season-ops',durationWeeks:10}});
+ await f.service.createYoloEventNight(admin,{id:'ops-night',tournamentId:'full-ops',stage:'regular-season',startsAt:'2026-11-07T18:00:00Z'});
+ await f.service.registerYoloParticipant(admin,'ops-night',{playerId:f.alpha.id});
+ await f.service.registerYoloParticipant(admin,'ops-night',{playerId:2});
+ const teamA=await f.service.createYoloTeam(admin,'ops-night',{id:'team-a',name:'Team A',participantIds:[String(f.alpha.id)]});
+ const teamB=await f.service.createYoloTeam(admin,'ops-night',{id:'team-b',name:'Team B',participantIds:['2']});
+ assert.equal(teamA.eventNightId,'ops-night');
+ await assert.rejects(f.service.createYoloTeam(admin,'ops-night',{id:'team-c',name:'Duplicate member',participantIds:[String(f.alpha.id)]}),e=>e.code==='PARTICIPANT_ALREADY_ASSIGNED');
+ const fixtureRow=await f.service.createYoloFixture(admin,'ops-night',{id:'fixture-1',homeTeamId:teamA.id,awayTeamId:teamB.id,scheduledAt:'2026-11-07T19:00:00Z'});
+ const match=await f.service.createYoloMatch(admin,fixtureRow.id,{id:'match-1',matchNumber:1});
+ const game=await f.service.createYoloGame(admin,match.id,{id:'game-1',gameNumber:1});
+ const upload=await f.service.submitImage(admin,{buffer:Buffer.from('verified evidence'),filename:'evidence.png',contentType:'image/png'});
+ await f.service.mapSubmission(admin,upload.submissionId,{playerId:f.alpha.id,event:'damage',gameNumber:1,shipClass:'DD',tier:8});
+ const linked=await f.service.linkYoloGameEvidence(admin,game.id,{recordId:upload.submissionId});
+ assert.equal(linked.status,'awaiting-evidence-review');
+ const reviewed=await f.service.reviewYoloGameEvidence(admin,game.id,{accepted:true});
+ assert.equal(reviewed.status,'evidence-accepted');
+ const sideEvent=await f.service.createYoloRaceSideEvent(admin,'ops-night',{id:'race-side-1',scheduleOffsetMinutes:60,scoringPolicyId:'approved-race-policy',approvedSettingsId:'approved-race-settings'});
+ assert.equal(sideEvent.type,'race-side-event');
+ const raceTime=await f.service.recordYoloRaceTime(admin,game.id,{evidenceRecordId:upload.submissionId,elapsedSeconds:42});
+ assert.equal(raceTime.normalizedMetric,1/42);
+ const certified=await f.service.certifyYoloMatchOutcome(admin,match.id,{winnerTeamId:teamA.id,approvedScoringMethodId:'approved-match-method',
+  acceptedPerformanceRecordIds:[upload.submissionId],aggregation:'approved aggregate rule v1',rounding:'approved rounding rule v1',
+  tieBreakOrder:['head-to-head','team-record','point-differential'],decisionReference:'signed-match-result-2026-11-07'});
+ assert.equal(certified.outcome.status,'certified');
+ await assert.rejects(f.service.certifyYoloMatchOutcome(admin,match.id,{winnerTeamId:teamB.id}),e=>e.code==='OUTCOME_ALREADY_CERTIFIED');
+});
+
+test('event-night publication requires signed settings and activation locks registration',async()=>{
+ const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN}),player=await f.service.resolvePrincipal({id:PLAYER});
+ await f.service.createYoloTournament(admin,{id:'pilot-lock',name:'Pilot Lock',format:'pilot'});
+ await f.service.createYoloEventNight(admin,{id:'night-lock',tournamentId:'pilot-lock',startsAt:'2026-11-08T18:00:00Z'});
+ await assert.rejects(f.service.transitionYoloEventNight(admin,'night-lock',{status:'published'}),/approved event settings/);
+ await f.service.createYoloEventNight(admin,{id:'night-approved',tournamentId:'pilot-lock',startsAt:'2026-11-08T18:00:00Z',approvedSettingsId:'signed-event-settings'});
+ await f.service.transitionYoloEventNight(admin,'night-approved',{status:'published'});
+ const active=await f.service.transitionYoloEventNight(admin,'night-approved',{status:'active'});
+ assert.ok(active.rosterLockedAt);
+ await assert.rejects(f.service.registerYoloParticipant(player,'night-approved'),/Registration is closed/);
+ assert.ok(active.audit.some(entry=>entry.action==='event-night-transitioned'));
+});
+
+test('Race side-event requires approval and Race-time metric requires accepted game evidence',async()=>{
+ const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
+ await f.service.createYoloTournament(admin,{id:'race-test',name:'Race Test',format:'pilot'});
+ await f.service.createYoloEventNight(admin,{id:'race-night',tournamentId:'race-test',startsAt:'2026-11-11T18:00:00Z'});
+ await assert.rejects(f.service.createYoloRaceSideEvent(admin,'race-night',{id:'race-side',scoringPolicyId:'policy'}),e=>e.code==='RACE_SIDE_EVENT_APPROVAL_REQUIRED');
+ await assert.rejects(f.service.recordYoloRaceTime(admin,'unknown-game',{elapsedSeconds:30,evidenceRecordId:'missing'}),e=>e.code==='GAME_NOT_FOUND');
+});

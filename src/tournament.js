@@ -91,6 +91,9 @@ function normalizeState(input = {}) {
     battleRecords: Array.isArray(input.battleRecords) ? input.battleRecords : [],
     pendingSubmissions: Array.isArray(input.pendingSubmissions) ? input.pendingSubmissions : [],
     pendingOcrCorrections: Array.isArray(input.pendingOcrCorrections) ? input.pendingOcrCorrections : [],
+    // Additive lifecycle metadata. Existing v2 score records remain unclassified.
+    yoloTournaments: Array.isArray(input.yoloTournaments ?? input.yolo_tournaments) ? clone(input.yoloTournaments ?? input.yolo_tournaments) : [],
+    eventNights: Array.isArray(input.eventNights ?? input.event_nights) ? clone(input.eventNights ?? input.event_nights) : [],
     nextPlayerId: Math.max(Math.max(0, ...players.map(p => Number(p?.id) || 0)) + 1, Number(input.nextPlayerId) || 1),
   };
 }
@@ -278,6 +281,8 @@ function makeArchiveSnapshot(state) {
     pending_submissions: clone(state.pendingSubmissions),
     pending_ocr_corrections: clone(state.pendingOcrCorrections || []),
     player_account_links: clone(state.playerAccountLinks || {}),
+    yolo_tournaments: clone(state.yoloTournaments || []),
+    event_nights: clone(state.eventNights || []),
   };
 }
 function makePublicArchiveSnapshot(state) {
@@ -291,6 +296,10 @@ function makePublicArchiveSnapshot(state) {
     'pending_ocr_corrections',
   ];
   snapshot.player_account_links = {};
+  // Public recovery copies deliberately exclude registration/roster lifecycle metadata.
+  snapshot.private_data_omitted.push('yolo_tournaments', 'event_nights');
+  snapshot.yolo_tournaments = [];
+  snapshot.event_nights = [];
   snapshot.battle_records = snapshot.battle_records.map(entry => {
     const { desktop_owner_id, desktop_owner_role, ...publicEntry } = entry || {};
     return publicEntry;
@@ -298,6 +307,8 @@ function makePublicArchiveSnapshot(state) {
   snapshot.pending_workflow_counts = {
     pending_submissions: snapshot.pending_submissions.length,
     pending_ocr_corrections: snapshot.pending_ocr_corrections.length,
+    yolo_tournaments: (state.yoloTournaments || []).length,
+    event_nights: (state.eventNights || []).length,
   };
   snapshot.pending_submissions = [];
   snapshot.pending_ocr_corrections = [];
@@ -313,6 +324,8 @@ function importBackup(raw) {
     state.pendingSubmissions = Array.isArray(raw.pending_submissions) ? raw.pending_submissions : [];
     state.pendingOcrCorrections = Array.isArray(raw.pending_ocr_corrections) ? raw.pending_ocr_corrections : [];
     state.playerAccountLinks = normalizePlayerAccountLinks(raw.player_account_links, state.players);
+    state.yoloTournaments = Array.isArray(raw.yolo_tournaments) ? clone(raw.yolo_tournaments) : [];
+    state.eventNights = Array.isArray(raw.event_nights) ? clone(raw.event_nights) : [];
   }
   return state;
 }

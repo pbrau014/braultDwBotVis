@@ -19,6 +19,103 @@
     <section class="page-heading"><div><p class="eyebrow">ADMIN WORKSPACE</p><h1>Tournament control</h1><p class="lede small">Roster, account links, scoring, OCR review and recovery exports. Every mutation is authorized again by the Node service.</p></div><a class="button secondary" href="/api/admin/backup">Download full recovery JSON</a></section>
     <section id="admin-denied" class="notice warning hidden"><h2>Administrator access required</h2><p>This page and its operations are restricted to Discord IDs listed in <code>TOURNAMENT_ADMIN_IDS</code> in the local bot environment.</p></section>
     <section id="admin-content" class="hidden">
+      <section class="panel" id="yolo-format-panel">
+        <div class="panel-heading"><div><p class="eyebrow">TOURNAMENT FORMAT</p><h2>Pilot YOLO or Full YOLO</h2><p class="muted">Both formats share participant workflows. Pilot is one evening; Full is a declared season with regular season, postseason and Grand YOLO finale.</p></div></div>
+        <details class="help-panel"><summary>Quick help - format differences</summary><p><strong>Pilot:</strong> no season or postseason. <strong>Full:</strong> declare season duration; the three stages are created automatically. Legacy Damage, Kills, Race and Grand Yolo remain score categories, not stages. Unapproved scoring and event values must remain blank.</p></details>
+        <form id="yolo-tournament-form" class="form-grid compact-form">
+          <label>Tournament ID <span class="quick-tip" tabindex="0" role="note" aria-label="Stable unique identifier" data-tip="Use a short stable ID, such as pilot-2026 or full-2026. It cannot be reused.">?</span><input name="id" maxlength="64" required placeholder="pilot-2026"></label>
+          <label>Tournament name<input name="name" maxlength="100" required placeholder="Grand YOLO"></label>
+          <label>Format <span class="quick-tip" tabindex="0" role="note" aria-label="Choose Pilot or Full" data-tip="Pilot is a one-evening event. Full creates regular-season, postseason and finale stages.">?</span><select name="format" id="yolo-format-select"><option value="pilot">Pilot YOLO</option><option value="full">Full YOLO</option></select></label>
+          <label>Approved tournament settings record ID <span class="quick-tip" tabindex="0" role="note" aria-label="Approval gate" data-tip="Required before the tournament or any Full season stage can be published. Use the organizer-signed approval record identifier; do not invent one.">?</span><input name="approvedSettingsId" maxlength="64" placeholder="Leave blank while draft"></label>
+          <label id="yolo-duration-wrap" class="hidden">Season duration (weeks)<input name="durationWeeks" type="number" min="2" max="52" step="1" placeholder="12"></label>
+          <button class="button primary span-all" type="submit">Create tournament</button>
+        </form>
+        <div id="yolo-tournament-list" class="event-list"><p class="muted">Loading format records…</p></div>
+        <h3>Schedule an event night</h3>
+        <form id="yolo-event-night-form" class="form-grid compact-form">
+          <label>Event-night ID<input name="id" maxlength="64" required placeholder="night-01"></label>
+          <label>Tournament<select name="tournamentId" id="yolo-event-tournament" required></select></label>
+          <label id="yolo-stage-wrap">Full season stage<select name="stage" id="yolo-event-stage"><option value="">Pilot / not applicable</option><option value="regular-season">Regular season</option><option value="postseason">Postseason</option><option value="grand-finale">Grand YOLO finale</option></select></label>
+          <label>Starts at (local time)<input name="startsAt" type="datetime-local" required></label>
+          <label>Approved event settings record ID <input name="approvedSettingsId" maxlength="64" placeholder="Required before publishing"></label>
+          <button class="button secondary span-all" type="submit">Create event night</button>
+        </form>
+        <h3>Register a roster participant</h3>
+        <form id="yolo-registration-form" class="form-grid compact-form">
+          <label>Event night<select name="eventNightId" id="yolo-event-night-select" required></select></label>
+          <label>Participant<select name="playerId" id="yolo-registration-player" required></select></label>
+          <button class="button secondary" type="submit">Register participant</button>
+        </form>
+        <div id="yolo-event-night-list" class="event-list"></div>
+        <h3>Teams and match operations</h3>
+        <form id="yolo-team-form" class="form-grid compact-form">
+          <label>Event night<select name="eventNightId" id="yolo-team-night" required></select></label>
+          <label>Team ID<input name="id" maxlength="64" required placeholder="team-blue"></label>
+          <label>Team name<input name="name" maxlength="80" required placeholder="Blue Team"></label>
+          <label>Registered participant IDs <span class="quick-tip" tabindex="0" role="note" aria-label="Participant IDs" data-tip="Enter roster player IDs separated by commas. Every participant must already be registered for this event night and may be assigned to only one team.">?</span><input name="participantIds" required placeholder="1, 2, 3"></label>
+          <button class="button secondary span-all" type="submit">Create team</button>
+        </form>
+        <form id="yolo-fixture-form" class="form-grid compact-form">
+          <label>Event night<select name="eventNightId" id="yolo-fixture-night" required></select></label>
+          <label>Fixture ID<input name="id" required placeholder="fixture-01"></label>
+          <label>Home team ID<input name="homeTeamId" required></label>
+          <label>Away team ID<input name="awayTeamId" required></label>
+          <label>Scheduled at<input name="scheduledAt" type="datetime-local" required></label>
+          <label>Series length (odd)<input name="seriesLength" type="number" min="1" max="9" step="2" value="1" required></label>
+          <button class="button secondary span-all" type="submit">Create fixture</button>
+        </form>
+        <form id="yolo-match-form" class="form-grid compact-form">
+          <label>Fixture ID<input name="fixtureId" required></label>
+          <label>Match ID<input name="id" required></label>
+          <label>Match number<input name="matchNumber" type="number" min="1" max="9" value="1" required></label>
+          <button class="button secondary" type="submit">Create match</button>
+        </form>
+        <form id="yolo-game-form" class="form-grid compact-form">
+          <label>Match ID<input name="matchId" required></label>
+          <label>Game ID<input name="id" required></label>
+          <label>Game number<input name="gameNumber" type="number" min="1" max="99" value="1" required></label>
+          <button class="button secondary" type="submit">Create game</button>
+        </form>
+        <form id="yolo-evidence-link-form" class="form-grid compact-form">
+          <label>Game ID<input name="gameId" required></label>
+          <label>Mapped screenshot record ID<input name="recordId" required></label>
+          <button class="button secondary" type="submit">Link evidence for review</button>
+        </form>
+        <form id="yolo-evidence-review-form" class="form-grid compact-form">
+          <label>Game ID<input name="gameId" required></label>
+          <label>Decision<select name="accepted"><option value="true">Accept evidence</option><option value="false">Reject evidence</option></select></label>
+          <label>Reason (required for rejection)<input name="reason" maxlength="500"></label>
+          <button class="button secondary" type="submit">Review evidence</button>
+        </form>
+        <h3>Certify a match outcome</h3>
+        <p class="muted">The bot does not invent or calculate a scoring formula. Enter the externally reconciled result and the approved method/evidence references.</p>
+        <h3>Race side-event and Race-time metric</h3>
+        <form id="yolo-race-side-event-form" class="form-grid compact-form">
+          <label>Event night<select name="eventNightId" id="yolo-race-night" required></select></label>
+          <label>Side-event ID<input name="id" required></label>
+          <label>Schedule offset before event (minutes)<input name="scheduleOffsetMinutes" type="number" min="0" max="1440" value="60" required></label>
+          <label>Approved scoring policy ID<input name="scoringPolicyId" required></label>
+          <label>Approved settings record ID<input name="approvedSettingsId" required></label>
+          <button class="button secondary span-all" type="submit">Create approved Race side-event</button>
+        </form>
+        <form id="yolo-race-time-form" class="form-grid compact-form">
+          <label>Game ID<input name="gameId" required></label>
+          <label>Accepted evidence record ID<input name="evidenceRecordId" required></label>
+          <label>Elapsed seconds<input name="elapsedSeconds" type="number" min="0.001" step="0.001" required></label>
+          <button class="button secondary" type="submit">Record Race-time metric</button>
+        </form>
+        <form id="yolo-match-outcome-form" class="form-grid compact-form">
+          <label>Match ID<input name="matchId" required></label>
+          <label>Winning team ID<input name="winnerTeamId" required></label>
+          <label>Approved scoring method ID<input name="approvedScoringMethodId" required></label>
+          <label>Accepted evidence record IDs (comma-separated)<input name="acceptedPerformanceRecordIds" required></label>
+          <label>Aggregation rule/reference<input name="aggregation" required></label>
+          <label>Rounding rule/reference<input name="rounding" required></label>
+          <label>Tie-break order (comma-separated)<input name="tieBreakOrder" required placeholder="head-to-head, team-record, point-differential"></label>
+          <label>Decision reference<input name="decisionReference" required></label>
+          <button class="button secondary span-all" type="submit">Certify outcome</button>
+        </form>
+      </section>
       <div class="metric-grid">
         <article class="metric-card"><span>ACTIVE ROSTER</span><strong id="admin-roster-count">—</strong><small>of 50 supported slots</small></article>
         <article class="metric-card"><span>AGGREGATE TOTAL</span><strong id="admin-total">—</strong><small>doubloons</small></article>
