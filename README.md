@@ -64,3 +64,6 @@ A hard-coded Discord webhook was found in the historical Image Text Reader HTML 
 
 
 **Important:** the sanitized OCR reader is committed on `dwbotVis`, but the current read-only `main` copy still contains the exposed webhook. The owner must revoke/delete that webhook in Discord immediately; removing it from a non-default branch does not invalidate it.
+
+
+The isolated live-test configuration can be checked without contacting Discord using `npm run preflight:discord-test`. This validates local settings only; it cannot validate the token, Developer Portal intent toggles or live channel permissions.

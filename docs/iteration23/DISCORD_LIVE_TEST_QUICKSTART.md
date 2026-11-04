@@ -38,6 +38,14 @@ First run the credential-free Discord channel-preflight unit tests:
 npm run test:discord-preflight
 ```
 
+After dependencies are restored and the local `.env` is configured, run the offline configuration check:
+
+```powershell
+npm run preflight:discord-test
+```
+
+It checks development/test mode, non-placeholder token presence without printing it, channel/admin snowflake syntax, JSON storage, state-path containment under `testdata/live-discord-state`, distinct state paths, and disabled slash/experimental provider flags. It makes no network request and cannot verify token validity, Developer Portal intent toggles, or actual Discord permissions.
+
 Use Node v22.16.0, pinned by `.nvmrc`:
 
 ```powershell
