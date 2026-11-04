@@ -1181,3 +1181,51 @@ DWBOT-UPD-2026-11-03-003 — FINAL REPRODUCIBILITY UPDATE
 - `package.json` and `package-lock.json` were checked for matching `>=22.16.0` engine requirements.
 - OCR report metadata now captures effective engine/feature/network/time-budget flags; Windows paired-benchmark outputs are named with the actual runtime version.
 - `pwsh`/Windows PowerShell was absent, so the `.ps1` runner has not been parsed or executed in this environment. Clean `npm ci` was not run because npm cache is empty and registry access was not established.
+
+
+================================================================================
+SUPERSEDING CANONICAL REPOSITORY / CONTINUATION AUTHORITY — 2026-11-04
+================================================================================
+
+This addendum is prospective. It preserves the plan's prior phase order and historical records.
+
+- Canonical repository: https://github.com/pbrau014/braultDwBotVis.git (pbrau014/braultDwBotVis).
+- Sole authorized working/delivery branch: dwbotVis. This branch was created from main head 9981355e6895a6c24c3b59a78be57865fbecafbb on 2026-11-04.
+- main is read-only regardless of GitHub protection metadata. Do not push, merge, force-push, or modify main. Do not substitute pop1, pbrau014/dwbot, or another repository/branch.
+- Re-read dwbotVis before every remote write and verify the resulting commit and tree. Keep source archives, ground truth and original provenance unchanged.
+- Continue authorized work through implementation, tests, correction, retest, packaging and verification. When an exact artifact is absent, search adjacent plan sections, callers/callees, related files, docs, archives, manifests and operational records. Record substitutions/limits. Do not invent evidence or stop independent work.
+- Keep the Node.js bot authoritative for commands, permissions, persistence, score logic and OCR validation. Exactly nine mandatory screenshot fields remain: result, player, map, mode, battleStart, credits, freeXp, damage, xp; XP is mandatory and ninth/final.
+- Do not weaken exact-value validation or rewrite approved ground truth. Clearly distinguish verified facts, assumptions, local/simulated tests, live tests, blocked gates and not-run gates.
+- Never put Discord tokens, webhooks or OAuth secrets in browser code or deliverables. The webhook in the supplied Image Text Reader code is exposed and must not be reused; its owner should revoke/regenerate it.
+- The full user-supplied Image Text Reader and workbook score-calculator HTML samples are the design baselines for the final Player/Admin interface phase. The exact implementation.zip and named historical HTML files were not found; available project references and the user-pasted code remain the sourced baseline.
+
+================================================================================
+PHASE 9 EXECUTION STATUS — 2026-11-04
+================================================================================
+
+The local working-copy Phase 9 report is docs/iteration23/PHASE9_DISCORD_INTEGRATION_TEST_REPORT_2026-11-04.md. Windows/live procedure: docs/iteration23/DISCORD_LIVE_TEST_QUICKSTART.md.
+
+Local verification on Node v22.16.0 / npm 10.9.2 / Linux x64:
+- npm test: 214 passed, 0 failed, 0 skipped.
+- Synthetic Discord system suite: 7/7.
+- SQLite persistence: 5/5.
+- OCR watchdog/process/damage tests: 21/21.
+- OCR.space client/quota/crop contracts: 19/19 (mock only; no provider requests).
+- OCR sequence checkpoints: 4/4.
+- Discord preflight tests: 5/5.
+- Native Tesseract 5.5.0, ImageMagick 7.1.2, Chromium 144 and child-process execution are available in this host.
+
+Live Discord is BLOCKED: no local bot token, test channel/guild/user IDs, no .env, no discord.js/dotenv installed, and Discord DNS/HTTPS is unavailable. npm registry DNS/HTTPS is also unavailable; previous offline npm ci failed on uncached zlibjs@0.3.1. No live login, channel-role action, attachment delivery, live 429, live gateway restart, OCR.space POST, or screenshot OCR acceptance was performed. Windows/PowerShell gates are NOT RUN on this Linux host. The local preflight correctly reports these blocks. Phase 9 is PARTIALLY IMPLEMENTED; production remains NO-GO.
+
+================================================================================
+PHASE 10 BASELINE RECONCILIATION — 2026-11-04
+================================================================================
+
+The Image Text Reader baseline includes desktop file selection, drag/drop, clipboard image, preview, in-browser Tesseract OCR, progress, editable text, copy/download/reset and status handling. The example's automatic Discord webhook POST is prohibited because a hard-coded webhook is a bearer secret. A safe no-backend fallback can produce a downloadable image/JSON submission for the participant to attach manually in Discord, but this is not automatic browser-to-bot delivery.
+
+The workbook calculator baseline includes four events (Damage, Kills, Race, Grand Yolo), seven games, dashboard, roster, standings, totals, multipliers/pools, localStorage, JSON backup, responsive layout and print. The provided file includes sample players/data and roster/reset/clear/scoring controls; these must not be exposed to participants unless the existing bot authorizes them. The Player derivative must be read-only for other participants and must not present workbook seed data as live scores.
+
+A static file:// HTML page cannot securely retrieve private current bot data, authenticate the player, send a command with the bot's credentials, or enforce admin permissions. It can support local preview/OCR assistance, data editing, JSON export/import and manual Discord attachment. Live authoritative refresh, direct secure transfer and protected Admin operations require a trusted server-side bridge (preferably within the existing Node.js bot process) with verified identity, server-side authorization, request/origin/CSRF protections, limits and audit provenance. Do not deploy an internet-accessible bridge without an agreed host/network/auth configuration. Continue independent offline UI work; pause only that backend-dependent execution until the deployment/identity decision is available.
+
+The exact implementation.zip and the exact filenames score_report_imgToDiscord.html, score_report_imgDiscord.html and yolo_tournament_scoreCalculator.html were not found in the inspected Library/archive material. The two full HTML examples pasted by the user are therefore the primary design inputs; testdata/yolo_tourney_workbook_reference.html, scoreReport_dark_clipboard (1).html, backupWkbkBrowser.html and the workbook are supporting references. Do not claim the missing archive/files were inspected.
+
