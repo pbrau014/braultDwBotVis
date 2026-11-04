@@ -17,6 +17,16 @@
   </header>
   <main class="page">
     <section class="page-heading"><div><p class="eyebrow">ADMIN WORKSPACE</p><h1>Tournament control</h1><p class="lede small">Roster, account links, scoring, OCR review and recovery exports. Every mutation is authorized again by the Node service.</p></div><a class="button secondary" href="/api/admin/backup">Download full recovery JSON</a></section>
+      <section class="panel format-guide" aria-labelledby="admin-format-guide-title">
+        <div class="panel-heading"><div><p class="eyebrow">FORMAT GOVERNANCE</p><h2 id="admin-format-guide-title">Pilot YOLO and Full YOLO</h2></div>
+          <button class="help-tip" type="button" aria-describedby="admin-format-tip" aria-label="Quick note about format governance">i<span id="admin-format-tip" class="help-tip__content" role="tooltip">Choose the format before registration opens. The format locks when registration opens; accepted results and legacy records are never silently reclassified.</span></button>
+        </div>
+        <div class="format-guide__grid">
+          <article><h3>Pilot YOLO</h3><p>One evening, with event-specific rules and no automatic carryover into a Full YOLO season.</p></article>
+          <article><h3>Full YOLO</h3><p>Season management across regular-season event nights, postseason fixtures and the Grand YOLO Finale.</p></article>
+        </div>
+        <p class="muted">Dates, roster sizes, ship restrictions, prize values, scoring publication and approvals remain organizer-controlled. Unapproved values must not be published as rules.</p>
+      </section>
     <section id="admin-denied" class="notice warning hidden"><h2>Administrator access required</h2><p>This page and its operations are restricted to Discord IDs listed in <code>TOURNAMENT_ADMIN_IDS</code> in the local bot environment.</p></section>
     <section id="admin-content" class="hidden">
       <div class="metric-grid">
