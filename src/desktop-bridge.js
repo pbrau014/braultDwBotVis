@@ -332,6 +332,16 @@ function createDesktopBridge(options={}){
         const result=await call('createYoloMatch',principal,matchRoute[1],await readJson(req));
         audit(principal,'yolo-match-create');sendJson(res,201,result);return true;
       }
+      const raceSideEventRoute=p.match(/^\/api\/admin\/yolo-event-nights\/([A-Za-z0-9._-]+)\/race-side-events$/);
+      if(req.method==='POST'&&raceSideEventRoute){
+        const result=await call('createYoloRaceSideEvent',principal,raceSideEventRoute[1],await readJson(req));
+        audit(principal,'yolo-race-side-event-create');sendJson(res,201,result);return true;
+      }
+      const raceTimeRoute=p.match(/^\/api\/admin\/yolo-games\/([A-Za-z0-9._-]+)\/race-time$/);
+      if(req.method==='POST'&&raceTimeRoute){
+        const result=await call('recordYoloRaceTime',principal,raceTimeRoute[1],await readJson(req));
+        audit(principal,'yolo-race-time-record');sendJson(res,200,result);return true;
+      }
       const matchOutcomeRoute=p.match(/^\/api\/admin\/yolo-matches\/([A-Za-z0-9._-]+)\/outcome$/);
       if(req.method==='POST'&&matchOutcomeRoute){
         const result=await call('certifyYoloMatchOutcome',principal,matchOutcomeRoute[1],await readJson(req));
