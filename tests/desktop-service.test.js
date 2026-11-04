@@ -149,3 +149,24 @@ test('participant overview exposes only aggregate event registration state, not 
  assert.equal(overview.eventNights[0].registrationCount,1);
  assert.equal(Object.hasOwn(overview.eventNights[0],'registrations'),false);
 });
+
+test('Full operations preserve registered roster, fixture, match, game and reviewed evidence relationships',async()=>{
+ const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN});
+ await f.service.createYoloTournament(admin,{id:'full-ops',name:'Full Ops',format:'full',season:{id:'season-ops',durationWeeks:10}});
+ await f.service.createYoloEventNight(admin,{id:'ops-night',tournamentId:'full-ops',stage:'regular-season',startsAt:'2026-11-07T18:00:00Z'});
+ await f.service.registerYoloParticipant(admin,'ops-night',{playerId:f.alpha.id});
+ await f.service.registerYoloParticipant(admin,'ops-night',{playerId:2});
+ const teamA=await f.service.createYoloTeam(admin,'ops-night',{id:'team-a',name:'Team A',participantIds:[String(f.alpha.id)]});
+ const teamB=await f.service.createYoloTeam(admin,'ops-night',{id:'team-b',name:'Team B',participantIds:['2']});
+ assert.equal(teamA.eventNightId,'ops-night');
+ await assert.rejects(f.service.createYoloTeam(admin,'ops-night',{id:'team-c',name:'Duplicate member',participantIds:[String(f.alpha.id)]}),e=>e.code==='PARTICIPANT_ALREADY_ASSIGNED');
+ const fixtureRow=await f.service.createYoloFixture(admin,'ops-night',{id:'fixture-1',homeTeamId:teamA.id,awayTeamId:teamB.id,scheduledAt:'2026-11-07T19:00:00Z'});
+ const match=await f.service.createYoloMatch(admin,fixtureRow.id,{id:'match-1',matchNumber:1});
+ const game=await f.service.createYoloGame(admin,match.id,{id:'game-1',gameNumber:1});
+ const upload=await f.service.submitImage(admin,{buffer:Buffer.from('verified evidence'),filename:'evidence.png',contentType:'image/png'});
+ await f.service.mapSubmission(admin,upload.submissionId,{playerId:f.alpha.id,event:'damage',gameNumber:1,shipClass:'DD',tier:8});
+ const linked=await f.service.linkYoloGameEvidence(admin,game.id,{recordId:upload.submissionId});
+ assert.equal(linked.status,'awaiting-evidence-review');
+ const reviewed=await f.service.reviewYoloGameEvidence(admin,game.id,{accepted:true});
+ assert.equal(reviewed.status,'evidence-accepted');
+});
