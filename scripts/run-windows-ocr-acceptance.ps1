@@ -38,8 +38,8 @@ try {
  $env:OCR_CV_ASSIST='0'
  $env:OCRSPACE_ENABLED='0'
  $env:OCR_NETWORK_BLOCK_ENABLED='1'
- $Guard=Join-Path $ProjectRoot 'scripts\block-network.js'
- $env:NODE_OPTIONS=(($env:NODE_OPTIONS+' --require "'+$Guard+'"').Trim())
+ $Guard=(Join-Path $ProjectRoot 'scripts\block-network.js').Replace('\','/')
+ $env:NODE_OPTIONS=(($env:NODE_OPTIONS+' --require="'+$Guard+'"').Trim())
  $script:Results=@()
  function Invoke-LoggedNpm {
   param([string]$Label,[string[]]$Arguments)
