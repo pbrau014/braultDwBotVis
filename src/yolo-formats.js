@@ -62,6 +62,37 @@ function registerParticipant(n, participantId, at = new Date().toISOString()) {
 }
 function freezeRules(settings, eventStarted) { if (eventStarted) throw new Error('Published event rules are frozen after event start; changes apply prospectively to future/unplayed games only.'); return structuredClone(settings); }
 function raceMetric(seconds) { const n = Number(seconds); if (!Number.isFinite(n) || n <= 0) throw new Error('Race elapsed time must be a positive number of seconds.'); return { type: 'race-time-metric', elapsedSeconds: n, normalizedMetric: 1 / n, ordering: 'lower-elapsed-time-is-better' }; }
+function createTeam(input = {}) {
+ const participantIds = input.participantIds;
+ if (!Array.isArray(participantIds) || !participantIds.length || participantIds.some(id=>!String(id||'').trim()))
+  throw new Error('A team requires one or more participant IDs.');
+ const members = participantIds.map(id=>String(id).trim());
+ if (new Set(members).size !== members.length) throw new Error('A team cannot contain the same participant twice.');
+ return { id:identifier(input.id,'Team ID'),eventNightId:identifier(input.eventNightId,'Event-night ID'),
+  name:requiredText(input.name,'Team name'),participantIds:members,status:'draft',rosterLockedAt:null };
+}
+function createFixture(input = {}) {
+ const homeTeamId=identifier(input.homeTeamId,'Home team ID'),awayTeamId=identifier(input.awayTeamId,'Away team ID');
+ if(homeTeamId===awayTeamId) throw new Error('A fixture requires two distinct teams.');
+ const seriesLength=input.seriesLength??1;
+ if(!Number.isInteger(seriesLength)||seriesLength<1||seriesLength>9||seriesLength%2===0)
+  throw new Error('Series length must be an odd integer from 1 to 9.');
+ const scheduledAt=timestamp(input.scheduledAt,'Fixture schedule');
+ if(!scheduledAt) throw new Error('Fixture schedule time is required.');
+ return {id:identifier(input.id,'Fixture ID'),eventNightId:identifier(input.eventNightId,'Event-night ID'),
+  homeTeamId,awayTeamId,scheduledAt,seriesLength,status:'draft',matchIds:[]};
+}
+function createMatch(input = {}) {
+ const number=input.matchNumber??1;
+ if(!Number.isInteger(number)||number<1||number>9) throw new Error('Match number must be an integer from 1 to 9.');
+ return {id:identifier(input.id,'Match ID'),fixtureId:identifier(input.fixtureId,'Fixture ID'),
+  matchNumber:number,status:'draft',gameIds:[],outcome:null,acceptedPerformanceRecordIds:[]};
+}
+function createGame(input = {}) {
+ return {id:identifier(input.id,'Game ID'),matchId:identifier(input.matchId,'Match ID'),
+  gameNumber:(()=>{const n=input.gameNumber??1;if(!Number.isInteger(n)||n<1||n>99)throw new Error('Game number must be an integer from 1 to 99.');return n;})(),
+  status:'pending-evidence',evidenceRecordIds:[],acceptedAt:null};
+}
 function createRaceSideEvent(input = {}) { const offset = input.scheduleOffsetMinutes ?? 60; if (!Number.isInteger(offset) || offset < 0 || offset > 1440) throw new Error('Race side-event offset must be from 0 to 1440 minutes.'); return { id: identifier(input.id, 'Race side-event ID'), type: 'race-side-event', eventNightId: identifier(input.eventNightId, 'Event-night ID'), scheduleOffsetMinutes: offset, scoringPolicyId: input.scoringPolicyId || null, approved: input.approved === true }; }
 function grandYoloScore(input = {}) { return { type: 'grand-yolo-score', scoringCategory: 'grand', eventNightId: requiredText(input.eventNightId, 'Event-night ID') }; }
 function grandYoloFinale(input = {}) { return { type: 'grand-yolo-finale', stageId: requiredText(input.stageId, 'Finale stage ID'), matchId: requiredText(input.matchId, 'Finale match ID') }; }
@@ -76,4 +107,4 @@ function validateMatchOutcome(input = {}) {
   throw new Error('A non-empty published tie-break order is required.');
  return { status:'pending-calculation',approvedScoringMethodId,acceptedPerformanceRecordIds:[...ids],aggregation:input.aggregation,rounding:input.rounding,tieBreakOrder:[...input.tieBreakOrder] };
 }
-module.exports = { FORMATS, STAGES, STATUSES, createTournament, assertTransition, transitionTournament, transitionStage, createEventNight, registerParticipant, freezeRules, raceMetric, createRaceSideEvent, grandYoloScore, grandYoloFinale, validateMatchOutcome };
+module.exports = { FORMATS, STAGES, STATUSES, createTournament, assertTransition, transitionTournament, transitionStage, createEventNight, registerParticipant, freezeRules, raceMetric, createTeam, createFixture, createMatch, createGame, createRaceSideEvent, grandYoloScore, grandYoloFinale, validateMatchOutcome };
