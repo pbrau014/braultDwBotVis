@@ -20,7 +20,7 @@ The bot ingests WoWS battle-result screenshots, extracts structured battle evide
 - Preferred reproducible runtime: Node.js 22.16.0 (`.nvmrc`).
 - Install with `npm ci`.
 - Run offline tests with `npm test`.
-- Run the Discord channel-preflight unit tests with `npm run test:discord-gateway-diagnostics`.
+- Run the combined Discord channel-preflight and command-policy unit tests with `npm run test:discord-preflight`.
 - OCR.space live/dry-run commands are not present in this branch's `package.json`; the provider is not currently integrated here.
 
 The current captured verification status is documented in `GITHUB_TRANSFER_STATUS.md` and `docs/iteration23/PHASE9_DISCORD_INTEGRATION_STATUS_2026-11-04.md`.
@@ -52,7 +52,7 @@ The current branch contains application source, scripts, tests, documentation, m
 
 The bot now records discord.js shard READY/disconnect/reconnect/resume/error events and validates the configured guild text channel after the client reaches ClientReady. The read-only preflight checks View Channel, Send Messages (or Send Messages in Threads for a thread), and Attach Files before reporting the bot as fully online. discord.js remains responsible for Gateway heartbeat and session recovery.
 
-The focused check is `npm run test:discord-gateway-diagnostics`. Its six isolated unit tests passed on Node.js v22.16.0; this is not a live Discord test. See the Phase 9 quickstart for the isolated test guild procedure.
+The focused check is `npm run test:discord-preflight`. Its six isolated unit tests passed on Node.js v22.16.0; this is not a live Discord test. See the Phase 9 quickstart for the isolated test guild procedure.
 
 
 The Discord REST manager's `rateLimited` event is logged without credentials or request bodies; discord.js retains responsibility for dynamic REST bucket scheduling and retry timing.

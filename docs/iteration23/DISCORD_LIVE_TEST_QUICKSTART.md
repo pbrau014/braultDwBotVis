@@ -35,7 +35,7 @@ Do not paste the token into chat or commit `.env`. It is excluded by the reposit
 First run the credential-free Discord channel-preflight unit tests:
 
 ```powershell
-npm run test:discord-gateway-diagnostics
+npm run test:discord-preflight
 ```
 
 Use Node v22.16.0, pinned by `.nvmrc`:
