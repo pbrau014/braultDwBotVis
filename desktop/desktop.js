@@ -105,7 +105,7 @@
     });
     details.append(form);return details;
   }
-  function mappingForm(submission,{admin=false,roster=[],onDone=()=>{}}={}) {
+  function mappingForm(submission,{admin=false,roster=[],tournaments=[],onDone=()=>{}}={}) {
     const block=node('div','review-block');
     block.append(node('h4','','Map this screenshot to a tournament game'));
     const form=node('form','form-grid');
@@ -121,6 +121,7 @@
       label.append(input);form.append(label);return input;
     };
     if(admin)addSelect('playerId','Roster player',[['','Select roster player…'],...roster.map(p=>[String(p.id),'#'+p.id+' · '+p.name])]);
+    if(tournaments.length)addSelect('tournamentId','Format-scoped tournament',[['','Use legacy/global scorebook'],...tournaments.map(t=>[t.id,t.name+' · '+(t.format==='pilot'?'Pilot YOLO':'Full YOLO')+' · '+t.status])],false);
     const eventSelect=addSelect('event','Event',[['','Select event…'],['damage','Damage'],['kills','Kills'],['race','Race'],['grand','Grand Yolo']]);
     addInput('gameNumber','Game number','number',true,'1–7');
     addSelect('shipClass','Ship class',[['','Select class…'],['DD','DD'],['CA','CA'],['BB','BB']]);
