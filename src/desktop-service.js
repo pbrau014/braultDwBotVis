@@ -301,11 +301,11 @@ function createDesktopService(options = {}) {
     },
     async recordMatchOutcome(principal,body) {
       role(principal,['admin']);
-      return mutate(async()=>{const current=state();const season=current.lifecycle?.seasons.find(x=>x.id===body?.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});const outcome=Lifecycle.recordMatchOutcome(season,body||{});await options.saveState();return outcome;});
+      return mutate(async()=>{const current=state();const season=current.lifecycle?.seasons.find(x=>x.id===body?.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});const approval=current.lifecycle?.approvals?.find(x=>x.id===body?.methodId&&x.status==='approved');if(!approval)throw Object.assign(new Error('A recorded organizer approval is required for this scoring method.'),{status:409,code:'SCORING_APPROVAL_REQUIRED'});const outcome=Lifecycle.recordMatchOutcome(season,{...body,method:{approved:true,methodId:approval.id,approvedAt:approval.approvedAt,approvedBy:approval.approvedBy}});await options.saveState();return outcome;});
     },
     async advanceBracket(principal,body) {
       role(principal,['admin']);
-      return mutate(async()=>{const current=state();const season=current.lifecycle?.seasons.find(x=>x.id===body?.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});const progression=Lifecycle.advanceBracket(season,body||{});await options.saveState();return progression;});
+      return mutate(async()=>{const current=state();const season=current.lifecycle?.seasons.find(x=>x.id===body?.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});const approval=current.lifecycle?.approvals?.find(x=>x.id===body?.methodId&&x.status==='approved');if(!approval)throw Object.assign(new Error('A recorded organizer approval is required for bracket advancement.'),{status:409,code:'SCORING_APPROVAL_REQUIRED'});const progression=Lifecycle.advanceBracket(season,{...body,method:{approved:true,methodId:approval.id,approvedAt:approval.approvedAt,approvedBy:approval.approvedBy}});await options.saveState();return progression;});
     },
     async createRaceSideEvent(principal,body) {
       role(principal,['admin']);
@@ -319,6 +319,15 @@ function createDesktopService(options = {}) {
     async completeStage(principal,body) {
       role(principal,['admin']);
       return mutate(async()=>{const current=state();const season=current.lifecycle?.seasons.find(x=>x.id===body?.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});const stage=Lifecycle.completeStage(season,body?.stageId);await options.saveState();return stage;});
+    },
+
+    async createApprovalRecord(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();current.lifecycle||=Lifecycle.createLifecycleState(current);const record=Lifecycle.createApprovalRecord({...body,approvedBy:principal.discordUserId});if(current.lifecycle.approvals.some(x=>x.id===record.id))throw Object.assign(new Error('Approval id already exists.'),{status:409,code:'APPROVAL_EXISTS'});current.lifecycle.approvals.push(record);await options.saveState();return record;});
+    },
+    async createAward(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();current.lifecycle||=Lifecycle.createLifecycleState(current);const approval=current.lifecycle.approvals.find(x=>x.id===body?.approvalId&&x.status==='approved');if(!approval)throw Object.assign(new Error('An approved award authorization record is required.'),{status:409,code:'AWARD_APPROVAL_REQUIRED'});const award=Lifecycle.createAward(body||{});current.lifecycle.awards.push(award);await options.saveState();return award;});
     },
     async exportBackup(principal) {
       role(principal,['admin']);
