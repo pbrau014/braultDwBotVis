@@ -244,7 +244,7 @@ function createDesktopService(options = {}) {
             if(!scopedTournament)throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});
             const season=scopedTournament.format==='full'?current.lifecycle.seasons.find(x=>x.id===scopedTournament.seasonId):null;
             const scoreEntry=Lifecycle.recordScoreEntry(scopedTournament,{participantId:String(player.id),category:event,gameNumber,shipClass,tier,evidenceId:entry.record_id,eventNightId:body?.eventNightId,damage,kills,time},season);
-            scopedStanding=tournamentStandings(current,scopedTournament,season).find(x=>String(x.id)===String(player.id))||null;
+            auditLifecycle(current,principal,'tournament.score.mapped',{tournamentId:scopedTournament.id,eventNightId:scoreEntry.eventNightId,participantId:String(player.id),category:event,gameNumber,evidenceId:entry.record_id});\n            scopedStanding=tournamentStandings(current,scopedTournament,season).find(x=>String(x.id)===String(player.id))||null;
             result={player,event,gameNumber,game:scoreEntry,scores:tournamentStandings(current,scopedTournament,season)};
           }else{
             result=Tournament.recordResult(current,{player:player.id,event,gameNumber,shipClass,tier,recordId:entry.record_id,damage,kills,time});
@@ -356,7 +356,7 @@ function createDesktopService(options = {}) {
 
     async transitionTournament(principal,body) {
       role(principal,['admin']);
-      return mutate(async()=>{const current=state();const t=current.lifecycle?.tournaments.find(x=>x.id===body?.tournamentId);if(!t)throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});Lifecycle.transitionTournament(t,body?.status,{actor:principal.discordUserId,reason:body?.reason});await options.saveState();return t;});
+      return mutate(async()=>{const current=state();const t=current.lifecycle?.tournaments.find(x=>x.id===body?.tournamentId);if(!t)throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});Lifecycle.transitionTournament(t,body?.status,{actor:principal.discordUserId,reason:body?.reason});auditLifecycle(current,principal,'tournament.status.changed',{tournamentId:t.id,status:t.status,reason:body?.reason||''});await options.saveState();return t;});
     },
     async completeStage(principal,body) {
       role(principal,['admin']);
