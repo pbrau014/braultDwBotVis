@@ -323,7 +323,7 @@ function createDesktopService(options = {}) {
     },
     async assignRoster(principal,body) {
       role(principal,['admin']);
-      return mutate(async()=>{const current=state();const season=current.lifecycle?.seasons.find(x=>x.id===body?.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});const assignment=Lifecycle.assignRoster(season,{participantId:body?.participantId,teamId:body?.teamId});await options.saveState();return assignment;});
+      return mutate(async()=>{const current=state();const season=current.lifecycle?.seasons.find(x=>x.id===body?.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});const assignment=Lifecycle.assignRoster(season,{participantId:body?.participantId,teamId:body?.teamId,eventNightId:body?.eventNightId});await options.saveState();return assignment;});
     },
     async createEventNight(principal,body) {
       role(principal,['admin']);
