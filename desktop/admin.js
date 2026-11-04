@@ -9,6 +9,7 @@
     async function load(){
       [overview]=await Promise.all([D.api('/api/overview')]);
       const submissions=await D.api('/api/submissions');
+      populateLifecycleSelectors(overview.lifecycle||{});
       D.$('admin-roster-count').textContent=overview.roster.length+'/'+overview.maxPlayers;
       D.$('admin-total').textContent=D.number(overview.aggregate.doubloons);
       D.$('admin-value').textContent=D.money(overview.aggregate.estimatedValue);
@@ -51,6 +52,36 @@
       for(const item of submissions.items)list.append(D.renderSubmission(item,{admin:true,roster:overview.roster,onDone:load}));
       status('Admin state loaded from the active tournament store.','success');
       updateSettingFields();
+    }
+
+    function populateLifecycleSelectors(lifecycle){
+      const groups={
+        tournaments:(lifecycle.tournaments||[]).filter(t=>t.format==='full').map(t=>[t.id,t.name+' ('+t.format+')']),
+        seasons:(lifecycle.seasons||[]).map(x=>[x.id,x.name||x.id]),
+        stages:(lifecycle.seasons||[]).flatMap(x=>(x.stages||[]).map(y=>[y.id,(x.name||x.id)+' · '+y.type])),
+        teams:(lifecycle.seasons||[]).flatMap(x=>(x.teams||[]).map(y=>[y.id,(x.name||x.id)+' · '+y.name])),
+      };
+      for(const select of document.querySelectorAll('select[data-entity]')){
+        const values=groups[select.dataset.entity]||[];
+        const previous=select.value;select.replaceChildren();
+        const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent=values.length?'Select…':'No records yet';select.append(placeholder);
+        for(const [value,label] of values){const option=document.createElement('option');option.value=value;option.textContent=label;select.append(option);}
+        if(values.some(x=>x[0]===previous))select.value=previous;
+      }
+    }
+    for(const form of document.querySelectorAll('form[data-lifecycle-endpoint]')){
+      form.addEventListener('submit',async event=>{
+        event.preventDefault();const button=form.querySelector('button[type="submit"]');if(button)button.disabled=true;
+        try{
+          const body=Object.fromEntries(new FormData(form).entries());
+          for(const key of ['scoreA','scoreB','gameNumber','elapsedSeconds'])if(body[key]!==undefined&&body[key]!=='')body[key]=Number(body[key]);
+          if(body.methodId){body.method={approved:true,methodId:body.methodId,approvedAt:new Date(body.approvedAt).toISOString(),approvedBy:body.approvedBy};delete body.methodId;delete body.approvedAt;delete body.approvedBy;}
+          if(body.startsAt)body.startsAt=new Date(body.startsAt).toISOString();
+          await D.api(form.dataset.lifecycleEndpoint,{method:'POST',body});
+          form.reset();await load();status('Lifecycle change saved.','success');
+        }catch(error){status(error.message,'error');}
+        finally{if(button)button.disabled=false;}
+      });
     }
     D.$('add-player-form').addEventListener('submit',async e=>{
       e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
