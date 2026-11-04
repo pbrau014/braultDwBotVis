@@ -2669,7 +2669,7 @@ function tournamentHelp() {
         '`!yolo help` — show this help',
         '`!yolo players` — list roster players and IDs',
         '`!yolo panel` — public interactive totals, standings, roster and event leaderboard panel',
-        '`!yolo download-workbook` / `!yolo workbook` — download the Excel source workbook',
+        '`!yolo download-workbook` / `!yolo workbook` — download the source workbook (admin only while participant display is reviewed)',
         '`!yolo export-workbook` — export workbook-compatible JSON (admin)',
         '`!yolo player <name or ID>` — show a player’s scores and 28 game slots',
         '`!yolo add-player <name>` — add a player (admin)',
@@ -2891,9 +2891,10 @@ async function handleTournamentCommand(message) {
             return true;
         }
         else if (command === 'download-workbook' || command === 'workbook') {
+            if (!isTournamentAdmin(message)) throw new Error('Workbook download is temporarily admin-only while the participant-facing workbook is reviewed.');
             const workbookBytes = await fs.readFile(WORKBOOK_PATH);
             await message.reply({
-                content: 'Source Excel tournament workbook attached. Its default Totals!H12 formula is `=0.54*G12/100` and displays **$12.49** for the workbook’s default data.',
+                content: 'Source Excel tournament workbook attached for administrator review. The participant-facing prize conversion remains unpublished pending canonical workbook approval.',
                 files: [new AttachmentBuilder(workbookBytes, { name: 'YOLO-Tournament-Workbook.xlsm' })],
                 allowedMentions: { repliedUser: false, parse: [] },
             });
