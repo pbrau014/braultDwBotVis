@@ -360,6 +360,8 @@ test('complete synthetic Discord tour: all commands, every slot, formulas, persi
   assert.match((await send('!yolo standings')).text, /aggregate/i);
   assert.match((await send('!yolo export', { admin: false })).text, /restricted to tournament admins/i);
   assert.match((await send('!yolo export-workbook', { admin: false })).text, /restricted to tournament admins/i);
+  assert.match((await send('!yolo settings', { admin: false })).text, /restricted to tournament admins/i);
+  assert.match((await send('!yolo setting damage multiplier 9', { admin: false })).text, /restricted to tournament admins/i);
   assert.match(help.text + '\n' + help.sends.map(x => x.content || '').join('\n'), /same configured channel/i);
   const workbookDownload = await send('!yolo download-workbook', { admin: false });
   const workbookReply = workbookDownload.replies.find(r => Array.isArray(r.files) && r.files.length);

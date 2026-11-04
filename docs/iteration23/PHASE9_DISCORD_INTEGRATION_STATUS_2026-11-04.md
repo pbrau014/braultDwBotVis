@@ -78,3 +78,6 @@ The channel permission preflight now aborts startup if the configured channel ca
 Code review found that the read-only `!yolo settings` command was handled under the plural name but the admin-only allowlist contained only the singular `setting` mutation command. The plural settings command could therefore be reached by an ordinary participant. This is corrected by centralizing the admin-only command policy in `src/tournament-command-policy.js`; both `setting` and `settings` are now restricted. Added pure regression tests for all admin-only and public command families. The live quickstart now explicitly verifies that a participant is denied both `!yolo settings` and `!yolo add-player`.
 
 This is a code-level authorization fix. The new policy unit tests are run separately; the complete synthetic Discord integration suite and live role/permission test still need to be rerun.
+
+
+The synthetic full-system test now also asserts that a non-admin is denied both the read-only `!yolo settings` command and the `!yolo setting` mutation command. These two integration assertions are committed but have not been executed in the current environment because the complete dependency-backed test checkout is unavailable.
