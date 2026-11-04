@@ -319,7 +319,7 @@ function createDesktopService(options = {}) {
             if(!tournament) throw new Error('Tournament ID is required.');
             const match=tournament.matches.find(item=>item.id===String(body.matchId));
             if(!match) throw new Error('Match was not found.');
-            result=TournamentFormats.recordGame(match,body.game||{},tournament.teams);
+            result=TournamentFormats.recordGame(match,body.game||{},tournament.teams,tournament.registrations);
             TournamentFormats.audit(tournament,'match_game_recorded',{matchId:match.id,gameNumber:result.gameNumber},actor);
             break;
           }
