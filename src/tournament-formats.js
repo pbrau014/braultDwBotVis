@@ -144,6 +144,7 @@ function assignTeam(tournament, teamInput, actor = 'organizer') {
   if (!Array.isArray(teamInput.playerIds)) throw new Error('Team playerIds must be an array of registered player IDs.');
   const members = [...new Set(teamInput.playerIds.map(String))];
   if (!members.length) throw new Error('A team must contain at least one registered participant.');
+  if (tournament.teams.some(team => team.playerIds.some(id => members.includes(id)))) throw new Error('A participant cannot be assigned to more than one active tournament team.');
   for (const id of members) {
     const registration = tournament.registrations.find(r => r.playerId === id && r.status === 'registered');
     if (!registration) throw new Error('Every team member must have an active registration: ' + id);
@@ -293,6 +294,8 @@ function createEventNight(tournament, input, actor = 'organizer') {
     startsAt: new Date(startsAt).toISOString(), endsAt: new Date(endsAt).toISOString(),
     timezone: cleanText(input.timezone || tournament.config.timezone, 'Event night timezone'),
     status: 'scheduled', fixtureIds: [], attendance: [], createdAt: now() };
+  try { new Intl.DateTimeFormat('en-US', { timeZone: eventNight.timezone }); }
+  catch { throw new Error('Event night requires a valid IANA timezone.'); }
   tournament.eventNights.push(eventNight);
   audit(tournament, 'event_night_scheduled', { eventNightId: id, stageKey: eventNight.stageKey, startsAt: eventNight.startsAt }, actor);
   return eventNight;
@@ -326,6 +329,7 @@ function createFixture(tournament, input, actor = 'organizer') {
 function createMatch(tournament, fixtureId, actor = 'organizer') {
   const fixture = tournament.fixtures.find(f => f.id === String(fixtureId));
   if (!fixture) throw new Error('Fixture was not found.');
+  if (fixture.status !== 'scheduled') throw new Error('Only a scheduled fixture can be converted into a match.');
   if (fixture.matchId) throw new Error('Fixture already has a match.');
   const match = { id: tournament.id + ':match:' + (tournament.matches.length + 1), fixtureId: fixture.id,
     stageKey: fixture.stageKey, homeTeamId: fixture.homeTeamId, awayTeamId: fixture.awayTeamId,
@@ -336,7 +340,7 @@ function createMatch(tournament, fixtureId, actor = 'organizer') {
   return match;
 }
 
-function recordGame(match, game, teams = [], registrations = [], evidence = null) {
+function recordGame(match, game, teams = [], registrations = [], evidence = []) {
   if (match.status !== 'scheduled' && match.status !== 'active') throw new Error('Match is not open for game results.');
   const gameNumber = Number(game.gameNumber);
   if (!Number.isInteger(gameNumber) || gameNumber < 1) throw new Error('Game number must be a positive integer.');
@@ -350,13 +354,11 @@ function recordGame(match, game, teams = [], registrations = [], evidence = null
     playerId: cleanText(game.playerId, 'Player ID'), metrics: { damage: Number(metrics.damage), kills: Number(metrics.kills) },
     evidenceId: cleanText(game.evidenceId, 'Evidence reference'), recordedAt: now() };
   if (![match.homeTeamId, match.awayTeamId].includes(result.teamId)) throw new Error('Game result team is not part of this match.');
-  if (evidence && !evidence.some(item => item.id === result.evidenceId)) throw new Error('Game result must reference registered original screenshot evidence.');
-  if (teams.length) {
-    const team = teams.find(item => item.id === result.teamId);
-    if (!team || !team.rosterLocked || !team.playerIds.includes(result.playerId)) throw new Error('Game player must belong to the locked roster of the recorded team.');
-    if (Array.isArray(registrations) && !registrations.some(item => item.playerId === result.playerId && item.status === 'registered'))
-      throw new Error('Game player must have an active registration.');
-  }
+  if (!Array.isArray(evidence) || !evidence.some(item => item.id === result.evidenceId)) throw new Error('Game result must reference registered original screenshot evidence.');
+  const team = teams.find(item => item.id === result.teamId);
+  if (!team || !team.rosterLocked || !team.playerIds.includes(result.playerId)) throw new Error('Game player must belong to the locked roster of the recorded team.');
+  if (!registrations.some(item => item.playerId === result.playerId && item.status === 'registered'))
+    throw new Error('Game player must have an active registration.');
   match.games.push(result);
   match.status = 'active';
   return result;
