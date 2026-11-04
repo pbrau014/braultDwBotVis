@@ -182,3 +182,26 @@ test('Race standings rank shorter elapsed time ahead of longer elapsed time',asy
   const summary=(await f.service.getOverview(admin)).tournaments.find(x=>x.id===pilot.id);
   assert.equal(summary.standings[0].id,f.alpha.id);
 });
+
+test('Player team visibility follows Pilot-visible and Full-ready-up rules',async()=>{
+ const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN}),player=await f.service.resolvePrincipal({id:PLAYER});
+ const pilot=await f.service.createTournament(admin,{id:'pilot-visibility',name:'Pilot',format:'pilot'});
+ await f.service.registerPilotParticipant(admin,{tournamentId:pilot.id,participantId:String(f.alpha.id)});
+ const pilotNight=await f.service.createPilotEventNight(admin,{tournamentId:pilot.id});
+ const pilotTeam=await f.service.createPilotTeam(admin,{tournamentId:pilot.id,name:'Home'});
+ await f.service.assignPilotRoster(admin,{tournamentId:pilot.id,participantId:String(f.alpha.id),teamId:pilotTeam.id,eventNightId:pilotNight.id});
+ let overview=await f.service.getOverview(player);
+ assert.equal(overview.tournaments.find(x=>x.id===pilot.id).myAssignments[0].teamName,'Home');
+ const full=await f.service.createTournament(admin,{id:'full-visibility',name:'Full',format:'full'});
+ const season=await f.service.createSeason(admin,{tournamentId:full.id,id:'season-visibility'});
+ const stage=await f.service.addStage(admin,{seasonId:season.id,type:'regular_season'});
+ const night=await f.service.createEventNight(admin,{seasonId:season.id,stageId:stage.id});
+ const team=await f.service.createTeam(admin,{seasonId:season.id,name:'Hidden Team'});
+ await f.service.registerParticipant(admin,{seasonId:season.id,participantId:String(f.alpha.id),displayName:f.alpha.name});
+ await f.service.assignRoster(admin,{seasonId:season.id,participantId:String(f.alpha.id),teamId:team.id,eventNightId:night.id});
+ overview=await f.service.getOverview(player);
+ assert.equal(overview.tournaments.find(x=>x.id===full.id).myAssignments.length,0);
+ for(const status of ['registration_open','locked'])await f.service.transitionEventNight(admin,{seasonId:season.id,eventNightId:night.id,status});
+ overview=await f.service.getOverview(player);
+ assert.equal(overview.tournaments.find(x=>x.id===full.id).myAssignments[0].teamName,'Hidden Team');
+});
