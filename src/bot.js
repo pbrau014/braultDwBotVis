@@ -1602,8 +1602,9 @@ async function extractTextCore(imageBuffer) {
             // this left-column sweep to the measured safe interval; the existing
             // multi-width/multi-PSM quorum still decides whether any value is usable.
             const lowLeftCompactDamagePanel =
-                (anchorDisagreement && rewardBaseFraction !== null && rewardBaseFraction < 0.10) ||
-                measuredDamageLeftFraction < 0.08;
+                correctedDamageLeftFraction < 0.08 ||
+                (anchorDisagreement && rewardBaseFraction !== null &&
+                    rewardBaseFraction < 0.10 && correctedDamageLeftFraction < 0.10);
             const damageSweepWidthFractions = lowLeftCompactDamagePanel
                 ? [0.108, 0.110, 0.112, 0.114, 0.116]
                 : needsExpandedDamageSweep
