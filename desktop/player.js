@@ -51,7 +51,7 @@
     const list=D.$('submission-list');list.replaceChildren();
     if(!submissions.items.length)list.append(D.node('p','muted','No desktop screenshot submissions yet. Submit a battle result screenshot to begin.'));
     for(const item of submissions.items){
-      list.append(D.renderSubmission(item,{admin:false,onDone:()=>location.reload()}));
+      list.append(D.renderSubmission(item,{admin:false,tournaments:(overview.tournaments||[]).filter(t=>(t.standings||[]).some(r=>String(r.id)===String(overview.player.id))),onDone:()=>location.reload()}));
     }
     status('Tournament data loaded from the local bot service.','success');
     async function refresh(){
