@@ -113,7 +113,8 @@ function createDesktopService(options = {}) {
       const tournamentSummaries=competition.tournaments.map(t=>({id:t.id,name:t.name,format:t.format,status:t.status,
         stages:t.stages.map(s=>({key:s.key,status:s.status,startsAt:s.startsAt||s.startedAt||null,endsAt:s.endsAt||s.completedAt||null})),
         registered:principal.role==='player'?t.registrations.some(r=>r.playerId===String(principal.player.id)&&r.status==='registered'):undefined,
-        seasonWeeks:t.config.seasonWeeks,registrationOpen:t.config.registrationOpen,eventStart:t.config.eventStart,eventEnd:t.config.eventEnd}));
+        seasonWeeks:t.config.seasonWeeks,registrationOpen:t.config.registrationOpen,eventStart:t.config.eventStart,eventEnd:t.config.eventEnd,
+        pilotStandings:t.format==='pilot'?TournamentFormats.pilotStandings(t):undefined}));
       const base={aggregate,maxPlayers:Tournament.MAX_PLAYERS,events: Tournament.EVENTS,eventLabels:Tournament.EVENT_LABELS,tournaments:tournamentSummaries};
       if(principal.role==='player') {
         const player=Tournament.findPlayer(current,principal.player.id);
@@ -325,6 +326,9 @@ function createDesktopService(options = {}) {
           case 'create_event_night':
             if(!tournament) throw new Error('Tournament ID is required.');
             result=TournamentFormats.createEventNight(tournament,body.eventNight||{},actor);break;
+          case 'record_pilot_result':
+            if(!tournament) throw new Error('Tournament ID is required.');
+            result=TournamentFormats.recordPilotResult(tournament,body.result||{},actor);break;
           case 'register_evidence':
             if(!tournament) throw new Error('Tournament ID is required.');
             result=TournamentFormats.registerEvidence(tournament,body.evidence||{},actor);break;
