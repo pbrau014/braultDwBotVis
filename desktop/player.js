@@ -22,6 +22,10 @@
       card.append(D.node('p','submission-meta',tournament.status+' · '+(tournament.format==='pilot'?'single-evening event':(tournament.seasonWeeks?tournament.seasonWeeks+' week season':'season duration pending'))));
       const stages=D.node('p','muted',tournament.stages.map(stage=>stage.key.replace(/_/g,' ')+' ('+stage.status+')').join(' → '));
       card.append(stages);
+      if(tournament.format==='pilot'&&Array.isArray(tournament.pilotStandings)&&tournament.pilotStandings.length){
+        const current=tournament.pilotStandings.find(row=>String(row.playerId)===String(overview.player.id));
+        if(current)card.append(D.node('p','muted','Your Pilot placement: #'+current.rank+' · '+D.number(current.totalDamage)+' Damage'));
+      }
       if(tournament.registered)card.append(D.node('p','form-success','You are registered for this tournament.'));
       else if(tournament.registrationOpen&&['published','active'].includes(tournament.status)){
         const register=D.node('button','button primary small','Register for this tournament');
