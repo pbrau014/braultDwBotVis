@@ -55,8 +55,8 @@
         title.append(D.node('p','submission-meta',item.format.toUpperCase()+' · '+item.lifecycle.toUpperCase()+(item.stage?' · '+item.stage:'')+' · '+item.registrationCount+' registrations · '+item.teamCount+' teams · '+item.fixtureCount+' fixtures'));
         head.append(title,pill(item.lifecycle==='complete'?'Complete':item.lifecycle==='active'?'Active':item.lifecycle==='published'?'Published':'Draft'));card.append(head);
         const actions=D.node('div','button-row');
-        const actionButton=(label,action,body={})=>{const button=D.node('button','button secondary small',label);button.type='button';button.addEventListener('click',async()=>{button.disabled=true;try{await D.api('/api/admin/yolo-tournaments/'+encodeURIComponent(item.id)+'/'+action,{method:'POST',body});await load();}catch(error){button.disabled=false;status(error.message,'error');}});actions.append(button);};
-        if(item.lifecycle==='draft')actionButton('Publish', 'publish', {approval:JSON.parse(D.$('yolo-approval-json').value||'{}')});
+        const actionButton=(label,action,body={})=>{const button=D.node('button','button secondary small',label);button.type='button';button.addEventListener('click',async()=>{button.disabled=true;try{let payload=body;if(action==='publish')payload={approval:JSON.parse(D.$('yolo-approval-json').value||'{}')};await D.api('/api/admin/yolo-tournaments/'+encodeURIComponent(item.id)+'/'+action,{method:'POST',body:payload});await load();}catch(error){button.disabled=false;status(error.message,'error');}});actions.append(button);};
+        if(item.lifecycle==='draft')actionButton('Publish', 'publish');
         if(item.lifecycle==='published')actionButton('Start', 'start');
         if(item.lifecycle==='active'&&item.format==='pilot')actionButton('Complete Pilot','finish-pilot');
         card.append(actions);
