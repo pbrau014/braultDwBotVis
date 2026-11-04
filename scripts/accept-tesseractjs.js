@@ -9,7 +9,9 @@ const { spawnSync } = require('node:child_process');
 const { quoteRequireOption } = require('./node-options-path');
 const root = path.join(__dirname, '..');
 const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-const runDir = path.join(root, 'testdata', 'ocr-acceptance', `${stamp}-${process.pid}`);
+const runDir = process.env.OCR_ACCEPTANCE_RUN_DIR
+    ? path.resolve(root, process.env.OCR_ACCEPTANCE_RUN_DIR)
+    : path.join(root, 'testdata', 'ocr-acceptance', `${stamp}-${process.pid}`);
 fs.mkdirSync(runDir, { recursive: true });
 const blockNetworkPath = path.join(__dirname, 'block-network.js');
 const blockLogPath = path.join(runDir, 'blocked-network-attempts.log');
@@ -162,11 +164,11 @@ function report() {
         ]);
         run('local-asset-package-check', ['scripts/check-tesseractjs-assets.js']);
         // First establish that the control fixture passes exact-field acceptance
-        // in this same runtime. The previous negative-control used the reported
-        // screenshot whose damage was already unresolved, so it could not prove
+        // in this same runtime. The previous negative-control used an Asashio fixture
+        // with a known player-identity mismatch, so it could not prove
         // that the injected wrong expectation alone caused rejection.
-        const negativeBaselinePath = path.join(runDir, 'negative-control-asashio-baseline.json');
-        const negativeBaseline = run('negative-control-asashio-known-good-baseline', ['scripts/run-ocr-sequence.js', 'asashio-defeat.jpg'], {
+        const negativeBaselinePath = path.join(runDir, 'negative-control-hoffmann-baseline.json');
+        const negativeBaseline = run('negative-control-hoffmann-known-good-baseline', ['scripts/run-ocr-sequence.js', 'hoffmann-victory.png'], {
             OCR_SEQUENCE_REPORT_PATH: negativeBaselinePath,
             OCR_NETWORK_BLOCK_LOG: blockLogPath,
             OCR_NETWORK_BLOCK_ENABLED: '1',
@@ -175,15 +177,15 @@ function report() {
         let baselineRow = null;
         try {
             const baselineReport = JSON.parse(fs.readFileSync(negativeBaselinePath, 'utf8'));
-            baselineRow = baselineReport.results?.find(item => item.fixtureKey === 'asashio-defeat.jpg') || null;
+            baselineRow = baselineReport.results?.find(item => item.fixtureKey === 'hoffmann-victory.png') || null;
             negativeBaselineValid = negativeBaseline.exitCode === 0 && baselineRow?.pipelineCompleted === true &&
                 baselineRow?.allRequiredFieldsPass === true && Array.isArray(baselineRow?.requiredMissing) &&
                 baselineRow.requiredMissing.length === 0 && baselineRow?.comparison?.damage?.pass === true &&
-                baselineRow?.actual?.damage === 171577 && baselineRow?.expected?.damage === 171577;
+                baselineRow?.actual?.damage === 303622 && baselineRow?.expected?.damage === 303622;
         } catch {}
         negativeBaseline.passed = negativeBaselineValid;
         negativeBaseline.exactBaselineValidated = negativeBaselineValid;
-        negativeBaseline.note = 'Negative control is only meaningful if this same-runtime Asashio baseline first matches all nine mandatory fields exactly, including XP.';
+        negativeBaseline.note = 'Negative control is only meaningful if this same-runtime Hoffmann baseline first matches all nine mandatory fields exactly, including XP.';
         console.log(`[ACCEPTANCE] ${negativeBaseline.passed ? 'PASS' : 'FAIL'} known-good negative-control baseline; verified=${negativeBaselineValid}`);
 
         // Run the same fixture again with exactly one deliberately incorrect
@@ -191,9 +193,9 @@ function report() {
         // exact, the OCR actuals stayed identical, and damage is the sole field
         // rejected by the expected-value override.
         const negativeReportPath = path.join(runDir, 'negative-expected-value.json');
-        const negative = run('deliberately-wrong-expected-value-must-fail', ['scripts/run-ocr-sequence.js', 'asashio-defeat.jpg'], {
+        const negative = run('deliberately-wrong-expected-value-must-fail', ['scripts/run-ocr-sequence.js', 'hoffmann-victory.png'], {
             OCR_ACCEPTANCE_TEST_MODE: '1',
-            OCR_ACCEPTANCE_TEST_EXPECTED_OVERRIDE: 'asashio-defeat.jpg.damage=171578',
+            OCR_ACCEPTANCE_TEST_EXPECTED_OVERRIDE: 'hoffmann-victory.png.damage=303623',
             OCR_SEQUENCE_REPORT_PATH: negativeReportPath,
             OCR_NETWORK_BLOCK_LOG: blockLogPath,
             OCR_NETWORK_BLOCK_ENABLED: '1',
@@ -201,12 +203,12 @@ function report() {
         let negativeReportValid = false;
         try {
             const negativeReport = JSON.parse(fs.readFileSync(negativeReportPath, 'utf8'));
-            const row = negativeReport.results?.find(item => item.fixtureKey === 'asashio-defeat.jpg');
+            const row = negativeReport.results?.find(item => item.fixtureKey === 'hoffmann-victory.png');
             negativeReportValid = negativeBaselineValid && validateNegativeExpectedControl(baselineRow, row, negative.exitCode);
         } catch {}
         negative.passed = negativeReportValid;
         negative.expectedFailureValidated = negativeReportValid;
-        negative.note = 'Expected nonzero exit is a pass only after an exact mandatory-field Asashio baseline, identical OCR actuals, and damage as the sole expected-value mismatch.';
+        negative.note = 'Expected nonzero exit is a pass only after an exact mandatory-field Hoffmann baseline, identical OCR actuals, and damage as the sole expected-value mismatch.';
         console.log(`[ACCEPTANCE] ${negative.passed ? 'PASS' : 'FAIL'} negative expected-value test; verified=${negativeReportValid}`);
 
         // Independently gate the lifecycle sequence on the already known-good

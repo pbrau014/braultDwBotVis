@@ -1,0 +1,176 @@
+[CmdletBinding()]
+param(
+ [string]$ProjectRoot = '',
+ [string]$OutputRoot = '',
+ [string]$MinimumNodeVersion = '24.22.1'
+)
+$ErrorActionPreference='Stop'
+if ([string]::IsNullOrWhiteSpace($ProjectRoot)) { $ProjectRoot = (Get-Location).Path }
+$ProjectRoot=(Resolve-Path -LiteralPath $ProjectRoot).Path
+if ([string]::IsNullOrWhiteSpace($OutputRoot)) { $OutputRoot = Join-Path $ProjectRoot 'testdata\ocr-acceptance' }
+$OutputRoot=[System.IO.Path]::GetFullPath($OutputRoot)
+Push-Location $ProjectRoot
+try {
+ $NodeText=(& node.exe -p 'process.versions.node').Trim()
+ if($LASTEXITCODE -ne 0){throw 'Could not determine Node.js version.'}
+ if([version]::Parse($NodeText) -lt [version]::Parse($MinimumNodeVersion)){throw "Node.js $MinimumNodeVersion or newer is required. Found $NodeText."}
+ $NpmVersion=(& npm.cmd --version).Trim()
+ if($LASTEXITCODE -ne 0){throw 'Could not determine npm version.'}
+ $TessName='tesseract.exe'; if($env:TESSERACT_BIN){$TessName=$env:TESSERACT_BIN}
+ $MagickName='magick.exe'; if($env:IMAGEMAGICK_BIN){$MagickName=$env:IMAGEMAGICK_BIN}
+ $Tess=Get-Command $TessName -ErrorAction Stop
+ $Magick=Get-Command $MagickName -ErrorAction Stop
+ $TessVersion=(& $Tess.Source --version 2>&1 | Select-Object -First 1).ToString().Trim()
+ if($TessVersion -notmatch '^tesseract\s+v?5\.'){throw "Native Tesseract 5.x required; found $TessVersion"}
+ $LanguageLines=@(& $Tess.Source --list-langs 2>&1)
+ $LanguageExit=$LASTEXITCODE
+ $Languages=($LanguageLines | ForEach-Object { $_.ToString().Trim() }) -join [Environment]::NewLine
+ $HasEnglish=@($LanguageLines | ForEach-Object { $_.ToString().Trim() } | Where-Object { $_ -eq 'eng' }).Count -gt 0
+ if($LanguageExit -ne 0 -or -not $HasEnglish){throw "Native Tesseract requires English traineddata; languages reported: $Languages"}
+ $MagickVersion=(& $Magick.Source -version 2>&1 | Select-Object -First 2) -join [Environment]::NewLine
+ if($LASTEXITCODE -ne 0){throw 'ImageMagick version check failed.'}
+ $Stamp=(Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ')
+ $RunDir=Join-Path $OutputRoot ("windows-native-node"+$NodeText+"-"+$Stamp+"-"+$PID)
+ New-Item -ItemType Directory -Force -Path $RunDir | Out-Null
+ $env:TESSERACT_BIN=$Tess.Source
+ $env:IMAGEMAGICK_BIN=$Magick.Source
+ $env:PADDLEOCR_FIELD_FALLBACK='0'
+ $env:OCR_CV_ASSIST='0'
+ $env:OCRSPACE_ENABLED='0'
+ $env:OCR_NETWORK_BLOCK_ENABLED='1'
+ $Guard=(Join-Path $ProjectRoot 'scripts\block-network.js').Replace('\','/')
+ $env:NODE_OPTIONS=(($env:NODE_OPTIONS+' --require="'+$Guard+'"').Trim())
+ $script:Results=@()
+ function Invoke-LoggedNpm {
+  param([string]$Label,[string[]]$Arguments)
+  $Log=Join-Path $RunDir ($Label+'.log')
+  Write-Host "[WINDOWS-OCR] START $Label"
+  $OutputLog=$Log+'.output.tmp'
+  $CommandLine='npm.cmd '+($Arguments -join ' ')+' > "'+$OutputLog+'" 2>&1'
+  & $env:ComSpec /d /c $CommandLine
+  $Code=$LASTEXITCODE
+  $Output=if(Test-Path -LiteralPath $OutputLog){Get-Content -LiteralPath $OutputLog -Raw}else{''}
+  @("COMMAND: npm "+($Arguments -join ' '),"EXIT: $Code",$Output) | Set-Content -LiteralPath $Log -Encoding utf8
+  Remove-Item -LiteralPath $OutputLog -Force -ErrorAction SilentlyContinue
+  Get-Content -LiteralPath $Log | ForEach-Object { Write-Host $_ }
+  $Outcome=if($Code -eq 0){'PASS'}else{'FAIL'}
+  $script:Results += [pscustomobject]@{label=$Label;arguments=$Arguments;exitCode=$Code;log=[System.IO.Path]::GetFileName($Log);passed=($Code -eq 0)}
+  Write-Host "[WINDOWS-OCR] $Outcome $Label exit=$Code"
+ }
+ $env:OCR_ENGINE='tesseractjs'
+ $env:OCR_ACCEPTANCE_RUN_DIR=Join-Path $RunDir 'tesseractjs-baseline'
+ Invoke-LoggedNpm -Label 'tesseractjs-full-current-source-acceptance' -Arguments @('run','test:tesseractjs')
+ $BaselineJsReportPath=Join-Path $env:OCR_ACCEPTANCE_RUN_DIR 'acceptance-report.json'
+ $BaselineJsReport=$null
+ if(Test-Path -LiteralPath $BaselineJsReportPath -PathType Leaf){$BaselineJsReport=Get-Content -LiteralPath $BaselineJsReportPath -Raw | ConvertFrom-Json}
+ $env:OCR_ENGINE='native'
+ $env:REPORTED_SCREENSHOT_REPORT_PATH=Join-Path $RunDir 'reported-native.json'
+ $env:OCR_NETWORK_BLOCK_LOG=Join-Path $RunDir 'reported-native-network-attempts.log'
+ Invoke-LoggedNpm -Label 'native-reported-screenshot' -Arguments @('run','test:reported-screenshot')
+ $env:FOUR_SCREENSHOT_REPORT_PATH=Join-Path $RunDir 'four-image-native.json'
+ $env:OCR_NETWORK_BLOCK_LOG=Join-Path $RunDir 'four-image-native-network-attempts.log'
+ Invoke-LoggedNpm -Label 'native-four-screenshot-acceptance' -Arguments @('run','test:four-images')
+ $env:OCR_SEQUENCE_REPORT_PATH=Join-Path $RunDir 'additional-sixteen-native.json'
+ $env:OCR_NETWORK_BLOCK_LOG=Join-Path $RunDir 'additional-sixteen-native-network-attempts.log'
+ Invoke-LoggedNpm -Label 'native-additional-sixteen-screenshot-acceptance' -Arguments @('run','test:additional-images')
+ $NativeReports=@()
+ foreach($Name in @('reported-native.json','four-image-native.json','additional-sixteen-native.json')){
+  $Path=Join-Path $RunDir $Name
+  if(-not(Test-Path -LiteralPath $Path -PathType Leaf)){
+   $NativeReports += [pscustomobject]@{name=$Name;exists=$false;exact=$false}; continue
+  }
+  $Data=Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json
+  if($Name -eq 'reported-native.json'){
+   $Missing=@($Data.requiredMissing).Count
+   $Exact=($Data.allExpectedFieldsPass -eq $true) -and ($Data.allRequiredFieldsPass -eq $true) -and ($Missing -eq 0)
+   $Count=1; $Done=if($Data.pipelineCompleted -eq $true){1}else{0}
+  }else{
+   $Expected=if($Name -eq 'four-image-native.json'){4}else{16}
+   $Bad=@($Data.results | Where-Object {-not $_.allExpectedFieldsPass -or -not $_.allRequiredFieldsPass -or @($_.requiredMissing).Count -gt 0}).Count
+   $Exact=($Data.imageCount -eq $Expected) -and ($Data.completedImages -eq $Expected) -and ($Data.exactMatches -eq $Expected) -and ($Data.mandatoryExactMatches -eq $Expected) -and ($Data.requiredFieldsComplete -eq $Expected) -and ($Bad -eq 0)
+   $Count=$Expected; $Done=[int]$Data.completedImages
+  }
+  $NativeReports += [pscustomobject]@{name=$Name;exists=$true;expectedImages=$Count;completedImages=$Done;exact=[bool]$Exact}
+ }
+ # Run a paired OpenCV geometry-assisted candidate on the same Windows host.
+ # The Tesseract-only outputs above remain intact as the control; CV can only
+ # propose regions and all accepted values still come from exact Tesseract
+ # reads and the unchanged nine-field validators.
+ $env:OCR_CV_ASSIST='1'
+ $env:OCR_CV_DEBUG='1'
+ $env:OCR_ACCEPTANCE_BATCH_REPEATS='1'
+ $env:OCR_ACCEPTANCE_RUN_DIR=Join-Path $RunDir 'tesseractjs-cv-assisted'
+ $env:OCR_ENGINE='tesseractjs'
+ Invoke-LoggedNpm -Label 'cv-assisted-tesseractjs-full-acceptance' -Arguments @('run','test:tesseractjs')
+ $CvJsReportPath=Join-Path $env:OCR_ACCEPTANCE_RUN_DIR 'acceptance-report.json'
+ $CvJsReport=$null
+ $CvJsExact=$false
+ if(Test-Path -LiteralPath $CvJsReportPath -PathType Leaf){
+  $CvJsReport=Get-Content -LiteralPath $CvJsReportPath -Raw | ConvertFrom-Json
+  $CvJsExact=($CvJsReport.passed -eq $true) -and ($CvJsReport.networkIsolation.blockedAttemptsDetected -eq $false)
+ }
+ $env:OCR_ENGINE='native'
+ $env:REPORTED_SCREENSHOT_REPORT_PATH=Join-Path $RunDir 'reported-native-cv.json'
+ $env:OCR_NETWORK_BLOCK_LOG=Join-Path $RunDir 'reported-native-cv-network-attempts.log'
+ Invoke-LoggedNpm -Label 'cv-assisted-native-reported-screenshot' -Arguments @('run','test:reported-screenshot')
+ $env:FOUR_SCREENSHOT_REPORT_PATH=Join-Path $RunDir 'four-image-native-cv.json'
+ $env:OCR_NETWORK_BLOCK_LOG=Join-Path $RunDir 'four-image-native-cv-network-attempts.log'
+ Invoke-LoggedNpm -Label 'cv-assisted-native-four-screenshot-acceptance' -Arguments @('run','test:four-images')
+ $env:OCR_SEQUENCE_REPORT_PATH=Join-Path $RunDir 'additional-sixteen-native-cv.json'
+ $env:OCR_NETWORK_BLOCK_LOG=Join-Path $RunDir 'additional-sixteen-native-cv-network-attempts.log'
+ Invoke-LoggedNpm -Label 'cv-assisted-native-additional-sixteen-acceptance' -Arguments @('run','test:additional-images')
+ $CvNativeReports=@()
+ foreach($Name in @('reported-native-cv.json','four-image-native-cv.json','additional-sixteen-native-cv.json')){
+  $Path=Join-Path $RunDir $Name
+  if(-not(Test-Path -LiteralPath $Path -PathType Leaf)){
+   $CvNativeReports += [pscustomobject]@{name=$Name;exists=$false;exact=$false}; continue
+  }
+  $Data=Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json
+  if($Name -eq 'reported-native-cv.json'){
+   $Missing=@($Data.requiredMissing).Count
+   $Exact=($Data.pipelineCompleted -eq $true) -and ($Data.allExpectedFieldsPass -eq $true) -and ($Data.allRequiredFieldsPass -eq $true) -and ($Missing -eq 0)
+   $Count=1; $Done=if($Data.pipelineCompleted -eq $true){1}else{0}
+  }else{
+   $Expected=if($Name -eq 'four-image-native-cv.json'){4}else{16}
+   $Bad=@($Data.results | Where-Object {-not $_.allExpectedFieldsPass -or -not $_.allRequiredFieldsPass -or @($_.requiredMissing).Count -gt 0}).Count
+   $Exact=($Data.imageCount -eq $Expected) -and ($Data.completedImages -eq $Expected) -and ($Data.exactMatches -eq $Expected) -and ($Data.mandatoryExactMatches -eq $Expected) -and ($Data.requiredFieldsComplete -eq $Expected) -and ($Bad -eq 0)
+   $Count=$Expected; $Done=[int]$Data.completedImages
+  }
+  $CvNativeReports += [pscustomobject]@{name=$Name;exists=$true;expectedImages=$Count;completedImages=$Done;exact=[bool]$Exact}
+ }
+ $CvPythonVersion='not-available'
+ if($env:OPENCV_PYTHON_BIN -and (Test-Path -LiteralPath $env:OPENCV_PYTHON_BIN -PathType Leaf)){
+  $CvPythonVersion=(& $env:OPENCV_PYTHON_BIN -c 'import cv2; print(cv2.__version__)' 2>&1 | Out-String).Trim()
+  if($LASTEXITCODE -ne 0){$CvPythonVersion='unavailable'}
+ }
+ $NoNetwork=($BaselineJsReport -and $BaselineJsReport.networkIsolation.blockedAttemptsDetected -eq $false) -and ($CvJsReport -and $CvJsReport.networkIsolation.blockedAttemptsDetected -eq $false)
+ foreach($Name in @('reported-native-network-attempts.log','four-image-native-network-attempts.log','additional-sixteen-native-network-attempts.log','reported-native-cv-network-attempts.log','four-image-native-cv-network-attempts.log','additional-sixteen-native-cv-network-attempts.log')){
+  $Path=Join-Path $RunDir $Name
+  if((Test-Path -LiteralPath $Path) -and (Get-Item -LiteralPath $Path).Length -gt 0){$NoNetwork=$false}
+ }
+ if(-not $BaselineJsReport -or -not $CvJsReport -or $CvPythonVersion -eq 'not-available' -or $CvPythonVersion -eq 'unavailable'){$NoNetwork=$false}
+ foreach($Name in @('reported-native-network-attempts.log','four-image-native-network-attempts.log','additional-sixteen-native-network-attempts.log')){
+  $Path=Join-Path $RunDir $Name
+  if((Test-Path -LiteralPath $Path) -and (Get-Item -LiteralPath $Path).Length -gt 0){$NoNetwork=$false}
+ }
+ $Commit='not-available'
+ try{$Commit=(& git -C $ProjectRoot rev-parse HEAD 2>$null).Trim()}catch{}
+ $Version=(& node.exe -p "require('./package.json').version").Trim()
+ $Report=[ordered]@{
+  schemaVersion=2;createdAt=(Get-Date).ToUniversalTime().ToString('o')
+  runtime=[ordered]@{node=$NodeText;npm=$NpmVersion;platform=[System.Runtime.InteropServices.RuntimeInformation]::OSDescription;architecture=[System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString()}
+  engines=[ordered]@{tesseract=$TessVersion;imageMagick=$MagickVersion;languages=$Languages}
+  source=[ordered]@{gitCommit=$Commit;packageVersion=$Version}
+  commands=$script:Results;baselineNativeReports=$NativeReports;cvCandidate=[ordered]@{opencvVersion=$CvPythonVersion;tesseractJsExact=$CvJsExact;nativeReports=$CvNativeReports};noNetworkAttempts=$NoNetwork
+  passed=(($CvJsExact) -and (@($script:Results|Where-Object{$_.label -like 'cv-assisted-*' -and -not $_.passed}).Count -eq 0) -and ($CvNativeReports.Count -eq 3) -and (@($CvNativeReports|Where-Object{-not $_.exists -or -not $_.exact}).Count -eq 0) -and $NoNetwork)
+ }
+ $ReportPath=Join-Path $RunDir 'windows-native-ocr-acceptance-report.json'
+ $Report | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $ReportPath -Encoding utf8
+ $Hash=(Get-FileHash -LiteralPath $ReportPath -Algorithm SHA256).Hash.ToLowerInvariant()
+ "$Hash  windows-native-ocr-acceptance-report.json" | Set-Content -LiteralPath (Join-Path $RunDir 'windows-native-ocr-acceptance-report.sha256') -Encoding ascii
+ Write-Host "[WINDOWS-OCR] Report: $ReportPath"
+ Write-Host "[WINDOWS-OCR] SHA-256: $Hash"
+ if(-not $Report.passed){Write-Error 'Windows OCR acceptance failed or remains incomplete. Diagnostics are retained; do not weaken exact-value validation.';exit 1}
+ Write-Host '[WINDOWS-OCR] PASS: OpenCV-assisted Tesseract.js and native Tesseract exact screenshot gates passed.'
+}
+finally{Pop-Location}

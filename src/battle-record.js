@@ -146,6 +146,15 @@ function parseModeMap(text) {
         const match = source.match(/(?:map|operation)\s*:\s*([^\n|]{2,80})/i);
         if (match && !/battle start time/i.test(match[1])) map = match[1].trim();
     }
+    // Some native Tesseract crops retain the separator after the map but omit
+    // the adjacent mode token. In that narrowly bounded shape, the pre-separator
+    // text is a usable map candidate; do not infer a mode or whitelist map names.
+    if (map === NOT_DETECTED) {
+        const trailingSeparator = source.match(/^([^\n|]{2,80}?)\s+[—–-]+\s*$/);
+        if (trailingSeparator && !/battle start time|victory|defeat|received|battle performance/i.test(trailingSeparator[1])) {
+            map = trailingSeparator[1].trim();
+        }
+    }
     // Repair common OCR separators in a map title without making a closed list
     // of map names. The fused "Sealof" token is a recurring OCR artifact for
     // the short word "of" in this particular title; leave all other words intact.
@@ -157,6 +166,7 @@ function parseModeMap(text) {
             // (e.g. `MountainiRange`). Treat only that pattern as a separator; do
             // not whitelist map names or rewrite other internal characters.
             .replace(/([a-z])i(?=[A-Z])/g, '$1 ')
+            .replace(/\s+[—–-]+\s*$/, '')
             .replace(/\s+/g, ' ')
             .trim();
     }

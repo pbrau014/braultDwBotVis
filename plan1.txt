@@ -1456,3 +1456,20 @@ Decoded full log is committed at reports/ci/2026-11-04-41814316145-final-branch-
 Latest main SHA observed at final check: e2fbcfbf680a8d40691a76d1be94aae29325016f. It remains read-only and was not changed.
 Final branch tree includes the complete handoff TXT, updated plan/status/README/quickstarts, exact 844-file inventory, original archive checksum sidecar and decoded CI log. Original 175 MB historical ZIP remains in File Library due GitHub per-file limit.
 ================================================================================
+
+
+---
+
+## Active branch synchronization and remaining real-environment gates - 2026-11-04
+
+Main is now the active implementation/delivery branch by explicit user authorization. This supersedes earlier branch-only instructions; dwbotVis remains a historical source snapshot. Before synchronization, main was e2fbcfbf680a8d40691a76d1be94aae29325016f (844 files) and dwbotVis was e4e69214971a9537ffde124c51b181747e524d01 (850 files). There were six source-only files, eight changed paths and no main-only files. Commit 6270f6e56c9064fb98df9976098ddf77ad74b837 used the prior main head as parent and exact tree 9e93b3c4ad3578f96853e391bb80779ac03fe135. The resulting 850-file tree was fetched and verified; no force-push/history rewrite occurred.
+
+### Remaining release gates - OPEN
+
+1. **Windows OCR:** current-source full screenshot acceptance on Windows Node 24.22.1, Tesseract.js baseline and native Tesseract 5.x; exact nine-field ground truth, offline execution and per-image diagnostics. Capture versions, image hashes, source fingerprint, logs/reports and SHA-256. Any mandatory mismatch is FAIL.
+2. **Local OAuth/browser:** real local Discord OAuth sign-in, Player/Admin role checks, browser visual QA and synthetic screenshot upload through the local bot bridge; confirm shared record visibility through Discord.
+3. **Isolated Discord:** separate dev bot/guild/channel; verify READY, channel permissions, participant/admin allow-deny, wrong-channel ignore, synthetic attachment, exact correction/mapping, shared state and restart/recovery.
+4. **Windows persistence/recovery:** JSON and SQLite over separate process restarts, full private archive import, private links/pending associations, physical SQLite copy after WAL checkpoint, integrity and restore using 50 synthetic players.
+5. **PDF/package:** produce and inspect the PDF manual. Package current source/tests/scripts/docs/reports/manifest; exclude secrets, .env, node_modules, runtime state/databases, caches and private content. Record SHA-256, test ZIP integrity, extract cleanly, rerun install/tests and verify the manifest from that extraction.
+
+Automation entry points: npm run test:persistence-recovery and npm run test:windows-native-ocr. GitHub Actions on main runs Linux and Windows Node 24/native OCR lanes; hosted CI does not replace the local OAuth/browser or isolated Discord checks. Presence of scripts/workflows is not a pass. Production remains NO-GO.

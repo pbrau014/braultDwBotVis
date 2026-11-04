@@ -60,3 +60,8 @@ Public channel snapshots and public !yolo export / !yolo finalize omit account l
 ## Shutdown / not verified
 Ctrl+C stops the bot, closes the local bridge and terminates the OCR worker. Do not expose the bridge via LAN/tunnel/reverse proxy.
 No real OAuth, browser visual QA, browser image upload, live Discord login or Windows/native Tesseract run has been performed.
+
+
+## Real browser/OAuth acceptance - still open
+
+Offline desktop tests/config preflight do not close this gate. On the Windows host, use an isolated development Discord application/account; complete OAuth identify sign-in for a participant and an explicitly allowlisted Admin; capture redacted browser screenshots at desktop and narrow viewport sizes. Test Player-only data visibility, direct API denial for non-admins, Admin roster/link/settings/backup operations, synthetic PNG/JPEG upload, OCR review, exact corrections/mapping and shared record visibility through Discord and desktop. Record image SHA-256 and redacted logs. Never share secrets, private screenshots or production state.

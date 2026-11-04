@@ -1,5 +1,30 @@
 # DWBOT GitHub transfer status — current branch verification 2026-11-04
 
+## Controlling branch decision - 2026-11-04 (supersedes historical branch instructions)
+
+The user explicitly authorized replacing the main tracked-file snapshot and making main the active implementation/delivery branch. This supersedes older sections designating dwbotVis as the only delivery branch and main as read-only.
+
+- Previous main: e2fbcfbf680a8d40691a76d1be94aae29325016f (844 files).
+- Verified dwbotVis source: e4e69214971a9537ffde124c51b181747e524d01 (850 files).
+- The trees differed by six dwbotVis-only files and eight changed files; main had no unique files.
+- Synchronization commit: 6270f6e56c9064fb98df9976098ddf77ad74b837; parent e2fbcfbf680a8d40691a76d1be94aae29325016f; tree 9e93b3c4ad3578f96853e391bb80779ac03fe135.
+- Verification confirmed exact tree equality with dwbotVis (850 files, recursive tree complete). No force push or history rewrite was used.
+- dwbotVis remains as a historical snapshot. New implementation and CI target main.
+- The current sanitized source tree is on main; an earlier webhook may remain in Git history and must be revoked by its owner.
+
+### Current release gates - OPEN
+
+1. Windows Node 24.22.1 screenshot acceptance with native Tesseract 5.x and paired Tesseract.js baseline, exact nine-field matching and complete per-image reports.
+2. Real local Discord OAuth, Player/Admin permission checks, browser visual QA and synthetic screenshot upload through the running local bridge.
+3. Isolated development-guild Discord smoke covering READY, effective permissions, access policy, synthetic attachment, restart and recovery.
+4. Windows process-separated JSON/SQLite persistence, full private archive import, physical SQLite copy/restore, WAL checkpoint and integrity.
+5. PDF manual, final package manifest/SHA-256, ZIP integrity and clean extraction followed by verification from the extracted copy.
+
+Linux/offline CI does not close these gates. Production remains NO-GO.
+
+---
+
+
 ## Superseding current status
 
 This section supersedes the historical `pop1` target and older transfer instructions below.

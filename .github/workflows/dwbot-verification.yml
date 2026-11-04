@@ -9,66 +9,163 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: dwbot-verification-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   node22-linux:
-    name: Node.js 22.16.0 · Linux verification
+    name: Node.js 22.16.0 - Linux offline verification
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
       contents: read
     steps:
       - name: Check out the exact triggering commit
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # actions/checkout v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-
-      - name: Set up the project's required Node.js runtime
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # actions/setup-node v7.1.0
+      - name: Set up Node.js 22.16.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22.16.0
           cache: npm
           package-manager-cache: false
-
-      - name: Record runtime and install the locked dependencies
+      - name: Install locked dependencies
         run: |
           node --version
           npm --version
           npm ci --no-audit --no-fund
-
-      - name: Check JavaScript syntax
+      - name: Syntax checks
         run: |
           node --check src/bot.js
           node --check src/desktop-service.js
           node --check src/desktop-bridge.js
-          node --check tests/desktop-service.test.js
-          node --check tests/desktop-bridge.test.js
           node --check src/desktop-test-preflight.js
-          node --check scripts/preflight-desktop-test.js
-          node --check tests/desktop-test-preflight.test.js
-          node --check tests/desktop-ui-contract.test.js
           node --check src/ocrspace-client.js
           node --check src/ocrspace-quota-ledger.js
           node --check src/ocrspace-field-evidence.js
           node --check src/discord-test-preflight.js
           node --check src/ocr-sequence-checkpoint.js
           node --check scripts/run-ocr-sequence.js
-          node --check tests/ocr-sequence-checkpoint.test.js
-
-      - name: Verify OCR.space contract, quotas and crop isolation
+          node --check scripts/run-additional-screenshot-regression.js
+          node --check scripts/run-persistence-recovery.js
+      - name: OCR.space mocked contract
         run: npm run test:ocrspace
-
-      - name: Verify Discord channel, admin policy and local test configuration
+      - name: Discord offline preflight and policy
         run: npm run test:discord-preflight
-
-      - name: Validate local desktop OAuth configuration without network calls
+      - name: Desktop offline configuration preflight
         run: npm run preflight:desktop-test
-
-      - name: Verify authenticated desktop UI service and bridge
+      - name: Desktop service and bridge tests
         run: npm run test:desktop
-
-      - name: Run the complete project test suite
+      - name: Process-level JSON and SQLite recovery
+        run: npm run test:persistence-recovery
+      - name: Full project suite
         run: npm test
+
+  windows-node24-native-ocr:
+    name: Windows Node.js 24.22.1 - native Tesseract and persistence
+    runs-on: windows-latest
+    timeout-minutes: 180
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the exact triggering commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js 24.22.1
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24.22.1
+          cache: npm
+          package-manager-cache: false
+      - name: Install native OCR prerequisites
+        shell: powershell
+        run: |
+          choco install tesseract --version=5.5.3.20260724 --yes --no-progress
+          Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+          refreshenv
+          $tesseract = Get-Command tesseract.exe -ErrorAction Stop
+          $magick = Get-Command magick.exe -ErrorAction Stop
+          $version = (& $tesseract.Source --version | Select-Object -First 1).Trim()
+          Write-Host "Native Tesseract: $version"
+          if ($version -notmatch '^tesseract\s+v?5\.') { throw "Expected native Tesseract 5.x: $version" }
+          & $tesseract.Source --list-langs
+          & $magick.Source -version | Select-Object -First 2
+          "TESSERACT_BIN=$($tesseract.Source)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "IMAGEMAGICK_BIN=$($magick.Source)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+      - name: Install isolated OpenCV geometry runtime
+        shell: powershell
+        run: |
+          $python = Get-Command python.exe -ErrorAction Stop
+          $venv = Join-Path $env:RUNNER_TEMP 'dwbot-opencv'
+          & $python.Source -m venv $venv
+          if ($LASTEXITCODE -ne 0) { throw 'Could not create the isolated OpenCV environment.' }
+          $opencvPython = Join-Path $venv 'Scripts\python.exe'
+          & $opencvPython -m pip install --disable-pip-version-check --no-warn-script-location --only-binary=:all: opencv-python-headless==4.10.0.84
+          if ($LASTEXITCODE -ne 0) { throw 'Could not install the pinned OpenCV wheel.' }
+          & $opencvPython -c 'import cv2, numpy; print(cv2.__version__, numpy.__version__)'
+          if ($LASTEXITCODE -ne 0) { throw 'OpenCV geometry runtime failed its import check.' }
+          "OPENCV_PYTHON_BIN=$opencvPython" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+      - name: Install locked dependencies
+        run: |
+          node --version
+          npm --version
+          npm ci --no-audit --no-fund
+      - name: Windows process-level persistence and recovery
+        run: npm run test:persistence-recovery
+      - name: Full Windows Node 24 test suite
+        run: npm test
+      - name: Current-source Tesseract.js and native Tesseract screenshot acceptance
+        shell: powershell
+        run: npm run test:windows-native-ocr
+      - name: Upload Windows acceptance evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dwbot-windows-node24-native-ocr-and-recovery
+          path: |
+            testdata/ocr-acceptance/**
+            testdata/persistence-recovery/**
+          if-no-files-found: warn
+          retention-days: 30
+
+  manual-and-package:
+    name: PDF manual and clean package verification
+    runs-on: windows-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24.22.1
+          cache: npm
+          package-manager-cache: false
+      - name: Install Pandoc and MiKTeX
+        shell: powershell
+        run: |
+          choco install pandoc --yes --no-progress
+          choco install typst --yes --no-progress --execution-timeout=900 --retrycount=3 --retryinterval=10
+          Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+          refreshenv
+          pandoc --version
+          typst --version
+      - name: Render PDF manual
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force release-artifacts | Out-Null
+          pandoc docs/iteration23/DWBOT_LOCAL_OPERATIONS_AND_RELEASE_VERIFICATION_MANUAL_2026-11-04.md -o release-artifacts/DWBOT_LOCAL_OPERATIONS_AND_RELEASE_VERIFICATION_MANUAL_2026-11-04.pdf --pdf-engine=typst --toc --number-sections -V geometry:margin=0.75in -V colorlinks=true
+          if ($LASTEXITCODE -ne 0) { throw "PDF render failed: $LASTEXITCODE" }
+          if ((Get-Item release-artifacts/DWBOT_LOCAL_OPERATIONS_AND_RELEASE_VERIFICATION_MANUAL_2026-11-04.pdf).Length -lt 10000) { throw 'PDF output unexpectedly small' }
+      - name: Package tracked source and verify clean extraction
+        shell: powershell
+        run: ./scripts/package-release.ps1
+      - name: Upload manual and package evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dwbot-pdf-manual-and-clean-package
+          path: release-artifacts/**
+          if-no-files-found: warn
+          retention-days: 30

@@ -5,7 +5,7 @@ DWBOT is a local-first Node.js Discord tournament bot, strict screenshot OCR pip
 ## Current verification
 
 Repository: https://github.com/pbrau014/braultDwBotVis  
-Delivery branch: dwbotVis only; main is read-only.  
+Active delivery branch: main. Historical integration snapshot: dwbotVis.  
 Implementation checkpoint before the current docs package: 8494c05687494b5afd8cb18aeab96faceeb56620.  
 CI: https://github.com/pbrau014/braultDwBotVis/actions/runs/41813315107
 
@@ -74,7 +74,7 @@ Public channel snapshots omit private Discord account links and per-user pending
 Historical DWBOT_COMPLETE_DOWNLOAD_KIT_2026-11-03.zip remains in the user's File Library: 175,126,438 bytes; SHA-256 7f5984ecbcd8009110b98f283e20b7d5fc5b840e2a5c08a5ad4f436959387c25; 472 manifest files / 108,083,848 uncompressed bytes. The ZIP was rehashed and passed unzip integrity. It is not committed as one GitHub blob because it exceeds the 100 MB per-file limit; the checksum sidecar and manifest are preserved in the repository.
 
 Current branch source ZIP:
-https://github.com/pbrau014/braultDwBotVis/archive/refs/heads/dwbotVis.zip
+https://github.com/pbrau014/braultDwBotVis/archive/refs/heads/main.zip
 
 Production remains NO-GO until current-source OCR acceptance, Windows/native OCR, local UI/OAuth/browser upload, isolated live Discord, security/recovery, PDF manual and final clean extraction pass.
 
@@ -82,3 +82,12 @@ Production remains NO-GO until current-source OCR acceptance, Windows/native OCR
 ## Final handoff package verification
 
 Final package commit: f6b60d45f647d09b60355c6460bb0554d20939ed. Exact-commit CI succeeded: https://github.com/pbrau014/braultDwBotVis/actions/runs/41814316145. Full CI log is committed at reports/ci/2026-11-04-41814316145-final-branch-log.txt. Complete plan-to-release handoff is DWBOT_PROJECT_COMPLETE_HANDOFF_2026-11-04.txt. Production remains NO-GO pending the Windows/native, current OCR acceptance, actual local browser/OAuth, live Discord and final user-manual/package gates.
+
+
+## Outstanding release gates - 2026-11-04
+
+The user authorized making main the active implementation branch and synchronizing its tracked tree to the verified 850-file dwbotVis snapshot in commit 6270f6e56c9064fb98df9976098ddf77ad74b837. No force-push or history rewrite was used; dwbotVis remains a historical snapshot.
+
+The following remain OPEN and require real environment evidence: current-source full screenshot OCR acceptance on Windows (including native Tesseract 5.x and the paired Tesseract.js baseline); local Discord OAuth and browser visual/upload testing using synthetic screenshots; isolated development-guild Discord smoke; Windows persistence and full recovery; PDF manual and final clean-extraction package verification. Linux/offline CI does not substitute for these gates. Production remains NO-GO.
+
+Automation: npm run test:persistence-recovery and npm run test:windows-native-ocr. See docs/iteration23/WINDOWS_OCR_AND_PERSISTENCE_ACCEPTANCE_2026-11-04.md.

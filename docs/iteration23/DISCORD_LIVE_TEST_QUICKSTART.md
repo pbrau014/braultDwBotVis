@@ -158,3 +158,8 @@ Run npm start. The bridge starts only after Discord READY and channel preflight,
 Use synthetic/non-sensitive images. One image per upload; PNG/JPEG/WEBP/BMP/TIFF; max 10 MB. Desktop upload uses the same OCR queue as Discord attachments. No real OAuth or browser upload has been performed in this session.
 
 For complete private recovery use the authenticated local Admin download. Public channel exports intentionally omit private account links and per-user pending workflow identifiers.
+
+
+## Current release-gate status - explicit
+
+This guide is a test procedure, not evidence that live testing has occurred. Isolated development-guild verification remains OPEN until READY, effective channel permissions, participant/admin allow-deny, wrong-channel ignore, synthetic attachment, exact nine-field correction/mapping, stop/start and state recovery are captured from the same real run. Windows runtime/persistence and native-Tesseract acceptance are separate gates. Do not test on a production tournament or deliberately flood Discord.

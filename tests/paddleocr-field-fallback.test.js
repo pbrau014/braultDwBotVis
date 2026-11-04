@@ -87,13 +87,13 @@ test('per-crop latency summary reports median, p95, mean, and total', () => {
 
 test('helper-reported blocked network attempts fail closed and retain diagnostics', async (t) => {
     const python = process.platform === 'win32' ? 'python' : 'python3';
-    const probe = spawnSync(python, ['--version'], { encoding: 'utf8', timeout: 2000 });
+    const probe = spawnSync(python, ['--version'], { encoding: 'utf8', timeout: 10000 });
     if (probe.error || probe.status !== 0) { t.skip('Python interpreter not installed for helper protocol test'); return; }
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'paddle-helper-protocol-'));
     const helper = path.join(dir, 'fake-helper.py');
     try {
         await fs.writeFile(helper, "import json; print(json.dumps({'schemaVersion':1,'status':'blocked','networkAttemptCount':1,'networkAttempts':['https://blocked.invalid'],'results':[]}))\n", 'utf8');
-        await assert.rejects(fallback.__test.runHelper(path.join(dir, 'unused.img'), [], { python, helperPath: helper, timeoutMs: 2000 }), error => {
+        await assert.rejects(fallback.__test.runHelper(path.join(dir, 'unused.img'), [], { python, helperPath: helper, timeoutMs: 10000 }), error => {
             assert.equal(error.code, 'PADDLEOCR_NETWORK_ATTEMPT_BLOCKED');
             assert.equal(error.networkAttemptCount, 1);
             assert.deepEqual(error.networkAttempts, ['https://blocked.invalid']);

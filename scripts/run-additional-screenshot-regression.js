@@ -18,7 +18,7 @@ const blockNetworkPath = path.join(__dirname, 'block-network.js');
 const preload = quoteRequireOption(blockNetworkPath);
 const env = {
     ...process.env,
-    OCR_ENGINE: 'tesseractjs',
+    OCR_ENGINE: String(process.env.OCR_ENGINE || 'tesseractjs').trim().toLowerCase(),
     OCR_SAVE_RAW_DIAGNOSTICS: process.env.OCR_SAVE_RAW_DIAGNOSTICS || '1',
     OCR_SEQUENCE_REPORT_PATH: reportPath,
     OCR_NETWORK_BLOCK_ENABLED: '1',

@@ -1,3 +1,11 @@
+ACTIVE BRANCH UPDATE - 2026-11-04
+
+The user authorized synchronizing main with the verified dwbotVis tree and making main the active implementation/delivery branch. Commit 6270f6e56c9064fb98df9976098ddf77ad74b837 has parent e2fbcfbf680a8d40691a76d1be94aae29325016f and exact tree 9e93b3c4ad3578f96853e391bb80779ac03fe135 (850 files). No history rewrite or force push occurred. dwbotVis remains a historical snapshot. New commits and CI target main.
+
+Current outstanding gates: Windows full OCR acceptance including native Tesseract; local OAuth/browser visual and synthetic upload; isolated development-guild Discord smoke; Windows persistence and complete recovery; PDF manual and final clean-extraction package verification. Linux/offline CI does not close these gates. Production remains NO-GO. See docs/iteration23/WINDOWS_OCR_AND_PERSISTENCE_ACCEPTANCE_2026-11-04.md.
+
+---
+
 DWBOT — COMPLETE PROJECT HANDOFF AND IMPLEMENTATION GUIDE
 Snapshot: 2026-11-04
 Repository: https://github.com/pbrau014/braultDwBotVis.git
@@ -253,3 +261,12 @@ Full decoded log: reports/ci/2026-11-04-41814316145-final-branch-log.txt.
 Latest main head observed at final check: e2fbcfbf680a8d40691a76d1be94aae29325016f. Main remains read-only; no changes by this work.
 The final branch includes the complete handoff, updated plan/status/README/quickstarts, path-by-path inventory, historical ZIP checksum sidecar and CI log. The original 175 MB historical ZIP remains in the File Library because it exceeds GitHub's 100 MB single-file limit.
 ================================================================================
+
+
+ACTIVE BRANCH / RELEASE-GATE ADDENDUM - 2026-11-04
+
+Active implementation branch: main. Historical snapshot: dwbotVis. Synchronization commit: 6270f6e56c9064fb98df9976098ddf77ad74b837. Tree: 9e93b3c4ad3578f96853e391bb80779ac03fe135 (850 files, exact match, verified).
+
+The Windows OCR and persistence scripts are automation scaffolding, not evidence the user's local Windows machine has been tested. Hosted Windows CI remains distinct from local OAuth/browser and real isolated Discord verification.
+
+Gate closure evidence: Windows runtime plus native/JS engine versions, fixture hashes, exact nine-field per-image reports and checksums; redacted OAuth/browser screenshots, role/access matrix and synthetic upload proof; live development-guild READY/permissions/attachment/restart logs; separate-process JSON/SQLite/private restore/physical-copy integrity on 50 synthetic players; inspected PDF pages, final manifest/checksum, ZIP integrity and clean extraction followed by repeated tests. Production remains NO-GO.

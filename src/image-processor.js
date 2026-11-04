@@ -147,7 +147,18 @@ async function cropResize(inputBuffer, rect, outputWidth, options = {}) {
     const width = Math.max(1, Math.round(rect.width));
     const height = Math.max(1, Math.round(rect.height));
     const args = ['-', '-crop', `${width}x${height}+${left}+${top}`, '+repage'];
-    if (options.grayscale) args.push('-colorspace', 'Gray');
+    if (options.channel) {
+        const channel = String(options.channel).toUpperCase();
+        if (!['R', 'G', 'B'].includes(channel)) {
+            throw new TypeError('Image crop channel must be one of R, G, or B.');
+        }
+        // Separating one source color channel creates a true grayscale image
+        // whose contrast can be optimized for low-contrast UI text such as the
+        // yellow player/clan row. This is image evidence, not value correction.
+        args.push('-channel', channel, '-separate', '+channel');
+    } else if (options.grayscale) {
+        args.push('-colorspace', 'Gray');
+    }
     if (options.contrastStretch) args.push('-contrast-stretch', String(options.contrastStretch));
     if (options.brightnessContrast) args.push('-brightness-contrast', String(options.brightnessContrast));
     if (options.sharpen) args.push('-unsharp', String(options.sharpen));

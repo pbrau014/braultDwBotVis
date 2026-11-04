@@ -629,6 +629,24 @@ async function extractTextCore(imageBuffer) {
             }
         }
     }
+    // Low-contrast yellow clan/player text can disappear in grayscale crops.
+    // A red-channel-only pass preserves its contrast against blue sea backgrounds
+    // and has independently recovered exact bracketed identities in the supplied
+    // low-contrast screenshots. Run only on unresolved/unstable identity; these
+    // reads remain ordinary OCR candidates and must pass strict identity consensus.
+    const sourceIdentityColorRescueReads = [];
+    if (identityNeedsRescue) {
+        const identityColorRescueRects = [
+            { left: Math.round(sourceWidth * 0.02), top: Math.round(sourceHeight * 0.23), width: Math.round(sourceWidth * 0.50), height: Math.round(sourceHeight * 0.16) },
+            { left: Math.round(sourceWidth * 0.02), top: Math.round(sourceHeight * 0.25), width: Math.round(sourceWidth * 0.50), height: Math.round(sourceHeight * 0.12) },
+        ];
+        for (const rescueRect of identityColorRescueRects) {
+            sourceIdentityColorRescueReads.push(await runSourceCrop({ ...rescueRect }, 3000, 6, {
+                channel: 'R', contrastStretch: '0.5%x0.5%', sharpen: '0x1+1+0.04',
+            }));
+        }
+    }
+
     // Always take two dedicated single-line source reads of the player region.
     // They are only admitted to identity consensus when both PSMs independently
     // parse the same valid player at adequate confidence; otherwise they remain
@@ -2360,6 +2378,7 @@ async function extractTextCore(imageBuffer) {
         { attempt: sourceIdentityTightPsm7, source: 'tight-identity-psm7', weight: 0.8 },
         { attempt: sourceIdentityTightPsm8, source: 'tight-identity-psm8', weight: 0.8 },
         ...sourceIdentityRescueReads.map((attempt) => ({ attempt, source: `identity-rescue-psm${attempt.pageSegmentationMode}`, weight: 1.1 })),
+        ...sourceIdentityColorRescueReads.map((attempt, index) => ({ attempt, source: `identity-red-channel-rescue-${index + 1}`, weight: 1.1 })),
         ...(tightIdentityAgreement ? sourceIdentityTightRescueReads.map((attempt) => ({ attempt, source: `identity-tight-rescue-psm${attempt.pageSegmentationMode}`, weight: 2.0 })) : []),
         ...(cvIdentityAttempt ? [{ attempt: cvIdentityAttempt, source: 'opencv-identity-geometry-rescue', weight: 0.55 }] : []),
         { attempt: standard, source: 'full-screen-psm3', weight: 0.7 },
@@ -2451,6 +2470,7 @@ async function extractTextCore(imageBuffer) {
         sourceMapModeUpperReads: sourceMapModeUpperReads.map((attempt) => ({ psm: attempt.pageSegmentationMode, text: attempt.text, confidence: attempt.confidence, sourceCrop: attempt.sourceCrop })),
         sourceMapModeLowerReads: sourceMapModeLowerReads.map((attempt) => ({ psm: attempt.pageSegmentationMode, text: attempt.text, confidence: attempt.confidence, sourceCrop: attempt.sourceCrop })),
         sourceIdentityRescueReads: sourceIdentityRescueReads.map((attempt) => ({ psm: attempt.pageSegmentationMode, text: attempt.text, confidence: attempt.confidence, sourceCrop: attempt.sourceCrop })),
+        sourceIdentityColorRescueReads: sourceIdentityColorRescueReads.map((attempt) => ({ psm: attempt.pageSegmentationMode, text: attempt.text, confidence: attempt.confidence, sourceCrop: attempt.sourceCrop, channel: 'R' })),
         sourceIdentityTightRescueReads: sourceIdentityTightRescueReads.map((attempt) => ({ psm: attempt.pageSegmentationMode, text: attempt.text, confidence: attempt.confidence, sourceCrop: attempt.sourceCrop })),
         sourceMapModeRescueReads: sourceMapModeRescueReads.map((attempt) => ({ psm: attempt.pageSegmentationMode, text: attempt.text, confidence: attempt.confidence, sourceCrop: attempt.sourceCrop })),
         sourceTimeDiagnostics,

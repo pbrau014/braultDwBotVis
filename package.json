@@ -31,7 +31,10 @@
     "test:ocr-sequence-checkpoint": "node --test tests/ocr-sequence-checkpoint.test.js",
     "test:desktop": "node --test tests/desktop-service.test.js tests/desktop-bridge.test.js tests/desktop-account-links.test.js tests/desktop-test-preflight.test.js tests/desktop-ui-contract.test.js",
     "preflight:desktop-test": "node scripts/preflight-desktop-test.js",
-    "test:prelive": "npm run test:discord-preflight && npm run preflight:desktop-test && npm run test:desktop && npm run test:ocr"
+    "test:prelive": "npm run test:discord-preflight && npm run preflight:desktop-test && npm run test:desktop && npm run test:ocr",
+    "test:persistence-recovery": "node scripts/run-persistence-recovery.js",
+    "test:windows-native-ocr": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/run-windows-ocr-acceptance.ps1",
+    "test:windows-release-gates": "npm run test:persistence-recovery && npm run test:windows-native-ocr"
   },
   "engines": {
     "node": ">=22.16.0"
