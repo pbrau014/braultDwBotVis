@@ -98,3 +98,37 @@ test('event nights, fixtures, matches and awards are season-scoped', () => {
   assert.throws(() => L.createFixture(s, { id: 'fx2', stageId: stage.id, teamA: 'a', teamB: 'missing' }), /two different teams/);
   assert.equal(L.createAward({ id: 'award-1', tournamentId: t.id, recipientId: 'u1', label: 'Winner', approvalId: 'PUB-1' }).status, 'approved');
 });
+
+test('Pilot registration, single event night and score ledger are format-scoped', () => {
+  const t=L.createTournament({id:'pilot-score',format:'pilot'});
+  L.registerPilotParticipant(t,{participantId:'17',displayName:'Alpha'});
+  assert.throws(()=>L.registerPilotParticipant(t,{participantId:'17',displayName:'Alpha'}),/already registered/);
+  const night=L.createPilotEventNight(t,{id:'pilot-night'});
+  assert.equal(night.tournamentId,t.id);
+  assert.throws(()=>L.createPilotEventNight(t,{id:'pilot-night-2'}),/one single-evening/);
+  assert.throws(()=>L.recordScoreEntry(t,{participantId:'17',category:'damage',gameNumber:1,shipClass:'DD',tier:8,evidenceId:'e1',damage:100}),/active/);
+  L.transitionTournament(t,'registration_open',{actor:'admin'});
+  L.transitionTournament(t,'locked',{actor:'admin'});
+  L.transitionTournament(t,'active',{actor:'admin'});
+  const entry=L.recordScoreEntry(t,{participantId:'17',category:'damage',gameNumber:1,shipClass:'DD',tier:8,evidenceId:'e1',damage:100});
+  assert.equal(entry.tournamentId,t.id);
+  assert.equal(entry.metric,100);
+  assert.throws(()=>L.recordScoreEntry(t,{participantId:'17',category:'damage',gameNumber:1,shipClass:'DD',tier:8,evidenceId:'e2',damage:200}),/already has/);
+});
+test('Full score entry requires a season registration and positive Race time', () => {
+  const t=L.createTournament({id:'full-score',format:'full'});
+  const season=L.createSeason(t.id,{id:'season-score',tournament:t});
+  L.registerParticipant(season,{participantId:'u1',displayName:'Alpha'});
+  L.transitionTournament(t,'registration_open',{actor:'admin'});
+  L.transitionTournament(t,'locked',{actor:'admin'});
+  L.transitionTournament(t,'active',{actor:'admin'});
+  assert.throws(()=>L.recordScoreEntry(t,{participantId:'u2',category:'race',gameNumber:1,shipClass:'DD',tier:8,evidenceId:'e1',time:90},season),/registered/);
+  const entry=L.recordScoreEntry(t,{participantId:'u1',category:'race',gameNumber:1,shipClass:'DD',tier:8,evidenceId:'e2',time:90},season);
+  assert.equal(entry.metric,90);
+  assert.throws(()=>L.recordScoreEntry(t,{participantId:'u1',category:'race',gameNumber:2,shipClass:'DD',tier:8,evidenceId:'e3',time:0},season),/positive/);
+});
+test('organizer approval records require a valid timestamp and attribution', () => {
+  assert.throws(()=>L.createApprovalRecord({id:'a',scope:'match outcome scoring',version:'1',approvedBy:'admin',approvedAt:'invalid'}),/valid ISO/);
+  const approval=L.createApprovalRecord({id:'a',scope:'match outcome scoring',version:'1',approvedBy:'admin',approvedAt:'2026-11-04T12:00:00Z'});
+  assert.equal(approval.status,'approved');
+});
