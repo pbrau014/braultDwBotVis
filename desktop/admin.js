@@ -97,6 +97,7 @@
       const startsAt=new Date(form.elements.startsAt.value);
       const body={id:form.elements.id.value.trim(),tournamentId:form.elements.tournamentId.value,startsAt:startsAt.toISOString()};
       if(form.elements.stage.value)body.stage=form.elements.stage.value;
+      body.approvedSettingsId=form.elements.approvedSettingsId.value.trim()||null;
       try{await D.api('/api/admin/yolo-event-nights',{method:'POST',body});form.reset();updateStageFields();await load();}
       catch(error){status(error.message,'error');}finally{button.disabled=false;}
     });
@@ -140,7 +141,7 @@
     D.$('yolo-tournament-form').addEventListener('submit',async e=>{
       e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
       const id=form.elements.id.value.trim(),format=form.elements.format.value;
-      const body={id,name:form.elements.name.value.trim(),format};
+      const body={id,name:form.elements.name.value.trim(),format,settings:{approvedSettingsId:form.elements.approvedSettingsId.value.trim()||null}};
       if(format==='full')body.season={id:id.slice(0,56)+'-season',durationWeeks:Number(form.elements.durationWeeks.value)};
       try{await D.api('/api/admin/yolo-tournaments',{method:'POST',body});form.reset();updateFormatFields();await load();}
       catch(error){status(error.message,'error');}finally{button.disabled=false;}
