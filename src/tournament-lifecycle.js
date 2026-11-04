@@ -1,0 +1,38 @@
+'use strict';
+const FORMATS=Object.freeze(['pilot','full']);
+const TOURNAMENT_STATUSES=Object.freeze(['draft','registration_open','locked','active','completed','archived']);
+const STAGE_TYPES=Object.freeze(['regular_season','postseason','grand_finale']);
+const SCORING_CATEGORIES=Object.freeze(['damage','kills','race','grand']);
+const TRANSITIONS=Object.freeze({draft:['registration_open','archived'],registration_open:['locked','archived'],locked:['active','archived'],active:['completed'],completed:['archived'],archived:[]});
+const STAGE_ORDER=Object.freeze({regular_season:1,postseason:2,grand_finale:3});
+const clone=v=>JSON.parse(JSON.stringify(v));
+function text(v,label){const s=String(v??'').trim();if(!s)throw new TypeError(label+' is required.');return s;}
+function score(v,label){if(v===''||v===null||v===undefined||!Number.isFinite(Number(v))||Number(v)<0)throw new TypeError(label+' must be finite and non-negative.');return Number(v);}
+function createLifecycleState(raw={}){return normalizeLifecycleState(raw);}
+function normalizeLifecycleState(raw={}){
+ const s=raw&&typeof raw==='object'&&!Array.isArray(raw)?raw:{};
+ const records=Array.isArray(s.battleRecords)?s.battleRecords:[];
+ const arrays=['tournaments','seasons','eventNights','teams','registrations','rosterAssignments','fixtures','matches','matchOutcomes','bracketProgression','raceSideEvents','awards','auditLog'];
+ const out={schemaVersion:1};
+ for(const key of arrays)out[key]=Array.isArray(s[key])?clone(s[key]):[];
+ out.legacyProvenance=s.legacyProvenance?clone(s.legacyProvenance):{format:'legacyUnassigned',recordCount:records.length,reason:'Pre-dual-format records are not automatically assigned.'};
+ return out;
+}
+function createTournament(input={}){
+ const id=text(input.id,'Tournament id'),format=text(input.format,'Tournament format').toLowerCase();
+ if(!FORMATS.includes(format))throw new TypeError('Tournament format must be pilot or full.');
+ return {id,name:String(input.name||id).trim(),format,status:'draft',seasonId:null,acceptedResultCount:0,settings:{duration:format==='pilot'?'single_evening':'multi_week_or_month',carryover:false},configFrozenAt:null,auditLog:[],createdAt:input.createdAt||new Date().toISOString()};
+}
+function audit(target,action,context={},details={}){const row={action,actor:text(context.actor,'Audit actor'),at:context.at||new Date().toISOString(),reason:String(context.reason||''),details:clone(details)};target.auditLog||=[];target.auditLog.push(row);return row;}
+function transitionTournament(t,next,context={}){if(!TOURNAMENT_STATUSES.includes(next))throw new TypeError('Unknown tournament status.');if(!TRANSITIONS[t.status]?.includes(next))throw new Error('Invalid tournament lifecycle transition.');audit(t,'tournament.status.changed',context,{from:t.status,to:next});t.status=next;if(next==='active')t.configFrozenAt=context.at||new Date().toISOString();return t;}
+function changeFormat(t,next){if(t.acceptedResultCount>0||t.status!=='draft')throw new Error('Tournament format is immutable after registration opens or results are accepted.');if(!FORMATS.includes(next))throw new TypeError('Tournament format must be pilot or full.');t.format=next;t.settings.duration=next==='pilot'?'single_evening':'multi_week_or_month';return t;}
+function createSeason(tournamentId,input={}){if(input.tournament&&input.tournament.format!=='full')throw new Error('Season entities are available only to Full YOLO.');return {id:text(input.id,'Season id'),tournamentId:text(tournamentId,'Tournament id'),name:String(input.name||input.id).trim(),status:'planned',stages:[],registrations:[],rosterAssignments:[],matchOutcomes:[],bracketProgression:[],createdAt:new Date().toISOString()};}
+function createStage(seasonId,type,input={}){if(!Object.hasOwn(STAGE_ORDER,type))throw new TypeError('Unknown stage type.');return {id:text(input.id,'Stage id'),seasonId:text(seasonId,'Season id'),type,order:STAGE_ORDER[type],status:'planned'};}
+function activateStage(season,id){const s=season.stages.find(x=>x.id===id);if(!s)throw new Error('Stage is not registered in this season.');const prev=season.stages.find(x=>x.order===s.order-1);if(prev&&prev.status!=='completed')throw new Error('A preceding stage must be completed first.');if(s.status!=='planned')throw new Error('Only planned stages can be activated.');s.status='active';return s;}
+function completeStage(season,id){const s=season.stages.find(x=>x.id===id);if(!s||s.status!=='active')throw new Error('Only an active stage can be completed.');s.status='completed';return s;}
+function registerParticipant(season,p){const id=text(p.participantId,'Participant id');if(season.registrations.some(x=>x.participantId===id))throw new Error('Participant is already registered in this season.');const r={participantId:id,displayName:text(p.displayName,'Display name'),status:'registered'};season.registrations.push(r);return r;}
+function assignRoster(season,a){const participantId=text(a.participantId,'Participant id'),teamId=text(a.teamId,'Team id');if(!season.registrations.some(x=>x.participantId===participantId))throw new Error('Participant must be registered before roster assignment.');if(season.rosterAssignments.some(x=>x.participantId===participantId&&x.status==='active'))throw new Error('Participant is already assigned to a team.');const r={participantId,teamId,status:'active',assignedAt:new Date().toISOString()};season.rosterAssignments.push(r);return r;}
+function recordMatchOutcome(season,input){const m=input.method||{};if(m.approved!==true||!text(m.methodId,'Approved scoring method id'))throw new Error('Match outcome requires an approved scoring method.');const a=text(input.teamA,'Team A'),b=text(input.teamB,'Team B');if(a===b)throw new Error('A match must contain two different teams.');const sa=score(input.scoreA,'Team A score'),sb=score(input.scoreB,'Team B score');if(sa===sb)throw new Error('A tied match requires the published tie-break procedure.');const r={id:text(input.id,'Match outcome id'),seasonId:season.id,teamA:a,teamB:b,scoreA:sa,scoreB:sb,winnerTeamId:sa>sb?a:b,methodId:m.methodId,approvedAt:text(m.approvedAt||'approval-recorded','Approval marker'),recordedAt:new Date().toISOString()};season.matchOutcomes||=[];season.matchOutcomes.push(r);return r;}
+function advanceBracket(season,input){if(input.method?.approved!==true||!input.method.methodId)throw new Error('Bracket advancement requires an approved scoring method.');const outcome=season.matchOutcomes.find(x=>x.id===input.outcomeId);if(!outcome)throw new Error('A verified match outcome is required before bracket advancement.');const row={seasonId:season.id,fromOutcomeId:outcome.id,winnerTeamId:outcome.winnerTeamId,toFixtureId:text(input.toFixtureId,'Next fixture id'),methodId:input.method.methodId,advancedAt:new Date().toISOString()};season.bracketProgression||=[];season.bracketProgression.push(row);return row;}
+function createRaceSideEvent(input={}){const elapsed=input.elapsedSeconds===undefined?null:Number(input.elapsedSeconds);if(elapsed!==null&&(!Number.isFinite(elapsed)||elapsed<=0))throw new TypeError('Race side-event elapsed seconds must be positive.');return {id:text(input.id,'Race side-event id'),seasonId:text(input.seasonId,'Season id'),eventNightId:text(input.eventNightId,'Event night id'),map:String(input.map||''),elapsedSeconds:elapsed,ordinaryMatchScoreContribution:0};}
+module.exports={FORMATS,TOURNAMENT_STATUSES,STAGE_TYPES,SCORING_CATEGORIES,createLifecycleState,normalizeLifecycleState,createTournament,transitionTournament,changeFormat,createSeason,createStage,activateStage,completeStage,registerParticipant,assignRoster,recordMatchOutcome,advanceBracket,createRaceSideEvent};
