@@ -281,6 +281,9 @@ function createEventNight(tournament, input, actor = 'organizer') {
   const endsAt = Date.parse(String(input.endsAt || ''));
   if (!Number.isFinite(startsAt) || !Number.isFinite(endsAt) || endsAt <= startsAt)
     throw new Error('Event night requires valid start/end timestamps with end after start.');
+  const tournamentStart=Date.parse(tournament.config.eventStart||'');
+  const tournamentEnd=Date.parse(tournament.config.eventEnd||'');
+  if (startsAt < tournamentStart || endsAt > tournamentEnd) throw new Error('Event night must fall within the published tournament start/end range.');
   const id = cleanText(input.id, 'Event night ID');
   if (tournament.eventNights.some(item => item.id === id)) throw new Error('Event night ID already exists.');
   const eventNight = { id, stageKey: input.stageKey, name: cleanText(input.name, 'Event night name'),
