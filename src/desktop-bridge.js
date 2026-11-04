@@ -312,6 +312,36 @@ function createDesktopBridge(options={}){
         const result=await call('registerYoloParticipant',principal,eventRegistration[1],await readJson(req));
         audit(principal,'yolo-participant-registration');sendJson(res,201,result);return true;
       }
+      const teamRoute=p.match(/^\/api\/admin\/yolo-event-nights\/([A-Za-z0-9._-]+)\/teams$/);
+      if(req.method==='POST'&&teamRoute){
+        const result=await call('createYoloTeam',principal,teamRoute[1],await readJson(req));
+        audit(principal,'yolo-team-create');sendJson(res,201,result);return true;
+      }
+      const fixtureRoute=p.match(/^\/api\/admin\/yolo-event-nights\/([A-Za-z0-9._-]+)\/fixtures$/);
+      if(req.method==='POST'&&fixtureRoute){
+        const result=await call('createYoloFixture',principal,fixtureRoute[1],await readJson(req));
+        audit(principal,'yolo-fixture-create');sendJson(res,201,result);return true;
+      }
+      const matchRoute=p.match(/^\/api\/admin\/yolo-fixtures\/([A-Za-z0-9._-]+)\/matches$/);
+      if(req.method==='POST'&&matchRoute){
+        const result=await call('createYoloMatch',principal,matchRoute[1],await readJson(req));
+        audit(principal,'yolo-match-create');sendJson(res,201,result);return true;
+      }
+      const gameRoute=p.match(/^\/api\/admin\/yolo-matches\/([A-Za-z0-9._-]+)\/games$/);
+      if(req.method==='POST'&&gameRoute){
+        const result=await call('createYoloGame',principal,gameRoute[1],await readJson(req));
+        audit(principal,'yolo-game-create');sendJson(res,201,result);return true;
+      }
+      const evidenceRoute=p.match(/^\/api\/admin\/yolo-games\/([A-Za-z0-9._-]+)\/evidence$/);
+      if(req.method==='POST'&&evidenceRoute){
+        const result=await call('linkYoloGameEvidence',principal,evidenceRoute[1],await readJson(req));
+        audit(principal,'yolo-game-evidence-link');sendJson(res,200,result);return true;
+      }
+      const evidenceReviewRoute=p.match(/^\/api\/admin\/yolo-games\/([A-Za-z0-9._-]+)\/evidence-review$/);
+      if(req.method==='POST'&&evidenceReviewRoute){
+        const result=await call('reviewYoloGameEvidence',principal,evidenceReviewRoute[1],await readJson(req));
+        audit(principal,'yolo-game-evidence-review');sendJson(res,200,result);return true;
+      }
       if(req.method==='POST'&&p==='/api/admin/results'){
         const result=await call('recordResult',principal,await readJson(req));audit(principal,'manual-score-entry');sendJson(res,200,result);return true;
       }
