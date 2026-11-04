@@ -24,7 +24,8 @@
     "acceptance:paddleocr": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/run-paddleocr-integrated-acceptance.ps1",
     "test:discord-gateway-diagnostics": "node --test discord-gateway-diagnostics.test.js",
     "test:discord-command-policy": "node --test tournament-command-policy.test.js",
-    "test:discord-preflight": "node --test discord-gateway-diagnostics.test.js tournament-command-policy.test.js"
+    "test:discord-preflight": "node --test discord-gateway-diagnostics.test.js tournament-command-policy.test.js discord-test-preflight.test.js",
+    "preflight:discord-test": "node scripts/preflight-discord-test.js"
   },
   "engines": {
     "node": ">=22.16.0"
