@@ -114,6 +114,27 @@
       status('Admin state loaded from the active tournament store.','success');
       updateSettingFields();
     }
+    function zonedInputToIso(value,timeZone){
+      const match=/^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2})$/.exec(value||'');
+      if(!match)throw new Error('Enter a valid local date and time.');
+      const target={year:Number(match[1]),month:Number(match[2]),day:Number(match[3]),hour:Number(match[4]),minute:Number(match[5])};
+      const targetUtc=Date.UTC(target.year,target.month-1,target.day,target.hour,target.minute);
+      const formatter=new Intl.DateTimeFormat('en-US',{timeZone,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
+      const partsAt=instant=>{
+        const parts=Object.fromEntries(formatter.formatToParts(new Date(instant)).filter(p=>p.type!=='literal').map(p=>[p.type,Number(p.value)]));
+        return {year:parts.year,month:parts.month,day:parts.day,hour:parts.hour,minute:parts.minute};
+      };
+      const same=instant=>{const p=partsAt(instant);return Object.keys(target).every(key=>p[key]===target[key]);};
+      let instant=targetUtc;
+      for(let i=0;i<5;i++){
+        const p=partsAt(instant);
+        const represented=Date.UTC(p.year,p.month-1,p.day,p.hour,p.minute);
+        instant+=targetUtc-represented;
+      }
+      if(!same(instant))throw new Error('That local time does not exist in the selected timezone because of a daylight-saving transition.');
+      if(same(instant-3600000)||same(instant+3600000))throw new Error('That local time is ambiguous in the selected timezone. Choose a different time outside the daylight-saving transition.');
+      return new Date(instant).toISOString();
+    }
     const competitionForm=D.$('competition-create-form');
     const formatSelect=competitionForm.elements.format;
     function updateFormatFields(){
@@ -128,8 +149,8 @@
       const format=formatSelect.value;
       const config={timezone:competitionForm.elements.timezone.value.trim()};
       const start=competitionForm.elements.eventStart.value,end=competitionForm.elements.eventEnd.value;
-      if(start)config.eventStart=new Date(start).toISOString();
-      if(end)config.eventEnd=new Date(end).toISOString();
+      if(start)config.eventStart=zonedInputToIso(start,config.timezone);
+      if(end)config.eventEnd=zonedInputToIso(end,config.timezone);
       if(format==='full')config.seasonWeeks=Number(competitionForm.elements.seasonWeeks.value);
       try{
         await competitionAction({action:'create_tournament',tournament:{
