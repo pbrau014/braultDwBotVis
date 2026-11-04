@@ -6,6 +6,7 @@ const clean = x => String(x ?? '').trim();
 const req = (x, label) => { if (!clean(x)) throw new Error(label + ' is required before publication.'); };
 function createTournament({ id, title, format, createdAt = new Date().toISOString(), settings = {} }) {
   req(id,'Tournament ID'); req(title,'Tournament title');
+  if (!settings || typeof settings !== 'object' || Array.isArray(settings)) throw new Error('Tournament settings must be an object.');
   if (![FORMATS.PILOT,FORMATS.FULL].includes(format)) throw new Error('Format must be pilot or full.');
   return { schemaVersion:1,id:clean(id),title:clean(title),format,lifecycle:'draft',
     stage:format===FORMATS.PILOT?STAGES.PILOT:null,createdAt,publishedAt:null,startedAt:null,completedAt:null,
@@ -16,14 +17,16 @@ function validatePublication(t,a) {
   if (!t || t.lifecycle!=='draft') throw new Error('Only a draft tournament can be published.');
   if (!a || typeof a!=='object') throw new Error('Organizer publication approval is required.');
   for (const [v,l] of [[a.approvedBy,'Approving organizer'],[a.approvedAt,'Approval timestamp'],[a.rulesVersion,'Rules version'],[a.rulesHash,'Published rules hash'],[t.settings?.timezone,'Event timezone']]) req(v,l);
+  if(!Number.isFinite(Date.parse(a.approvedAt))||! /^[a-f0-9]{64}$/i.test(clean(a.rulesHash))) throw new Error('Approval timestamp must be valid and rulesHash must be a SHA-256 digest.');
+  try { new Intl.DateTimeFormat('en-US',{timeZone:t.settings.timezone}); } catch { throw new Error('Event timezone must be a valid IANA timezone.'); }
   const s=t.settings;
   if(t.format===FORMATS.PILOT) {
-    for(const [k,l] of [['startAt','Pilot start'],['endAt','Pilot end'],['entryClosesAt','Entry close'],['lineupLocksAt','Lineup lock'],['gameCount','Game count'],['mapPolicy','Map policy'],['modePolicy','Mode policy'],['shipPolicy','Ship policy'],['prizePolicy','Prize policy'],['disputePolicy','Dispute policy']]) req(s[k],l);
+    for(const [k,l] of [['startAt','Pilot start'],['endAt','Pilot end'],['entryClosesAt','Entry close'],['lineupLocksAt','Lineup lock'],['gameCount','Game count'],['mapPolicy','Map policy'],['modePolicy','Mode policy'],['shipPolicy','Ship policy'],['teamComposition','Team composition'],['prizePolicy','Prize policy'],['disputePolicy','Dispute policy']]) req(s[k],l);
     if(!Number.isInteger(Number(s.gameCount))||Number(s.gameCount)<1) throw new Error('Pilot game count must be a positive integer.');
-    if(!Number.isFinite(Date.parse(s.startAt))||!Number.isFinite(Date.parse(s.endAt))||Date.parse(s.endAt)<=Date.parse(s.startAt)) throw new Error('Pilot end must be after a valid start.');
+    const start=Date.parse(s.startAt),end=Date.parse(s.endAt),entry=Date.parse(s.entryClosesAt),lock=Date.parse(s.lineupLocksAt);if(!Number.isFinite(start)||!Number.isFinite(end)||!Number.isFinite(entry)||!Number.isFinite(lock)||end<=start) throw new Error('Pilot event dates must be valid and end must be after start.');if(entry>start||lock>start||lock<entry)throw new Error('Pilot entry close and lineup lock must occur no later than start, with lineup lock at or after entry close.');
   } else {
-    for(const [k,l] of [['duration','Full season duration'],['cadence','Event cadence'],['regularSeasonStart','Regular Season start'],['regularSeasonEnd','Regular Season end'],['postseasonPolicy','Postseason policy'],['finalePolicy','Grand Finale policy'],['teamPolicy','Team and roster policy'],['matchOutcomeMethodId','Match outcome method ID'],['matchOutcomeMethodVersion','Match outcome method version'],['matchOutcomeMethodHash','Match outcome method hash'],['tieBreakPolicy','Tie-break policy'],['disputePolicy','Dispute policy']]) req(s[k],l);
-    if(!Number.isFinite(Date.parse(s.regularSeasonStart))||!Number.isFinite(Date.parse(s.regularSeasonEnd))||Date.parse(s.regularSeasonEnd)<=Date.parse(s.regularSeasonStart)) throw new Error('Regular Season end must be after a valid start.');
+    for(const [k,l] of [['duration','Full season duration'],['cadence','Event cadence'],['regularSeasonStart','Regular Season start'],['regularSeasonEnd','Regular Season end'],['postseasonStart','Postseason start'],['postseasonEnd','Postseason end'],['finaleStart','Grand Finale start'],['finaleEnd','Grand Finale end'],['postseasonPolicy','Postseason policy'],['finalePolicy','Grand Finale policy'],['teamPolicy','Team and roster policy'],['teamComposition','Team composition'],['shipPolicy','Ship policy'],['mapPolicy','Map policy'],['modePolicy','Mode policy'],['awardPolicy','Award policy'],['matchOutcomeMethodId','Match outcome method ID'],['matchOutcomeMethodVersion','Match outcome method version'],['matchOutcomeMethodHash','Match outcome method hash'],['tieBreakPolicy','Tie-break policy'],['disputePolicy','Dispute policy']]) req(s[k],l);
+    const dates=[s.regularSeasonStart,s.regularSeasonEnd,s.postseasonStart,s.postseasonEnd,s.finaleStart,s.finaleEnd].map(Date.parse);if(dates.some(x=>!Number.isFinite(x))||!(dates[0]<dates[1]&&dates[1]<=dates[2]&&dates[2]<=dates[3]&&dates[3]<dates[4]&&dates[4]<=dates[5]))throw new Error('Full YOLO stage boundaries must be valid and ordered: Regular Season, Postseason, Grand Finale.');
   }
   return true;
 }
