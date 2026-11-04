@@ -29,6 +29,16 @@
       row.append(D.node('span','',label),D.node('strong','',D.number(standing.events?.[key])));
       eventList.append(row);
     }
+    const tournamentList=D.$('player-tournament-list');tournamentList.replaceChildren();
+    const tournamentRows=overview.tournaments||[];
+    if(!tournamentRows.length)tournamentList.append(D.node('p','muted','No Pilot or Full YOLO tournament has been assigned to this account yet.'));
+    for(const tournament of tournamentRows){
+      const own=(tournament.standings||[]).find(row=>String(row.id)===String(overview.player.id));
+      const row=D.node('div','event-row');
+      const left=D.node('span','',tournament.name+' · '+(tournament.format==='pilot'?'Pilot YOLO':'Full YOLO')+' · '+tournament.status);
+      const right=D.node('strong','',own?'#'+own.rank+' · '+D.number(own.total):'Not registered');
+      row.append(left,right);tournamentList.append(row);
+    }
     const tbody=D.$('standings-body');tbody.replaceChildren();
     for(const row of overview.publicStandings){
       const tr=document.createElement('tr');
