@@ -7,7 +7,7 @@ const valid = {
   ENABLE_DESKTOP_UI: '1',
   DESKTOP_UI_PORT: '8787',
   DISCORD_OAUTH_CLIENT_ID: '123456789012345678',
-  DISCORD_OAUTH_CLIENT_SECRET: 'a-secret-value-that-is-not-a-placeholder',
+  DISCORD_OAUTH_CLIENT_SECRET: 'a-secret-value-with-no-template-marker',
   DISCORD_OAUTH_REDIRECT_URI: 'http://127.0.0.1:8787/auth/discord/callback',
   TOURNAMENT_ADMIN_IDS: '223456789012345678,323456789012345678',
 };

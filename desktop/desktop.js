@@ -61,33 +61,49 @@
     else if(status==='needs-correction'||status==='admin-review')p.classList.add('warn');
     return p;
   }
-  function submitCorrectionForm(submission,{admin=false,roster=[],onDone=()=>{}}={}) {
-    const block=node('div','review-block');
-    block.append(node('h4','',submission.missingFields?.length?'Confirm required OCR values':'Review OCR values'));
+  function submitCorrectionForm(submission,{admin=false,onDone=()=>{}}={}) {
+    const details=node('details','review-block');
+    const missing=submission.missingFields||[];
+    details.open=admin||missing.length>0;
+    const summary=node('summary','',admin?'Review / correct all nine required OCR fields':'Review your OCR field values');
+    details.append(summary);
+    if(missing.length)details.append(node('p','muted','Missing or unresolved: '+missing.map(field=>field.label).join(', ')+'. Enter exact values from the screenshot.'));
     const form=node('form','form-grid');
-    const values={};
-    for(const field of (submission.missingFields||[])) {
-      const label=node('label','',field.label||labels[field.key]||field.key);
+    const inputs={};
+    for(const [key,labelText] of Object.entries(labels)){
+      const label=node('label','',labelText);
       const input=node('input');
-      input.name=field.key;input.required=true;input.autocomplete='off';
-      if(field.key==='player'&&!admin)input.placeholder='Enter your linked roster name exactly';
-      else input.placeholder='Enter the exact value shown in the screenshot';
-      label.append(input);form.append(label);values[field.key]=input;
+      const original=String(submission.requiredValues?.[key]??'');
+      input.name=key;
+      input.autocomplete='off';
+      input.value=original==='Not detected'?'':original;
+      input.dataset.original=input.value;
+      input.placeholder=missing.some(field=>field.key===key)?'Enter exact value shown in screenshot':'Current OCR value · change only if incorrect';
+      if(key==='credits'||key==='freeXp'||key==='xp'||key==='damage')input.inputMode='numeric';
+      label.append(input);form.append(label);inputs[key]=input;
     }
-    if(!Object.keys(values).length){block.append(node('p','muted','All nine required values are currently confirmed.'));return block;}
-    const button=node('button','button secondary span-all','Save exact corrections');
+    const button=node('button','button secondary span-all', 'Save exact OCR corrections');
     button.type='submit';form.append(button);
     form.addEventListener('submit',async event=>{
       event.preventDefault();button.disabled=true;
-      const payload={};
-      for(const [key,input] of Object.entries(values))payload[key]=input.value.trim();
+      const values={};
+      for(const [key,input] of Object.entries(inputs)){
+        const next=input.value.trim();
+        if(next!==input.dataset.original)values[key]=next;
+      }
+      if(!Object.keys(values).length){
+        button.disabled=false;
+        details.prepend(node('p','muted','No field values were changed.'));
+        return;
+      }
       try{
-        const result=await api('/api/submissions/'+encodeURIComponent(submission.recordId)+'/corrections',{method:'POST',body:{values:payload}});
-        block.replaceChildren(node('p','form-success','Corrections saved. Status: '+result.status+'.'));
+        const result=await api('/api/submissions/'+encodeURIComponent(submission.recordId)+'/corrections',{method:'POST',body:{values}});
+        details.replaceChildren(node('p','form-success','Corrections saved. Status: '+result.status+'.'));
+        if(result.invalidCorrections?.length)details.append(node('p','form-error',result.invalidCorrections.map(item=>item.label+': '+item.reason).join(' · ')));
         await onDone();
-      }catch(error){button.disabled=false;block.prepend(node('p','form-error',error.message));}
+      }catch(error){button.disabled=false;details.prepend(node('p','form-error',error.message));}
     });
-    block.append(form);return block;
+    details.append(form);return details;
   }
   function mappingForm(submission,{admin=false,roster=[],onDone=()=>{}}={}) {
     const block=node('div','review-block');
@@ -155,7 +171,7 @@
     ];
     for(const [label,value] of values){const cell=node('div','summary-cell');cell.append(node('span','',label),node('strong','',value));cells.append(cell);}
     card.append(cells);
-    if(submission.missingFields?.length)card.append(submitCorrectionForm(submission,options));
+    if(submission.status!=='mapped')card.append(submitCorrectionForm(submission,options));
     if(!submission.missingFields?.length&&submission.status!=='mapped'&&(options.admin||submission.status==='awaiting-mapping'))card.append(mappingForm(submission,options));
     if(submission.status==='admin-review')card.append(node('p','form-error','Player identity or record mapping requires administrator review.'));
     if(submission.sourceEvidence?.sha256){

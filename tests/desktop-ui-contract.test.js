@@ -32,13 +32,15 @@ test('desktop browser scripts use only same-origin local APIs and do not contain
   assert.match(read('desktop/upload.js'), /\/api\/upload/);
   assert.match(read('desktop/desktop.js'), /\/api\/overview/);
   assert.match(read('desktop/admin.js'), /\/api\/admin\/settings/);
+  assert.match(read('desktop/desktop.js'), /submission.requiredValues/);
+  assert.match(read('desktop/desktop.js'), /submission.status==='awaiting-mapping'/);
 });
 
 test('upload page supports one image preview, drag and drop, type/size validation and progress', () => {
   const html = read('desktop/upload.html');
   const script = read('desktop/upload.js');
   assert.match(html, /type="file"/);
-  assert.match(html, /multiple/i) === false;
+  assert.doesNotMatch(html, /multiple/i);
   assert.match(script, /dragover/);
   assert.match(script, /URL\.createObjectURL/);
   assert.match(script, /10\*1024\*1024/);

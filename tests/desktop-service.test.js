@@ -38,7 +38,10 @@ test('player can view only owned submissions and only their own roster identity'
   const owned=await f.service.submitImage(p,{buffer:Buffer.from('synthetic screenshot'),filename:'one.png',contentType:'image/png'});
   const admin=await f.service.submitImage(a,{buffer:Buffer.from('[BEAR]Bravo admin screenshot'),filename:'two.png',contentType:'image/png'});
   assert.equal(owned.status,'awaiting-mapping');assert.equal(admin.status,'admin-review');
-  assert.equal((await f.service.listSubmissions(p)).items.length,1);
+  const ownRows=await f.service.listSubmissions(p);
+  assert.equal(ownRows.items.length,1);
+  assert.equal(ownRows.items[0].requiredValues.player,'[WOLF]Alpha');
+  assert.equal(ownRows.items[0].requiredValues.xp,'7890');
   await assert.rejects(f.service.correctSubmission(p,admin.submissionId,{values:{xp:'100'}}),e=>e.status===404);
   await assert.rejects(f.service.correctSubmission(p,owned.submissionId,{values:{player:'[BEAR]Bravo'}}),e=>e.status===403&&e.code==='PLAYER_IDENTITY_MISMATCH');
 });

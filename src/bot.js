@@ -3217,17 +3217,19 @@ async function postBattleRecord(message, record, fileName, note = '', sourceEvid
         if (!exists) {
             const discordUserId = String(message.author?.id || '');
             const linkedPlayer = Tournament.findPlayerByDiscordUserId(tournamentState, discordUserId);
+            const identityMatches = Boolean(linkedPlayer && String(record?.player || '').trim().toLowerCase() === String(linkedPlayer.name).trim().toLowerCase());
             const archived = {
                 record_id: exportData.record_id,
-                status: 'unmapped',
+                status: identityMatches ? 'awaiting-mapping' : 'admin-review',
                 captured_at: new Date().toISOString(),
                 source_file: String(fileName || ''),
                 record: exportData,
                 ocr_record: record,
                 missing_fields: [],
             };
-            // Keep Discord-originated records visible to the same linked player in
-            // the desktop review page. Unlinked senders remain admin-review only.
+            // Preserve ownership for roster-linked Discord submitters. The same
+            // record then appears in that player's desktop review queue. Identity
+            // mismatch is still admin-review and cannot be remapped by the player.
             if (linkedPlayer) {
                 archived.desktop_owner_id = discordUserId;
                 archived.desktop_owner_role = 'player';
