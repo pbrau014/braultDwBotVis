@@ -164,7 +164,10 @@ function lockRoster(tournament, teamId, actor = 'organizer') {
 function publishTournament(tournament, approval = {}, actor = 'organizer') {
   if (tournament.status !== STATUS.DRAFT) throw new Error('Only a draft tournament can be published.');
   if (!tournament.config.timezone) throw new Error('Set the event/season timezone before publication.');
-  if (tournament.format === FORMAT.PILOT && !tournament.config.eventStart) throw new Error('Set the Pilot event start before publication.');
+  const start = Date.parse(tournament.config.eventStart || '');
+  const end = Date.parse(tournament.config.eventEnd || '');
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start)
+    throw new Error('Publish valid event/season start and end timestamps with the end after the start.');
   if (tournament.format === FORMAT.FULL && !tournament.config.seasonWeeks) throw new Error('Set the Full YOLO season duration in weeks before publication.');
   if (tournament.format === FORMAT.FULL && (!approval.matchOutcomeMethod || !approval.approvedBy)) {
     throw new Error('Full YOLO publication requires an approved, published match-outcome method and named approver.');
@@ -251,7 +254,9 @@ function registerEvidence(tournament, input, actor = 'organizer') {
   const sizeBytes = Number(input.sizeBytes);
   if (!Number.isSafeInteger(sizeBytes) || sizeBytes <= 0) throw new Error('Evidence size must be a positive whole number of bytes.');
   const contentType = cleanText(input.contentType, 'Evidence content type');
-  if (!contentType.startsWith('image/')) throw new Error('Tournament screenshot evidence must have an image content type.');
+  if (!['image/png','image/jpeg','image/webp','image/bmp','image/tiff'].includes(contentType.toLowerCase())) throw new Error('Tournament screenshot evidence must be PNG, JPEG, WEBP, BMP or TIFF.');
+  if (!Number.isFinite(Date.parse(String(input.capturedAt || '')))) throw new Error('Evidence capture timestamp must be a valid date/time.');
+  if (tournament.evidence.some(item => item.sha256 === sha256)) throw new Error('This screenshot digest is already registered; reuse the existing evidence ID.');
   const record = { id, sha256, sizeBytes, contentType, sourceFile: cleanText(input.sourceFile, 'Evidence source filename'),
     capturedAt: cleanText(input.capturedAt, 'Evidence capture timestamp'), source: input.source ? clone(input.source) : null,
     registeredAt: now(), registeredBy: String(actor) };
