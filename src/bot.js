@@ -2933,7 +2933,7 @@ async function handleTournamentCommand(message) {
             const [event, field, value, ...extra] = args.split(/\s+/);
             if (!event || !field || value === undefined || extra.length) throw new Error('Usage: `!yolo setting <event> <field> <number>`.');
             const activeCompetitions = (tournamentState.competition?.tournaments || [])
-                .filter(item => item.stages.some(stage => stage.status === Tournament.TournamentFormats.STATUS.ACTIVE));
+                .filter(item => item.config.settingsFreeze && item.stages.some(stage => stage.status === Tournament.TournamentFormats.STATUS.ACTIVE));
             if (activeCompetitions.length) {
                 for (const competition of activeCompetitions) {
                     Tournament.TournamentFormats.freezeSettings(competition, { event, field, value }, message.author.id);
