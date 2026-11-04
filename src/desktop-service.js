@@ -260,7 +260,7 @@ function createDesktopService(options = {}) {
         const standing=scopedTournament?scopedStanding:result.scores.find(r=>r.id===player.id);
         const total=result.scores.reduce((s,r)=>s+r.total,0);
         return {status:'mapped',player:{id:player.id,name:player.name},event,gameNumber,standing,
-          aggregate:{doubloons:total,estimatedValue:total*0.54/100},tournamentId:scopedTournament?.id||null};
+          aggregate:scopedTournament?{doubloons:total}:{doubloons:total,estimatedValue:total*0.54/100},tournamentId:scopedTournament?.id||null};
       });
     },
     async addPlayer(principal,body) {
