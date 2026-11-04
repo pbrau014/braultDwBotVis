@@ -23,6 +23,8 @@ Shared participant identity, evidence, scoring validation, referee review, corre
 10. Added Discord commands for format discovery, lifecycle status, creation/publication/start, self-service Full registration and Pilot check-in, teams, roster locks, event nights, fixtures, game/evidence recording, outcome verification, explicit resolution, stage advancement, Pilot results, Race side-event records and Pilot completion. Mutating organizer commands are admin-gated; participant registration/check-in derives identity from the existing Discord-to-roster link.
 11. Added a hash-pinned qualification report requirement before postseason/finale advancement. Raw individual scores do not independently advance a team.
 12. Added Player/Admin format reference panels and hover/keyboard-focus quick notes with visible descriptions.
+13. Added Full YOLO stage-specific non-overlapping date-window validation and Pilot single-evening/entry-close/lineup-lock ordering checks.
+14. Added separately approved Full Race side-event schedule records; each result must reference a scheduled event, positive elapsed seconds and archived evidence. Side-event results remain separate from match outcomes.
 
 ## Appendment A - safety and provenance
 - Match outcomes cannot be derived from raw individual totals by this module. The organizer must publish a scoring method ID, version and SHA-256 hash; a completed fixture must reference that exact method and evidence.
@@ -59,7 +61,8 @@ Shared participant identity, evidence, scoring validation, referee review, corre
 
 ## Current verification record
 - GitHub Actions offline regression on the lifecycle branch's initial integrated source (commit `b7be1981bef9c261146f1320928c11b5d63aa4a3`): Node 22.16.0 and Node 24 both PASS; 269 passed, 0 failed, 2 skipped. The skips are optional OpenCV-dependent checks because the Linux runner lacks `cv2`.
-- A subsequent source-evidence lookup correction (commit `6cc23d13ec17d6d50980075a78c7f250ccc5fa2b`) was added after that run. A validation-only PR was opened to run CI against this exact latest source; result pending at this plan revision.
+- Source-evidence lookup corrections and method-hash-pinned qualification evidence were validated by a second GitHub Actions run (PR #9 head `6697f6f94387f8d57e023f6eebfb74d44e29d857`): Node 22.16.0 and Node 24 both PASS; 269 passed, 0 failed, 2 optional OpenCV-dependent skips.
+- Subsequent stage-window and Race side-event schedule changes are included in PR #7 head `954dcea2f405ed16639d72c729335f85b809ea97`. A final-source validation-only PR #10 has a GitHub Actions run in progress; do not count those latest changes as passed until that run completes.
 - The earlier local isolated domain prototype suite was 6/6 PASS, but it is not the same code as the remote branch and is not used as current branch acceptance.
 - Windows/native OCR, current game-client, live Discord, local OAuth/browser visual testing, and organizer publication approvals: NOT RUN / OPEN.
 - This increment is not production certification.
@@ -80,6 +83,11 @@ Shared participant identity, evidence, scoring validation, referee review, corre
 - Added authenticated linked-player self-registration/check-in.
 - Added desktop quick-help panels and keyboard-focus support.
 - Added offline regression workflow for Node 22.16 and Node 24.
+
+### 2026-11-04 - implementation expansion A4: event-window and Race side-event integrity
+- Added chronological, non-overlapping stage windows for Regular Season, Postseason and Grand Finale; Pilot event timing is constrained to one evening and ordered entry/lineup deadlines.
+- Added organizer-approved Full Race side-event schedule records and linked result records with positive elapsed-time and evidence requirements.
+- Added tests for invalid duration/date windows, missing side-event approval and missing schedule references.
 
 ### 2026-11-04 - initial Pilot/Full lifecycle implementation
 - Added separate lifecycle module and persistence field.
