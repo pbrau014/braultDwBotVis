@@ -106,6 +106,7 @@ test('desktop service creates Pilot drafts and binds check-in to the authenticat
   const f=fixture(),admin=await f.service.resolvePrincipal({id:ADMIN}),player=await f.service.resolvePrincipal({id:PLAYER});
   const created=await f.service.createLifecycle(admin,{title:'One-night Pilot',format:'pilot',settings:pilotSettings()});
   await f.service.publishLifecycle(admin,{tournamentId:created.id,approval:approval()});
+  await assert.rejects(f.service.createLifecycle(admin,{id:created.id,title:'Duplicate',format:'pilot',settings:pilotSettings()}),e=>e.status===409&&e.code==='LIFECYCLE_ID_CONFLICT');
   const overview=await f.service.getOverview(player);
   assert.equal(overview.yoloTournaments[0].format,'pilot');
   const checked=await f.service.checkInPilotLifecycle(player,{tournamentId:created.id});
