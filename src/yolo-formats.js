@@ -29,7 +29,6 @@ function createTournament(input = {}) {
 function assertTransition(from, to, format, stageType) {
  const allowed = { draft: ['published', 'cancelled'], published: ['active', 'cancelled'], active: ['completed', 'cancelled'], completed: [], cancelled: [] };
  if (!allowed[from] || !allowed[from].includes(to)) throw new Error('Invalid lifecycle transition: ' + from + ' -> ' + to + '.');
- if (format === FORMATS.FULL && to === 'completed' && stageType === 'regular-season') throw new Error('A Full YOLO season cannot complete before postseason and Grand YOLO finale are resolved.');
 }
 function transitionStage(t, stageType, nextStatus, actor, at = new Date().toISOString()) {
  if (!t || t.format !== FORMATS.FULL || !Array.isArray(t.stages)) throw new Error('Stage transitions apply only to Full YOLO.');
