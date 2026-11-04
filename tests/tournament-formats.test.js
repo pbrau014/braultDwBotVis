@@ -162,7 +162,8 @@ test('registration close prevents late entry and withdrawal remains auditable', 
 test('match game must be supported by locked team roster and non-empty match', () => {
   const t = full();
   F.activateStage(t, F.STAGES.REGULAR_SEASON);
-  const fixture = F.createFixture(t, { id: 'f1', stageKey: F.STAGES.REGULAR_SEASON, homeTeamId: 'home', awayTeamId: 'away' });
+  const night=F.createEventNight(t,{id:'night-f1',stageKey:F.STAGES.REGULAR_SEASON,name:'Night',startsAt:'2026-12-02T18:00:00-06:00',endsAt:'2026-12-02T22:00:00-06:00',timezone:'America/Chicago'});
+  const fixture = F.createFixture(t, { id: 'f1', stageKey: F.STAGES.REGULAR_SEASON, eventNightId:night.id, homeTeamId: 'home', awayTeamId: 'away' });
   const match = F.createMatch(t, fixture.id);
   evidence(t,'ev-roster');
   assert.throws(() => F.recordGame(match, { gameNumber: 1, teamId: 'home', playerId: 'p2', metrics: { damage: 1, kills: 0 }, evidenceId: 'ev-roster' }, t.teams,t.registrations,t.evidence), /locked roster/);
