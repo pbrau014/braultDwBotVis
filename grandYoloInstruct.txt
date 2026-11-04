@@ -21,11 +21,14 @@ Damage / Kills / Race / Grand Yolo are legacy scoring categories, not stages. Ra
 6. INTEGRITY AND EVIDENCE
 Preserve original screenshot, hash, OCR candidates, accepted correction, reviewer, timestamp and record linkage. DWBOT's nine mandatory fields remain exact: result, player, map, mode, battleStart, credits, freeXp, damage, xp. This OCR contract does not define match outcome. Official match outcomes require approved scoring-method ID, accepted individual-performance records, published aggregation and rounding, and explicit tie-break order. Tie-break sequence: head-to-head; record among tied teams; predeclared team metric/point differential; extra deciding game if feasible; auditable random draw only when expressly authorized. Training Room rewards are not assumed; test actual screenshots and never fabricate missing Credits/XP as zero. Freeze ordinary rules at event start; changes apply prospectively to future/unplayed games. Emergency changes require reason, scope, approver, timestamp, affected games and participant notice/review. Never use unapproved workbook formulas for official advancement or awards.
 
-7. ORGANIZER CHECKLIST
+7. ORGANIZER AND MATCH OPERATIONS
+Create the tournament as a draft. Pilot has no season; Full declares duration and receives regular-season, postseason and finale stages. Attach the organizer-approved settings record ID before publishing the tournament or any Full stage. Create event nights with their own approved settings record; starting the event locks registration. Register participants by linked roster identity. Team assignment requires registration and prevents duplicate team membership. Create fixtures only between teams in the same event night; create matches within the declared series length and games within each match. Link only complete, mapped screenshots to games. Linking requests review; it does not automatically accept evidence or determine match outcome. Administrators record acceptance/rejection, with a reason required for rejection. Retain actor/time/action audit history. Private full archives retain roster details; public recovery snapshots omit registrations and private roster metadata. Full YOLO cannot complete until regular season, postseason and Grand YOLO finale are complete.
+
+8. ORGANIZER CHECKLIST
 Format; organizer/approver; date/time/timezone; registration close; roster lock; cap; eligibility/ship list; room/password distribution; maps/modes; team composition; game count/duration; scoring/rounding; tie-breaks; no-show/forfeit/bye; evidence/dispute windows; awards; privacy/channel scope; accessibility/contact; emergency procedure. Blank values block publication; the bot must not guess.
 
 8. DESKTOP QUICK HELP
 Help must work on hover and keyboard focus, have visible labels and accessible descriptions, and be duplicated in an always-available help panel for touch/keyboard users. Tooltips supplement full instructions.
 
-9. KNOWN LIMITS
+10. KNOWN LIMITS
 This is a working operational draft, not event approval. Canonical v3.22 workbook and Score Reporter HTML were absent from audited sources. Ship allowlists, exact roster sizes, special-mode current-client label, dates, approver signatures, award amounts and some team/bot composition remain unresolved. Do not invent them. Organizer sign-off is required before live event approval.
