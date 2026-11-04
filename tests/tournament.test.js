@@ -161,3 +161,25 @@ test('randomized 50-player tournament aggregate matches Excel-style G12/H12 unro
   assert.equal(`$${excelH12Equivalent.toFixed(2)}`, `$${(0.54 * excelG12Equivalent / 100).toFixed(2)}`);
   assert.equal(T.MAX_PLAYERS, 50);
 });
+
+test('additive Pilot/Full metadata round-trips in private archive without reclassifying legacy scores', () => {
+  const state = T.createState();
+  const player = T.addPlayer(state, 'Legacy Player');
+  T.recordResult(state, { player: player.id, event: 'damage', gameNumber: 1, shipClass: 'DD', tier: 6, damage: 12345 });
+  state.yoloTournaments = [{ id: 'pilot-1', format: 'pilot', status: 'completed' }];
+  state.eventNights = [{ id: 'night-1', tournamentId: 'pilot-1', registrations: [] }];
+  const restored = T.importBackup(T.makeArchiveSnapshot(state));
+  assert.equal(restored.players[0].events.damage[0].metric, 12345);
+  assert.deepEqual(restored.yoloTournaments, state.yoloTournaments);
+  assert.deepEqual(restored.eventNights, state.eventNights);
+});
+test('public recovery archive omits private tournament registrations and event-night metadata', () => {
+  const state = T.createState();
+  state.yoloTournaments = [{ id: 'full-1', format: 'full' }];
+  state.eventNights = [{ id: 'night-1', registrations: [{ participantId: 'private-player-id' }] }];
+  const snapshot = T.makePublicArchiveSnapshot(state);
+  assert.deepEqual(snapshot.yolo_tournaments, []);
+  assert.deepEqual(snapshot.event_nights, []);
+  assert.ok(snapshot.private_data_omitted.includes('event_nights'));
+  assert.equal(snapshot.pending_workflow_counts.event_nights, 1);
+});
