@@ -53,3 +53,8 @@ This implementation does not prove a live login, live permissions, Gateway resum
 - Result: **6 passed / 0 failed / 0 skipped**.
 - Scope: pure permission-preflight helper tests only. These do not import discord.js, use credentials, connect to Discord, or validate the modified `src/bot.js` in a complete installed project.
 - The full project suite has not been rerun after this change. The previously recorded 214/214 result remains historical baseline evidence, not a current post-change result.
+
+
+## REST rate-limit observability added — 2026-11-04
+
+The bot now subscribes to discord.js REST `rateLimited` events and records method, normalized route, scope, global flag and retry delay. It intentionally omits full request URLs, tokens, headers and request bodies. The discord.js REST manager remains responsible for dynamic bucket scheduling; no custom retry loop or hard-coded Discord limits were introduced. No live 429 has been observed.

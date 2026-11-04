@@ -113,6 +113,14 @@ const client = new Client({
     partials: [Partials.Channel],
 });
 
+// discord.js REST already schedules requests around Discord's dynamic buckets.
+// Observe 429 handling without hard-coding limits or creating a competing retry loop.
+client.rest.on('rateLimited', (rateLimit) => {
+    console.warn(
+        `[Discord REST] rate limited: ${rateLimit.method} ${rateLimit.route}; scope=${rateLimit.scope}; global=${Boolean(rateLimit.global)}; retryAfterMs=${Number(rateLimit.retryAfter) || 0}. discord.js REST manager is applying its rate-limit queue.`,
+    );
+});
+
 let ocrWorker = null;
 let ocrWorkerInitialization = null;
 let ocrWorkerGeneration = 0;

@@ -109,3 +109,10 @@ Gateway event limits and HTTP REST rate limits are distinct. Do not flood either
 - Application commands and guild-scoped testing: https://docs.discord.com/developers/interactions/application-commands
 
 The bot requests Guilds, Guild Messages and Message Content. Message Content is privileged and must be enabled in the Developer Portal. The bot does not request Guild Members or Guild Presences. Gateway event limits are not the same as REST API limits; do not intentionally flood either. Discord also documents a global IDENTIFY limit, so avoid repeated restart loops.
+
+
+## REST API rate-limit handling
+
+Discord HTTP REST limits are separate from Gateway event limits. The bot now observes discord.js REST `rateLimited` events and logs only the HTTP method, normalized route, scope, global flag and retry delay in milliseconds. It does not log authorization headers, bot tokens, request bodies or full URLs.
+
+Do not hard-code Discord route limits. Discord recommends following dynamic response headers and the `Retry-After` header or `retry_after` response field for 429 responses. The existing discord.js REST manager owns request scheduling; DWBOT does not add a second retry loop. A live 429 is not required to run this test, and must not be deliberately induced against a real bot.
