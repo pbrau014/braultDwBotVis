@@ -74,7 +74,7 @@ test('public recovery snapshots omit private account links and per-user pending 
   assert.equal(Object.hasOwn(safe.battle_records[0], 'desktop_owner_role'), false);
   assert.deepEqual(safe.pending_submissions, []);
   assert.deepEqual(safe.pending_ocr_corrections, []);
-  assert.deepEqual(safe.pending_workflow_counts, { pending_submissions: 1, pending_ocr_corrections: 1 });
+  assert.deepEqual(safe.pending_workflow_counts, { pending_submissions: 1, pending_ocr_corrections: 1, yolo_tournaments: 0, event_nights: 0 });
   assert.ok(safe.private_data_omitted.includes('player_account_links'));
   assert.match(safe.public_snapshot_note, /authenticated local Admin backup/);
   const restoredPublic = T.importBackup(safe);
