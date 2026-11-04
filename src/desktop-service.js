@@ -2,6 +2,7 @@
 const crypto = require('node:crypto');
 const Tournament = require('./tournament');
 const BattleRecord = require('./battle-record');
+const YoloFormats = require('./yolo-formats');
 
 const CORRECTION_LABELS = Object.freeze({
   result:'Battle Result', player:'Player', map:'Map', mode:'Battle Mode',
@@ -256,6 +257,71 @@ function createDesktopService(options = {}) {
     async setSetting(principal,body) {
       role(principal,['admin']);
       return mutate(async()=>{const value=Tournament.setSetting(state(),String(body?.event||''),String(body?.field||''),body?.value);await options.saveState();return{event:body.event,field:body.field,value};});
+    },
+    async listYoloTournaments(principal) {
+      role(principal,['admin']);
+      return { items: [...(state().yoloTournaments || [])] };
+    },
+    async createYoloTournament(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{
+        const tournament=YoloFormats.createTournament(body || {});
+        const current=state();
+        if((current.yoloTournaments || []).some(item=>item.id===tournament.id))
+          throw Object.assign(new Error('Tournament ID already exists.'),{status:409,code:'DUPLICATE_TOURNAMENT'});
+        current.yoloTournaments ||= [];
+        current.yoloTournaments.push(tournament);
+        await options.saveState();
+        return tournament;
+      });
+    },
+    async createYoloEventNight(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{
+        const current=state(),tournament=(current.yoloTournaments || []).find(item=>item.id===body?.tournamentId);
+        if(!tournament) throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});
+        if(tournament.status==='completed'||tournament.status==='cancelled')
+          throw Object.assign(new Error('Cannot add an event night to a closed tournament.'),{status:409,code:'TOURNAMENT_CLOSED'});
+        if(tournament.format==='pilot'&&body?.stage)
+          throw Object.assign(new Error('Pilot YOLO event nights cannot be assigned to Full season stages.'),{status:400,code:'PILOT_HAS_NO_STAGES'});
+        if(tournament.format==='full'&&!body?.stage)
+          throw Object.assign(new Error('Full YOLO event nights must belong to a declared season stage.'),{status:400,code:'FULL_STAGE_REQUIRED'});
+        if(tournament.format==='full'&&!tournament.stages.some(stage=>stage.type===body.stage))
+          throw Object.assign(new Error('Stage is not part of this Full YOLO season.'),{status:400,code:'INVALID_SEASON_STAGE'});
+        const night=YoloFormats.createEventNight(body || {});
+        if((current.eventNights || []).some(item=>item.id===night.id))
+          throw Object.assign(new Error('Event-night ID already exists.'),{status:409,code:'DUPLICATE_EVENT_NIGHT'});
+        current.eventNights ||= [];
+        current.eventNights.push(night);
+        tournament.eventNights ||= [];
+        tournament.eventNights.push(night.id);
+        await options.saveState();
+        return night;
+      });
+    },
+    async registerYoloParticipant(principal,eventNightId,body={}) {
+      role(principal,['admin','player']);
+      return mutate(async()=>{
+        const current=state(),night=(current.eventNights || []).find(item=>item.id===eventNightId);
+        if(!night) throw Object.assign(new Error('Event night was not found.'),{status:404,code:'EVENT_NIGHT_NOT_FOUND'});
+        const participant=principal.role==='player'?ownPlayer(principal,current):Tournament.findPlayer(current,body.playerId);
+        if(!participant) throw Object.assign(new Error('A valid linked roster participant is required.'),{status:400,code:'PARTICIPANT_REQUIRED'});
+        const updated=YoloFormats.registerParticipant(night,String(participant.id));
+        night.registrations=updated.registrations;
+        await options.saveState();
+        return {eventNightId,participantId:participant.id,registered:true};
+      });
+    },
+    async transitionYoloTournament(principal,tournamentId,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{
+        const current=state(),index=(current.yoloTournaments || []).findIndex(item=>item.id===tournamentId);
+        if(index<0) throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});
+        const updated=YoloFormats.transitionTournament(current.yoloTournaments[index],body?.status,principal.discordUserId);
+        current.yoloTournaments[index]=updated;
+        await options.saveState();
+        return updated;
+      });
     },
     async exportBackup(principal) {
       role(principal,['admin']);
