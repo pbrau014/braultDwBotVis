@@ -209,6 +209,7 @@ function setStageQualifiers(tournament, stageKey, teamIds, approval = {}, actor 
 function activateStage(tournament, stageKey, actor = 'organizer') {
   const index = tournament.stages.findIndex(s => s.key === stageKey);
   if (index < 0) throw new Error('Stage does not belong to this tournament format.');
+  const stage = tournament.stages[index];
   if (index > 0 && tournament.stages[index - 1].status !== STATUS.COMPLETE) throw new Error('The preceding stage must be complete before this stage begins.');
   if (![STATUS.PUBLISHED, STATUS.ACTIVE].includes(tournament.status)) throw new Error('Tournament must be published before a stage can begin.');
   if (tournament.config.registrationOpen) throw new Error('Close registration before starting the event stage.');
@@ -216,7 +217,6 @@ function activateStage(tournament, stageKey, actor = 'organizer') {
     throw new Error('Full YOLO regular season requires all team rosters to be locked.');
   if (tournament.format === FORMAT.FULL && [STAGES.POSTSEASON, STAGES.GRAND_FINALE].includes(stageKey) && stage.qualifiedTeamIds.length < 2)
     throw new Error('Publish an approved qualification list before activating this Full YOLO stage.');
-  const stage = tournament.stages[index];
   stage.status = STATUS.ACTIVE;
   stage.startedAt = now();
   tournament.status = STATUS.ACTIVE;
