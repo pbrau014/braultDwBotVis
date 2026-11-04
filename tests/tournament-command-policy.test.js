@@ -12,7 +12,7 @@ test('settings mutation and all score/state mutation commands are admin-only', (
     for (const command of [
         'setting', 'add-player', 'rename-player', 'remove-player', 'result',
         'import', 'map', 'clear-slot', 'clear-event', 'clear-results',
-        'finalize', 'export', 'export-workbook', 'snapshot', 'lifecycle-create', 'lifecycle-publish', 'lifecycle-start', 'lifecycle-finish', 'lifecycle-night', 'lifecycle-team', 'lifecycle-assign', 'lifecycle-lock', 'lifecycle-fixture', 'lifecycle-game', 'lifecycle-complete-fixture', 'lifecycle-resolve', 'lifecycle-stage', 'lifecycle-pilot-result', 'lifecycle-race',
+        'finalize', 'export', 'export-workbook', 'snapshot', 'lifecycle-create', 'lifecycle-publish', 'lifecycle-start', 'lifecycle-finish', 'lifecycle-night', 'lifecycle-team', 'lifecycle-assign', 'lifecycle-lock', 'lifecycle-fixture', 'lifecycle-game', 'lifecycle-complete-fixture', 'lifecycle-resolve', 'lifecycle-stage', 'lifecycle-pilot-result', 'lifecycle-race-schedule', 'lifecycle-race',
     ]) {
         assert.equal(isAdminOnlyCommand(command), true, command);
     }
