@@ -58,6 +58,8 @@ test('roster assignments reject duplicates and cross-season references', () => {
 test('match outcomes require an approved, identified scoring method and exact positive inputs', () => {
   const t = L.createTournament({ id: 'f4', format: 'full' });
   const s = L.createSeason(t.id, { id: 's4', tournament: t });
+  L.createTeam(s, { id: 'a', name: 'Alpha' });
+  L.createTeam(s, { id: 'b', name: 'Bravo' });
   assert.throws(() => L.recordMatchOutcome(s, { id: 'm1', method: { approved: false }, teamA: 'a', teamB: 'b', scoreA: 1, scoreB: 0 }), /approved/);
   const result = L.recordMatchOutcome(s, { id: 'm2', method: { approved: true, methodId: 'D21-approved-v1', approvedAt: '2026-11-04T12:00:00Z', approvedBy: 'organizer-1' }, teamA: 'a', teamB: 'b', scoreA: 12.5, scoreB: 9 });
   assert.equal(result.winnerTeamId, 'a');
@@ -77,4 +79,18 @@ test('legacy state receives empty lifecycle with no invented format assignment',
   assert.deepEqual(state.seasons, []);
   assert.equal(state.legacyProvenance.format, 'legacyUnassigned');
   assert.equal(state.legacyProvenance.recordCount, 1);
+});
+
+test('event nights, fixtures, matches and awards are season-scoped', () => {
+  const t = L.createTournament({ id: 'f5', format: 'full' });
+  const s = L.createSeason(t.id, { id: 's5', tournament: t });
+  const stage = L.createStage(s.id, 'regular_season', { id: 'regular' });
+  s.stages.push(stage);
+  L.createTeam(s, { id: 'a', name: 'Alpha' });
+  L.createTeam(s, { id: 'b', name: 'Bravo' });
+  assert.equal(L.createEventNight(s, { id: 'n1', stageId: stage.id }).seasonId, s.id);
+  const fixture = L.createFixture(s, { id: 'fx1', stageId: stage.id, teamA: 'a', teamB: 'b' });
+  assert.equal(L.createMatch(s, fixture.id, { id: 'm1', gameNumber: 1 }).fixtureId, fixture.id);
+  assert.throws(() => L.createFixture(s, { id: 'fx2', stageId: stage.id, teamA: 'a', teamB: 'missing' }), /two different teams/);
+  assert.equal(L.createAward({ id: 'award-1', tournamentId: t.id, recipientId: 'u1', label: 'Winner', approvalId: 'PUB-1' }).status, 'approved');
 });
