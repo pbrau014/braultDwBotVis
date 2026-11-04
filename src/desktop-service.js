@@ -1,6 +1,7 @@
 'use strict';
 const crypto = require('node:crypto');
 const Tournament = require('./tournament');
+const TournamentFormats = Tournament.TournamentFormats;
 const BattleRecord = require('./battle-record');
 
 const CORRECTION_LABELS = Object.freeze({
@@ -108,7 +109,12 @@ function createDesktopService(options = {}) {
       const current=state(), rows=Tournament.standings(current);
       const total=rows.reduce((s,r)=>s+r.total,0);
       const aggregate={doubloons:total,estimatedValue:total*0.54/100};
-      const base={aggregate,maxPlayers:Tournament.MAX_PLAYERS,events: Tournament.EVENTS,eventLabels:Tournament.EVENT_LABELS};
+      const competition=current.competition||TournamentFormats.normalizeCompetition();
+      const tournamentSummaries=competition.tournaments.map(t=>({id:t.id,name:t.name,format:t.format,status:t.status,
+        stages:t.stages.map(s=>({key:s.key,status:s.status,startsAt:s.startsAt||s.startedAt||null,endsAt:s.endsAt||s.completedAt||null})),
+        registered:principal.role==='player'?t.registrations.some(r=>r.playerId===String(principal.player.id)&&r.status==='registered'):undefined,
+        seasonWeeks:t.config.seasonWeeks}));
+      const base={aggregate,maxPlayers:Tournament.MAX_PLAYERS,events: Tournament.EVENTS,eventLabels:Tournament.EVENT_LABELS,tournaments:tournamentSummaries};
       if(principal.role==='player') {
         const player=Tournament.findPlayer(current,principal.player.id);
         if(!player) throw Object.assign(new Error('Your linked roster entry no longer exists.'),{status:403,code:'PLAYER_UNLINKED'});
@@ -117,6 +123,7 @@ function createDesktopService(options = {}) {
       }
       return {...base,role:'admin',roster:current.players,standings:rows.map((r,i)=>({rank:i+1,...r})),
         settings:current.settings,
+        competition,
         playerAccountLinks:Object.entries(current.playerAccountLinks).map(([playerId,discordUserId])=>({playerId:Number(playerId),discordUserId})),
         pendingCount:current.battleRecords.filter(r=>r.status!=='mapped').length};
     },
@@ -256,6 +263,74 @@ function createDesktopService(options = {}) {
     async setSetting(principal,body) {
       role(principal,['admin']);
       return mutate(async()=>{const value=Tournament.setSetting(state(),String(body?.event||''),String(body?.field||''),body?.value);await options.saveState();return{event:body.event,field:body.field,value};});
+    },
+    async registerForTournament(principal,tournamentId) {
+      role(principal,['player']);
+      return mutate(async()=>{
+        const current=state(),player=ownPlayer(principal,current);
+        if(!player) throw Object.assign(new Error('Your linked roster entry no longer exists.'),{status:403,code:'PLAYER_UNLINKED'});
+        const tournament=TournamentFormats.getTournament(current.competition,tournamentId);
+        const result=TournamentFormats.registerParticipant(tournament,{playerId:String(player.id),displayName:player.name},principal.discordUserId);
+        await options.saveState();
+        return {registrationId:result.id,tournamentId:tournament.id,status:result.status};
+      });
+    },
+    async competitionAction(principal,body) {
+      role(principal,['admin']);
+      const action=String(body?.action||'');
+      return mutate(async()=>{
+        const current=state(),competition=current.competition||=TournamentFormats.normalizeCompetition();
+        const tournament=body?.tournamentId?TournamentFormats.getTournament(competition,body.tournamentId):null;
+        const actor=principal.discordUserId;
+        let result;
+        switch(action){
+          case 'create_tournament': result=TournamentFormats.createTournament(competition,body.tournament||{},actor);break;
+          case 'register_participant':
+            if(!tournament) throw new Error('Tournament ID is required.');
+            result=TournamentFormats.registerParticipant(tournament,body.participant||{},actor);break;
+          case 'create_team':
+            if(!tournament) throw new Error('Tournament ID is required.');
+            result=TournamentFormats.assignTeam(tournament,body.team||{},actor);break;
+          case 'lock_roster':
+            if(!tournament) throw new Error('Tournament ID is required.');
+            result=TournamentFormats.lockRoster(tournament,body.teamId,actor);break;
+          case 'publish':
+            if(!tournament) throw new Error('Tournament ID is required.');
+            result=TournamentFormats.publishTournament(tournament,body.approval||{},actor);break;
+          case 'activate_stage':
+            if(!tournament) throw new Error('Tournament ID is required.');
+            result=TournamentFormats.activateStage(tournament,body.stageKey,actor);break;
+          case 'complete_stage':
+            if(!tournament) throw new Error('Tournament ID is required.');
+            result=TournamentFormats.completeStage(tournament,body.stageKey,actor);break;
+          case 'create_fixture':
+            if(!tournament) throw new Error('Tournament ID is required.');
+            result=TournamentFormats.createFixture(tournament,body.fixture||{},actor);break;
+          case 'create_match':
+            if(!tournament) throw new Error('Tournament ID is required.');
+            result=TournamentFormats.createMatch(tournament,body.fixtureId,actor);break;
+          case 'record_match_game': {
+            if(!tournament) throw new Error('Tournament ID is required.');
+            const match=tournament.matches.find(item=>item.id===String(body.matchId));
+            if(!match) throw new Error('Match was not found.');
+            result=TournamentFormats.recordGame(match,body.game||{});
+            TournamentFormats.audit(tournament,'match_game_recorded',{matchId:match.id,gameNumber:result.gameNumber},actor);
+            break;
+          }
+          case 'complete_match':
+            if(!tournament) throw new Error('Tournament ID is required.');
+            result=TournamentFormats.completeMatch(tournament,body.matchId,body.options||{},actor);break;
+          case 'race_side_event':
+            if(!tournament) throw new Error('Tournament ID is required.');
+            result=TournamentFormats.recordRaceSideEvent(tournament,body.event||{},actor);break;
+          case 'freeze_settings':
+            if(!tournament) throw new Error('Tournament ID is required.');
+            result=TournamentFormats.freezeSettings(tournament,body.changes||{},actor);break;
+          default: throw Object.assign(new Error('Unsupported competition action.'),{status:400,code:'INVALID_COMPETITION_ACTION'});
+        }
+        await options.saveState();
+        return result;
+      });
     },
     async exportBackup(principal) {
       role(principal,['admin']);
