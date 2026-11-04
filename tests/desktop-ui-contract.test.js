@@ -78,3 +78,17 @@ test('Pilot and Full format guidance is present with keyboard-accessible hover q
   assert.match(css, /\.help-tip:focus-visible/);
   assert.match(css, /\.format-guide__grid/);
 });
+
+test('Admin lifecycle forms use same-origin protected API routes and cover Pilot/Full operations', () => {
+  const html = read('desktop/admin.html');
+  const script = read('desktop/admin.js');
+  const bridge = read('src/desktop-bridge.js');
+  for (const route of ['/api/admin/tournaments','/api/admin/seasons','/api/admin/stages','/api/admin/teams','/api/admin/registrations','/api/admin/rosters','/api/admin/event-nights','/api/admin/fixtures','/api/admin/matches','/api/admin/match-outcomes','/api/admin/bracket/advance','/api/admin/approvals']) {
+    assert.ok(html.includes('data-lifecycle-endpoint="'+route+'"'), 'Admin form missing '+route);
+    assert.ok(bridge.includes("'"+route+"'"), 'Bridge route missing '+route);
+  }
+  assert.match(script, /data-lifecycle-endpoint/);
+  assert.match(script, /data-entity/);
+  assert.match(bridge, /csrf\(req,session\)/);
+  assert.match(bridge, /role\(principal,\['admin'\]\)/);
+});
