@@ -1,5 +1,8 @@
+'use strict';
 
-
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const T = require('../src/tournament');
 test('Discord account links are unique, survive the private archive, and stay out of workbook exports', () => {
   const state = T.createState();
   const alpha = T.addPlayer(state, 'Alpha');
