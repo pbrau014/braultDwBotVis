@@ -137,6 +137,18 @@
         competitionForm.reset();updateFormatFields();await load();
       }catch(error){status(error.message,'error');}finally{button.disabled=false;}
     });
+    D.$('competition-action-form').addEventListener('submit',async e=>{
+      e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
+      try{
+        const payload=JSON.parse(form.elements.payload.value||'{}');
+        payload.action=form.elements.action.value;
+        const result=await competitionAction(payload);
+        status('Operation completed: '+payload.action,'success');
+        form.reset();
+        await load();
+      }catch(error){status(error instanceof SyntaxError?'Payload must be valid JSON.':error.message,'error');}
+      finally{button.disabled=false;}
+    });
     D.$('add-player-form').addEventListener('submit',async e=>{
       e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
       try{await D.api('/api/admin/players',{method:'POST',body:{name:form.elements.name.value.trim()}});form.reset();await load();}
