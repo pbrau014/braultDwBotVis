@@ -18,7 +18,7 @@
         card.append(D.node('h3','',tournament.name+' · '+(tournament.format==='pilot'?'Pilot YOLO':'Full YOLO')));
         card.append(D.node('p','submission-meta','ID '+tournament.id+' · '+tournament.status+' · '+(tournament.config?.seasonWeeks?tournament.config.seasonWeeks+' weeks':'single-event format')));
         const stages=D.node('div','event-list');
-        for(const stage of tournament.stages){
+        for(const [stageIndex,stage] of tournament.stages.entries()){
           const row=D.node('div','event-row');
           row.append(D.node('span','',stage.key.replace(/_/g,' ')+' · '+stage.status));
           if(stage.status==='active'){
@@ -28,7 +28,7 @@
               try{await competitionAction({action:'complete_stage',tournamentId:tournament.id,stageKey:stage.key});await load();}
               catch(error){complete.disabled=false;status(error.message,'error');}
             });row.append(complete);
-          }else if(stage.status!=='complete'&&tournament.status!=='draft'){
+          }else if(stage.status!=='complete'&&tournament.status!=='draft'&&(stageIndex===0||tournament.stages[stageIndex-1].status==='complete')){
             const activate=D.node('button','button secondary small','Activate stage');
             activate.type='button';activate.addEventListener('click',async()=>{
               activate.disabled=true;
