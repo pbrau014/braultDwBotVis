@@ -30,6 +30,21 @@
           <button class="button primary span-all" type="submit">Create tournament</button>
         </form>
         <div id="yolo-tournament-list" class="event-list"><p class="muted">Loading format records…</p></div>
+        <h3>Schedule an event night</h3>
+        <form id="yolo-event-night-form" class="form-grid compact-form">
+          <label>Event-night ID<input name="id" maxlength="64" required placeholder="night-01"></label>
+          <label>Tournament<select name="tournamentId" id="yolo-event-tournament" required></select></label>
+          <label id="yolo-stage-wrap">Full season stage<select name="stage" id="yolo-event-stage"><option value="">Pilot / not applicable</option><option value="regular-season">Regular season</option><option value="postseason">Postseason</option><option value="grand-finale">Grand YOLO finale</option></select></label>
+          <label>Starts at (local time)<input name="startsAt" type="datetime-local" required></label>
+          <button class="button secondary span-all" type="submit">Create event night</button>
+        </form>
+        <h3>Register a roster participant</h3>
+        <form id="yolo-registration-form" class="form-grid compact-form">
+          <label>Event night<select name="eventNightId" id="yolo-event-night-select" required></select></label>
+          <label>Participant<select name="playerId" id="yolo-registration-player" required></select></label>
+          <button class="button secondary" type="submit">Register participant</button>
+        </form>
+        <div id="yolo-event-night-list" class="event-list"></div>
       </section>
       <div class="metric-grid">
         <article class="metric-card"><span>ACTIVE ROSTER</span><strong id="admin-roster-count">—</strong><small>of 50 supported slots</small></article>
