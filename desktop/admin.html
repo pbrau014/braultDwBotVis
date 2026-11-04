@@ -17,6 +17,14 @@
   </header>
   <main class="page">
     <section class="page-heading"><div><p class="eyebrow">ADMIN WORKSPACE</p><h1>Tournament control</h1><p class="lede small">Roster, account links, scoring, OCR review and recovery exports. Every mutation is authorized again by the Node service.</p></div><a class="button secondary" href="/api/admin/backup">Download full recovery JSON</a></section>
+    <section class="format-guide" aria-labelledby="admin-format-guide-title">
+      <div class="panel-heading"><div><p class="eyebrow">FORMAT CONTROL REFERENCE</p><h2 id="admin-format-guide-title">One system, two tournament lifecycles</h2><p class="muted">Create and publish each event only after its format-specific decisions are approved.</p></div></div>
+      <div class="format-guide-grid">
+        <article class="format-guide-card"><h3>Pilot YOLO <button type="button" class="quick-help" aria-label="Pilot YOLO organizer quick note" aria-describedby="admin-pilot-note" data-tip="Single-evening event; no season, postseason or carryover.">?</button></h3><p id="admin-pilot-note">Publish date/time, timezone, entry close, lineup lock, game count, maps/modes/ships, awards and dispute policy before signup.</p></article>
+        <article class="format-guide-card"><h3>Full YOLO <button type="button" class="quick-help" aria-label="Full YOLO organizer quick note" aria-describedby="admin-full-note" data-tip="Season length is organizer-selected; advancement requires the published outcome method.">?</button></h3><p id="admin-full-note">Publish season duration, cadence, dates, team/roster policy, match-outcome method, qualification, tie-breaks and Grand Finale rules.</p></article>
+      </div>
+      <p class="muted">The lifecycle API and organizer controls are available below. Publish only after every format-specific setting and approval has been confirmed.</p>
+    </section>
     <section id="admin-denied" class="notice warning hidden"><h2>Administrator access required</h2><p>This page and its operations are restricted to Discord IDs listed in <code>TOURNAMENT_ADMIN_IDS</code> in the local bot environment.</p></section>
     <section id="admin-content" class="hidden">
       <div class="metric-grid">
@@ -25,6 +33,25 @@
         <article class="metric-card"><span>ESTIMATED VALUE</span><strong id="admin-value">—</strong><small>workbook formula</small></article>
         <article class="metric-card"><span>UNMAPPED RECORDS</span><strong id="admin-pending">—</strong><small>require admin review</small></article>
       </div>
+      <section class="panel lifecycle-admin-panel">
+        <div class="panel-heading"><div><p class="eyebrow">PILOT / FULL LIFECYCLE</p><h2>Format lifecycle administration</h2><p class="muted">Create drafts, publish approved rules and manage the current stage. Detailed organizer actions use validated JSON payloads.</p></div></div>
+        <div id="lifecycle-admin-list" class="lifecycle-list"><p class="muted">Loading configured tournaments…</p></div>
+        <form id="lifecycle-create-form" class="form-grid lifecycle-form">
+          <label>Tournament title<input name="title" maxlength="120" required placeholder="Pilot event or season title"></label>
+          <label>Format<select name="format" required><option value="pilot">Pilot YOLO — one evening</option><option value="full">Full YOLO — season</option></select></label>
+          <label class="span-all">Format settings JSON<textarea name="settings" rows="7" required spellcheck="false" placeholder='{"timezone":"America/Chicago", "...":"replace with approved values"}'></textarea></label>
+          <p class="muted span-all">Settings are not guessed. Use the grandYoloInstruct manual's exact Pilot or Full required fields. Creation stores a draft only.</p>
+          <button class="button primary span-all" type="submit">Create draft</button>
+        </form>
+        <div class="divider"></div>
+        <form id="lifecycle-action-form" class="form-grid lifecycle-form">
+          <label>Tournament<select name="tournamentId" id="lifecycle-target" required></select></label>
+          <label>Operation<select name="operation"><option value="publish">Publish approved rules</option><option value="start">Start published tournament</option><option value="action">Other lifecycle action</option></select></label>
+          <label class="span-all">JSON payload<textarea name="payload" rows="7" spellcheck="false" placeholder='For Publish: {"approval":{"approvedBy":"...","approvedAt":"...","rulesVersion":"...","rulesHash":"..."}}. For Other action: {"action":"team","team":{"id":"...","name":"..."}}.'></textarea></label>
+          <p class="muted span-all">The selected tournament ID is added by the app. Other actions include team, assign, lock-roster, event-night, settings, fixture, game, complete-fixture, resolve-fixture, advance-stage, pilot-result, race-schedule, race-result and finish-pilot.</p>
+          <button class="button secondary span-all" type="submit">Run organizer operation</button>
+        </form>
+      </section>
       <div class="content-grid">
         <section class="panel">
           <div class="panel-heading"><div><p class="eyebrow">PARTICIPANTS</p><h2>Roster management</h2></div></div>

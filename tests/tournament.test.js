@@ -161,3 +161,20 @@ test('randomized 50-player tournament aggregate matches Excel-style G12/H12 unro
   assert.equal(`$${excelH12Equivalent.toFixed(2)}`, `$${(0.54 * excelG12Equivalent / 100).toFixed(2)}`);
   assert.equal(T.MAX_PLAYERS, 50);
 });
+
+test('legacy version-2 scores migrate without assigning a YOLO format', () => {
+  const legacy = { version: 2, players: [{ id: 1, name: 'Legacy', events: { damage: [{ class: 'DD', tier: 6, metric: 12345 }] } }], settings: {} };
+  const migrated = T.normalizeState(legacy);
+  assert.equal(migrated.players[0].events.damage[0].metric, 12345);
+  assert.deepEqual(migrated.yoloTournaments, []);
+});
+
+test('format lifecycle survives workbook backup and full archive recovery', () => {
+  const state = T.createState();
+  const pilot = T.YoloFormats.createTournament({ id: 'pilot-preserve', title: 'Pilot', format: 'pilot' });
+  state.yoloTournaments.push(pilot);
+  const backup = T.importBackup(T.makeWorkbookBackup(state));
+  assert.equal(backup.yoloTournaments[0].format, 'pilot');
+  const archive = T.importBackup(T.makeArchiveSnapshot(state));
+  assert.equal(archive.yoloTournaments[0].id, 'pilot-preserve');
+});

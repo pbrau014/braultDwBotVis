@@ -1,0 +1,225 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>grandYoloInstruct - Pilot and Full YOLO</title><style>body{font:16px/1.65 system-ui,Segoe UI,Arial,sans-serif;max-width:980px;margin:3rem auto;padding:0 1.25rem;color:#17212b}h1,h2,h3{line-height:1.2;margin-top:2rem}h1{font-size:2.2rem}h2{border-bottom:1px solid #d7e0e8;padding-bottom:.35rem}li{margin:.35rem 0}code{background:#eef2f5;padding:.1rem .25rem;border-radius:4px}pre{overflow:auto;background:#101d2b;color:#f2f6fa;padding:1rem;border-radius:8px}p{margin:.75rem 0}</style></head><body><h1>grandYoloInstruct</h1>
+<h2>Pilot and Full YOLO Tournament System</h2>
+<p><strong>Implementation and operations manual - organizer publication required</strong></p>
+<p>Revision: 1.3</p>
+<p>Status: lifecycle foundation, Discord command operations, authenticated desktop lifecycle service/bridge, Player/Admin lifecycle controls and accessible quick-help implemented; guided form refinement and final production gates remain open.</p>
+<h2>1. Governing model</h2>
+<p>One YOLO tournament system supports two formats:</p>
+<ul>
+<li><strong>Pilot YOLO</strong> is a single-evening event with attendance/lineup check-in, individual Damage placement and no automatic season carryover.</li>
+<li><strong>Full YOLO</strong> is an organizer-defined multi-week or multi-month season with Regular Season, Postseason and Grand YOLO Finale.</li>
+</ul>
+<p>The formats share participant identity, evidence, OCR validation, referee review, correction, audit, communication and recovery procedures. They do not share the same lifecycle. The four legacy individual score categories remain separate from season stages and team match records.</p>
+<h2>2. Pilot YOLO</h2>
+<p>Lifecycle: Draft -&gt; Published -&gt; Active Pilot Event -&gt; Complete.</p>
+<p>Pilot has one event stage, not a season. Pilot attendance is checked in against an existing linked Discord roster identity; it is not Full-season registration. Each individual result records player ID, game number, ship class/tier, Damage and an original screenshot evidence SHA-256. Duplicate player/game slots are rejected. Individual standings aggregate recorded Damage. Pilot results do not automatically seed Full YOLO.</p>
+<p>Before publication, organizers must provide the event title, timezone, start/end, entry close, lineup lock, game count, map/mode/ship policies, award/prize policy, dispute policy and an approved rules version/hash. Entry close must be no later than lineup lock, which must be no later than event start. The event must fit within a single 24-hour period. Historical guidance of roughly seven games and under three hours is context, not a mandatory limit.</p>
+<h2>3. Full YOLO</h2>
+<p>Lifecycle: Draft -&gt; Published -&gt; Regular Season -&gt; Postseason -&gt; Grand YOLO Finale -&gt; Complete.</p>
+<p>Organizers choose and publish the season duration in weeks or months, cadence, timezone and separate non-overlapping date windows for all three stages. Do not assume a fixed 12-week season. Full YOLO uses distinct records for registration, teams, locked rosters, event nights, fixtures, games, evidence, verified match outcomes, Race side-events and progression.</p>
+<p>Full publication requires a named, versioned, approved match-outcome method with a SHA-256 hash, plus team/roster, qualification, tie-break, finale and dispute policies. Every event night must fall within its published stage window. Each fixture must reference an event night in the current stage and fit inside that night's time window.</p>
+<h2>4. Shared participant requirements</h2>
+<p>Use the exact Discord account linked to the tournament roster entry. Follow the published schedule and referee instructions. Submit original post-battle evidence. A player must be on the locked team roster for a Full YOLO fixture game.</p>
+<p>The nine mandatory OCR fields remain in exact order: <code>result</code>, <code>player</code>, <code>map</code>, <code>mode</code>, <code>battleStart</code>, <code>credits</code>, <code>freeXp</code>, <code>damage</code>, <code>xp</code>. Missing, ambiguous or illegible values remain unresolved. Never guess, fuzzy-repair, or substitute zero. Corrections retain before/after values, actor, timestamp, reason and evidence reference.</p>
+<p>Training Room battles may not produce economy rewards. That does not authorize fabricated Credits/XP values or weakened validation. Establish screenshot-type-specific evidence policy from current-client evidence before accepting it.</p>
+<h2>5. Scoring terminology and boundaries</h2>
+<p>Keep separate:</p>
+<ul>
+<li>legacy Race individual score category;</li>
+<li>positive elapsed-time Race metric;</li>
+<li>Full YOLO recurring Race side-event;</li>
+<li>Big Race map;</li>
+<li>legacy Grand Yolo individual score category;</li>
+<li>Grand YOLO Finale stage.</li>
+</ul>
+<p>Race elapsed time must be positive seconds; lower elapsed time is better. A normalized metric may be (1 / elapsedSeconds). Race side-event totals are recorded in their own ledger and do not silently affect ordinary match outcomes.</p>
+<p>Ship weights remain DD=4, CA=3, BB=2. Unknown/blank class is invalid, not zero. Preserve the historical Grand Yolo tierWeight default of 0.9 pending canonical workbook reconciliation. The legacy 0.54 x score / 100 display is not a verified cash or prize conversion.</p>
+<h2>6. Full match outcomes and tie-breaks</h2>
+<p>Before Full YOLO publication, require a named, versioned, approved and published method for aggregating applicable individual metrics, including Damage and Kills. Publish weights, aggregation, rounding, point differential and qualification rules. Do not substitute raw wins/losses or one individual score.</p>
+<p>A fixture can be completed only with a verified outcome that references the exact published method ID, version and hash, names one of the fixture teams as winner, and includes evidence. Stage advancement requires a separate approved qualification report using the same published method and evidence reference. The lifecycle module records this approval; it does not invent or calculate an unapproved scoring formula.</p>
+<p>Tie-break order: (1) head-to-head outcome; (2) record among tied teams; (3) predeclared team metric/point differential; (4) extra deciding game if feasible and published; (5) auditable random draw only when expressly authorized. If no authorized tie-break resolves a tie, advancement is blocked.</p>
+<h2>7. Registration, teams and roster locks</h2>
+<p>Full registration attaches to an existing player ID and a verified linked Discord identity. Duplicate active registration is rejected. Team assignment requires active registration. Lock rosters before fixtures and play. A game must identify a player on the locked roster of the recorded team and reference an archived screenshot evidence record.</p>
+<p>Pilot uses attendance check-in rather than Full-season registration. Pilot check-in also requires an existing linked Discord identity. Locked-roster withdrawals cannot silently edit the roster; an organizer-approved substitute or forfeit resolution is required.</p>
+<h2>8. Race side-event</h2>
+<p>A Full YOLO Race side-event schedule is a separately approved record. It requires an occurrence label, start/end window, map reference and named organizer approval. Individual results require an active Full registration, positive elapsed seconds, a reference to the approved side-event schedule and archived screenshot evidence. The suggested weeks 3/6/9/finale template is not automatic; organizers must ratify the schedule for the actual season. Keep the side-event map reference distinct from the ordinary Race category.</p>
+<h2>9. Discord lifecycle commands</h2>
+<p>Public discovery:</p>
+<ul>
+<li><code>!yolo formats</code> - explains Pilot and Full formats.</li>
+<li><code>!yolo lifecycle</code> - lists configured lifecycle tournaments.</li>
+<li><code>!yolo lifecycle-register &lt;tournament ID&gt;</code> - self-registers a linked identity for Full YOLO.</li>
+<li><code>!yolo lifecycle-checkin &lt;tournament ID&gt;</code> - checks in a linked identity for Pilot YOLO.</li>
+</ul>
+<p>Administrator-only lifecycle actions:</p>
+<ul>
+<li><code>!yolo lifecycle-create</code> with a JSON object.</li>
+<li><code>!yolo lifecycle-publish</code> with a JSON object containing organizer approval.</li>
+<li><code>!yolo lifecycle-start &lt;tournament ID&gt;</code>.</li>
+<li><code>!yolo lifecycle-team</code>, <code>lifecycle-assign</code>, <code>lifecycle-lock</code>.</li>
+<li><code>!yolo lifecycle-night</code>, <code>lifecycle-settings</code>, <code>lifecycle-fixture</code>, <code>lifecycle-game</code>.</li>
+<li><code>!yolo lifecycle-complete-fixture</code>, <code>lifecycle-resolve</code>, <code>lifecycle-stage</code>.</li>
+<li><code>!yolo lifecycle-pilot-result</code>, <code>lifecycle-race-schedule</code>, <code>lifecycle-race</code>.</li>
+<li><code>!yolo lifecycle-finish &lt;tournament ID&gt;</code>.</li>
+</ul>
+<p>The JSON command interface is an initial operations surface, not a guided UI. Commands must be run in the configured DWBOT channel. Organizer mutations are admin-gated. Participant registration/check-in resolves the sender's Discord ID against the existing linked roster. Evidence arguments reference an archived battle record ID; the bot resolves its stored original-source SHA-256 rather than accepting a typed hash.</p>
+<h3>9.1 Create a Pilot draft</h3>
+<pre><code>{
+  &quot;title&quot;: &quot;[PILOT EVENT TITLE]&quot;,
+  &quot;format&quot;: &quot;pilot&quot;,
+  &quot;settings&quot;: {
+    &quot;timezone&quot;: &quot;[IANA TIMEZONE]&quot;,
+    &quot;startAt&quot;: &quot;[ISO DATETIME WITH OFFSET]&quot;,
+    &quot;endAt&quot;: &quot;[ISO DATETIME WITH OFFSET]&quot;,
+    &quot;entryClosesAt&quot;: &quot;[ISO DATETIME WITH OFFSET]&quot;,
+    &quot;lineupLocksAt&quot;: &quot;[ISO DATETIME WITH OFFSET]&quot;,
+    &quot;gameCount&quot;: 7,
+    &quot;mapPolicy&quot;: &quot;[APPROVED MAP POLICY]&quot;,
+    &quot;modePolicy&quot;: &quot;[VERIFIED MODE POLICY]&quot;,
+    &quot;shipPolicy&quot;: &quot;[APPROVED SHIP POLICY]&quot;,
+    &quot;prizePolicy&quot;: &quot;[APPROVED AWARDS]&quot;,
+    &quot;disputePolicy&quot;: &quot;[APPROVED REVIEW POLICY]&quot;
+  }
+}</code></pre>
+<p>Run <code>!yolo lifecycle-create</code> followed by that JSON object. Replace every bracketed placeholder with approved values. Seven games is an example only; set the actual approved game count.</p>
+<h3>9.2 Create a Full YOLO draft</h3>
+<pre><code>{
+  &quot;title&quot;: &quot;[SEASON TITLE]&quot;,
+  &quot;format&quot;: &quot;full&quot;,
+  &quot;settings&quot;: {
+    &quot;timezone&quot;: &quot;[IANA TIMEZONE]&quot;,
+    &quot;duration&quot;: &quot;8 weeks&quot;,
+    &quot;cadence&quot;: &quot;[WEEKLY OR APPROVED CADENCE]&quot;,
+    &quot;regularSeasonStart&quot;: &quot;[ISO DATETIME]&quot;,
+    &quot;regularSeasonEnd&quot;: &quot;[ISO DATETIME]&quot;,
+    &quot;postseasonStart&quot;: &quot;[ISO DATETIME]&quot;,
+    &quot;postseasonEnd&quot;: &quot;[ISO DATETIME]&quot;,
+    &quot;finaleStart&quot;: &quot;[ISO DATETIME]&quot;,
+    &quot;finaleEnd&quot;: &quot;[ISO DATETIME]&quot;,
+    &quot;postseasonPolicy&quot;: &quot;[APPROVED QUALIFICATION AND BRACKET]&quot;,
+    &quot;finalePolicy&quot;: &quot;[APPROVED GRAND FINALE FORMAT]&quot;,
+    &quot;teamPolicy&quot;: &quot;[APPROVED TEAM AND ROSTER POLICY]&quot;,
+    &quot;matchOutcomeMethodId&quot;: &quot;[METHOD ID]&quot;,
+    &quot;matchOutcomeMethodVersion&quot;: &quot;[METHOD VERSION]&quot;,
+    &quot;matchOutcomeMethodHash&quot;: &quot;[64-CHARACTER SHA-256]&quot;,
+    &quot;tieBreakPolicy&quot;: &quot;[APPROVED TIE-BREAK POLICY]&quot;,
+    &quot;disputePolicy&quot;: &quot;[APPROVED REVIEW POLICY]&quot;
+  }
+}</code></pre>
+<p>The duration must be a positive number of weeks or months. Stage windows must be chronological and non-overlapping. The example duration is not a default season length.</p>
+<h3>9.3 Publish a draft</h3>
+<pre><code>{
+  &quot;tournamentId&quot;: &quot;[TOURNAMENT ID]&quot;,
+  &quot;approval&quot;: {
+    &quot;approvedBy&quot;: &quot;[ORGANIZER]&quot;,
+    &quot;approvedAt&quot;: &quot;[ISO DATETIME]&quot;,
+    &quot;rulesVersion&quot;: &quot;[VERSION]&quot;,
+    &quot;rulesHash&quot;: &quot;[64-CHARACTER SHA-256]&quot;
+  }
+}</code></pre>
+<p>Run <code>!yolo lifecycle-publish</code> with this object. Publication fails if required format-specific settings or approval fields are missing.</p>
+<h3>9.4 Full teams, event nights and fixtures</h3>
+<p>Examples of payload shapes (all IDs must be unique and refer to records in the same tournament):</p>
+<pre><code>{ &quot;tournamentId&quot;: &quot;[ID]&quot;, &quot;team&quot;: { &quot;id&quot;: &quot;[TEAM ID]&quot;, &quot;name&quot;: &quot;[TEAM NAME]&quot; } }
+{ &quot;tournamentId&quot;: &quot;[ID]&quot;, &quot;playerId&quot;: 12, &quot;teamId&quot;: &quot;[TEAM ID]&quot; }
+{ &quot;tournamentId&quot;: &quot;[ID]&quot;, &quot;teamId&quot;: &quot;[TEAM ID]&quot; }
+{ &quot;tournamentId&quot;: &quot;[ID]&quot;, &quot;night&quot;: { &quot;id&quot;: &quot;[NIGHT ID]&quot;, &quot;title&quot;: &quot;[WEEK / NIGHT]&quot;, &quot;startsAt&quot;: &quot;[ISO]&quot;, &quot;endsAt&quot;: &quot;[ISO]&quot; } }
+{ &quot;tournamentId&quot;: &quot;[ID]&quot;, &quot;fixture&quot;: { &quot;id&quot;: &quot;[FIXTURE ID]&quot;, &quot;eventNightId&quot;: &quot;[NIGHT ID]&quot;, &quot;teamAId&quot;: &quot;[TEAM A]&quot;, &quot;teamBId&quot;: &quot;[TEAM B]&quot;, &quot;startsAt&quot;: &quot;[ISO]&quot; } }</code></pre>
+<p>Create teams, assign active registrants, lock both rosters, create the event night, then schedule fixtures. Fixtures outside the published stage or event-night window are rejected. Stage settings are snapshotted at stage start and on each transition. Each event night also receives its own versioned settings snapshot.</p>
+<h3>9.5 Prospective settings revision</h3>
+<p>At stage start, the system stores a settings snapshot, version and SHA-256. A later revision may apply only to selected future event nights with no fixtures scheduled. Completed or already scheduled games are never retroactively changed. The published match-outcome method, qualification policy and tie-break rules are frozen for the season.</p>
+<pre><code>{
+  &quot;tournamentId&quot;: &quot;[ID]&quot;,
+  &quot;version&quot;: &quot;[NEW SETTINGS VERSION]&quot;,
+  &quot;settings&quot;: {
+    &quot;modePolicy&quot;: &quot;[APPROVED FUTURE MODE POLICY]&quot;
+  },
+  &quot;eventNightIds&quot;: [&quot;[FUTURE UNPLAYED EVENT NIGHT ID]&quot;]
+}</code></pre>
+<p>Run <code>!yolo lifecycle-settings</code> with this object. The command is administrator-only. It rejects event nights that are not future/unplayed or already have fixtures.</p>
+<h3>9.6 Record evidence-backed games and outcomes</h3>
+<pre><code>{
+  &quot;tournamentId&quot;: &quot;[ID]&quot;,
+  &quot;game&quot;: {
+    &quot;id&quot;: &quot;[GAME ID]&quot;,
+    &quot;fixtureId&quot;: &quot;[FIXTURE ID]&quot;,
+    &quot;playerId&quot;: 12,
+    &quot;teamId&quot;: &quot;[TEAM ID]&quot;,
+    &quot;evidenceRecordId&quot;: &quot;[ARCHIVED BATTLE RECORD ID]&quot;,
+    &quot;result&quot;: { &quot;damage&quot;: 50000, &quot;kills&quot;: 2 }
+  }
+}</code></pre>
+<p>To complete a fixture, provide the published outcome method and a second archived evidence reference:</p>
+<pre><code>{
+  &quot;tournamentId&quot;: &quot;[ID]&quot;,
+  &quot;fixtureId&quot;: &quot;[FIXTURE ID]&quot;,
+  &quot;outcome&quot;: {
+    &quot;status&quot;: &quot;verified&quot;,
+    &quot;methodId&quot;: &quot;[PUBLISHED METHOD ID]&quot;,
+    &quot;methodVersion&quot;: &quot;[PUBLISHED METHOD VERSION]&quot;,
+    &quot;methodHash&quot;: &quot;[PUBLISHED METHOD SHA-256]&quot;,
+    &quot;winnerTeamId&quot;: &quot;[TEAM ID]&quot;,
+    &quot;evidenceRecordId&quot;: &quot;[ARCHIVED BATTLE RECORD ID]&quot;
+  }
+}</code></pre>
+<h3>9.7 Advance a Full stage</h3>
+<pre><code>{
+  &quot;tournamentId&quot;: &quot;[ID]&quot;,
+  &quot;nextStage&quot;: &quot;postseason&quot;,
+  &quot;qualification&quot;: {
+    &quot;approved&quot;: true,
+    &quot;methodId&quot;: &quot;[PUBLISHED METHOD ID]&quot;,
+    &quot;methodVersion&quot;: &quot;[PUBLISHED METHOD VERSION]&quot;,
+    &quot;methodHash&quot;: &quot;[PUBLISHED METHOD SHA-256]&quot;,
+    &quot;evidenceRecordId&quot;: &quot;[ARCHIVED QUALIFICATION REPORT RECORD ID]&quot;,
+    &quot;qualifiedTeamIds&quot;: [&quot;[TEAM A]&quot;, &quot;[TEAM B]&quot;]
+  }
+}</code></pre>
+<p>Only use this after all fixtures in the current stage have been completed or explicitly resolved. The report and team list must be produced under the approved published method. Do not invent qualification results.</p>
+<h3>9.8 Pilot results, Race side-event and explicit resolutions</h3>
+<p>Pilot result payload:</p>
+<pre><code>{ &quot;tournamentId&quot;: &quot;[ID]&quot;, &quot;result&quot;: { &quot;playerId&quot;: 12, &quot;gameNumber&quot;: 1, &quot;damage&quot;: 50000, &quot;shipClass&quot;: &quot;DD&quot;, &quot;shipTier&quot;: 8, &quot;evidenceRecordId&quot;: &quot;[ARCHIVED BATTLE RECORD ID]&quot; } }</code></pre>
+<p>Approved Full Race schedule payload:</p>
+<pre><code>{ &quot;tournamentId&quot;: &quot;[ID]&quot;, &quot;schedule&quot;: { &quot;id&quot;: &quot;[RACE EVENT ID]&quot;, &quot;occurrence&quot;: &quot;[APPROVED OCCURRENCE]&quot;, &quot;startsAt&quot;: &quot;[ISO]&quot;, &quot;endsAt&quot;: &quot;[ISO]&quot;, &quot;mapReference&quot;: &quot;[APPROVED BIG RACE MAP]&quot;, &quot;approval&quot;: { &quot;approved&quot;: true, &quot;approvedBy&quot;: &quot;[ORGANIZER]&quot;, &quot;approvedAt&quot;: &quot;[ISO]&quot; } } }</code></pre>
+<p>Race result payload:</p>
+<pre><code>{ &quot;tournamentId&quot;: &quot;[ID]&quot;, &quot;result&quot;: { &quot;id&quot;: &quot;[RESULT ID]&quot;, &quot;eventId&quot;: &quot;[RACE EVENT ID]&quot;, &quot;playerId&quot;: 12, &quot;elapsedSeconds&quot;: 60, &quot;evidenceRecordId&quot;: &quot;[ARCHIVED BATTLE RECORD ID]&quot; } }</code></pre>
+<p>Forfeit/withdrawal/bye resolutions require an explicit reason, winner where applicable, and archived evidence. Cancellation requires a reason and does not require a winner. Do not silently edit a locked roster.</p>
+<h2>10. Desktop and Discord safety</h2>
+<p>The Player/Admin desktop pages explain both formats and provide quick notes on mouse hover and keyboard focus; the descriptions are also available as visible text for touch and assistive technology. The authenticated desktop lifecycle service and CSRF-protected bridge expose draft creation, publication, start, participant self-registration/check-in and administrator lifecycle actions. The Admin UI currently uses a generic lifecycle action payload for several operations rather than complete guided forms; detailed timeline, roster, fixture, evidence and audit visualizations plus referee-specific authorization remain follow-on work. Discord lifecycle JSON commands remain available in the configured channel. Live permissions, channel scope and slash-command defaults have not been changed.</p>
+<p>Do not change channel privacy, enable slash commands, or conduct live Discord actions outside an isolated development-guild test. Public replies and snapshots remain subject to the current configured-channel behavior.</p>
+<h2>11. Settings freeze, audit and appeals</h2>
+<p>At tournament/stage start, the lifecycle engine records a versioned settings snapshot and SHA-256. Each Full event night receives its own settings snapshot. The administrator-only <code>lifecycle-settings</code> command can apply a versioned revision only to selected future event nights that have no fixtures; completed or scheduled fixtures are not retroactively changed. Published match-outcome, qualification and tie-break policies remain frozen for the season. An emergency safety, security or platform override workflow is still required and must capture reason, scope, approver, timestamp, affected games and participant notice/review.</p>
+<p>Publish dispute window and appeal authority before the event. Historical sources do not establish one universal appeal duration.</p>
+<h2>12. Organizer publication checklist</h2>
+<p>Required approvals not to be invented:</p>
+<ul>
+<li>Pilot date/start/end/timezone/entry close/lineup lock/game count.</li>
+<li>Full duration, cadence, and non-overlapping Regular Season, Postseason and Grand Finale date windows.</li>
+<li>Team size and human/bot composition.</li>
+<li>Ship allowlist/bans/tiers/maps/modes and verified current-client special-mode label.</li>
+<li>Match-outcome weights, aggregation, rounding, point differential and qualification.</li>
+<li>Tie-break, substitute, forfeit, bye, no-show, withdrawal, disqualification and appeal policy.</li>
+<li>Race side-event schedule/map and any use of weeks 3/6/9/finale template.</li>
+<li>Prizes, approver names, rules version/hash and publication time.</li>
+</ul>
+<p>A blank or unapproved value blocks publication where it affects eligibility, scoring, outcomes, safety or awards.</p>
+<h2>13. Production release gates</h2>
+<p>Production is NO-GO until:</p>
+<ul>
+<li>automated unit/integration/migration/backup/restore/security tests pass on current source;</li>
+<li>legacy scores, settings, account links, battle records and pending OCR work survive migration;</li>
+<li>Pilot and Full lifecycle, fixture resolution, qualification and tie-break tests pass;</li>
+<li>the canonical workbook and Score Reporter are identified and formula parity is reconciled;</li>
+<li>Windows current-source OCR acceptance passes with native Tesseract;</li>
+<li>local OAuth, Player/Admin authorization, browser visual QA and synthetic upload pass;</li>
+<li>isolated development-guild Discord smoke passes;</li>
+<li>the organizer publication checklist is signed;</li>
+<li>DOCX/PDF/HTML/TXT are generated from this source and rendered/inspected;</li>
+<li>the release archive checksum, ZIP integrity and clean extraction/restore are verified.</li>
+</ul>
+<p>Linux/offline CI cannot certify Windows, current game-client, browser, live Discord or organizer approval.</p>
+<h2>14. Provenance and implementation limits</h2>
+<p>Legacy version-2 score data is preserved and not retroactively assigned to Pilot or Full. The designated canonical scoring workbook and Score Reporter HTML were absent from the audited Library. The repository workbook is not proven canonical; workbook formula changes remain blocked until the designated source is identified.</p>
+<p>This manual is an implementation baseline, not a signed event publication. Add append-only amendments with version, date, approver, affected sections, reason, test evidence and effective scope.</p>
+<h2>15. Amendment 1.3 - implementation and verification update (2026-11-04)</h2>
+<p>The authenticated desktop lifecycle API and Player/Admin lifecycle controls are implemented in the lifecycle candidate branch. The generic Admin lifecycle action form is functional but not yet a fully guided workflow for every operation. Hover and keyboard-focus quick notes supplement visible instructions; they are not the only help channel. The active implementation PR is #7 against main. Its verified CI source commit is <code>4c2cef91446cae13403a7e487c8cb160d54bb714</code>; the Node 22.16.0 and Node 24 jobs completed successfully with 275 passed, 0 failed and 2 optional OpenCV-dependent skips because <code>cv2</code> was unavailable on Ubuntu. This is offline regression evidence, not live or production certification. Windows/native OCR, current screenshot accuracy, local OAuth/browser visual and upload testing, isolated development-guild Discord smoke, canonical workbook parity, signed event settings and final clean-extraction packaging remain open. No event-specific values or organizer approvals are inferred.</p></body></html>
