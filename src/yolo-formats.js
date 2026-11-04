@@ -37,6 +37,7 @@ function transitionStage(t, stageType, nextStatus, actor, at = new Date().toISOS
  if (index < 0) throw new Error('Season stage was not found.');
  const stage = t.stages[index];
  assertTransition(stage.status, nextStatus, t.format, stageType);
+ if(nextStatus==='published'&&!t.settings?.approvedSettingsId) throw new Error('An approved tournament settings record ID is required before publishing Full YOLO stages.');
  if (nextStatus === 'active' && index > 0 && t.stages[index - 1].status !== 'completed')
   throw new Error('The preceding Full YOLO stage must be completed first.');
  const stages = t.stages.map((item,i)=>i===index?{...item,status:nextStatus}:item);
@@ -45,16 +46,24 @@ function transitionStage(t, stageType, nextStatus, actor, at = new Date().toISOS
 function transitionTournament(t, nextStatus, actor, at = new Date().toISOString()) {
  if (!t || !STATUSES.includes(t.status) || !STATUSES.includes(nextStatus)) throw new Error('A valid tournament and status are required.');
  assertTransition(t.status, nextStatus, t.format, null);
+ if(nextStatus==='published'&&!t.settings?.approvedSettingsId) throw new Error('An approved tournament settings record ID is required before publishing.');
  if (t.format === FORMATS.FULL && nextStatus === 'completed' && t.stages.some(stage=>stage.status!=='completed'))
   throw new Error('Full YOLO cannot complete until regular season, postseason and Grand YOLO finale are completed.');
  return { ...t, status: nextStatus, audit: [...(t.audit || []), { type: 'tournament-status', from: t.status, to: nextStatus, actor: requiredText(actor, 'Actor'), at: timestamp(at, 'Transition time') }] };
+}
+function transitionEventNight(n,nextStatus,actor,at=new Date().toISOString()) {
+ if(!n||!STATUSES.includes(n.status)||!STATUSES.includes(nextStatus)) throw new Error('A valid event night and status are required.');
+ assertTransition(n.status,nextStatus,null,null);
+ if(nextStatus==='published'&&!n.approvedSettingsId) throw new Error('An approved event settings record ID is required before publishing this event night.');
+ const rosterLockedAt=nextStatus==='active'?(timestamp(at,'Event start time')):(n.rosterLockedAt||null);
+ return {...n,status:nextStatus,rosterLockedAt,audit:[...(n.audit||[]),{type:'event-night-status',from:n.status,to:nextStatus,actor:requiredText(actor,'Actor'),at:timestamp(at,'Transition time')}]};
 }
 function createEventNight(input = {}) {
  const startsAt = timestamp(input.startsAt, 'Event-night start'); if (!startsAt) throw new Error('Event-night start time is required.');
  const endsAt = timestamp(input.endsAt, 'Event-night end'); if (endsAt && Date.parse(endsAt) <= Date.parse(startsAt)) throw new Error('Event-night end must be after its start.');
  const stage = input.stage || null; if (stage && !STAGES.includes(stage)) throw new Error('Unknown Full YOLO stage.');
  const status=input.status || 'draft'; if(!STATUSES.includes(status)) throw new Error('Invalid event-night status.');
- return { id: identifier(input.id, 'Event-night ID'), tournamentId: identifier(input.tournamentId, 'Tournament ID'), stage, sequence: Number.isInteger(input.sequence) && input.sequence > 0 ? input.sequence : 1, startsAt, endsAt, status, registrations: [], teams: [], fixtures: [], matches: [], games: [], evidenceIds: [], audit: [] };
+ return { id: identifier(input.id, 'Event-night ID'), tournamentId: identifier(input.tournamentId, 'Tournament ID'), stage, sequence: Number.isInteger(input.sequence) && input.sequence > 0 ? input.sequence : 1, startsAt, endsAt, status, approvedSettingsId:input.approvedSettingsId||null, rosterLockedAt:null, registrations: [], teams: [], fixtures: [], matches: [], games: [], evidenceIds: [], audit: [] };
 }
 function registerParticipant(n, participantId, at = new Date().toISOString()) {
  const id = requiredText(participantId, 'Participant ID'); if (!['draft', 'published'].includes(n.status)) throw new Error('Registration is closed for this event night.');
@@ -108,4 +117,4 @@ function validateMatchOutcome(input = {}) {
   throw new Error('A non-empty published tie-break order is required.');
  return { status:'pending-calculation',approvedScoringMethodId,acceptedPerformanceRecordIds:[...ids],aggregation:input.aggregation,rounding:input.rounding,tieBreakOrder:[...input.tieBreakOrder] };
 }
-module.exports = { FORMATS, STAGES, STATUSES, createTournament, assertTransition, transitionTournament, transitionStage, createEventNight, registerParticipant, freezeRules, raceMetric, createTeam, createFixture, createMatch, createGame, createRaceSideEvent, grandYoloScore, grandYoloFinale, validateMatchOutcome };
+module.exports = { FORMATS, STAGES, STATUSES, createTournament, assertTransition, transitionTournament, transitionStage, transitionEventNight, createEventNight, registerParticipant, freezeRules, raceMetric, createTeam, createFixture, createMatch, createGame, createRaceSideEvent, grandYoloScore, grandYoloFinale, validateMatchOutcome };
