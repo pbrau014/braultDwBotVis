@@ -11,7 +11,7 @@ test('desktop login, Player, Admin and upload HTML pages are present and link lo
   const pages = {
     'desktop/index.html': ['Continue with Discord', '/auth/discord'],
     'desktop/player.html': ['/desktop.css', '/desktop.js', '/player.js', 'standings-body', 'submission-list'],
-    'desktop/admin.html': ['/desktop.css', '/desktop.js', '/admin.js', 'add-player-form', 'settings-form', 'admin-submissions', 'yolo-tournament-form', 'yolo-format-select', 'quick help'],
+    'desktop/admin.html': ['/desktop.css', '/desktop.js', '/admin.js', 'add-player-form', 'settings-form', 'admin-submissions', 'yolo-tournament-form', 'yolo-format-select', 'Quick help'],
     'desktop/upload.html': ['/desktop.css', '/desktop.js', '/upload.js', 'drop-zone', 'image-file', 'image-preview'],
   };
   for (const [file, needles] of Object.entries(pages)) {
