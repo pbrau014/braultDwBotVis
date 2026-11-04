@@ -73,6 +73,8 @@
         seasons:(lifecycle.seasons||[]).map(x=>[x.id,x.name||x.id]),
         stages:(lifecycle.seasons||[]).flatMap(x=>(x.stages||[]).map(y=>[y.id,(x.name||x.id)+' · '+y.type])),
         teams:(lifecycle.seasons||[]).flatMap(x=>(x.teams||[]).map(y=>[y.id,(x.name||x.id)+' · '+y.name])),
+        pilotTeams:(lifecycle.tournaments||[]).filter(x=>x.format==='pilot').flatMap(x=>(x.teams||[]).map(y=>[y.id,(x.name||x.id)+' · '+y.name])),
+        pilotFixtures:(lifecycle.tournaments||[]).filter(x=>x.format==='pilot').flatMap(x=>(x.fixtures||[]).map(y=>[y.id,(x.name||x.id)+' · '+y.id])),
         eventNights:[...(lifecycle.seasons||[]).flatMap(x=>(x.eventNights||[]).map(y=>[y.id,(x.name||x.id)+' · '+y.id])),...(lifecycle.tournaments||[]).filter(x=>x.format==='pilot').flatMap(x=>(x.eventNights||[]).map(y=>[y.id,(x.name||x.id)+' · '+y.id]))],
         raceSideEvents:(lifecycle.seasons||[]).flatMap(x=>(x.raceSideEvents||[]).map(y=>[y.id,(x.name||x.id)+' · '+y.map])),
         approvals:(lifecycle.approvals||[]).filter(x=>x.status==='approved').map(x=>[x.id,x.scope+' · '+x.version]),
