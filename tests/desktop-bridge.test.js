@@ -28,6 +28,12 @@ async function fixture(t,options={}){
     async unlinkPlayer(p,id){actions.push({name:'unlink',id});return{linked:false};},
     async recordResult(p,body){actions.push({name:'score',body});return{ok:true};},
     async setSetting(p,body){actions.push({name:'setting',body});return{ok:true};},
+    async listYoloTournaments(){return{items:[]};},
+    async createYoloTournament(p,body){actions.push({name:'yolo-create',body});return{id:body.id,format:body.format};},
+    async createYoloEventNight(p,body){actions.push({name:'yolo-night',body});return{id:body.id};},
+    async registerYoloParticipant(p,id,body){actions.push({name:'yolo-register',id,body});return{registered:true};},
+    async transitionYoloStage(p,id,body){actions.push({name:'yolo-stage',id,body});return{status:body.status};},
+    async transitionYoloTournament(p,id,body){actions.push({name:'yolo-status',id,body});return{status:body.status};},
     async exportBackup(){return JSON.stringify({format:'dwbot-test-archive'});},
   };
   const fetchImpl=async(url,init={})=>{
@@ -136,4 +142,23 @@ test('OAuth callback rejects missing transaction state',async t=>{
   const f=await fixture(t);
   const responseResult=await fetch(f.origin+'/auth/discord/callback?code=stolen&state=missing',{redirect:'manual'});
   assert.equal(responseResult.status,400);
+});
+
+test('admin format lifecycle endpoints require session, CSRF and admin role',async t=>{
+ const f=await fixture(t),auth=await login(f.origin,'admin');
+ const headers={Cookie:auth.cookie,Origin:f.origin,'X-CSRF-Token':auth.session.csrfToken,'Content-Type':'application/json'};
+ const list=await fetch(f.origin+'/api/admin/yolo-tournaments',{headers:{Cookie:auth.cookie}});
+ assert.equal(list.status,200);
+ const created=await fetch(f.origin+'/api/admin/yolo-tournaments',{method:'POST',headers,body:JSON.stringify({id:'pilot-1',name:'Pilot',format:'pilot'})});
+ assert.equal(created.status,201);
+ const night=await fetch(f.origin+'/api/admin/yolo-event-nights',{method:'POST',headers,body:JSON.stringify({id:'night-1',tournamentId:'pilot-1'})});
+ assert.equal(night.status,201);
+ const stage=await fetch(f.origin+'/api/admin/yolo-tournaments/full-1/stages',{method:'POST',headers,body:JSON.stringify({stage:'regular-season',status:'published'})});
+ assert.equal(stage.status,200);
+ const status=await fetch(f.origin+'/api/admin/yolo-tournaments/pilot-1/status',{method:'POST',headers,body:JSON.stringify({status:'published'})});
+ assert.equal(status.status,200);
+ assert.deepEqual(f.actions.filter(x=>x.name.startsWith('yolo-')).map(x=>x.name),['yolo-create','yolo-night','yolo-stage','yolo-status']);
+ const player=await login(f.origin,'player');
+ const denied=await fetch(f.origin+'/api/admin/yolo-tournaments',{headers:{Cookie:player.cookie}});
+ assert.equal(denied.status,403);
 });
