@@ -83,7 +83,7 @@ Administrator-only lifecycle actions:
 - `!yolo lifecycle-publish` with a JSON object containing organizer approval.
 - `!yolo lifecycle-start <tournament ID>`.
 - `!yolo lifecycle-team`, `lifecycle-assign`, `lifecycle-lock`.
-- `!yolo lifecycle-night`, `lifecycle-fixture`, `lifecycle-game`.
+- `!yolo lifecycle-night`, `lifecycle-settings`, `lifecycle-fixture`, `lifecycle-game`.
 - `!yolo lifecycle-complete-fixture`, `lifecycle-resolve`, `lifecycle-stage`.
 - `!yolo lifecycle-pilot-result`, `lifecycle-race-schedule`, `lifecycle-race`.
 - `!yolo lifecycle-finish <tournament ID>`.
@@ -172,9 +172,26 @@ Examples of payload shapes (all IDs must be unique and refer to records in the s
 { "tournamentId": "[ID]", "fixture": { "id": "[FIXTURE ID]", "eventNightId": "[NIGHT ID]", "teamAId": "[TEAM A]", "teamBId": "[TEAM B]", "startsAt": "[ISO]" } }
 ```
 
-Create teams, assign active registrants, lock both rosters, create the event night, then schedule fixtures. Fixtures outside the published stage or event-night window are rejected.
+Create teams, assign active registrants, lock both rosters, create the event night, then schedule fixtures. Fixtures outside the published stage or event-night window are rejected. Stage settings are snapshotted at stage start and on each transition. Each event night also receives its own versioned settings snapshot.
 
-### 9.5 Record evidence-backed games and outcomes
+### 9.5 Prospective settings revision
+
+At stage start, the system stores a settings snapshot, version and SHA-256. A later revision may apply only to selected future event nights with no fixtures scheduled. Completed or already scheduled games are never retroactively changed. The published match-outcome method, qualification policy and tie-break rules are frozen for the season.
+
+```json
+{
+  "tournamentId": "[ID]",
+  "version": "[NEW SETTINGS VERSION]",
+  "settings": {
+    "modePolicy": "[APPROVED FUTURE MODE POLICY]"
+  },
+  "eventNightIds": ["[FUTURE UNPLAYED EVENT NIGHT ID]"]
+}
+```
+
+Run `!yolo lifecycle-settings` with this object. The command is administrator-only. It rejects event nights that are not future/unplayed or already have fixtures.
+
+### 9.6 Record evidence-backed games and outcomes
 
 ```json
 {
@@ -207,7 +224,7 @@ To complete a fixture, provide the published outcome method and a second archive
 }
 ```
 
-### 9.6 Advance a Full stage
+### 9.7 Advance a Full stage
 
 ```json
 {
@@ -226,7 +243,7 @@ To complete a fixture, provide the published outcome method and a second archive
 
 Only use this after all fixtures in the current stage have been completed or explicitly resolved. The report and team list must be produced under the approved published method. Do not invent qualification results.
 
-### 9.7 Pilot results, Race side-event and explicit resolutions
+### 9.8 Pilot results, Race side-event and explicit resolutions
 
 Pilot result payload:
 ```json
@@ -253,7 +270,7 @@ Do not change channel privacy, enable slash commands, or conduct live Discord ac
 
 ## 11. Settings freeze, audit and appeals
 
-Lifecycle changes are audited. Ordinary scoring/gameplay settings must be frozen at event/stage start; changes should apply prospectively to future/unplayed games only. The complete versioned settings-freeze workflow and emergency change approval process remain a follow-up implementation item. Emergency safety, security or platform actions require reason, scope, approver, timestamp, affected games and participant notice/review.
+At tournament/stage start, the lifecycle engine records a versioned settings snapshot and SHA-256. Each Full event night receives its own settings snapshot. The administrator-only `lifecycle-settings` command can apply a versioned revision only to selected future event nights that have no fixtures; completed or scheduled fixtures are not retroactively changed. Published match-outcome, qualification and tie-break policies remain frozen for the season. An emergency safety, security or platform override workflow is still required and must capture reason, scope, approver, timestamp, affected games and participant notice/review.
 
 Publish dispute window and appeal authority before the event. Historical sources do not establish one universal appeal duration.
 
