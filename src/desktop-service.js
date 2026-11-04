@@ -264,7 +264,7 @@ function createDesktopService(options = {}) {
       role(principal,['admin']);
       return mutate(async()=>{
         const current=state();
-        const active=(current.competition?.tournaments||[]).filter(t=>t.stages.some(stage=>stage.status===TournamentFormats.STATUS.ACTIVE));
+        const active=(current.competition?.tournaments||[]).filter(t=>t.config.settingsFreeze&&t.stages.some(stage=>stage.status===TournamentFormats.STATUS.ACTIVE));
         if(active.length){
           for(const tournament of active) TournamentFormats.freezeSettings(tournament,{event:body?.event,field:body?.field,value:body?.value},principal.discordUserId);
           await options.saveState();
