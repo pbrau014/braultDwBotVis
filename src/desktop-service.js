@@ -312,6 +312,17 @@ function createDesktopService(options = {}) {
         return {eventNightId,participantId:participant.id,registered:true};
       });
     },
+    async transitionYoloStage(principal,tournamentId,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{
+        const current=state(),index=(current.yoloTournaments || []).findIndex(item=>item.id===tournamentId);
+        if(index<0) throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});
+        const updated=YoloFormats.transitionStage(current.yoloTournaments[index],body?.stage,body?.status,principal.discordUserId);
+        current.yoloTournaments[index]=updated;
+        await options.saveState();
+        return updated;
+      });
+    },
     async transitionYoloTournament(principal,tournamentId,body) {
       role(principal,['admin']);
       return mutate(async()=>{
