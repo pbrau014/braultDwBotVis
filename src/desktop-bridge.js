@@ -269,6 +269,9 @@ function createDesktopBridge(options={}){
     }
     if(p.startsWith('/api/admin/')){
       role(principal,['admin']);
+      if(req.method==='GET'&&p==='/api/admin/yolo-tournaments'){
+        sendJson(res,200,await call('listYoloTournaments',principal));return true;
+      }
       if(req.method==='GET'&&p==='/api/admin/backup'){
         const backup=await call('exportBackup',principal),body=Buffer.from(backup);
         res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Content-Length':body.length,
@@ -285,9 +288,6 @@ function createDesktopBridge(options={}){
       }
       if(link&&req.method==='DELETE'){
         const result=await call('unlinkPlayer',principal,Number(link[1]));audit(principal,'player-account-unlink');sendJson(res,200,result);return true;
-      }
-      if(req.method==='GET'&&p==='/api/admin/yolo-tournaments'){
-        sendJson(res,200,await call('listYoloTournaments',principal));return true;
       }
       if(req.method==='POST'&&p==='/api/admin/yolo-tournaments'){
         const result=await call('createYoloTournament',principal,await readJson(req));
