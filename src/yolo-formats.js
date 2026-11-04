@@ -10,7 +10,7 @@ function createTournament({ id, title, format, createdAt = new Date().toISOStrin
   if (![FORMATS.PILOT,FORMATS.FULL].includes(format)) throw new Error('Format must be pilot or full.');
   return { schemaVersion:1,id:clean(id),title:clean(title),format,lifecycle:'draft',
     stage:format===FORMATS.PILOT?STAGES.PILOT:null,createdAt,publishedAt:null,startedAt:null,completedAt:null,
-    settings:clone(settings),publication:null,stageHistory:[],advancements:[],registrations:[],teams:[],fixtures:[],matches:[],games:[],raceSideEvents:[],
+    settings:clone(settings),publication:null,stageHistory:[],advancements:[],registrations:[],teams:[],eventNights:[],fixtures:[],matches:[],games:[],pilotResults:[],raceSideEvents:[],
     audit:[{at:createdAt,action:'created',actor:'system',detail:{format}}] };
 }
 function validatePublication(t,a) {
