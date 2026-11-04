@@ -250,7 +250,7 @@ test('PSM 11 retains a split damage value near the top of the performance block 
       'Damage',
       'Target hits',
       'Combat Missions',
-    ].join('\\n'),
+    ].join('\n'),
   }]);
   assert.deepEqual(candidates.map(candidate => candidate.value), ['166183']);
 });
