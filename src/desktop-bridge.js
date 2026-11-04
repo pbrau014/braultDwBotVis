@@ -286,6 +286,27 @@ function createDesktopBridge(options={}){
       if(req.method==='POST'&&p==='/api/admin/settings'){
         const result=await call('setSetting',principal,await readJson(req));audit(principal,'scoring-setting');sendJson(res,200,result);return true;
       }
+      if(req.method==='POST'&&p==='/api/admin/lifecycle'){
+        const result=await call('createLifecycle',principal,await readJson(req));audit(principal,'lifecycle-create');sendJson(res,201,result);return true;
+      }
+      if(req.method==='POST'&&p==='/api/admin/lifecycle/publish'){
+        const result=await call('publishLifecycle',principal,await readJson(req));audit(principal,'lifecycle-publish');sendJson(res,200,result);return true;
+      }
+      if(req.method==='POST'&&p==='/api/admin/lifecycle/start'){
+        const result=await call('startLifecycle',principal,await readJson(req));audit(principal,'lifecycle-start');sendJson(res,200,result);return true;
+      }
+      if(req.method==='POST'&&p==='/api/admin/lifecycle/action'){
+        const result=await call('lifecycleAction',principal,await readJson(req));audit(principal,'lifecycle-action');sendJson(res,200,result);return true;
+      }
+    }
+    if(req.method==='POST'&&p==='/api/lifecycle/register'){
+      csrf(req,session);role(principal,['admin','player']);
+      const result=await call('registerLifecycle',principal,await readJson(req));audit(principal,'lifecycle-register');sendJson(res,200,result);return true;
+    }
+    if(req.method==='POST'&&p==='/api/lifecycle/check-in'){
+      csrf(req,session);role(principal,['admin','player']);
+      const result=await call('checkInPilotLifecycle',principal,await readJson(req));audit(principal,'lifecycle-checkin');sendJson(res,200,result);return true;
+    }
     }
     return false;
   }
