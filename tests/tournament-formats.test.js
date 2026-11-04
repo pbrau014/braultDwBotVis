@@ -24,7 +24,7 @@ function playStage(t, stageKey) {
   const match=F.createMatch(t,fixture.id);
   evidence(t,'ev-'+suffix+'-h');evidence(t,'ev-'+suffix+'-a');
   F.recordGame(match,{gameNumber:1,teamId:'home',playerId:'p1',metrics:{damage:9000,kills:2},evidenceId:'ev-'+suffix+'-h'},t.teams,t.registrations,t.evidence);
-  F.recordGame(match,{gameNumber:2,teamId:'away',playerId:'p2',metrics:{damage:4000,kills:1},evidenceId:'ev-'+suffix+'-a'},t.teams,t.registrations);
+  F.recordGame(match,{gameNumber:2,teamId:'away',playerId:'p2',metrics:{damage:4000,kills:1},evidenceId:'ev-'+suffix+'-a'},t.teams,t.registrations,t.evidence);
   F.completeMatch(t,match.id);
 }
 
@@ -90,7 +90,7 @@ test('Full regular season advances in order through postseason and Grand Finale'
   const match = F.createMatch(t, fixture.id);
   evidence(t,'ev1');evidence(t,'ev2');
   F.recordGame(match, { gameNumber: 1, teamId: 'home', playerId: 'p1', metrics: { damage: 10000, kills: 2 }, evidenceId: 'ev1' }, t.teams,t.registrations,t.evidence);
-  F.recordGame(match, { gameNumber: 2, teamId: 'away', playerId: 'p2', metrics: { damage: 5000, kills: 1 }, evidenceId: 'ev2' }, t.teams,t.registrations);
+  F.recordGame(match, { gameNumber: 2, teamId: 'away', playerId: 'p2', metrics: { damage: 5000, kills: 1 }, evidenceId: 'ev2' }, t.teams,t.registrations,t.evidence);
   F.completeMatch(t, match.id);
   assert.equal(match.outcome.winnerTeamId, 'home');
   F.completeStage(t, F.STAGES.REGULAR_SEASON);
@@ -161,7 +161,7 @@ test('match game must be supported by locked team roster and non-empty match', (
   const fixture = F.createFixture(t, { id: 'f1', stageKey: F.STAGES.REGULAR_SEASON, homeTeamId: 'home', awayTeamId: 'away' });
   const match = F.createMatch(t, fixture.id);
   evidence(t,'ev-roster');
-  assert.throws(() => F.recordGame(match, { gameNumber: 1, teamId: 'home', playerId: 'p2', metrics: { damage: 1, kills: 0 }, evidenceId: 'ev' }, t.teams,t.registrations), /locked roster/);
+  assert.throws(() => F.recordGame(match, { gameNumber: 1, teamId: 'home', playerId: 'p2', metrics: { damage: 1, kills: 0 }, evidenceId: 'ev-roster' }, t.teams,t.registrations,t.evidence), /locked roster/);
   assert.throws(() => F.completeMatch(t, match.id), /no recorded games/);
 });
 
