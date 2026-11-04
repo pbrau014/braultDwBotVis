@@ -109,7 +109,12 @@ function createDesktopService(options = {}) {
       const current=state(), rows=Tournament.standings(current);
       const total=rows.reduce((s,r)=>s+r.total,0);
       const aggregate={doubloons:total,estimatedValue:total*0.54/100};
-      const base={aggregate,maxPlayers:Tournament.MAX_PLAYERS,events: Tournament.EVENTS,eventLabels:Tournament.EVENT_LABELS};
+      const formats=(current.yoloTournaments || []).map(t=>({
+        id:t.id,name:t.name,format:t.format,status:t.status,startsAt:t.startsAt,endsAt:t.endsAt,
+        season:t.season?{durationWeeks:t.season.durationWeeks,startsAt:t.season.startsAt,endsAt:t.season.endsAt}:null,
+        stages:(t.stages || []).map(s=>({type:s.type,status:s.status})),
+      }));
+      const base={aggregate,maxPlayers:Tournament.MAX_PLAYERS,events: Tournament.EVENTS,eventLabels:Tournament.EVENT_LABELS,formats};
       if(principal.role==='player') {
         const player=Tournament.findPlayer(current,principal.player.id);
         if(!player) throw Object.assign(new Error('Your linked roster entry no longer exists.'),{status:403,code:'PLAYER_UNLINKED'});
