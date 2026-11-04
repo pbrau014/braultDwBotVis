@@ -108,3 +108,14 @@ Shared participant identity, evidence, scoring validation, referee review, corre
 - Added separate lifecycle module and persistence field.
 - Added tests for format-specific publication, identity/roster constraints, evidence-bound outcomes, stage progression, Race side-event isolation, and legacy migration.
 - No scoring weights, prize amounts, ship lists, dates or organizer approvals invented.
+
+
+## Appendment A7 - source reconciliation and release-readiness correction (2026-11-04)
+
+- Reconciled the current implementation candidate against `main`; the lifecycle work is carried by PR #7 and remains unmerged pending review/merge policy.
+- Corrected the manual's desktop-status statement: authenticated lifecycle service/CSRF bridge and initial Admin/Player controls are implemented. Guided operation forms and detailed visualizations remain incomplete.
+- Verified PR #7's CI run 41920122308: Node 22.16.0 and Node 24 jobs both succeeded. The plan's previously recorded 275/0/2 test totals remain the reported run result; the two skips are optional OpenCV-dependent checks unavailable because `cv2` is not installed on the Ubuntu runner.
+- Explicitly retain production NO-GO until Windows/native Tesseract and current screenshot acceptance, local OAuth/browser/upload visual QA, isolated Discord smoke, workbook/source parity, event-setting approval, final manual rendering, security/recovery and clean package extraction are evidenced.
+- The canonical v3.22 workbook and Score Reporter HTML remain absent from the audited Library. Do not change workbook formulas or use the repository workbook as an assumed canonical source.
+- Preserve legacy score buckets and version-2 data; do not assign historical records to Pilot/Full. Keep the strict nine-field OCR contract unchanged.
+- Follow-up: expand generic Admin lifecycle actions into guided forms; implement referee-specific permissions and emergency override audit; add event timeline/roster/fixture/evidence views; test every lifecycle transition and rollback against current SQLite/JSON/archive persistence; generate and visually inspect DOCX/PDF/HTML/TXT manual outputs from the maintained Markdown source.
