@@ -1,0 +1,110 @@
+
+> wows-yolo-tourney-discord-bot@2.5.0 test:paddleocr-fallback
+> node --test tests/paddleocr-field-fallback.test.js
+
+TAP version 13
+# Subtest: field-crop PaddleOCR fallback is disabled by default
+ok 1 - field-crop PaddleOCR fallback is disabled by default
+  ---
+  duration_ms: 1.713815
+  type: 'test'
+  ...
+# Subtest: field need selection triggers on unresolved, ambiguous, or contradictory evidence
+ok 2 - field need selection triggers on unresolved, ambiguous, or contradictory evidence
+  ---
+  duration_ms: 7.580641
+  type: 'test'
+  ...
+# Subtest: crop-specific helper errors are preserved in diagnostics rather than hidden as empty OCR
+ok 3 - crop-specific helper errors are preserved in diagnostics rather than hidden as empty OCR
+  ---
+  duration_ms: 0.651604
+  type: 'test'
+  ...
+# Subtest: invalid or non-finite proposed rectangles fail closed
+ok 4 - invalid or non-finite proposed rectangles fail closed
+  ---
+  duration_ms: 0.220621
+  type: 'test'
+  ...
+# Subtest: fallback skips model startup when the image deadline is already exhausted
+ok 5 - fallback skips model startup when the image deadline is already exhausted
+  ---
+  duration_ms: 2.973301
+  type: 'test'
+  ...
+# Subtest: per-crop latency summary reports median, p95, mean, and total
+ok 6 - per-crop latency summary reports median, p95, mean, and total
+  ---
+  duration_ms: 0.666712
+  type: 'test'
+  ...
+# Subtest: helper-reported blocked network attempts fail closed and retain diagnostics
+ok 7 - helper-reported blocked network attempts fail closed and retain diagnostics
+  ---
+  duration_ms: 893.746963
+  type: 'test'
+  ...
+# Subtest: PaddleOCR candidates without a usable score or below the conservative floor are rejected
+ok 8 - PaddleOCR candidates without a usable score or below the conservative floor are rejected
+  ---
+  duration_ms: 0.320646
+  type: 'test'
+  ...
+# Subtest: PaddleOCR raw output cannot independently authorize a result
+ok 9 - PaddleOCR raw output cannot independently authorize a result
+  ---
+  duration_ms: 0.984128
+  type: 'test'
+  ...
+# Subtest: PaddleOCR may corroborate an identical Tesseract candidate through existing parser consensus
+ok 10 - PaddleOCR may corroborate an identical Tesseract candidate through existing parser consensus
+  ---
+  duration_ms: 0.86538
+  type: 'test'
+  ...
+# Subtest: player-only rescue cannot silently change optional ship identity from the same crop
+ok 11 - player-only rescue cannot silently change optional ship identity from the same crop
+  ---
+  duration_ms: 0.46815
+  type: 'test'
+  ...
+# Subtest: PaddleOCR O/0 identity conflict is preserved for human review, not rewritten
+ok 12 - PaddleOCR O/0 identity conflict is preserved for human review, not rewritten
+  ---
+  duration_ms: 0.43215
+  type: 'test'
+  ...
+# Subtest: merged adjacent reward numbers are rejected by the existing field parser
+ok 13 - merged adjacent reward numbers are rejected by the existing field parser
+  ---
+  duration_ms: 0.428218
+  type: 'test'
+  ...
+# Subtest: field crop plan stays bounded and every crop fits the source image
+ok 14 - field crop plan stays bounded and every crop fits the source image
+  ---
+  duration_ms: 0.606245
+  type: 'test'
+  ...
+# Subtest: numeric PaddleOCR candidate only resolves when it agrees with a Tesseract candidate
+ok 15 - numeric PaddleOCR candidate only resolves when it agrees with a Tesseract candidate
+  ---
+  duration_ms: 0.728822
+  type: 'test'
+  ...
+# Subtest: PaddleOCR reward conflict is left unresolved rather than arbitrated by confidence
+ok 16 - PaddleOCR reward conflict is left unresolved rather than arbitrated by confidence
+  ---
+  duration_ms: 0.579119
+  type: 'test'
+  ...
+1..16
+# tests 16
+# suites 0
+# pass 16
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 989.610289

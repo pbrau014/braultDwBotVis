@@ -1,0 +1,28 @@
+{
+  "source_workbook": "assets/YOLO-Tournament-Workbook.xlsm",
+  "source_sheet": "Totals",
+  "source_cell": "H12",
+  "source_formula": "=0.54*G12/100",
+  "source_total_doubloons_cell": "G12",
+  "source_total_doubloons_formula": "=SUM(G3:G11,G14:G54)",
+  "source_G12_cached_value": 2312.5598233298197,
+  "source_H12_cached_value": 12.487823045981026,
+  "source_H12_number_format": "$#,##0.00",
+  "source_H12_display_value": "$12.49",
+  "grand_yolo_default_tier_weight": 0.9,
+  "default_setting_source_cell": "d4!F10",
+  "calculation": "H12 = 0.54 \u00d7 G12 \u00f7 100; G12 sums all 50 player rows while keeping unrounded values until final currency display.",
+  "comparison_note": "The expanded workbook preserves the original nine-player cached default (G12=2312.5598233298197; H12=12.487823045981026, displayed $12.49). Extra player rows are blank templates. G12 aggregates all 50 player rows via the expanded formula.",
+  "source_workbook_sha256": "12ad80209ef77451b3586b52359a06b5361a68bc9926fc81a9da3d6c4b586397",
+  "original_source_workbook_sha256": "f4ca30bcad0a0d41dd8dcf8156ffb72f93cc10378ee41244f0200fea3a28333c",
+  "original_source_total_doubloons_formula": "=SUM(G3:G11)",
+  "expanded_total_doubloons_formula": "=SUM(G3:G11,G14:G54)",
+  "expanded_max_players": 50,
+  "expanded_player_rows": {
+    "source_sheets": "a1,b2,c3,d4",
+    "participant_rows": "15:64",
+    "aggregate_row": 65,
+    "totals_rows": "3:11,14:54",
+    "footer_row": 55
+  }
+}
