@@ -97,3 +97,11 @@ test('Admin lifecycle forms use same-origin protected API routes and cover Pilot
 });
 
 test('event-night selection is available for scoped score mapping and roster assignment',()=>{const admin=read('desktop/admin.html');const app=read('desktop/desktop.js');assert.match(admin,/name="eventNightId"/);assert.match(app,/eventNightId/);assert.match(read('desktop/admin.js'),/eventNights/);});
+
+test('participant surfaces do not publish the historical H12 dollar conversion', () => {
+  const bot = read('src/bot.js');
+  const service = read('src/desktop-service.js');
+  assert.doesNotMatch(bot, /estimatedValue|Estimated total value|0\.54\*G12\/100/);
+  assert.doesNotMatch(service, /estimatedValue:total\*0\.54/);
+  assert.match(bot, /Workbook download is temporarily admin-only/);
+});
