@@ -50,9 +50,14 @@ test('roster assignments reject duplicates and cross-season references', () => {
   const t = L.createTournament({ id: 'f3', format: 'full' });
   const s = L.createSeason(t.id, { id: 's3', tournament: t });
   L.registerParticipant(s, { participantId: 'u1', displayName: 'Alpha' });
-  L.assignRoster(s, { participantId: 'u1', teamId: 'red' });
-  assert.throws(() => L.assignRoster(s, { participantId: 'u1', teamId: 'blue' }), /already assigned/);
-  assert.throws(() => L.assignRoster(s, { participantId: 'u2', teamId: 'red' }), /registered/);
+  L.createTeam(s,{id:'red',name:'Red'});L.createTeam(s,{id:'blue',name:'Blue'});
+  const stage=L.createStage(s.id,'regular_season',{id:'regular'});s.stages.push(stage);
+  const night1=L.createEventNight(s,{id:'night-1',stageId:stage.id});
+  const night2=L.createEventNight(s,{id:'night-2',stageId:stage.id});
+  L.assignRoster(s,{participantId:'u1',teamId:'red',eventNightId:night1.id});
+  assert.throws(()=>L.assignRoster(s,{participantId:'u1',teamId:'blue',eventNightId:night1.id}),/already assigned/);
+  assert.equal(L.assignRoster(s,{participantId:'u1',teamId:'blue',eventNightId:night2.id}).teamId,'blue');
+  assert.throws(()=>L.assignRoster(s,{participantId:'u2',teamId:'red',eventNightId:night1.id}),/registered/);
 });
 
 test('match outcomes require an approved, identified scoring method and exact positive inputs', () => {
