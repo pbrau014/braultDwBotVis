@@ -67,8 +67,8 @@ test('Full regular season advances in order through postseason and Grand Finale'
   F.activateStage(t, F.STAGES.REGULAR_SEASON);
   const fixture = F.createFixture(t, { id: 'f1', stageKey: F.STAGES.REGULAR_SEASON, homeTeamId: 'home', awayTeamId: 'away' });
   const match = F.createMatch(t, fixture.id);
-  F.recordGame(match, { gameNumber: 1, teamId: 'home', playerId: 'p1', metrics: { damage: 10000, kills: 2 }, evidenceId: 'ev1' });
-  F.recordGame(match, { gameNumber: 2, teamId: 'away', playerId: 'p2', metrics: { damage: 5000, kills: 1 }, evidenceId: 'ev2' });
+  F.recordGame(match, { gameNumber: 1, teamId: 'home', playerId: 'p1', metrics: { damage: 10000, kills: 2 }, evidenceId: 'ev1' }, t.teams);
+  F.recordGame(match, { gameNumber: 2, teamId: 'away', playerId: 'p2', metrics: { damage: 5000, kills: 1 }, evidenceId: 'ev2' }, t.teams);
   F.completeMatch(t, match.id);
   assert.equal(match.outcome.winnerTeamId, 'home');
   F.completeStage(t, F.STAGES.REGULAR_SEASON);
@@ -116,4 +116,47 @@ test('registrations, team rosters and fixture references are validated', () => {
   assert.throws(() => F.registerParticipant(t, { playerId: 'p1', displayName: 'Alpha' }), /already registered/);
   assert.throws(() => F.assignTeam(t, { id: 'bad', name: 'Bad', playerIds: ['unknown'] }), /active registration/);
   assert.throws(() => F.createFixture(t, { id: 'f', stageKey: F.STAGES.REGULAR_SEASON, homeTeamId: 'home', awayTeamId: 'missing' }), /two distinct registered teams/);
+});
+
+test('registration close prevents late entry and withdrawal remains auditable', () => {
+  const t = full();
+  F.closeRegistration(t);
+  assert.throws(() => F.registerParticipant(t, { playerId: 'p3', displayName: 'Charlie' }), /Registration is closed/);
+  const withdrawn = F.withdrawParticipant(t, 'p1', 'Participant request');
+  assert.equal(withdrawn.status, 'withdrawn');
+  assert.equal(t.audit.at(-1).action, 'participant_withdrawn');
+  assert.ok(t.teams.find(team => team.id === 'home').playerIds.includes('p1'), 'locked historical roster membership is preserved');
+});
+
+test('match game must be supported by locked team roster and non-empty match', () => {
+  const t = full();
+  F.activateStage(t, F.STAGES.REGULAR_SEASON);
+  const fixture = F.createFixture(t, { id: 'f1', stageKey: F.STAGES.REGULAR_SEASON, homeTeamId: 'home', awayTeamId: 'away' });
+  const match = F.createMatch(t, fixture.id);
+  assert.throws(() => F.recordGame(match, { gameNumber: 1, teamId: 'home', playerId: 'p2', metrics: { damage: 1, kills: 0 }, evidenceId: 'ev' }, t.teams), /locked roster/);
+  assert.throws(() => F.completeMatch(t, match.id), /no recorded games/);
+});
+
+test('forfeit requires a team winner, reason and evidence and is auditable', () => {
+  const t = full();
+  F.activateStage(t, F.STAGES.REGULAR_SEASON);
+  const fixture = F.createFixture(t, { id: 'f1', stageKey: F.STAGES.REGULAR_SEASON, homeTeamId: 'home', awayTeamId: 'away' });
+  const match = F.createMatch(t, fixture.id);
+  const result = F.resolveForfeit(t, match.id, 'home', 'Opponent no-show', 'evidence-1');
+  assert.equal(result.status, F.STATUS.FORFEIT);
+  assert.equal(result.outcome.decidedBy, 'forfeit');
+  assert.equal(t.audit.at(-1).action, 'match_forfeit_resolved');
+});
+
+test('head-to-head tie-break is explicit and has precedence over later criteria', () => {
+  const match = { id: 'm', homeTeamId: 'a', awayTeamId: 'b', status: 'active', games: [
+    { teamId: 'a', metrics: { damage: 100, kills: 1 } },
+    { teamId: 'b', metrics: { damage: 100, kills: 1 } },
+  ] };
+  const method = { approved: true, publishedAt: '2026-11-01', version: 'v1', weights: { damage: 1, kills: 1 } };
+  const result = F.resolveMatch(match, method, { tieBreak: {
+    headToHeadWinnerTeamId: 'b', seasonRecordHome: 10, seasonRecordAway: 1,
+  } });
+  assert.equal(result.winnerTeamId, 'b');
+  assert.equal(result.decidedBy, 'head_to_head');
 });
