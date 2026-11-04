@@ -60,6 +60,7 @@
         seasons:(lifecycle.seasons||[]).map(x=>[x.id,x.name||x.id]),
         stages:(lifecycle.seasons||[]).flatMap(x=>(x.stages||[]).map(y=>[y.id,(x.name||x.id)+' · '+y.type])),
         teams:(lifecycle.seasons||[]).flatMap(x=>(x.teams||[]).map(y=>[y.id,(x.name||x.id)+' · '+y.name])),
+        approvals:(lifecycle.approvals||[]).filter(x=>x.status==='approved').map(x=>[x.id,x.scope+' · '+x.version]),
       };
       for(const select of document.querySelectorAll('select[data-entity]')){
         const values=groups[select.dataset.entity]||[];
@@ -75,8 +76,8 @@
         try{
           const body=Object.fromEntries(new FormData(form).entries());
           for(const key of ['scoreA','scoreB','gameNumber','elapsedSeconds'])if(body[key]!==undefined&&body[key]!=='')body[key]=Number(body[key]);
-          if(body.methodId){body.method={approved:true,methodId:body.methodId,approvedAt:new Date(body.approvedAt).toISOString(),approvedBy:body.approvedBy};delete body.methodId;delete body.approvedAt;delete body.approvedBy;}
           if(body.startsAt)body.startsAt=new Date(body.startsAt).toISOString();
+          if(body.approvedAt)body.approvedAt=new Date(body.approvedAt).toISOString();
           await D.api(form.dataset.lifecycleEndpoint,{method:'POST',body});
           form.reset();await load();status('Lifecycle change saved.','success');
         }catch(error){status(error.message,'error');}
