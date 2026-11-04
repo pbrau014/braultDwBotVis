@@ -31,11 +31,11 @@ The project is not marked release-ready. The latest Phase 9 report records a his
 
 ## Sensitive data
 
-Never commit a real Discord bot token, OCR provider key, `.env`, database, local runtime state, or private user data. Use `.env.example` for placeholders and keep real values in a local `.env` file excluded by Git.
+Never commit a real Discord bot token, OCR provider key, `.env`, database, local runtime state, or private user data. Use `.env.discord-test.example` for safe test placeholders and keep real values in a local `.env` file excluded by Git.
 
 ## Complete source package
 
-The current full checkpoint contains application source, scripts, tests, documentation, model assets, fixtures, expanded corpus inputs, and provenance records. The only authorized delivery branch is `dwbotVis`. Historical scripts targeting `pop1` are not authorized for current use. `main` is read-only.
+The current branch contains application source, scripts, tests, documentation, model assets, fixtures, expanded corpus inputs, and provenance records. Exact byte-for-byte equivalence with every historical working-copy package has not been established; consult `GITHUB_TRANSFER_STATUS.md` before treating a package as a complete transfer. The only authorized delivery branch is `dwbotVis`. Historical scripts targeting `pop1` are not authorized for current use. `main` is read-only.
 
 
 ## Current DWBOT project rules and continuation status

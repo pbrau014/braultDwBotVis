@@ -11,9 +11,9 @@
 - Synthetic Discord system suite: **7/7**. It covers a synthetic command tour, admin-only command checks, one-channel routing, public panel controls, state persistence/recovery, synthetic attachment/OCR paths, and 50-player scoring. It is not a live Discord test.
 - SQLite persistence: **5/5**.
 - OCR watchdog/process cancellation/damage consensus: **21/21**.
-- OCR.space client/quota/crop contracts: **19/19**, mocked only; no external provider call.
-- OCR sequence checkpoints: **4/4**.
-- Secret-safe Discord preflight tests: **5/5**.
+- Historical working-copy report: OCR.space client/quota/crop contracts **19/19**, mocked only; the current `dwbotVis` tree does not contain those adapter/quota source files or tests, so this result is not reproducible from the current branch.
+- Historical working-copy report: OCR sequence checkpoints **4/4**; the checkpoint module and sequence-runner changes are not present in the current branch tree, so this result is not reproducible from the current branch.
+- Historical working-copy report: secret-safe Discord preflight tests **5/5**; no matching standalone test file was found in the current branch tree. Do not count this as current-branch verification.
 - Native utilities present in this host: Tesseract 5.5.0, ImageMagick 7.1.2, Chromium 144. Node child-process execution and local file writes work.
 - Changed JavaScript syntax checks pass.
 
@@ -58,3 +58,11 @@ This implementation does not prove a live login, live permissions, Gateway resum
 ## REST rate-limit observability added — 2026-11-04
 
 The bot now subscribes to discord.js REST `rateLimited` events and records method, normalized route, scope, global flag and retry delay. It intentionally omits full request URLs, tokens, headers and request bodies. The discord.js REST manager remains responsible for dynamic bucket scheduling; no custom retry loop or hard-coded Discord limits were introduced. No live 429 has been observed.
+
+
+## Current-branch test and setup verification
+
+- The six pure Gateway/channel-preflight tests were run from the exact helper and test source committed to this branch: **6/6 passed** on Node.js v22.16.0.
+- The package script name and command were exercised in an isolated temporary npm package with the same script definition; the full project dependency tree was not installed in this environment.
+- The committed `.gitignore` behavior was checked with Git: `.env`, `node_modules/`, local SQLite files and `testdata/live-discord-state/` are ignored; `.env.discord-test.example` is not ignored.
+- The modified `src/bot.js` has been reviewed at the changed import, client setup, REST rate-limit listener and READY/preflight sections, but a full-project `node --check src/bot.js` and full `npm test` have not been run from a complete local checkout in this environment.
