@@ -167,6 +167,15 @@
       try{await D.api('/api/admin/yolo-games/'+encodeURIComponent(form.elements.gameId.value.trim())+'/evidence-review',{method:'POST',body:{accepted:form.elements.accepted.value==='true',reason:form.elements.reason.value.trim()}});form.reset();await load();}
       catch(error){status(error.message,'error');}finally{button.disabled=false;}
     });
+    D.$('yolo-match-outcome-form').addEventListener('submit',async e=>{
+      e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
+      const body={winnerTeamId:form.elements.winnerTeamId.value.trim(),approvedScoringMethodId:form.elements.approvedScoringMethodId.value.trim(),
+        acceptedPerformanceRecordIds:form.elements.acceptedPerformanceRecordIds.value.split(',').map(x=>x.trim()).filter(Boolean),
+        aggregation:form.elements.aggregation.value.trim(),rounding:form.elements.rounding.value.trim(),
+        tieBreakOrder:form.elements.tieBreakOrder.value.split(',').map(x=>x.trim()).filter(Boolean),decisionReference:form.elements.decisionReference.value.trim()};
+      try{await D.api('/api/admin/yolo-matches/'+encodeURIComponent(form.elements.matchId.value.trim())+'/outcome',{method:'POST',body});form.reset();await load();}
+      catch(error){status(error.message,'error');}finally{button.disabled=false;}
+    });
     D.$('yolo-tournament-form').addEventListener('submit',async e=>{
       e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
       const id=form.elements.id.value.trim(),format=form.elements.format.value;
