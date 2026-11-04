@@ -2,6 +2,7 @@
 const crypto = require('node:crypto');
 const Tournament = require('./tournament');
 const BattleRecord = require('./battle-record');
+const Lifecycle = Tournament.TournamentLifecycle;
 
 const CORRECTION_LABELS = Object.freeze({
   result:'Battle Result', player:'Player', map:'Map', mode:'Battle Mode',
@@ -108,7 +109,7 @@ function createDesktopService(options = {}) {
       const current=state(), rows=Tournament.standings(current);
       const total=rows.reduce((s,r)=>s+r.total,0);
       const aggregate={doubloons:total,estimatedValue:total*0.54/100};
-      const base={aggregate,maxPlayers:Tournament.MAX_PLAYERS,events: Tournament.EVENTS,eventLabels:Tournament.EVENT_LABELS};
+      const lifecycle=current.lifecycle||Lifecycle.createLifecycleState(current);\n      const publicTournaments=lifecycle.tournaments.map(t=>({id:t.id,name:t.name,format:t.format,status:t.status,seasonId:t.seasonId||null}));\n      const base={aggregate,maxPlayers:Tournament.MAX_PLAYERS,events: Tournament.EVENTS,eventLabels:Tournament.EVENT_LABELS,formats:Lifecycle.FORMATS,scoringCategories:Lifecycle.SCORING_CATEGORIES,tournaments:publicTournaments};
       if(principal.role==='player') {
         const player=Tournament.findPlayer(current,principal.player.id);
         if(!player) throw Object.assign(new Error('Your linked roster entry no longer exists.'),{status:403,code:'PLAYER_UNLINKED'});
@@ -256,6 +257,59 @@ function createDesktopService(options = {}) {
     async setSetting(principal,body) {
       role(principal,['admin']);
       return mutate(async()=>{const value=Tournament.setSetting(state(),String(body?.event||''),String(body?.field||''),body?.value);await options.saveState();return{event:body.event,field:body.field,value};});
+    },
+
+    async createTournament(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();current.lifecycle||=Lifecycle.createLifecycleState(current);const tournament=Lifecycle.createTournament({id:body?.id||crypto.randomUUID(),name:body?.name,format:body?.format});if(current.lifecycle.tournaments.some(x=>x.id===tournament.id))throw Object.assign(new Error('Tournament id already exists.'),{status:409,code:'TOURNAMENT_EXISTS'});current.lifecycle.tournaments.push(tournament);await options.saveState();return tournament;});
+    },
+    async createSeason(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();current.lifecycle||=Lifecycle.createLifecycleState(current);const tournament=current.lifecycle.tournaments.find(x=>x.id===body?.tournamentId);if(!tournament)throw Object.assign(new Error('Tournament was not found.'),{status:404,code:'TOURNAMENT_NOT_FOUND'});const season=Lifecycle.createSeason(tournament.id,{id:body?.id||crypto.randomUUID(),name:body?.name,tournament});if(tournament.seasonId)throw Object.assign(new Error('A season is already attached to this tournament.'),{status:409,code:'SEASON_EXISTS'});tournament.seasonId=season.id;current.lifecycle.seasons.push(season);await options.saveState();return season;});
+    },
+    async addStage(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();current.lifecycle||=Lifecycle.createLifecycleState(current);const season=current.lifecycle.seasons.find(x=>x.id===body?.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});const stage=Lifecycle.createStage(season.id,body?.type,{id:body?.id||crypto.randomUUID()});if(season.stages.some(x=>x.id===stage.id||x.type===stage.type))throw Object.assign(new Error('Stage id or type already exists.'),{status:409,code:'STAGE_EXISTS'});season.stages.push(stage);await options.saveState();return stage;});
+    },
+    async activateStage(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();const season=current.lifecycle?.seasons.find(x=>x.id===body?.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});const stage=Lifecycle.activateStage(season,body?.stageId);await options.saveState();return stage;});
+    },
+    async createTeam(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();const season=current.lifecycle?.seasons.find(x=>x.id===body?.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});const team=Lifecycle.createTeam(season,{id:body?.id||crypto.randomUUID(),name:body?.name});await options.saveState();return team;});
+    },
+    async registerParticipant(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();const season=current.lifecycle?.seasons.find(x=>x.id===body?.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});const registration=Lifecycle.registerParticipant(season,{participantId:body?.participantId,displayName:body?.displayName});await options.saveState();return registration;});
+    },
+    async assignRoster(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();const season=current.lifecycle?.seasons.find(x=>x.id===body?.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});const assignment=Lifecycle.assignRoster(season,{participantId:body?.participantId,teamId:body?.teamId});await options.saveState();return assignment;});
+    },
+    async createEventNight(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();const season=current.lifecycle?.seasons.find(x=>x.id===body?.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});const eventNight=Lifecycle.createEventNight(season,{id:body?.id||crypto.randomUUID(),stageId:body?.stageId,startsAt:body?.startsAt,settings:body?.settings});await options.saveState();return eventNight;});
+    },
+    async createFixture(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();const season=current.lifecycle?.seasons.find(x=>x.id===body?.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});const fixture=Lifecycle.createFixture(season,{id:body?.id||crypto.randomUUID(),stageId:body?.stageId,teamA:body?.teamA,teamB:body?.teamB,scheduledAt:body?.scheduledAt});await options.saveState();return fixture;});
+    },
+    async createMatch(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();const season=current.lifecycle?.seasons.find(x=>x.id===body?.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});const match=Lifecycle.createMatch(season,body?.fixtureId,{id:body?.id||crypto.randomUUID(),gameNumber:body?.gameNumber});await options.saveState();return match;});
+    },
+    async recordMatchOutcome(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();const season=current.lifecycle?.seasons.find(x=>x.id===body?.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});const outcome=Lifecycle.recordMatchOutcome(season,body||{});await options.saveState();return outcome;});
+    },
+    async advanceBracket(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();const season=current.lifecycle?.seasons.find(x=>x.id===body?.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});const progression=Lifecycle.advanceBracket(season,body||{});await options.saveState();return progression;});
+    },
+    async createRaceSideEvent(principal,body) {
+      role(principal,['admin']);
+      return mutate(async()=>{const current=state();const event=Lifecycle.createRaceSideEvent(body||{});const season=current.lifecycle?.seasons.find(x=>x.id===event.seasonId);if(!season)throw Object.assign(new Error('Season was not found.'),{status:404,code:'SEASON_NOT_FOUND'});season.raceSideEvents||=[];season.raceSideEvents.push(event);current.lifecycle.raceSideEvents.push(event);await options.saveState();return event;});
     },
     async exportBackup(principal) {
       role(principal,['admin']);
