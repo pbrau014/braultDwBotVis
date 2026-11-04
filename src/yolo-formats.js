@@ -103,7 +103,7 @@ function createGame(input = {}) {
   gameNumber:(()=>{const n=input.gameNumber??1;if(!Number.isInteger(n)||n<1||n>99)throw new Error('Game number must be an integer from 1 to 99.');return n;})(),
   status:'pending-evidence',evidenceRecordIds:[],acceptedAt:null};
 }
-function createRaceSideEvent(input = {}) { const offset = input.scheduleOffsetMinutes ?? 60; if (!Number.isInteger(offset) || offset < 0 || offset > 1440) throw new Error('Race side-event offset must be from 0 to 1440 minutes.'); return { id: identifier(input.id, 'Race side-event ID'), type: 'race-side-event', eventNightId: identifier(input.eventNightId, 'Event-night ID'), scheduleOffsetMinutes: offset, scoringPolicyId: input.scoringPolicyId || null, approved: input.approved === true }; }
+function createRaceSideEvent(input = {}) { const offset = input.scheduleOffsetMinutes ?? 60; if (!Number.isInteger(offset) || offset < 0 || offset > 1440) throw new Error('Race side-event offset must be from 0 to 1440 minutes.'); return { id: identifier(input.id, 'Race side-event ID'), type: 'race-side-event', eventNightId: identifier(input.eventNightId, 'Event-night ID'), scheduleOffsetMinutes: offset, scoringPolicyId: input.scoringPolicyId || null, approvedSettingsId: input.approvedSettingsId || null, approved: Boolean(input.approvedSettingsId) }; }
 function grandYoloScore(input = {}) { return { type: 'grand-yolo-score', scoringCategory: 'grand', eventNightId: requiredText(input.eventNightId, 'Event-night ID') }; }
 function grandYoloFinale(input = {}) { return { type: 'grand-yolo-finale', stageId: requiredText(input.stageId, 'Finale stage ID'), matchId: requiredText(input.matchId, 'Finale match ID') }; }
 function validateMatchOutcome(input = {}) {
