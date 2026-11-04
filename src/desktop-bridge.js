@@ -272,6 +272,9 @@ function createDesktopBridge(options={}){
       csrf(req,session);
       const lifecycleRoutes={
         '/api/admin/tournaments':'createTournament',
+        '/api/admin/pilot/registrations':'registerPilotParticipant',
+        '/api/admin/pilot/event-nights':'createPilotEventNight',
+        '/api/admin/tournament-scores':'recordTournamentScore',
         '/api/admin/tournaments/transition':'transitionTournament',
         '/api/admin/seasons':'createSeason',
         '/api/admin/stages':'addStage',
