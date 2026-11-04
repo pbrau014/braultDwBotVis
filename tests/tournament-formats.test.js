@@ -145,6 +145,7 @@ test('registrations, team rosters and fixture references are validated', () => {
   F.activateStage(t,F.STAGES.REGULAR_SEASON);
   assert.throws(() => F.registerParticipant(t, { playerId: 'p1', displayName: 'Alpha' }), /Registration is closed/);
   assert.throws(() => F.assignTeam(t, { id: 'bad', name: 'Bad', playerIds: ['unknown'] }), /active registration/);
+  F.activateStage(t,F.STAGES.REGULAR_SEASON);
   const night=F.createEventNight(t,{id:'night-invalid',stageKey:F.STAGES.REGULAR_SEASON,name:'Night',startsAt:'2026-12-02T18:00:00-06:00',endsAt:'2026-12-02T22:00:00-06:00',timezone:'America/Chicago'});
   assert.throws(() => F.createFixture(t, { id: 'f', stageKey: F.STAGES.REGULAR_SEASON, eventNightId:night.id, homeTeamId: 'home', awayTeamId: 'missing' }), /two distinct registered teams/);
 });
@@ -173,7 +174,8 @@ test('match game must be supported by locked team roster and non-empty match', (
 test('forfeit requires a team winner, reason and evidence and is auditable', () => {
   const t = full();
   F.activateStage(t, F.STAGES.REGULAR_SEASON);
-  const fixture = F.createFixture(t, { id: 'f1', stageKey: F.STAGES.REGULAR_SEASON, homeTeamId: 'home', awayTeamId: 'away' });
+  const night=F.createEventNight(t,{id:'night-forfeit',stageKey:F.STAGES.REGULAR_SEASON,name:'Night',startsAt:'2026-12-02T18:00:00-06:00',endsAt:'2026-12-02T22:00:00-06:00',timezone:'America/Chicago'});
+  const fixture = F.createFixture(t, { id: 'f1', stageKey: F.STAGES.REGULAR_SEASON, eventNightId:night.id, homeTeamId: 'home', awayTeamId: 'away' });
   const match = F.createMatch(t, fixture.id);
   evidence(t,'evidence-1');
   const result = F.resolveForfeit(t, match.id, 'home', 'Opponent no-show', 'evidence-1');
