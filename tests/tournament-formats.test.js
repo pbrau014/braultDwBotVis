@@ -20,7 +20,8 @@ function qualify(t, stageKey) {
 }
 function playStage(t, stageKey) {
   const suffix=stageKey.replace(/_/g,'-');
-  const fixture=F.createFixture(t,{id:'fixture-'+suffix,stageKey,homeTeamId:'home',awayTeamId:'away'});
+  const night=F.createEventNight(t,{id:'night-'+suffix,stageKey,name:'Test '+suffix,startsAt:'2026-12-02T18:00:00-06:00',endsAt:'2026-12-02T22:00:00-06:00',timezone:'America/Chicago'});
+  const fixture=F.createFixture(t,{id:'fixture-'+suffix,stageKey,eventNightId:night.id,homeTeamId:'home',awayTeamId:'away'});
   const match=F.createMatch(t,fixture.id);
   evidence(t,'ev-'+suffix+'-h');evidence(t,'ev-'+suffix+'-a');
   F.recordGame(match,{gameNumber:1,teamId:'home',playerId:'p1',metrics:{damage:9000,kills:2},evidenceId:'ev-'+suffix+'-h'},t.teams,t.registrations,t.evidence);
@@ -86,7 +87,8 @@ test('Full YOLO requires explicit season duration and approved published match m
 test('Full regular season advances in order through postseason and Grand Finale', () => {
   const t = full();
   F.activateStage(t, F.STAGES.REGULAR_SEASON);
-  const fixture = F.createFixture(t, { id: 'f1', stageKey: F.STAGES.REGULAR_SEASON, homeTeamId: 'home', awayTeamId: 'away' });
+  const night = F.createEventNight(t,{id:'night-f1',stageKey:F.STAGES.REGULAR_SEASON,name:'Regular Night',startsAt:'2026-12-02T18:00:00-06:00',endsAt:'2026-12-02T22:00:00-06:00',timezone:'America/Chicago'});
+  const fixture = F.createFixture(t, { id: 'f1', stageKey: F.STAGES.REGULAR_SEASON, eventNightId:night.id, homeTeamId: 'home', awayTeamId: 'away' });
   const match = F.createMatch(t, fixture.id);
   evidence(t,'ev1');evidence(t,'ev2');
   F.recordGame(match, { gameNumber: 1, teamId: 'home', playerId: 'p1', metrics: { damage: 10000, kills: 2 }, evidenceId: 'ev1' }, t.teams,t.registrations,t.evidence);
@@ -142,7 +144,8 @@ test('registrations, team rosters and fixture references are validated', () => {
   const t = full();
   assert.throws(() => F.registerParticipant(t, { playerId: 'p1', displayName: 'Alpha' }), /Registration is closed/);
   assert.throws(() => F.assignTeam(t, { id: 'bad', name: 'Bad', playerIds: ['unknown'] }), /active registration/);
-  assert.throws(() => F.createFixture(t, { id: 'f', stageKey: F.STAGES.REGULAR_SEASON, homeTeamId: 'home', awayTeamId: 'missing' }), /two distinct registered teams/);
+  const night=F.createEventNight(t,{id:'night-invalid',stageKey:F.STAGES.REGULAR_SEASON,name:'Night',startsAt:'2026-12-02T18:00:00-06:00',endsAt:'2026-12-02T22:00:00-06:00',timezone:'America/Chicago'});
+  assert.throws(() => F.createFixture(t, { id: 'f', stageKey: F.STAGES.REGULAR_SEASON, eventNightId:night.id, homeTeamId: 'home', awayTeamId: 'missing' }), /two distinct registered teams/);
 });
 
 test('registration close prevents late entry and withdrawal remains auditable', () => {
