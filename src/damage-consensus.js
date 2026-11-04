@@ -62,17 +62,16 @@ function extractFullScreenDamageCandidates(reads = []) {
         const combatMissions = afterHeading.search(/combat\s+missions/i);
         const section = combatMissions >= 0 ? afterHeading.slice(0, combatMissions) : afterHeading;
         const captionIndex = section.search(/\bdamage\b/i);
-        let candidateLines;
-        if (captionIndex >= 0) {
-            const beforeCaption = section.slice(0, captionIndex);
-            candidateLines = beforeCaption.split(/\r?\n/).map(line => line.trim()).filter(Boolean).slice(-7).reverse();
-        } else {
-            // The missing caption is a known PSM 11 failure mode. The damage
-            // value is at the beginning of the section, not at its end near
-            // the mission/ribbon text. Limit the fallback to the numeric row
-            // area immediately following the heading.
-            candidateLines = section.split(/\r?\n/).map(line => line.trim()).filter(Boolean).slice(0, 7);
-        }
+        // The damage number is positioned immediately below the performance
+        // heading in the source UI, while OCR may place the "Damage" caption
+        // several lines later after reading ribbon labels/icons. Looking only
+        // at the seven lines immediately before that caption can skip the value.
+        // Keep the search bounded to the top of this section and stop at the
+        // caption when it appears; do not scan medal/ribbon rows below it.
+        const sectionLines = section.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+        const candidateLines = captionIndex >= 0
+            ? sectionLines.slice(0, 7)
+            : sectionLines.slice(0, 7);
 
         let value = '';
         for (const line of candidateLines) {
