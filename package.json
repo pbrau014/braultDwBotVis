@@ -1,0 +1,38 @@
+{
+  "name": "wows-yolo-tourney-discord-bot",
+  "version": "2.5.0",
+  "private": true,
+  "description": "Hardened WoWS OCR battle reporter and 50-player YOLO Tourney bot with transactional local SQLite, public interactive controls, expanded workbook totals, and JSON/Discord recovery.",
+  "main": "src/bot.js",
+  "scripts": {
+    "start": "node src/bot.js",
+    "test": "node --test",
+    "corpus:fetch": "node scripts/fetch-reference-corpus.js",
+    "corpus:test": "node scripts/run-reference-regression.js",
+    "test:four-images": "node scripts/run-four-screenshot-pipeline.js",
+    "test:reported-screenshot": "node scripts/run-reported-screenshot-regression.js",
+    "test:system": "node --test tests/full-system.test.js",
+    "test:sqlite": "node --test tests/sqlite-store.test.js",
+    "acceptance": "npm test && npm run test:reported-screenshot && npm run test:four-images && npm run test:additional-images",
+    "test:tesseractjs": "node scripts/accept-tesseractjs.js",
+    "test:ocr-watchdog": "node --test tests/ocr-watchdog.test.js tests/windows-process-cancel.test.js tests/damage-consensus.test.js",
+    "test:additional-images": "node scripts/run-additional-screenshot-regression.js",
+    "test:opencv": "node --test tests/opencv-field-isolation.test.js",
+    "benchmark:paddleocr:offline": "node scripts/run-offline-paddleocr-benchmark.js",
+    "summarize:ocr": "node scripts/summarize-ocr-acceptance.js",
+    "test:paddleocr-fallback": "node --test tests/paddleocr-field-fallback.test.js",
+    "acceptance:paddleocr": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/run-paddleocr-integrated-acceptance.ps1"
+  },
+  "engines": {
+    "node": ">=22.16.0"
+  },
+  "dependencies": {
+    "discord.js": "^14.27.0",
+    "dotenv": "^16.4.7",
+    "tesseract.js": "^6.0.1",
+    "tesseract.js-core": "^6.0.0"
+  },
+  "allowScripts": {
+    "tesseract.js@6.0.1": true
+  }
+}

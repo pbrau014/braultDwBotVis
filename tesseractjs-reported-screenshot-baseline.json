@@ -1,0 +1,83 @@
+{
+  "buildVersion": "2.5.0",
+  "configuredEngine": "tesseractjs",
+  "engine": "Tesseract.js local assets + ImageMagick preprocessing",
+  "filename": "Screenshot_2026-10-22_201950.png",
+  "imageSizeBytes": 838129,
+  "pipelineCompleted": true,
+  "attempts": 3,
+  "selectedPageSegmentationMode": 3,
+  "confidence": 80,
+  "actual": {
+    "result": "Defeat",
+    "player": "[AYNS]BabyEatingDingo",
+    "map": "New Dawn",
+    "mode": "Random Battle",
+    "battleStart": "30.09.2026 14:46",
+    "credits": 540180,
+    "xp": 4906,
+    "freeXp": 1536,
+    "damage": 87313
+  },
+  "expected": {
+    "result": "Defeat",
+    "player": "[AYNS]BabyEatingDingo",
+    "map": "New Dawn",
+    "mode": "Random Battle",
+    "battleStart": "30.09.2026 14:46",
+    "credits": 540180,
+    "xp": 4906,
+    "freeXp": 1536,
+    "damage": 87373
+  },
+  "comparison": {
+    "result": {
+      "expected": "Defeat",
+      "actual": "Defeat",
+      "pass": true
+    },
+    "player": {
+      "expected": "[AYNS]BabyEatingDingo",
+      "actual": "[AYNS]BabyEatingDingo",
+      "pass": true
+    },
+    "map": {
+      "expected": "New Dawn",
+      "actual": "New Dawn",
+      "pass": true
+    },
+    "mode": {
+      "expected": "Random Battle",
+      "actual": "Random Battle",
+      "pass": true
+    },
+    "battleStart": {
+      "expected": "30.09.2026 14:46",
+      "actual": "30.09.2026 14:46",
+      "pass": true
+    },
+    "credits": {
+      "expected": 540180,
+      "actual": 540180,
+      "pass": true
+    },
+    "xp": {
+      "expected": 4906,
+      "actual": 4906,
+      "pass": true
+    },
+    "freeXp": {
+      "expected": 1536,
+      "actual": 1536,
+      "pass": true
+    },
+    "damage": {
+      "expected": 87373,
+      "actual": 87313,
+      "pass": false
+    }
+  },
+  "allExpectedFieldsPass": false,
+  "requiredMissing": [],
+  "ambiguities": {}
+}

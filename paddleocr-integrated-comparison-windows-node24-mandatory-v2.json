@@ -1,0 +1,4205 @@
+{
+  "schemaVersion": 2,
+  "status": "complete",
+  "createdAt": "2026-10-26T16:08:21.946Z",
+  "approvedManifestPath": "testdata/additional-screenshot-ground-truth.json",
+  "approvedManifestSha256": "66faf4bb6018a921db719323f4cb287900ba5f84057ce4ed455cbf192c4c5704",
+  "baselinePath": "testdata/ocr-acceptance/tesseract-only-baseline-windows-node24.json",
+  "baselineReportSha256": "4d0e76f73b22fa47d321649cadfc9ec384cb27e53382266829ddfa9c59b428d4",
+  "candidatePath": "testdata/ocr-acceptance/paddleocr-integrated-acceptance-windows-node24.json",
+  "candidateReportSha256": "a3eb389e84f015b1b83ef9c2f77ef741fab247493556c7352b3ebdead3d1f077",
+  "datasetPolicy": "16 screenshots are the tuning/development corpus, not an untouched holdout; no ground-truth values are altered",
+  "fieldPolicy": {
+    "mandatoryFields": [
+      "result",
+      "player",
+      "map",
+      "mode",
+      "battleStart",
+      "credits",
+      "freeXp",
+      "damage"
+    ],
+    "optionalFields": [
+      "xp"
+    ],
+    "note": "Optional fields are compared diagnostically but do not affect mandatory-record completeness or required-field review."
+  },
+  "baseline": {
+    "name": "tesseract-only-baseline",
+    "fixtureCount": 16,
+    "reportedCount": 16,
+    "comparedFields": [
+      "result",
+      "player",
+      "map",
+      "mode",
+      "battleStart",
+      "credits",
+      "xp",
+      "freeXp",
+      "damage"
+    ],
+    "mandatoryFields": [
+      "result",
+      "player",
+      "map",
+      "mode",
+      "battleStart",
+      "credits",
+      "freeXp",
+      "damage"
+    ],
+    "optionalFields": [
+      "xp"
+    ],
+    "exactFieldAccuracy": 0.8611111111111112,
+    "exactFields": 124,
+    "totalFields": 144,
+    "completeRecordAccuracy": 0.375,
+    "completeRecords": 6,
+    "totalRecords": 16,
+    "criticalFalseAcceptanceRate": 0.023622047244094488,
+    "acceptedWrongFields": 3,
+    "unresolvedRate": 0.11805555555555555,
+    "falseRejectionRate": 0.11805555555555555,
+    "unresolvedFields": 17,
+    "humanReviewRecords": 8,
+    "humanReviewRate": 0.5,
+    "mandatory": {
+      "fields": [
+        "result",
+        "player",
+        "map",
+        "mode",
+        "battleStart",
+        "credits",
+        "freeXp",
+        "damage"
+      ],
+      "totalFields": 128,
+      "exactFields": 111,
+      "exactFieldAccuracy": 0.8671875,
+      "acceptedWrongFields": 2,
+      "unresolvedFields": 15,
+      "criticalFalseAcceptanceRate": 0.017699115044247787,
+      "byField": [
+        {
+          "field": "result",
+          "total": 16,
+          "correct": 16,
+          "unresolved": 0,
+          "acceptedWrong": 0,
+          "exactAccuracy": 1
+        },
+        {
+          "field": "player",
+          "total": 16,
+          "correct": 12,
+          "unresolved": 2,
+          "acceptedWrong": 2,
+          "exactAccuracy": 0.75
+        },
+        {
+          "field": "map",
+          "total": 16,
+          "correct": 12,
+          "unresolved": 4,
+          "acceptedWrong": 0,
+          "exactAccuracy": 0.75
+        },
+        {
+          "field": "mode",
+          "total": 16,
+          "correct": 14,
+          "unresolved": 2,
+          "acceptedWrong": 0,
+          "exactAccuracy": 0.875
+        },
+        {
+          "field": "battleStart",
+          "total": 16,
+          "correct": 13,
+          "unresolved": 3,
+          "acceptedWrong": 0,
+          "exactAccuracy": 0.8125
+        },
+        {
+          "field": "credits",
+          "total": 16,
+          "correct": 16,
+          "unresolved": 0,
+          "acceptedWrong": 0,
+          "exactAccuracy": 1
+        },
+        {
+          "field": "freeXp",
+          "total": 16,
+          "correct": 16,
+          "unresolved": 0,
+          "acceptedWrong": 0,
+          "exactAccuracy": 1
+        },
+        {
+          "field": "damage",
+          "total": 16,
+          "correct": 12,
+          "unresolved": 4,
+          "acceptedWrong": 0,
+          "exactAccuracy": 0.75
+        }
+      ],
+      "completeRecords": 7,
+      "totalRecords": 16,
+      "completeRecordAccuracy": 0.4375
+    },
+    "optional": {
+      "fields": [
+        "xp"
+      ],
+      "totalFields": 16,
+      "exactFields": 13,
+      "exactFieldAccuracy": 0.8125,
+      "acceptedWrongFields": 1,
+      "unresolvedFields": 2,
+      "criticalFalseAcceptanceRate": 0.07142857142857142,
+      "byField": [
+        {
+          "field": "xp",
+          "total": 16,
+          "correct": 13,
+          "unresolved": 2,
+          "acceptedWrong": 1,
+          "exactAccuracy": 0.8125
+        }
+      ]
+    },
+    "byField": [
+      {
+        "field": "result",
+        "total": 16,
+        "correct": 16,
+        "unresolved": 0,
+        "acceptedWrong": 0,
+        "exactAccuracy": 1
+      },
+      {
+        "field": "player",
+        "total": 16,
+        "correct": 12,
+        "unresolved": 2,
+        "acceptedWrong": 2,
+        "exactAccuracy": 0.75
+      },
+      {
+        "field": "map",
+        "total": 16,
+        "correct": 12,
+        "unresolved": 4,
+        "acceptedWrong": 0,
+        "exactAccuracy": 0.75
+      },
+      {
+        "field": "mode",
+        "total": 16,
+        "correct": 14,
+        "unresolved": 2,
+        "acceptedWrong": 0,
+        "exactAccuracy": 0.875
+      },
+      {
+        "field": "battleStart",
+        "total": 16,
+        "correct": 13,
+        "unresolved": 3,
+        "acceptedWrong": 0,
+        "exactAccuracy": 0.8125
+      },
+      {
+        "field": "credits",
+        "total": 16,
+        "correct": 16,
+        "unresolved": 0,
+        "acceptedWrong": 0,
+        "exactAccuracy": 1
+      },
+      {
+        "field": "xp",
+        "total": 16,
+        "correct": 13,
+        "unresolved": 2,
+        "acceptedWrong": 1,
+        "exactAccuracy": 0.8125
+      },
+      {
+        "field": "freeXp",
+        "total": 16,
+        "correct": 16,
+        "unresolved": 0,
+        "acceptedWrong": 0,
+        "exactAccuracy": 1
+      },
+      {
+        "field": "damage",
+        "total": 16,
+        "correct": 12,
+        "unresolved": 4,
+        "acceptedWrong": 0,
+        "exactAccuracy": 0.75
+      }
+    ],
+    "latency": {
+      "count": 16,
+      "medianMs": 34898,
+      "p95Ms": 41123,
+      "meanMs": 35167.375
+    },
+    "fallback": {
+      "attemptedImages": 0,
+      "attemptedCrops": 0,
+      "failures": 0,
+      "returnedCropResults": 0,
+      "failedCropResults": 0,
+      "networkAttemptCount": 0,
+      "latency": {
+        "count": 0,
+        "medianMs": null,
+        "p95Ms": null,
+        "meanMs": null
+      },
+      "perCropLatency": {
+        "count": 0,
+        "medianMs": null,
+        "p95Ms": null,
+        "meanMs": null
+      }
+    },
+    "records": [
+      {
+        "key": "Screenshot_16.jpg",
+        "elapsedMs": 38011,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": false,
+        "optionalExact": true,
+        "needsHumanReview": true,
+        "fallback": {
+          "status": "disabled",
+          "elapsedMs": 0,
+          "requestedFields": [],
+          "attemptedCrops": [],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]VeritechCEO",
+            "actual": "[HO-FL]VeritechCEQ",
+            "exact": false,
+            "kind": "accepted-wrong"
+          },
+          "map": {
+            "expected": "Aegis",
+            "actual": "Aegis",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Operations",
+            "actual": "Operations",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "09.10.2025 16:20",
+            "actual": "09.10.2025 16:20",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 583527,
+            "actual": 583527,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 6872,
+            "actual": 6872,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 2856,
+            "actual": 2856,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 401597,
+            "actual": null,
+            "exact": false,
+            "kind": "unresolved"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "Screenshot_2023-02-21_20-54-39.png",
+        "elapsedMs": 38200,
+        "pipelineCompleted": true,
+        "exactRecord": true,
+        "mandatoryExactRecord": true,
+        "optionalExact": true,
+        "needsHumanReview": false,
+        "fallback": {
+          "status": "disabled",
+          "elapsedMs": 0,
+          "requestedFields": [],
+          "attemptedCrops": [],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]kmcroy",
+            "actual": "[HO-FL]kmcroy",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "Northern Lights",
+            "actual": "Northern Lights",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Random Battle",
+            "actual": "Random Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "21.02.2023 20:32",
+            "actual": "21.02.2023 20:32",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 735475,
+            "actual": 735475,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 13036,
+            "actual": 13036,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 2208,
+            "actual": 2208,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 127218,
+            "actual": 127218,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "Screenshot_2024-11-14_133326.png",
+        "elapsedMs": 29957,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": false,
+        "optionalExact": true,
+        "needsHumanReview": true,
+        "fallback": {
+          "status": "disabled",
+          "elapsedMs": 0,
+          "requestedFields": [],
+          "attemptedCrops": [],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]gtrain25465",
+            "actual": "Not detected",
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "map": {
+            "expected": "Sea of Fortune",
+            "actual": "Not detected",
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "mode": {
+            "expected": "Brawl",
+            "actual": "Brawl",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "14.11.2024 13:26",
+            "actual": "Not detected",
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "credits": {
+            "expected": 1092292,
+            "actual": 1092292,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 8425,
+            "actual": 8425,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 1904,
+            "actual": 1904,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 58673,
+            "actual": null,
+            "exact": false,
+            "kind": "unresolved"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "WTF.jpg",
+        "elapsedMs": 41021,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": false,
+        "optionalExact": true,
+        "needsHumanReview": true,
+        "fallback": {
+          "status": "disabled",
+          "elapsedMs": 0,
+          "requestedFields": [],
+          "attemptedCrops": [],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]VeritechCEO",
+            "actual": "Not detected",
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "map": {
+            "expected": "North",
+            "actual": "Not detected",
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "mode": {
+            "expected": "Random Battle",
+            "actual": "Random Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "13.07.2025 14:17",
+            "actual": "13.07.2025 14:17",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 495530,
+            "actual": 495530,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 6649,
+            "actual": 6649,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 2350,
+            "actual": 2350,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 31160,
+            "actual": 31160,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "World_of_Warships_2_20_2023_10_06_11_PM.png",
+        "elapsedMs": 32053,
+        "pipelineCompleted": true,
+        "exactRecord": true,
+        "mandatoryExactRecord": true,
+        "optionalExact": true,
+        "needsHumanReview": false,
+        "fallback": {
+          "status": "disabled",
+          "elapsedMs": 0,
+          "requestedFields": [],
+          "attemptedCrops": [],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]LongchampGTS",
+            "actual": "[HO-FL]LongchampGTS",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "North",
+            "actual": "North",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Random Battle",
+            "actual": "Random Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "20.02.2023 21:44",
+            "actual": "20.02.2023 21:44",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 667539,
+            "actual": 667539,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 8184,
+            "actual": 8184,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 3400,
+            "actual": 3400,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 238630,
+            "actual": 238630,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "imag7e.png",
+        "elapsedMs": 28803,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": false,
+        "optionalExact": true,
+        "needsHumanReview": true,
+        "fallback": {
+          "status": "disabled",
+          "elapsedMs": 0,
+          "requestedFields": [],
+          "attemptedCrops": [],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]gtrain25465",
+            "actual": "[HO-FL]gtrain25465",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "Estuary",
+            "actual": "Estuary",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Random Battle",
+            "actual": "Random Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "15.09.2024 11:56",
+            "actual": "Not detected",
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "credits": {
+            "expected": 261393,
+            "actual": 261393,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 5400,
+            "actual": 5400,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 1188,
+            "actual": 1188,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 107925,
+            "actual": 107925,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "imag8e.png",
+        "elapsedMs": 34898,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": true,
+        "optionalExact": false,
+        "needsHumanReview": false,
+        "fallback": {
+          "status": "disabled",
+          "elapsedMs": 0,
+          "requestedFields": [],
+          "attemptedCrops": [],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]gtrain25465",
+            "actual": "[HO-FL]gtrain25465",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "Ring",
+            "actual": "Ring",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Random Battle",
+            "actual": "Random Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "08.08.2024 00:46",
+            "actual": "08.08.2024 00:46",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 180068,
+            "actual": 180068,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 5247,
+            "actual": null,
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "freeXp": {
+            "expected": 1184,
+            "actual": 1184,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 120649,
+            "actual": 120649,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "image.png",
+        "elapsedMs": 34130,
+        "pipelineCompleted": true,
+        "exactRecord": true,
+        "mandatoryExactRecord": true,
+        "optionalExact": true,
+        "needsHumanReview": false,
+        "fallback": {
+          "status": "disabled",
+          "elapsedMs": 0,
+          "requestedFields": [],
+          "attemptedCrops": [],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[PPP]Nightrise",
+            "actual": "[PPP]Nightrise",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "Shards",
+            "actual": "Shards",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Asymmetric Battle",
+            "actual": "Asymmetric Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "22.10.2026 21:24",
+            "actual": "22.10.2026 21:24",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 966578,
+            "actual": 966578,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 4056,
+            "actual": 4056,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 5141,
+            "actual": 5141,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 255359,
+            "actual": 255359,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "image1.png",
+        "elapsedMs": 36339,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": false,
+        "optionalExact": false,
+        "needsHumanReview": true,
+        "fallback": {
+          "status": "disabled",
+          "elapsedMs": 0,
+          "requestedFields": [],
+          "attemptedCrops": [],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[PPP]Nightrise",
+            "actual": "[PPP]Nightrise",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "Sleeping Giant",
+            "actual": "Sleeping Giant",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Asymmetric Battle",
+            "actual": "Asymmetric Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "16.09.2026 21:37",
+            "actual": "16.09.2026 21:37",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 552549,
+            "actual": 552549,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 9250,
+            "actual": 92505,
+            "exact": false,
+            "kind": "accepted-wrong"
+          },
+          "freeXp": {
+            "expected": 1695,
+            "actual": 1695,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 289577,
+            "actual": null,
+            "exact": false,
+            "kind": "unresolved"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "image2.png",
+        "elapsedMs": 34906,
+        "pipelineCompleted": true,
+        "exactRecord": true,
+        "mandatoryExactRecord": true,
+        "optionalExact": true,
+        "needsHumanReview": false,
+        "fallback": {
+          "status": "disabled",
+          "elapsedMs": 0,
+          "requestedFields": [],
+          "attemptedCrops": [],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[PPP]Nightrise",
+            "actual": "[PPP]Nightrise",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "Loop",
+            "actual": "Loop",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Asymmetric Battle",
+            "actual": "Asymmetric Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "11.09.2026 02:53",
+            "actual": "11.09.2026 02:53",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 576099,
+            "actual": 576099,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 4290,
+            "actual": 4290,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 1743,
+            "actual": 1743,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 134953,
+            "actual": 134953,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "image3.png",
+        "elapsedMs": 34569,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": false,
+        "optionalExact": false,
+        "needsHumanReview": false,
+        "fallback": {
+          "status": "disabled",
+          "elapsedMs": 0,
+          "requestedFields": [],
+          "attemptedCrops": [],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[W-G]Tbone87_Scott_TS",
+            "actual": "[W-G]Thone87_Scott_TS",
+            "exact": false,
+            "kind": "accepted-wrong"
+          },
+          "map": {
+            "expected": "Hotspot",
+            "actual": "Hotspot",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Asymmetric Battle",
+            "actual": "Asymmetric Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "15.12.2023 18:31",
+            "actual": "15.12.2023 18:31",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 566231,
+            "actual": 566231,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 6646,
+            "actual": null,
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "freeXp": {
+            "expected": 2350,
+            "actual": 2350,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 172183,
+            "actual": 172183,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "image4.png",
+        "elapsedMs": 31766,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": false,
+        "optionalExact": true,
+        "needsHumanReview": true,
+        "fallback": {
+          "status": "disabled",
+          "elapsedMs": 0,
+          "requestedFields": [],
+          "attemptedCrops": [],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Defeat",
+            "actual": "Defeat",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]gtrain25465",
+            "actual": "[HO-FL]gtrain25465",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "Hotspot",
+            "actual": "Not detected",
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "mode": {
+            "expected": "Random Battle",
+            "actual": "Not detected",
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "battleStart": {
+            "expected": "28.09.2024 17:04",
+            "actual": "Not detected",
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "credits": {
+            "expected": 372648,
+            "actual": 372648,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 6470,
+            "actual": 6470,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 1598,
+            "actual": 1598,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 148626,
+            "actual": 148626,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "image5.png",
+        "elapsedMs": 35679,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": false,
+        "optionalExact": true,
+        "needsHumanReview": true,
+        "fallback": {
+          "status": "disabled",
+          "elapsedMs": 0,
+          "requestedFields": [],
+          "attemptedCrops": [],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]VeritechCEO",
+            "actual": "[HO-FL]VeritechCEO",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "Hermes",
+            "actual": "Hermes",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Operations",
+            "actual": "Operations",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "18.09.2024 13:26",
+            "actual": "18.09.2024 13:26",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 370341,
+            "actual": 370341,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 6037,
+            "actual": 6037,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 6400,
+            "actual": 6400,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 166183,
+            "actual": null,
+            "exact": false,
+            "kind": "unresolved"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "image6.png",
+        "elapsedMs": 41123,
+        "pipelineCompleted": true,
+        "exactRecord": true,
+        "mandatoryExactRecord": true,
+        "optionalExact": true,
+        "needsHumanReview": false,
+        "fallback": {
+          "status": "disabled",
+          "elapsedMs": 0,
+          "requestedFields": [],
+          "attemptedCrops": [],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]gtrain25465",
+            "actual": "[HO-FL]gtrain25465",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "Two Brothers",
+            "actual": "Two Brothers",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Random Battle",
+            "actual": "Random Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "16.09.2024 13:05",
+            "actual": "16.09.2024 13:05",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 297514,
+            "actual": 297514,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 7146,
+            "actual": 7146,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 1406,
+            "actual": 1406,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 126457,
+            "actual": 126457,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "shot-26.08.31_16.22.19-0048.jpg",
+        "elapsedMs": 38114,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": false,
+        "optionalExact": true,
+        "needsHumanReview": true,
+        "fallback": {
+          "status": "disabled",
+          "elapsedMs": 0,
+          "requestedFields": [],
+          "attemptedCrops": [],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]VeritechCEO",
+            "actual": "[HO-FL]VeritechCEO",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "Big Race",
+            "actual": "Not detected",
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "mode": {
+            "expected": "Random Battle",
+            "actual": "Not detected",
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "battleStart": {
+            "expected": "31.08.2026 15:58",
+            "actual": "31.08.2026 15:58",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 211546,
+            "actual": 211546,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 2960,
+            "actual": 2960,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 1234,
+            "actual": 1234,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 119195,
+            "actual": 119195,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "unknown.png",
+        "elapsedMs": 33109,
+        "pipelineCompleted": true,
+        "exactRecord": true,
+        "mandatoryExactRecord": true,
+        "optionalExact": true,
+        "needsHumanReview": false,
+        "fallback": {
+          "status": "disabled",
+          "elapsedMs": 0,
+          "requestedFields": [],
+          "attemptedCrops": [],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]Ken400",
+            "actual": "[HO-FL]Ken400",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "Two Brothers",
+            "actual": "Two Brothers",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Random Battle",
+            "actual": "Random Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "18.08.2022 10:03",
+            "actual": "18.08.2022 10:03",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 828719,
+            "actual": 828719,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 31741,
+            "actual": 31741,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 2632,
+            "actual": 2632,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 122261,
+            "actual": 122261,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      }
+    ]
+  },
+  "candidate": {
+    "name": "tesseract-plus-paddle-local-field-crop",
+    "fixtureCount": 16,
+    "reportedCount": 16,
+    "comparedFields": [
+      "result",
+      "player",
+      "map",
+      "mode",
+      "battleStart",
+      "credits",
+      "xp",
+      "freeXp",
+      "damage"
+    ],
+    "mandatoryFields": [
+      "result",
+      "player",
+      "map",
+      "mode",
+      "battleStart",
+      "credits",
+      "freeXp",
+      "damage"
+    ],
+    "optionalFields": [
+      "xp"
+    ],
+    "exactFieldAccuracy": 0.8333333333333334,
+    "exactFields": 120,
+    "totalFields": 144,
+    "completeRecordAccuracy": 0.125,
+    "completeRecords": 2,
+    "totalRecords": 16,
+    "criticalFalseAcceptanceRate": 0.04,
+    "acceptedWrongFields": 5,
+    "unresolvedRate": 0.13194444444444445,
+    "falseRejectionRate": 0.13194444444444445,
+    "unresolvedFields": 19,
+    "humanReviewRecords": 12,
+    "humanReviewRate": 0.75,
+    "mandatory": {
+      "fields": [
+        "result",
+        "player",
+        "map",
+        "mode",
+        "battleStart",
+        "credits",
+        "freeXp",
+        "damage"
+      ],
+      "totalFields": 128,
+      "exactFields": 108,
+      "exactFieldAccuracy": 0.84375,
+      "acceptedWrongFields": 4,
+      "unresolvedFields": 16,
+      "criticalFalseAcceptanceRate": 0.03571428571428571,
+      "byField": [
+        {
+          "field": "result",
+          "total": 16,
+          "correct": 16,
+          "unresolved": 0,
+          "acceptedWrong": 0,
+          "exactAccuracy": 1
+        },
+        {
+          "field": "player",
+          "total": 16,
+          "correct": 12,
+          "unresolved": 2,
+          "acceptedWrong": 2,
+          "exactAccuracy": 0.75
+        },
+        {
+          "field": "map",
+          "total": 16,
+          "correct": 11,
+          "unresolved": 3,
+          "acceptedWrong": 2,
+          "exactAccuracy": 0.6875
+        },
+        {
+          "field": "mode",
+          "total": 16,
+          "correct": 15,
+          "unresolved": 1,
+          "acceptedWrong": 0,
+          "exactAccuracy": 0.9375
+        },
+        {
+          "field": "battleStart",
+          "total": 16,
+          "correct": 16,
+          "unresolved": 0,
+          "acceptedWrong": 0,
+          "exactAccuracy": 1
+        },
+        {
+          "field": "credits",
+          "total": 16,
+          "correct": 16,
+          "unresolved": 0,
+          "acceptedWrong": 0,
+          "exactAccuracy": 1
+        },
+        {
+          "field": "freeXp",
+          "total": 16,
+          "correct": 10,
+          "unresolved": 6,
+          "acceptedWrong": 0,
+          "exactAccuracy": 0.625
+        },
+        {
+          "field": "damage",
+          "total": 16,
+          "correct": 12,
+          "unresolved": 4,
+          "acceptedWrong": 0,
+          "exactAccuracy": 0.75
+        }
+      ],
+      "completeRecords": 3,
+      "totalRecords": 16,
+      "completeRecordAccuracy": 0.1875
+    },
+    "optional": {
+      "fields": [
+        "xp"
+      ],
+      "totalFields": 16,
+      "exactFields": 12,
+      "exactFieldAccuracy": 0.75,
+      "acceptedWrongFields": 1,
+      "unresolvedFields": 3,
+      "criticalFalseAcceptanceRate": 0.07692307692307693,
+      "byField": [
+        {
+          "field": "xp",
+          "total": 16,
+          "correct": 12,
+          "unresolved": 3,
+          "acceptedWrong": 1,
+          "exactAccuracy": 0.75
+        }
+      ]
+    },
+    "byField": [
+      {
+        "field": "result",
+        "total": 16,
+        "correct": 16,
+        "unresolved": 0,
+        "acceptedWrong": 0,
+        "exactAccuracy": 1
+      },
+      {
+        "field": "player",
+        "total": 16,
+        "correct": 12,
+        "unresolved": 2,
+        "acceptedWrong": 2,
+        "exactAccuracy": 0.75
+      },
+      {
+        "field": "map",
+        "total": 16,
+        "correct": 11,
+        "unresolved": 3,
+        "acceptedWrong": 2,
+        "exactAccuracy": 0.6875
+      },
+      {
+        "field": "mode",
+        "total": 16,
+        "correct": 15,
+        "unresolved": 1,
+        "acceptedWrong": 0,
+        "exactAccuracy": 0.9375
+      },
+      {
+        "field": "battleStart",
+        "total": 16,
+        "correct": 16,
+        "unresolved": 0,
+        "acceptedWrong": 0,
+        "exactAccuracy": 1
+      },
+      {
+        "field": "credits",
+        "total": 16,
+        "correct": 16,
+        "unresolved": 0,
+        "acceptedWrong": 0,
+        "exactAccuracy": 1
+      },
+      {
+        "field": "xp",
+        "total": 16,
+        "correct": 12,
+        "unresolved": 3,
+        "acceptedWrong": 1,
+        "exactAccuracy": 0.75
+      },
+      {
+        "field": "freeXp",
+        "total": 16,
+        "correct": 10,
+        "unresolved": 6,
+        "acceptedWrong": 0,
+        "exactAccuracy": 0.625
+      },
+      {
+        "field": "damage",
+        "total": 16,
+        "correct": 12,
+        "unresolved": 4,
+        "acceptedWrong": 0,
+        "exactAccuracy": 0.75
+      }
+    ],
+    "latency": {
+      "count": 16,
+      "medianMs": 42601,
+      "p95Ms": 56511,
+      "meanMs": 45257.25
+    },
+    "fallback": {
+      "attemptedImages": 16,
+      "attemptedCrops": 54,
+      "failures": 7,
+      "returnedCropResults": 29,
+      "failedCropResults": 0,
+      "networkAttemptCount": 0,
+      "latency": {
+        "count": 16,
+        "medianMs": 9560,
+        "p95Ms": 15029,
+        "meanMs": 10064.5
+      },
+      "perCropLatency": {
+        "count": 29,
+        "medianMs": 297.427,
+        "p95Ms": 4070.658,
+        "meanMs": 1239.713103448276
+      }
+    },
+    "records": [
+      {
+        "key": "Screenshot_16.jpg",
+        "elapsedMs": 53422,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": false,
+        "optionalExact": true,
+        "needsHumanReview": true,
+        "fallback": {
+          "status": "failed-open",
+          "elapsedMs": 15027,
+          "requestedFields": [
+            {
+              "field": "player",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "[HO-FL]VeritechCEQ"
+            },
+            {
+              "field": "map",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "Aegis"
+            },
+            {
+              "field": "credits",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "583527"
+            },
+            {
+              "field": "xp",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "6872"
+            },
+            {
+              "field": "freeXp",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "2856"
+            },
+            {
+              "field": "damage",
+              "reasons": [
+                "unresolved-or-invalid",
+                "existing-parser-ambiguity",
+                "candidate-values-conflict"
+              ],
+              "currentValue": null
+            }
+          ],
+          "attemptedCrops": [
+            "identity",
+            "metadata",
+            "credits",
+            "damage",
+            "freeXp",
+            "xp"
+          ],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]VeritechCEO",
+            "actual": "[HO-FL]VeritechCEQ",
+            "exact": false,
+            "kind": "accepted-wrong"
+          },
+          "map": {
+            "expected": "Aegis",
+            "actual": "Aegis",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Operations",
+            "actual": "Operations",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "09.10.2025 16:20",
+            "actual": "09.10.2025 16:20",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 583527,
+            "actual": 583527,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 6872,
+            "actual": 6872,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 2856,
+            "actual": 2856,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 401597,
+            "actual": null,
+            "exact": false,
+            "kind": "unresolved"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "Screenshot_2023-02-21_20-54-39.png",
+        "elapsedMs": 48004,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": false,
+        "optionalExact": true,
+        "needsHumanReview": true,
+        "fallback": {
+          "status": "complete",
+          "elapsedMs": 9685,
+          "requestedFields": [
+            {
+              "field": "map",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "Northern Lights"
+            },
+            {
+              "field": "battleStart",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "21.02.2023 20:32"
+            },
+            {
+              "field": "credits",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "735475"
+            },
+            {
+              "field": "xp",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "13036"
+            },
+            {
+              "field": "freeXp",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "2208"
+            },
+            {
+              "field": "damage",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "127218"
+            }
+          ],
+          "attemptedCrops": [
+            "metadata",
+            "credits",
+            "damage",
+            "freeXp",
+            "xp"
+          ],
+          "decisions": [
+            {
+              "field": "map",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "Northern Lights �",
+              "source": "paddleocr-local-field-crop:metadata",
+              "confidenceCeiling": 84
+            },
+            {
+              "field": "battleStart",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "21.02.2023 20:32",
+              "source": "paddleocr-local-field-crop:metadata",
+              "confidenceCeiling": 84
+            },
+            {
+              "field": "credits",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "735475",
+              "source": "paddleocr-local-field-crop:credits",
+              "confidenceCeiling": 84
+            },
+            {
+              "fieldGroup": "damage",
+              "status": "not-admitted",
+              "reason": "existing-field-parser-rejected-raw-output",
+              "rawText": "le Performance\n7218"
+            },
+            {
+              "field": "freeXp",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "22",
+              "source": "paddleocr-local-field-crop:freeXp",
+              "confidenceCeiling": 84
+            },
+            {
+              "fieldGroup": "xp",
+              "status": "not-admitted",
+              "reason": "existing-field-parser-rejected-raw-output",
+              "rawText": "13 03"
+            }
+          ],
+          "cropLatency": {
+            "count": 5,
+            "totalMs": 5022.258,
+            "medianMs": 284.056,
+            "p95Ms": 3635.4,
+            "meanMs": 1004.4516
+          },
+          "cropResults": [
+            {
+              "fieldGroup": "metadata",
+              "status": "candidate",
+              "fields": {
+                "map": "Northern Lights �",
+                "battleStart": "21.02.2023 20:32"
+              },
+              "elapsedMs": 3635.4,
+              "reason": null
+            },
+            {
+              "fieldGroup": "credits",
+              "status": "candidate",
+              "fields": {
+                "credits": "735475"
+              },
+              "elapsedMs": 284.056,
+              "reason": null
+            },
+            {
+              "fieldGroup": "damage",
+              "status": "rejected",
+              "fields": {
+                "damage": null
+              },
+              "elapsedMs": 609.281,
+              "reason": "existing-field-parser-rejected-raw-output"
+            },
+            {
+              "fieldGroup": "freeXp",
+              "status": "candidate",
+              "fields": {
+                "freeXp": "22"
+              },
+              "elapsedMs": 221.672,
+              "reason": null
+            },
+            {
+              "fieldGroup": "xp",
+              "status": "rejected",
+              "fields": {
+                "xp": null
+              },
+              "elapsedMs": 271.849,
+              "reason": "existing-field-parser-rejected-raw-output"
+            }
+          ]
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]kmcroy",
+            "actual": "[HO-FL]kmcroy",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "Northern Lights",
+            "actual": "Northern Lights",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Random Battle",
+            "actual": "Random Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "21.02.2023 20:32",
+            "actual": "21.02.2023 20:32",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 735475,
+            "actual": 735475,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 13036,
+            "actual": 13036,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 2208,
+            "actual": null,
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "damage": {
+            "expected": 127218,
+            "actual": 127218,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "Screenshot_2024-11-14_133326.png",
+        "elapsedMs": 43395,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": false,
+        "optionalExact": true,
+        "needsHumanReview": true,
+        "fallback": {
+          "status": "complete",
+          "elapsedMs": 12528,
+          "requestedFields": [
+            {
+              "field": "player",
+              "reasons": [
+                "unresolved-or-invalid",
+                "existing-parser-ambiguity",
+                "candidate-values-conflict"
+              ],
+              "currentValue": null
+            },
+            {
+              "field": "map",
+              "reasons": [
+                "unresolved-or-invalid",
+                "existing-parser-ambiguity",
+                "candidate-values-conflict"
+              ],
+              "currentValue": null
+            },
+            {
+              "field": "battleStart",
+              "reasons": [
+                "unresolved-or-invalid",
+                "existing-parser-ambiguity"
+              ],
+              "currentValue": null
+            },
+            {
+              "field": "damage",
+              "reasons": [
+                "unresolved-or-invalid",
+                "existing-parser-ambiguity",
+                "candidate-values-conflict"
+              ],
+              "currentValue": null
+            }
+          ],
+          "attemptedCrops": [
+            "identity",
+            "metadata",
+            "damage"
+          ],
+          "decisions": [
+            {
+              "field": "player",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "[HO-FL]gtrain25465X",
+              "source": "paddleocr-local-field-crop:identity",
+              "confidenceCeiling": 84
+            },
+            {
+              "field": "map",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "Sea of Fortune �",
+              "source": "paddleocr-local-field-crop:metadata",
+              "confidenceCeiling": 84
+            },
+            {
+              "field": "battleStart",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "14.11.2024 13:26",
+              "source": "paddleocr-local-field-crop:metadata",
+              "confidenceCeiling": 84
+            },
+            {
+              "fieldGroup": "damage",
+              "status": "not-admitted",
+              "reason": "existing-field-parser-rejected-raw-output",
+              "rawText": "tle performance\n8.673"
+            }
+          ],
+          "cropLatency": {
+            "count": 3,
+            "totalMs": 7910.5509999999995,
+            "medianMs": 3496.484,
+            "p95Ms": 3795.373,
+            "meanMs": 2636.8503333333333
+          },
+          "cropResults": [
+            {
+              "fieldGroup": "identity",
+              "status": "candidate",
+              "fields": {
+                "player": "[HO-FL]gtrain25465X"
+              },
+              "elapsedMs": 3795.373,
+              "reason": null
+            },
+            {
+              "fieldGroup": "metadata",
+              "status": "candidate",
+              "fields": {
+                "map": "Sea of Fortune �",
+                "battleStart": "14.11.2024 13:26"
+              },
+              "elapsedMs": 3496.484,
+              "reason": null
+            },
+            {
+              "fieldGroup": "damage",
+              "status": "rejected",
+              "fields": {
+                "damage": null
+              },
+              "elapsedMs": 618.694,
+              "reason": "existing-field-parser-rejected-raw-output"
+            }
+          ]
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]gtrain25465",
+            "actual": "Not detected",
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "map": {
+            "expected": "Sea of Fortune",
+            "actual": "Not detected",
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "mode": {
+            "expected": "Brawl",
+            "actual": "Brawl",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "14.11.2024 13:26",
+            "actual": "14.11.2024 13:26",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 1092292,
+            "actual": 1092292,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 8425,
+            "actual": 8425,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 1904,
+            "actual": 1904,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 58673,
+            "actual": null,
+            "exact": false,
+            "kind": "unresolved"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "WTF.jpg",
+        "elapsedMs": 56511,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": false,
+        "optionalExact": true,
+        "needsHumanReview": true,
+        "fallback": {
+          "status": "failed-open",
+          "elapsedMs": 15021,
+          "requestedFields": [
+            {
+              "field": "player",
+              "reasons": [
+                "unresolved-or-invalid"
+              ],
+              "currentValue": null
+            },
+            {
+              "field": "map",
+              "reasons": [
+                "unresolved-or-invalid",
+                "existing-parser-ambiguity",
+                "candidate-values-conflict"
+              ],
+              "currentValue": null
+            },
+            {
+              "field": "xp",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "6649"
+            },
+            {
+              "field": "freeXp",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "2350"
+            }
+          ],
+          "attemptedCrops": [
+            "identity",
+            "metadata",
+            "freeXp",
+            "xp"
+          ],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]VeritechCEO",
+            "actual": "Not detected",
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "map": {
+            "expected": "North",
+            "actual": "Not detected",
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "mode": {
+            "expected": "Random Battle",
+            "actual": "Random Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "13.07.2025 14:17",
+            "actual": "13.07.2025 14:17",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 495530,
+            "actual": 495530,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 6649,
+            "actual": 6649,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 2350,
+            "actual": 2350,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 31160,
+            "actual": 31160,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "World_of_Warships_2_20_2023_10_06_11_PM.png",
+        "elapsedMs": 37067,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": false,
+        "optionalExact": true,
+        "needsHumanReview": true,
+        "fallback": {
+          "status": "complete",
+          "elapsedMs": 5151,
+          "requestedFields": [
+            {
+              "field": "credits",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "667539"
+            },
+            {
+              "field": "freeXp",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "3400"
+            }
+          ],
+          "attemptedCrops": [
+            "credits",
+            "freeXp"
+          ],
+          "decisions": [
+            {
+              "field": "credits",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "667539",
+              "source": "paddleocr-local-field-crop:credits",
+              "confidenceCeiling": 84
+            },
+            {
+              "field": "freeXp",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "340",
+              "source": "paddleocr-local-field-crop:freeXp",
+              "confidenceCeiling": 84
+            }
+          ],
+          "cropLatency": {
+            "count": 2,
+            "totalMs": 547.831,
+            "medianMs": 218.544,
+            "p95Ms": 329.287,
+            "meanMs": 273.9155
+          },
+          "cropResults": [
+            {
+              "fieldGroup": "credits",
+              "status": "candidate",
+              "fields": {
+                "credits": "667539"
+              },
+              "elapsedMs": 329.287,
+              "reason": null
+            },
+            {
+              "fieldGroup": "freeXp",
+              "status": "candidate",
+              "fields": {
+                "freeXp": "340"
+              },
+              "elapsedMs": 218.544,
+              "reason": null
+            }
+          ]
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]LongchampGTS",
+            "actual": "[HO-FL]LongchampGTS",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "North",
+            "actual": "North",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Random Battle",
+            "actual": "Random Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "20.02.2023 21:44",
+            "actual": "20.02.2023 21:44",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 667539,
+            "actual": 667539,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 8184,
+            "actual": 8184,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 3400,
+            "actual": null,
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "damage": {
+            "expected": 238630,
+            "actual": 238630,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "imag7e.png",
+        "elapsedMs": 37413,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": false,
+        "optionalExact": true,
+        "needsHumanReview": false,
+        "fallback": {
+          "status": "complete",
+          "elapsedMs": 8083,
+          "requestedFields": [
+            {
+              "field": "battleStart",
+              "reasons": [
+                "unresolved-or-invalid",
+                "existing-parser-ambiguity"
+              ],
+              "currentValue": null
+            },
+            {
+              "field": "xp",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "5400"
+            },
+            {
+              "field": "freeXp",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "1188"
+            }
+          ],
+          "attemptedCrops": [
+            "metadata",
+            "freeXp",
+            "xp"
+          ],
+          "decisions": [
+            {
+              "field": "battleStart",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "15.09.2024 11:56",
+              "source": "paddleocr-local-field-crop:metadata",
+              "confidenceCeiling": 84
+            },
+            {
+              "field": "freeXp",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "1188",
+              "source": "paddleocr-local-field-crop:freeXp",
+              "confidenceCeiling": 84
+            },
+            {
+              "field": "xp",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "5400",
+              "source": "paddleocr-local-field-crop:xp",
+              "confidenceCeiling": 84
+            }
+          ],
+          "cropLatency": {
+            "count": 3,
+            "totalMs": 3025.81,
+            "medianMs": 292.98,
+            "p95Ms": 2448.83,
+            "meanMs": 1008.6033333333334
+          },
+          "cropResults": [
+            {
+              "fieldGroup": "metadata",
+              "status": "candidate",
+              "fields": {
+                "battleStart": "15.09.2024 11:56"
+              },
+              "elapsedMs": 2448.83,
+              "reason": null
+            },
+            {
+              "fieldGroup": "freeXp",
+              "status": "candidate",
+              "fields": {
+                "freeXp": "1188"
+              },
+              "elapsedMs": 292.98,
+              "reason": null
+            },
+            {
+              "fieldGroup": "xp",
+              "status": "candidate",
+              "fields": {
+                "xp": "5400"
+              },
+              "elapsedMs": 284,
+              "reason": null
+            }
+          ]
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]gtrain25465",
+            "actual": "[HO-FL]gtrain25465",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "Estuary",
+            "actual": "Estuary �",
+            "exact": false,
+            "kind": "accepted-wrong"
+          },
+          "mode": {
+            "expected": "Random Battle",
+            "actual": "Random Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "15.09.2024 11:56",
+            "actual": "15.09.2024 11:56",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 261393,
+            "actual": 261393,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 5400,
+            "actual": 5400,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 1188,
+            "actual": 1188,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 107925,
+            "actual": 107925,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "imag8e.png",
+        "elapsedMs": 41790,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": true,
+        "optionalExact": false,
+        "needsHumanReview": false,
+        "fallback": {
+          "status": "failed-open",
+          "elapsedMs": 5672,
+          "requestedFields": [
+            {
+              "field": "credits",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "180068"
+            },
+            {
+              "field": "xp",
+              "reasons": [
+                "unresolved-or-invalid",
+                "candidate-values-conflict"
+              ],
+              "currentValue": null
+            }
+          ],
+          "attemptedCrops": [
+            "credits",
+            "xp"
+          ],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]gtrain25465",
+            "actual": "[HO-FL]gtrain25465",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "Ring",
+            "actual": "Ring",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Random Battle",
+            "actual": "Random Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "08.08.2024 00:46",
+            "actual": "08.08.2024 00:46",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 180068,
+            "actual": 180068,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 5247,
+            "actual": null,
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "freeXp": {
+            "expected": 1184,
+            "actual": 1184,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 120649,
+            "actual": 120649,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "image.png",
+        "elapsedMs": 40371,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": false,
+        "optionalExact": false,
+        "needsHumanReview": true,
+        "fallback": {
+          "status": "complete",
+          "elapsedMs": 8554,
+          "requestedFields": [
+            {
+              "field": "map",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "Shards"
+            },
+            {
+              "field": "credits",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "966578"
+            },
+            {
+              "field": "xp",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "4056"
+            },
+            {
+              "field": "freeXp",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "5141"
+            }
+          ],
+          "attemptedCrops": [
+            "metadata",
+            "credits",
+            "freeXp",
+            "xp"
+          ],
+          "decisions": [
+            {
+              "field": "map",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "Shards �",
+              "source": "paddleocr-local-field-crop:metadata",
+              "confidenceCeiling": 84
+            },
+            {
+              "fieldGroup": "credits",
+              "status": "not-admitted",
+              "reason": "existing-field-parser-rejected-raw-output",
+              "rawText": "966 57"
+            },
+            {
+              "field": "freeXp",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "51",
+              "source": "paddleocr-local-field-crop:freeXp",
+              "confidenceCeiling": 84
+            },
+            {
+              "field": "xp",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "405",
+              "source": "paddleocr-local-field-crop:xp",
+              "confidenceCeiling": 84
+            }
+          ],
+          "cropLatency": {
+            "count": 4,
+            "totalMs": 3785.754,
+            "medianMs": 272.209,
+            "p95Ms": 2985.514,
+            "meanMs": 946.4385
+          },
+          "cropResults": [
+            {
+              "fieldGroup": "metadata",
+              "status": "candidate",
+              "fields": {
+                "map": "Shards �"
+              },
+              "elapsedMs": 2985.514,
+              "reason": null
+            },
+            {
+              "fieldGroup": "credits",
+              "status": "rejected",
+              "fields": {
+                "credits": null
+              },
+              "elapsedMs": 290.487,
+              "reason": "existing-field-parser-rejected-raw-output"
+            },
+            {
+              "fieldGroup": "freeXp",
+              "status": "candidate",
+              "fields": {
+                "freeXp": "51"
+              },
+              "elapsedMs": 237.544,
+              "reason": null
+            },
+            {
+              "fieldGroup": "xp",
+              "status": "candidate",
+              "fields": {
+                "xp": "405"
+              },
+              "elapsedMs": 272.209,
+              "reason": null
+            }
+          ]
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[PPP]Nightrise",
+            "actual": "[PPP]Nightrise",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "Shards",
+            "actual": "Shards",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Asymmetric Battle",
+            "actual": "Asymmetric Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "22.10.2026 21:24",
+            "actual": "22.10.2026 21:24",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 966578,
+            "actual": 966578,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 4056,
+            "actual": null,
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "freeXp": {
+            "expected": 5141,
+            "actual": null,
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "damage": {
+            "expected": 255359,
+            "actual": 255359,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "image1.png",
+        "elapsedMs": 42601,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": false,
+        "optionalExact": false,
+        "needsHumanReview": true,
+        "fallback": {
+          "status": "failed-open",
+          "elapsedMs": 6258,
+          "requestedFields": [
+            {
+              "field": "xp",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "92505"
+            },
+            {
+              "field": "freeXp",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "1695"
+            },
+            {
+              "field": "damage",
+              "reasons": [
+                "unresolved-or-invalid",
+                "existing-parser-ambiguity",
+                "candidate-values-conflict"
+              ],
+              "currentValue": null
+            }
+          ],
+          "attemptedCrops": [
+            "damage",
+            "freeXp",
+            "xp"
+          ],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[PPP]Nightrise",
+            "actual": "[PPP]Nightrise",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "Sleeping Giant",
+            "actual": "Sleeping Giant",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Asymmetric Battle",
+            "actual": "Asymmetric Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "16.09.2026 21:37",
+            "actual": "16.09.2026 21:37",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 552549,
+            "actual": 552549,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 9250,
+            "actual": 92505,
+            "exact": false,
+            "kind": "accepted-wrong"
+          },
+          "freeXp": {
+            "expected": 1695,
+            "actual": 1695,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 289577,
+            "actual": null,
+            "exact": false,
+            "kind": "unresolved"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "image2.png",
+        "elapsedMs": 41073,
+        "pipelineCompleted": true,
+        "exactRecord": true,
+        "mandatoryExactRecord": true,
+        "optionalExact": true,
+        "needsHumanReview": false,
+        "fallback": {
+          "status": "complete",
+          "elapsedMs": 7360,
+          "requestedFields": [
+            {
+              "field": "battleStart",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "11.09.2026 02:53"
+            },
+            {
+              "field": "credits",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "576099"
+            }
+          ],
+          "attemptedCrops": [
+            "metadata",
+            "credits"
+          ],
+          "decisions": [
+            {
+              "field": "battleStart",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "11.09.2026 02:53",
+              "source": "paddleocr-local-field-crop:metadata",
+              "confidenceCeiling": 84
+            },
+            {
+              "field": "credits",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "576099",
+              "source": "paddleocr-local-field-crop:credits",
+              "confidenceCeiling": 84
+            }
+          ],
+          "cropLatency": {
+            "count": 2,
+            "totalMs": 2538.3610000000003,
+            "medianMs": 297.427,
+            "p95Ms": 2240.934,
+            "meanMs": 1269.1805000000002
+          },
+          "cropResults": [
+            {
+              "fieldGroup": "metadata",
+              "status": "candidate",
+              "fields": {
+                "battleStart": "11.09.2026 02:53"
+              },
+              "elapsedMs": 2240.934,
+              "reason": null
+            },
+            {
+              "fieldGroup": "credits",
+              "status": "candidate",
+              "fields": {
+                "credits": "576099"
+              },
+              "elapsedMs": 297.427,
+              "reason": null
+            }
+          ]
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[PPP]Nightrise",
+            "actual": "[PPP]Nightrise",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "Loop",
+            "actual": "Loop",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Asymmetric Battle",
+            "actual": "Asymmetric Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "11.09.2026 02:53",
+            "actual": "11.09.2026 02:53",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 576099,
+            "actual": 576099,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 4290,
+            "actual": 4290,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 1743,
+            "actual": 1743,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 134953,
+            "actual": 134953,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "image3.png",
+        "elapsedMs": 41416,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": false,
+        "optionalExact": false,
+        "needsHumanReview": true,
+        "fallback": {
+          "status": "complete",
+          "elapsedMs": 8423,
+          "requestedFields": [
+            {
+              "field": "player",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "[W-G]Thone87_Scott_TS"
+            },
+            {
+              "field": "credits",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "566231"
+            },
+            {
+              "field": "xp",
+              "reasons": [
+                "unresolved-or-invalid"
+              ],
+              "currentValue": null
+            },
+            {
+              "field": "freeXp",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "2350"
+            }
+          ],
+          "attemptedCrops": [
+            "identity",
+            "credits",
+            "freeXp",
+            "xp"
+          ],
+          "decisions": [
+            {
+              "field": "player",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "[W-G]Tbone87_Scott_TS",
+              "source": "paddleocr-local-field-crop:identity",
+              "confidenceCeiling": 84
+            },
+            {
+              "fieldGroup": "credits",
+              "status": "not-admitted",
+              "reason": "existing-field-parser-rejected-raw-output",
+              "rawText": "566 23"
+            },
+            {
+              "field": "freeXp",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "2",
+              "source": "paddleocr-local-field-crop:freeXp",
+              "confidenceCeiling": 84
+            },
+            {
+              "field": "xp",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "664",
+              "source": "paddleocr-local-field-crop:xp",
+              "confidenceCeiling": 84
+            }
+          ],
+          "cropLatency": {
+            "count": 4,
+            "totalMs": 3559.252,
+            "medianMs": 252.293,
+            "p95Ms": 2775.125,
+            "meanMs": 889.813
+          },
+          "cropResults": [
+            {
+              "fieldGroup": "identity",
+              "status": "candidate",
+              "fields": {
+                "player": "[W-G]Tbone87_Scott_TS"
+              },
+              "elapsedMs": 2775.125,
+              "reason": null
+            },
+            {
+              "fieldGroup": "credits",
+              "status": "rejected",
+              "fields": {
+                "credits": null
+              },
+              "elapsedMs": 281.556,
+              "reason": "existing-field-parser-rejected-raw-output"
+            },
+            {
+              "fieldGroup": "freeXp",
+              "status": "candidate",
+              "fields": {
+                "freeXp": "2"
+              },
+              "elapsedMs": 250.278,
+              "reason": null
+            },
+            {
+              "fieldGroup": "xp",
+              "status": "candidate",
+              "fields": {
+                "xp": "664"
+              },
+              "elapsedMs": 252.293,
+              "reason": null
+            }
+          ]
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[W-G]Tbone87_Scott_TS",
+            "actual": "[W-G]Thone87_Scott_TS",
+            "exact": false,
+            "kind": "accepted-wrong"
+          },
+          "map": {
+            "expected": "Hotspot",
+            "actual": "Hotspot",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Asymmetric Battle",
+            "actual": "Asymmetric Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "15.12.2023 18:31",
+            "actual": "15.12.2023 18:31",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 566231,
+            "actual": 566231,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 6646,
+            "actual": null,
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "freeXp": {
+            "expected": 2350,
+            "actual": null,
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "damage": {
+            "expected": 172183,
+            "actual": 172183,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "image4.png",
+        "elapsedMs": 40918,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": false,
+        "optionalExact": true,
+        "needsHumanReview": true,
+        "fallback": {
+          "status": "complete",
+          "elapsedMs": 9560,
+          "requestedFields": [
+            {
+              "field": "map",
+              "reasons": [
+                "unresolved-or-invalid",
+                "existing-parser-ambiguity"
+              ],
+              "currentValue": null
+            },
+            {
+              "field": "mode",
+              "reasons": [
+                "unresolved-or-invalid",
+                "existing-parser-ambiguity"
+              ],
+              "currentValue": null
+            },
+            {
+              "field": "battleStart",
+              "reasons": [
+                "unresolved-or-invalid",
+                "existing-parser-ambiguity",
+                "candidate-values-conflict"
+              ],
+              "currentValue": null
+            },
+            {
+              "field": "credits",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "372648"
+            },
+            {
+              "field": "freeXp",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "1598"
+            }
+          ],
+          "attemptedCrops": [
+            "metadata",
+            "credits",
+            "freeXp"
+          ],
+          "decisions": [
+            {
+              "field": "map",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "Hotspot �",
+              "source": "paddleocr-local-field-crop:metadata",
+              "confidenceCeiling": 84
+            },
+            {
+              "field": "mode",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "Random Battle",
+              "source": "paddleocr-local-field-crop:metadata",
+              "confidenceCeiling": 84
+            },
+            {
+              "field": "battleStart",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "28.09.2024 17:04",
+              "source": "paddleocr-local-field-crop:metadata",
+              "confidenceCeiling": 84
+            },
+            {
+              "field": "credits",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "372648",
+              "source": "paddleocr-local-field-crop:credits",
+              "confidenceCeiling": 84
+            },
+            {
+              "field": "freeXp",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "159",
+              "source": "paddleocr-local-field-crop:freeXp",
+              "confidenceCeiling": 84
+            }
+          ],
+          "cropLatency": {
+            "count": 3,
+            "totalMs": 4868.381,
+            "medianMs": 299.346,
+            "p95Ms": 4313.103,
+            "meanMs": 1622.7936666666667
+          },
+          "cropResults": [
+            {
+              "fieldGroup": "metadata",
+              "status": "candidate",
+              "fields": {
+                "map": "Hotspot �",
+                "mode": "Random Battle",
+                "battleStart": "28.09.2024 17:04"
+              },
+              "elapsedMs": 4313.103,
+              "reason": null
+            },
+            {
+              "fieldGroup": "credits",
+              "status": "candidate",
+              "fields": {
+                "credits": "372648"
+              },
+              "elapsedMs": 299.346,
+              "reason": null
+            },
+            {
+              "fieldGroup": "freeXp",
+              "status": "candidate",
+              "fields": {
+                "freeXp": "159"
+              },
+              "elapsedMs": 255.932,
+              "reason": null
+            }
+          ]
+        },
+        "fields": {
+          "result": {
+            "expected": "Defeat",
+            "actual": "Defeat",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]gtrain25465",
+            "actual": "[HO-FL]gtrain25465",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "Hotspot",
+            "actual": "Hotspot �",
+            "exact": false,
+            "kind": "accepted-wrong"
+          },
+          "mode": {
+            "expected": "Random Battle",
+            "actual": "Random Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "28.09.2024 17:04",
+            "actual": "28.09.2024 17:04",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 372648,
+            "actual": 372648,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 6470,
+            "actual": 6470,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 1598,
+            "actual": null,
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "damage": {
+            "expected": 148626,
+            "actual": 148626,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "image5.png",
+        "elapsedMs": 50111,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": false,
+        "optionalExact": true,
+        "needsHumanReview": true,
+        "fallback": {
+          "status": "failed-open",
+          "elapsedMs": 15029,
+          "requestedFields": [
+            {
+              "field": "player",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "[HO-FL]VeritechCEO"
+            },
+            {
+              "field": "map",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "Hermes"
+            },
+            {
+              "field": "damage",
+              "reasons": [
+                "unresolved-or-invalid",
+                "existing-parser-ambiguity",
+                "candidate-values-conflict"
+              ],
+              "currentValue": null
+            }
+          ],
+          "attemptedCrops": [
+            "identity",
+            "metadata",
+            "damage"
+          ],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]VeritechCEO",
+            "actual": "[HO-FL]VeritechCEO",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "Hermes",
+            "actual": "Hermes",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Operations",
+            "actual": "Operations",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "18.09.2024 13:26",
+            "actual": "18.09.2024 13:26",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 370341,
+            "actual": 370341,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 6037,
+            "actual": 6037,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 6400,
+            "actual": 6400,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 166183,
+            "actual": null,
+            "exact": false,
+            "kind": "unresolved"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "image6.png",
+        "elapsedMs": 51790,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": false,
+        "optionalExact": true,
+        "needsHumanReview": true,
+        "fallback": {
+          "status": "complete",
+          "elapsedMs": 9808,
+          "requestedFields": [
+            {
+              "field": "map",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "Two Brothers"
+            },
+            {
+              "field": "credits",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "297514"
+            },
+            {
+              "field": "freeXp",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "1406"
+            }
+          ],
+          "attemptedCrops": [
+            "metadata",
+            "credits",
+            "freeXp"
+          ],
+          "decisions": [
+            {
+              "field": "map",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "Two Brothers �",
+              "source": "paddleocr-local-field-crop:metadata",
+              "confidenceCeiling": 84
+            },
+            {
+              "field": "credits",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "297514",
+              "source": "paddleocr-local-field-crop:credits",
+              "confidenceCeiling": 84
+            },
+            {
+              "field": "freeXp",
+              "status": "candidate-added-for-existing-consensus",
+              "candidate": "1400",
+              "source": "paddleocr-local-field-crop:freeXp",
+              "confidenceCeiling": 84
+            }
+          ],
+          "cropLatency": {
+            "count": 3,
+            "totalMs": 4693.482,
+            "medianMs": 338.04,
+            "p95Ms": 4070.658,
+            "meanMs": 1564.494
+          },
+          "cropResults": [
+            {
+              "fieldGroup": "metadata",
+              "status": "candidate",
+              "fields": {
+                "map": "Two Brothers �"
+              },
+              "elapsedMs": 4070.658,
+              "reason": null
+            },
+            {
+              "fieldGroup": "credits",
+              "status": "candidate",
+              "fields": {
+                "credits": "297514"
+              },
+              "elapsedMs": 338.04,
+              "reason": null
+            },
+            {
+              "fieldGroup": "freeXp",
+              "status": "candidate",
+              "fields": {
+                "freeXp": "1400"
+              },
+              "elapsedMs": 284.784,
+              "reason": null
+            }
+          ]
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]gtrain25465",
+            "actual": "[HO-FL]gtrain25465",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "Two Brothers",
+            "actual": "Two Brothers",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Random Battle",
+            "actual": "Random Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "16.09.2024 13:05",
+            "actual": "16.09.2024 13:05",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 297514,
+            "actual": 297514,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 7146,
+            "actual": 7146,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 1406,
+            "actual": null,
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "damage": {
+            "expected": 126457,
+            "actual": 126457,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "shot-26.08.31_16.22.19-0048.jpg",
+        "elapsedMs": 54380,
+        "pipelineCompleted": true,
+        "exactRecord": false,
+        "mandatoryExactRecord": false,
+        "optionalExact": true,
+        "needsHumanReview": true,
+        "fallback": {
+          "status": "failed-open",
+          "elapsedMs": 15027,
+          "requestedFields": [
+            {
+              "field": "map",
+              "reasons": [
+                "unresolved-or-invalid",
+                "existing-parser-ambiguity"
+              ],
+              "currentValue": null
+            },
+            {
+              "field": "mode",
+              "reasons": [
+                "unresolved-or-invalid",
+                "existing-parser-ambiguity"
+              ],
+              "currentValue": null
+            },
+            {
+              "field": "credits",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "211546"
+            },
+            {
+              "field": "xp",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "2960"
+            },
+            {
+              "field": "freeXp",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "1234"
+            },
+            {
+              "field": "damage",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "119195"
+            }
+          ],
+          "attemptedCrops": [
+            "metadata",
+            "credits",
+            "damage",
+            "freeXp",
+            "xp"
+          ],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]VeritechCEO",
+            "actual": "[HO-FL]VeritechCEO",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "Big Race",
+            "actual": "Not detected",
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "mode": {
+            "expected": "Random Battle",
+            "actual": "Not detected",
+            "exact": false,
+            "kind": "unresolved"
+          },
+          "battleStart": {
+            "expected": "31.08.2026 15:58",
+            "actual": "31.08.2026 15:58",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 211546,
+            "actual": 211546,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 2960,
+            "actual": 2960,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 1234,
+            "actual": 1234,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 119195,
+            "actual": 119195,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      },
+      {
+        "key": "unknown.png",
+        "elapsedMs": 43854,
+        "pipelineCompleted": true,
+        "exactRecord": true,
+        "mandatoryExactRecord": true,
+        "optionalExact": true,
+        "needsHumanReview": false,
+        "fallback": {
+          "status": "failed-open",
+          "elapsedMs": 9846,
+          "requestedFields": [
+            {
+              "field": "player",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "[HO-FL]Ken400"
+            },
+            {
+              "field": "freeXp",
+              "reasons": [
+                "candidate-values-conflict"
+              ],
+              "currentValue": "2632"
+            }
+          ],
+          "attemptedCrops": [
+            "identity",
+            "freeXp"
+          ],
+          "decisions": [],
+          "cropLatency": null,
+          "cropResults": []
+        },
+        "fields": {
+          "result": {
+            "expected": "Victory",
+            "actual": "Victory",
+            "exact": true,
+            "kind": "correct"
+          },
+          "player": {
+            "expected": "[HO-FL]Ken400",
+            "actual": "[HO-FL]Ken400",
+            "exact": true,
+            "kind": "correct"
+          },
+          "map": {
+            "expected": "Two Brothers",
+            "actual": "Two Brothers",
+            "exact": true,
+            "kind": "correct"
+          },
+          "mode": {
+            "expected": "Random Battle",
+            "actual": "Random Battle",
+            "exact": true,
+            "kind": "correct"
+          },
+          "battleStart": {
+            "expected": "18.08.2022 10:03",
+            "actual": "18.08.2022 10:03",
+            "exact": true,
+            "kind": "correct"
+          },
+          "credits": {
+            "expected": 828719,
+            "actual": 828719,
+            "exact": true,
+            "kind": "correct"
+          },
+          "xp": {
+            "expected": 31741,
+            "actual": 31741,
+            "exact": true,
+            "kind": "correct"
+          },
+          "freeXp": {
+            "expected": 2632,
+            "actual": 2632,
+            "exact": true,
+            "kind": "correct"
+          },
+          "damage": {
+            "expected": 122261,
+            "actual": 122261,
+            "exact": true,
+            "kind": "correct"
+          }
+        },
+        "error": null
+      }
+    ]
+  },
+  "deltas": {
+    "exactFields": -4,
+    "exactFieldAccuracy": -0.02777777777777779,
+    "completeRecords": -4,
+    "completeRecordAccuracy": -0.25,
+    "acceptedWrongFields": 2,
+    "unresolvedFields": 2,
+    "humanReviewRecords": 4,
+    "medianLatencyMs": 7703,
+    "p95LatencyMs": 15388
+  },
+  "mandatoryDeltas": {
+    "exactFields": -3,
+    "completeRecords": -4,
+    "acceptedWrongFields": 2,
+    "unresolvedFields": 1
+  },
+  "optionalDeltas": {
+    "exactFields": -1,
+    "acceptedWrongFields": 0,
+    "unresolvedFields": 1
+  },
+  "byFieldDelta": [
+    {
+      "field": "result",
+      "baselineCorrect": 16,
+      "candidateCorrect": 16,
+      "deltaCorrectFields": 0,
+      "baselineAccuracy": 1,
+      "candidateAccuracy": 1,
+      "accuracyDelta": 0
+    },
+    {
+      "field": "player",
+      "baselineCorrect": 12,
+      "candidateCorrect": 12,
+      "deltaCorrectFields": 0,
+      "baselineAccuracy": 0.75,
+      "candidateAccuracy": 0.75,
+      "accuracyDelta": 0
+    },
+    {
+      "field": "map",
+      "baselineCorrect": 12,
+      "candidateCorrect": 11,
+      "deltaCorrectFields": -1,
+      "baselineAccuracy": 0.75,
+      "candidateAccuracy": 0.6875,
+      "accuracyDelta": -0.0625
+    },
+    {
+      "field": "mode",
+      "baselineCorrect": 14,
+      "candidateCorrect": 15,
+      "deltaCorrectFields": 1,
+      "baselineAccuracy": 0.875,
+      "candidateAccuracy": 0.9375,
+      "accuracyDelta": 0.0625
+    },
+    {
+      "field": "battleStart",
+      "baselineCorrect": 13,
+      "candidateCorrect": 16,
+      "deltaCorrectFields": 3,
+      "baselineAccuracy": 0.8125,
+      "candidateAccuracy": 1,
+      "accuracyDelta": 0.1875
+    },
+    {
+      "field": "credits",
+      "baselineCorrect": 16,
+      "candidateCorrect": 16,
+      "deltaCorrectFields": 0,
+      "baselineAccuracy": 1,
+      "candidateAccuracy": 1,
+      "accuracyDelta": 0
+    },
+    {
+      "field": "xp",
+      "baselineCorrect": 13,
+      "candidateCorrect": 12,
+      "deltaCorrectFields": -1,
+      "baselineAccuracy": 0.8125,
+      "candidateAccuracy": 0.75,
+      "accuracyDelta": -0.0625
+    },
+    {
+      "field": "freeXp",
+      "baselineCorrect": 16,
+      "candidateCorrect": 10,
+      "deltaCorrectFields": -6,
+      "baselineAccuracy": 1,
+      "candidateAccuracy": 0.625,
+      "accuracyDelta": -0.375
+    },
+    {
+      "field": "damage",
+      "baselineCorrect": 12,
+      "candidateCorrect": 12,
+      "deltaCorrectFields": 0,
+      "baselineAccuracy": 0.75,
+      "candidateAccuracy": 0.75,
+      "accuracyDelta": 0
+    }
+  ],
+  "mandatoryByFieldDelta": [
+    {
+      "field": "result",
+      "baselineCorrect": 16,
+      "candidateCorrect": 16,
+      "deltaCorrectFields": 0,
+      "baselineAccuracy": 1,
+      "candidateAccuracy": 1,
+      "accuracyDelta": 0
+    },
+    {
+      "field": "player",
+      "baselineCorrect": 12,
+      "candidateCorrect": 12,
+      "deltaCorrectFields": 0,
+      "baselineAccuracy": 0.75,
+      "candidateAccuracy": 0.75,
+      "accuracyDelta": 0
+    },
+    {
+      "field": "map",
+      "baselineCorrect": 12,
+      "candidateCorrect": 11,
+      "deltaCorrectFields": -1,
+      "baselineAccuracy": 0.75,
+      "candidateAccuracy": 0.6875,
+      "accuracyDelta": -0.0625
+    },
+    {
+      "field": "mode",
+      "baselineCorrect": 14,
+      "candidateCorrect": 15,
+      "deltaCorrectFields": 1,
+      "baselineAccuracy": 0.875,
+      "candidateAccuracy": 0.9375,
+      "accuracyDelta": 0.0625
+    },
+    {
+      "field": "battleStart",
+      "baselineCorrect": 13,
+      "candidateCorrect": 16,
+      "deltaCorrectFields": 3,
+      "baselineAccuracy": 0.8125,
+      "candidateAccuracy": 1,
+      "accuracyDelta": 0.1875
+    },
+    {
+      "field": "credits",
+      "baselineCorrect": 16,
+      "candidateCorrect": 16,
+      "deltaCorrectFields": 0,
+      "baselineAccuracy": 1,
+      "candidateAccuracy": 1,
+      "accuracyDelta": 0
+    },
+    {
+      "field": "freeXp",
+      "baselineCorrect": 16,
+      "candidateCorrect": 10,
+      "deltaCorrectFields": -6,
+      "baselineAccuracy": 1,
+      "candidateAccuracy": 0.625,
+      "accuracyDelta": -0.375
+    },
+    {
+      "field": "damage",
+      "baselineCorrect": 12,
+      "candidateCorrect": 12,
+      "deltaCorrectFields": 0,
+      "baselineAccuracy": 0.75,
+      "candidateAccuracy": 0.75,
+      "accuracyDelta": 0
+    }
+  ],
+  "optionalByFieldDelta": [
+    {
+      "field": "xp",
+      "baselineCorrect": 13,
+      "candidateCorrect": 12,
+      "deltaCorrectFields": -1
+    }
+  ],
+  "interpretation": "Keep PaddleOCR disabled for production: compare optional XP diagnostically, but decide required-field acceptance using the eight mandatory fields. The current paired candidate worsens mandatory accuracy and false acceptance; the 16-image development corpus is not an untouched holdout."
+}

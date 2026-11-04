@@ -1,0 +1,3893 @@
+{
+  "reportMetadata": {
+    "package": {
+      "name": "wows-yolo-tourney-discord-bot",
+      "version": "2.5.0",
+      "engines": {
+        "node": ">=24.17.0"
+      }
+    },
+    "sourceBuild": {
+      "sha256": "6ffe93caa7d495532dad79b641af182a0515ac0d6cc13c5d6cb11fe7405e7d45",
+      "files": 74
+    },
+    "runtime": {
+      "node": "v24.17.0",
+      "platform": "linux",
+      "arch": "x64"
+    },
+    "engineVersions": {
+      "tesseractJs": "6.0.1",
+      "tesseractJsCore": "6.1.2"
+    },
+    "languageModel": {
+      "language": "eng",
+      "source": "eng.traineddata",
+      "sizeBytes": 5199098,
+      "sha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747"
+    },
+    "localAssets": [
+      {
+        "role": "language-model",
+        "path": "eng.traineddata",
+        "exists": true,
+        "sizeBytes": 5199098,
+        "sha256": "5dc5d8d640a212c9d6184921ba103b186f50e0fed9ee716c53e6b312b400d747"
+      },
+      {
+        "role": "worker-script",
+        "path": "node_modules/tesseract.js/src/worker-script/node/index.js",
+        "exists": true,
+        "sizeBytes": 771,
+        "sha256": "a973c23ce067bc752c0bf602297eac843098e531ac03f3ea34cdf694326a6d02"
+      },
+      {
+        "role": "wasm-core",
+        "path": "node_modules/tesseract.js-core/tesseract-core.wasm.js",
+        "exists": true,
+        "sizeBytes": 4750805,
+        "sha256": "e66872f6a76f5ad414d73d21512245df0de3060ad4871a97c47efceaab27b955"
+      },
+      {
+        "role": "wasm-core",
+        "path": "node_modules/tesseract.js-core/tesseract-core-simd.wasm.js",
+        "exists": true,
+        "sizeBytes": 4751193,
+        "sha256": "3b0678c47a8dea6abb931b214171c08b742a5b9a9fcbbb1a028a08d5de6e9d4c"
+      },
+      {
+        "role": "wasm-core",
+        "path": "node_modules/tesseract.js-core/tesseract-core-lstm.wasm.js",
+        "exists": true,
+        "sizeBytes": 3954181,
+        "sha256": "775a35df6f2ae100e02609443e6bd5cafcd07983dd6175454ca4a432a7730687"
+      },
+      {
+        "role": "wasm-core",
+        "path": "node_modules/tesseract.js-core/tesseract-core-simd-lstm.wasm.js",
+        "exists": true,
+        "sizeBytes": 3954569,
+        "sha256": "9d7c43fb206dc9f48475228b46bf35f888fa9e6259da2e67d5a75c77049f2dc7"
+      }
+    ]
+  },
+  "buildVersion": "2.5.0",
+  "packageName": "wows-yolo-tourney-discord-bot",
+  "packageEngines": {
+    "node": ">=24.17.0"
+  },
+  "createdAt": "2026-10-26T09:40:52.808Z",
+  "nodeVersion": "v24.17.0",
+  "configuredEngine": "tesseractjs",
+  "executionMode": "single sequential parent batch; each screenshot runs in an isolated supervised child whose close is confirmed before the next image",
+  "workerRecyclePerImage": true,
+  "operationTimeoutMs": 15000,
+  "fixtureOrder": [
+    "Screenshot_16.jpg",
+    "Screenshot_2023-02-21_20-54-39.png",
+    "Screenshot_2024-11-14_133326.png",
+    "WTF.jpg",
+    "World_of_Warships_2_20_2023_10_06_11_PM.png",
+    "imag7e.png",
+    "imag8e.png",
+    "image.png",
+    "image1.png",
+    "image2.png",
+    "image3.png",
+    "image4.png",
+    "image5.png",
+    "image6.png",
+    "shot-26.08.31_16.22.19-0048.jpg",
+    "unknown.png"
+  ],
+  "imageCount": 16,
+  "completedImages": 16,
+  "exactMatches": 10,
+  "requiredFieldsComplete": 12,
+  "durationMs": 713019,
+  "networkBlocked": true,
+  "results": [
+    {
+      "fixtureKey": "Screenshot_16.jpg",
+      "filename": "Screenshot_16.jpg",
+      "imageSha256": "4a58aad7cb1d21f9bb457e1ad728fee59ebff3873a1e47938cf401d41f784bbc",
+      "elapsedMs": 49654,
+      "pipelineCompleted": true,
+      "attempts": 3,
+      "selectedPageSegmentationMode": 3,
+      "confidence": 84,
+      "actual": {
+        "result": "Victory",
+        "player": "[HO-FL]VeritechCEO",
+        "map": "Aegis",
+        "mode": "Operations",
+        "battleStart": "09.10.2025 16:20",
+        "credits": 583527,
+        "xp": 6872,
+        "freeXp": 2856,
+        "damage": 401597
+      },
+      "expected": {
+        "result": "Victory",
+        "player": "[HO-FL]VeritechCEO",
+        "map": "Aegis",
+        "mode": "Operations",
+        "battleStart": "09.10.2025 16:20",
+        "credits": 583527,
+        "xp": 6872,
+        "freeXp": 2856,
+        "damage": 401597
+      },
+      "comparison": {
+        "result": {
+          "expected": "Victory",
+          "actual": "Victory",
+          "pass": true
+        },
+        "player": {
+          "expected": "[HO-FL]VeritechCEO",
+          "actual": "[HO-FL]VeritechCEO",
+          "pass": true
+        },
+        "map": {
+          "expected": "Aegis",
+          "actual": "Aegis",
+          "pass": true
+        },
+        "mode": {
+          "expected": "Operations",
+          "actual": "Operations",
+          "pass": true
+        },
+        "battleStart": {
+          "expected": "09.10.2025 16:20",
+          "actual": "09.10.2025 16:20",
+          "pass": true
+        },
+        "credits": {
+          "expected": 583527,
+          "actual": 583527,
+          "pass": true
+        },
+        "xp": {
+          "expected": 6872,
+          "actual": 6872,
+          "pass": true
+        },
+        "freeXp": {
+          "expected": 2856,
+          "actual": 2856,
+          "pass": true
+        },
+        "damage": {
+          "expected": 401597,
+          "actual": 401597,
+          "pass": true
+        }
+      },
+      "allExpectedFieldsPass": true,
+      "requiredMissing": [],
+      "ambiguities": {},
+      "paddleOcrFallback": {
+        "schemaVersion": 1,
+        "enabled": false,
+        "status": "disabled",
+        "elapsedMs": 0,
+        "reason": "PADDLEOCR_FIELD_FALLBACK is not 1"
+      },
+      "supervision": {
+        "closeConfirmed": true,
+        "childExitCode": 0,
+        "childSignal": null,
+        "elapsedMs": 49633,
+        "timeoutMs": 95000
+      },
+      "damageSelection": {
+        "candidates": [
+          {
+            "value": "401597",
+            "confidence": 84,
+            "source": "full-screen-psm-3"
+          },
+          {
+            "value": "401597",
+            "confidence": 69,
+            "source": "full-screen-psm-11"
+          }
+        ],
+        "selectedBy": "full-screen-consensus",
+        "selectedValue": "401597",
+        "conflictingFocusedValues": [
+          "401507"
+        ]
+      },
+      "damageCandidates": [
+        {
+          "value": "401597",
+          "confidence": 84,
+          "source": "full-screen-psm-3"
+        },
+        {
+          "value": "401597",
+          "confidence": 69,
+          "source": "full-screen-psm-11"
+        }
+      ],
+      "fullScreenDamageCandidates": [
+        {
+          "value": "401597",
+          "confidence": 84,
+          "source": "full-screen-psm-3"
+        },
+        {
+          "value": "401597",
+          "confidence": 69,
+          "source": "full-screen-psm-11"
+        }
+      ],
+      "damageOcrText": "401507"
+    },
+    {
+      "fixtureKey": "Screenshot_2023-02-21_20-54-39.png",
+      "filename": "Screenshot_2023-02-21_20-54-39.png",
+      "imageSha256": "42d40b0b87bb687003e86a1a939f3cf1563ddc2ab22f9f581b54ae0acad578f2",
+      "elapsedMs": 44943,
+      "pipelineCompleted": true,
+      "attempts": 3,
+      "selectedPageSegmentationMode": 3,
+      "confidence": 79,
+      "actual": {
+        "result": "Victory",
+        "player": "[HO-FL]kmcroy",
+        "map": "Northern Lights",
+        "mode": "Random Battle",
+        "battleStart": "21.02.2023 20:32",
+        "credits": 735475,
+        "xp": 13036,
+        "freeXp": 2208,
+        "damage": 127218
+      },
+      "expected": {
+        "result": "Victory",
+        "player": "[HO-FL]kmcroy",
+        "map": "Northern Lights",
+        "mode": "Random Battle",
+        "battleStart": "21.02.2023 20:32",
+        "credits": 735475,
+        "xp": 13036,
+        "freeXp": 2208,
+        "damage": 127218
+      },
+      "comparison": {
+        "result": {
+          "expected": "Victory",
+          "actual": "Victory",
+          "pass": true
+        },
+        "player": {
+          "expected": "[HO-FL]kmcroy",
+          "actual": "[HO-FL]kmcroy",
+          "pass": true
+        },
+        "map": {
+          "expected": "Northern Lights",
+          "actual": "Northern Lights",
+          "pass": true
+        },
+        "mode": {
+          "expected": "Random Battle",
+          "actual": "Random Battle",
+          "pass": true
+        },
+        "battleStart": {
+          "expected": "21.02.2023 20:32",
+          "actual": "21.02.2023 20:32",
+          "pass": true
+        },
+        "credits": {
+          "expected": 735475,
+          "actual": 735475,
+          "pass": true
+        },
+        "xp": {
+          "expected": 13036,
+          "actual": 13036,
+          "pass": true
+        },
+        "freeXp": {
+          "expected": 2208,
+          "actual": 2208,
+          "pass": true
+        },
+        "damage": {
+          "expected": 127218,
+          "actual": 127218,
+          "pass": true
+        }
+      },
+      "allExpectedFieldsPass": true,
+      "requiredMissing": [],
+      "ambiguities": {},
+      "paddleOcrFallback": {
+        "schemaVersion": 1,
+        "enabled": false,
+        "status": "disabled",
+        "elapsedMs": 0,
+        "reason": "PADDLEOCR_FIELD_FALLBACK is not 1"
+      },
+      "supervision": {
+        "closeConfirmed": true,
+        "childExitCode": 0,
+        "childSignal": null,
+        "elapsedMs": 44931,
+        "timeoutMs": 95000
+      },
+      "damageSelection": {
+        "candidates": [
+          {
+            "value": "127218",
+            "confidence": 0,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.100390625,
+            "cropPsm": 7
+          },
+          {
+            "value": "127218",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.100390625,
+            "cropPsm": 8
+          },
+          {
+            "value": "127218",
+            "confidence": 0,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.103515625,
+            "cropPsm": 7
+          },
+          {
+            "value": "127218",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.103515625,
+            "cropPsm": 8
+          },
+          {
+            "value": "127218",
+            "confidence": 21,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.106640625,
+            "cropPsm": 7
+          },
+          {
+            "value": "127218",
+            "confidence": 0,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.100390625,
+            "cropPsm": 7
+          },
+          {
+            "value": "127218",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.100390625,
+            "cropPsm": 8
+          },
+          {
+            "value": "127218",
+            "confidence": 0,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.103515625,
+            "cropPsm": 7
+          },
+          {
+            "value": "127218",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.103515625,
+            "cropPsm": 8
+          },
+          {
+            "value": "127218",
+            "confidence": 0,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.106640625,
+            "cropPsm": 7
+          },
+          {
+            "value": "127218",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.106640625,
+            "cropPsm": 8
+          },
+          {
+            "value": "127218",
+            "confidence": 59,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.096,
+            "cropPsm": 8
+          },
+          {
+            "value": "127218",
+            "confidence": 59,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.096,
+            "cropPsm": 13
+          },
+          {
+            "value": "127218",
+            "confidence": 18,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.098,
+            "cropPsm": 8
+          },
+          {
+            "value": "127218",
+            "confidence": 18,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.098,
+            "cropPsm": 13
+          },
+          {
+            "value": "127218",
+            "confidence": 20,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.1,
+            "cropPsm": 8
+          },
+          {
+            "value": "127218",
+            "confidence": 20,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.1,
+            "cropPsm": 13
+          }
+        ],
+        "selectedBy": "isolated-focused-crop-quorum-matches-full-screen",
+        "selectedValue": "127218",
+        "conflictingFocusedValues": [
+          "11218",
+          "1272181"
+        ]
+      },
+      "damageCandidates": [
+        {
+          "value": "127218",
+          "confidence": 0,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.100390625,
+          "cropPsm": 7
+        },
+        {
+          "value": "127218",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.100390625,
+          "cropPsm": 8
+        },
+        {
+          "value": "127218",
+          "confidence": 0,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.103515625,
+          "cropPsm": 7
+        },
+        {
+          "value": "127218",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.103515625,
+          "cropPsm": 8
+        },
+        {
+          "value": "127218",
+          "confidence": 21,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.106640625,
+          "cropPsm": 7
+        },
+        {
+          "value": "127218",
+          "confidence": 0,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.100390625,
+          "cropPsm": 7
+        },
+        {
+          "value": "127218",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.100390625,
+          "cropPsm": 8
+        },
+        {
+          "value": "127218",
+          "confidence": 0,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.103515625,
+          "cropPsm": 7
+        },
+        {
+          "value": "127218",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.103515625,
+          "cropPsm": 8
+        },
+        {
+          "value": "127218",
+          "confidence": 0,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.106640625,
+          "cropPsm": 7
+        },
+        {
+          "value": "127218",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.106640625,
+          "cropPsm": 8
+        },
+        {
+          "value": "127218",
+          "confidence": 59,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.096,
+          "cropPsm": 8
+        },
+        {
+          "value": "127218",
+          "confidence": 59,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.096,
+          "cropPsm": 13
+        },
+        {
+          "value": "127218",
+          "confidence": 18,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.098,
+          "cropPsm": 8
+        },
+        {
+          "value": "127218",
+          "confidence": 18,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.098,
+          "cropPsm": 13
+        },
+        {
+          "value": "127218",
+          "confidence": 20,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.1,
+          "cropPsm": 8
+        },
+        {
+          "value": "127218",
+          "confidence": 20,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.1,
+          "cropPsm": 13
+        }
+      ],
+      "fullScreenDamageCandidates": [
+        {
+          "value": "11218",
+          "confidence": 79,
+          "source": "full-screen-psm-3"
+        },
+        {
+          "value": "127218",
+          "confidence": 77,
+          "source": "full-screen-psm-11"
+        }
+      ],
+      "damageOcrText": "127218"
+    },
+    {
+      "fixtureKey": "Screenshot_2024-11-14_133326.png",
+      "filename": "Screenshot_2024-11-14_133326.png",
+      "imageSha256": "5e5bd7084cd20407e56b44714efd25e97be4cea463813f60e351f229a458768c",
+      "elapsedMs": 48389,
+      "pipelineCompleted": true,
+      "attempts": 3,
+      "selectedPageSegmentationMode": 3,
+      "confidence": 83,
+      "actual": {
+        "result": "Victory",
+        "player": "Not detected",
+        "map": "Sea of Fortune",
+        "mode": "Brawl",
+        "battleStart": "14.11.2024 13:26",
+        "credits": 1092292,
+        "xp": 8425,
+        "freeXp": 1904,
+        "damage": 58673
+      },
+      "expected": {
+        "result": "Victory",
+        "player": "[HO-FL]gtrain25465",
+        "map": "Sea of Fortune",
+        "mode": "Brawl",
+        "battleStart": "14.11.2024 13:26",
+        "credits": 1092292,
+        "xp": 8425,
+        "freeXp": 1904,
+        "damage": 58673
+      },
+      "comparison": {
+        "result": {
+          "expected": "Victory",
+          "actual": "Victory",
+          "pass": true
+        },
+        "player": {
+          "expected": "[HO-FL]gtrain25465",
+          "actual": "Not detected",
+          "pass": false
+        },
+        "map": {
+          "expected": "Sea of Fortune",
+          "actual": "Sea of Fortune",
+          "pass": true
+        },
+        "mode": {
+          "expected": "Brawl",
+          "actual": "Brawl",
+          "pass": true
+        },
+        "battleStart": {
+          "expected": "14.11.2024 13:26",
+          "actual": "14.11.2024 13:26",
+          "pass": true
+        },
+        "credits": {
+          "expected": 1092292,
+          "actual": 1092292,
+          "pass": true
+        },
+        "xp": {
+          "expected": 8425,
+          "actual": 8425,
+          "pass": true
+        },
+        "freeXp": {
+          "expected": 1904,
+          "actual": 1904,
+          "pass": true
+        },
+        "damage": {
+          "expected": 58673,
+          "actual": 58673,
+          "pass": true
+        }
+      },
+      "allExpectedFieldsPass": false,
+      "requiredMissing": [
+        {
+          "key": "player",
+          "reason": "Player OCR passes disagreed: [HOFL]girain25465 vs [HO-FL]gtrain25465 vs [HOF]girain25465 vs [HOZFL]otrain25465"
+        }
+      ],
+      "ambiguities": {
+        "player": "Player OCR passes disagreed: [HOFL]girain25465 vs [HO-FL]gtrain25465 vs [HOF]girain25465 vs [HOZFL]otrain25465"
+      },
+      "paddleOcrFallback": {
+        "schemaVersion": 1,
+        "enabled": false,
+        "status": "disabled",
+        "elapsedMs": 0,
+        "reason": "PADDLEOCR_FIELD_FALLBACK is not 1"
+      },
+      "supervision": {
+        "closeConfirmed": true,
+        "childExitCode": 0,
+        "childSignal": null,
+        "elapsedMs": 48376,
+        "timeoutMs": 95000
+      },
+      "damageSelection": {
+        "candidates": [
+          {
+            "value": "58673",
+            "confidence": 16,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.096,
+            "cropPsm": 8
+          },
+          {
+            "value": "58673",
+            "confidence": 16,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.096,
+            "cropPsm": 13
+          },
+          {
+            "value": "58673",
+            "confidence": 20,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.098,
+            "cropPsm": 8
+          },
+          {
+            "value": "58673",
+            "confidence": 20,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.098,
+            "cropPsm": 13
+          }
+        ],
+        "selectedBy": "combined-evidence",
+        "selectedValue": null,
+        "conflictingFocusedValues": []
+      },
+      "damageCandidates": [
+        {
+          "value": "58673",
+          "confidence": 16,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.096,
+          "cropPsm": 8
+        },
+        {
+          "value": "58673",
+          "confidence": 16,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.096,
+          "cropPsm": 13
+        },
+        {
+          "value": "58673",
+          "confidence": 20,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.098,
+          "cropPsm": 8
+        },
+        {
+          "value": "58673",
+          "confidence": 20,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.098,
+          "cropPsm": 13
+        }
+      ],
+      "fullScreenDamageCandidates": [],
+      "damageOcrText": "58673"
+    },
+    {
+      "fixtureKey": "WTF.jpg",
+      "filename": "WTF.jpg",
+      "imageSha256": "7b058cb31a047ed5671c5bce7d0ae9f6d285579a16b4660149f39eeb5a65590d",
+      "elapsedMs": 58223,
+      "pipelineCompleted": true,
+      "attempts": 3,
+      "selectedPageSegmentationMode": 3,
+      "confidence": 82,
+      "actual": {
+        "result": "Victory",
+        "player": "Not detected",
+        "map": "Not detected",
+        "mode": "Random Battle",
+        "battleStart": "13.07.2025 14:17",
+        "credits": 495530,
+        "xp": null,
+        "freeXp": 2350,
+        "damage": 31160
+      },
+      "expected": {
+        "result": "Victory",
+        "player": "[HO-FL]VeritechCEO",
+        "map": "North",
+        "mode": "Random Battle",
+        "battleStart": "13.07.2025 14:17",
+        "credits": 495530,
+        "xp": 6649,
+        "freeXp": 2350,
+        "damage": 31160
+      },
+      "comparison": {
+        "result": {
+          "expected": "Victory",
+          "actual": "Victory",
+          "pass": true
+        },
+        "player": {
+          "expected": "[HO-FL]VeritechCEO",
+          "actual": "Not detected",
+          "pass": false
+        },
+        "map": {
+          "expected": "North",
+          "actual": "Not detected",
+          "pass": false
+        },
+        "mode": {
+          "expected": "Random Battle",
+          "actual": "Random Battle",
+          "pass": true
+        },
+        "battleStart": {
+          "expected": "13.07.2025 14:17",
+          "actual": "13.07.2025 14:17",
+          "pass": true
+        },
+        "credits": {
+          "expected": 495530,
+          "actual": 495530,
+          "pass": true
+        },
+        "xp": {
+          "expected": 6649,
+          "actual": null,
+          "pass": false
+        },
+        "freeXp": {
+          "expected": 2350,
+          "actual": 2350,
+          "pass": true
+        },
+        "damage": {
+          "expected": 31160,
+          "actual": 31160,
+          "pass": true
+        }
+      },
+      "allExpectedFieldsPass": false,
+      "requiredMissing": [
+        {
+          "key": "player",
+          "reason": "OCR could not confidently read Player"
+        },
+        {
+          "key": "map",
+          "reason": "Map OCR passes disagreed: North vs NorthE vs Or vs I vs iil vs Norih vs NOTES"
+        }
+      ],
+      "ambiguities": {
+        "map": "Map OCR passes disagreed: North vs NorthE vs Or vs I vs iil vs Norih vs NOTES"
+      },
+      "paddleOcrFallback": {
+        "schemaVersion": 1,
+        "enabled": false,
+        "status": "disabled",
+        "elapsedMs": 0,
+        "reason": "PADDLEOCR_FIELD_FALLBACK is not 1"
+      },
+      "supervision": {
+        "closeConfirmed": true,
+        "childExitCode": 0,
+        "childSignal": null,
+        "elapsedMs": 58211,
+        "timeoutMs": 95000
+      },
+      "damageSelection": {
+        "candidates": [
+          {
+            "value": "31160",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.096,
+            "cropPsm": 8
+          },
+          {
+            "value": "31160",
+            "confidence": 0,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.096,
+            "cropPsm": 13
+          },
+          {
+            "value": "31160",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.098,
+            "cropPsm": 8
+          },
+          {
+            "value": "31160",
+            "confidence": 0,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.098,
+            "cropPsm": 13
+          },
+          {
+            "value": "31160",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.1,
+            "cropPsm": 8
+          },
+          {
+            "value": "31160",
+            "confidence": 0,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.1,
+            "cropPsm": 13
+          }
+        ],
+        "selectedBy": "combined-evidence",
+        "selectedValue": null,
+        "conflictingFocusedValues": []
+      },
+      "damageCandidates": [
+        {
+          "value": "31160",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.096,
+          "cropPsm": 8
+        },
+        {
+          "value": "31160",
+          "confidence": 0,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.096,
+          "cropPsm": 13
+        },
+        {
+          "value": "31160",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.098,
+          "cropPsm": 8
+        },
+        {
+          "value": "31160",
+          "confidence": 0,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.098,
+          "cropPsm": 13
+        },
+        {
+          "value": "31160",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.1,
+          "cropPsm": 8
+        },
+        {
+          "value": "31160",
+          "confidence": 0,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.1,
+          "cropPsm": 13
+        }
+      ],
+      "fullScreenDamageCandidates": [],
+      "damageOcrText": "31160"
+    },
+    {
+      "fixtureKey": "World_of_Warships_2_20_2023_10_06_11_PM.png",
+      "filename": "World_of_Warships_2_20_2023_10_06_11_PM.png",
+      "imageSha256": "7530fe8acbbab6682bccd7e80b2b5376cf02357f1ac5e66fe2876f000c5e1987",
+      "elapsedMs": 46178,
+      "pipelineCompleted": true,
+      "attempts": 3,
+      "selectedPageSegmentationMode": 3,
+      "confidence": 80,
+      "actual": {
+        "result": "Victory",
+        "player": "[HO-FL]LongchampGTS",
+        "map": "North",
+        "mode": "Random Battle",
+        "battleStart": "20.02.2023 21:44",
+        "credits": 667539,
+        "xp": 8184,
+        "freeXp": 3400,
+        "damage": 238630
+      },
+      "expected": {
+        "result": "Victory",
+        "player": "[HO-FL]LongchampGTS",
+        "map": "North",
+        "mode": "Random Battle",
+        "battleStart": "20.02.2023 21:44",
+        "credits": 667539,
+        "xp": 8184,
+        "freeXp": 3400,
+        "damage": 238630
+      },
+      "comparison": {
+        "result": {
+          "expected": "Victory",
+          "actual": "Victory",
+          "pass": true
+        },
+        "player": {
+          "expected": "[HO-FL]LongchampGTS",
+          "actual": "[HO-FL]LongchampGTS",
+          "pass": true
+        },
+        "map": {
+          "expected": "North",
+          "actual": "North",
+          "pass": true
+        },
+        "mode": {
+          "expected": "Random Battle",
+          "actual": "Random Battle",
+          "pass": true
+        },
+        "battleStart": {
+          "expected": "20.02.2023 21:44",
+          "actual": "20.02.2023 21:44",
+          "pass": true
+        },
+        "credits": {
+          "expected": 667539,
+          "actual": 667539,
+          "pass": true
+        },
+        "xp": {
+          "expected": 8184,
+          "actual": 8184,
+          "pass": true
+        },
+        "freeXp": {
+          "expected": 3400,
+          "actual": 3400,
+          "pass": true
+        },
+        "damage": {
+          "expected": 238630,
+          "actual": 238630,
+          "pass": true
+        }
+      },
+      "allExpectedFieldsPass": true,
+      "requiredMissing": [],
+      "ambiguities": {},
+      "paddleOcrFallback": {
+        "schemaVersion": 1,
+        "enabled": false,
+        "status": "disabled",
+        "elapsedMs": 0,
+        "reason": "PADDLEOCR_FIELD_FALLBACK is not 1"
+      },
+      "supervision": {
+        "closeConfirmed": true,
+        "childExitCode": 0,
+        "childSignal": null,
+        "elapsedMs": 46169,
+        "timeoutMs": 95000
+      },
+      "damageSelection": {
+        "candidates": [
+          {
+            "value": "238630",
+            "confidence": 80,
+            "source": "full-screen-psm-3"
+          },
+          {
+            "value": "238630",
+            "confidence": 75,
+            "source": "full-screen-psm-11"
+          }
+        ],
+        "selectedBy": "full-screen-consensus",
+        "selectedValue": "238630",
+        "conflictingFocusedValues": []
+      },
+      "damageCandidates": [
+        {
+          "value": "238630",
+          "confidence": 80,
+          "source": "full-screen-psm-3"
+        },
+        {
+          "value": "238630",
+          "confidence": 75,
+          "source": "full-screen-psm-11"
+        }
+      ],
+      "fullScreenDamageCandidates": [
+        {
+          "value": "238630",
+          "confidence": 80,
+          "source": "full-screen-psm-3"
+        },
+        {
+          "value": "238630",
+          "confidence": 75,
+          "source": "full-screen-psm-11"
+        }
+      ],
+      "damageOcrText": "238630"
+    },
+    {
+      "fixtureKey": "imag7e.png",
+      "filename": "imag7e.png",
+      "imageSha256": "4879e6287c975ecdb7745ecd893102f8032eb2b7c4524caa58b884b2674e3748",
+      "elapsedMs": 37188,
+      "pipelineCompleted": true,
+      "attempts": 3,
+      "selectedPageSegmentationMode": 3,
+      "confidence": 70,
+      "actual": {
+        "result": "Victory",
+        "player": "[HO-FL]gtrain25465",
+        "map": "Estuary",
+        "mode": "Random Battle",
+        "battleStart": "15.09.2024 11:56",
+        "credits": 261393,
+        "xp": 5400,
+        "freeXp": 1188,
+        "damage": 107925
+      },
+      "expected": {
+        "result": "Victory",
+        "player": "[HO-FL]gtrain25465",
+        "map": "Estuary",
+        "mode": "Random Battle",
+        "battleStart": "15.09.2024 11:56",
+        "credits": 261393,
+        "xp": 5400,
+        "freeXp": 1188,
+        "damage": 107925
+      },
+      "comparison": {
+        "result": {
+          "expected": "Victory",
+          "actual": "Victory",
+          "pass": true
+        },
+        "player": {
+          "expected": "[HO-FL]gtrain25465",
+          "actual": "[HO-FL]gtrain25465",
+          "pass": true
+        },
+        "map": {
+          "expected": "Estuary",
+          "actual": "Estuary",
+          "pass": true
+        },
+        "mode": {
+          "expected": "Random Battle",
+          "actual": "Random Battle",
+          "pass": true
+        },
+        "battleStart": {
+          "expected": "15.09.2024 11:56",
+          "actual": "15.09.2024 11:56",
+          "pass": true
+        },
+        "credits": {
+          "expected": 261393,
+          "actual": 261393,
+          "pass": true
+        },
+        "xp": {
+          "expected": 5400,
+          "actual": 5400,
+          "pass": true
+        },
+        "freeXp": {
+          "expected": 1188,
+          "actual": 1188,
+          "pass": true
+        },
+        "damage": {
+          "expected": 107925,
+          "actual": 107925,
+          "pass": true
+        }
+      },
+      "allExpectedFieldsPass": true,
+      "requiredMissing": [],
+      "ambiguities": {},
+      "paddleOcrFallback": {
+        "schemaVersion": 1,
+        "enabled": false,
+        "status": "disabled",
+        "elapsedMs": 0,
+        "reason": "PADDLEOCR_FIELD_FALLBACK is not 1"
+      },
+      "supervision": {
+        "closeConfirmed": true,
+        "childExitCode": 0,
+        "childSignal": null,
+        "elapsedMs": 37181,
+        "timeoutMs": 95000
+      },
+      "damageSelection": {
+        "candidates": [
+          {
+            "value": "107925",
+            "confidence": 70,
+            "source": "full-screen-psm-3"
+          },
+          {
+            "value": "107925",
+            "confidence": 66,
+            "source": "full-screen-psm-11"
+          }
+        ],
+        "selectedBy": "full-screen-consensus",
+        "selectedValue": "107925",
+        "conflictingFocusedValues": [
+          "13940",
+          "10920"
+        ]
+      },
+      "damageCandidates": [
+        {
+          "value": "107925",
+          "confidence": 70,
+          "source": "full-screen-psm-3"
+        },
+        {
+          "value": "107925",
+          "confidence": 66,
+          "source": "full-screen-psm-11"
+        }
+      ],
+      "fullScreenDamageCandidates": [
+        {
+          "value": "107925",
+          "confidence": 70,
+          "source": "full-screen-psm-3"
+        },
+        {
+          "value": "107925",
+          "confidence": 66,
+          "source": "full-screen-psm-11"
+        }
+      ],
+      "damageOcrText": "10920"
+    },
+    {
+      "fixtureKey": "imag8e.png",
+      "filename": "imag8e.png",
+      "imageSha256": "239fe1633efad6fd3732879f0f7867913144bb34fcaab34f044f96173504a67e",
+      "elapsedMs": 52100,
+      "pipelineCompleted": true,
+      "attempts": 3,
+      "selectedPageSegmentationMode": 3,
+      "confidence": 76,
+      "actual": {
+        "result": "Victory",
+        "player": "[HO-FL]gtrain25465",
+        "map": "Ring",
+        "mode": "Random Battle",
+        "battleStart": "08.08.2024 00:46",
+        "credits": 180068,
+        "xp": 5247,
+        "freeXp": 1184,
+        "damage": 120649
+      },
+      "expected": {
+        "result": "Victory",
+        "player": "[HO-FL]gtrain25465",
+        "map": "Ring",
+        "mode": "Random Battle",
+        "battleStart": "08.08.2024 00:46",
+        "credits": 180068,
+        "xp": 5247,
+        "freeXp": 1184,
+        "damage": 120649
+      },
+      "comparison": {
+        "result": {
+          "expected": "Victory",
+          "actual": "Victory",
+          "pass": true
+        },
+        "player": {
+          "expected": "[HO-FL]gtrain25465",
+          "actual": "[HO-FL]gtrain25465",
+          "pass": true
+        },
+        "map": {
+          "expected": "Ring",
+          "actual": "Ring",
+          "pass": true
+        },
+        "mode": {
+          "expected": "Random Battle",
+          "actual": "Random Battle",
+          "pass": true
+        },
+        "battleStart": {
+          "expected": "08.08.2024 00:46",
+          "actual": "08.08.2024 00:46",
+          "pass": true
+        },
+        "credits": {
+          "expected": 180068,
+          "actual": 180068,
+          "pass": true
+        },
+        "xp": {
+          "expected": 5247,
+          "actual": 5247,
+          "pass": true
+        },
+        "freeXp": {
+          "expected": 1184,
+          "actual": 1184,
+          "pass": true
+        },
+        "damage": {
+          "expected": 120649,
+          "actual": 120649,
+          "pass": true
+        }
+      },
+      "allExpectedFieldsPass": true,
+      "requiredMissing": [],
+      "ambiguities": {},
+      "paddleOcrFallback": {
+        "schemaVersion": 1,
+        "enabled": false,
+        "status": "disabled",
+        "elapsedMs": 0,
+        "reason": "PADDLEOCR_FIELD_FALLBACK is not 1"
+      },
+      "supervision": {
+        "closeConfirmed": true,
+        "childExitCode": 0,
+        "childSignal": null,
+        "elapsedMs": 52088,
+        "timeoutMs": 95000
+      },
+      "damageSelection": {
+        "candidates": [
+          {
+            "value": "120649",
+            "confidence": 0,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10216110019646366,
+            "cropPsm": 7
+          },
+          {
+            "value": "120649",
+            "confidence": 23,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10216110019646366,
+            "cropPsm": 8
+          },
+          {
+            "value": "120649",
+            "confidence": 0,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10530451866404715,
+            "cropPsm": 7
+          },
+          {
+            "value": "120649",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10530451866404715,
+            "cropPsm": 8
+          },
+          {
+            "value": "120649",
+            "confidence": 0,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10844793713163065,
+            "cropPsm": 7
+          },
+          {
+            "value": "120649",
+            "confidence": 26,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10844793713163065,
+            "cropPsm": 8
+          },
+          {
+            "value": "120649",
+            "confidence": 0,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10216110019646366,
+            "cropPsm": 7
+          },
+          {
+            "value": "120649",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10216110019646366,
+            "cropPsm": 8
+          },
+          {
+            "value": "120649",
+            "confidence": 37,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10530451866404715,
+            "cropPsm": 7
+          },
+          {
+            "value": "120649",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10530451866404715,
+            "cropPsm": 8
+          },
+          {
+            "value": "120649",
+            "confidence": 0,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10844793713163065,
+            "cropPsm": 7
+          },
+          {
+            "value": "120649",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10844793713163065,
+            "cropPsm": 8
+          },
+          {
+            "value": "120649",
+            "confidence": 27,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.096,
+            "cropPsm": 8
+          },
+          {
+            "value": "120649",
+            "confidence": 27,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.096,
+            "cropPsm": 13
+          },
+          {
+            "value": "120649",
+            "confidence": 30,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.098,
+            "cropPsm": 8
+          },
+          {
+            "value": "120649",
+            "confidence": 30,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.098,
+            "cropPsm": 13
+          },
+          {
+            "value": "120649",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.1,
+            "cropPsm": 8
+          },
+          {
+            "value": "120649",
+            "confidence": 0,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.1,
+            "cropPsm": 13
+          }
+        ],
+        "selectedBy": "isolated-focused-crop-quorum-matches-full-screen",
+        "selectedValue": "120649",
+        "conflictingFocusedValues": [
+          "120609"
+        ]
+      },
+      "damageCandidates": [
+        {
+          "value": "120649",
+          "confidence": 0,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10216110019646366,
+          "cropPsm": 7
+        },
+        {
+          "value": "120649",
+          "confidence": 23,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10216110019646366,
+          "cropPsm": 8
+        },
+        {
+          "value": "120649",
+          "confidence": 0,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10530451866404715,
+          "cropPsm": 7
+        },
+        {
+          "value": "120649",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10530451866404715,
+          "cropPsm": 8
+        },
+        {
+          "value": "120649",
+          "confidence": 0,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10844793713163065,
+          "cropPsm": 7
+        },
+        {
+          "value": "120649",
+          "confidence": 26,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10844793713163065,
+          "cropPsm": 8
+        },
+        {
+          "value": "120649",
+          "confidence": 0,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10216110019646366,
+          "cropPsm": 7
+        },
+        {
+          "value": "120649",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10216110019646366,
+          "cropPsm": 8
+        },
+        {
+          "value": "120649",
+          "confidence": 37,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10530451866404715,
+          "cropPsm": 7
+        },
+        {
+          "value": "120649",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10530451866404715,
+          "cropPsm": 8
+        },
+        {
+          "value": "120649",
+          "confidence": 0,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10844793713163065,
+          "cropPsm": 7
+        },
+        {
+          "value": "120649",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10844793713163065,
+          "cropPsm": 8
+        },
+        {
+          "value": "120649",
+          "confidence": 27,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.096,
+          "cropPsm": 8
+        },
+        {
+          "value": "120649",
+          "confidence": 27,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.096,
+          "cropPsm": 13
+        },
+        {
+          "value": "120649",
+          "confidence": 30,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.098,
+          "cropPsm": 8
+        },
+        {
+          "value": "120649",
+          "confidence": 30,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.098,
+          "cropPsm": 13
+        },
+        {
+          "value": "120649",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.1,
+          "cropPsm": 8
+        },
+        {
+          "value": "120649",
+          "confidence": 0,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.1,
+          "cropPsm": 13
+        }
+      ],
+      "fullScreenDamageCandidates": [
+        {
+          "value": "120609",
+          "confidence": 76,
+          "source": "full-screen-psm-3"
+        },
+        {
+          "value": "120649",
+          "confidence": 74,
+          "source": "full-screen-psm-11"
+        }
+      ],
+      "damageOcrText": "120649"
+    },
+    {
+      "fixtureKey": "image.png",
+      "filename": "image.png",
+      "imageSha256": "6da867a4086b3588cbc868bfe52869b9d7bb1121b3532091e495f70fc5c94035",
+      "elapsedMs": 37269,
+      "pipelineCompleted": true,
+      "attempts": 3,
+      "selectedPageSegmentationMode": 3,
+      "confidence": 86,
+      "actual": {
+        "result": "Victory",
+        "player": "[PPP]Nightrise",
+        "map": "Shards",
+        "mode": "Asymmetric Battle",
+        "battleStart": "22.10.2026 21:24",
+        "credits": 966578,
+        "xp": 4056,
+        "freeXp": 5141,
+        "damage": 255359
+      },
+      "expected": {
+        "result": "Victory",
+        "player": "[PPP]Nightrise",
+        "map": "Shards",
+        "mode": "Asymmetric Battle",
+        "battleStart": "22.10.2026 21:24",
+        "credits": 966578,
+        "xp": 4056,
+        "freeXp": 5141,
+        "damage": 255359
+      },
+      "comparison": {
+        "result": {
+          "expected": "Victory",
+          "actual": "Victory",
+          "pass": true
+        },
+        "player": {
+          "expected": "[PPP]Nightrise",
+          "actual": "[PPP]Nightrise",
+          "pass": true
+        },
+        "map": {
+          "expected": "Shards",
+          "actual": "Shards",
+          "pass": true
+        },
+        "mode": {
+          "expected": "Asymmetric Battle",
+          "actual": "Asymmetric Battle",
+          "pass": true
+        },
+        "battleStart": {
+          "expected": "22.10.2026 21:24",
+          "actual": "22.10.2026 21:24",
+          "pass": true
+        },
+        "credits": {
+          "expected": 966578,
+          "actual": 966578,
+          "pass": true
+        },
+        "xp": {
+          "expected": 4056,
+          "actual": 4056,
+          "pass": true
+        },
+        "freeXp": {
+          "expected": 5141,
+          "actual": 5141,
+          "pass": true
+        },
+        "damage": {
+          "expected": 255359,
+          "actual": 255359,
+          "pass": true
+        }
+      },
+      "allExpectedFieldsPass": true,
+      "requiredMissing": [],
+      "ambiguities": {},
+      "paddleOcrFallback": {
+        "schemaVersion": 1,
+        "enabled": false,
+        "status": "disabled",
+        "elapsedMs": 0,
+        "reason": "PADDLEOCR_FIELD_FALLBACK is not 1"
+      },
+      "supervision": {
+        "closeConfirmed": true,
+        "childExitCode": 0,
+        "childSignal": null,
+        "elapsedMs": 37261,
+        "timeoutMs": 95000
+      },
+      "damageSelection": {
+        "candidates": [
+          {
+            "value": "255359",
+            "confidence": 70,
+            "source": "full-screen-psm-11",
+            "supportedByIsolatedPrefixQuorum": true
+          }
+        ],
+        "selectedBy": "isolated-focused-prefix-supports-six-digit-full-screen",
+        "selectedValue": "255359",
+        "conflictingFocusedValues": [
+          "25535"
+        ]
+      },
+      "damageCandidates": [
+        {
+          "value": "255359",
+          "confidence": 70,
+          "source": "full-screen-psm-11",
+          "supportedByIsolatedPrefixQuorum": true
+        }
+      ],
+      "fullScreenDamageCandidates": [
+        {
+          "value": "255359",
+          "confidence": 70,
+          "source": "full-screen-psm-11"
+        }
+      ],
+      "damageOcrText": "25535"
+    },
+    {
+      "fixtureKey": "image1.png",
+      "filename": "image1.png",
+      "imageSha256": "dedbaf1296b0541b5592629cd7967ebe577c8e7de340bf7f7b18cf06bc05f3b7",
+      "elapsedMs": 40757,
+      "pipelineCompleted": true,
+      "attempts": 3,
+      "selectedPageSegmentationMode": 3,
+      "confidence": 75,
+      "actual": {
+        "result": "Victory",
+        "player": "[PPP]Nightrise",
+        "map": "Sleeping Giant",
+        "mode": "Asymmetric Battle",
+        "battleStart": "16.09.2026 21:37",
+        "credits": 552549,
+        "xp": 92505,
+        "freeXp": 1695,
+        "damage": 289577
+      },
+      "expected": {
+        "result": "Victory",
+        "player": "[PPP]Nightrise",
+        "map": "Sleeping Giant",
+        "mode": "Asymmetric Battle",
+        "battleStart": "16.09.2026 21:37",
+        "credits": 552549,
+        "xp": 9250,
+        "freeXp": 1695,
+        "damage": 289577
+      },
+      "comparison": {
+        "result": {
+          "expected": "Victory",
+          "actual": "Victory",
+          "pass": true
+        },
+        "player": {
+          "expected": "[PPP]Nightrise",
+          "actual": "[PPP]Nightrise",
+          "pass": true
+        },
+        "map": {
+          "expected": "Sleeping Giant",
+          "actual": "Sleeping Giant",
+          "pass": true
+        },
+        "mode": {
+          "expected": "Asymmetric Battle",
+          "actual": "Asymmetric Battle",
+          "pass": true
+        },
+        "battleStart": {
+          "expected": "16.09.2026 21:37",
+          "actual": "16.09.2026 21:37",
+          "pass": true
+        },
+        "credits": {
+          "expected": 552549,
+          "actual": 552549,
+          "pass": true
+        },
+        "xp": {
+          "expected": 9250,
+          "actual": 92505,
+          "pass": false
+        },
+        "freeXp": {
+          "expected": 1695,
+          "actual": 1695,
+          "pass": true
+        },
+        "damage": {
+          "expected": 289577,
+          "actual": 289577,
+          "pass": true
+        }
+      },
+      "allExpectedFieldsPass": false,
+      "requiredMissing": [],
+      "ambiguities": {
+        "ship": "Ship OCR passes disagreed: X WAMI vs IX IWAMI"
+      },
+      "paddleOcrFallback": {
+        "schemaVersion": 1,
+        "enabled": false,
+        "status": "disabled",
+        "elapsedMs": 0,
+        "reason": "PADDLEOCR_FIELD_FALLBACK is not 1"
+      },
+      "supervision": {
+        "closeConfirmed": true,
+        "childExitCode": 0,
+        "childSignal": null,
+        "elapsedMs": 40745,
+        "timeoutMs": 95000
+      },
+      "damageSelection": {
+        "candidates": [
+          {
+            "value": "289577",
+            "confidence": 13,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.104,
+            "cropPsm": 8
+          },
+          {
+            "value": "289577",
+            "confidence": 13,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.104,
+            "cropPsm": 13
+          },
+          {
+            "value": "289577",
+            "confidence": 20,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.106,
+            "cropPsm": 8
+          },
+          {
+            "value": "289577",
+            "confidence": 20,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.106,
+            "cropPsm": 13
+          }
+        ],
+        "selectedBy": "isolated-focused-crop-consensus-excludes-adjacent-ui",
+        "selectedValue": "289577",
+        "conflictingFocusedValues": [
+          "2895770"
+        ]
+      },
+      "damageCandidates": [
+        {
+          "value": "289577",
+          "confidence": 13,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.104,
+          "cropPsm": 8
+        },
+        {
+          "value": "289577",
+          "confidence": 13,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.104,
+          "cropPsm": 13
+        },
+        {
+          "value": "289577",
+          "confidence": 20,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.106,
+          "cropPsm": 8
+        },
+        {
+          "value": "289577",
+          "confidence": 20,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.106,
+          "cropPsm": 13
+        }
+      ],
+      "fullScreenDamageCandidates": [
+        {
+          "value": "2895770",
+          "confidence": 75,
+          "source": "full-screen-psm-3"
+        },
+        {
+          "value": "2895770",
+          "confidence": 71,
+          "source": "full-screen-psm-11"
+        }
+      ],
+      "damageOcrText": "289577"
+    },
+    {
+      "fixtureKey": "image2.png",
+      "filename": "image2.png",
+      "imageSha256": "70cda4e727f1c6560458d8767ab42eb433d3df27ffce4df098cd1d10a533fe42",
+      "elapsedMs": 39573,
+      "pipelineCompleted": true,
+      "attempts": 3,
+      "selectedPageSegmentationMode": 3,
+      "confidence": 83,
+      "actual": {
+        "result": "Victory",
+        "player": "[PPP]Nightrise",
+        "map": "Loop",
+        "mode": "Asymmetric Battle",
+        "battleStart": "11.09.2026 02:53",
+        "credits": 576099,
+        "xp": 4290,
+        "freeXp": 1743,
+        "damage": null
+      },
+      "expected": {
+        "result": "Victory",
+        "player": "[PPP]Nightrise",
+        "map": "Loop",
+        "mode": "Asymmetric Battle",
+        "battleStart": "11.09.2026 02:53",
+        "credits": 576099,
+        "xp": 4290,
+        "freeXp": 1743,
+        "damage": 134953
+      },
+      "comparison": {
+        "result": {
+          "expected": "Victory",
+          "actual": "Victory",
+          "pass": true
+        },
+        "player": {
+          "expected": "[PPP]Nightrise",
+          "actual": "[PPP]Nightrise",
+          "pass": true
+        },
+        "map": {
+          "expected": "Loop",
+          "actual": "Loop",
+          "pass": true
+        },
+        "mode": {
+          "expected": "Asymmetric Battle",
+          "actual": "Asymmetric Battle",
+          "pass": true
+        },
+        "battleStart": {
+          "expected": "11.09.2026 02:53",
+          "actual": "11.09.2026 02:53",
+          "pass": true
+        },
+        "credits": {
+          "expected": 576099,
+          "actual": 576099,
+          "pass": true
+        },
+        "xp": {
+          "expected": 4290,
+          "actual": 4290,
+          "pass": true
+        },
+        "freeXp": {
+          "expected": 1743,
+          "actual": 1743,
+          "pass": true
+        },
+        "damage": {
+          "expected": 134953,
+          "actual": null,
+          "pass": false
+        }
+      },
+      "allExpectedFieldsPass": false,
+      "requiredMissing": [
+        {
+          "key": "damage",
+          "reason": "Damage OCR passes disagreed: 13495 vs 1349538"
+        }
+      ],
+      "ambiguities": {
+        "ship": "Ship was readable in only one OCR pass (confidence 83%); another agreeing read or manual correction is needed",
+        "damage": "Damage OCR passes disagreed: 13495 vs 1349538"
+      },
+      "paddleOcrFallback": {
+        "schemaVersion": 1,
+        "enabled": false,
+        "status": "disabled",
+        "elapsedMs": 0,
+        "reason": "PADDLEOCR_FIELD_FALLBACK is not 1"
+      },
+      "supervision": {
+        "closeConfirmed": true,
+        "childExitCode": 0,
+        "childSignal": null,
+        "elapsedMs": 39565,
+        "timeoutMs": 95000
+      },
+      "damageSelection": {
+        "candidates": [
+          {
+            "value": "13495",
+            "confidence": 26,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.098,
+            "cropPsm": 8
+          },
+          {
+            "value": "13495",
+            "confidence": 26,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.098,
+            "cropPsm": 13
+          },
+          {
+            "value": "13495",
+            "confidence": 30,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.1,
+            "cropPsm": 8
+          },
+          {
+            "value": "13495",
+            "confidence": 30,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.1,
+            "cropPsm": 13
+          },
+          {
+            "value": "13495",
+            "confidence": 55,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.102,
+            "cropPsm": 8
+          },
+          {
+            "value": "13495",
+            "confidence": 55,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.102,
+            "cropPsm": 13
+          },
+          {
+            "value": "13495",
+            "confidence": 57,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.104,
+            "cropPsm": 8
+          },
+          {
+            "value": "13495",
+            "confidence": 57,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.104,
+            "cropPsm": 13
+          },
+          {
+            "value": "13495",
+            "confidence": 27,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.106,
+            "cropPsm": 8
+          },
+          {
+            "value": "13495",
+            "confidence": 27,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.106,
+            "cropPsm": 13
+          },
+          {
+            "value": "1349538",
+            "confidence": 83,
+            "source": "full-screen-psm-3"
+          }
+        ],
+        "selectedBy": "combined-evidence",
+        "selectedValue": null,
+        "conflictingFocusedValues": []
+      },
+      "damageCandidates": [
+        {
+          "value": "13495",
+          "confidence": 26,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.098,
+          "cropPsm": 8
+        },
+        {
+          "value": "13495",
+          "confidence": 26,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.098,
+          "cropPsm": 13
+        },
+        {
+          "value": "13495",
+          "confidence": 30,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.1,
+          "cropPsm": 8
+        },
+        {
+          "value": "13495",
+          "confidence": 30,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.1,
+          "cropPsm": 13
+        },
+        {
+          "value": "13495",
+          "confidence": 55,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.102,
+          "cropPsm": 8
+        },
+        {
+          "value": "13495",
+          "confidence": 55,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.102,
+          "cropPsm": 13
+        },
+        {
+          "value": "13495",
+          "confidence": 57,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.104,
+          "cropPsm": 8
+        },
+        {
+          "value": "13495",
+          "confidence": 57,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.104,
+          "cropPsm": 13
+        },
+        {
+          "value": "13495",
+          "confidence": 27,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.106,
+          "cropPsm": 8
+        },
+        {
+          "value": "13495",
+          "confidence": 27,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.106,
+          "cropPsm": 13
+        },
+        {
+          "value": "1349538",
+          "confidence": 83,
+          "source": "full-screen-psm-3"
+        }
+      ],
+      "fullScreenDamageCandidates": [
+        {
+          "value": "1349538",
+          "confidence": 83,
+          "source": "full-screen-psm-3"
+        }
+      ],
+      "damageOcrText": "13495"
+    },
+    {
+      "fixtureKey": "image3.png",
+      "filename": "image3.png",
+      "imageSha256": "f6f61a0208d6336c49397ef9257eb875aaed3e93aef2585bbfe7d8b5c1fce18b",
+      "elapsedMs": 36516,
+      "pipelineCompleted": true,
+      "attempts": 3,
+      "selectedPageSegmentationMode": 3,
+      "confidence": 75,
+      "actual": {
+        "result": "Victory",
+        "player": "[W-G]Tbone87_Scott_TS",
+        "map": "Hotspot",
+        "mode": "Asymmetric Battle",
+        "battleStart": "15.12.2023 18:31",
+        "credits": 566231,
+        "xp": 6646,
+        "freeXp": 2350,
+        "damage": 172183
+      },
+      "expected": {
+        "result": "Victory",
+        "player": "[W-G]Tbone87_Scott_TS",
+        "map": "Hotspot",
+        "mode": "Asymmetric Battle",
+        "battleStart": "15.12.2023 18:31",
+        "credits": 566231,
+        "xp": 6646,
+        "freeXp": 2350,
+        "damage": 172183
+      },
+      "comparison": {
+        "result": {
+          "expected": "Victory",
+          "actual": "Victory",
+          "pass": true
+        },
+        "player": {
+          "expected": "[W-G]Tbone87_Scott_TS",
+          "actual": "[W-G]Tbone87_Scott_TS",
+          "pass": true
+        },
+        "map": {
+          "expected": "Hotspot",
+          "actual": "Hotspot",
+          "pass": true
+        },
+        "mode": {
+          "expected": "Asymmetric Battle",
+          "actual": "Asymmetric Battle",
+          "pass": true
+        },
+        "battleStart": {
+          "expected": "15.12.2023 18:31",
+          "actual": "15.12.2023 18:31",
+          "pass": true
+        },
+        "credits": {
+          "expected": 566231,
+          "actual": 566231,
+          "pass": true
+        },
+        "xp": {
+          "expected": 6646,
+          "actual": 6646,
+          "pass": true
+        },
+        "freeXp": {
+          "expected": 2350,
+          "actual": 2350,
+          "pass": true
+        },
+        "damage": {
+          "expected": 172183,
+          "actual": 172183,
+          "pass": true
+        }
+      },
+      "allExpectedFieldsPass": true,
+      "requiredMissing": [],
+      "ambiguities": {},
+      "paddleOcrFallback": {
+        "schemaVersion": 1,
+        "enabled": false,
+        "status": "disabled",
+        "elapsedMs": 0,
+        "reason": "PADDLEOCR_FIELD_FALLBACK is not 1"
+      },
+      "supervision": {
+        "closeConfirmed": true,
+        "childExitCode": 0,
+        "childSignal": null,
+        "elapsedMs": 36506,
+        "timeoutMs": 95000
+      },
+      "damageSelection": {
+        "candidates": [
+          {
+            "value": "172183",
+            "confidence": 53,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.098,
+            "cropPsm": 8
+          },
+          {
+            "value": "172183",
+            "confidence": 53,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.098,
+            "cropPsm": 13
+          },
+          {
+            "value": "172183",
+            "confidence": 47,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.1,
+            "cropPsm": 8
+          },
+          {
+            "value": "172183",
+            "confidence": 47,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.1,
+            "cropPsm": 13
+          }
+        ],
+        "selectedBy": "isolated-focused-crop-quorum",
+        "selectedValue": "172183",
+        "conflictingFocusedValues": []
+      },
+      "damageCandidates": [
+        {
+          "value": "172183",
+          "confidence": 53,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.098,
+          "cropPsm": 8
+        },
+        {
+          "value": "172183",
+          "confidence": 53,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.098,
+          "cropPsm": 13
+        },
+        {
+          "value": "172183",
+          "confidence": 47,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.1,
+          "cropPsm": 8
+        },
+        {
+          "value": "172183",
+          "confidence": 47,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.1,
+          "cropPsm": 13
+        }
+      ],
+      "fullScreenDamageCandidates": [
+        {
+          "value": "172183",
+          "confidence": 75,
+          "source": "full-screen-psm-3"
+        }
+      ],
+      "damageOcrText": "172183"
+    },
+    {
+      "fixtureKey": "image4.png",
+      "filename": "image4.png",
+      "imageSha256": "b590f10eeebba8f1358f3497a6ba0216ce8c3deb30a822dab1478440689c973f",
+      "elapsedMs": 41175,
+      "pipelineCompleted": true,
+      "attempts": 3,
+      "selectedPageSegmentationMode": 3,
+      "confidence": 73,
+      "actual": {
+        "result": "Defeat",
+        "player": "[HO-FL]gtrain25465",
+        "map": "Hotspot",
+        "mode": "Random Battle",
+        "battleStart": "28.09.2024 17:04",
+        "credits": 372648,
+        "xp": 6470,
+        "freeXp": 1598,
+        "damage": 148626
+      },
+      "expected": {
+        "result": "Defeat",
+        "player": "[HO-FL]gtrain25465",
+        "map": "Hotspot",
+        "mode": "Random Battle",
+        "battleStart": "28.09.2024 17:04",
+        "credits": 372648,
+        "xp": 6470,
+        "freeXp": 1598,
+        "damage": 148626
+      },
+      "comparison": {
+        "result": {
+          "expected": "Defeat",
+          "actual": "Defeat",
+          "pass": true
+        },
+        "player": {
+          "expected": "[HO-FL]gtrain25465",
+          "actual": "[HO-FL]gtrain25465",
+          "pass": true
+        },
+        "map": {
+          "expected": "Hotspot",
+          "actual": "Hotspot",
+          "pass": true
+        },
+        "mode": {
+          "expected": "Random Battle",
+          "actual": "Random Battle",
+          "pass": true
+        },
+        "battleStart": {
+          "expected": "28.09.2024 17:04",
+          "actual": "28.09.2024 17:04",
+          "pass": true
+        },
+        "credits": {
+          "expected": 372648,
+          "actual": 372648,
+          "pass": true
+        },
+        "xp": {
+          "expected": 6470,
+          "actual": 6470,
+          "pass": true
+        },
+        "freeXp": {
+          "expected": 1598,
+          "actual": 1598,
+          "pass": true
+        },
+        "damage": {
+          "expected": 148626,
+          "actual": 148626,
+          "pass": true
+        }
+      },
+      "allExpectedFieldsPass": true,
+      "requiredMissing": [],
+      "ambiguities": {},
+      "paddleOcrFallback": {
+        "schemaVersion": 1,
+        "enabled": false,
+        "status": "disabled",
+        "elapsedMs": 0,
+        "reason": "PADDLEOCR_FIELD_FALLBACK is not 1"
+      },
+      "supervision": {
+        "closeConfirmed": true,
+        "childExitCode": 0,
+        "childSignal": null,
+        "elapsedMs": 41166,
+        "timeoutMs": 95000
+      },
+      "damageSelection": {
+        "candidates": [
+          {
+            "value": "148626",
+            "confidence": 20,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.096,
+            "cropPsm": 8
+          },
+          {
+            "value": "148626",
+            "confidence": 20,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.096,
+            "cropPsm": 13
+          },
+          {
+            "value": "148626",
+            "confidence": 20,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.098,
+            "cropPsm": 8
+          },
+          {
+            "value": "148626",
+            "confidence": 20,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.098,
+            "cropPsm": 13
+          },
+          {
+            "value": "148626",
+            "confidence": 23,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.1,
+            "cropPsm": 8
+          },
+          {
+            "value": "148626",
+            "confidence": 23,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.1,
+            "cropPsm": 13
+          }
+        ],
+        "selectedBy": "isolated-focused-crop-quorum-no-full-screen",
+        "selectedValue": "148626",
+        "conflictingFocusedValues": []
+      },
+      "damageCandidates": [
+        {
+          "value": "148626",
+          "confidence": 20,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.096,
+          "cropPsm": 8
+        },
+        {
+          "value": "148626",
+          "confidence": 20,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.096,
+          "cropPsm": 13
+        },
+        {
+          "value": "148626",
+          "confidence": 20,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.098,
+          "cropPsm": 8
+        },
+        {
+          "value": "148626",
+          "confidence": 20,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.098,
+          "cropPsm": 13
+        },
+        {
+          "value": "148626",
+          "confidence": 23,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.1,
+          "cropPsm": 8
+        },
+        {
+          "value": "148626",
+          "confidence": 23,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.1,
+          "cropPsm": 13
+        }
+      ],
+      "fullScreenDamageCandidates": [],
+      "damageOcrText": "148626"
+    },
+    {
+      "fixtureKey": "image5.png",
+      "filename": "image5.png",
+      "imageSha256": "2f6ca55f3f3f0483d273e5a8aed92da4a7c397ef46649682cd6790cfd5521cc5",
+      "elapsedMs": 36440,
+      "pipelineCompleted": true,
+      "attempts": 3,
+      "selectedPageSegmentationMode": 11,
+      "confidence": 80,
+      "actual": {
+        "result": "Victory",
+        "player": "[HO-FL]VeritechCEQ",
+        "map": "Hermes",
+        "mode": "Operations",
+        "battleStart": "18.09.2024 13:26",
+        "credits": 370341,
+        "xp": 6037,
+        "freeXp": 6400,
+        "damage": null
+      },
+      "expected": {
+        "result": "Victory",
+        "player": "[HO-FL]VeritechCEO",
+        "map": "Hermes",
+        "mode": "Operations",
+        "battleStart": "18.09.2024 13:26",
+        "credits": 370341,
+        "xp": 6037,
+        "freeXp": 6400,
+        "damage": 166183
+      },
+      "comparison": {
+        "result": {
+          "expected": "Victory",
+          "actual": "Victory",
+          "pass": true
+        },
+        "player": {
+          "expected": "[HO-FL]VeritechCEO",
+          "actual": "[HO-FL]VeritechCEQ",
+          "pass": false
+        },
+        "map": {
+          "expected": "Hermes",
+          "actual": "Hermes",
+          "pass": true
+        },
+        "mode": {
+          "expected": "Operations",
+          "actual": "Operations",
+          "pass": true
+        },
+        "battleStart": {
+          "expected": "18.09.2024 13:26",
+          "actual": "18.09.2024 13:26",
+          "pass": true
+        },
+        "credits": {
+          "expected": 370341,
+          "actual": 370341,
+          "pass": true
+        },
+        "xp": {
+          "expected": 6037,
+          "actual": 6037,
+          "pass": true
+        },
+        "freeXp": {
+          "expected": 6400,
+          "actual": 6400,
+          "pass": true
+        },
+        "damage": {
+          "expected": 166183,
+          "actual": null,
+          "pass": false
+        }
+      },
+      "allExpectedFieldsPass": false,
+      "requiredMissing": [
+        {
+          "key": "damage",
+          "reason": "Damage OCR passes disagreed: 166183 vs 100109 vs 100100"
+        }
+      ],
+      "ambiguities": {
+        "damage": "Damage OCR passes disagreed: 166183 vs 100109 vs 100100"
+      },
+      "paddleOcrFallback": {
+        "schemaVersion": 1,
+        "enabled": false,
+        "status": "disabled",
+        "elapsedMs": 0,
+        "reason": "PADDLEOCR_FIELD_FALLBACK is not 1"
+      },
+      "supervision": {
+        "closeConfirmed": true,
+        "childExitCode": 0,
+        "childSignal": null,
+        "elapsedMs": 36431,
+        "timeoutMs": 95000
+      },
+      "damageSelection": {
+        "candidates": [
+          {
+            "value": "166183",
+            "confidence": 83,
+            "source": "focused-7",
+            "excludeAdjacentUi": false,
+            "cropWidth": null,
+            "cropPsm": 7
+          },
+          {
+            "value": "166183",
+            "confidence": 92,
+            "source": "focused-6",
+            "excludeAdjacentUi": false,
+            "cropWidth": null,
+            "cropPsm": 6
+          },
+          {
+            "value": "100109",
+            "confidence": 0,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.12153846153846154,
+            "cropPsm": 7
+          },
+          {
+            "value": "100100",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.12153846153846154,
+            "cropPsm": 8
+          },
+          {
+            "value": "100100",
+            "confidence": 0,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.12538461538461537,
+            "cropPsm": 7
+          },
+          {
+            "value": "100100",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.12538461538461537,
+            "cropPsm": 8
+          },
+          {
+            "value": "100100",
+            "confidence": 0,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.12923076923076923,
+            "cropPsm": 7
+          },
+          {
+            "value": "100100",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.12923076923076923,
+            "cropPsm": 8
+          },
+          {
+            "value": "100109",
+            "confidence": 0,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.12140871177015755,
+            "cropPsm": 7
+          },
+          {
+            "value": "100100",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.12140871177015755,
+            "cropPsm": 8
+          },
+          {
+            "value": "100100",
+            "confidence": 0,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.12542477602718566,
+            "cropPsm": 7
+          },
+          {
+            "value": "100109",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.12542477602718566,
+            "cropPsm": 8
+          },
+          {
+            "value": "100100",
+            "confidence": 0,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.12913191226444237,
+            "cropPsm": 7
+          },
+          {
+            "value": "100100",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.12913191226444237,
+            "cropPsm": 8
+          },
+          {
+            "value": "166183",
+            "confidence": 76,
+            "source": "full-screen-psm-3"
+          }
+        ],
+        "selectedBy": "combined-evidence",
+        "selectedValue": null,
+        "conflictingFocusedValues": []
+      },
+      "damageCandidates": [
+        {
+          "value": "166183",
+          "confidence": 83,
+          "source": "focused-7",
+          "excludeAdjacentUi": false,
+          "cropWidth": null,
+          "cropPsm": 7
+        },
+        {
+          "value": "166183",
+          "confidence": 92,
+          "source": "focused-6",
+          "excludeAdjacentUi": false,
+          "cropWidth": null,
+          "cropPsm": 6
+        },
+        {
+          "value": "100109",
+          "confidence": 0,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.12153846153846154,
+          "cropPsm": 7
+        },
+        {
+          "value": "100100",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.12153846153846154,
+          "cropPsm": 8
+        },
+        {
+          "value": "100100",
+          "confidence": 0,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.12538461538461537,
+          "cropPsm": 7
+        },
+        {
+          "value": "100100",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.12538461538461537,
+          "cropPsm": 8
+        },
+        {
+          "value": "100100",
+          "confidence": 0,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.12923076923076923,
+          "cropPsm": 7
+        },
+        {
+          "value": "100100",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.12923076923076923,
+          "cropPsm": 8
+        },
+        {
+          "value": "100109",
+          "confidence": 0,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.12140871177015755,
+          "cropPsm": 7
+        },
+        {
+          "value": "100100",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.12140871177015755,
+          "cropPsm": 8
+        },
+        {
+          "value": "100100",
+          "confidence": 0,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.12542477602718566,
+          "cropPsm": 7
+        },
+        {
+          "value": "100109",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.12542477602718566,
+          "cropPsm": 8
+        },
+        {
+          "value": "100100",
+          "confidence": 0,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.12913191226444237,
+          "cropPsm": 7
+        },
+        {
+          "value": "100100",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.12913191226444237,
+          "cropPsm": 8
+        },
+        {
+          "value": "166183",
+          "confidence": 76,
+          "source": "full-screen-psm-3"
+        }
+      ],
+      "fullScreenDamageCandidates": [
+        {
+          "value": "166183",
+          "confidence": 76,
+          "source": "full-screen-psm-3"
+        }
+      ],
+      "damageOcrText": "100100"
+    },
+    {
+      "fixtureKey": "image6.png",
+      "filename": "image6.png",
+      "imageSha256": "c87ead619e3050f63dd596ba0df80be7b384d01361e1c12cafbf44e0dff023de",
+      "elapsedMs": 49001,
+      "pipelineCompleted": true,
+      "attempts": 3,
+      "selectedPageSegmentationMode": 3,
+      "confidence": 80,
+      "actual": {
+        "result": "Victory",
+        "player": "[HO-FL]gtrain25465",
+        "map": "Two Brothers",
+        "mode": "Random Battle",
+        "battleStart": "16.09.2024 13:05",
+        "credits": 297514,
+        "xp": 4714,
+        "freeXp": 1406,
+        "damage": 126457
+      },
+      "expected": {
+        "result": "Victory",
+        "player": "[HO-FL]gtrain25465",
+        "map": "Two Brothers",
+        "mode": "Random Battle",
+        "battleStart": "16.09.2024 13:05",
+        "credits": 297514,
+        "xp": 7146,
+        "freeXp": 1406,
+        "damage": 126457
+      },
+      "comparison": {
+        "result": {
+          "expected": "Victory",
+          "actual": "Victory",
+          "pass": true
+        },
+        "player": {
+          "expected": "[HO-FL]gtrain25465",
+          "actual": "[HO-FL]gtrain25465",
+          "pass": true
+        },
+        "map": {
+          "expected": "Two Brothers",
+          "actual": "Two Brothers",
+          "pass": true
+        },
+        "mode": {
+          "expected": "Random Battle",
+          "actual": "Random Battle",
+          "pass": true
+        },
+        "battleStart": {
+          "expected": "16.09.2024 13:05",
+          "actual": "16.09.2024 13:05",
+          "pass": true
+        },
+        "credits": {
+          "expected": 297514,
+          "actual": 297514,
+          "pass": true
+        },
+        "xp": {
+          "expected": 7146,
+          "actual": 4714,
+          "pass": false
+        },
+        "freeXp": {
+          "expected": 1406,
+          "actual": 1406,
+          "pass": true
+        },
+        "damage": {
+          "expected": 126457,
+          "actual": 126457,
+          "pass": true
+        }
+      },
+      "allExpectedFieldsPass": false,
+      "requiredMissing": [],
+      "ambiguities": {},
+      "paddleOcrFallback": {
+        "schemaVersion": 1,
+        "enabled": false,
+        "status": "disabled",
+        "elapsedMs": 0,
+        "reason": "PADDLEOCR_FIELD_FALLBACK is not 1"
+      },
+      "supervision": {
+        "closeConfirmed": true,
+        "childExitCode": 0,
+        "childSignal": null,
+        "elapsedMs": 48990,
+        "timeoutMs": 95000
+      },
+      "damageSelection": {
+        "candidates": [
+          {
+            "value": "126457",
+            "confidence": 0,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10168165819319515,
+            "cropPsm": 7
+          },
+          {
+            "value": "126457",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10168165819319515,
+            "cropPsm": 8
+          },
+          {
+            "value": "126457",
+            "confidence": 20,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10481032459913962,
+            "cropPsm": 7
+          },
+          {
+            "value": "126457",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10481032459913962,
+            "cropPsm": 8
+          },
+          {
+            "value": "126457",
+            "confidence": 0,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10793899100508408,
+            "cropPsm": 7
+          },
+          {
+            "value": "126457",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10793899100508408,
+            "cropPsm": 8
+          },
+          {
+            "value": "126457",
+            "confidence": 0,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10168165819319515,
+            "cropPsm": 7
+          },
+          {
+            "value": "126457",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10168165819319515,
+            "cropPsm": 8
+          },
+          {
+            "value": "126457",
+            "confidence": 0,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10481032459913962,
+            "cropPsm": 7
+          },
+          {
+            "value": "126457",
+            "confidence": 0,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10481032459913962,
+            "cropPsm": 8
+          },
+          {
+            "value": "126457",
+            "confidence": 0,
+            "source": "focused-7",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10793899100508408,
+            "cropPsm": 7
+          },
+          {
+            "value": "126457",
+            "confidence": 38,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.10793899100508408,
+            "cropPsm": 8
+          },
+          {
+            "value": "126457",
+            "confidence": 4,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.096,
+            "cropPsm": 8
+          },
+          {
+            "value": "126457",
+            "confidence": 4,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.096,
+            "cropPsm": 13
+          },
+          {
+            "value": "126457",
+            "confidence": 4,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.098,
+            "cropPsm": 8
+          },
+          {
+            "value": "126457",
+            "confidence": 4,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.098,
+            "cropPsm": 13
+          },
+          {
+            "value": "126457",
+            "confidence": 5,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.1,
+            "cropPsm": 8
+          },
+          {
+            "value": "126457",
+            "confidence": 5,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.1,
+            "cropPsm": 13
+          },
+          {
+            "value": "126457",
+            "confidence": 80,
+            "source": "full-screen-psm-3"
+          }
+        ],
+        "selectedBy": "combined-evidence",
+        "selectedValue": null,
+        "conflictingFocusedValues": []
+      },
+      "damageCandidates": [
+        {
+          "value": "126457",
+          "confidence": 0,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10168165819319515,
+          "cropPsm": 7
+        },
+        {
+          "value": "126457",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10168165819319515,
+          "cropPsm": 8
+        },
+        {
+          "value": "126457",
+          "confidence": 20,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10481032459913962,
+          "cropPsm": 7
+        },
+        {
+          "value": "126457",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10481032459913962,
+          "cropPsm": 8
+        },
+        {
+          "value": "126457",
+          "confidence": 0,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10793899100508408,
+          "cropPsm": 7
+        },
+        {
+          "value": "126457",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10793899100508408,
+          "cropPsm": 8
+        },
+        {
+          "value": "126457",
+          "confidence": 0,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10168165819319515,
+          "cropPsm": 7
+        },
+        {
+          "value": "126457",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10168165819319515,
+          "cropPsm": 8
+        },
+        {
+          "value": "126457",
+          "confidence": 0,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10481032459913962,
+          "cropPsm": 7
+        },
+        {
+          "value": "126457",
+          "confidence": 0,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10481032459913962,
+          "cropPsm": 8
+        },
+        {
+          "value": "126457",
+          "confidence": 0,
+          "source": "focused-7",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10793899100508408,
+          "cropPsm": 7
+        },
+        {
+          "value": "126457",
+          "confidence": 38,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.10793899100508408,
+          "cropPsm": 8
+        },
+        {
+          "value": "126457",
+          "confidence": 4,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.096,
+          "cropPsm": 8
+        },
+        {
+          "value": "126457",
+          "confidence": 4,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.096,
+          "cropPsm": 13
+        },
+        {
+          "value": "126457",
+          "confidence": 4,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.098,
+          "cropPsm": 8
+        },
+        {
+          "value": "126457",
+          "confidence": 4,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.098,
+          "cropPsm": 13
+        },
+        {
+          "value": "126457",
+          "confidence": 5,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.1,
+          "cropPsm": 8
+        },
+        {
+          "value": "126457",
+          "confidence": 5,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.1,
+          "cropPsm": 13
+        },
+        {
+          "value": "126457",
+          "confidence": 80,
+          "source": "full-screen-psm-3"
+        }
+      ],
+      "fullScreenDamageCandidates": [
+        {
+          "value": "126457",
+          "confidence": 80,
+          "source": "full-screen-psm-3"
+        }
+      ],
+      "damageOcrText": "126457"
+    },
+    {
+      "fixtureKey": "shot-26.08.31_16.22.19-0048.jpg",
+      "filename": "shot-26.08.31_16.22.19-0048.jpg",
+      "imageSha256": "b7d5c4362bfd5d9d531075c6f0807906e3f5b3bb5e94055420ac96eb519a964c",
+      "elapsedMs": 50706,
+      "pipelineCompleted": true,
+      "attempts": 3,
+      "selectedPageSegmentationMode": 3,
+      "confidence": 68,
+      "actual": {
+        "result": "Victory",
+        "player": "[HO-FL]VeritechCEO",
+        "map": "Big Race",
+        "mode": "Random Battle",
+        "battleStart": "31.08.2026 15:58",
+        "credits": 211546,
+        "xp": 2960,
+        "freeXp": 1234,
+        "damage": 119195
+      },
+      "expected": {
+        "result": "Victory",
+        "player": "[HO-FL]VeritechCEO",
+        "map": "Big Race",
+        "mode": "Random Battle",
+        "battleStart": "31.08.2026 15:58",
+        "credits": 211546,
+        "xp": 2960,
+        "freeXp": 1234,
+        "damage": 119195
+      },
+      "comparison": {
+        "result": {
+          "expected": "Victory",
+          "actual": "Victory",
+          "pass": true
+        },
+        "player": {
+          "expected": "[HO-FL]VeritechCEO",
+          "actual": "[HO-FL]VeritechCEO",
+          "pass": true
+        },
+        "map": {
+          "expected": "Big Race",
+          "actual": "Big Race",
+          "pass": true
+        },
+        "mode": {
+          "expected": "Random Battle",
+          "actual": "Random Battle",
+          "pass": true
+        },
+        "battleStart": {
+          "expected": "31.08.2026 15:58",
+          "actual": "31.08.2026 15:58",
+          "pass": true
+        },
+        "credits": {
+          "expected": 211546,
+          "actual": 211546,
+          "pass": true
+        },
+        "xp": {
+          "expected": 2960,
+          "actual": 2960,
+          "pass": true
+        },
+        "freeXp": {
+          "expected": 1234,
+          "actual": 1234,
+          "pass": true
+        },
+        "damage": {
+          "expected": 119195,
+          "actual": 119195,
+          "pass": true
+        }
+      },
+      "allExpectedFieldsPass": true,
+      "requiredMissing": [],
+      "ambiguities": {},
+      "paddleOcrFallback": {
+        "schemaVersion": 1,
+        "enabled": false,
+        "status": "disabled",
+        "elapsedMs": 0,
+        "reason": "PADDLEOCR_FIELD_FALLBACK is not 1"
+      },
+      "supervision": {
+        "closeConfirmed": true,
+        "childExitCode": 0,
+        "childSignal": null,
+        "elapsedMs": 50698,
+        "timeoutMs": 95000
+      },
+      "damageSelection": {
+        "candidates": [
+          {
+            "value": "119195",
+            "confidence": 2,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.098,
+            "cropPsm": 8
+          },
+          {
+            "value": "119195",
+            "confidence": 2,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.098,
+            "cropPsm": 13
+          },
+          {
+            "value": "119195",
+            "confidence": 2,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.1,
+            "cropPsm": 8
+          },
+          {
+            "value": "119195",
+            "confidence": 2,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.1,
+            "cropPsm": 13
+          },
+          {
+            "value": "119195",
+            "confidence": 24,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.102,
+            "cropPsm": 8
+          },
+          {
+            "value": "119195",
+            "confidence": 24,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.102,
+            "cropPsm": 13
+          },
+          {
+            "value": "119195",
+            "confidence": 9,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.104,
+            "cropPsm": 8
+          },
+          {
+            "value": "119195",
+            "confidence": 9,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.104,
+            "cropPsm": 13
+          },
+          {
+            "value": "119195",
+            "confidence": 10,
+            "source": "focused-8",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.106,
+            "cropPsm": 8
+          },
+          {
+            "value": "119195",
+            "confidence": 10,
+            "source": "focused-13",
+            "excludeAdjacentUi": true,
+            "cropWidth": 0.106,
+            "cropPsm": 13
+          }
+        ],
+        "selectedBy": "isolated-focused-crop-quorum-matches-full-screen",
+        "selectedValue": "119195",
+        "conflictingFocusedValues": [
+          "1191958"
+        ]
+      },
+      "damageCandidates": [
+        {
+          "value": "119195",
+          "confidence": 2,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.098,
+          "cropPsm": 8
+        },
+        {
+          "value": "119195",
+          "confidence": 2,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.098,
+          "cropPsm": 13
+        },
+        {
+          "value": "119195",
+          "confidence": 2,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.1,
+          "cropPsm": 8
+        },
+        {
+          "value": "119195",
+          "confidence": 2,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.1,
+          "cropPsm": 13
+        },
+        {
+          "value": "119195",
+          "confidence": 24,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.102,
+          "cropPsm": 8
+        },
+        {
+          "value": "119195",
+          "confidence": 24,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.102,
+          "cropPsm": 13
+        },
+        {
+          "value": "119195",
+          "confidence": 9,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.104,
+          "cropPsm": 8
+        },
+        {
+          "value": "119195",
+          "confidence": 9,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.104,
+          "cropPsm": 13
+        },
+        {
+          "value": "119195",
+          "confidence": 10,
+          "source": "focused-8",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.106,
+          "cropPsm": 8
+        },
+        {
+          "value": "119195",
+          "confidence": 10,
+          "source": "focused-13",
+          "excludeAdjacentUi": true,
+          "cropWidth": 0.106,
+          "cropPsm": 13
+        }
+      ],
+      "fullScreenDamageCandidates": [
+        {
+          "value": "119195",
+          "confidence": 68,
+          "source": "full-screen-psm-3"
+        },
+        {
+          "value": "1191958",
+          "confidence": 63,
+          "source": "full-screen-psm-11"
+        }
+      ],
+      "damageOcrText": "119195"
+    },
+    {
+      "fixtureKey": "unknown.png",
+      "filename": "unknown.png",
+      "imageSha256": "ac2a61da73901b8d308789c2ddaff2da7642b5bb5f1f4ff999bfdccd689555a4",
+      "elapsedMs": 44807,
+      "pipelineCompleted": true,
+      "attempts": 3,
+      "selectedPageSegmentationMode": 3,
+      "confidence": 79,
+      "actual": {
+        "result": "Victory",
+        "player": "[HO-FL]Ken400",
+        "map": "Two Brothers",
+        "mode": "Random Battle",
+        "battleStart": "18.08.2022 10:03",
+        "credits": 828719,
+        "xp": 31741,
+        "freeXp": 2632,
+        "damage": 122261
+      },
+      "expected": {
+        "result": "Victory",
+        "player": "[HO-FL]Ken400",
+        "map": "Two Brothers",
+        "mode": "Random Battle",
+        "battleStart": "18.08.2022 10:03",
+        "credits": 828719,
+        "xp": 31741,
+        "freeXp": 2632,
+        "damage": 122261
+      },
+      "comparison": {
+        "result": {
+          "expected": "Victory",
+          "actual": "Victory",
+          "pass": true
+        },
+        "player": {
+          "expected": "[HO-FL]Ken400",
+          "actual": "[HO-FL]Ken400",
+          "pass": true
+        },
+        "map": {
+          "expected": "Two Brothers",
+          "actual": "Two Brothers",
+          "pass": true
+        },
+        "mode": {
+          "expected": "Random Battle",
+          "actual": "Random Battle",
+          "pass": true
+        },
+        "battleStart": {
+          "expected": "18.08.2022 10:03",
+          "actual": "18.08.2022 10:03",
+          "pass": true
+        },
+        "credits": {
+          "expected": 828719,
+          "actual": 828719,
+          "pass": true
+        },
+        "xp": {
+          "expected": 31741,
+          "actual": 31741,
+          "pass": true
+        },
+        "freeXp": {
+          "expected": 2632,
+          "actual": 2632,
+          "pass": true
+        },
+        "damage": {
+          "expected": 122261,
+          "actual": 122261,
+          "pass": true
+        }
+      },
+      "allExpectedFieldsPass": true,
+      "requiredMissing": [],
+      "ambiguities": {},
+      "paddleOcrFallback": {
+        "schemaVersion": 1,
+        "enabled": false,
+        "status": "disabled",
+        "elapsedMs": 0,
+        "reason": "PADDLEOCR_FIELD_FALLBACK is not 1"
+      },
+      "supervision": {
+        "closeConfirmed": true,
+        "childExitCode": 0,
+        "childSignal": null,
+        "elapsedMs": 44791,
+        "timeoutMs": 95000
+      },
+      "damageSelection": {
+        "candidates": [
+          {
+            "value": "122261",
+            "confidence": 79,
+            "source": "full-screen-psm-3"
+          },
+          {
+            "value": "122261",
+            "confidence": 77,
+            "source": "full-screen-psm-11"
+          }
+        ],
+        "selectedBy": "full-screen-consensus",
+        "selectedValue": "122261",
+        "conflictingFocusedValues": [
+          "1222617",
+          "1222611"
+        ]
+      },
+      "damageCandidates": [
+        {
+          "value": "122261",
+          "confidence": 79,
+          "source": "full-screen-psm-3"
+        },
+        {
+          "value": "122261",
+          "confidence": 77,
+          "source": "full-screen-psm-11"
+        }
+      ],
+      "fullScreenDamageCandidates": [
+        {
+          "value": "122261",
+          "confidence": 79,
+          "source": "full-screen-psm-3"
+        },
+        {
+          "value": "122261",
+          "confidence": 77,
+          "source": "full-screen-psm-11"
+        }
+      ],
+      "damageOcrText": "122261"
+    }
+  ]
+}

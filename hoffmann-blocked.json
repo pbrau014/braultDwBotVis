@@ -1,0 +1,235 @@
+{
+  "buildVersion": "2.5.0",
+  "createdAt": "2026-10-25T00:24:42.744Z",
+  "nodeVersion": "v22.16.0",
+  "configuredEngine": "tesseractjs",
+  "executionMode": "single-process sequential pipeline; worker recycle enabled after each image unless explicitly disabled",
+  "workerRecyclePerImage": true,
+  "operationTimeoutMs": 15000,
+  "fixtureOrder": [
+    "hoffmann-victory.png"
+  ],
+  "imageCount": 1,
+  "completedImages": 1,
+  "exactMatches": 0,
+  "requiredFieldsComplete": 0,
+  "durationMs": 21097,
+  "networkBlocked": true,
+  "results": [
+    {
+      "fixtureKey": "hoffmann-victory.png",
+      "filename": "hoffmann-victory.png",
+      "imageSha256": "c83c61543a806225b4a0e3a60ce4a02d7da5aecc710c4c6c92197c853cc03a1e",
+      "elapsedMs": 21096,
+      "pipelineCompleted": true,
+      "attempts": 3,
+      "selectedPageSegmentationMode": 3,
+      "confidence": 83,
+      "actual": {
+        "result": "Victory",
+        "player": "[-SEN-]WorldSpOwn",
+        "map": "Not detected",
+        "mode": "Not detected",
+        "battleStart": "Not detected",
+        "credits": 1237152,
+        "xp": 143905,
+        "freeXp": 1645,
+        "damage": null
+      },
+      "expected": {
+        "result": "Victory",
+        "player": "[-SEN-]WorldSpOwn",
+        "map": "Mountain Range",
+        "mode": "Random Battle",
+        "battleStart": "27.03.2025 23:55",
+        "credits": 1237152,
+        "xp": 14390,
+        "freeXp": 1645,
+        "damage": 303622
+      },
+      "comparison": {
+        "result": {
+          "expected": "Victory",
+          "actual": "Victory",
+          "pass": true
+        },
+        "player": {
+          "expected": "[-SEN-]WorldSpOwn",
+          "actual": "[-SEN-]WorldSpOwn",
+          "pass": true
+        },
+        "map": {
+          "expected": "Mountain Range",
+          "actual": "Not detected",
+          "pass": false
+        },
+        "mode": {
+          "expected": "Random Battle",
+          "actual": "Not detected",
+          "pass": false
+        },
+        "battleStart": {
+          "expected": "27.03.2025 23:55",
+          "actual": "Not detected",
+          "pass": false
+        },
+        "credits": {
+          "expected": 1237152,
+          "actual": 1237152,
+          "pass": true
+        },
+        "xp": {
+          "expected": 14390,
+          "actual": 143905,
+          "pass": false
+        },
+        "freeXp": {
+          "expected": 1645,
+          "actual": 1645,
+          "pass": true
+        },
+        "damage": {
+          "expected": 303622,
+          "actual": null,
+          "pass": false
+        }
+      },
+      "allExpectedFieldsPass": false,
+      "requiredMissing": [
+        {
+          "key": "map",
+          "reason": "Map was readable in only one OCR pass (confidence 67%); another agreeing read or manual correction is needed"
+        },
+        {
+          "key": "mode",
+          "reason": "Battle Mode was readable in only one OCR pass (confidence 67%); another agreeing read or manual correction is needed"
+        },
+        {
+          "key": "battleStart",
+          "reason": "OCR could not confidently read Battle Start Time"
+        },
+        {
+          "key": "damage",
+          "reason": "OCR could not confidently read Damage"
+        }
+      ],
+      "ambiguities": {
+        "map": "Map was readable in only one OCR pass (confidence 67%); another agreeing read or manual correction is needed",
+        "mode": "Battle Mode was readable in only one OCR pass (confidence 67%); another agreeing read or manual correction is needed"
+      },
+      "damageSelection": {
+        "candidates": [],
+        "selectedBy": "combined-evidence",
+        "selectedValue": null,
+        "conflictingFocusedValues": []
+      },
+      "damageCandidates": [],
+      "fullScreenDamageCandidates": [],
+      "damageOcrText": "JB",
+      "rawCandidateText": [
+        {
+          "psm": 3,
+          "confidence": 83,
+          "text": "PERSONAL SCORE DETAILED REPORT CREDITS AND XP\n\nIncapaciations Destroyed Set on fire\n\nCaptured Spotted\n\nCombat Missions\n\nReceive potential Win a battle Weekly Mission [ amssonsmrora |\n“ Earn 2000 Base XP. © Fe 11] ly 3 MISSIONS IN TOTAL\n\n.\n« .\n\nBACK TO PORT -"
+        },
+        {
+          "psm": 11,
+          "confidence": 65,
+          "text": "PERSONAL SCORE\n\nCORE\n\nDETAILED REPORT\n\nCREDITS AND XP\n\n[esc\n\na\n\nuntain R\n\ntain\n\nBattle\n\nstart tim\n\n23:55\n\nOur.\n\nteam comp\n\nd the mission.\n\nG. HOFFMANN.\n\ntect\n\nd fo the Battle:\n\nA\n\nwe.\n\n=\n\n7\n\nxe\n\n03\n\n1\n\nNy\n\nittle\n\nperforma\n\n5]\n\n=\n\n0\n\n=i\n\nLi\n\nE77 TE\n\nIN\n\nSE\n\na\n\nSet on fire\n\nDf =\n\nGitadel hits\n\nDefended\n\nDamage\n\ngs hits\n\nTarget hits\n\nincapacitations\n\nDestroyed\n\nCaused flooding\n\n-\n\nCaptured\n\nSpotted\n\nCombat Missions\n\n“ Earn 2000 Base XP. ©\n\ndamage\n\nReceive potential\n\n[IR vn a vate\n\n© Weekly Mission\n\n3 MISSIONS IN TOTAL\n\nB\n\ned\n\n.\n\n-."
+        },
+        {
+          "psm": "combined",
+          "confidence": 64.9,
+          "text": "PERSONAL SCORE DETAILED REPORT CREDITS AND XP\nCREDITS AND XP\n[esc\nPERSONAL SCORE\nCORE\nDETAILED REPORT\nVIN J LAM vuunc | ULIAILLU nor vn | LNELUVITO ANU AT\nLAV vuunc\nUEIARILLU noun\nLIEU TO ANU Al\na\nVictory! 5\nVictory!\n|_|\n_—\nMountain Range — Random Battle\nMountain Range = Random B\nMountain Range == Random\nMountain Rang\n— Random Battle\nuntain R\nBattle\nMour\ntain\nBattle start time: 27:03:2025 23:55\nBattle start time: 27:03:20 -\nBattle start time: 27.03.20\nBattle start time: 27:03:20\n23:55\nstart tim\nOur team completed the mission. .\nOur.\nOur team comp\nd the mission.\nteam comp\nOur team completed the mission.\n[-SEN-]WorldSpOwn ®= XG. HOFFMANN N\n[-SEN-]WorldSpOwn == XG. HOFFMANN .\n[-SEN-WorldSpOwn == X G. HOFFMANN\nG. HOFFMANN.\n[-SEN-]WorldSpOwn ®= X G. HOFFMANN\n[-SEN-]WorldSpOwn ®™ X G. HOFFMANN\nReceived for the Battle < } i\nReceived for the Bate — ¢\nReceived for the hilly\nd fo the Battle:\nReceived for the Battle\ntect\n5 A NE a RIN NG TN AL >\n1237152 14390% 16454 \"© 2 BA Ras i R60\n1237152© 14390 16454 [N17 | Ul Jal ped [1] 2\n1237152@ 14 390+ 1645+ ~\\| 2 40) Jal)\n= EN gC =i AEN amet pres\n=\ne x Ne YEE Ek\n5\ni\n\\\n~\n(I;\nNi\nxe\n[AC\nee Batigl BY lance\nAN\nwe.\nUs?\n7\n03\n70\n1\n_ Batilejperformance i : : —— — i 4 -\n: a “ Battle performance |\nNy\nCy\naX\nittle\nperforma\nLo mE PETS ATTY Led TEL\n= — = — —_— i =\n3\nEB\n=i\nE77 TE\n5]\nNe\nSE\n-\n| E——\nIN\n0\nx2\nLi\n=7\nDamage\nEa Damage eT Target hits - Target hits i ncapacitations Destroyed - Set on fire h Caused flooding Citadel hits Defended\nIncapaciations Destroyed Set on fire\n- Damage Target hits Target hits “Incapacitations Destroyed Set on fire Caused flooding Citadel hits Defended\ngs hits\nincapacitations\nDf =\n.\nTarget hits\nDestroyed\nSet on fire\nCaused flooding\nCitadel hits\nDefended\nGitadel hits\nations\nncap:\n——=\nCaptured Spotted\nCaptured Spotted ’\nCaptured\nSpotted\nCombat Missions\n“ BAMOED @ pester! Win a battle ® Weekly Mission\n[v4 2 Earn 2 000 Base XP << damage | = —\n(2 Earn 2 000 Base XP @ Receive potential Win a battle © Weekly Mission\n(2 Earn 2 000 Base XP @\n© Weekly Mission\n“ Earn 2000 Base XP. © Fe 11] ly 3 MISSIONS IN TOTAL\n“ Earn 2000 Base XP. ©\n= Receive potential [Hi Win a battle ® Weekly Mission 3 MISSIONS IN TOTAL\nHH Win a battle\nReceive potential Win a battle Weekly Mission [ amssonsmrora |\nReceive potential\n[IR vn a vate\n3 MISSIONS IN TOTAL\ndamage || —\nB\n> ’\now .\n« .\n»\ned\n-.\nBACK TO PORT |e — -\nBACK TO PORT |e\nBACK TO PORT -"
+        }
+      ],
+      "fullScreenDamageOcrText": [
+        {
+          "psm": 3,
+          "text": "PERSONAL SCORE DETAILED REPORT CREDITS AND XP\n\nIncapaciations Destroyed Set on fire\n\nCaptured Spotted\n\nCombat Missions\n\nReceive potential Win a battle Weekly Mission [ amssonsmrora |\n“ Earn 2000 Base XP. © Fe 11] ly 3 MISSIONS IN TOTAL\n\n.\n« .\n\nBACK TO PORT -"
+        },
+        {
+          "psm": 11,
+          "text": "PERSONAL SCORE\n\nCORE\n\nDETAILED REPORT\n\nCREDITS AND XP\n\n[esc\n\na\n\nuntain R\n\ntain\n\nBattle\n\nstart tim\n\n23:55\n\nOur.\n\nteam comp\n\nd the mission.\n\nG. HOFFMANN.\n\ntect\n\nd fo the Battle:\n\nA\n\nwe.\n\n=\n\n7\n\nxe\n\n03\n\n1\n\nNy\n\nittle\n\nperforma\n\n5]\n\n=\n\n0\n\n=i\n\nLi\n\nE77 TE\n\nIN\n\nSE\n\na\n\nSet on fire\n\nDf =\n\nGitadel hits\n\nDefended\n\nDamage\n\ngs hits\n\nTarget hits\n\nincapacitations\n\nDestroyed\n\nCaused flooding\n\n-\n\nCaptured\n\nSpotted\n\nCombat Missions\n\n“ Earn 2000 Base XP. ©\n\ndamage\n\nReceive potential\n\n[IR vn a vate\n\n© Weekly Mission\n\n3 MISSIONS IN TOTAL\n\nB\n\ned\n\n.\n\n-."
+        }
+      ],
+      "rewardOcrText": "1237152@ 143905 1645% ~ 7 Jo 4",
+      "rawCandidateFields": {
+        "identityCandidates": [
+          {
+            "text": "|_|\nVictory! 5\nOur team completed the mission.\n[-SEN-]WorldSpOwn ®= X G. HOFFMANN\nReceived for the Battle\n= EN gC =i AEN amet pres\n1237152© 14390 16454 [N17 | Ul Jal ped [1] 2",
+            "confidence": 50
+          },
+          {
+            "text": "Mour\n\nVictory!\n\nBattle\n\nOur team completed the mission.\n\n[-SEN-]WorldSpOwn ®™ X G. HOFFMANN\n\nReceived for the Battle\n\n~\n\n1237152@ 14 390+ 1645+ ~\\| 2 40) Jal)",
+            "confidence": 64
+          },
+          {
+            "text": "Our. team completed the mission.\n[-SEN-]WorldSpOwn ®= X G. HOFFMANN",
+            "confidence": 83
+          },
+          {
+            "text": "Our. team completed the mission.\n\n[-SEN-]WorldSpOwn = X G. HOFFMANN",
+            "confidence": 79
+          }
+        ],
+        "metadataCandidates": [
+          {
+            "text": "_—\nMountain Range = Random B\nBattle start time: 27:03:20 -",
+            "confidence": 67
+          },
+          {
+            "text": "Mountain Range == Random\n\nBattle start time: 27.03.20",
+            "confidence": 61
+          },
+          {
+            "text": "a _ o-\nMolntainlRangeSsRandom's\nBattlelstartitimea27403120 e",
+            "confidence": 21
+          },
+          {
+            "text": "MountainlRangeE=Handom'B\n\nBattle/StartitimeA2740 3120",
+            "confidence": 0
+          }
+        ],
+        "resultCandidates": [
+          {
+            "text": "PERSONAL SCORE DETAILED REPORT CREDITS AND XP\n\nIncapaciations Destroyed Set on fire\n\nCaptured Spotted\n\nCombat Missions\n\nReceive potential Win a battle Weekly Mission [ amssonsmrora |\n“ Earn 2000 Base XP. © Fe 11] ly 3 MISSIONS IN TOTAL\n\n.\n« .\n\nBACK TO PORT -",
+            "confidence": 83
+          },
+          {
+            "text": "PERSONAL SCORE\n\nCORE\n\nDETAILED REPORT\n\nCREDITS AND XP\n\n[esc\n\na\n\nuntain R\n\ntain\n\nBattle\n\nstart tim\n\n23:55\n\nOur.\n\nteam comp\n\nd the mission.\n\nG. HOFFMANN.\n\ntect\n\nd fo the Battle:\n\nA\n\nwe.\n\n=\n\n7\n\nxe\n\n03\n\n1\n\nNy\n\nittle\n\nperforma\n\n5]\n\n=\n\n0\n\n=i\n\nLi\n\nE77 TE\n\nIN\n\nSE\n\na\n\nSet on fire\n\nDf =\n\nGitadel hits\n\nDefended\n\nDamage\n\ngs hits\n\nTarget hits\n\nincapacitations\n\nDestroyed\n\nCaused flooding\n\n-\n\nCaptured\n\nSpotted\n\nCombat Missions\n\n“ Earn 2000 Base XP. ©\n\ndamage\n\nReceive potential\n\n[IR vn a vate\n\n© Weekly Mission\n\n3 MISSIONS IN TOTAL\n\nB\n\ned\n\n.\n\n-.",
+            "confidence": 65
+          },
+          {
+            "text": "Our team completed the mission.\n[-SEN-JWorldSpOwn = X G. HOFFMANN.\nReceived for the Battle",
+            "confidence": 83
+          },
+          {
+            "text": "Our team completed the mission.\n\n[-SEN-]WorldSpOwn ®= X G. HOFFMANN\n\nReceived for the Battle",
+            "confidence": 84
+          },
+          {
+            "text": "[mi\nVictory!\nOur team completed the mission.\n[-SEN-]WorldSpOwn ®™ X G. HOFFMANN\nReceived for the Battle",
+            "confidence": 83
+          }
+        ],
+        "rewardCandidates": [
+          {
+            "credits": "1237152",
+            "xp": "143905",
+            "freeXp": "1645",
+            "confidence": 53,
+            "source": 6
+          },
+          {
+            "credits": "1237152",
+            "xp": "143905",
+            "freeXp": "1645",
+            "confidence": 53,
+            "source": 7
+          }
+        ]
+      }
+    }
+  ]
+}

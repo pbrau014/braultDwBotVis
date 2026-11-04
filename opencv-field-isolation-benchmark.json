@@ -1,0 +1,1456 @@
+{
+  "schemaVersion": 1,
+  "status": "complete",
+  "benchmarkType": "OpenCV geometry-proposal coverage only; not OCR accuracy or field correctness",
+  "networkCalls": 0,
+  "manifestSha256": "087ec5b900c4e782d01181ac9099e83ce6c763c534a187990e52aab398cf7bc5",
+  "imageCount": 16,
+  "processedCount": 16,
+  "failedCount": 0,
+  "opencvVersion": "4.13.0",
+  "totalElapsedMs": 1423.796,
+  "metrics": {
+    "imagesProcessed": 16,
+    "imagesWithAnyProposal": 16,
+    "imagesWithAllFiveProposals": 13,
+    "proposalCount": 77,
+    "boundedProposalCount": 77,
+    "meanAnalysisMs": 47.361
+  },
+  "records": [
+    {
+      "key": "Screenshot_16.jpg",
+      "filename": "Screenshot_16.jpg",
+      "imageSha256": "4a58aad7cb1d21f9bb457e1ad728fee59ebff3873a1e47938cf401d41f784bbc",
+      "width": 3840,
+      "height": 2160,
+      "status": "ok",
+      "elapsedMs": 91.558,
+      "regionCount": 5,
+      "regions": {
+        "result": {
+          "rect": {
+            "left": 584,
+            "top": 447,
+            "width": 527,
+            "height": 103
+          },
+          "score": 0.786,
+          "componentCount": 22,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "identity": {
+          "rect": {
+            "left": 540,
+            "top": 443,
+            "width": 615,
+            "height": 207
+          },
+          "score": 0.8,
+          "componentCount": 16,
+          "bounded": true,
+          "method": "opencv-connected-component-line",
+          "isolatedFromAdjacentUi": false
+        },
+        "metadata": {
+          "rect": {
+            "left": 2754,
+            "top": 492,
+            "width": 614,
+            "height": 97
+          },
+          "score": 0.167,
+          "componentCount": 3,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "rewardBand": {
+          "rect": {
+            "left": 390,
+            "top": 588,
+            "width": 1655,
+            "height": 286
+          },
+          "score": 1.0,
+          "componentCount": 74,
+          "bounded": true,
+          "method": "opencv-connected-component-row",
+          "isolatedFromAdjacentUi": false
+        },
+        "damage": {
+          "rect": {
+            "left": 607,
+            "top": 826,
+            "width": 449,
+            "height": 151
+          },
+          "score": 1.0,
+          "componentCount": 18,
+          "bounded": true,
+          "method": "opencv-connected-component-number",
+          "isolatedFromAdjacentUi": false
+        }
+      },
+      "componentCountsBySeed": {
+        "result": 22,
+        "identity": 42,
+        "metadata": 12,
+        "rewardBand": 100,
+        "damage": 50
+      },
+      "preprocessing": [
+        "BGR-to-grayscale",
+        "CLAHE clipLimit=2.0 tileGridSize=8x8",
+        "adaptive Gaussian threshold (binary and inverse)",
+        "Otsu threshold (binary and inverse)",
+        "horizontal morphological close"
+      ],
+      "acceptancePolicy": "geometry proposals only; OCR and application validation remain authoritative"
+    },
+    {
+      "key": "Screenshot_2023-02-21_20-54-39.png",
+      "filename": "Screenshot_2023-02-21_20-54-39.png",
+      "imageSha256": "42d40b0b87bb687003e86a1a939f3cf1563ddc2ab22f9f581b54ae0acad578f2",
+      "width": 2560,
+      "height": 1440,
+      "status": "ok",
+      "elapsedMs": 43.37,
+      "regionCount": 5,
+      "regions": {
+        "result": {
+          "rect": {
+            "left": 438,
+            "top": 303,
+            "width": 343,
+            "height": 64
+          },
+          "score": 0.464,
+          "componentCount": 13,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "identity": {
+          "rect": {
+            "left": 438,
+            "top": 300,
+            "width": 460,
+            "height": 153
+          },
+          "score": 0.75,
+          "componentCount": 15,
+          "bounded": true,
+          "method": "opencv-connected-component-line",
+          "isolatedFromAdjacentUi": false
+        },
+        "metadata": {
+          "rect": {
+            "left": 1382,
+            "top": 165,
+            "width": 802,
+            "height": 144
+          },
+          "score": 0.556,
+          "componentCount": 10,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "rewardBand": {
+          "rect": {
+            "left": 443,
+            "top": 367,
+            "width": 1016,
+            "height": 216
+          },
+          "score": 1.0,
+          "componentCount": 91,
+          "bounded": true,
+          "method": "opencv-connected-component-row",
+          "isolatedFromAdjacentUi": false
+        },
+        "damage": {
+          "rect": {
+            "left": 452,
+            "top": 525,
+            "width": 252,
+            "height": 119
+          },
+          "score": 1.0,
+          "componentCount": 13,
+          "bounded": true,
+          "method": "opencv-connected-component-number",
+          "isolatedFromAdjacentUi": false
+        }
+      },
+      "componentCountsBySeed": {
+        "result": 15,
+        "identity": 35,
+        "metadata": 32,
+        "rewardBand": 110,
+        "damage": 59
+      },
+      "preprocessing": [
+        "BGR-to-grayscale",
+        "CLAHE clipLimit=2.0 tileGridSize=8x8",
+        "adaptive Gaussian threshold (binary and inverse)",
+        "Otsu threshold (binary and inverse)",
+        "horizontal morphological close"
+      ],
+      "acceptancePolicy": "geometry proposals only; OCR and application validation remain authoritative"
+    },
+    {
+      "key": "Screenshot_2024-11-14_133326.png",
+      "filename": "Screenshot_2024-11-14_133326.png",
+      "imageSha256": "5e5bd7084cd20407e56b44714efd25e97be4cea463813f60e351f229a458768c",
+      "width": 2558,
+      "height": 1439,
+      "status": "ok",
+      "elapsedMs": 42.859,
+      "regionCount": 5,
+      "regions": {
+        "result": {
+          "rect": {
+            "left": 443,
+            "top": 296,
+            "width": 334,
+            "height": 70
+          },
+          "score": 0.571,
+          "componentCount": 16,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "identity": {
+          "rect": {
+            "left": 51,
+            "top": 294,
+            "width": 726,
+            "height": 130
+          },
+          "score": 0.75,
+          "componentCount": 15,
+          "bounded": true,
+          "method": "opencv-connected-component-line",
+          "isolatedFromAdjacentUi": false
+        },
+        "metadata": {
+          "rect": {
+            "left": 1443,
+            "top": 170,
+            "width": 445,
+            "height": 131
+          },
+          "score": 0.556,
+          "componentCount": 10,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "rewardBand": {
+          "rect": {
+            "left": 140,
+            "top": 385,
+            "width": 1318,
+            "height": 197
+          },
+          "score": 1.0,
+          "componentCount": 99,
+          "bounded": true,
+          "method": "opencv-connected-component-row",
+          "isolatedFromAdjacentUi": false
+        },
+        "damage": {
+          "rect": {
+            "left": 460,
+            "top": 624,
+            "width": 243,
+            "height": 102
+          },
+          "score": 0.778,
+          "componentCount": 7,
+          "bounded": true,
+          "method": "opencv-connected-component-number",
+          "isolatedFromAdjacentUi": false
+        }
+      },
+      "componentCountsBySeed": {
+        "result": 18,
+        "identity": 60,
+        "metadata": 25,
+        "rewardBand": 143,
+        "damage": 62
+      },
+      "preprocessing": [
+        "BGR-to-grayscale",
+        "CLAHE clipLimit=2.0 tileGridSize=8x8",
+        "adaptive Gaussian threshold (binary and inverse)",
+        "Otsu threshold (binary and inverse)",
+        "horizontal morphological close"
+      ],
+      "acceptancePolicy": "geometry proposals only; OCR and application validation remain authoritative"
+    },
+    {
+      "key": "WTF.jpg",
+      "filename": "WTF.jpg",
+      "imageSha256": "7b058cb31a047ed5671c5bce7d0ae9f6d285579a16b4660149f39eeb5a65590d",
+      "width": 3840,
+      "height": 2160,
+      "status": "ok",
+      "elapsedMs": 89.748,
+      "regionCount": 4,
+      "regions": {
+        "result": {
+          "rect": {
+            "left": 96,
+            "top": 373,
+            "width": 1675,
+            "height": 177
+          },
+          "score": 0.786,
+          "componentCount": 22,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "identity": {
+          "rect": {
+            "left": 76,
+            "top": 442,
+            "width": 2151,
+            "height": 192
+          },
+          "score": 1.0,
+          "componentCount": 34,
+          "bounded": true,
+          "method": "opencv-connected-component-line",
+          "isolatedFromAdjacentUi": false
+        },
+        "metadata": {
+          "rect": {
+            "left": 2073,
+            "top": 267,
+            "width": 1646,
+            "height": 236
+          },
+          "score": 0.778,
+          "componentCount": 14,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "rewardBand": {
+          "rect": {
+            "left": 211,
+            "top": 550,
+            "width": 1977,
+            "height": 324
+          },
+          "score": 1.0,
+          "componentCount": 121,
+          "bounded": true,
+          "method": "opencv-connected-component-row",
+          "isolatedFromAdjacentUi": false
+        }
+      },
+      "componentCountsBySeed": {
+        "result": 28,
+        "identity": 74,
+        "metadata": 35,
+        "rewardBand": 156,
+        "damage": 125
+      },
+      "preprocessing": [
+        "BGR-to-grayscale",
+        "CLAHE clipLimit=2.0 tileGridSize=8x8",
+        "adaptive Gaussian threshold (binary and inverse)",
+        "Otsu threshold (binary and inverse)",
+        "horizontal morphological close"
+      ],
+      "acceptancePolicy": "geometry proposals only; OCR and application validation remain authoritative"
+    },
+    {
+      "key": "World_of_Warships_2_20_2023_10_06_11_PM.png",
+      "filename": "World_of_Warships_2_20_2023_10_06_11_PM.png",
+      "imageSha256": "7530fe8acbbab6682bccd7e80b2b5376cf02357f1ac5e66fe2876f000c5e1987",
+      "width": 2560,
+      "height": 1400,
+      "status": "ok",
+      "elapsedMs": 46.721,
+      "regionCount": 5,
+      "regions": {
+        "result": {
+          "rect": {
+            "left": 598,
+            "top": 216,
+            "width": 386,
+            "height": 101
+          },
+          "score": 0.214,
+          "componentCount": 6,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "identity": {
+          "rect": {
+            "left": 166,
+            "top": 287,
+            "width": 705,
+            "height": 154
+          },
+          "score": 0.9,
+          "componentCount": 18,
+          "bounded": true,
+          "method": "opencv-connected-component-line",
+          "isolatedFromAdjacentUi": false
+        },
+        "metadata": {
+          "rect": {
+            "left": 1409,
+            "top": 187,
+            "width": 954,
+            "height": 163
+          },
+          "score": 0.333,
+          "componentCount": 6,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "rewardBand": {
+          "rect": {
+            "left": 444,
+            "top": 383,
+            "width": 1012,
+            "height": 184
+          },
+          "score": 1.0,
+          "componentCount": 83,
+          "bounded": true,
+          "method": "opencv-connected-component-row",
+          "isolatedFromAdjacentUi": false
+        },
+        "damage": {
+          "rect": {
+            "left": 455,
+            "top": 613,
+            "width": 249,
+            "height": 76
+          },
+          "score": 1.0,
+          "componentCount": 18,
+          "bounded": true,
+          "method": "opencv-connected-component-number",
+          "isolatedFromAdjacentUi": false
+        }
+      },
+      "componentCountsBySeed": {
+        "result": 28,
+        "identity": 41,
+        "metadata": 27,
+        "rewardBand": 140,
+        "damage": 67
+      },
+      "preprocessing": [
+        "BGR-to-grayscale",
+        "CLAHE clipLimit=2.0 tileGridSize=8x8",
+        "adaptive Gaussian threshold (binary and inverse)",
+        "Otsu threshold (binary and inverse)",
+        "horizontal morphological close"
+      ],
+      "acceptancePolicy": "geometry proposals only; OCR and application validation remain authoritative"
+    },
+    {
+      "key": "imag7e.png",
+      "filename": "imag7e.png",
+      "imageSha256": "4879e6287c975ecdb7745ecd893102f8032eb2b7c4524caa58b884b2674e3748",
+      "width": 1874,
+      "height": 967,
+      "status": "ok",
+      "elapsedMs": 25.511,
+      "regionCount": 5,
+      "regions": {
+        "result": {
+          "rect": {
+            "left": 450,
+            "top": 159,
+            "width": 390,
+            "height": 48
+          },
+          "score": 0.286,
+          "componentCount": 8,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "identity": {
+          "rect": {
+            "left": 278,
+            "top": 219,
+            "width": 681,
+            "height": 41
+          },
+          "score": 0.4,
+          "componentCount": 8,
+          "bounded": true,
+          "method": "opencv-connected-component-line",
+          "isolatedFromAdjacentUi": false
+        },
+        "metadata": {
+          "rect": {
+            "left": 1011,
+            "top": 111,
+            "width": 836,
+            "height": 98
+          },
+          "score": 1.0,
+          "componentCount": 88,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "rewardBand": {
+          "rect": {
+            "left": 193,
+            "top": 270,
+            "width": 822,
+            "height": 121
+          },
+          "score": 1.0,
+          "componentCount": 124,
+          "bounded": true,
+          "method": "opencv-connected-component-row",
+          "isolatedFromAdjacentUi": false
+        },
+        "damage": {
+          "rect": {
+            "left": 204,
+            "top": 434,
+            "width": 260,
+            "height": 54
+          },
+          "score": 1.0,
+          "componentCount": 43,
+          "bounded": true,
+          "method": "opencv-connected-component-number",
+          "isolatedFromAdjacentUi": false
+        }
+      },
+      "componentCountsBySeed": {
+        "result": 122,
+        "identity": 202,
+        "metadata": 116,
+        "rewardBand": 234,
+        "damage": 63
+      },
+      "preprocessing": [
+        "BGR-to-grayscale",
+        "CLAHE clipLimit=2.0 tileGridSize=8x8",
+        "adaptive Gaussian threshold (binary and inverse)",
+        "Otsu threshold (binary and inverse)",
+        "horizontal morphological close"
+      ],
+      "acceptancePolicy": "geometry proposals only; OCR and application validation remain authoritative"
+    },
+    {
+      "key": "imag8e.png",
+      "filename": "imag8e.png",
+      "imageSha256": "239fe1633efad6fd3732879f0f7867913144bb34fcaab34f044f96173504a67e",
+      "width": 2545,
+      "height": 1431,
+      "status": "ok",
+      "elapsedMs": 41.637,
+      "regionCount": 5,
+      "regions": {
+        "result": {
+          "rect": {
+            "left": 63,
+            "top": 232,
+            "width": 836,
+            "height": 132
+          },
+          "score": 0.75,
+          "componentCount": 21,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "identity": {
+          "rect": {
+            "left": 60,
+            "top": 334,
+            "width": 774,
+            "height": 70
+          },
+          "score": 0.35,
+          "componentCount": 7,
+          "bounded": true,
+          "method": "opencv-connected-component-line",
+          "isolatedFromAdjacentUi": false
+        },
+        "metadata": {
+          "rect": {
+            "left": 1374,
+            "top": 164,
+            "width": 1145,
+            "height": 112
+          },
+          "score": 0.722,
+          "componentCount": 13,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "rewardBand": {
+          "rect": {
+            "left": 139,
+            "top": 364,
+            "width": 1311,
+            "height": 215
+          },
+          "score": 1.0,
+          "componentCount": 132,
+          "bounded": true,
+          "method": "opencv-connected-component-row",
+          "isolatedFromAdjacentUi": false
+        },
+        "damage": {
+          "rect": {
+            "left": 63,
+            "top": 569,
+            "width": 381,
+            "height": 62
+          },
+          "score": 0.889,
+          "componentCount": 8,
+          "bounded": true,
+          "method": "opencv-connected-component-number",
+          "isolatedFromAdjacentUi": true
+        }
+      },
+      "componentCountsBySeed": {
+        "result": 52,
+        "identity": 86,
+        "metadata": 25,
+        "rewardBand": 176,
+        "damage": 109
+      },
+      "preprocessing": [
+        "BGR-to-grayscale",
+        "CLAHE clipLimit=2.0 tileGridSize=8x8",
+        "adaptive Gaussian threshold (binary and inverse)",
+        "Otsu threshold (binary and inverse)",
+        "horizontal morphological close"
+      ],
+      "acceptancePolicy": "geometry proposals only; OCR and application validation remain authoritative"
+    },
+    {
+      "key": "image.png",
+      "filename": "image.png",
+      "imageSha256": "6da867a4086b3588cbc868bfe52869b9d7bb1121b3532091e495f70fc5c94035",
+      "width": 1916,
+      "height": 1032,
+      "status": "ok",
+      "elapsedMs": 25.008,
+      "regionCount": 5,
+      "regions": {
+        "result": {
+          "rect": {
+            "left": 290,
+            "top": 187,
+            "width": 268,
+            "height": 76
+          },
+          "score": 0.679,
+          "componentCount": 19,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "identity": {
+          "rect": {
+            "left": 270,
+            "top": 211,
+            "width": 307,
+            "height": 72
+          },
+          "score": 0.65,
+          "componentCount": 13,
+          "bounded": true,
+          "method": "opencv-connected-component-line",
+          "isolatedFromAdjacentUi": false
+        },
+        "metadata": {
+          "rect": {
+            "left": 1279,
+            "top": 211,
+            "width": 346,
+            "height": 60
+          },
+          "score": 0.833,
+          "componentCount": 15,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "rewardBand": {
+          "rect": {
+            "left": 105,
+            "top": 263,
+            "width": 745,
+            "height": 154
+          },
+          "score": 1.0,
+          "componentCount": 112,
+          "bounded": true,
+          "method": "opencv-connected-component-row",
+          "isolatedFromAdjacentUi": false
+        },
+        "damage": {
+          "rect": {
+            "left": 287,
+            "top": 449,
+            "width": 239,
+            "height": 72
+          },
+          "score": 1.0,
+          "componentCount": 19,
+          "bounded": true,
+          "method": "opencv-connected-component-number",
+          "isolatedFromAdjacentUi": false
+        }
+      },
+      "componentCountsBySeed": {
+        "result": 21,
+        "identity": 53,
+        "metadata": 15,
+        "rewardBand": 114,
+        "damage": 64
+      },
+      "preprocessing": [
+        "BGR-to-grayscale",
+        "CLAHE clipLimit=2.0 tileGridSize=8x8",
+        "adaptive Gaussian threshold (binary and inverse)",
+        "Otsu threshold (binary and inverse)",
+        "horizontal morphological close"
+      ],
+      "acceptancePolicy": "geometry proposals only; OCR and application validation remain authoritative"
+    },
+    {
+      "key": "image1.png",
+      "filename": "image1.png",
+      "imageSha256": "dedbaf1296b0541b5592629cd7967ebe577c8e7de340bf7f7b18cf06bc05f3b7",
+      "width": 1700,
+      "height": 877,
+      "status": "ok",
+      "elapsedMs": 20.661,
+      "regionCount": 5,
+      "regions": {
+        "result": {
+          "rect": {
+            "left": 46,
+            "top": 134,
+            "width": 597,
+            "height": 86
+          },
+          "score": 1.0,
+          "componentCount": 32,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "identity": {
+          "rect": {
+            "left": 228,
+            "top": 204,
+            "width": 325,
+            "height": 45
+          },
+          "score": 1.0,
+          "componentCount": 60,
+          "bounded": true,
+          "method": "opencv-connected-component-line",
+          "isolatedFromAdjacentUi": false
+        },
+        "metadata": {
+          "rect": {
+            "left": 1162,
+            "top": 150,
+            "width": 389,
+            "height": 91
+          },
+          "score": 1.0,
+          "componentCount": 99,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "rewardBand": {
+          "rect": {
+            "left": 121,
+            "top": 237,
+            "width": 847,
+            "height": 118
+          },
+          "score": 1.0,
+          "componentCount": 117,
+          "bounded": true,
+          "method": "opencv-connected-component-row",
+          "isolatedFromAdjacentUi": false
+        },
+        "damage": {
+          "rect": {
+            "left": 230,
+            "top": 387,
+            "width": 211,
+            "height": 55
+          },
+          "score": 1.0,
+          "componentCount": 43,
+          "bounded": true,
+          "method": "opencv-connected-component-number",
+          "isolatedFromAdjacentUi": false
+        }
+      },
+      "componentCountsBySeed": {
+        "result": 108,
+        "identity": 125,
+        "metadata": 102,
+        "rewardBand": 213,
+        "damage": 67
+      },
+      "preprocessing": [
+        "BGR-to-grayscale",
+        "CLAHE clipLimit=2.0 tileGridSize=8x8",
+        "adaptive Gaussian threshold (binary and inverse)",
+        "Otsu threshold (binary and inverse)",
+        "horizontal morphological close"
+      ],
+      "acceptancePolicy": "geometry proposals only; OCR and application validation remain authoritative"
+    },
+    {
+      "key": "image2.png",
+      "filename": "image2.png",
+      "imageSha256": "70cda4e727f1c6560458d8767ab42eb433d3df27ffce4df098cd1d10a533fe42",
+      "width": 1511,
+      "height": 818,
+      "status": "ok",
+      "elapsedMs": 18.242,
+      "regionCount": 4,
+      "regions": {
+        "result": {
+          "rect": {
+            "left": 86,
+            "top": 98,
+            "width": 245,
+            "height": 82
+          },
+          "score": 0.5,
+          "componentCount": 14,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "identity": {
+          "rect": {
+            "left": 79,
+            "top": 196,
+            "width": 241,
+            "height": 36
+          },
+          "score": 1.0,
+          "componentCount": 27,
+          "bounded": true,
+          "method": "opencv-connected-component-line",
+          "isolatedFromAdjacentUi": false
+        },
+        "metadata": {
+          "rect": {
+            "left": 815,
+            "top": 94,
+            "width": 680,
+            "height": 83
+          },
+          "score": 1.0,
+          "componentCount": 62,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "rewardBand": {
+          "rect": {
+            "left": 91,
+            "top": 238,
+            "width": 742,
+            "height": 93
+          },
+          "score": 1.0,
+          "componentCount": 94,
+          "bounded": true,
+          "method": "opencv-connected-component-row",
+          "isolatedFromAdjacentUi": false
+        }
+      },
+      "componentCountsBySeed": {
+        "result": 84,
+        "identity": 94,
+        "metadata": 74,
+        "rewardBand": 138,
+        "damage": 89
+      },
+      "preprocessing": [
+        "BGR-to-grayscale",
+        "CLAHE clipLimit=2.0 tileGridSize=8x8",
+        "adaptive Gaussian threshold (binary and inverse)",
+        "Otsu threshold (binary and inverse)",
+        "horizontal morphological close"
+      ],
+      "acceptancePolicy": "geometry proposals only; OCR and application validation remain authoritative"
+    },
+    {
+      "key": "image3.png",
+      "filename": "image3.png",
+      "imageSha256": "f6f61a0208d6336c49397ef9257eb875aaed3e93aef2585bbfe7d8b5c1fce18b",
+      "width": 1821,
+      "height": 960,
+      "status": "ok",
+      "elapsedMs": 26.294,
+      "regionCount": 5,
+      "regions": {
+        "result": {
+          "rect": {
+            "left": 218,
+            "top": 128,
+            "width": 637,
+            "height": 116
+          },
+          "score": 0.643,
+          "componentCount": 18,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "identity": {
+          "rect": {
+            "left": 228,
+            "top": 235,
+            "width": 526,
+            "height": 42
+          },
+          "score": 0.6,
+          "componentCount": 12,
+          "bounded": true,
+          "method": "opencv-connected-component-line",
+          "isolatedFromAdjacentUi": false
+        },
+        "metadata": {
+          "rect": {
+            "left": 983,
+            "top": 110,
+            "width": 679,
+            "height": 122
+          },
+          "score": 0.778,
+          "componentCount": 14,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "rewardBand": {
+          "rect": {
+            "left": 100,
+            "top": 244,
+            "width": 875,
+            "height": 144
+          },
+          "score": 1.0,
+          "componentCount": 188,
+          "bounded": true,
+          "method": "opencv-connected-component-row",
+          "isolatedFromAdjacentUi": false
+        },
+        "damage": {
+          "rect": {
+            "left": 154,
+            "top": 418,
+            "width": 284,
+            "height": 57
+          },
+          "score": 1.0,
+          "componentCount": 50,
+          "bounded": true,
+          "method": "opencv-connected-component-number",
+          "isolatedFromAdjacentUi": false
+        }
+      },
+      "componentCountsBySeed": {
+        "result": 35,
+        "identity": 105,
+        "metadata": 62,
+        "rewardBand": 197,
+        "damage": 98
+      },
+      "preprocessing": [
+        "BGR-to-grayscale",
+        "CLAHE clipLimit=2.0 tileGridSize=8x8",
+        "adaptive Gaussian threshold (binary and inverse)",
+        "Otsu threshold (binary and inverse)",
+        "horizontal morphological close"
+      ],
+      "acceptancePolicy": "geometry proposals only; OCR and application validation remain authoritative"
+    },
+    {
+      "key": "image4.png",
+      "filename": "image4.png",
+      "imageSha256": "b590f10eeebba8f1358f3497a6ba0216ce8c3deb30a822dab1478440689c973f",
+      "width": 2559,
+      "height": 1439,
+      "status": "ok",
+      "elapsedMs": 43.498,
+      "regionCount": 5,
+      "regions": {
+        "result": {
+          "rect": {
+            "left": 440,
+            "top": 296,
+            "width": 307,
+            "height": 70
+          },
+          "score": 0.571,
+          "componentCount": 16,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "identity": {
+          "rect": {
+            "left": 468,
+            "top": 318,
+            "width": 980,
+            "height": 65
+          },
+          "score": 0.2,
+          "componentCount": 4,
+          "bounded": true,
+          "method": "opencv-connected-component-line",
+          "isolatedFromAdjacentUi": false
+        },
+        "metadata": {
+          "rect": {
+            "left": 1381,
+            "top": 227,
+            "width": 1025,
+            "height": 168
+          },
+          "score": 0.722,
+          "componentCount": 13,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "rewardBand": {
+          "rect": {
+            "left": 447,
+            "top": 382,
+            "width": 931,
+            "height": 200
+          },
+          "score": 1.0,
+          "componentCount": 110,
+          "bounded": true,
+          "method": "opencv-connected-component-row",
+          "isolatedFromAdjacentUi": false
+        },
+        "damage": {
+          "rect": {
+            "left": 460,
+            "top": 623,
+            "width": 243,
+            "height": 71
+          },
+          "score": 1.0,
+          "componentCount": 12,
+          "bounded": true,
+          "method": "opencv-connected-component-number",
+          "isolatedFromAdjacentUi": false
+        }
+      },
+      "componentCountsBySeed": {
+        "result": 17,
+        "identity": 53,
+        "metadata": 25,
+        "rewardBand": 124,
+        "damage": 63
+      },
+      "preprocessing": [
+        "BGR-to-grayscale",
+        "CLAHE clipLimit=2.0 tileGridSize=8x8",
+        "adaptive Gaussian threshold (binary and inverse)",
+        "Otsu threshold (binary and inverse)",
+        "horizontal morphological close"
+      ],
+      "acceptancePolicy": "geometry proposals only; OCR and application validation remain authoritative"
+    },
+    {
+      "key": "image5.png",
+      "filename": "image5.png",
+      "imageSha256": "2f6ca55f3f3f0483d273e5a8aed92da4a7c397ef46649682cd6790cfd5521cc5",
+      "width": 3237,
+      "height": 1542,
+      "status": "ok",
+      "elapsedMs": 60.579,
+      "regionCount": 4,
+      "regions": {
+        "result": {
+          "rect": {
+            "left": 139,
+            "top": 235,
+            "width": 569,
+            "height": 158
+          },
+          "score": 0.571,
+          "componentCount": 16,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "identity": {
+          "rect": {
+            "left": 625,
+            "top": 364,
+            "width": 518,
+            "height": 57
+          },
+          "score": 0.15,
+          "componentCount": 3,
+          "bounded": true,
+          "method": "opencv-connected-component-line",
+          "isolatedFromAdjacentUi": false
+        },
+        "metadata": {
+          "rect": {
+            "left": 2292,
+            "top": 283,
+            "width": 553,
+            "height": 113
+          },
+          "score": 1.0,
+          "componentCount": 27,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "rewardBand": {
+          "rect": {
+            "left": 178,
+            "top": 438,
+            "width": 1028,
+            "height": 186
+          },
+          "score": 1.0,
+          "componentCount": 51,
+          "bounded": true,
+          "method": "opencv-connected-component-row",
+          "isolatedFromAdjacentUi": false
+        }
+      },
+      "componentCountsBySeed": {
+        "result": 23,
+        "identity": 83,
+        "metadata": 28,
+        "rewardBand": 92,
+        "damage": 70
+      },
+      "preprocessing": [
+        "BGR-to-grayscale",
+        "CLAHE clipLimit=2.0 tileGridSize=8x8",
+        "adaptive Gaussian threshold (binary and inverse)",
+        "Otsu threshold (binary and inverse)",
+        "horizontal morphological close"
+      ],
+      "acceptancePolicy": "geometry proposals only; OCR and application validation remain authoritative"
+    },
+    {
+      "key": "image6.png",
+      "filename": "image6.png",
+      "imageSha256": "c87ead619e3050f63dd596ba0df80be7b384d01361e1c12cafbf44e0dff023de",
+      "width": 2557,
+      "height": 1437,
+      "status": "ok",
+      "elapsedMs": 45.558,
+      "regionCount": 5,
+      "regions": {
+        "result": {
+          "rect": {
+            "left": 278,
+            "top": 172,
+            "width": 949,
+            "height": 194
+          },
+          "score": 1.0,
+          "componentCount": 41,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "identity": {
+          "rect": {
+            "left": 51,
+            "top": 294,
+            "width": 1432,
+            "height": 158
+          },
+          "score": 1.0,
+          "componentCount": 51,
+          "bounded": true,
+          "method": "opencv-connected-component-line",
+          "isolatedFromAdjacentUi": false
+        },
+        "metadata": {
+          "rect": {
+            "left": 1380,
+            "top": 165,
+            "width": 664,
+            "height": 127
+          },
+          "score": 1.0,
+          "componentCount": 33,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "rewardBand": {
+          "rect": {
+            "left": 140,
+            "top": 366,
+            "width": 1317,
+            "height": 215
+          },
+          "score": 1.0,
+          "componentCount": 140,
+          "bounded": true,
+          "method": "opencv-connected-component-row",
+          "isolatedFromAdjacentUi": false
+        },
+        "damage": {
+          "rect": {
+            "left": 353,
+            "top": 607,
+            "width": 350,
+            "height": 84
+          },
+          "score": 1.0,
+          "componentCount": 16,
+          "bounded": true,
+          "method": "opencv-connected-component-number",
+          "isolatedFromAdjacentUi": false
+        }
+      },
+      "componentCountsBySeed": {
+        "result": 93,
+        "identity": 128,
+        "metadata": 73,
+        "rewardBand": 206,
+        "damage": 78
+      },
+      "preprocessing": [
+        "BGR-to-grayscale",
+        "CLAHE clipLimit=2.0 tileGridSize=8x8",
+        "adaptive Gaussian threshold (binary and inverse)",
+        "Otsu threshold (binary and inverse)",
+        "horizontal morphological close"
+      ],
+      "acceptancePolicy": "geometry proposals only; OCR and application validation remain authoritative"
+    },
+    {
+      "key": "shot-26.08.31_16.22.19-0048.jpg",
+      "filename": "shot-26.08.31_16.22.19-0048.jpg",
+      "imageSha256": "b7d5c4362bfd5d9d531075c6f0807906e3f5b3bb5e94055420ac96eb519a964c",
+      "width": 3840,
+      "height": 2160,
+      "status": "ok",
+      "elapsedMs": 93.756,
+      "regionCount": 5,
+      "regions": {
+        "result": {
+          "rect": {
+            "left": 96,
+            "top": 332,
+            "width": 1747,
+            "height": 145
+          },
+          "score": 0.286,
+          "componentCount": 8,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "identity": {
+          "rect": {
+            "left": 428,
+            "top": 506,
+            "width": 615,
+            "height": 85
+          },
+          "score": 0.2,
+          "componentCount": 4,
+          "bounded": true,
+          "method": "opencv-connected-component-line",
+          "isolatedFromAdjacentUi": false
+        },
+        "metadata": {
+          "rect": {
+            "left": 2073,
+            "top": 344,
+            "width": 1728,
+            "height": 212
+          },
+          "score": 0.222,
+          "componentCount": 4,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "rewardBand": {
+          "rect": {
+            "left": 435,
+            "top": 639,
+            "width": 1753,
+            "height": 230
+          },
+          "score": 1.0,
+          "componentCount": 60,
+          "bounded": true,
+          "method": "opencv-connected-component-row",
+          "isolatedFromAdjacentUi": false
+        },
+        "damage": {
+          "rect": {
+            "left": 408,
+            "top": 788,
+            "width": 552,
+            "height": 70
+          },
+          "score": 0.444,
+          "componentCount": 4,
+          "bounded": true,
+          "method": "opencv-connected-component-number",
+          "isolatedFromAdjacentUi": false
+        }
+      },
+      "componentCountsBySeed": {
+        "result": 25,
+        "identity": 36,
+        "metadata": 22,
+        "rewardBand": 103,
+        "damage": 65
+      },
+      "preprocessing": [
+        "BGR-to-grayscale",
+        "CLAHE clipLimit=2.0 tileGridSize=8x8",
+        "adaptive Gaussian threshold (binary and inverse)",
+        "Otsu threshold (binary and inverse)",
+        "horizontal morphological close"
+      ],
+      "acceptancePolicy": "geometry proposals only; OCR and application validation remain authoritative"
+    },
+    {
+      "key": "unknown.png",
+      "filename": "unknown.png",
+      "imageSha256": "ac2a61da73901b8d308789c2ddaff2da7642b5bb5f1f4ff999bfdccd689555a4",
+      "width": 2558,
+      "height": 1440,
+      "status": "ok",
+      "elapsedMs": 42.775,
+      "regionCount": 5,
+      "regions": {
+        "result": {
+          "rect": {
+            "left": 440,
+            "top": 304,
+            "width": 339,
+            "height": 63
+          },
+          "score": 0.536,
+          "componentCount": 15,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "identity": {
+          "rect": {
+            "left": 440,
+            "top": 301,
+            "width": 433,
+            "height": 152
+          },
+          "score": 0.8,
+          "componentCount": 16,
+          "bounded": true,
+          "method": "opencv-connected-component-line",
+          "isolatedFromAdjacentUi": false
+        },
+        "metadata": {
+          "rect": {
+            "left": 1381,
+            "top": 268,
+            "width": 898,
+            "height": 128
+          },
+          "score": 0.389,
+          "componentCount": 7,
+          "bounded": true,
+          "method": "opencv-connected-component-lines",
+          "isolatedFromAdjacentUi": false
+        },
+        "rewardBand": {
+          "rect": {
+            "left": 140,
+            "top": 367,
+            "width": 1129,
+            "height": 216
+          },
+          "score": 1.0,
+          "componentCount": 88,
+          "bounded": true,
+          "method": "opencv-connected-component-row",
+          "isolatedFromAdjacentUi": false
+        },
+        "damage": {
+          "rect": {
+            "left": 466,
+            "top": 637,
+            "width": 237,
+            "height": 58
+          },
+          "score": 1.0,
+          "componentCount": 15,
+          "bounded": true,
+          "method": "opencv-connected-component-number",
+          "isolatedFromAdjacentUi": false
+        }
+      },
+      "componentCountsBySeed": {
+        "result": 16,
+        "identity": 36,
+        "metadata": 13,
+        "rewardBand": 105,
+        "damage": 91
+      },
+      "preprocessing": [
+        "BGR-to-grayscale",
+        "CLAHE clipLimit=2.0 tileGridSize=8x8",
+        "adaptive Gaussian threshold (binary and inverse)",
+        "Otsu threshold (binary and inverse)",
+        "horizontal morphological close"
+      ],
+      "acceptancePolicy": "geometry proposals only; OCR and application validation remain authoritative"
+    }
+  ],
+  "failures": []
+}

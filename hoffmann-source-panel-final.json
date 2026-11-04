@@ -1,0 +1,1781 @@
+{
+  "buildVersion": "2.5.0",
+  "createdAt": "2026-10-25T01:00:45.356Z",
+  "nodeVersion": "v22.16.0",
+  "configuredEngine": "tesseractjs",
+  "executionMode": "single-process sequential pipeline; worker recycle enabled after each image unless explicitly disabled",
+  "workerRecyclePerImage": true,
+  "operationTimeoutMs": 15000,
+  "fixtureOrder": [
+    "hoffmann-victory.png"
+  ],
+  "imageCount": 1,
+  "completedImages": 1,
+  "exactMatches": 1,
+  "requiredFieldsComplete": 1,
+  "durationMs": 28920,
+  "networkBlocked": false,
+  "results": [
+    {
+      "fixtureKey": "hoffmann-victory.png",
+      "filename": "hoffmann-victory.png",
+      "imageSha256": "c83c61543a806225b4a0e3a60ce4a02d7da5aecc710c4c6c92197c853cc03a1e",
+      "elapsedMs": 28920,
+      "pipelineCompleted": true,
+      "attempts": 3,
+      "selectedPageSegmentationMode": 3,
+      "confidence": 83,
+      "actual": {
+        "result": "Victory",
+        "player": "[-SEN-]WorldSpOwn",
+        "map": "Mountain Range",
+        "mode": "Random Battle",
+        "battleStart": "27.03.2025 23:55",
+        "credits": 1237152,
+        "xp": 14390,
+        "freeXp": 1645,
+        "damage": 303622
+      },
+      "expected": {
+        "result": "Victory",
+        "player": "[-SEN-]WorldSpOwn",
+        "map": "Mountain Range",
+        "mode": "Random Battle",
+        "battleStart": "27.03.2025 23:55",
+        "credits": 1237152,
+        "xp": 14390,
+        "freeXp": 1645,
+        "damage": 303622
+      },
+      "comparison": {
+        "result": {
+          "expected": "Victory",
+          "actual": "Victory",
+          "pass": true
+        },
+        "player": {
+          "expected": "[-SEN-]WorldSpOwn",
+          "actual": "[-SEN-]WorldSpOwn",
+          "pass": true
+        },
+        "map": {
+          "expected": "Mountain Range",
+          "actual": "Mountain Range",
+          "pass": true
+        },
+        "mode": {
+          "expected": "Random Battle",
+          "actual": "Random Battle",
+          "pass": true
+        },
+        "battleStart": {
+          "expected": "27.03.2025 23:55",
+          "actual": "27.03.2025 23:55",
+          "pass": true
+        },
+        "credits": {
+          "expected": 1237152,
+          "actual": 1237152,
+          "pass": true
+        },
+        "xp": {
+          "expected": 14390,
+          "actual": 14390,
+          "pass": true
+        },
+        "freeXp": {
+          "expected": 1645,
+          "actual": 1645,
+          "pass": true
+        },
+        "damage": {
+          "expected": 303622,
+          "actual": 303622,
+          "pass": true
+        }
+      },
+      "allExpectedFieldsPass": true,
+      "requiredMissing": [],
+      "ambiguities": {},
+      "damageSelection": {
+        "candidates": [
+          {
+            "value": "303622",
+            "confidence": 0,
+            "source": "focused-7"
+          },
+          {
+            "value": "303622",
+            "confidence": 36,
+            "source": "focused-8"
+          }
+        ],
+        "selectedBy": "combined-evidence",
+        "selectedValue": null,
+        "conflictingFocusedValues": []
+      },
+      "damageCandidates": [
+        {
+          "value": "303622",
+          "confidence": 0,
+          "source": "focused-7"
+        },
+        {
+          "value": "303622",
+          "confidence": 36,
+          "source": "focused-8"
+        }
+      ],
+      "fullScreenDamageCandidates": [],
+      "damageOcrText": "303622",
+      "rawCandidateText": [
+        {
+          "psm": 3,
+          "confidence": 83,
+          "text": "PERSONAL SCORE DETAILED REPORT CREDITS AND XP\n\nIncapaciations Destroyed Set on fire\n\nCaptured Spotted\n\nCombat Missions\n\nReceive potential Win a battle Weekly Mission [ amssonsmrora |\n“ Earn 2000 Base XP. © Fe 11] ly 3 MISSIONS IN TOTAL\n\n.\n« .\n\nBACK TO PORT -"
+        },
+        {
+          "psm": 11,
+          "confidence": 65,
+          "text": "PERSONAL SCORE\n\nCORE\n\nDETAILED REPORT\n\nCREDITS AND XP\n\n[esc\n\na\n\nuntain R\n\ntain\n\nBattle\n\nstart tim\n\n23:55\n\nOur.\n\nteam comp\n\nd the mission.\n\nG. HOFFMANN.\n\ntect\n\nd fo the Battle:\n\nA\n\nwe.\n\n=\n\n7\n\nxe\n\n03\n\n1\n\nNy\n\nittle\n\nperforma\n\n5]\n\n=\n\n0\n\n=i\n\nLi\n\nE77 TE\n\nIN\n\nSE\n\na\n\nSet on fire\n\nDf =\n\nGitadel hits\n\nDefended\n\nDamage\n\ngs hits\n\nTarget hits\n\nincapacitations\n\nDestroyed\n\nCaused flooding\n\n-\n\nCaptured\n\nSpotted\n\nCombat Missions\n\n“ Earn 2000 Base XP. ©\n\ndamage\n\nReceive potential\n\n[IR vn a vate\n\n© Weekly Mission\n\n3 MISSIONS IN TOTAL\n\nB\n\ned\n\n.\n\n-."
+        },
+        {
+          "psm": "combined",
+          "confidence": 64.9,
+          "text": "PERSONAL SCORE DETAILED REPORT CREDITS AND XP\nCREDITS AND XP\n[esc\nPERSONAL SCORE\nCORE\nDETAILED REPORT\nVIN J LAM vuunc | ULIAILLU nor vn | LNELUVITO ANU AT\nVINA uv 1LAIV vLuUno | ULIAILLU nL | LRLUITO ANU AT\nLAV vuunc\nUEIARILLU noun\nLIEU TO ANU Al\na\nVictory! 5\nVictory!\n|_|\n_—\n—\nMountainiRange== Random Battle\nMountain Range — Random Battle\nMountain Range = Random Battle\nMountainiRange==Random'E\nMountain'Range==Random'E\nMountain Range = Random B\nMountain Range == Random\nMountain Rang\n— Random Battle\nuntain R\nBattle\nMour\ntain\nBattle start time #2703120\nBattle start time: 27:03:2025 23:55\nBattle start time: 27:03:20 -\nBattle start time: 27.03.20\nBattle start time#2740312C\nBattle start time: 27:03:20\n23:55\nstart tim\nOur team completed the mission. .\nOur.\nOur team comp\nd the mission.\nteam comp\nOur team completed the mission.\n[-SEN-]WorldSpOwn ®= XG. HOFFMANN N\n[-SEN-]WorldSpOwn = X G. HOFFMANN \\\n[-SEN-]WorldSpOwn == XG. HOFFMANN .\n[-SEN-WorldSpOwn == X G. HOFFMANN\nG. HOFFMANN.\n[-SEN-]WorldSpOwn ®= X G. HOFFMANN\n[-SEN-]WorldSpOwn ®™ X G. HOFFMANN\nReceived for the Battle < } i\nReceived for the Battle . N. y |\n-\nReceived for the Bate — ¢\nReceived for the hilly\nd fo the Battle:\nReceived for the Battle\ntect\n4 097 4E0e 44 200A Te OT Zl) AS) >\n5 A NE a RIN NG TN AL >\n1237152 14390% 16454 \"© 2 BA Ras i R60\n1237152© 14390 16454 [N17 | Ul Jal ped [1] 2\n1237152@ 14 390+ 1645+ ~\\| 2 40) Jal)\n= EN gC =i AEN amet pres\n=\ne x Ne YEE Ek\n5\ni\n\\\n~\n(I;\nNi\nxe\n[AC\nee Batigl BY lance\nAN\nwe.\nUs?\n7\n03\n70\n1\n_ Batilejperformance i : : —— — i 4 -\n: a “ Battle performance |\n: -. “ Battle performance: 8\nNy\nCy\naX\nittle\nperforma\nLo mE PETS ATTY Led TEL\n= — = — —_— i =\nA — — — a 1 =\n3\nEB\n=i\nE77 TE\n5]\nNe\nSE\n| E——\nIN\n0\nx2\nLi\n=7\nDamage\nEa Damage eT Target hits - Target hits i ncapacitations Destroyed - Set on fire h Caused flooding Citadel hits Defended\nIncapaciations Destroyed Set on fire\n- Damage Target hits Target hits “Incapacitations Destroyed Set on fire Caused flooding Citadel hits Defended\n* Damage . Target hits Target hits ncapacitations Destroyed - Setonfire Caused flooding Citadel hits Defended\ngs hits\nincapacitations\nDf =\n.\nTarget hits\nDestroyed\nSet on fire\nCaused flooding\nCitadel hits\nDefended\nGitadel hits\nations\nncap:\n——=\nCaptured Spotted\nCaptured Spotted ’\nCaptured\nSpotted\nCombat Missions\n“ BAMOED @ pester! Win a battle ® Weekly Mission\n[v4 2 Earn 2 000 Base XP << damage | = —\n(2 Earn 2 000 Base XP @ Receive potential Win a battle © Weekly Mission\n(2 Earn 2 000 Base XP @\n(72 Earn 2 000 Base XP @ Receive potential Win a battle ® Weekly Mission\n© Weekly Mission\n“ Earn 2000 Base XP. © Fe 11] ly 3 MISSIONS IN TOTAL\n“ Earn 2000 Base XP. ©\n= Receive potential [Hi Win a battle ® Weekly Mission 3 MISSIONS IN TOTAL\nHH Win a battle\nReceive potential Win a battle Weekly Mission [ amssonsmrora |\nReceive potential\n[IR vn a vate\n3 MISSIONS IN TOTAL\ndamage || —\ndamage re — —_—\nB\n> ’\n. '\now .\nod »\n« .\n»\ned\n-.\nBACK TO PORT |e — -\nBACK TO PORT |e\nBACK TO PORT -"
+        }
+      ],
+      "fullScreenDamageOcrText": [
+        {
+          "psm": 3,
+          "text": "PERSONAL SCORE DETAILED REPORT CREDITS AND XP\n\nIncapaciations Destroyed Set on fire\n\nCaptured Spotted\n\nCombat Missions\n\nReceive potential Win a battle Weekly Mission [ amssonsmrora |\n“ Earn 2000 Base XP. © Fe 11] ly 3 MISSIONS IN TOTAL\n\n.\n« .\n\nBACK TO PORT -"
+        },
+        {
+          "psm": 11,
+          "text": "PERSONAL SCORE\n\nCORE\n\nDETAILED REPORT\n\nCREDITS AND XP\n\n[esc\n\na\n\nuntain R\n\ntain\n\nBattle\n\nstart tim\n\n23:55\n\nOur.\n\nteam comp\n\nd the mission.\n\nG. HOFFMANN.\n\ntect\n\nd fo the Battle:\n\nA\n\nwe.\n\n=\n\n7\n\nxe\n\n03\n\n1\n\nNy\n\nittle\n\nperforma\n\n5]\n\n=\n\n0\n\n=i\n\nLi\n\nE77 TE\n\nIN\n\nSE\n\na\n\nSet on fire\n\nDf =\n\nGitadel hits\n\nDefended\n\nDamage\n\ngs hits\n\nTarget hits\n\nincapacitations\n\nDestroyed\n\nCaused flooding\n\n-\n\nCaptured\n\nSpotted\n\nCombat Missions\n\n“ Earn 2000 Base XP. ©\n\ndamage\n\nReceive potential\n\n[IR vn a vate\n\n© Weekly Mission\n\n3 MISSIONS IN TOTAL\n\nB\n\ned\n\n.\n\n-."
+        }
+      ],
+      "rewardOcrText": "1237152@ 143905 1645% ~ 7 Jo 4",
+      "rawCandidateFields": {
+        "identityCandidates": [
+          {
+            "text": "|_|\nVictory! 5\nOur team completed the mission.\n[-SEN-]WorldSpOwn ®= X G. HOFFMANN\nReceived for the Battle\n= EN gC =i AEN amet pres\n1237152© 14390 16454 [N17 | Ul Jal ped [1] 2",
+            "confidence": 50
+          },
+          {
+            "text": "Mour\n\nVictory!\n\nBattle\n\nOur team completed the mission.\n\n[-SEN-]WorldSpOwn ®™ X G. HOFFMANN\n\nReceived for the Battle\n\n~\n\n1237152@ 14 390+ 1645+ ~\\| 2 40) Jal)",
+            "confidence": 64
+          },
+          {
+            "text": "Our. team completed the mission.\n[-SEN-]WorldSpOwn ®= X G. HOFFMANN",
+            "confidence": 83
+          },
+          {
+            "text": "Our. team completed the mission.\n\n[-SEN-]WorldSpOwn = X G. HOFFMANN",
+            "confidence": 79
+          },
+          {
+            "text": "our — i",
+            "confidence": 23
+          },
+          {
+            "text": "Our team complete",
+            "confidence": 26
+          }
+        ],
+        "metadataCandidates": [
+          {
+            "text": "_—\nMountain Range = Random B\nBattle start time: 27:03:20 -",
+            "confidence": 67
+          },
+          {
+            "text": "VIN J LAM vuunc | ULIAILLU nor vn | LNELUVITO ANU AT\nMountain Range — Random Battle\nBattle start time: 27:03:2025 23:55\nOur team completed the mission. .\n[-SEN-]WorldSpOwn ®= XG. HOFFMANN N\nReceived for the Battle < } i\n5 A NE a RIN NG TN AL >\ne x Ne YEE Ek\n: a “ Battle performance |\n= — = — —_— i =\nEa Damage eT Target hits - Target hits i ncapacitations Destroyed - Set on fire h Caused flooding Citadel hits Defended\nCaptured Spotted\nCombat Missions\n(2 Earn 2 000 Base XP @ Receive potential Win a battle © Weekly Mission\ndamage || —\n> ’\now .\nBACK TO PORT |e — -",
+            "confidence": 61
+          },
+          {
+            "text": "VINA uv 1LAIV vLuUno | ULIAILLU nL | LRLUITO ANU AT\nMountain Range = Random Battle\nBattle start time: 27:03:2025 23:55\nOur team completed the mission. .\n[-SEN-]WorldSpOwn = X G. HOFFMANN \\\n-\nReceived for the Battle . N. y |\n4 097 4E0e 44 200A Te OT Zl) AS) >\n: -. “ Battle performance: 8\nA — — — a 1 =\n* Damage . Target hits Target hits ncapacitations Destroyed - Setonfire Caused flooding Citadel hits Defended\nCaptured Spotted\nCombat Missions\n(72 Earn 2 000 Base XP @ Receive potential Win a battle ® Weekly Mission\ndamage re — —_—\n. '\nod »\nBACK TO PORT |e — -",
+            "confidence": 62
+          }
+        ],
+        "resultCandidates": [
+          {
+            "text": "PERSONAL SCORE DETAILED REPORT CREDITS AND XP\n\nIncapaciations Destroyed Set on fire\n\nCaptured Spotted\n\nCombat Missions\n\nReceive potential Win a battle Weekly Mission [ amssonsmrora |\n“ Earn 2000 Base XP. © Fe 11] ly 3 MISSIONS IN TOTAL\n\n.\n« .\n\nBACK TO PORT -",
+            "confidence": 83
+          },
+          {
+            "text": "PERSONAL SCORE\n\nCORE\n\nDETAILED REPORT\n\nCREDITS AND XP\n\n[esc\n\na\n\nuntain R\n\ntain\n\nBattle\n\nstart tim\n\n23:55\n\nOur.\n\nteam comp\n\nd the mission.\n\nG. HOFFMANN.\n\ntect\n\nd fo the Battle:\n\nA\n\nwe.\n\n=\n\n7\n\nxe\n\n03\n\n1\n\nNy\n\nittle\n\nperforma\n\n5]\n\n=\n\n0\n\n=i\n\nLi\n\nE77 TE\n\nIN\n\nSE\n\na\n\nSet on fire\n\nDf =\n\nGitadel hits\n\nDefended\n\nDamage\n\ngs hits\n\nTarget hits\n\nincapacitations\n\nDestroyed\n\nCaused flooding\n\n-\n\nCaptured\n\nSpotted\n\nCombat Missions\n\n“ Earn 2000 Base XP. ©\n\ndamage\n\nReceive potential\n\n[IR vn a vate\n\n© Weekly Mission\n\n3 MISSIONS IN TOTAL\n\nB\n\ned\n\n.\n\n-.",
+            "confidence": 65
+          },
+          {
+            "text": "Our team completed the mission.\n[-SEN-JWorldSpOwn = X G. HOFFMANN.\nReceived for the Battle",
+            "confidence": 83
+          },
+          {
+            "text": "Our team completed the mission.\n\n[-SEN-]WorldSpOwn ®= X G. HOFFMANN\n\nReceived for the Battle",
+            "confidence": 84
+          },
+          {
+            "text": "[mi\nVictory!\nOur team completed the mission.\n[-SEN-]WorldSpOwn ®™ X G. HOFFMANN\nReceived for the Battle",
+            "confidence": 83
+          }
+        ],
+        "rewardCandidates": [
+          {
+            "credits": "1237152",
+            "xp": "14390",
+            "freeXp": "1645",
+            "confidence": 95,
+            "source": "localized-column-consensus"
+          }
+        ],
+        "legacyRewardCandidates": [
+          {
+            "credits": "1237152",
+            "xp": "143905",
+            "freeXp": "1645",
+            "confidence": 53,
+            "source": 6
+          },
+          {
+            "credits": "1237152",
+            "xp": "143905",
+            "freeXp": "1645",
+            "confidence": 53,
+            "source": 7
+          }
+        ],
+        "localizedRewardEvidence": {
+          "attempted": true,
+          "anchors": {
+            "received": {
+              "x0": 320.2109090909091,
+              "y0": 360.3127272727273,
+              "x1": 531.2363636363636,
+              "y1": 378.4654545454546
+            },
+            "performance": {
+              "x0": 67,
+              "y0": 421.0875,
+              "x1": 1544.0471428571427,
+              "y1": 520.7478571428571
+            },
+            "receivedLeftX": 315.91999999999996
+          },
+          "bounds": {
+            "baseX": 312.08,
+            "top": 380,
+            "bottom": 419,
+            "imageWidth": 1920,
+            "imageHeight": 1080
+          },
+          "rects": {
+            "credits-psm7": {
+              "left": 310,
+              "top": 380,
+              "width": 131,
+              "height": 39
+            },
+            "xp-psm7": {
+              "left": 487,
+              "top": 380,
+              "width": 115,
+              "height": 39
+            },
+            "freeXp-psm7": {
+              "left": 658,
+              "top": 380,
+              "width": 77,
+              "height": 39
+            },
+            "credits-psm8": {
+              "left": 310,
+              "top": 380,
+              "width": 131,
+              "height": 39
+            },
+            "xp-psm8": {
+              "left": 487,
+              "top": 380,
+              "width": 115,
+              "height": 39
+            },
+            "freeXp-psm8": {
+              "left": 658,
+              "top": 380,
+              "width": 77,
+              "height": 39
+            }
+          },
+          "reads": {
+            "credits": [
+              {
+                "value": "",
+                "confidence": 0,
+                "psm": 7,
+                "text": "474"
+              },
+              {
+                "value": "40074",
+                "confidence": 0,
+                "psm": 8,
+                "text": "40074"
+              }
+            ],
+            "xp": [
+              {
+                "value": "411",
+                "confidence": 0,
+                "psm": 7,
+                "text": "411"
+              },
+              {
+                "value": "4",
+                "confidence": 0,
+                "psm": 8,
+                "text": "4"
+              }
+            ],
+            "freeXp": [
+              {
+                "value": "",
+                "confidence": 0,
+                "psm": 7,
+                "text": ""
+              },
+              {
+                "value": "",
+                "confidence": 0,
+                "psm": 8,
+                "text": ""
+              }
+            ]
+          },
+          "values": {
+            "credits": "1237152",
+            "xp": "14390",
+            "freeXp": "1645"
+          },
+          "wordGeometry": {
+            "sourceCrop": {
+              "left": 230,
+              "top": 389,
+              "width": 960,
+              "height": 59,
+              "outputWidth": 2500,
+              "transform": {
+                "left": 230,
+                "top": 389,
+                "scale": 2.6041666666666665
+              }
+            },
+            "words": [
+              {
+                "text": "1237152@",
+                "confidence": 16,
+                "bbox": {
+                  "x0": 319.088,
+                  "y0": 395.912,
+                  "x1": 532.976,
+                  "y1": 433.16
+                }
+              },
+              {
+                "text": "143905",
+                "confidence": 68,
+                "bbox": {
+                  "x0": 556.0160000000001,
+                  "y0": 395.912,
+                  "x1": 716.528,
+                  "y1": 433.16
+                }
+              },
+              {
+                "text": "1645%",
+                "confidence": 52,
+                "bbox": {
+                  "x0": 738.8,
+                  "y0": 395.528,
+                  "x1": 876.6560000000001,
+                  "y1": 433.16
+                }
+              }
+            ],
+            "reads": {
+              "credits": [
+                {
+                  "value": "1237152",
+                  "text": "1237152",
+                  "confidence": 92,
+                  "psm": 7,
+                  "fraction": 0.825,
+                  "rect": {
+                    "left": 317,
+                    "top": 390,
+                    "width": 178,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "1237152",
+                  "text": "1237152",
+                  "confidence": 33,
+                  "psm": 8,
+                  "fraction": 0.825,
+                  "rect": {
+                    "left": 317,
+                    "top": 390,
+                    "width": 178,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "1237152",
+                  "text": "1237152",
+                  "confidence": 70,
+                  "psm": 7,
+                  "fraction": 0.875,
+                  "rect": {
+                    "left": 317,
+                    "top": 390,
+                    "width": 189,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "1237152",
+                  "text": "1237152",
+                  "confidence": 0,
+                  "psm": 8,
+                  "fraction": 0.875,
+                  "rect": {
+                    "left": 317,
+                    "top": 390,
+                    "width": 189,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "1237152",
+                  "text": "1237152",
+                  "confidence": 0,
+                  "psm": 7,
+                  "fraction": 0.91,
+                  "rect": {
+                    "left": 317,
+                    "top": 390,
+                    "width": 197,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "1237152",
+                  "text": "1237152",
+                  "confidence": 0,
+                  "psm": 8,
+                  "fraction": 0.91,
+                  "rect": {
+                    "left": 317,
+                    "top": 390,
+                    "width": 197,
+                    "height": 49
+                  }
+                }
+              ],
+              "xp": [
+                {
+                  "value": "14390",
+                  "text": "14390",
+                  "confidence": 0,
+                  "psm": 7,
+                  "fraction": 0.783,
+                  "rect": {
+                    "left": 554,
+                    "top": 390,
+                    "width": 128,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "14390",
+                  "text": "14390",
+                  "confidence": 0,
+                  "psm": 8,
+                  "fraction": 0.783,
+                  "rect": {
+                    "left": 554,
+                    "top": 390,
+                    "width": 128,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "14390",
+                  "text": "14390",
+                  "confidence": 0,
+                  "psm": 7,
+                  "fraction": 0.833,
+                  "rect": {
+                    "left": 554,
+                    "top": 390,
+                    "width": 136,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "14390",
+                  "text": "14390",
+                  "confidence": 0,
+                  "psm": 8,
+                  "fraction": 0.833,
+                  "rect": {
+                    "left": 554,
+                    "top": 390,
+                    "width": 136,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "",
+                  "text": "143905",
+                  "confidence": 0,
+                  "psm": 7,
+                  "fraction": 0.868,
+                  "rect": {
+                    "left": 554,
+                    "top": 390,
+                    "width": 141,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "",
+                  "text": "143905",
+                  "confidence": 0,
+                  "psm": 8,
+                  "fraction": 0.868,
+                  "rect": {
+                    "left": 554,
+                    "top": 390,
+                    "width": 141,
+                    "height": 49
+                  }
+                }
+              ],
+              "freeXp": [
+                {
+                  "value": "1645",
+                  "text": "1645",
+                  "confidence": 86,
+                  "psm": 7,
+                  "fraction": 0.75,
+                  "rect": {
+                    "left": 737,
+                    "top": 390,
+                    "width": 105,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "1645",
+                  "text": "1645",
+                  "confidence": 67,
+                  "psm": 8,
+                  "fraction": 0.75,
+                  "rect": {
+                    "left": 737,
+                    "top": 390,
+                    "width": 105,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "1645",
+                  "text": "1645",
+                  "confidence": 89,
+                  "psm": 7,
+                  "fraction": 0.8,
+                  "rect": {
+                    "left": 737,
+                    "top": 390,
+                    "width": 112,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "1645",
+                  "text": "1645",
+                  "confidence": 0,
+                  "psm": 8,
+                  "fraction": 0.8,
+                  "rect": {
+                    "left": 737,
+                    "top": 390,
+                    "width": 112,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "16455",
+                  "text": "16455",
+                  "confidence": 47,
+                  "psm": 7,
+                  "fraction": 0.835,
+                  "rect": {
+                    "left": 737,
+                    "top": 390,
+                    "width": 117,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "1645",
+                  "text": "1645",
+                  "confidence": 0,
+                  "psm": 8,
+                  "fraction": 0.835,
+                  "rect": {
+                    "left": 737,
+                    "top": 390,
+                    "width": 117,
+                    "height": 49
+                  }
+                }
+              ]
+            },
+            "acceptedValues": {
+              "credits": "1237152",
+              "xp": "14390",
+              "freeXp": "1645"
+            }
+          }
+        },
+        "rewardWordGeometry": {
+          "rowBounds": {
+            "top": 378.4654545454546,
+            "bottom": 421.0875
+          },
+          "passes": [
+            {
+              "psm": 3,
+              "text": "PERSONAL SCORE DETAILED REPORT CREDITS AND XP\n\nIncapaciations Destroyed Set on fire\n\nCaptured Spotted\n\nCombat Missions\n\nReceive potential Win a battle Weekly Mission [ amssonsmrora |\n“ Earn 2000 Base XP. © Fe 11] ly 3 MISSIONS IN TOTAL\n\n.\n« .\n\nBACK TO PORT -",
+              "words": [
+                {
+                  "text": "2000",
+                  "confidence": 86,
+                  "bbox": {
+                    "x0": 409,
+                    "y0": 733,
+                    "x1": 440,
+                    "y1": 745
+                  }
+                },
+                {
+                  "text": "11]",
+                  "confidence": 45,
+                  "bbox": {
+                    "x0": 756,
+                    "y0": 728,
+                    "x1": 788,
+                    "y1": 752
+                  }
+                },
+                {
+                  "text": "3",
+                  "confidence": 93,
+                  "bbox": {
+                    "x0": 1218,
+                    "y0": 731,
+                    "x1": 1224,
+                    "y1": 743
+                  }
+                }
+              ]
+            },
+            {
+              "psm": 11,
+              "text": "PERSONAL SCORE\n\nCORE\n\nDETAILED REPORT\n\nCREDITS AND XP\n\n[esc\n\na\n\nuntain R\n\ntain\n\nBattle\n\nstart tim\n\n23:55\n\nOur.\n\nteam comp\n\nd the mission.\n\nG. HOFFMANN.\n\ntect\n\nd fo the Battle:\n\nA\n\nwe.\n\n=\n\n7\n\nxe\n\n03\n\n1\n\nNy\n\nittle\n\nperforma\n\n5]\n\n=\n\n0\n\n=i\n\nLi\n\nE77 TE\n\nIN\n\nSE\n\na\n\nSet on fire\n\nDf =\n\nGitadel hits\n\nDefended\n\nDamage\n\ngs hits\n\nTarget hits\n\nincapacitations\n\nDestroyed\n\nCaused flooding\n\n-\n\nCaptured\n\nSpotted\n\nCombat Missions\n\n“ Earn 2000 Base XP. ©\n\ndamage\n\nReceive potential\n\n[IR vn a vate\n\n© Weekly Mission\n\n3 MISSIONS IN TOTAL\n\nB\n\ned\n\n.\n\n-.",
+              "words": [
+                {
+                  "text": "23:55",
+                  "confidence": 95,
+                  "bbox": {
+                    "x0": 1559,
+                    "y0": 245,
+                    "x1": 1594,
+                    "y1": 258
+                  }
+                },
+                {
+                  "text": "7",
+                  "confidence": 54,
+                  "bbox": {
+                    "x0": 1102,
+                    "y0": 412,
+                    "x1": 1113,
+                    "y1": 419
+                  }
+                },
+                {
+                  "text": "03",
+                  "confidence": 50,
+                  "bbox": {
+                    "x0": 1505,
+                    "y0": 412,
+                    "x1": 1515,
+                    "y1": 424
+                  }
+                },
+                {
+                  "text": "1",
+                  "confidence": 18,
+                  "bbox": {
+                    "x0": 1083,
+                    "y0": 418,
+                    "x1": 1115,
+                    "y1": 440
+                  }
+                },
+                {
+                  "text": "5]",
+                  "confidence": 23,
+                  "bbox": {
+                    "x0": 329,
+                    "y0": 507,
+                    "x1": 341,
+                    "y1": 520
+                  }
+                },
+                {
+                  "text": "0",
+                  "confidence": 72,
+                  "bbox": {
+                    "x0": 407,
+                    "y0": 525,
+                    "x1": 413,
+                    "y1": 538
+                  }
+                },
+                {
+                  "text": "E77",
+                  "confidence": 6,
+                  "bbox": {
+                    "x0": 754,
+                    "y0": 498,
+                    "x1": 842,
+                    "y1": 548
+                  }
+                },
+                {
+                  "text": "2000",
+                  "confidence": 86,
+                  "bbox": {
+                    "x0": 409,
+                    "y0": 733,
+                    "x1": 440,
+                    "y1": 745
+                  }
+                },
+                {
+                  "text": "3",
+                  "confidence": 93,
+                  "bbox": {
+                    "x0": 1218,
+                    "y0": 731,
+                    "x1": 1224,
+                    "y1": 743
+                  }
+                }
+              ]
+            },
+            {
+              "psm": 6,
+              "text": "1237152@ 143905 1645% ~ 7 Jo 4",
+              "words": [
+                {
+                  "text": "1237152@",
+                  "confidence": 16,
+                  "bbox": {
+                    "x0": 319.088,
+                    "y0": 395.912,
+                    "x1": 532.976,
+                    "y1": 433.16
+                  }
+                },
+                {
+                  "text": "143905",
+                  "confidence": 68,
+                  "bbox": {
+                    "x0": 556.0160000000001,
+                    "y0": 395.912,
+                    "x1": 716.528,
+                    "y1": 433.16
+                  }
+                },
+                {
+                  "text": "1645%",
+                  "confidence": 52,
+                  "bbox": {
+                    "x0": 738.8,
+                    "y0": 395.528,
+                    "x1": 876.6560000000001,
+                    "y1": 433.16
+                  }
+                },
+                {
+                  "text": "7",
+                  "confidence": 63,
+                  "bbox": {
+                    "x0": 981.8720000000001,
+                    "y0": 389,
+                    "x1": 1032.176,
+                    "y1": 435.08
+                  }
+                },
+                {
+                  "text": "4",
+                  "confidence": 30,
+                  "bbox": {
+                    "x0": 1141.232,
+                    "y0": 389.768,
+                    "x1": 1188.848,
+                    "y1": 433.16
+                  }
+                }
+              ]
+            },
+            {
+              "psm": 7,
+              "text": "1237152@ 143905 1645% ~ 7 Jo 4",
+              "words": [
+                {
+                  "text": "1237152@",
+                  "confidence": 16,
+                  "bbox": {
+                    "x0": 319.088,
+                    "y0": 395.912,
+                    "x1": 532.976,
+                    "y1": 433.16
+                  }
+                },
+                {
+                  "text": "143905",
+                  "confidence": 68,
+                  "bbox": {
+                    "x0": 556.0160000000001,
+                    "y0": 395.912,
+                    "x1": 716.528,
+                    "y1": 433.16
+                  }
+                },
+                {
+                  "text": "1645%",
+                  "confidence": 52,
+                  "bbox": {
+                    "x0": 738.8,
+                    "y0": 395.528,
+                    "x1": 876.6560000000001,
+                    "y1": 433.16
+                  }
+                },
+                {
+                  "text": "7",
+                  "confidence": 63,
+                  "bbox": {
+                    "x0": 981.8720000000001,
+                    "y0": 389,
+                    "x1": 1032.176,
+                    "y1": 435.08
+                  }
+                },
+                {
+                  "text": "4",
+                  "confidence": 30,
+                  "bbox": {
+                    "x0": 1141.232,
+                    "y0": 389.768,
+                    "x1": 1188.848,
+                    "y1": 433.16
+                  }
+                }
+              ]
+            }
+          ],
+          "rewardBandWords": [
+            {
+              "text": "1237152@",
+              "confidence": 16,
+              "bbox": {
+                "x0": 319.088,
+                "y0": 395.912,
+                "x1": 532.976,
+                "y1": 433.16
+              }
+            },
+            {
+              "text": "143905",
+              "confidence": 68,
+              "bbox": {
+                "x0": 556.0160000000001,
+                "y0": 395.912,
+                "x1": 716.528,
+                "y1": 433.16
+              }
+            },
+            {
+              "text": "1645%",
+              "confidence": 52,
+              "bbox": {
+                "x0": 738.8,
+                "y0": 395.528,
+                "x1": 876.6560000000001,
+                "y1": 433.16
+              }
+            },
+            {
+              "text": "~",
+              "confidence": 90,
+              "bbox": {
+                "x0": 901.2320000000001,
+                "y0": 389.768,
+                "x1": 953.84,
+                "y1": 433.16
+              }
+            },
+            {
+              "text": "7",
+              "confidence": 63,
+              "bbox": {
+                "x0": 981.8720000000001,
+                "y0": 389,
+                "x1": 1032.176,
+                "y1": 435.08
+              }
+            },
+            {
+              "text": "Jo",
+              "confidence": 58,
+              "bbox": {
+                "x0": 1060.976,
+                "y0": 389,
+                "x1": 1114.352,
+                "y1": 433.928
+              }
+            },
+            {
+              "text": "4",
+              "confidence": 30,
+              "bbox": {
+                "x0": 1141.232,
+                "y0": 389.768,
+                "x1": 1188.848,
+                "y1": 433.16
+              }
+            }
+          ],
+          "rewardSourceCrop": {
+            "left": 230,
+            "top": 389,
+            "width": 960,
+            "height": 59,
+            "outputWidth": 2500,
+            "transform": {
+              "left": 230,
+              "top": 389,
+              "scale": 2.6041666666666665
+            }
+          },
+          "localizedWordGeometry": {
+            "sourceCrop": {
+              "left": 230,
+              "top": 389,
+              "width": 960,
+              "height": 59,
+              "outputWidth": 2500,
+              "transform": {
+                "left": 230,
+                "top": 389,
+                "scale": 2.6041666666666665
+              }
+            },
+            "words": [
+              {
+                "text": "1237152@",
+                "confidence": 16,
+                "bbox": {
+                  "x0": 319.088,
+                  "y0": 395.912,
+                  "x1": 532.976,
+                  "y1": 433.16
+                }
+              },
+              {
+                "text": "143905",
+                "confidence": 68,
+                "bbox": {
+                  "x0": 556.0160000000001,
+                  "y0": 395.912,
+                  "x1": 716.528,
+                  "y1": 433.16
+                }
+              },
+              {
+                "text": "1645%",
+                "confidence": 52,
+                "bbox": {
+                  "x0": 738.8,
+                  "y0": 395.528,
+                  "x1": 876.6560000000001,
+                  "y1": 433.16
+                }
+              }
+            ],
+            "reads": {
+              "credits": [
+                {
+                  "value": "1237152",
+                  "text": "1237152",
+                  "confidence": 92,
+                  "psm": 7,
+                  "fraction": 0.825,
+                  "rect": {
+                    "left": 317,
+                    "top": 390,
+                    "width": 178,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "1237152",
+                  "text": "1237152",
+                  "confidence": 33,
+                  "psm": 8,
+                  "fraction": 0.825,
+                  "rect": {
+                    "left": 317,
+                    "top": 390,
+                    "width": 178,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "1237152",
+                  "text": "1237152",
+                  "confidence": 70,
+                  "psm": 7,
+                  "fraction": 0.875,
+                  "rect": {
+                    "left": 317,
+                    "top": 390,
+                    "width": 189,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "1237152",
+                  "text": "1237152",
+                  "confidence": 0,
+                  "psm": 8,
+                  "fraction": 0.875,
+                  "rect": {
+                    "left": 317,
+                    "top": 390,
+                    "width": 189,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "1237152",
+                  "text": "1237152",
+                  "confidence": 0,
+                  "psm": 7,
+                  "fraction": 0.91,
+                  "rect": {
+                    "left": 317,
+                    "top": 390,
+                    "width": 197,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "1237152",
+                  "text": "1237152",
+                  "confidence": 0,
+                  "psm": 8,
+                  "fraction": 0.91,
+                  "rect": {
+                    "left": 317,
+                    "top": 390,
+                    "width": 197,
+                    "height": 49
+                  }
+                }
+              ],
+              "xp": [
+                {
+                  "value": "14390",
+                  "text": "14390",
+                  "confidence": 0,
+                  "psm": 7,
+                  "fraction": 0.783,
+                  "rect": {
+                    "left": 554,
+                    "top": 390,
+                    "width": 128,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "14390",
+                  "text": "14390",
+                  "confidence": 0,
+                  "psm": 8,
+                  "fraction": 0.783,
+                  "rect": {
+                    "left": 554,
+                    "top": 390,
+                    "width": 128,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "14390",
+                  "text": "14390",
+                  "confidence": 0,
+                  "psm": 7,
+                  "fraction": 0.833,
+                  "rect": {
+                    "left": 554,
+                    "top": 390,
+                    "width": 136,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "14390",
+                  "text": "14390",
+                  "confidence": 0,
+                  "psm": 8,
+                  "fraction": 0.833,
+                  "rect": {
+                    "left": 554,
+                    "top": 390,
+                    "width": 136,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "",
+                  "text": "143905",
+                  "confidence": 0,
+                  "psm": 7,
+                  "fraction": 0.868,
+                  "rect": {
+                    "left": 554,
+                    "top": 390,
+                    "width": 141,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "",
+                  "text": "143905",
+                  "confidence": 0,
+                  "psm": 8,
+                  "fraction": 0.868,
+                  "rect": {
+                    "left": 554,
+                    "top": 390,
+                    "width": 141,
+                    "height": 49
+                  }
+                }
+              ],
+              "freeXp": [
+                {
+                  "value": "1645",
+                  "text": "1645",
+                  "confidence": 86,
+                  "psm": 7,
+                  "fraction": 0.75,
+                  "rect": {
+                    "left": 737,
+                    "top": 390,
+                    "width": 105,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "1645",
+                  "text": "1645",
+                  "confidence": 67,
+                  "psm": 8,
+                  "fraction": 0.75,
+                  "rect": {
+                    "left": 737,
+                    "top": 390,
+                    "width": 105,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "1645",
+                  "text": "1645",
+                  "confidence": 89,
+                  "psm": 7,
+                  "fraction": 0.8,
+                  "rect": {
+                    "left": 737,
+                    "top": 390,
+                    "width": 112,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "1645",
+                  "text": "1645",
+                  "confidence": 0,
+                  "psm": 8,
+                  "fraction": 0.8,
+                  "rect": {
+                    "left": 737,
+                    "top": 390,
+                    "width": 112,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "16455",
+                  "text": "16455",
+                  "confidence": 47,
+                  "psm": 7,
+                  "fraction": 0.835,
+                  "rect": {
+                    "left": 737,
+                    "top": 390,
+                    "width": 117,
+                    "height": 49
+                  }
+                },
+                {
+                  "value": "1645",
+                  "text": "1645",
+                  "confidence": 0,
+                  "psm": 8,
+                  "fraction": 0.835,
+                  "rect": {
+                    "left": 737,
+                    "top": 390,
+                    "width": 117,
+                    "height": 49
+                  }
+                }
+              ]
+            },
+            "acceptedValues": {
+              "credits": "1237152",
+              "xp": "14390",
+              "freeXp": "1645"
+            }
+          }
+        },
+        "performanceOcrText": "[-SEN-]WorldSpOwn == XG. HOFFMANN .\n\nReceived for the Bate — ¢\n\n1237152 14390% 16454 \"© 2 BA Ras i R60\n\n_ Batilejperformance i : : —— — i 4 -\nLo mE PETS ATTY Led TEL\n- Damage Target hits Target hits “Incapacitations Destroyed Set on fire Caused flooding Citadel hits Defended\nCaptured Spotted ’\nCombat Missions\n“ BAMOED @ pester! Win a battle ® Weekly Mission",
+        "performanceOcrWords": [
+          {
+            "text": "[-SEN-]WorldSpOwn",
+            "confidence": 30,
+            "bbox": {
+              "x0": 319.76,
+              "y0": 305.2,
+              "x1": 474,
+              "y1": 326.96
+            }
+          },
+          {
+            "text": "==",
+            "confidence": 41,
+            "bbox": {
+              "x0": 457.36,
+              "y0": 302,
+              "x1": 470.16,
+              "y1": 332.08
+            }
+          },
+          {
+            "text": "XG.",
+            "confidence": 38,
+            "bbox": {
+              "x0": 479.76,
+              "y0": 302,
+              "x1": 507.92,
+              "y1": 332.08
+            }
+          },
+          {
+            "text": "HOFFMANN",
+            "confidence": 56,
+            "bbox": {
+              "x0": 514.96,
+              "y0": 302,
+              "x1": 587.9200000000001,
+              "y1": 332.08
+            }
+          },
+          {
+            "text": ".",
+            "confidence": 50,
+            "bbox": {
+              "x0": 1684.24,
+              "y0": 325.04,
+              "x1": 1690,
+              "y1": 337.2
+            }
+          },
+          {
+            "text": "Received",
+            "confidence": 89,
+            "bbox": {
+              "x0": 315.91999999999996,
+              "y0": 339.12,
+              "x1": 402.32,
+              "y1": 393.52
+            }
+          },
+          {
+            "text": "for",
+            "confidence": 93,
+            "bbox": {
+              "x0": 410.64,
+              "y0": 339.12,
+              "x1": 438.8,
+              "y1": 393.52
+            }
+          },
+          {
+            "text": "the",
+            "confidence": 70,
+            "bbox": {
+              "x0": 442.64,
+              "y0": 339.12,
+              "x1": 470.16,
+              "y1": 393.52
+            }
+          },
+          {
+            "text": "Bate",
+            "confidence": 55,
+            "bbox": {
+              "x0": 479.12,
+              "y0": 339.12,
+              "x1": 533.52,
+              "y1": 393.52
+            }
+          },
+          {
+            "text": "¢",
+            "confidence": 88,
+            "bbox": {
+              "x0": 1668.88,
+              "y0": 341.68,
+              "x1": 1690,
+              "y1": 391.6
+            }
+          },
+          {
+            "text": "1237152",
+            "confidence": 51,
+            "bbox": {
+              "x0": 317.84000000000003,
+              "y0": 382,
+              "x1": 514.3199999999999,
+              "y1": 461.36
+            }
+          },
+          {
+            "text": "14390%",
+            "confidence": 75,
+            "bbox": {
+              "x0": 553.36,
+              "y0": 382,
+              "x1": 705.68,
+              "y1": 461.36
+            }
+          },
+          {
+            "text": "16454",
+            "confidence": 0,
+            "bbox": {
+              "x0": 738.32,
+              "y0": 382,
+              "x1": 871.44,
+              "y1": 461.36
+            }
+          },
+          {
+            "text": "2",
+            "confidence": 25,
+            "bbox": {
+              "x0": 996.24,
+              "y0": 387.12,
+              "x1": 1016.72,
+              "y1": 442.15999999999997
+            }
+          },
+          {
+            "text": "R60",
+            "confidence": 13,
+            "bbox": {
+              "x0": 1333.52,
+              "y0": 382,
+              "x1": 1515.28,
+              "y1": 461.36
+            }
+          },
+          {
+            "text": "4",
+            "confidence": 43,
+            "bbox": {
+              "x0": 1516.56,
+              "y0": 458.8,
+              "x1": 1542.16,
+              "y1": 500.4
+            }
+          },
+          {
+            "text": "Damage",
+            "confidence": 96,
+            "bbox": {
+              "x0": 369.68,
+              "y0": 553.52,
+              "x1": 415.12,
+              "y1": 568.24
+            }
+          }
+        ],
+        "sourceMetadataTightReads": [
+          {
+            "psm": 6,
+            "text": "—\nMountainiRange==Random'E\nBattle start time#2740312C",
+            "confidence": 24,
+            "sourceCrop": {
+              "left": 1114,
+              "top": 162,
+              "width": 653,
+              "height": 113,
+              "outputWidth": 2400,
+              "transform": {
+                "left": 1114,
+                "top": 162,
+                "scale": 3.6753445635528332
+              }
+            }
+          },
+          {
+            "psm": 7,
+            "text": "",
+            "confidence": 0,
+            "sourceCrop": {
+              "left": 1114,
+              "top": 162,
+              "width": 653,
+              "height": 113,
+              "outputWidth": 2400,
+              "transform": {
+                "left": 1114,
+                "top": 162,
+                "scale": 3.6753445635528332
+              }
+            }
+          },
+          {
+            "psm": 11,
+            "text": "Mountain'Range==Random'E\n\nBattle start time #2703120",
+            "confidence": 23,
+            "sourceCrop": {
+              "left": 1114,
+              "top": 162,
+              "width": 653,
+              "height": 113,
+              "outputWidth": 2400,
+              "transform": {
+                "left": 1114,
+                "top": 162,
+                "scale": 3.6753445635528332
+              }
+            }
+          }
+        ],
+        "sourceMapModeReads": [
+          {
+            "psm": 6,
+            "text": "MountainiRange== Random Battle",
+            "confidence": 39,
+            "sourceCrop": {
+              "left": 1133,
+              "top": 213,
+              "width": 518,
+              "height": 29,
+              "outputWidth": 2400,
+              "transform": {
+                "left": 1133,
+                "top": 213,
+                "scale": 4.633204633204633
+              }
+            }
+          },
+          {
+            "psm": 7,
+            "text": "MountainiRange== Random Battle",
+            "confidence": 39,
+            "sourceCrop": {
+              "left": 1133,
+              "top": 213,
+              "width": 518,
+              "height": 29,
+              "outputWidth": 2400,
+              "transform": {
+                "left": 1133,
+                "top": 213,
+                "scale": 4.633204633204633
+              }
+            }
+          },
+          {
+            "psm": 11,
+            "text": "MountainiRange== Random Battle",
+            "confidence": 39,
+            "sourceCrop": {
+              "left": 1133,
+              "top": 213,
+              "width": 518,
+              "height": 29,
+              "outputWidth": 2400,
+              "transform": {
+                "left": 1133,
+                "top": 213,
+                "scale": 4.633204633204633
+              }
+            }
+          }
+        ],
+        "sourceTimeDiagnostics": [
+          {
+            "psm": 6,
+            "text": "Battle'start time: 71",
+            "confidence": 19,
+            "sourceCrop": {
+              "left": 1133,
+              "top": 240,
+              "width": 538,
+              "height": 43,
+              "outputWidth": 2400,
+              "transform": {
+                "left": 1133,
+                "top": 240,
+                "scale": 4.4609665427509295
+              }
+            }
+          },
+          {
+            "psm": 7,
+            "text": "Battle'start time: 71",
+            "confidence": 19,
+            "sourceCrop": {
+              "left": 1133,
+              "top": 240,
+              "width": 538,
+              "height": 43,
+              "outputWidth": 2400,
+              "transform": {
+                "left": 1133,
+                "top": 240,
+                "scale": 4.4609665427509295
+              }
+            }
+          },
+          {
+            "psm": 11,
+            "text": "Battle/startitimes 71",
+            "confidence": 9,
+            "sourceCrop": {
+              "left": 1133,
+              "top": 240,
+              "width": 538,
+              "height": 43,
+              "outputWidth": 2400,
+              "transform": {
+                "left": 1133,
+                "top": 240,
+                "scale": 4.4609665427509295
+              }
+            }
+          }
+        ],
+        "panelMetadataCandidates": [
+          {
+            "psm": 6,
+            "text": "VIN J LAM vuunc | ULIAILLU nor vn | LNELUVITO ANU AT\nMountain Range — Random Battle\nBattle start time: 27:03:2025 23:55\nOur team completed the mission. .\n[-SEN-]WorldSpOwn ®= XG. HOFFMANN N\nReceived for the Battle < } i\n5 A NE a RIN NG TN AL >\ne x Ne YEE Ek\n: a “ Battle performance |\n= — = — —_— i =\nEa Damage eT Target hits - Target hits i ncapacitations Destroyed - Set on fire h Caused flooding Citadel hits Defended\nCaptured Spotted\nCombat Missions\n(2 Earn 2 000 Base XP @ Receive potential Win a battle © Weekly Mission\ndamage || —\n> ’\now .\nBACK TO PORT |e — -",
+            "confidence": 61
+          },
+          {
+            "psm": 11,
+            "text": "LAV vuunc\n\nUEIARILLU noun\n\nLIEU TO ANU Al\n\na\n\nMountain Rang\n\n— Random Battle\n\nBattle start time: 27:03:20\n\n23:55\n\nOur team comp\n\nd the mission.\n\n[-SEN-WorldSpOwn == X G. HOFFMANN\n\nReceived for the hilly\n\nAN\n\n[AC\n\n5\n\n\\\n\ni\n\nNi\n\n(I;\n\n70\n\n=\n\naX\n\n5\n\nUs?\n\nCy\n\nee Batigl BY lance\n\n| E——\n\n=7\n\nx2\n\nNe\n\n3\n\nEB\n\n.\n\nDamage\n\nTarget hits\n\nTarget hits\n\nncap:\n\nations\n\nDestroyed\n\nSet on fire\n\nCaused flooding\n\nCitadel hits\n\nDefended\n\n——=\n\nCaptured\n\nSpotted\n\nCombat Missions\n\nReceive potential\n\n(2 Earn 2 000 Base XP @\n\ndamage\n\nHH Win a battle\n\n© Weekly Mission\n\n3 MISSIONS IN TOTAL\n\n.\n\n-\n\n»\n\nBACK TO PORT |e",
+            "confidence": 66
+          },
+          {
+            "psm": 6,
+            "text": "VINA uv 1LAIV vLuUno | ULIAILLU nL | LRLUITO ANU AT\nMountain Range = Random Battle\nBattle start time: 27:03:2025 23:55\nOur team completed the mission. .\n[-SEN-]WorldSpOwn = X G. HOFFMANN \\\n-\nReceived for the Battle . N. y |\n4 097 4E0e 44 200A Te OT Zl) AS) >\n: -. “ Battle performance: 8\nA — — — a 1 =\n* Damage . Target hits Target hits ncapacitations Destroyed - Setonfire Caused flooding Citadel hits Defended\nCaptured Spotted\nCombat Missions\n(72 Earn 2 000 Base XP @ Receive potential Win a battle ® Weekly Mission\ndamage re — —_—\n. '\nod »\nBACK TO PORT |e — -",
+            "confidence": 62
+          }
+        ],
+        "damageFieldPasses": [
+          {
+            "psm": 7,
+            "text": "»",
+            "words": [
+              {
+                "text": "»",
+                "confidence": 17,
+                "bbox": {
+                  "x0": 63,
+                  "y0": 461,
+                  "x1": 236,
+                  "y1": 574.9059405940594
+                }
+              }
+            ]
+          },
+          {
+            "psm": 6,
+            "text": "»",
+            "words": [
+              {
+                "text": "»",
+                "confidence": 17,
+                "bbox": {
+                  "x0": 63,
+                  "y0": 461,
+                  "x1": 236,
+                  "y1": 574.9059405940594
+                }
+              }
+            ]
+          },
+          {
+            "psm": 6,
+            "text": "Battle per\n303\n\nDamag\n= 7",
+            "words": [
+              {
+                "text": "Battle",
+                "confidence": 75,
+                "bbox": {
+                  "x0": 320.14285714285717,
+                  "y0": 465,
+                  "x1": 372.14285714285717,
+                  "y1": 483.57142857142856
+                }
+              },
+              {
+                "text": "per",
+                "confidence": 95,
+                "bbox": {
+                  "x0": 380.7142857142857,
+                  "y0": 469.57142857142856,
+                  "x1": 409,
+                  "y1": 487.85714285714283
+                }
+              },
+              {
+                "text": "303",
+                "confidence": 80,
+                "bbox": {
+                  "x0": 320.7142857142857,
+                  "y0": 506.42857142857144,
+                  "x1": 387,
+                  "y1": 544.1428571428571
+                }
+              },
+              {
+                "text": "Damag",
+                "confidence": 80,
+                "bbox": {
+                  "x0": 370.14285714285717,
+                  "y0": 554.1428571428571,
+                  "x1": 407.85714285714283,
+                  "y1": 568.1428571428571
+                }
+              },
+              {
+                "text": "=",
+                "confidence": 65,
+                "bbox": {
+                  "x0": 323.2857142857143,
+                  "y0": 576.1428571428571,
+                  "x1": 409,
+                  "y1": 606.1428571428571
+                }
+              },
+              {
+                "text": "7",
+                "confidence": 43,
+                "bbox": {
+                  "x0": 389.57142857142856,
+                  "y0": 575,
+                  "x1": 407.85714285714283,
+                  "y1": 606.1428571428571
+                }
+              }
+            ]
+          },
+          {
+            "psm": 8,
+            "text": "om",
+            "words": [
+              {
+                "text": "om",
+                "confidence": 6,
+                "bbox": {
+                  "x0": 63,
+                  "y0": 465,
+                  "x1": 404.14285714285717,
+                  "y1": 606.1428571428571
+                }
+              }
+            ]
+          },
+          {
+            "psm": 7,
+            "text": "303622",
+            "words": [
+              {
+                "text": "303622",
+                "confidence": 0,
+                "bbox": {
+                  "x0": 320.7142857142857,
+                  "y0": 507,
+                  "x1": 495,
+                  "y1": 546.4285714285714
+                }
+              }
+            ]
+          },
+          {
+            "psm": 8,
+            "text": "303622",
+            "words": [
+              {
+                "text": "303622",
+                "confidence": 36,
+                "bbox": {
+                  "x0": 320.7142857142857,
+                  "y0": 507,
+                  "x1": 495,
+                  "y1": 546.4285714285714
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

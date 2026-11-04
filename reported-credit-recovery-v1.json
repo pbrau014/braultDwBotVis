@@ -1,0 +1,1955 @@
+{
+  "buildVersion": "2.5.0",
+  "createdAt": "2026-10-25T01:45:19.697Z",
+  "nodeVersion": "v22.16.0",
+  "configuredEngine": "tesseractjs",
+  "executionMode": "single sequential parent batch; each screenshot runs in an isolated supervised child whose close is confirmed before the next image",
+  "workerRecyclePerImage": true,
+  "operationTimeoutMs": 15000,
+  "fixtureOrder": [
+    "reported"
+  ],
+  "imageCount": 1,
+  "completedImages": 1,
+  "exactMatches": 1,
+  "requiredFieldsComplete": 1,
+  "durationMs": 29548,
+  "networkBlocked": false,
+  "results": [
+    {
+      "fixtureKey": "reported",
+      "filename": "Screenshot_2026-10-22_201950.png",
+      "imageSha256": "477157667cc720089d72149d30d23f103ba7e0209c149efdbbbaf405cade6605",
+      "elapsedMs": 29546,
+      "pipelineCompleted": true,
+      "attempts": 3,
+      "selectedPageSegmentationMode": 3,
+      "confidence": 80,
+      "actual": {
+        "result": "Defeat",
+        "player": "[AYNS]BabyEatingDingo",
+        "map": "New Dawn",
+        "mode": "Random Battle",
+        "battleStart": "30.09.2026 14:46",
+        "credits": 540180,
+        "xp": 4906,
+        "freeXp": 1536,
+        "damage": 87373
+      },
+      "expected": {
+        "result": "Defeat",
+        "player": "[AYNS]BabyEatingDingo",
+        "map": "New Dawn",
+        "mode": "Random Battle",
+        "battleStart": "30.09.2026 14:46",
+        "credits": 540180,
+        "xp": 4906,
+        "freeXp": 1536,
+        "damage": 87373
+      },
+      "comparison": {
+        "result": {
+          "expected": "Defeat",
+          "actual": "Defeat",
+          "pass": true
+        },
+        "player": {
+          "expected": "[AYNS]BabyEatingDingo",
+          "actual": "[AYNS]BabyEatingDingo",
+          "pass": true
+        },
+        "map": {
+          "expected": "New Dawn",
+          "actual": "New Dawn",
+          "pass": true
+        },
+        "mode": {
+          "expected": "Random Battle",
+          "actual": "Random Battle",
+          "pass": true
+        },
+        "battleStart": {
+          "expected": "30.09.2026 14:46",
+          "actual": "30.09.2026 14:46",
+          "pass": true
+        },
+        "credits": {
+          "expected": 540180,
+          "actual": 540180,
+          "pass": true
+        },
+        "xp": {
+          "expected": 4906,
+          "actual": 4906,
+          "pass": true
+        },
+        "freeXp": {
+          "expected": 1536,
+          "actual": 1536,
+          "pass": true
+        },
+        "damage": {
+          "expected": 87373,
+          "actual": 87373,
+          "pass": true
+        }
+      },
+      "allExpectedFieldsPass": true,
+      "requiredMissing": [],
+      "ambiguities": {},
+      "supervision": {
+        "closeConfirmed": true,
+        "childExitCode": 0,
+        "childSignal": null,
+        "elapsedMs": 29528,
+        "timeoutMs": 45000
+      },
+      "damageSelection": {
+        "candidates": [
+          {
+            "value": "87373",
+            "confidence": 80,
+            "source": "full-screen-psm-3"
+          },
+          {
+            "value": "87373",
+            "confidence": 73,
+            "source": "full-screen-psm-11"
+          }
+        ],
+        "selectedBy": "full-screen-consensus",
+        "selectedValue": "87373",
+        "conflictingFocusedValues": []
+      },
+      "damageCandidates": [
+        {
+          "value": "87373",
+          "confidence": 80,
+          "source": "full-screen-psm-3"
+        },
+        {
+          "value": "87373",
+          "confidence": 73,
+          "source": "full-screen-psm-11"
+        }
+      ],
+      "fullScreenDamageCandidates": [
+        {
+          "value": "87373",
+          "confidence": 80,
+          "source": "full-screen-psm-3"
+        },
+        {
+          "value": "87373",
+          "confidence": 73,
+          "source": "full-screen-psm-11"
+        }
+      ],
+      "damageOcrText": "i",
+      "rawCandidateText": [
+        {
+          "psm": 3,
+          "confidence": 80,
+          "text": "PERSONAL SCORE | TEAM SCORE | DETAILED REPORT CREDITSANDXP |\n\nDefeat RR\n\nBattle performance\n\n87373 1 \\ NL. FT FOR YY\n\nDamage Destroyed Citadel hits Incapacitations Spotted Target hits Target hits — Aircraft shot down Defended\nCaptured\nCombat Missions\n\nEarn 3 000 Base XP ® Earn Commander XP © Get ribbons & Earn Base XP 4 MISSIONS IN TOTAL"
+        },
+        {
+          "psm": 11,
+          "confidence": 73,
+          "text": "PERSONAL SCORE\n\n| tewscore  omuomomr cheomsawxe\n\nN\n\n1 — Randor\n\nDefeat\n\nBattle st\n\nme: 30.09.2026 14\n\nov\n\nallied warships\n\n[AYN\n\nJBab)\n\ngDing\n\nVII GNEISENAU Destroyed.\n\nfireAMightyLecramSRVIRANGER]\n\nor the Battle\n\n180® 4906\n\nJ\n\nBattle performance\n\n87373\n\na\n\n=\n\n(TT\n\nx1\n\nDamage\n\nDestroyed\n\nCitadel hits\n\nIncapacitations\n\nSpotted\n\nTarget hits\n\nTarget hits\n\nAircraft shot down\n\nDefended\n\n——\n\n| a\n\nCaptured\n\nCombat Missions\n\nEarn 3 000 Base XP\n\nEarn Commander XP\n\nGet ribbons\n\n®\n\n—\n\n& Earn Base XP\n\nmen"
+        },
+        {
+          "psm": "combined",
+          "confidence": 79.4,
+          "text": "| tewscore  omuomomr cheomsawxe\nPERSONAL SCORE | TEAM SCORE | DETAILED REPORT CREDITSANDXP |\nPERSONAL SCORE\nDefeat ror:\nDefeat Wi\nDefeat\nDefeat RR\ntle tr ime 30.08.2026 1446\nNew Dawn — Random Battle\nNew Dawn — Random\nN\n1 — Randor\nNew Dawn — Random Ba\nBattle start time: 30.09.2026 14:\nBattle st\nme: 30.09.2026 14\nBattle start time: 30.09.2026 14:46\nAll allied warships destroyed\nAll allied warships destroyed.\nallied warships\nov\n[AYN\nJBab)\n[AYNS]BabyEatingDingo 7 Vil GNEISENAU Destroyed by fire 1101/1 eorain— VIRANGER:\n[AYNS]BabyEatingDingo # VII GNEISENAU Destroyed by fire WiiohiyLecian — VIHANGER,\n[AYNS]BabyEatingDingo # VII GNEISENAU Destroyed by fire 11011)Loora VI RANGER\nVII GNEISENAU Destroyed.\nfireAMightyLecramSRVIRANGER]\n[AYNS]BabyEatingDingo #2 VII GNEISENAU Destroyed by fire\n[AYNS]BabyEatingDingo #2 VII GNEISENAU Destroyed by fire IV! I RANG\ngDing\nReceived for the Battle ~\n1 for the Battle\nReceived for the Battle\nor the Battle\nReceived for the Battle »\n~ 540180® 4906+ 1536% 1 =\n%\n540180@ 49065 1536% 1\n540180® 4906-r 1536% 1 «\n940180® 4906 6x 1 «©\n(A\n6 ce 1\n0180® 4906\n180® 4906\n9 w ) fr;\ni” WP ny\ni»\nBattle performance _-\nJ\nBattle performance\n87373 1 \\ § Bi] FFP°R\n87313 . Na . BUEN | = FON FTF NSH Te dd uh FN 5\n{ — ~~ BE ERs E aN TT —\n87373 1 \\ NL. FT FOR YY\n87373\na\n=\n87373 § \\» f B—u.R BFR a dl aC I RCo TE RL\n87373 1 \\» § Bi. FR Ya TNT) TEL\nI} PP) OR NT Te LT.) To)\niT\n(TT\nSm——\nx1\n\\\nDamage Destroyed Citadel hits Incapacitations Spotted Target hits Target hits — Aircraft shot down Defended\nDamage Destroyed Citadel hits Incapacitations Spotted Target hits Target hits Aircraft shot down Defended\nDEE Destroyed Citadel hits Incapacitations Spotted Target hits Target hits Aircraft shot down Defended\nDamage\nSpotted\nAircraft shot down\nDefended\nDestroyed\nCitadel hits\nIncapacitations\nTarget hits\nwy -—\nLia —\n| a\n= 2 B\n—_\n——\n—_—\n= xi\n~ Captured\ni Captured\nCaptured\nCombat Missions\n|=] Earn 3 000 Base XP ® Earn Commander XP &) Get ribbons =. Earn Base XP\nEarn 3 000 Base XP ® Earn Commander XP © Get ribbons & Earn Base XP 4 MISSIONS IN TOTAL\n|=] Earn 3 000 Base XP ® Earn Commander XP ® Get ribbons i £ Earn Base XP\n® Earn Commander XP\n|=] Earn 3 000 Base XP ® Earn Commander XP ® Get ribbons = Earn Base XP 4 MISSIONS IN TOTAL\n|=] Earn 3 000 Base XP ® Earn Commander XP ® Get ribbons £ Earn Base XP 4 MISSIONS IN TOTAL\n®\n=. Earn Base XP\n|=] arn 3 000 Base XP\n& Earn Base XP\nGet ribbons\nEarn 3 000 Base XP\nEarn Commander XP\n4 MISSIONS IN TOTAL\nB —\n—\nmen"
+        }
+      ],
+      "fullScreenDamageOcrText": [
+        {
+          "psm": 3,
+          "text": "PERSONAL SCORE | TEAM SCORE | DETAILED REPORT CREDITSANDXP |\n\nDefeat RR\n\nBattle performance\n\n87373 1 \\ NL. FT FOR YY\n\nDamage Destroyed Citadel hits Incapacitations Spotted Target hits Target hits — Aircraft shot down Defended\nCaptured\nCombat Missions\n\nEarn 3 000 Base XP ® Earn Commander XP © Get ribbons & Earn Base XP 4 MISSIONS IN TOTAL"
+        },
+        {
+          "psm": 11,
+          "text": "PERSONAL SCORE\n\n| tewscore  omuomomr cheomsawxe\n\nN\n\n1 — Randor\n\nDefeat\n\nBattle st\n\nme: 30.09.2026 14\n\nov\n\nallied warships\n\n[AYN\n\nJBab)\n\ngDing\n\nVII GNEISENAU Destroyed.\n\nfireAMightyLecramSRVIRANGER]\n\nor the Battle\n\n180® 4906\n\nJ\n\nBattle performance\n\n87373\n\na\n\n=\n\n(TT\n\nx1\n\nDamage\n\nDestroyed\n\nCitadel hits\n\nIncapacitations\n\nSpotted\n\nTarget hits\n\nTarget hits\n\nAircraft shot down\n\nDefended\n\n——\n\n| a\n\nCaptured\n\nCombat Missions\n\nEarn 3 000 Base XP\n\nEarn Commander XP\n\nGet ribbons\n\n®\n\n—\n\n& Earn Base XP\n\nmen"
+        }
+      ],
+      "rewardOcrText": "540180@ 4906+ 1536% 1 «",
+      "rawCandidateFields": {
+        "identityCandidates": [
+          {
+            "text": "All allied warships destroyed.\n\n[AYNS]BabyEatingDingo #2 VII GNEISENAU Destroyed by fire\n\nReceived for the Battle »\n540180® 4906-r 1536% 1 «",
+            "confidence": 76,
+            "source": "prepared-identity-psm6",
+            "weight": 1.5
+          },
+          {
+            "text": "Defeat\n\nAll allied warships destroyed.\n\n[AYNS]BabyEatingDingo #2 VII GNEISENAU Destroyed by fire\n\nReceived for the Battle\n\n540180@ 49065 1536% 1",
+            "confidence": 77,
+            "source": "prepared-identity-psm11",
+            "weight": 1.5
+          },
+          {
+            "text": "2d warships destroyed.\nbyEatingDingo #2 VII GNEISENAU Destroyed by fire IVlightyLecra \\/| RAN GEF",
+            "confidence": 72,
+            "source": "source-identity-psm6",
+            "weight": 1.1
+          },
+          {
+            "text": "2d warships destroyed.\n\nbyEatingDingo #2 VII GNEISENAU Destroyed by fire\n\nJ!",
+            "confidence": 76,
+            "source": "source-identity-psm11",
+            "weight": 1.1
+          },
+          {
+            "text": "aa GNEISENAU Destroyed by fir",
+            "confidence": 68,
+            "source": "tight-identity-psm7",
+            "weight": 0.8
+          },
+          {
+            "text": "SE ES",
+            "confidence": 13,
+            "source": "tight-identity-psm8",
+            "weight": 0.8
+          },
+          {
+            "text": "PERSONAL SCORE | TEAM SCORE | DETAILED REPORT CREDITSANDXP |\n\nDefeat RR\n\nBattle performance\n\n87373 1 \\ NL. FT FOR YY\n\nDamage Destroyed Citadel hits Incapacitations Spotted Target hits Target hits — Aircraft shot down Defended\nCaptured\nCombat Missions\n\nEarn 3 000 Base XP ® Earn Commander XP © Get ribbons & Earn Base XP 4 MISSIONS IN TOTAL",
+            "confidence": 80,
+            "source": "full-screen-psm3",
+            "weight": 0.7
+          },
+          {
+            "text": "PERSONAL SCORE\n\n| tewscore  omuomomr cheomsawxe\n\nN\n\n1 — Randor\n\nDefeat\n\nBattle st\n\nme: 30.09.2026 14\n\nov\n\nallied warships\n\n[AYN\n\nJBab)\n\ngDing\n\nVII GNEISENAU Destroyed.\n\nfireAMightyLecramSRVIRANGER]\n\nor the Battle\n\n180® 4906\n\nJ\n\nBattle performance\n\n87373\n\na\n\n=\n\n(TT\n\nx1\n\nDamage\n\nDestroyed\n\nCitadel hits\n\nIncapacitations\n\nSpotted\n\nTarget hits\n\nTarget hits\n\nAircraft shot down\n\nDefended\n\n——\n\n| a\n\nCaptured\n\nCombat Missions\n\nEarn 3 000 Base XP\n\nEarn Commander XP\n\nGet ribbons\n\n®\n\n—\n\n& Earn Base XP\n\nmen",
+            "confidence": 73,
+            "source": "full-screen-psm11",
+            "weight": 0.7
+          }
+        ],
+        "metadataCandidates": [
+          {
+            "text": "PERSONAL SCORE | TEAM SCORE | DETAILED REPORT CREDITSANDXP |\n\nDefeat RR\n\nBattle performance\n\n87373 1 \\ NL. FT FOR YY\n\nDamage Destroyed Citadel hits Incapacitations Spotted Target hits Target hits — Aircraft shot down Defended\nCaptured\nCombat Missions\n\nEarn 3 000 Base XP ® Earn Commander XP © Get ribbons & Earn Base XP 4 MISSIONS IN TOTAL",
+            "confidence": 80,
+            "source": "full-screen-psm3",
+            "weight": 1.4
+          },
+          {
+            "text": "PERSONAL SCORE\n\n| tewscore  omuomomr cheomsawxe\n\nN\n\n1 — Randor\n\nDefeat\n\nBattle st\n\nme: 30.09.2026 14\n\nov\n\nallied warships\n\n[AYN\n\nJBab)\n\ngDing\n\nVII GNEISENAU Destroyed.\n\nfireAMightyLecramSRVIRANGER]\n\nor the Battle\n\n180® 4906\n\nJ\n\nBattle performance\n\n87373\n\na\n\n=\n\n(TT\n\nx1\n\nDamage\n\nDestroyed\n\nCitadel hits\n\nIncapacitations\n\nSpotted\n\nTarget hits\n\nTarget hits\n\nAircraft shot down\n\nDefended\n\n——\n\n| a\n\nCaptured\n\nCombat Missions\n\nEarn 3 000 Base XP\n\nEarn Commander XP\n\nGet ribbons\n\n®\n\n—\n\n& Earn Base XP\n\nmen",
+            "confidence": 73,
+            "source": "full-screen-psm11",
+            "weight": 1.4
+          },
+          {
+            "text": "New Dawn — Random Battle\nBattle start time: 30.09.2026 14:46",
+            "confidence": 92,
+            "source": "metadata-crop",
+            "weight": 0.65
+          },
+          {
+            "text": "Defeat ror:\nBattle start time: 30.09.2026 14:\nAll allied warships destroyed.\n[AYNS]BabyEatingDingo # VII GNEISENAU Destroyed by fire WiiohiyLecian — VIHANGER,\nReceived for the Battle ~\n940180® 4906 6x 1 «©\ni” WP ny\nBattle performance\n87373 1 \\» § Bi. FR Ya TNT) TEL\nDEE Destroyed Citadel hits Incapacitations Spotted Target hits Target hits Aircraft shot down Defended\nLia —\ni Captured\nCombat Missions\n|=] Earn 3 000 Base XP ® Earn Commander XP &) Get ribbons =. Earn Base XP",
+            "confidence": 73,
+            "source": "prepared-panel-psm6",
+            "weight": 0.8
+          },
+          {
+            "text": "Defeat Wi\nBattle start time: 30.09.2026 14:\nAll allied warships destroyed\n[AYNS]BabyEatingDingo 7 Vil GNEISENAU Destroyed by fire 1101/1 eorain— VIRANGER:\nReceived for the Battle ~\n~ 540180® 4906+ 1536% 1 =\nBattle performance _-\n87373 § \\» f B—u.R BFR a dl aC I RCo TE RL\nDamage Destroyed Citadel hits Incapacitations Spotted Target hits Target hits Aircraft shot down Defended\n\nwy -—\n~ Captured\nCombat Missions\n|=] Earn 3 000 Base XP ® Earn Commander XP ® Get ribbons i £ Earn Base XP",
+            "confidence": 68,
+            "source": "source-panel-psm6",
+            "weight": 0.8
+          },
+          {
+            "text": "New Dawn — Random",
+            "confidence": 93,
+            "source": "source-map-mode-psm6",
+            "weight": 1
+          },
+          {
+            "text": "New Dawn — Random",
+            "confidence": 93,
+            "source": "source-map-mode-psm7",
+            "weight": 1
+          },
+          {
+            "text": "New Dawn — Random",
+            "confidence": 91,
+            "source": "source-map-mode-psm11",
+            "weight": 1
+          }
+        ],
+        "resultCandidates": [
+          {
+            "text": "PERSONAL SCORE | TEAM SCORE | DETAILED REPORT CREDITSANDXP |\n\nDefeat RR\n\nBattle performance\n\n87373 1 \\ NL. FT FOR YY\n\nDamage Destroyed Citadel hits Incapacitations Spotted Target hits Target hits — Aircraft shot down Defended\nCaptured\nCombat Missions\n\nEarn 3 000 Base XP ® Earn Commander XP © Get ribbons & Earn Base XP 4 MISSIONS IN TOTAL",
+            "confidence": 80
+          },
+          {
+            "text": "PERSONAL SCORE\n\n| tewscore  omuomomr cheomsawxe\n\nN\n\n1 — Randor\n\nDefeat\n\nBattle st\n\nme: 30.09.2026 14\n\nov\n\nallied warships\n\n[AYN\n\nJBab)\n\ngDing\n\nVII GNEISENAU Destroyed.\n\nfireAMightyLecramSRVIRANGER]\n\nor the Battle\n\n180® 4906\n\nJ\n\nBattle performance\n\n87373\n\na\n\n=\n\n(TT\n\nx1\n\nDamage\n\nDestroyed\n\nCitadel hits\n\nIncapacitations\n\nSpotted\n\nTarget hits\n\nTarget hits\n\nAircraft shot down\n\nDefended\n\n——\n\n| a\n\nCaptured\n\nCombat Missions\n\nEarn 3 000 Base XP\n\nEarn Commander XP\n\nGet ribbons\n\n®\n\n—\n\n& Earn Base XP\n\nmen",
+            "confidence": 73
+          },
+          {
+            "text": "All allied warships destroyed.\n[AYNS]BabyEatingDingo ## VII GNEISENAU Destroyed by fire \"ion becom = VTHANGER\nReceived for the Battle",
+            "confidence": 74
+          },
+          {
+            "text": "Defeat\n\nAll allied warships destroyed.\n\n[AYNS]BabyEatingDingo ## VII GNEISENAU Destroyed by fire \"ion becom = VTHANGER\n\nReceived for the Battle",
+            "confidence": 75
+          },
+          {
+            "text": "All'allied warships destroyed.\n[AYNS]BabyEatingDingo #2 VII GNEISENAU Destroyed by fire\nReceived for the Battle",
+            "confidence": 85
+          }
+        ],
+        "rewardCandidates": [
+          {
+            "credits": "540180",
+            "xp": "4906",
+            "freeXp": "1536",
+            "confidence": 95,
+            "source": "localized-column-consensus"
+          }
+        ],
+        "legacyRewardCandidates": [
+          {
+            "credits": "540180",
+            "xp": "4906",
+            "freeXp": "1536",
+            "confidence": 63,
+            "source": 7
+          },
+          {
+            "credits": "540180",
+            "xp": "4906",
+            "freeXp": "1536",
+            "confidence": 63,
+            "source": 6
+          }
+        ],
+        "localizedRewardEvidence": {
+          "attempted": true,
+          "anchors": {
+            "received": {
+              "x0": 147.6,
+              "y0": 413.8,
+              "x1": 387,
+              "y1": 434.8
+            },
+            "performance": {
+              "x0": 147,
+              "y0": 532,
+              "x1": 347,
+              "y1": 558
+            },
+            "receivedLeftX": 147.6
+          },
+          "bounds": {
+            "baseX": 144,
+            "top": 437,
+            "bottom": 530,
+            "imageWidth": 1800,
+            "imageHeight": 1246
+          },
+          "rects": {
+            "credits-psm7": {
+              "left": 142,
+              "top": 437,
+              "width": 180,
+              "height": 93
+            },
+            "xp-psm7": {
+              "left": 376,
+              "top": 437,
+              "width": 122,
+              "height": 93
+            },
+            "freeXp-psm7": {
+              "left": 556,
+              "top": 437,
+              "width": 122,
+              "height": 93
+            },
+            "credits-psm8": {
+              "left": 142,
+              "top": 437,
+              "width": 180,
+              "height": 93
+            },
+            "xp-psm8": {
+              "left": 376,
+              "top": 437,
+              "width": 122,
+              "height": 93
+            },
+            "freeXp-psm8": {
+              "left": 556,
+              "top": 437,
+              "width": 122,
+              "height": 93
+            }
+          },
+          "reads": {
+            "credits": [
+              {
+                "value": "940180",
+                "confidence": 70,
+                "psm": 7,
+                "text": "940180"
+              },
+              {
+                "value": "540180",
+                "confidence": 89,
+                "psm": 8,
+                "text": "540180"
+              }
+            ],
+            "xp": [
+              {
+                "value": "4906",
+                "confidence": 78,
+                "psm": 7,
+                "text": "4906"
+              },
+              {
+                "value": "4906",
+                "confidence": 86,
+                "psm": 8,
+                "text": "4906"
+              }
+            ],
+            "freeXp": [
+              {
+                "value": "1336",
+                "confidence": 81,
+                "psm": 7,
+                "text": "1336"
+              },
+              {
+                "value": "1536",
+                "confidence": 95,
+                "psm": 8,
+                "text": "1536"
+              }
+            ]
+          },
+          "values": {
+            "credits": "540180",
+            "xp": "4906",
+            "freeXp": "1536"
+          },
+          "wordGeometry": {
+            "sourceCrop": null,
+            "words": [
+              {
+                "text": "540180@",
+                "confidence": 53,
+                "bbox": {
+                  "x0": 147.256,
+                  "y0": 453.848,
+                  "x1": 353.968,
+                  "y1": 495.968
+                }
+              },
+              {
+                "text": "4906+",
+                "confidence": 79,
+                "bbox": {
+                  "x0": 381.50800000000004,
+                  "y0": 453.848,
+                  "x1": 536.704,
+                  "y1": 495.968
+                }
+              },
+              {
+                "text": "1536%",
+                "confidence": 75,
+                "bbox": {
+                  "x0": 562.3,
+                  "y0": 453.848,
+                  "x1": 717.496,
+                  "y1": 495.968
+                }
+              }
+            ],
+            "reads": {
+              "credits": [
+                {
+                  "value": "54018",
+                  "text": "54018",
+                  "confidence": 83,
+                  "psm": 7,
+                  "fraction": 0.65,
+                  "rect": {
+                    "left": 145,
+                    "top": 447,
+                    "width": 137,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "54018",
+                  "text": "54018",
+                  "confidence": 95,
+                  "psm": 8,
+                  "fraction": 0.65,
+                  "rect": {
+                    "left": 145,
+                    "top": 447,
+                    "width": 137,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "54018",
+                  "text": "54018",
+                  "confidence": 4,
+                  "psm": 7,
+                  "fraction": 0.7,
+                  "rect": {
+                    "left": 145,
+                    "top": 447,
+                    "width": 147,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "54018",
+                  "text": "54018",
+                  "confidence": 44,
+                  "psm": 8,
+                  "fraction": 0.7,
+                  "rect": {
+                    "left": 145,
+                    "top": 447,
+                    "width": 147,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "54018",
+                  "text": "54018",
+                  "confidence": 0,
+                  "psm": 7,
+                  "fraction": 0.735,
+                  "rect": {
+                    "left": 145,
+                    "top": 447,
+                    "width": 154,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "54018",
+                  "text": "54018",
+                  "confidence": 0,
+                  "psm": 8,
+                  "fraction": 0.735,
+                  "rect": {
+                    "left": 145,
+                    "top": 447,
+                    "width": 154,
+                    "height": 55
+                  }
+                }
+              ],
+              "xp": [
+                {
+                  "value": "4906",
+                  "text": "4906",
+                  "confidence": 0,
+                  "psm": 7,
+                  "fraction": 0.75,
+                  "rect": {
+                    "left": 379,
+                    "top": 447,
+                    "width": 119,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "4906",
+                  "text": "4906",
+                  "confidence": 27,
+                  "psm": 8,
+                  "fraction": 0.75,
+                  "rect": {
+                    "left": 379,
+                    "top": 447,
+                    "width": 119,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "4906",
+                  "text": "4906",
+                  "confidence": 0,
+                  "psm": 7,
+                  "fraction": 0.8,
+                  "rect": {
+                    "left": 379,
+                    "top": 447,
+                    "width": 126,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "4906",
+                  "text": "4906",
+                  "confidence": 2,
+                  "psm": 8,
+                  "fraction": 0.8,
+                  "rect": {
+                    "left": 379,
+                    "top": 447,
+                    "width": 126,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "4906",
+                  "text": "4906",
+                  "confidence": 0,
+                  "psm": 7,
+                  "fraction": 0.835,
+                  "rect": {
+                    "left": 379,
+                    "top": 447,
+                    "width": 132,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "4906",
+                  "text": "4906",
+                  "confidence": 0,
+                  "psm": 8,
+                  "fraction": 0.835,
+                  "rect": {
+                    "left": 379,
+                    "top": 447,
+                    "width": 132,
+                    "height": 55
+                  }
+                }
+              ],
+              "freeXp": [
+                {
+                  "value": "1536",
+                  "text": "1536",
+                  "confidence": 94,
+                  "psm": 7,
+                  "fraction": 0.75,
+                  "rect": {
+                    "left": 560,
+                    "top": 447,
+                    "width": 119,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "1536",
+                  "text": "1536",
+                  "confidence": 96,
+                  "psm": 8,
+                  "fraction": 0.75,
+                  "rect": {
+                    "left": 560,
+                    "top": 447,
+                    "width": 119,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "1536",
+                  "text": "1536",
+                  "confidence": 90,
+                  "psm": 7,
+                  "fraction": 0.8,
+                  "rect": {
+                    "left": 560,
+                    "top": 447,
+                    "width": 126,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "1536",
+                  "text": "1536",
+                  "confidence": 46,
+                  "psm": 8,
+                  "fraction": 0.8,
+                  "rect": {
+                    "left": 560,
+                    "top": 447,
+                    "width": 126,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "15365",
+                  "text": "15365",
+                  "confidence": 31,
+                  "psm": 7,
+                  "fraction": 0.835,
+                  "rect": {
+                    "left": 560,
+                    "top": 447,
+                    "width": 132,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "1536",
+                  "text": "1536",
+                  "confidence": 0,
+                  "psm": 8,
+                  "fraction": 0.835,
+                  "rect": {
+                    "left": 560,
+                    "top": 447,
+                    "width": 132,
+                    "height": 55
+                  }
+                }
+              ]
+            },
+            "acceptedValues": {
+              "credits": "54018",
+              "xp": "4906",
+              "freeXp": "1536"
+            }
+          },
+          "creditPrefixRecovery": {
+            "value": "540180",
+            "recovered": true,
+            "supportingSources": [
+              "localized-psm-8",
+              "broad-7",
+              "broad-6"
+            ]
+          },
+          "xpGeometrySweep": {
+            "attempted": false,
+            "reads": [],
+            "selectedValue": ""
+          },
+          "tupleFallback": null
+        },
+        "rewardWordGeometry": {
+          "rowBounds": {
+            "top": 434.8,
+            "bottom": 532
+          },
+          "passes": [
+            {
+              "psm": 3,
+              "text": "PERSONAL SCORE | TEAM SCORE | DETAILED REPORT CREDITSANDXP |\n\nDefeat RR\n\nBattle performance\n\n87373 1 \\ NL. FT FOR YY\n\nDamage Destroyed Citadel hits Incapacitations Spotted Target hits Target hits — Aircraft shot down Defended\nCaptured\nCombat Missions\n\nEarn 3 000 Base XP ® Earn Commander XP © Get ribbons & Earn Base XP 4 MISSIONS IN TOTAL",
+              "words": [
+                {
+                  "text": "87373",
+                  "confidence": 90,
+                  "bbox": {
+                    "x0": 155,
+                    "y0": 579,
+                    "x1": 291,
+                    "y1": 622
+                  }
+                },
+                {
+                  "text": "1",
+                  "confidence": 75,
+                  "bbox": {
+                    "x0": 317,
+                    "y0": 574,
+                    "x1": 334,
+                    "y1": 625
+                  }
+                },
+                {
+                  "text": "3",
+                  "confidence": 93,
+                  "bbox": {
+                    "x0": 248,
+                    "y0": 829,
+                    "x1": 255,
+                    "y1": 842
+                  }
+                },
+                {
+                  "text": "000",
+                  "confidence": 93,
+                  "bbox": {
+                    "x0": 260,
+                    "y0": 829,
+                    "x1": 283,
+                    "y1": 842
+                  }
+                },
+                {
+                  "text": "4",
+                  "confidence": 93,
+                  "bbox": {
+                    "x0": 1161,
+                    "y0": 833,
+                    "x1": 1169,
+                    "y1": 846
+                  }
+                }
+              ]
+            },
+            {
+              "psm": 11,
+              "text": "PERSONAL SCORE\n\n| tewscore  omuomomr cheomsawxe\n\nN\n\n1 — Randor\n\nDefeat\n\nBattle st\n\nme: 30.09.2026 14\n\nov\n\nallied warships\n\n[AYN\n\nJBab)\n\ngDing\n\nVII GNEISENAU Destroyed.\n\nfireAMightyLecramSRVIRANGER]\n\nor the Battle\n\n180® 4906\n\nJ\n\nBattle performance\n\n87373\n\na\n\n=\n\n(TT\n\nx1\n\nDamage\n\nDestroyed\n\nCitadel hits\n\nIncapacitations\n\nSpotted\n\nTarget hits\n\nTarget hits\n\nAircraft shot down\n\nDefended\n\n——\n\n| a\n\nCaptured\n\nCombat Missions\n\nEarn 3 000 Base XP\n\nEarn Commander XP\n\nGet ribbons\n\n®\n\n—\n\n& Earn Base XP\n\nmen",
+              "words": [
+                {
+                  "text": "1",
+                  "confidence": 21,
+                  "bbox": {
+                    "x0": 1451,
+                    "y0": 264,
+                    "x1": 1455,
+                    "y1": 276
+                  }
+                },
+                {
+                  "text": "30.09.2026",
+                  "confidence": 90,
+                  "bbox": {
+                    "x0": 1472,
+                    "y0": 283,
+                    "x1": 1544,
+                    "y1": 300
+                  }
+                },
+                {
+                  "text": "14",
+                  "confidence": 39,
+                  "bbox": {
+                    "x0": 1548,
+                    "y0": 283,
+                    "x1": 1557,
+                    "y1": 299
+                  }
+                },
+                {
+                  "text": "180®",
+                  "confidence": 42,
+                  "bbox": {
+                    "x0": 235,
+                    "y0": 453,
+                    "x1": 355,
+                    "y1": 497
+                  }
+                },
+                {
+                  "text": "4906",
+                  "confidence": 90,
+                  "bbox": {
+                    "x0": 381,
+                    "y0": 453,
+                    "x1": 493,
+                    "y1": 497
+                  }
+                },
+                {
+                  "text": "87373",
+                  "confidence": 0,
+                  "bbox": {
+                    "x0": 155,
+                    "y0": 579,
+                    "x1": 291,
+                    "y1": 622
+                  }
+                },
+                {
+                  "text": "x1",
+                  "confidence": 68,
+                  "bbox": {
+                    "x0": 1365,
+                    "y0": 605,
+                    "x1": 1383,
+                    "y1": 623
+                  }
+                },
+                {
+                  "text": "3",
+                  "confidence": 93,
+                  "bbox": {
+                    "x0": 248,
+                    "y0": 829,
+                    "x1": 255,
+                    "y1": 842
+                  }
+                },
+                {
+                  "text": "000",
+                  "confidence": 93,
+                  "bbox": {
+                    "x0": 260,
+                    "y0": 829,
+                    "x1": 283,
+                    "y1": 842
+                  }
+                }
+              ]
+            },
+            {
+              "psm": 7,
+              "text": "540180@ 4906+ 1536% 1 «",
+              "words": [
+                {
+                  "text": "540180@",
+                  "confidence": 53,
+                  "bbox": {
+                    "x0": 147.256,
+                    "y0": 453.848,
+                    "x1": 353.968,
+                    "y1": 495.968
+                  }
+                },
+                {
+                  "text": "4906+",
+                  "confidence": 79,
+                  "bbox": {
+                    "x0": 381.50800000000004,
+                    "y0": 453.848,
+                    "x1": 536.704,
+                    "y1": 495.968
+                  }
+                },
+                {
+                  "text": "1536%",
+                  "confidence": 75,
+                  "bbox": {
+                    "x0": 562.3,
+                    "y0": 453.848,
+                    "x1": 717.496,
+                    "y1": 495.968
+                  }
+                },
+                {
+                  "text": "1",
+                  "confidence": 93,
+                  "bbox": {
+                    "x0": 767.716,
+                    "y0": 452.876,
+                    "x1": 785.212,
+                    "y1": 497.912
+                  }
+                }
+              ]
+            },
+            {
+              "psm": 6,
+              "text": "540180@ 4906+ 1536% 1 «",
+              "words": [
+                {
+                  "text": "540180@",
+                  "confidence": 53,
+                  "bbox": {
+                    "x0": 147.256,
+                    "y0": 453.848,
+                    "x1": 353.968,
+                    "y1": 495.968
+                  }
+                },
+                {
+                  "text": "4906+",
+                  "confidence": 79,
+                  "bbox": {
+                    "x0": 381.50800000000004,
+                    "y0": 453.848,
+                    "x1": 536.704,
+                    "y1": 495.968
+                  }
+                },
+                {
+                  "text": "1536%",
+                  "confidence": 75,
+                  "bbox": {
+                    "x0": 562.3,
+                    "y0": 453.848,
+                    "x1": 717.496,
+                    "y1": 495.968
+                  }
+                },
+                {
+                  "text": "1",
+                  "confidence": 93,
+                  "bbox": {
+                    "x0": 767.716,
+                    "y0": 452.876,
+                    "x1": 785.212,
+                    "y1": 497.912
+                  }
+                }
+              ]
+            }
+          ],
+          "rewardBandWords": [
+            {
+              "text": "540180@",
+              "confidence": 53,
+              "bbox": {
+                "x0": 147.256,
+                "y0": 453.848,
+                "x1": 353.968,
+                "y1": 495.968
+              }
+            },
+            {
+              "text": "4906+",
+              "confidence": 79,
+              "bbox": {
+                "x0": 381.50800000000004,
+                "y0": 453.848,
+                "x1": 536.704,
+                "y1": 495.968
+              }
+            },
+            {
+              "text": "1536%",
+              "confidence": 75,
+              "bbox": {
+                "x0": 562.3,
+                "y0": 453.848,
+                "x1": 717.496,
+                "y1": 495.968
+              }
+            },
+            {
+              "text": "1",
+              "confidence": 93,
+              "bbox": {
+                "x0": 767.716,
+                "y0": 452.876,
+                "x1": 785.212,
+                "y1": 497.912
+              }
+            },
+            {
+              "text": "«",
+              "confidence": 16,
+              "bbox": {
+                "x0": 833.164,
+                "y0": 444.776,
+                "x1": 892.456,
+                "y1": 494.024
+              }
+            }
+          ],
+          "rewardSourceCrop": null,
+          "localizedWordGeometry": {
+            "sourceCrop": null,
+            "words": [
+              {
+                "text": "540180@",
+                "confidence": 53,
+                "bbox": {
+                  "x0": 147.256,
+                  "y0": 453.848,
+                  "x1": 353.968,
+                  "y1": 495.968
+                }
+              },
+              {
+                "text": "4906+",
+                "confidence": 79,
+                "bbox": {
+                  "x0": 381.50800000000004,
+                  "y0": 453.848,
+                  "x1": 536.704,
+                  "y1": 495.968
+                }
+              },
+              {
+                "text": "1536%",
+                "confidence": 75,
+                "bbox": {
+                  "x0": 562.3,
+                  "y0": 453.848,
+                  "x1": 717.496,
+                  "y1": 495.968
+                }
+              }
+            ],
+            "reads": {
+              "credits": [
+                {
+                  "value": "54018",
+                  "text": "54018",
+                  "confidence": 83,
+                  "psm": 7,
+                  "fraction": 0.65,
+                  "rect": {
+                    "left": 145,
+                    "top": 447,
+                    "width": 137,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "54018",
+                  "text": "54018",
+                  "confidence": 95,
+                  "psm": 8,
+                  "fraction": 0.65,
+                  "rect": {
+                    "left": 145,
+                    "top": 447,
+                    "width": 137,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "54018",
+                  "text": "54018",
+                  "confidence": 4,
+                  "psm": 7,
+                  "fraction": 0.7,
+                  "rect": {
+                    "left": 145,
+                    "top": 447,
+                    "width": 147,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "54018",
+                  "text": "54018",
+                  "confidence": 44,
+                  "psm": 8,
+                  "fraction": 0.7,
+                  "rect": {
+                    "left": 145,
+                    "top": 447,
+                    "width": 147,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "54018",
+                  "text": "54018",
+                  "confidence": 0,
+                  "psm": 7,
+                  "fraction": 0.735,
+                  "rect": {
+                    "left": 145,
+                    "top": 447,
+                    "width": 154,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "54018",
+                  "text": "54018",
+                  "confidence": 0,
+                  "psm": 8,
+                  "fraction": 0.735,
+                  "rect": {
+                    "left": 145,
+                    "top": 447,
+                    "width": 154,
+                    "height": 55
+                  }
+                }
+              ],
+              "xp": [
+                {
+                  "value": "4906",
+                  "text": "4906",
+                  "confidence": 0,
+                  "psm": 7,
+                  "fraction": 0.75,
+                  "rect": {
+                    "left": 379,
+                    "top": 447,
+                    "width": 119,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "4906",
+                  "text": "4906",
+                  "confidence": 27,
+                  "psm": 8,
+                  "fraction": 0.75,
+                  "rect": {
+                    "left": 379,
+                    "top": 447,
+                    "width": 119,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "4906",
+                  "text": "4906",
+                  "confidence": 0,
+                  "psm": 7,
+                  "fraction": 0.8,
+                  "rect": {
+                    "left": 379,
+                    "top": 447,
+                    "width": 126,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "4906",
+                  "text": "4906",
+                  "confidence": 2,
+                  "psm": 8,
+                  "fraction": 0.8,
+                  "rect": {
+                    "left": 379,
+                    "top": 447,
+                    "width": 126,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "4906",
+                  "text": "4906",
+                  "confidence": 0,
+                  "psm": 7,
+                  "fraction": 0.835,
+                  "rect": {
+                    "left": 379,
+                    "top": 447,
+                    "width": 132,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "4906",
+                  "text": "4906",
+                  "confidence": 0,
+                  "psm": 8,
+                  "fraction": 0.835,
+                  "rect": {
+                    "left": 379,
+                    "top": 447,
+                    "width": 132,
+                    "height": 55
+                  }
+                }
+              ],
+              "freeXp": [
+                {
+                  "value": "1536",
+                  "text": "1536",
+                  "confidence": 94,
+                  "psm": 7,
+                  "fraction": 0.75,
+                  "rect": {
+                    "left": 560,
+                    "top": 447,
+                    "width": 119,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "1536",
+                  "text": "1536",
+                  "confidence": 96,
+                  "psm": 8,
+                  "fraction": 0.75,
+                  "rect": {
+                    "left": 560,
+                    "top": 447,
+                    "width": 119,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "1536",
+                  "text": "1536",
+                  "confidence": 90,
+                  "psm": 7,
+                  "fraction": 0.8,
+                  "rect": {
+                    "left": 560,
+                    "top": 447,
+                    "width": 126,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "1536",
+                  "text": "1536",
+                  "confidence": 46,
+                  "psm": 8,
+                  "fraction": 0.8,
+                  "rect": {
+                    "left": 560,
+                    "top": 447,
+                    "width": 126,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "15365",
+                  "text": "15365",
+                  "confidence": 31,
+                  "psm": 7,
+                  "fraction": 0.835,
+                  "rect": {
+                    "left": 560,
+                    "top": 447,
+                    "width": 132,
+                    "height": 55
+                  }
+                },
+                {
+                  "value": "1536",
+                  "text": "1536",
+                  "confidence": 0,
+                  "psm": 8,
+                  "fraction": 0.835,
+                  "rect": {
+                    "left": 560,
+                    "top": 447,
+                    "width": 132,
+                    "height": 55
+                  }
+                }
+              ]
+            },
+            "acceptedValues": {
+              "credits": "54018",
+              "xp": "4906",
+              "freeXp": "1536"
+            }
+          }
+        },
+        "performanceOcrText": "[AYNS]BabyEatingDingo #2 VII GNEISENAU Destroyed by fire IV! I RANG\nReceived for the Battle\n(A\n9 w ) fr;\nBattle performance\n{ — ~~ BE ERs E aN TT —\nI} PP) OR NT Te LT.) To)\n87313 . Na . BUEN | = FON FTF NSH Te dd uh FN 5\nDamage Destroyed Citadel hits Incapacitations Spotted Target hits Target hits Aircraft shot down Defended\n= 2 B\n= xi\nCaptured\nCombat Missions\n|=] Earn 3 000 Base XP ® Earn Commander XP ® Get ribbons £ Earn Base XP 4 MISSIONS IN TOTAL",
+        "performanceOcrWords": [
+          {
+            "text": "[AYNS]BabyEatingDingo",
+            "confidence": 87,
+            "bbox": {
+              "x0": 148.8,
+              "y0": 354.4,
+              "x1": 321.6,
+              "y1": 372.4
+            }
+          },
+          {
+            "text": "#2",
+            "confidence": 15,
+            "bbox": {
+              "x0": 330.6,
+              "y0": 355.6,
+              "x1": 351,
+              "y1": 366.4
+            }
+          },
+          {
+            "text": "VII",
+            "confidence": 84,
+            "bbox": {
+              "x0": 358.79999999999995,
+              "y0": 354.4,
+              "x1": 376.79999999999995,
+              "y1": 368.8
+            }
+          },
+          {
+            "text": "GNEISENAU",
+            "confidence": 91,
+            "bbox": {
+              "x0": 382.2,
+              "y0": 354.4,
+              "x1": 466.8,
+              "y1": 368.8
+            }
+          },
+          {
+            "text": "Destroyed",
+            "confidence": 96,
+            "bbox": {
+              "x0": 477,
+              "y0": 354.4,
+              "x1": 548.4,
+              "y1": 372.4
+            }
+          },
+          {
+            "text": "by",
+            "confidence": 96,
+            "bbox": {
+              "x0": 555,
+              "y0": 355,
+              "x1": 571.2,
+              "y1": 372.4
+            }
+          },
+          {
+            "text": "fire",
+            "confidence": 96,
+            "bbox": {
+              "x0": 576,
+              "y0": 354.4,
+              "x1": 598.8,
+              "y1": 368.8
+            }
+          },
+          {
+            "text": "IV!",
+            "confidence": 61,
+            "bbox": {
+              "x0": 618.5999999999999,
+              "y0": 355.6,
+              "x1": 619.8,
+              "y1": 357.4
+            }
+          },
+          {
+            "text": "I",
+            "confidence": 46,
+            "bbox": {
+              "x0": 700.1999999999999,
+              "y0": 359.2,
+              "x1": 700.8,
+              "y1": 367.6
+            }
+          },
+          {
+            "text": "RANG",
+            "confidence": 62,
+            "bbox": {
+              "x0": 769.1999999999999,
+              "y0": 355.6,
+              "x1": 813,
+              "y1": 367.6
+            }
+          },
+          {
+            "text": "Received",
+            "confidence": 96,
+            "bbox": {
+              "x0": 147.6,
+              "y0": 413.8,
+              "x1": 242.39999999999998,
+              "y1": 434.8
+            }
+          },
+          {
+            "text": "for",
+            "confidence": 96,
+            "bbox": {
+              "x0": 250.8,
+              "y0": 414.4,
+              "x1": 279.6,
+              "y1": 434.8
+            }
+          },
+          {
+            "text": "the",
+            "confidence": 96,
+            "bbox": {
+              "x0": 286.79999999999995,
+              "y0": 414.4,
+              "x1": 318,
+              "y1": 434.8
+            }
+          },
+          {
+            "text": "Battle",
+            "confidence": 96,
+            "bbox": {
+              "x0": 327.6,
+              "y0": 414.4,
+              "x1": 387,
+              "y1": 434.8
+            }
+          },
+          {
+            "text": "9",
+            "confidence": 68,
+            "bbox": {
+              "x0": 316.2,
+              "y0": 457,
+              "x1": 354,
+              "y1": 495.4
+            }
+          },
+          {
+            "text": "87313",
+            "confidence": 73,
+            "bbox": {
+              "x0": 154.8,
+              "y0": 579.4,
+              "x1": 290.4,
+              "y1": 622
+            }
+          },
+          {
+            "text": "5",
+            "confidence": 17,
+            "bbox": {
+              "x0": 1540.2,
+              "y0": 596.2,
+              "x1": 1567.8,
+              "y1": 623.2
+            }
+          },
+          {
+            "text": "Damage",
+            "confidence": 96,
+            "bbox": {
+              "x0": 197.4,
+              "y0": 633.4,
+              "x1": 247.8,
+              "y1": 649
+            }
+          },
+          {
+            "text": "2",
+            "confidence": 52,
+            "bbox": {
+              "x0": 228,
+              "y0": 661,
+              "x1": 259.2,
+              "y1": 706
+            }
+          },
+          {
+            "text": "3",
+            "confidence": 95,
+            "bbox": {
+              "x0": 247.2,
+              "y0": 826.5999999999999,
+              "x1": 255,
+              "y1": 848.8
+            }
+          },
+          {
+            "text": "000",
+            "confidence": 95,
+            "bbox": {
+              "x0": 262.2,
+              "y0": 829,
+              "x1": 283.2,
+              "y1": 842.2
+            }
+          },
+          {
+            "text": "4",
+            "confidence": 96,
+            "bbox": {
+              "x0": 1161.6,
+              "y0": 833.8,
+              "x1": 1168.8,
+              "y1": 846.4
+            }
+          }
+        ],
+        "sourceMetadataTightReads": [
+          {
+            "psm": 6,
+            "text": "New Dawn — Random Battle\nBattle start time: 30.09.2026 14:46",
+            "confidence": 93,
+            "sourceCrop": {
+              "left": 867,
+              "top": 155,
+              "width": 508,
+              "height": 109,
+              "outputWidth": 2400,
+              "transform": {
+                "left": 1044.578313253012,
+                "top": 186.74698795180726,
+                "scale": 3.9212598425196843
+              }
+            }
+          },
+          {
+            "psm": 7,
+            "text": "tle tr ime 30.08.2026 1446",
+            "confidence": 65,
+            "sourceCrop": {
+              "left": 867,
+              "top": 155,
+              "width": 508,
+              "height": 109,
+              "outputWidth": 2400,
+              "transform": {
+                "left": 1044.578313253012,
+                "top": 186.74698795180726,
+                "scale": 3.9212598425196843
+              }
+            }
+          },
+          {
+            "psm": 11,
+            "text": "New Dawn — Random Battle\n\nBattle start time: 30.09.2026 14:46",
+            "confidence": 93,
+            "sourceCrop": {
+              "left": 867,
+              "top": 155,
+              "width": 508,
+              "height": 109,
+              "outputWidth": 2400,
+              "transform": {
+                "left": 1044.578313253012,
+                "top": 186.74698795180726,
+                "scale": 3.9212598425196843
+              }
+            }
+          }
+        ],
+        "sourceMapModeReads": [
+          {
+            "psm": 6,
+            "text": "New Dawn — Random",
+            "confidence": 93,
+            "sourceCrop": {
+              "left": 881,
+              "top": 204,
+              "width": 403,
+              "height": 28,
+              "outputWidth": 2400,
+              "transform": {
+                "left": 1061.4457831325303,
+                "top": 245.7831325301205,
+                "scale": 4.942928039702233
+              }
+            }
+          },
+          {
+            "psm": 7,
+            "text": "New Dawn — Random",
+            "confidence": 93,
+            "sourceCrop": {
+              "left": 881,
+              "top": 204,
+              "width": 403,
+              "height": 28,
+              "outputWidth": 2400,
+              "transform": {
+                "left": 1061.4457831325303,
+                "top": 245.7831325301205,
+                "scale": 4.942928039702233
+              }
+            }
+          },
+          {
+            "psm": 11,
+            "text": "New Dawn — Random",
+            "confidence": 91,
+            "sourceCrop": {
+              "left": 881,
+              "top": 204,
+              "width": 403,
+              "height": 28,
+              "outputWidth": 2400,
+              "transform": {
+                "left": 1061.4457831325303,
+                "top": 245.7831325301205,
+                "scale": 4.942928039702233
+              }
+            }
+          }
+        ],
+        "sourceTimeDiagnostics": [],
+        "panelMetadataCandidates": [
+          {
+            "psm": 6,
+            "text": "Defeat ror:\nBattle start time: 30.09.2026 14:\nAll allied warships destroyed.\n[AYNS]BabyEatingDingo # VII GNEISENAU Destroyed by fire WiiohiyLecian — VIHANGER,\nReceived for the Battle ~\n940180® 4906 6x 1 «©\ni” WP ny\nBattle performance\n87373 1 \\» § Bi. FR Ya TNT) TEL\nDEE Destroyed Citadel hits Incapacitations Spotted Target hits Target hits Aircraft shot down Defended\nLia —\ni Captured\nCombat Missions\n|=] Earn 3 000 Base XP ® Earn Commander XP &) Get ribbons =. Earn Base XP",
+            "confidence": 73
+          },
+          {
+            "psm": 11,
+            "text": "New Dawn — Random Ba\n\nDefeat\n\nBattle start time: 30.09.2026 14:\n\nAll allied warships destroyed.\n\n[AYNS]BabyEatingDingo # VII GNEISENAU Destroyed by fire 11011)Loora VI RANGER\n\n1 for the Battle\n\n0180® 4906\n\n6 ce 1\n\n%\n\ni»\n\nBattle performance\n\nSm——\n\n87373 1 \\ § Bi] FFP°R\n\nx1\n\n=\n\n\\\n\niT\n\nDamage\n\nDestroyed\n\nCitadel hits\n\nIncapacitations\n\nSpotted\n\nTarget hits\n\nTarget hits\n\nAircraft shot down\n\nDefended\n\n—_\n\n—_—\n\nCaptured\n\nCombat Missions\n\nGet ribbons\n\n|=] arn 3 000 Base XP\n\n® Earn Commander XP\n\nB —\n\n=. Earn Base XP\n\n4 MISSIONS IN TOTAL",
+            "confidence": 76
+          },
+          {
+            "psm": 6,
+            "text": "Defeat Wi\nBattle start time: 30.09.2026 14:\nAll allied warships destroyed\n[AYNS]BabyEatingDingo 7 Vil GNEISENAU Destroyed by fire 1101/1 eorain— VIRANGER:\nReceived for the Battle ~\n~ 540180® 4906+ 1536% 1 =\nBattle performance _-\n87373 § \\» f B—u.R BFR a dl aC I RCo TE RL\nDamage Destroyed Citadel hits Incapacitations Spotted Target hits Target hits Aircraft shot down Defended\n\nwy -—\n~ Captured\nCombat Missions\n|=] Earn 3 000 Base XP ® Earn Commander XP ® Get ribbons i £ Earn Base XP",
+            "confidence": 68
+          }
+        ],
+        "damageFieldPasses": [
+          {
+            "psm": 7,
+            "text": "i",
+            "words": [
+              {
+                "text": "i",
+                "confidence": 31,
+                "bbox": {
+                  "x0": 152.42857142857142,
+                  "y0": 579.1428571428571,
+                  "x1": 291.8571428571429,
+                  "y1": 722
+                }
+              }
+            ]
+          },
+          {
+            "psm": 6,
+            "text": "3\n4\na\n= —",
+            "words": [
+              {
+                "text": "3",
+                "confidence": 96,
+                "bbox": {
+                  "x0": 267,
+                  "y0": 579.1428571428571,
+                  "x1": 290.1428571428571,
+                  "y1": 622
+                }
+              },
+              {
+                "text": "4",
+                "confidence": 0,
+                "bbox": {
+                  "x0": 217,
+                  "y0": 579.1428571428571,
+                  "x1": 291.57142857142856,
+                  "y1": 706.2857142857142
+                }
+              },
+              {
+                "text": "a",
+                "confidence": 35,
+                "bbox": {
+                  "x0": 155,
+                  "y0": 579.1428571428571,
+                  "x1": 248.42857142857144,
+                  "y1": 722
+                }
+              },
+              {
+                "text": "=",
+                "confidence": 94,
+                "bbox": {
+                  "x0": 154.14285714285714,
+                  "y0": 682.5714285714286,
+                  "x1": 173.28571428571428,
+                  "y1": 701.1428571428571
+                }
+              },
+              {
+                "text": "—",
+                "confidence": 38,
+                "bbox": {
+                  "x0": 194.71428571428572,
+                  "y0": 717.1428571428571,
+                  "x1": 216.71428571428572,
+                  "y1": 722
+                }
+              }
+            ]
+          },
+          {
+            "psm": 6,
+            "text": "Damage Destroyed\n- + - x1\nCantiired",
+            "words": [
+              {
+                "text": "Damage",
+                "confidence": 96,
+                "bbox": {
+                  "x0": 197.28571428571428,
+                  "y0": 633.2857142857143,
+                  "x1": 248.14285714285714,
+                  "y1": 649
+                }
+              },
+              {
+                "text": "Destroyed",
+                "confidence": 96,
+                "bbox": {
+                  "x0": 350.1428571428571,
+                  "y0": 633.5714285714286,
+                  "x1": 412.7142857142857,
+                  "y1": 648.7142857142857
+                }
+              },
+              {
+                "text": "-",
+                "confidence": 63,
+                "bbox": {
+                  "x0": 155.85714285714286,
+                  "y0": 693.2857142857142,
+                  "x1": 158.42857142857142,
+                  "y1": 701
+                }
+              },
+              {
+                "text": "+",
+                "confidence": 41,
+                "bbox": {
+                  "x0": 168.14285714285714,
+                  "y0": 685.8571428571429,
+                  "x1": 173.28571428571428,
+                  "y1": 701.2857142857142
+                }
+              },
+              {
+                "text": "-",
+                "confidence": 32,
+                "bbox": {
+                  "x0": 213,
+                  "y0": 660.7142857142857,
+                  "x1": 242.14285714285714,
+                  "y1": 705.8571428571429
+                }
+              },
+              {
+                "text": "x1",
+                "confidence": 80,
+                "bbox": {
+                  "x0": 272.1428571428571,
+                  "y0": 686.7142857142857,
+                  "x1": 289.57142857142856,
+                  "y1": 706.4285714285714
+                }
+              },
+              {
+                "text": "Cantiired",
+                "confidence": 72,
+                "bbox": {
+                  "x0": 194.71428571428572,
+                  "y0": 717,
+                  "x1": 250.71428571428572,
+                  "y1": 727
+                }
+              }
+            ]
+          },
+          {
+            "psm": 8,
+            "text": "AE",
+            "words": [
+              {
+                "text": "AE",
+                "confidence": 30,
+                "bbox": {
+                  "x0": 154.42857142857142,
+                  "y0": 574.4285714285714,
+                  "x1": 452.14285714285717,
+                  "y1": 727
+                }
+              }
+            ]
+          },
+          {
+            "psm": 7,
+            "text": "09",
+            "words": [
+              {
+                "text": "09",
+                "confidence": 0,
+                "bbox": {
+                  "x0": 155.10270880361173,
+                  "y0": 585,
+                  "x1": 333.00225733634306,
+                  "y1": 624.4063205417607
+                }
+              }
+            ]
+          },
+          {
+            "psm": 8,
+            "text": "00",
+            "words": [
+              {
+                "text": "00",
+                "confidence": 0,
+                "bbox": {
+                  "x0": 155.10270880361173,
+                  "y0": 585,
+                  "x1": 333.00225733634306,
+                  "y1": 624.4063205417607
+                }
+              }
+            ]
+          }
+        ],
+        "damageCropSweepDiagnostics": [
+          {
+            "value": "",
+            "text": "873",
+            "confidence": 0,
+            "leftFraction": 0.05949999999999999,
+            "widthFraction": 0.096,
+            "psm": 8,
+            "rect": {
+              "left": 89,
+              "top": 461,
+              "width": 143,
+              "height": 77
+            }
+          },
+          {
+            "value": "",
+            "text": "873",
+            "confidence": 0,
+            "leftFraction": 0.05949999999999999,
+            "widthFraction": 0.096,
+            "psm": 13,
+            "rect": {
+              "left": 89,
+              "top": 461,
+              "width": 143,
+              "height": 77
+            }
+          },
+          {
+            "value": "",
+            "text": "873",
+            "confidence": 0,
+            "leftFraction": 0.05949999999999999,
+            "widthFraction": 0.098,
+            "psm": 8,
+            "rect": {
+              "left": 89,
+              "top": 461,
+              "width": 146,
+              "height": 77
+            }
+          },
+          {
+            "value": "",
+            "text": "873",
+            "confidence": 0,
+            "leftFraction": 0.05949999999999999,
+            "widthFraction": 0.098,
+            "psm": 13,
+            "rect": {
+              "left": 89,
+              "top": 461,
+              "width": 146,
+              "height": 77
+            }
+          },
+          {
+            "value": "87373",
+            "text": "87373",
+            "confidence": 27,
+            "leftFraction": 0.05949999999999999,
+            "widthFraction": 0.1,
+            "psm": 8,
+            "rect": {
+              "left": 89,
+              "top": 461,
+              "width": 149,
+              "height": 77
+            }
+          },
+          {
+            "value": "87373",
+            "text": "87373",
+            "confidence": 27,
+            "leftFraction": 0.05949999999999999,
+            "widthFraction": 0.1,
+            "psm": 13,
+            "rect": {
+              "left": 89,
+              "top": 461,
+              "width": 149,
+              "height": 77
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

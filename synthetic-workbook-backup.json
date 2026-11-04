@@ -1,0 +1,622 @@
+{
+  "version": 2,
+  "exportedAt": "2026-11-03T22:13:54.602Z",
+  "players": [
+    {
+      "id": 4,
+      "name": "[WOLF1]CaptainWren",
+      "events": {
+        "damage": [
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 8,
+            "metric": 11111
+          },
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 3,
+            "metric": 170028
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 7,
+            "metric": 104662
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 9,
+            "metric": 198403
+          },
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 6,
+            "metric": 159183
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 2,
+            "metric": 115639
+          },
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 11,
+            "metric": 18072
+          }
+        ],
+        "kills": [
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 10,
+            "metric": 8
+          },
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 7,
+            "metric": 2
+          },
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 8,
+            "metric": 7
+          },
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 1,
+            "metric": 5
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 8,
+            "metric": 6
+          },
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 10,
+            "metric": 3
+          },
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 7,
+            "metric": 1
+          }
+        ],
+        "race": [
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 2,
+            "metric": 179
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 2,
+            "metric": 254
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 1,
+            "metric": 254
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 1,
+            "metric": 240
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 10,
+            "metric": 89
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 8,
+            "metric": 111
+          },
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 11,
+            "metric": 127
+          }
+        ],
+        "grand": [
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 6,
+            "damage": 26219,
+            "kills": 3,
+            "time": 172
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 11,
+            "damage": 127635,
+            "kills": 1,
+            "time": 186
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 5,
+            "damage": 31718,
+            "kills": 3,
+            "time": 125
+          },
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 3,
+            "damage": 115000,
+            "kills": 2,
+            "time": 124
+          },
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 1,
+            "damage": 58761,
+            "kills": 4,
+            "time": 210
+          },
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 7,
+            "damage": 74019,
+            "kills": 3,
+            "time": 58
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 7,
+            "damage": 115846,
+            "kills": 1,
+            "time": 166
+          }
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "name": "[NORTH]StarPilot",
+      "events": {
+        "damage": [
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 8,
+            "metric": 181126
+          },
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 3,
+            "metric": 190799
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 4,
+            "metric": 99443
+          },
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 2,
+            "metric": 17402
+          },
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 9,
+            "metric": 123216
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 2,
+            "metric": 151787
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 10,
+            "metric": 190240
+          }
+        ],
+        "kills": [
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 4,
+            "metric": 0
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 7,
+            "metric": 7
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 5,
+            "metric": 2
+          },
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 9,
+            "metric": 2
+          },
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 3,
+            "metric": 4
+          },
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 2,
+            "metric": 2
+          },
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 10,
+            "metric": 3
+          }
+        ],
+        "race": [
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 7,
+            "metric": 254
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 4,
+            "metric": 78
+          },
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 3,
+            "metric": 238
+          },
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 9,
+            "metric": 236
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 10,
+            "metric": 60
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 10,
+            "metric": 259
+          },
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 11,
+            "metric": 168
+          }
+        ],
+        "grand": [
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 5,
+            "damage": 176314,
+            "kills": 1,
+            "time": 168
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 9,
+            "damage": 52980,
+            "kills": 1,
+            "time": 171
+          },
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 4,
+            "damage": 189773,
+            "kills": 0,
+            "time": 159
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 10,
+            "damage": 104808,
+            "kills": 2,
+            "time": 235
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 4,
+            "damage": 123639,
+            "kills": 6,
+            "time": 260
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 5,
+            "damage": 155478,
+            "kills": 4,
+            "time": 193
+          },
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 5,
+            "damage": 113247,
+            "kills": 3,
+            "time": 216
+          }
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "name": "[YOLO]Pixel7",
+      "events": {
+        "damage": [
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 9,
+            "metric": 187115
+          },
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 9,
+            "metric": 65197
+          },
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 1,
+            "metric": 182209
+          },
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 4,
+            "metric": 180139
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 1,
+            "metric": 27855
+          },
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 4,
+            "metric": 55172
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 8,
+            "metric": 15047
+          }
+        ],
+        "kills": [
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 1,
+            "metric": 2
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 5,
+            "metric": 0
+          },
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 10,
+            "metric": 1
+          },
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 2,
+            "metric": 5
+          },
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 1,
+            "metric": 6
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 7,
+            "metric": 0
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 4,
+            "metric": 5
+          }
+        ],
+        "race": [
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 6,
+            "metric": 56
+          },
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 6,
+            "metric": 206
+          },
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 9,
+            "metric": 228
+          },
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 8,
+            "metric": 164
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 8,
+            "metric": 236
+          },
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 10,
+            "metric": 98
+          },
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 2,
+            "metric": 68
+          }
+        ],
+        "grand": [
+          {
+            "class": "CA",
+            "classWeight": 3,
+            "tier": 9,
+            "damage": 132367,
+            "kills": 4,
+            "time": 150
+          },
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 11,
+            "damage": 200360,
+            "kills": 3,
+            "time": 138
+          },
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 11,
+            "damage": 107557,
+            "kills": 1,
+            "time": 39
+          },
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 3,
+            "damage": 167514,
+            "kills": 0,
+            "time": 131
+          },
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 6,
+            "damage": 196988,
+            "kills": 4,
+            "time": 195
+          },
+          {
+            "class": "DD",
+            "classWeight": 4,
+            "tier": 5,
+            "damage": 209637,
+            "kills": 1,
+            "time": 82
+          },
+          {
+            "class": "BB",
+            "classWeight": 2,
+            "tier": 11,
+            "damage": 27162,
+            "kills": 2,
+            "time": 82
+          }
+        ]
+      }
+    }
+  ],
+  "settings": {
+    "events": {
+      "damage": {
+        "pool": 625.5,
+        "multiplier": 1.17,
+        "tierPower": 1.25
+      },
+      "kills": {
+        "pool": 575.2,
+        "multiplier": 0.95,
+        "tierPower": 0.5
+      },
+      "race": {
+        "pool": 700,
+        "multiplier": 1.4,
+        "tierPower": 1.15
+      },
+      "grand": {
+        "pool": 999.9,
+        "multiplier": 0.85,
+        "tierWeight": 1.1,
+        "damageWeight": 1.4,
+        "killsWeight": 0.9,
+        "timeWeight": 1.3
+      }
+    }
+  },
+  "importedBattleRecordIds": []
+}
