@@ -303,6 +303,9 @@ function createDesktopService(options = {}) {
           case 'publish':
             if(!tournament) throw new Error('Tournament ID is required.');
             result=TournamentFormats.publishTournament(tournament,body.approval||{},actor);break;
+          case 'set_stage_qualifiers':
+            if(!tournament) throw new Error('Tournament ID is required.');
+            result=TournamentFormats.setStageQualifiers(tournament,body.stageKey,body.teamIds||[],body.approval||{},actor);break;
           case 'activate_stage':
             if(!tournament) throw new Error('Tournament ID is required.');
             result=TournamentFormats.activateStage(tournament,body.stageKey,actor);break;
@@ -329,6 +332,9 @@ function createDesktopService(options = {}) {
           case 'resolve_forfeit':
             if(!tournament) throw new Error('Tournament ID is required.');
             result=TournamentFormats.resolveForfeit(tournament,body.matchId,body.winnerTeamId,body.reason,body.evidenceId,actor);break;
+          case 'record_bye':
+            if(!tournament) throw new Error('Tournament ID is required.');
+            result=TournamentFormats.recordBye(tournament,body.stageKey,body.teamId,body.reason,body.evidenceId,actor);break;
           case 'race_side_event':
             if(!tournament) throw new Error('Tournament ID is required.');
             result=TournamentFormats.recordRaceSideEvent(tournament,body.event||{},actor);break;
