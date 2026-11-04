@@ -131,6 +131,11 @@ test('Full YOLO cannot close until every season stage is completed in order',asy
  await f.service.transitionYoloTournament(admin,'full-stage',{status:'active'});
  await assert.rejects(f.service.transitionYoloTournament(admin,'full-stage',{status:'completed'}),/cannot complete/);
  for(const stage of ['regular-season','postseason','grand-finale']){
+  const nightId='night-'+stage;
+  await f.service.createYoloEventNight(admin,{id:nightId,tournamentId:'full-stage',stage,startsAt:'2026-11-10T18:00:00Z',approvedSettingsId:'approved-'+stage});
+  await f.service.transitionYoloEventNight(admin,nightId,{status:'published'});
+  await f.service.transitionYoloEventNight(admin,nightId,{status:'active'});
+  await f.service.transitionYoloEventNight(admin,nightId,{status:'completed'});
   await f.service.transitionYoloStage(admin,'full-stage',{stage,status:'published'});
   await f.service.transitionYoloStage(admin,'full-stage',{stage,status:'active'});
   await f.service.transitionYoloStage(admin,'full-stage',{stage,status:'completed'});
@@ -169,6 +174,11 @@ test('Full operations preserve registered roster, fixture, match, game and revie
  assert.equal(linked.status,'awaiting-evidence-review');
  const reviewed=await f.service.reviewYoloGameEvidence(admin,game.id,{accepted:true});
  assert.equal(reviewed.status,'evidence-accepted');
+ const certified=await f.service.certifyYoloMatchOutcome(admin,match.id,{winnerTeamId:teamA.id,approvedScoringMethodId:'approved-match-method',
+  acceptedPerformanceRecordIds:[upload.submissionId],aggregation:'approved aggregate rule v1',rounding:'approved rounding rule v1',
+  tieBreakOrder:['head-to-head','team-record','point-differential'],decisionReference:'signed-match-result-2026-11-07'});
+ assert.equal(certified.outcome.status,'certified');
+ await assert.rejects(f.service.certifyYoloMatchOutcome(admin,match.id,{winnerTeamId:teamB.id}),e=>e.code==='OUTCOME_ALREADY_CERTIFIED');
 });
 
 test('event-night publication requires signed settings and activation locks registration',async()=>{
