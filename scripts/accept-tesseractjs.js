@@ -165,8 +165,9 @@ function report() {
         run('local-asset-package-check', ['scripts/check-tesseractjs-assets.js']);
         // First establish that the control fixture passes exact-field acceptance
         // in this same runtime. The previous negative-control used an Asashio fixture
-        // with a known player-identity mismatch, so it could not prove
-        // that the injected wrong expectation alone caused rejection.
+        // on the four-image set was unresolved in the previous Windows run. The additional-corpus
+        // image.png fixture passed all nine fields exactly in the same captured runtime.
+        // Use it for the control so only the deliberately wrong expected value can fail.
         const negativeBaselinePath = path.join(runDir, 'negative-control-image-baseline.json');
         const negativeBaseline = run('negative-control-image-known-good-baseline', ['scripts/run-ocr-sequence.js', 'image.png'], {
             OCR_SEQUENCE_REPORT_PATH: negativeBaselinePath,
@@ -193,7 +194,7 @@ function report() {
         // exact, the OCR actuals stayed identical, and damage is the sole field
         // rejected by the expected-value override.
         const negativeReportPath = path.join(runDir, 'negative-expected-value.json');
-        const negative = run('deliberately-wrong-expected-value-must-fail', ['scripts/run-ocr-sequence.js', 'hoffmann-victory.png'], {
+        const negative = run('deliberately-wrong-expected-value-must-fail', ['scripts/run-ocr-sequence.js', 'image.png'], {
             OCR_ACCEPTANCE_TEST_MODE: '1',
             OCR_ACCEPTANCE_TEST_EXPECTED_OVERRIDE: 'image.png.damage=255360',
             OCR_SEQUENCE_REPORT_PATH: negativeReportPath,
@@ -203,7 +204,7 @@ function report() {
         let negativeReportValid = false;
         try {
             const negativeReport = JSON.parse(fs.readFileSync(negativeReportPath, 'utf8'));
-            const row = negativeReport.results?.find(item => item.fixtureKey === 'hoffmann-victory.png');
+            const row = negativeReport.results?.find(item => item.fixtureKey === 'image.png');
             negativeReportValid = negativeBaselineValid && validateNegativeExpectedControl(baselineRow, row, negative.exitCode);
         } catch {}
         negative.passed = negativeReportValid;
