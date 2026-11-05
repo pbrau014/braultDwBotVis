@@ -1,3 +1,7 @@
+# Main/source checkpoint clarification — 2026-11-05
+
+Last source-code checkpoint: 5a12a9c218cebe61d277999318b7ceef5a8dc3b1. Documentation sync commit: 846c125c039358b7b4d8e30f2a882409b5b6e526; exact-head run 42115213448 is pending. Main includes subsequent documentation-only reconciliation; re-fetch main before further writes. Windows screenshot acceptance on run 42111470540 is still running; production remains NO-GO.
+
 # Current authority override — 2026-11-05
 
 Canonical repository: pbrau014/braultDwBotVis; active branch: main; checkpoint head: 5a12a9c218cebe61d277999318b7ceef5a8dc3b1. Other branches and repositories are historical/read-only. No force-push, history rewrite, branch merge, production deployment, live Discord action, paid service or production screenshot transmission.

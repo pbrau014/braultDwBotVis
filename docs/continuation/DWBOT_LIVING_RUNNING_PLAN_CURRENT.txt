@@ -1,3 +1,9 @@
+CURRENT MAIN / SOURCE-CHECKPOINT CLARIFICATION — 2026-11-05
+
+The last source-code checkpoint is 5a12a9c218cebe61d277999318b7ceef5a8dc3b1,
+which is the exact source SHA for Windows/Linux/package run 42111470540.
+Documentation reconciliation was then committed in 846c125c039358b7b4d8e30f2a882409b5b6e526; exact-head run 42115213448 is pending for that documentation sync. The main branch now includes those documentation-only updates. Do not describe 5a12 as the current branch HEAD; re-fetch main before any further GitHub write. No production code changed after the 5a12 source checkpoint in the 846c documentation sync.
+
 ================================================================================
 CURRENT EXECUTION RECONCILIATION — 2026-11-05 (NEWEST ACTIVE STATUS)
 This block supersedes stale current-head, CI, package and deliverable-identity

@@ -1,3 +1,9 @@
+## Source and documentation checkpoint clarification — 2026-11-05
+
+- Last source-code checkpoint: 5a12a9c218cebe61d277999318b7ceef5a8dc3b1 (run 42111470540).
+- Documentation sync commit: 846c125c039358b7b4d8e30f2a882409b5b6e526; exact-head run 42115213448 is pending. Main includes subsequent documentation-only reconciliation; re-fetch the branch before further writes.
+- Run 42111470540 remains in progress on the source checkpoint: Linux and clean-package/PDF jobs PASS; Windows persistence/recovery and full Node 22 suite PASS; Windows screenshot acceptance still running.
+
 ## Current execution checkpoint — 2026-11-05
 
 - Canonical main is 5a12a9c218cebe61d277999318b7ceef5a8dc3b1. The two test-only corrections are committed and verified: 78558e68c414ec4ed5164fc0d7dbdbcb8e8d9d59 and 5a12a9c218cebe61d277999318b7ceef5a8dc3b1.

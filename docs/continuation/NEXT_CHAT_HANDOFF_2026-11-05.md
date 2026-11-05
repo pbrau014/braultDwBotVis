@@ -1,3 +1,7 @@
+# Main/source checkpoint clarification — 2026-11-05
+
+Last source-code checkpoint: 5a12a9c218cebe61d277999318b7ceef5a8dc3b1 (run 42111470540). Documentation sync commit: 846c125c039358b7b4d8e30f2a882409b5b6e526; exact-head run 42115213448 is pending. Main now includes documentation-only reconciliation after the source checkpoint; re-fetch main before further writes. Run 42111470540 is still running Windows current-source screenshot acceptance; its Linux and clean-package/PDF jobs passed, as did Windows persistence/recovery and the full Node 22 suite.
+
 # Current continuation update — 2026-11-05
 
 Canonical repository: pbrau014/braultDwBotVis, branch main, checkpoint head 5a12a9c218cebe61d277999318b7ceef5a8dc3b1. Continue in this ChatGPT conversation only; do not use Work mode. Do not emit interim progress narration; update the living plan and report one consolidated result.
