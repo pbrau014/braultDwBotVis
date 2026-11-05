@@ -327,6 +327,10 @@ test('truncated XP prefixes trigger a geometry repair instead of masquerading as
 test('four-digit XP crop quorum may remove one trailing icon digit from a five-digit anchor', () => {
   const evidence = { reads: 4, geometries: 2, psms: 2 };
   assert.equal(rewardGeometryQuorumCanResolveXpTrailingAdornment('xp', '26534', '2653', evidence), true);
+  assert.equal(rewardGeometryQuorumCanResolveXpTrailingAdornment('xp', '66465', '6646', evidence), true,
+    'the reported image3 false-acceptance must resolve to 6646 only with an independent four-read geometry/PSM quorum');
+  assert.equal(rewardGeometryQuorumCanResolveXpTrailingAdornment('xp', '66465', '6645', evidence), false,
+    'a different four-digit value must remain unresolved rather than being guessed');
   assert.equal(rewardGeometryQuorumCanResolveXpTrailingAdornment('xp', '26534', '2653', {
     reads: 3, geometries: 2, psms: 2,
   }), false, 'three reads are not a quorum');
