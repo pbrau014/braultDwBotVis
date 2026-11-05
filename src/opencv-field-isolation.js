@@ -134,7 +134,7 @@ async function analyze(imageBuffer, options = {}) {
     // CV proposals can influence which OCR crops are considered, so keep the
     // feature opt-in until same-input accuracy/false-acceptance benchmarks
     // demonstrate a benefit. Exact-value validation remains authoritative.
-    if (String(process.env.OCR_CV_ASSIST || '').trim() !== '1') {
+    if (options.force !== true && String(process.env.OCR_CV_ASSIST || '').trim() !== '1') {
         return { schemaVersion: 1, status: 'disabled', regions: {}, preprocessing: [], acceptancePolicy: 'disabled unless explicitly enabled for controlled evaluation' };
     }
     try {

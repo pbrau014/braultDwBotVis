@@ -377,7 +377,74 @@ async function extractTextCore(imageBuffer) {
     // OpenCV is a local geometry assistant only. It never emits accepted values;
     // the established Tesseract passes, parsers and ambiguity checks remain the
     // authority. Missing Python/OpenCV fails back to the existing OCR pipeline.
-    const cvAnalysis = await opencvFieldIsolation.analyze(imageBuffer);
+    const ocrSpaceConfigured = process.env.OCRSPACE_ENABLED === '1' && Boolean(String(process.env.OCRSPACE_API_KEY || '').trim());
+    // OCR.Space-first prepass: OpenCV supplies geometry only. Identity geometry is
+    // used as an exclusion boundary and is never uploaded. If a safe crop cannot
+    // be proven, the remote prepass skips it and local OCR continues unchanged.
+    const cvAnalysis = await opencvFieldIsolation.analyze(imageBuffer, { force: ocrSpaceConfigured });
+    let ocrSpacePrepassEvidence = { status: 'disabled', reason: 'OCRSPACE_ENABLED/key not configured', requests: 0, evidence: [] };
+    if (ocrSpaceConfigured) {
+        try {
+            const regions = cvAnalysis?.regions || {};
+            const identity = regions.identity?.rect;
+            const identityBottom = identity ? Number(identity.top) + Number(identity.height) : Math.round(sourceHeight * 0.315);
+            const cropPlan = [];
+            const addSafeCrop = (field, source, rect, isTable = false) => {
+                if (!rect) return;
+                const left = Math.max(0, Math.floor(Number(rect.left)));
+                const top = Math.max(0, Math.floor(Number(rect.top)));
+                const right = Math.min(sourceWidth, Math.ceil(Number(rect.left) + Number(rect.width)));
+                const bottom = Math.min(sourceHeight, Math.ceil(Number(rect.top) + Number(rect.height)));
+                if (![left, top, right, bottom].every(Number.isFinite) || right - left < 8 || bottom - top < 6) return;
+                cropPlan.push({ field, source, engine: 3, isTable, scale: true,
+                    rect: { left, top, width: right - left, height: bottom - top } });
+            };
+            const resultRect = regions.result?.rect;
+            if (resultRect) addSafeCrop('result', 'opencv-result-title', {
+                ...resultRect, height: Math.min(Number(resultRect.top) + Number(resultRect.height), sourceHeight * 0.205) - Number(resultRect.top),
+            });
+            const metadataRect = regions.metadata?.rect;
+            if (metadataRect) {
+                const top = Math.max(Number(metadataRect.top), sourceHeight * 0.115);
+                const bottom = Math.min(Number(metadataRect.top) + Number(metadataRect.height), sourceHeight * 0.275);
+                const left = Math.max(Number(metadataRect.left), sourceWidth * 0.585);
+                addSafeCrop('battleMetadata', 'opencv-battle-metadata', {
+                    left, top, width: Math.min(Number(metadataRect.left) + Number(metadataRect.width), sourceWidth) - left, height: bottom - top,
+                });
+            }
+            const rewardRect = regions.rewardBand?.rect;
+            if (rewardRect) {
+                const top = Math.max(Number(rewardRect.top), identityBottom + sourceHeight * 0.004, sourceHeight * 0.315);
+                const bottom = Math.min(Number(rewardRect.top) + Number(rewardRect.height), sourceHeight * 0.405);
+                addSafeCrop('rewardBand', 'opencv-reward-band', {
+                    left: Number(rewardRect.left), top, width: Number(rewardRect.width), height: bottom - top,
+                }, true);
+            }
+            const damageRect = regions.damage?.rect;
+            if (damageRect) {
+                const left = Math.max(Number(damageRect.left), sourceWidth * 0.025);
+                const top = Math.max(Number(damageRect.top), sourceHeight * 0.365);
+                const right = Math.min(Number(damageRect.left) + Number(damageRect.width), sourceWidth * 0.275);
+                const bottom = Math.min(Number(damageRect.top) + Number(damageRect.height), sourceHeight * 0.505);
+                addSafeCrop('damage', 'opencv-damage', { left, top, width: right - left, height: bottom - top });
+            }
+            const remaining = Math.max(1000, OCR_IMAGE_TIMEOUT_MS - (Date.now() - imageStartedAt) - 45000);
+            if (cropPlan.length && remaining >= 1000) {
+                ocrSpacePrepassEvidence = await collectOcrSpaceFieldEvidence({
+                    env: { ...process.env, OCRSPACE_MAX_CROPS: process.env.OCRSPACE_MAX_CROPS || '4',
+                        OCRSPACE_STAGE_BUDGET_MS: String(Math.min(20000, remaining)) },
+                    cropPlan,
+                    buildCrop: async spec => imageProcessor.cropResize(imageBuffer, spec.rect,
+                        Math.max(600, Math.min(1800, Math.round(spec.rect.width * 2.5))),
+                        { grayscale: true, contrastStretch: '0.5%x0.5%', sharpen: '0x1+1+0.02' }),
+                });
+            } else {
+                ocrSpacePrepassEvidence = { status: 'skipped', reason: 'no geometrically safe non-identifying crops or insufficient time budget', requests: 0, evidence: [] };
+            }
+        } catch (error) {
+            ocrSpacePrepassEvidence = { status: 'failed', reason: String(error && error.code || 'OCRSPACE_PREPASS_ERROR'), requests: 0, evidence: [] };
+        }
+    }
     ensureImageBudget();
     const worker = await getOcrWorker();
     // Enlarge smaller screenshots and boost contrast before OCR, with a bounded
@@ -2425,6 +2492,7 @@ async function extractTextCore(imageBuffer) {
         text: String(attempt.text || ''), confidence: Number(attempt.confidence) || 0,
     }));
     const extractedFields = {
+        ocrSpaceEvidence: ocrSpacePrepassEvidence,
         rewards: focusedRewards,
         rewardCandidates,
         legacyRewardCandidates,
@@ -2518,8 +2586,7 @@ async function extractTextCore(imageBuffer) {
     // the remaining per-image budget and fails open to the Tesseract result.
     const prePaddleRecord = buildBattleRecord(combined.text, extractedFields);
     const hasUnresolvedBeforePaddle = getMissingRequiredFields(prePaddleRecord).length > 0;
-    const ocrSpaceConfigured = process.env.OCRSPACE_ENABLED === '1' && Boolean(String(process.env.OCRSPACE_API_KEY || '').trim());
-    const ocrSpaceReserveMs = ocrSpaceConfigured && hasUnresolvedBeforePaddle
+    const ocrSpaceReserveMs = ocrSpaceConfigured && hasUnresolvedBeforePaddle && ocrSpacePrepassEvidence.status !== 'complete'
         ? Math.max(1000, Math.min(20000, Number(process.env.OCRSPACE_STAGE_BUDGET_MS) || 20000)) : 0;
     const fallbackRemainingMs = Math.max(0, OCR_IMAGE_TIMEOUT_MS - (Date.now() - imageStartedAt) - 1500 - ocrSpaceReserveMs);
     await paddleOcrFieldFallback.applyFieldFallback({
@@ -2543,23 +2610,24 @@ async function extractTextCore(imageBuffer) {
             const cropPlan = [];
             const addCrop = (field, engine, rect, source, imageSource, outputWidth) => {
                 if (rect && Number(rect.width) >= 8 && Number(rect.height) >= 6) {
-                    cropPlan.push({ field, engine, rect: { ...rect }, source, imageSource, outputWidth });
+                    cropPlan.push({ field, engine: 3, rect: { ...rect }, source, imageSource, outputWidth,
+                        isTable: source === 'localized-reward-column' });
                 }
             };
             for (const field of ['xp', 'freeXp', 'credits']) {
                 const label = field === 'freeXp' ? 'Free XP' : field === 'xp' ? 'XP' : 'Credits';
                 if (!missingLabels.has(label)) continue;
                 const rect = localizedRewardEvidence.rects[field + '-psm7'] || localizedRewardEvidence.rects[field + '-psm8'];
-                if (rect) addCrop(field, 2, rect, 'localized-reward-column', 'prepared', Math.max(420, Math.min(1400, Math.round(rect.width * 3.5))));
+                if (rect) addCrop(field, 3, rect, 'localized-reward-column', 'prepared', Math.max(420, Math.min(1400, Math.round(rect.width * 3.5))));
             }
-            if (missingLabels.has('Damage')) addCrop('damage', 2, damageProviderRect, 'localized-damage-column', 'prepared', 1400);
-            if (missingLabels.has('Battle Result')) addCrop('result', 2, resultTitleRect, 'localized-result-title', 'original', 1700);
+            if (missingLabels.has('Damage')) addCrop('damage', 3, damageProviderRect, 'localized-damage-column', 'prepared', 1400);
+            if (missingLabels.has('Battle Result')) addCrop('result', 3, resultTitleRect, 'localized-result-title', 'original', 1700);
             if (missingLabels.has('Map') || missingLabels.has('Battle Mode') || missingLabels.has('Battle Start Time')) {
-                addCrop('battleMetadata', 2, sourceMetadataTightRect, 'localized-battle-metadata', 'original', 1700);
+                addCrop('battleMetadata', 3, sourceMetadataTightRect, 'localized-battle-metadata', 'original', 1700);
             }
             const remainingBudget = OCR_IMAGE_TIMEOUT_MS - (Date.now() - imageStartedAt) - 1500;
             if (remainingBudget >= 1500) {
-                extractedFields.ocrSpaceEvidence = await collectOcrSpaceFieldEvidence({
+                extractedFields.ocrSpaceRefinementEvidence = await collectOcrSpaceFieldEvidence({
                     env: { ...process.env, OCRSPACE_STAGE_BUDGET_MS: String(Math.min(20000, remainingBudget)) },
                     cropPlan,
                     buildCrop: async (spec) => imageProcessor.cropResize(
@@ -2570,14 +2638,14 @@ async function extractTextCore(imageBuffer) {
                     ),
                 });
             } else {
-                extractedFields.ocrSpaceEvidence = { status: 'skipped', reason: 'insufficient remaining per-image time budget', requests: 0, evidence: [] };
+                extractedFields.ocrSpaceRefinementEvidence = { status: 'skipped', reason: 'insufficient remaining per-image time budget', requests: 0, evidence: [] };
             }
         } catch (error) {
             console.warn('[OCR.space] Optional evidence stage failed; local OCR remains authoritative:', String(error && error.message || error).slice(0, 240));
-            extractedFields.ocrSpaceEvidence = { status: 'failed', reason: String(error && error.code || 'OCRSPACE_STAGE_ERROR'), requests: 0, evidence: [] };
+            extractedFields.ocrSpaceRefinementEvidence = { status: 'failed', reason: String(error && error.code || 'OCRSPACE_STAGE_ERROR'), requests: 0, evidence: [] };
         }
     } else {
-        extractedFields.ocrSpaceEvidence = { status: 'disabled', reason: process.env.OCRSPACE_ENABLED !== '1'
+        extractedFields.ocrSpaceRefinementEvidence = { status: 'skipped', reason: process.env.OCRSPACE_ENABLED !== '1'
             ? 'OCRSPACE_ENABLED is not explicitly enabled' : 'OCRSPACE_API_KEY is not configured', requests: 0, evidence: [] };
     }
 
