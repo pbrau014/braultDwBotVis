@@ -1708,6 +1708,22 @@ async function extractTextCore(imageBuffer) {
     }
     if (!rewardCandidates.length && focusedRewards) rewardCandidates.push({ ...focusedRewards, confidence: Number(rewardFieldOcr.confidence) || 0, source: 'focused-primary' });
     const legacyRewardCandidates = rewardCandidates.map((candidate) => ({ ...candidate }));
+    // Keep broad full-screen reads out of acceptance, but retain them as
+    // independent conflict evidence even when the fixed-band fallback is active.
+    const fullScreenRewardConflictCandidates = [];
+    for (const attempt of [standard, sparse]) {
+        const parsed = extractRewards(attempt.text);
+        if (/^\d{5,9}$/.test(String(parsed.credits || '')) &&
+            /^\d{1,5}$/.test(String(parsed.xp || '')) &&
+            /^\d{1,7}$/.test(String(parsed.freeXp || ''))) {
+            fullScreenRewardConflictCandidates.push({
+                ...parsed,
+                confidence: Number(attempt.confidence) || 0,
+                source: \`full-screen-conflict-psm\${attempt.pageSegmentationMode}\`,
+            });
+        }
+    }
+    const rewardConflictCandidates = [...legacyRewardCandidates, ...fullScreenRewardConflictCandidates];
     for (const field of ['credits', 'xp', 'freeXp']) {
         const geometryValue = localizedRewardEvidence.wordGeometry?.acceptedValues?.[field] || '';
         localizedRewardEvidence.values[field] = geometryValue || selectLocalizedRewardValue(
@@ -2087,13 +2103,21 @@ async function extractTextCore(imageBuffer) {
             bbox: anchor.bbox, groupBBox: anchor.groupBBox, targetX: anchor.targetX,
         } : null;
         if (!anchor) {
-            if (!current) fieldEvidence.triggerReasons.push('no-accepted-value-and-no-geometry-anchor');
+            if (!current) {
+                fieldEvidence.triggerReasons.push('no-accepted-value-and-no-geometry-anchor');
+            } else if (hasIndependentRewardFieldConflict(field, current.replace(/\D/g, ''), rewardConflictCandidates)) {
+                // Without a row anchor there is no safe geometry sweep to
+                // adjudicate independently supported competing numeric reads.
+                fieldEvidence.triggerReasons.push('conflicting-independent-reward-reads-without-geometry-anchor');
+                fieldEvidence.unresolved = true;
+                localizedRewardEvidence.values[field] = '';
+            }
             shouldRunGeometrySweep[field] = false;
             continue;
         }
         const currentDigits = String(current).replace(/\D/g, '');
         const anchorDigits = String(anchor.groupedDigits || anchor.digits || '');
-        const independentConflict = Boolean(current) && hasIndependentRewardFieldConflict(field, currentDigits, legacyRewardCandidates);
+        const independentConflict = Boolean(current) && hasIndependentRewardFieldConflict(field, currentDigits, rewardConflictCandidates);
         const anchorShowsTrailingDigit = Boolean(currentDigits && anchorDigits &&
             currentDigits.length === anchorDigits.length + 1 && currentDigits.startsWith(anchorDigits));
         if (!current) fieldEvidence.triggerReasons.push('no-accepted-localized-value');
@@ -2158,9 +2182,9 @@ async function extractTextCore(imageBuffer) {
                 const completeAnchor = fieldSpec && anchorValue.length >= fieldSpec.minDigits &&
                     anchorValue.length <= fieldSpec.maxDigits;
                 const anchorHasIndependentSupport = Boolean(completeAnchor) &&
-                    hasIndependentRewardFieldValueSupport(field, anchorValue, legacyRewardCandidates);
+                    hasIndependentRewardFieldValueSupport(field, anchorValue, rewardConflictCandidates);
                 const anchorHasSupportedPrefixConflict = hasIndependentRewardFieldPrefixConflict(
-                    field, anchorValue, legacyRewardCandidates,
+                    field, anchorValue, rewardConflictCandidates,
                 );
                 // A field can enter the sweep with no accepted localized value.
                 // In that case `currentValue` is empty, so checking only conflicts
@@ -2170,10 +2194,13 @@ async function extractTextCore(imageBuffer) {
                 // repeatedly select an inserted icon digit (e.g. 8287119 over 828719).
                 const stableConflictsWithSupportedAnchor = Boolean(anchorHasIndependentSupport) &&
                     stable.some(group => String(group.value) !== anchorValue);
+                const stableConflictsWithSupportedCandidate = stable.some(group =>
+                    hasIndependentRewardFieldConflict(field, group.value, rewardConflictCandidates));
                 const conflictRequiresIndependentSupport = (Boolean(currentValue) && (
                     fieldEvidence.triggerReasons.includes('localized-value-conflicts-with-independent-reward-source-consensus') ||
                     fieldEvidence.triggerReasons.includes('localized-value-has-one-digit-beyond-row-anchor')
-                )) || anchorHasSupportedPrefixConflict || stableConflictsWithSupportedAnchor;
+                )) || anchorHasSupportedPrefixConflict || stableConflictsWithSupportedAnchor ||
+                    stableConflictsWithSupportedCandidate;
                 const hasStrongGeometryQuorum = (group) => group.reads.length >= 6 &&
                     group.geometries.size >= 3 && group.psms.size >= 2;
                 // A stable Credits crop may correct the leading glyph only when the
@@ -2224,15 +2251,17 @@ async function extractTextCore(imageBuffer) {
                     // reinforce the original error. Require the replacement to match
                     // independent field evidence, the bounded anchor, or the strict
                     // three-width Credits suffix quorum above.
-                    const supportedStable = stable.filter(group => !conflictRequiresIndependentSupport ||
-                        hasIndependentRewardFieldValueSupport(field, group.value, legacyRewardCandidates) ||
+                    const supportedStable = stable.filter(group =>
+                        !hasIndependentRewardFieldConflict(field, group.value, rewardConflictCandidates) &&
+                        (!conflictRequiresIndependentSupport ||
+                        hasIndependentRewardFieldValueSupport(field, group.value, rewardConflictCandidates) ||
                         strongCreditSuffixQuorums.includes(group) || strongSplitCreditQuorums.includes(group) ||
                         (anchorValue && String(group.value) === anchorValue && !anchorHasSupportedPrefixConflict) ||
                         rewardGeometryQuorumCanResolveXpTrailingAdornment(field, anchorValue, group.value, {
                             reads: group.reads.length,
                             geometries: group.geometries.size,
                             psms: group.psms.size,
-                        }));
+                        })));
                     if (supportedStable.length === 1) {
                         fieldEvidence.selectedValue = String(supportedStable[0].value);
                         if (strongCreditSuffixQuorums.includes(supportedStable[0])) {
@@ -2270,7 +2299,8 @@ async function extractTextCore(imageBuffer) {
         const limits = field === 'credits' ? /^\d{5,9}$/ : field === 'xp' ? /^\d{1,5}$/ : /^\d{1,7}$/;
         return limits.test(value);
     });
-    if (!localizedTupleComplete && !localizedRewardEvidence.rowGeometrySweeps.fallbackSuppressedForUnresolvedSweep) {
+    if (localizedRewardEvidence.attempted && !localizedTupleComplete &&
+        !localizedRewardEvidence.rowGeometrySweeps.fallbackSuppressedForUnresolvedSweep) {
         const tupleFallback = selectConsistentRewardTuple(legacyRewardCandidates);
         if (tupleFallback) {
             localizedRewardEvidence.values = {
@@ -2289,15 +2319,17 @@ async function extractTextCore(imageBuffer) {
     // Localized column consensus is the acceptance source of truth for OCR rewards.
     // A field without two agreeing cropped reads stays missing and goes through the
     // correction workflow; broad OCR candidates are retained separately in logs.
-    if (localizedRewardEvidence.attempted) {
-        rewardCandidates.splice(0, rewardCandidates.length, {
-            credits: localizedRewardEvidence.values.credits || 'Not detected',
-            xp: localizedRewardEvidence.values.xp || 'Not detected',
-            freeXp: localizedRewardEvidence.values.freeXp || 'Not detected',
-            confidence: 95,
-            source: 'localized-column-consensus',
-        });
-    }
+    // Localized geometry is the acceptance source of truth. If the row could
+    // not be isolated, retain no broad-only numeric reward guesses.
+    rewardCandidates.splice(0, rewardCandidates.length, {
+        credits: localizedRewardEvidence.values.credits || 'Not detected',
+        xp: localizedRewardEvidence.values.xp || 'Not detected',
+        freeXp: localizedRewardEvidence.values.freeXp || 'Not detected',
+        confidence: 95,
+        source: localizedRewardEvidence.attempted
+            ? 'localized-column-consensus'
+            : 'localized-column-unavailable-fail-closed',
+    });
 
     // When damage is missing or conflicts across existing sources, use the CV
     // component boundary as a left/right geometry proposal and repeat a small,

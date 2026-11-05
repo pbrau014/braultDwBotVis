@@ -8,6 +8,8 @@ const {
     extractRewardGroups,
     extractFocusedRewards,
     extractFocusedDamage,
+    selectLocalizedRewardValue,
+    hasIndependentRewardFieldPrefixConflict,
 } = require('../src/number-parser');
 
 test('normalizes thousands separators only after isolating a value', () => {
@@ -45,4 +47,23 @@ test('reads damage from a dedicated crop and rejects obviously tiny/incomplete O
 
 test('reward groups ignore following medal / award numbers after the first three values', () => {
     assert.deepEqual(extractRewardGroups('899 836 3 776 1 596 1 medal x4'), ['899836', '3776', '1596', '1', '4']);
+});
+
+test('localized reward selection requires two agreeing isolated reads, not one read plus broad repeats', () => {
+    assert.equal(selectLocalizedRewardValue('freeXp', ['2', ''], ['2', '2']), '');
+    assert.equal(selectLocalizedRewardValue('freeXp', ['2', '2'], ['2', '2']), '2');
+    assert.equal(selectLocalizedRewardValue('freeXp', ['1743', '11483'], ['1743', '1743']), '');
+    assert.equal(selectLocalizedRewardValue('credits', ['576099', '576099'], ['576099', '516099']), '576099');
+});
+
+test('independent one-digit suffix conflicts are detected as well as prefixes', () => {
+    const candidates = [
+        { freeXp: '1695', source: 'full-screen-psm3', confidence: 80 },
+        { freeXp: '1695', source: 'full-screen-psm11', confidence: 78 },
+    ];
+    assert.equal(hasIndependentRewardFieldPrefixConflict('freeXp', '695', candidates), true);
+    assert.equal(hasIndependentRewardFieldPrefixConflict('freeXp', '1695', [
+        { freeXp: '695', source: 'crop-a', confidence: 80 },
+        { freeXp: '695', source: 'crop-b', confidence: 80 },
+    ]), true);
 });

@@ -140,7 +140,15 @@ function selectDamageCandidates(focusedCandidates = [], fullScreenCandidates = [
             // consensus, not a positive crop-confidence score.
             return group.candidates.length >= 4 && widths.size >= 2 && psms.size >= 2;
         }) : [];
-    if (consensusGroup && leadingDigitRecoveryPrecheck.length !== 1 && trailingDigitCropPrecheck.length !== 1) {
+    // A geometry-bounded focused crop is stronger spatial evidence than a
+    // broad full-screen read when the two disagree. Do not let two correlated
+    // full-screen PSMs override that conflict unless one of the explicit,
+    // geometry-quorum prefix/extension repairs above has already proved it.
+    const geometryBoundedConflict = consensusGroup && grouped(focusedCandidates).some(group =>
+        group.value !== consensusGroup.value &&
+        group.candidates.some(candidate => candidate.excludeAdjacentUi === true));
+    if (consensusGroup && leadingDigitRecoveryPrecheck.length !== 1 &&
+        trailingDigitCropPrecheck.length !== 1 && !geometryBoundedConflict) {
         return {
             candidates: consensusGroup.candidates,
             selectedBy: 'full-screen-consensus',

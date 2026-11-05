@@ -45,6 +45,24 @@ test('agreeing independent full-screen damage reads override a conflicting focus
   assert.deepEqual(selected.conflictingFocusedValues, ['87313']);
 });
 
+test('a geometry-bounded crop conflict blocks broad consensus when the crop is too short to resolve the value', () => {
+  const selected = selectDamageCandidates(
+    [
+      { value: '13495', confidence: 0, source: 'focused-8-a', excludeAdjacentUi: true, cropWidth: 0.108, cropPsm: 8 },
+      { value: '13495', confidence: 0, source: 'focused-13-a', excludeAdjacentUi: true, cropWidth: 0.108, cropPsm: 13 },
+      { value: '13495', confidence: 0, source: 'focused-8-b', excludeAdjacentUi: true, cropWidth: 0.110, cropPsm: 8 },
+      { value: '13495', confidence: 0, source: 'focused-13-b', excludeAdjacentUi: true, cropWidth: 0.110, cropPsm: 13 },
+    ],
+    [
+      { value: '1349538', confidence: 84, source: 'full-screen-psm-3' },
+      { value: '1349538', confidence: 81, source: 'full-screen-psm-11' },
+    ],
+  );
+  assert.equal(selected.selectedValue, null);
+  assert.equal(selected.selectedBy, 'combined-evidence');
+  assert.deepEqual(selected.conflictingFocusedValues, []);
+});
+
 test('conflicting full-screen reads are not resolved by confidence alone', () => {
   const selected = selectDamageCandidates(
     [{ value: '87313', confidence: 99, source: 'focused-7' }],

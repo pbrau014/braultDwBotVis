@@ -171,8 +171,8 @@ function hasIndependentRewardFieldPrefixConflict(field, currentValue, candidates
         const value = normaliseOcrNumber(candidate?.[field]);
         if (!value || value === current) return false;
         const oneDigitPrefixConflict =
-            (current.length === value.length + 1 && current.startsWith(value)) ||
-            (value.length === current.length + 1 && value.startsWith(current));
+            (current.length === value.length + 1 && (current.startsWith(value) || current.endsWith(value))) ||
+            (value.length === current.length + 1 && (value.startsWith(current) || value.endsWith(current)));
         return oneDigitPrefixConflict && hasIndependentRewardFieldValueSupport(field, value, candidates);
     });
 }
@@ -187,14 +187,14 @@ function selectLocalizedRewardValue(field, localizedValues = [], legacyValues = 
         return /^\d+$/.test(digits) && digits.length >= limits.min && digits.length <= limits.max ? digits : '';
     };
     const local = localizedValues.map(valid).filter(Boolean);
-    // XP is especially vulnerable to a nearby star/icon being interpreted as a
-    // digit. Never fall back to the legacy broad reward band for XP: the two
-    // isolated column reads must agree, or the value must be corrected manually.
-    if (field === 'xp') return local.length >= 2 && new Set(local).size === 1 ? local[0] : '';
+    // Every accepted numeric reward needs agreement from both isolated field
+    // reads. A single crop read plus repeated broad/full-screen values is not
+    // independent enough: it can preserve a clipped or icon-contaminated digit.
+    if (local.length < 2 || new Set(local).size !== 1) return '';
+    if (field === 'xp') return local[0];
 
-    // Credits and Free XP may contain a similar-looking leading digit in one
-    // PSM. Allow a strict majority only when at least one localized read supports
-    // that value; legacy candidates alone can never establish acceptance.
+    // Broad reads can corroborate a localized value, but cannot outvote it or
+    // establish acceptance on their own. Ties and competing candidates fail closed.
     const votes = [...local, ...legacyValues.map(valid).filter(Boolean)];
     const counts = new Map();
     for (const value of votes) counts.set(value, (counts.get(value) || 0) + 1);
