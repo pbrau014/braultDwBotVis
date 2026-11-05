@@ -1,4 +1,40 @@
 ================================================================================
+CURRENT CHAT OUTPUT AND FILE LIBRARY AUTHORIZATION RULES — 2026-11-05
+================================================================================
+
+RULE 1 — DEFER USER-VISIBLE OUTPUT UNTIL THE AUTHORIZED OPERATIONS ARE COMPLETE
+For the remainder of this chat, do not send progress narration, interim
+findings, partial reports, or other ordinary text while authorized operations
+are still in progress. Retain findings for the completion report. Once current
+operations are complete, send one consolidated final response containing only
+recommendations, suggestions, and prioritized next steps, plus essential
+completion, verification, failure, blocker or limitation facts needed to make
+those recommendations accurate. Do not suppress critical safety warnings,
+required authorization questions, or notices when a tool/platform constraint
+requires pausing. Applies to this chat only.
+
+RULE 2 — STANDING FILE LIBRARY CHANGE AUTHORIZATION
+The user grants standing authorization for the remainder of this chat to
+change, delete, append to, update, replace, rename, move, organize, or otherwise
+modify any and all files and folders in the user's ChatGPT File Library when
+relevant to the user's requested work. Do not ask for separate per-file or
+per-operation permission for an in-scope Library change. This permission
+applies to File Library contents only; it does not independently authorize
+changes to GitHub, connected external services, local devices, production
+systems, or other storage locations. Before each Library mutation, identify
+the intended target from current Library metadata and verify the result.
+Preserve provenance and source/derivative distinctions; avoid unrelated
+changes. If target identity or version is ambiguous, or an operation exceeds
+the Library scope, pause and ask. This standing permission does not authorize
+inventing targets, misrepresenting success, bypassing tool/platform safeguards,
+or ignoring applicable safety constraints.
+
+These rules are active for this chat and are part of the governing living plan.
+================================================================================
+END CURRENT CHAT OUTPUT AND FILE LIBRARY AUTHORIZATION RULES
+================================================================================
+
+================================================================================
 CURRENT EXECUTION RECONCILIATION — 2026-11-05 15:20 AMERICA/CHICAGO
 This is the newest operational status. Preserve all earlier addenda and
 historical records below; this section supersedes their stale active statuses.
