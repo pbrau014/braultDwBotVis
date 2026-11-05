@@ -34,7 +34,8 @@ test('reward selection uses localized agreement and never accepts XP from legacy
     // Conflicting isolated reads must abstain; broad agreement cannot outvote them.
     assert.equal(selectLocalizedRewardValue('credits', ['940180', '540180'], ['540180', '540180']), '');
     assert.equal(selectLocalizedRewardValue('credits', ['540180', '540180'], ['540180', '540180']), '540180');
-    assert.equal(selectLocalizedRewardValue('freeXp', ['1336', '1536'], ['1536', '1536']), '1536');
+    assert.equal(selectLocalizedRewardValue('freeXp', ['1336', '1536'], ['1536', '1536']), '');
+    assert.equal(selectLocalizedRewardValue('freeXp', ['1536', '1536'], ['1536', '1536']), '1536');
     assert.equal(selectLocalizedRewardValue('credits', ['940180', '540180'], ['123456', '654321']), '');
 });
 
