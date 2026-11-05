@@ -21,6 +21,7 @@ const { createWorker } = require('./ocr-worker');
 const { inspectTargetChannelPermissions } = require('./discord-gateway-diagnostics');
 const { isAdminOnlyCommand } = require('./tournament-command-policy');
 const { collectOcrSpaceFieldEvidence } = require('./ocrspace-field-evidence');
+const { buildSafeOcrSpacePrepassCropPlan } = require('./ocrspace-prepass');
 const path = require('node:path');
 const { createHash } = require('node:crypto');
 const os = require('node:os');
@@ -385,49 +386,7 @@ async function extractTextCore(imageBuffer) {
     let ocrSpacePrepassEvidence = { status: 'disabled', reason: 'OCRSPACE_ENABLED/key not configured', requests: 0, evidence: [] };
     if (ocrSpaceConfigured) {
         try {
-            const regions = cvAnalysis?.regions || {};
-            const identity = regions.identity?.rect;
-            const identityBottom = identity ? Number(identity.top) + Number(identity.height) : Math.round(sourceHeight * 0.315);
-            const cropPlan = [];
-            const addSafeCrop = (field, source, rect, isTable = false) => {
-                if (!rect) return;
-                const left = Math.max(0, Math.floor(Number(rect.left)));
-                const top = Math.max(0, Math.floor(Number(rect.top)));
-                const right = Math.min(sourceWidth, Math.ceil(Number(rect.left) + Number(rect.width)));
-                const bottom = Math.min(sourceHeight, Math.ceil(Number(rect.top) + Number(rect.height)));
-                if (![left, top, right, bottom].every(Number.isFinite) || right - left < 8 || bottom - top < 6) return;
-                cropPlan.push({ field, source, engine: 3, isTable, scale: true,
-                    rect: { left, top, width: right - left, height: bottom - top } });
-            };
-            const resultRect = regions.result?.rect;
-            if (resultRect) addSafeCrop('result', 'opencv-result-title', {
-                ...resultRect, height: Math.min(Number(resultRect.top) + Number(resultRect.height), sourceHeight * 0.205) - Number(resultRect.top),
-            });
-            const metadataRect = regions.metadata?.rect;
-            if (metadataRect) {
-                const top = Math.max(Number(metadataRect.top), sourceHeight * 0.115);
-                const bottom = Math.min(Number(metadataRect.top) + Number(metadataRect.height), sourceHeight * 0.275);
-                const left = Math.max(Number(metadataRect.left), sourceWidth * 0.585);
-                addSafeCrop('battleMetadata', 'opencv-battle-metadata', {
-                    left, top, width: Math.min(Number(metadataRect.left) + Number(metadataRect.width), sourceWidth) - left, height: bottom - top,
-                });
-            }
-            const rewardRect = regions.rewardBand?.rect;
-            if (rewardRect) {
-                const top = Math.max(Number(rewardRect.top), identityBottom + sourceHeight * 0.004, sourceHeight * 0.315);
-                const bottom = Math.min(Number(rewardRect.top) + Number(rewardRect.height), sourceHeight * 0.405);
-                addSafeCrop('rewardBand', 'opencv-reward-band', {
-                    left: Number(rewardRect.left), top, width: Number(rewardRect.width), height: bottom - top,
-                }, true);
-            }
-            const damageRect = regions.damage?.rect;
-            if (damageRect) {
-                const left = Math.max(Number(damageRect.left), sourceWidth * 0.025);
-                const top = Math.max(Number(damageRect.top), sourceHeight * 0.365);
-                const right = Math.min(Number(damageRect.left) + Number(damageRect.width), sourceWidth * 0.275);
-                const bottom = Math.min(Number(damageRect.top) + Number(damageRect.height), sourceHeight * 0.505);
-                addSafeCrop('damage', 'opencv-damage', { left, top, width: right - left, height: bottom - top });
-            }
+            const cropPlan = buildSafeOcrSpacePrepassCropPlan({ regions: cvAnalysis?.regions || {}, width: sourceWidth, height: sourceHeight });
             const remaining = Math.max(1000, OCR_IMAGE_TIMEOUT_MS - (Date.now() - imageStartedAt) - 45000);
             if (cropPlan.length && remaining >= 1000) {
                 ocrSpacePrepassEvidence = await collectOcrSpaceFieldEvidence({
