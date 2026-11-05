@@ -30,7 +30,7 @@ test('Engine 3 uses HTTPS multipart and required orientation, table, scaling and
     assert.ok(request.options.body instanceof FormData);
     assert.equal(request.options.body.get('OCREngine'), '3');
     assert.equal(request.options.body.get('language'), 'auto');
-    assert.equal(request.options.body.get('isOverlayRequired'), 'false');
+    assert.equal(request.options.body.get('isOverlayRequired'), null);
     assert.equal(request.options.body.get('detectOrientation'), 'true');
     assert.equal(request.options.body.get('isTable'), 'false');
     assert.equal(request.options.body.get('scale'), 'true');
@@ -68,7 +68,7 @@ test('Engine 3 searchable PDF does not request slower optional TextOverlay data'
     let form;
     const result = await recognizeCrop({ ...args(), engine: 3, fetchImpl: async (_url, options) => { form = options.body; return reply(payload('player text', 3)); } });
     assert.equal(form.get('OCREngine'), '3');
-    assert.equal(form.get('isOverlayRequired'), 'false');
+    assert.equal(form.get('isOverlayRequired'), null);
     assert.equal(form.get('isCreateSearchablePdf'), 'true');
     assert.equal(form.get('isSearchablePdfHideTextLayer'), 'false');
     assert.equal(result.providerConfidence, null);
