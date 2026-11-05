@@ -2,7 +2,7 @@
 param(
  [string]$ProjectRoot = '',
  [string]$OutputRoot = '',
- [string]$MinimumNodeVersion = '24.22.1'
+ [string]$MinimumNodeVersion = '22.16.0'
 )
 $ErrorActionPreference='Stop'
 if ([string]::IsNullOrWhiteSpace($ProjectRoot)) { $ProjectRoot = (Get-Location).Path }
