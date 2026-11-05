@@ -11,8 +11,9 @@ requirements, or mandatory acceptance/release gates.
 
 Never spoof, simulate, disable, evade, or bypass a required control to make
 progress appear complete. If a required credential, role, approval, environment
-or permission is missing, stop that action, record the exact blocker, and
-continue only with independent work that is genuinely authorized.
+or permission is missing, record that specific dependency as BLOCKED and
+continue every independent authorized task. The blocked action resumes when
+its required condition is available; unrelated work continues.
 
 A requirement is fulfilled only when its implementation, review and verification
 evidence is complete against the exact source and runtime where applicable.
@@ -26,6 +27,112 @@ required controls and document the conflict rather than bypassing them.
 ================================================================================
 END PRIME DIRECTIVE
 ================================================================================
+
+================================================================================
+STANDING CONTINUATION RULE — ACTIVE OVERRIDE
+================================================================================
+
+Continue all authorized DWBOT work automatically in dependency order. Ordinary
+checkpoints, progress labels, incomplete independent tasks, and routine status
+updates do not create a wait or acknowledgment requirement. When a prerequisite,
+credential, source, environment, or scoped approval is unavailable, record only
+the dependent action as BLOCKED and continue independent authorized work. Return
+to the blocked action when its dependency becomes available. Preserve all
+mandatory security, privacy, authentication, process-integrity, legal, and
+acceptance/release controls. Historical status records remain evidence and do
+not interrupt current work. All DWBOT work stays in this ChatGPT conversation.
+
+================================================================================
+CURRENT EXECUTION OVERRIDE — 2026-11-05
+This block supersedes older active queue, run-state, and current-head statements
+below. Historical records remain unchanged and must not be projected onto newer
+source fingerprints.
+================================================================================
+
+CANONICAL SOURCE
+- Repository: pbrau014/braultDwBotVis; sole active branch: main.
+- Main HEAD before this plan update: 277f935b66601febbd83c7b44a4e706721ee093a.
+- Canonical plan: docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt.
+- Seven commits separate this HEAD from 3f0c0a2. They include Windows wrapper
+  corrections (e7d537b, 7810502, bea78fa, 593a692) and map normalization plus
+  regression coverage (70b00da, 6a3e3b5). Exact-head evidence on 3f0c0a2 does
+  not verify these later changes.
+
+RUN 42121716388 — ARTIFACT REVIEW COMPLETE; SCREENSHOT ACCEPTANCE FAILED
+- Exact source: 3f0c0a2a7446414372f9db547d1e375f02fee5a0.
+- Windows Node 22.16.0 suite: 291 total, 289 passed, 0 failed, 2 skipped.
+  Process-level JSON/SQLite persistence recovery passed 11 stages with 50
+  synthetic players. These results do not establish screenshot acceptance or
+  full Gate C.
+- Windows acceptance artifact 13461886316 downloaded and inspected; ZIP
+  SHA-256 48a696639e8001a7fb4d6bd9b0733fa60917c5098e1412a8168bdaa1d8a31fca.
+- Runtime: Node v22.16.0, npm 10.9.2, Windows x64; Tesseract.js 6.0.1 and
+  core 6.1.2. OCR.Space explicitly disabled; network blocking enabled and
+  blockedAttemptsDetected=false. Native Tesseract was available, but this
+  artifact contains no native-Tesseract or OpenCV-assisted comparative report:
+  PowerShell 5.1 terminated the wrapper after the Tesseract.js stage when child
+  stderr was promoted to NativeCommandError.
+- Approved 16-image development corpus: 16/16 processed, 3/16 exact complete
+  nine-field records, 13/16 incomplete, 32 unresolved field comparisons
+  (20 missing values and 12 incorrect non-empty candidates). Unresolved counts:
+  result 1, player 1, map 5, mode 2, battleStart 3, credits 2, freeXp 5,
+  damage 7, xp 6. No incorrect complete record was accepted. Gate A FAILED.
+- Repeated five-image regression batch: 3/5 exact in each of three repetitions.
+  Hoffmann map and battleStart candidates were wrong; Schlieffen map candidate
+  was "Crash Zone Alpha —" and XP was unresolved. Commits 70b00da and 6a3e3b5
+  add trailing-dash normalization and regression coverage; this correction
+  still requires exact-head verification.
+- image.png did not establish an exact negative-control baseline because freeXp
+  and damage were unresolved. The deliberately-wrong expected-value run is not
+  a validated real-image negative control. No OCR.Space request occurred.
+
+WINDOWS WRAPPER CORRECTIONS / LATEST RUN
+- Run 42127038562 did not launch OCR commands because the wrapper's $Npm
+  reference was unresolved; bea78fa resolves npm.cmd. Run 42121716388 exposed
+  PowerShell native-stderr promotion; e7d537b and 7810502 change stream capture
+  and the static regression test. Commit 593a692 adds the resolved-executable
+  assertion.
+- Run 42127310691 on 593a692: Linux and PDF/clean-package jobs SUCCESS;
+  Windows persistence recovery and full suite passed (291 total, 289 passed,
+  0 failed, 2 skipped). At the latest query its Windows screenshot-acceptance
+  step remained IN_PROGRESS; no Windows artifact was available, and active
+  log retrieval returned BlobNotFound. This run predates the map fix and does
+  not verify main 277f935.
+- Queries for run IDs 42127666357 and 42128249853 returned no jobs/artifacts;
+  no pass is inferred from those IDs.
+
+GATE STATUS / ACTIVE QUEUE
+1. Finish and inspect run 42127310691's Windows artifact when uploaded. Review
+   Tesseract.js, native Tesseract, and OpenCV-assisted reports separately;
+   verify every nine-field result, source/runtime/model fingerprint, and
+   network diagnostics. This is ancestor evidence, not current-main evidence.
+2. Verify current main 277f935 with exact-head CI. Inspect the latest wrapper
+   and map-normalization corrections on that exact source.
+3. Diagnose remaining OCR failures by demonstrated image/field root cause.
+   Preserve Tesseract.js as local acceptance authority and OpenCV as geometry
+   assistance only. Do not weaken nine-field validation or tune on holdout.
+4. Gate A: all 16 approved development images must yield exact complete
+   nine-field records, zero wrong accepted mandatory values, zero unresolved
+   mandatory fields, and no unauthorized network activity.
+5. Gate B: locate/verify the independent 50-image minimum / 100-image preferred
+   holdout with independent nine-field labels. The previously named
+   dwbot_56_image_ground_truth_review(3).xlsx has not been located by targeted
+   Library search; do not substitute development images or invent labels.
+6. Recheck OCR.Space Free-tier terms/privacy/retention and local key handling
+   before any explicitly authorized synthetic non-identifying live smoke. No
+   local key is configured in this chat; local-only work continues meanwhile.
+7. Gate C isolated Windows backup/restore/rollback follows only after A and B;
+   Gate D release decision follows all required evidence.
+8. Continue independent browser/OAuth/desktop, isolated Discord, workbook and
+   scoring parity, 25 MiB ingestion/resource, security/secret, manual/package,
+   and GrandYoloInstruct identity work in dependency order. Production remains
+   NO-GO.
+
+================================================================================
+END CURRENT EXECUTION OVERRIDE — 2026-11-05
+================================================================================
+
+
 
 ================================================================================
 CURRENT EXECUTION STATUS — 2026-11-05 17:15 AMERICA/CHICAGO
