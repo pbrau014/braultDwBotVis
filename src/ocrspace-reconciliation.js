@@ -1,6 +1,6 @@
 'use strict';
 
-const { buildBattleRecord, NOT_DETECTED } = require('./battle-record');
+const { NOT_DETECTED, parseBattleResult, parseModeMap, parseBattleStartTime } = require('./battle-record');
 const { extractFocusedRewards, extractFocusedDamage, parseLocalizedNumericField } = require('./number-parser');
 
 const REQUIRED_FIELDS = ['result', 'player', 'map', 'mode', 'battleStart', 'credits', 'freeXp', 'damage', 'xp'];
@@ -15,12 +15,22 @@ function parseEvidenceItem(item) {
     const text = String(item.text || '').trim();
     if (!text || item.status !== 'success') return {};
     if (field === 'result') {
-        const parsed = buildBattleRecord(text, { resultCandidates: [{ text, confidence: 0, source: item.source }] });
-        return { result: parsed.result };
+        // Parse the remote text directly. Local candidate consensus thresholds
+        // must not suppress diagnostic evidence merely because OCR.Space has no
+        // comparable confidence score; this value is never accepted as local.
+        const result = parseBattleResult(text);
+        return present(result) ? { result } : {};
     }
     if (field === 'battleMetadata') {
-        const parsed = buildBattleRecord(text, { metadataCandidates: [{ text, confidence: 0, source: item.source }] });
-        return { map: parsed.map, mode: parsed.mode, battleStart: parsed.battleStart };
+        // Keep the remote parse independent from local multi-crop consensus.
+        // Reconciliation below compares the parsed values but never promotes them.
+        const metadata = parseModeMap(text);
+        const battleStart = parseBattleStartTime(text);
+        const parsed = {};
+        if (present(metadata.map)) parsed.map = metadata.map;
+        if (present(metadata.mode)) parsed.mode = metadata.mode;
+        if (present(battleStart)) parsed.battleStart = battleStart;
+        return parsed;
     }
     if (field === 'rewardBand') return extractFocusedRewards(text) || {};
     if (['credits', 'freeXp', 'xp'].includes(field)) {

@@ -35,6 +35,48 @@ END CURRENT CHAT OUTPUT AND FILE LIBRARY AUTHORIZATION RULES
 ================================================================================
 
 ================================================================================
+CURRENT EXACT-HEAD VERIFICATION AND TEST REPAIR — 2026-11-05
+================================================================================
+
+- Commit d2bdad3e9c1627df26beb8bc803e2202eb061587 added the OCR.Space
+  identity-boundary fail-closed correction. Exact-head workflow run
+  42103546978 completed with failure; do not label it green.
+- Windows Node 22.16.0 job: native Tesseract and OpenCV prerequisites installed;
+  locked dependency installation passed; process-level persistence/recovery
+  passed. Full Windows test suite: 276 tests, 272 passed, 2 failed, 2 skipped.
+  Screenshot acceptance was skipped because the full suite failed.
+  Windows evidence artifact ID 13449024939, SHA-256
+  3d31c3929c245d9b7c1bb1ea501b4786d13a0db97a8958e6c4d2081e559b9483.
+- Linux offline job: locked dependency install and syntax checks passed. The
+  OCR.Space mocked contract was 31/33; full project tests were skipped after
+  the contract step failed.
+- PDF/package job: PDF manual render passed. Clean-package extraction/install
+  ran, but its npm test failed on the same two test failures. Artifact ID
+  13450413059, 282,905,009 bytes, SHA-256
+  13bbb30142c2c619f4da88f3dfe52648143c4eb7f450f1370533d9b29b64354b.
+  Artifact upload is not package verification or visual approval.
+- The two exact failures were diagnosed:
+  1. tests/ocr-report-metadata.test.js expected the pre-default-on metadata
+     shape and omitted defaultEnabled, explicitlyDisabled and activationReason.
+     The implementation's metadata was correct; the expected test object was
+     stale. The test expectation is updated.
+  2. src/ocrspace-reconciliation.js used buildBattleRecord with confidence 0
+     for remote result/metadata text. That incorrectly applied local OCR
+     consensus thresholds and suppressed otherwise parseable diagnostic
+     values. The remote diagnostic parser now calls the pure result/map/mode/
+     timestamp parsers directly. It remains diagnostic-only and cannot mutate
+     or complete the local record.
+- The new identity-boundary tests (missing/weak/out-of-bounds/undersized ROI)
+  passed in this run. No remote provider request occurred.
+- The Windows screenshot acceptance stage was skipped; this run provides no
+  new current-head OCR accuracy result. Prior ancestor run 42088538702 remains
+  diagnostic only and Gate A remains FAIL/BLOCKED.
+
+================================================================================
+END CURRENT EXACT-HEAD VERIFICATION AND TEST REPAIR — 2026-11-05
+================================================================================
+
+================================================================================
 CURRENT IMPLEMENTATION CONTINUATION ADDENDUM — 2026-11-05
 ================================================================================
 
@@ -942,11 +984,12 @@ This section governs current work. The historical plan follows unchanged below.
   states. Remote-only values never complete a record and conflicts never
   override local results. Tesseract.js remains the local baseline and acceptance
   authority; OpenCV is geometry only; PaddleOCR remains optional local comparison.
-- Remote activation remains default-off and requires both
-  `OCRSPACE_ENABLED=1` and a locally configured Free API key. A key alone never
-  activates remote use. This default-off interlock is not a quarantine; the
-  complete request profile applies whenever the provider is enabled. No paid
-  tier, paid engine or paid usage is authorized.
+- Remote activation is default-on when a locally configured valid Free API
+  key is present. Unset/blank `OCRSPACE_ENABLED` or value `1` enables; value
+  `0` explicitly disables; any other nonblank value fails closed. The API key
+  remains mandatory, so no key means no request. This supersedes older
+  default-off / explicit-1-required statements. No paid tier, paid engine or
+  paid usage is authorized.
 - Required request profile for every OCR.Space request: `detectOrientation=true`;
   `OCREngine=3`; `scale=true` by default for DWBOT's typical 96-DPI screenshots
   and low-DPI crops (`scale=false` only for verified 200–300 DPI input);
@@ -1106,14 +1149,22 @@ This section governs current work. The historical plan follows unchanged below.
   native-16-image-report.json
   SHA-256: f6f4dd7a3b6c8cc6c300c480c20dcd44f0638797e20f32036726478b51cd0f5a.
   Preserve byte-for-byte; never overwrite it.
-- The exact XP-repair candidate ZIP was attached in this conversation and
-  extracted to a controlled workspace. Uploaded ZIP SHA-256:
-  ce13a49618494946ccf74ca734aff210b3e1dce2de18ccc093314d764964cda2.
-  ZIP integrity passed; 966 entries; original attachment remains unchanged.
-- The extracted candidate's pre-hardening fingerprints matched the prior
-  recorded XP-repair derivative: source-build c8975bf1f0224251ab81cee5d39cb176f648be4f134ae44579374d2f1f2dc39f
-  (101 inputs) and acceptance 7d14bb19eb56b014995e5a95dc62dfe2a372e1cce7e07944c7fa1da8515fbfbb
-  (118 inputs). This establishes source identity against the prior record.
+- Historical record: an XP-repair source ZIP with SHA-256
+  `ce13a49618494946ccf74ca734aff210b3e1dce2de18ccc093314d764964cda2`
+  (966 entries) was previously attached and extracted, and its pre-hardening
+  fingerprints were recorded as source-build
+  `c8975bf1f0224251ab81cee5d39cb176f648be4f134ae44579374d2f1f2dc39f`
+  (101 inputs) and acceptance
+  `7d14bb19eb56b014995e5a95dc62dfe2a372e1cce7e07944c7fa1da8515fbfbb`
+  (118 inputs). Preserve those historical identities.
+- Current accessibility recheck: the current conversation upload inventory and
+  recursive Library ZIP inventory do not contain the XP-repair candidate ZIP
+  bytes. The prior output ZIP's recorded SHA-256 is
+  `6e8632a6f1881617a8bbe43a64d04f07e46316d15e5c7acbf7691387ad65b286`;
+  its detached sidecar is recorded, but a sidecar is not the archive. Do not
+  claim that archive can currently be extracted or reverified. Canonical GitHub
+  `main` is the current implementation source and must be fingerprinted and
+  tested directly.
 - OCR.Space client hardening changed one source and its regression test. Current
   source-build fingerprint: 78defb2c38633ed2d615aafec225547b5ef9e46787194aa5d20af54bb465c97c
   (101 inputs); current acceptance fingerprint:
@@ -1197,7 +1248,7 @@ holdout screenshots and independently established ground truth.
 5. OPEN TASKS — STRICT PRIORITY QUEUE
 
 TASK 3 — FULL DEPENDENCY-BACKED TEST SUITE ON THE NEW CANDIDATE
-Status: PARTIAL / BLOCKED — candidate package is built; clean dependency install is still required.
+Status: FAIL on exact current-main run 42103546978 (head d2bdad3e9c1627df26beb8bc803e2202eb061587); dependency installation itself passed on Linux and Windows. The full Windows suite was 272 passed / 2 failed / 2 skipped; the OCR.Space mocked suite was 31/33. The two failures were the stale OCR metadata expectation and the remote diagnostic parser applying local consensus confidence thresholds. Both are corrected in the current follow-up commit; the next exact-head run must pass before closure.
 Node.js v22.16.0 is authorized; record exact Node/npm versions. Run the
 full dependency-backed suite on the available supported runtime, then repeat on
 Windows if Windows-specific behavior or release scripts are in scope.
@@ -1213,7 +1264,7 @@ Closure: clean install succeeds and full suite passes with no unexplained skips
 or failures; otherwise document exact blockers and keep candidate blocked.
 
 TASK 4 — FRESH WINDOWS OCR EXECUTION AND XP REGRESSION
-Status: OPEN — depends on Task 2 and a Windows runner; use actual Windows x64, native Tesseract,
+Status: OPEN — run 42103546978 skipped screenshot acceptance because the Windows full test suite failed first. Its Windows dependencies installed and persistence/recovery passed, but it produced no current-head OCR acceptance result. Re-run after the test fixes pass on the exact head; use actual Windows x64, native Tesseract, ImageMagick and Node/npm.
 ImageMagick and supported Node/npm.
 Actions: use a fresh extraction/output directory. Confirm node/npm, native
 Tesseract executable/version/languages (eng), ImageMagick, and source
@@ -1250,8 +1301,7 @@ Tasks 3–5. Never overwrite prior candidates/reports.
 Closure: new run passes Gate A or residual blocker is documented; no false pass.
 
 TASK 7 — COMPLETE PROJECT-WIDE OCR.SPACE IMPLEMENTATION
-Status: IMPLEMENTED IN MAIN / VERIFICATION IN PROGRESS. Exact-head CI for the
-new diagnostic reconciliation helper is queued; live provider smoke and
+Status: IMPLEMENTED IN MAIN / VERIFICATION FAILED ON d2bdad3e9c1627df26beb8bc803e2202eb061587; two test defects are corrected in the current follow-up commit. The next exact-head CI run must pass; live provider smoke and independent accuracy evaluation remain blocked by the absence of a local key and approved synthetic live test input.
 independent accuracy evaluation remain blocked by the absence of a local key
 and approved synthetic live test input.
 Purpose: integrate OCR.Space across the shared DWBOT OCR pipeline and all
@@ -1345,50 +1395,47 @@ production-authoritative merely because its ZIP verifies.
 
 6. NEXT STEPS AND PREREQUISITES (IMMEDIATE)
 
-Immediate state: OCR.Space is the active priority and the Engine 3 first-pass
-implementation is committed to canonical main. Remote use is default-on when a local Free key is configured.
-The exact 332-name root-cleanup list has zero matches in the current main root;
-no GitHub deletion commit is needed. Linux and clean-package gates passed on
-run `42088538702`; Windows screenshot acceptance is still in progress. The new
-OCR.Space reconciliation helper/tests are committed but await queued CI run
-`42089449390`; current main's exact-head run is `42090354073` (queued at the time
-of this plan revision).
+Immediate state: OCR.Space is the active priority. The identity-boundary
+privacy correction is committed on canonical main; the next commit fixes two
+exact-head test failures. Remote activation is default-on with a local Free key;
+no key is configured here. The 332-name cleanup list has zero matches in the
+current main root, so no GitHub deletion commit is needed. Run 42103546978 on
+d2bdad3 failed: Windows persistence/recovery passed; Windows full suite was
+272/276 with two failures and two skips; screenshot acceptance was skipped;
+Linux OCR.Space mock tests were 31/33; PDF manual rendering passed, while the
+clean-package test failed on the same two tests.
 
 Next sequence:
-1. Inspect `42089449390` for the new reconciliation tests and `42090354073`
-   for current main. Fix any failure at its root cause and rerun; do not transfer
-   an ancestor pass to a later commit.
-2. Finish Windows screenshot acceptance on `42088538702` and earlier
-   `42088032492`. Inspect reports/artifacts for all fixture batches, exact nine
-   fields, wrong accepted values, unresolved fields, network diagnostics,
-   source/runtime fingerprints and engine/model versions. A completed job alone
-   is not sufficient without inspecting the acceptance report.
-3. Review the clean package artifact from `42088538702`: manifest and ZIP
-   already verified, npm ci/test/prelive PASS. Inspect the rendered PDF visually
-   page by page and preserve the result; do not claim visual approval yet.
-4. Run the OCR.Space mocked contract, prepass and reconciliation tests on the
-   final main head. Verify default-on/key interlock, explicit local-only opt-out, Engine 3 request profile, orientation,
-   scale, per-crop table flag, visible searchable PDF, Engine 2 PDF-only fallback,
-   identity exclusion, no full screenshots, quotas, timeout, redirects and
-   remote-only/conflict fail-closed behavior.
-5. Before live use, recheck signup terms/privacy/retention, configure a Free key
+1. Inspect the new exact-head run created by the current fix commit. Require
+   Linux OCR.Space 33/33, full Linux project suite, Windows full suite, process
+   persistence/recovery, and clean-package tests to pass; keep the PDF render
+   distinct from page-by-page visual inspection.
+2. After exact-head tests pass, run current-source Windows screenshot acceptance
+   (native Tesseract and Tesseract.js/CV as configured). Review the uploaded
+   report artifacts for all per-image/per-field values, wrong accepts, unresolved
+   fields, engine/model versions, source fingerprint and network diagnostics.
+3. Target image3 XP first: accept 6646 only when the independent quorum supports
+   it; otherwise abstain. Never accept 66465. Then run the approved 16-image
+   Gate A corpus in a unique output directory; preserve original ground truth
+   and failed reports byte-for-byte.
+4. Fix any remaining Gate A failures only from observed evidence, add regression
+   tests, build a new fingerprint and repeat the full test/Windows sequence.
+5. Before live OCR.Space use, review any signup terms, configure a Free key
    locally (never paste it into chat), and run a synthetic non-identifying crop
-   smoke test. Record redacted HTTP response, provider status, quota and paired
-   comparison; no production screenshot or identity crop.
-6. Complete targeted Windows XP `image3.png` regression (6646 or abstain, never
-   66465), then Gate A on the approved 16-image development corpus. Preserve
-   original failed report byte-for-byte; zero wrong accepted mandatory values
-   and zero unauthorized network requests are mandatory.
-7. After Gate A passes, run independent Gate B with 50 minimum / 100 preferred
-   screenshots and independent nine-field ground truth; no holdout tuning.
-   Gate C isolated persistence/recovery follows only after A/B; Gate D release
-   decision follows all gates.
-8. Continue the rest of the 20-phase roadmap and six supporting deliverables,
+   smoke test. The official Free API currently lists 500 requests/day/IP,
+   25,000/month, 1 MB uploads and 1,000 Engine 3 conversions/month; free use is
+   permitted commercially but has no uptime guarantee. Uploaded documents are
+   deleted after processing; searchable PDFs last 60 minutes and IP logs one
+   month. No standalone ToS was located; no key or live request is available.
+6. After Gate A passes, run independent Gate B with 50 minimum / 100 preferred
+   screenshots and independently established nine-field ground truth; no holdout
+   tuning. Gate C isolated persistence/recovery follows only after A/B; Gate D
+   release decision follows all gates.
+7. Continue the rest of the 20-phase roadmap and six supporting deliverables,
    workbook, streamed 25 MB ingestion, Pilot/Full lifecycle, event-night,
    authenticated Admin/desktop, isolated Discord, security, and four
-   GrandYoloInstruct deliverables only in their authorized order. Resolve the
-   exact identities of unknown deliverables from authoritative records; do not
-   guess or rename them.
+   GrandYoloInstruct deliverables only in their authorized order. Resolve exact
+   identities from authoritative records; do not guess or rename them.
 
 External/environment blockers: no local OCR.Space key or approved live synthetic
 request has been supplied; Windows screenshot acceptance is still running;

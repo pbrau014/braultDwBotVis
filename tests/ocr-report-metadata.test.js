@@ -45,7 +45,10 @@ test('OCR configuration metadata makes optional engine and network feature flags
         ocrSequence: ['tesseractjs-local'],
         ocrSpace: {
             enabled: false,
+            defaultEnabled: true,
             explicitlyEnabled: false,
+            explicitlyDisabled: false,
+            activationReason: 'OCRSPACE_API_KEY is not configured',
             apiKeyConfigured: false,
             engine: 3,
             requestProfile: {
@@ -61,7 +64,7 @@ test('OCR configuration metadata makes optional engine and network feature flags
 });
 
 
-test('OCR.Space report metadata records opt-in request profile without exposing the key', () => {
+test('OCR.Space report metadata records the configured request profile without exposing the key', () => {
     const defaults = describeOcrConfiguration({});
     assert.equal(defaults.ocrSpace.enabled, false);
     assert.equal(defaults.ocrSpace.defaultEnabled, true);
