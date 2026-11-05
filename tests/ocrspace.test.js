@@ -30,7 +30,7 @@ test('Engine 3 uses HTTPS multipart and required orientation, table, scaling and
     assert.ok(request.options.body instanceof FormData);
     assert.equal(request.options.body.get('OCREngine'), '3');
     assert.equal(request.options.body.get('language'), 'auto');
-    assert.equal(request.options.body.get('isOverlayRequired'), 'false');
+    assert.equal(request.options.body.get('isOverlayRequired'), 'true');
     assert.equal(request.options.body.get('detectOrientation'), 'true');
     assert.equal(request.options.body.get('isTable'), 'false');
     assert.equal(request.options.body.get('scale'), 'true');
@@ -64,11 +64,11 @@ test('Engine 2 is used only as a searchable-PDF fallback when Engine 3 returns n
     assert.deepEqual(calls, ['reserve:3', 'client:3:true:false', 'reserve:2', 'client:2:true:false']);
 });
 
-test('Engine 3 defaults overlay off and returns no fabricated confidence', async () => {
+test('Engine 3 searchable PDF requests overlay and returns no fabricated confidence', async () => {
     let form;
     const result = await recognizeCrop({ ...args(), engine: 3, fetchImpl: async (_url, options) => { form = options.body; return reply(payload('player text', 3)); } });
     assert.equal(form.get('OCREngine'), '3');
-    assert.equal(form.get('isOverlayRequired'), 'false');
+    assert.equal(form.get('isOverlayRequired'), 'true');
     assert.equal(form.get('isCreateSearchablePdf'), 'true');
     assert.equal(form.get('isSearchablePdfHideTextLayer'), 'false');
     assert.equal(result.providerConfidence, null);

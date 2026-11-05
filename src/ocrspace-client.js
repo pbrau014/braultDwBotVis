@@ -73,7 +73,8 @@ async function recognizeCrop({ apiKey, imageBuffer, filename = 'dwbot-field-crop
     const form = new FormData();
     form.append('file', new Blob([imageBuffer], { type: selectedMime }), String(filename).slice(0, 120));
     form.append('OCREngine', String(selectedEngine));
-    form.append('isOverlayRequired', overlayRequired ? 'true' : 'false');
+    const effectiveOverlayRequired = overlayRequired || createSearchablePdf;
+    form.append('isOverlayRequired', effectiveOverlayRequired ? 'true' : 'false');
     form.append('language', 'auto');
     form.append('detectOrientation', detectOrientation ? 'true' : 'false');
     form.append('isTable', isTable ? 'true' : 'false');
@@ -117,7 +118,7 @@ async function recognizeCrop({ apiKey, imageBuffer, filename = 'dwbot-field-crop
         return {
             provider: 'ocr.space', engine: selectedEngine, exitCode, partial: exitCode === 2,
             parsedText: ok.map(x => String(x.ParsedText || '')).join('\n').slice(0, 12000),
-            overlay: overlayRequired ? compactOverlay(ok) : [],
+            overlay: effectiveOverlayRequired ? compactOverlay(ok) : [],
             providerConfidence: null,
             searchablePdfUrl: createSearchablePdf ? safeSearchablePdfUrl(payload.SearchablePDFURL) : null,
             processingTimeMs: Number(payload.ProcessingTimeInMilliseconds) || null,
