@@ -85,4 +85,9 @@ test('OCR.Space report metadata records opt-in request profile without exposing 
     assert.equal(enabled.ocrSpace.limits.maxCrops, 4);
     assert.equal(enabled.ocrSpace.limits.stageBudgetMs, 18000);
     assert.equal(JSON.stringify(enabled).includes('never-log-this-secret'), false);
+    const bounded = describeOcrConfiguration({ OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'key',
+        OCRSPACE_MAX_CROPS: '999', OCRSPACE_STAGE_BUDGET_MS: '999999', OCRSPACE_MAX_PER_DAY: '9999',
+        OCRSPACE_MAX_PER_MONTH: '999999', OCRSPACE_MAX_ENGINE3_PER_MONTH: '9999' });
+    assert.deepEqual(bounded.ocrSpace.limits, { maxCrops: 7, stageBudgetMs: 30000,
+        maxPerDay: 499, maxPerMonth: 24999, maxEngine3PerMonth: 999 });
 });
