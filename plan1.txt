@@ -1,3 +1,26 @@
+================================================================================
+CURRENT USER AUTHORITY ADDENDUM — 2026-11-05
+================================================================================
+- OCR.Space remote use is default-on when a local Free API key is configured.
+  An unset/blank OCRSPACE_ENABLED value or 1 enables; explicit 0 is a deliberate
+  local-only opt-out; invalid non-empty values fail closed. No key means no
+  remote request. Keep the key local and untracked.
+- This default does not weaken privacy or transport safeguards: only safe,
+  allowlisted, pre-localized, non-identifying crops; no full screenshots,
+  player identity, Discord IDs, credentials or private account data; HTTPS,
+  bounded requests, quotas, and fail-closed handling remain mandatory.
+- OCR.Space remains diagnostic evidence only. Tesseract.js is the local baseline
+  and final acceptance authority; src/ocrspace-reconciliation.js compares exact
+  remote/local values but never mutates the local record or accepts remote-only
+  candidates. Keep explicit OCRSPACE_ENABLED=0 for local-only Gate A baselines.
+- DWBOT's Engine 3 comparison marks searchable PDF SUPPORTED based on the
+  provider's Engine 3 feature description. The provider's comparison matrix
+  still conflicts; verify SearchablePDFURL at runtime and retain Engine 2 only
+  as a quota-reserved PDF fallback, discarding its OCR text.
+- Historical default-off statements below are preserved as provenance and are
+  superseded prospectively by this addendum.
+================================================================================
+
 # CURRENT AUTHORITY NOTE — 2026-11-05
 
 This historical append-only roadmap is subordinate to the canonical DWBOT Living Running Plan at docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt. All work stays in this ChatGPT conversation; no Work-mode handoff. Do not emit interim progress narration; report once after operations. Every development step references the living plan, and every plan update/download comprehensively reconciles the entire accessible context and active/historical narratives. Carry these rules into the next chat. The current governing plan is docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt; the File Library's dated/updated copies are historical until synchronized with its exact content. All DWBOT work uses only canonical repository pbrau014/braultDwBotVis, branch main. Older RC2/RC3 work copies, other repository names and branch names below are historical provenance only, not active sources or destinations. Node.js 22.16.0 is authorized; older Node 24+ requirements below are historical unless a specific tool gate proves otherwise. Last verified main before this plan/status refresh: fc59a52591673250ef289ef5cea68f1c25ea648c; exact-head run 42095870483 is pending and the refresh triggers a newer run.
