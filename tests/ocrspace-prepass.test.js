@@ -5,7 +5,7 @@ const { buildSafeOcrSpacePrepassCropPlan } = require('../src/ocrspace-prepass');
 
 const regions = {
     result: { rect: { left: 80, top: 140, width: 500, height: 120 } },
-    identity: { rect: { left: 100, top: 210, width: 650, height: 100 } },
+    identity: { rect: { left: 100, top: 210, width: 650, height: 100 }, score: 0.5 },
     metadata: { rect: { left: 1080, top: 120, width: 700, height: 140 } },
     rewardBand: { rect: { left: 90, top: 280, width: 900, height: 170 } },
     damage: { rect: { left: 40, top: 390, width: 300, height: 130 } },
@@ -29,7 +29,7 @@ test('OCR.Space prepass creates only bounded non-identifying crops and marks onl
 test('identity geometry that expands into reward or damage bands pushes crops below it or skips them', () => {
     const extended = {
         ...regions,
-        identity: { rect: { left: 100, top: 210, width: 650, height: 250 } },
+        identity: { rect: { left: 100, top: 210, width: 650, height: 250 }, score: 0.5 },
     };
     const plan = buildSafeOcrSpacePrepassCropPlan({ regions: extended, width: 1920, height: 1080 });
     for (const crop of plan) {
@@ -43,8 +43,33 @@ test('invalid dimensions and invalid or undersized regions fail closed', () => {
     assert.deepEqual(buildSafeOcrSpacePrepassCropPlan({ regions, width: 200, height: 100 }), []);
     const invalid = buildSafeOcrSpacePrepassCropPlan({
         width: 1920, height: 1080,
-        regions: { identity: { rect: { left: 'bad', top: 1, width: 10, height: 10 } },
+        regions: { identity: { rect: { left: 'bad', top: 1, width: 10, height: 10 }, score: 0.5 },
             result: { rect: { left: 1, top: 1, width: 2, height: 2 } } },
     });
     assert.deepEqual(invalid, []);
+});
+
+test('missing or weak identity geometry fails closed without using a nominal fallback box', () => {
+    const { identity, ...withoutIdentity } = regions;
+    assert.deepEqual(buildSafeOcrSpacePrepassCropPlan({ regions: withoutIdentity, width: 1920, height: 1080 }), []);
+
+    const weakIdentity = {
+        ...regions,
+        identity: { ...regions.identity, score: 0.119 },
+    };
+    assert.deepEqual(buildSafeOcrSpacePrepassCropPlan({ regions: weakIdentity, width: 1920, height: 1080 }), []);
+});
+
+test('identity geometry must be valid and fully inside the source image', () => {
+    const outside = {
+        ...regions,
+        identity: { rect: { left: -1, top: 210, width: 650, height: 100 }, score: 0.5 },
+    };
+    assert.deepEqual(buildSafeOcrSpacePrepassCropPlan({ regions: outside, width: 1920, height: 1080 }), []);
+
+    const tooSmall = {
+        ...regions,
+        identity: { rect: { left: 100, top: 210, width: 4, height: 5 }, score: 0.5 },
+    };
+    assert.deepEqual(buildSafeOcrSpacePrepassCropPlan({ regions: tooSmall, width: 1920, height: 1080 }), []);
 });

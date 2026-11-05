@@ -2,10 +2,10 @@
 
 ## Governing sequence
 
-When OCR.Space is explicitly enabled, the sequence is:
+When OCR.Space is enabled by a locally configured Free API key (default-on unless explicitly disabled), the sequence is:
 
 1. Inspect the original image locally and run geometry-only OpenCV region proposals. OpenCV does not recognize text or accept values.
-2. Exclude the player-identity region and construct only bounded, non-identifying crops. If a crop cannot be proven separate from identity content, skip it.
+2. Require an explicit, valid OpenCV identity proposal with score >= 0.12 (the same minimum used by the local geometry-region selector), and require the complete identity rectangle to be inside the source image. A missing, weak, malformed or out-of-bounds identity proposal disables the entire remote prepass; never substitute a nominal/fallback rectangle. Exclude the player-identity region and construct only bounded, non-identifying crops. If a crop cannot be proven separate from identity content, skip it.
 3. Run OCR.Space Engine 3 first on those safe crops, with the request profile below. Preserve text, partial status, processing time, crop geometry, request settings and searchable-PDF status as separate remote evidence.
 4. Run the existing Tesseract.js/local pipeline on the original image and its established crops. Preserve local evidence independently and compare it to the remote result.
 5. Run the existing parsers, independent-read/geometry consensus and exact validators. Conflicts, ambiguous values and missing fields remain unresolved.
@@ -54,7 +54,7 @@ The searchable PDF link is documented as valid for one hour. The Free tier adds 
 ## Privacy, bounds and quotas
 
 - Send only minimum-necessary, pre-localized, non-identifying crops. Never send player name/identity, Discord IDs, credentials, private account data, unrelated UI or full screenshots.
-- Identity exclusion is geometric and happens before transmission. If the crop intersects or may include the identity ROI, skip it and record the reason.
+- Identity exclusion is geometric and happens before transmission. The identity ROI must be an explicit in-bounds OpenCV proposal with score >= 0.12; missing, weak, malformed or out-of-bounds identity geometry disables remote OCR for that image. No nominal/fallback identity rectangle is accepted. If a crop intersects or may include the identity ROI, skip it and record the reason.
 - The client uses the fixed HTTPS endpoint `https://api.ocr.space/parse/image`, API key in the request header, redirect rejection, bounded MIME/input/response handling, request-plus-response timeout, and no automatic retry after HTTP 429.
 - Maximum upload is 1 MiB per image; JSON response is bounded at 256 KiB. Calls are sequential and bounded by crop count and per-image stage budget.
 - The local quota ledger reserves before every provider request, including the Engine 2 PDF-only fallback, and fails closed on corruption or lock contention.
@@ -68,7 +68,7 @@ The searchable PDF link is documented as valid for one hour. The Free tier adds 
 - `src/ocrspace-field-evidence.js`: default-on with local-key interlock and allowlisted crops, Engine 3 first, quota reservation, visible-PDF request and Engine 2 PDF-only fallback when Engine 3 does not return a PDF URL. Evidence is diagnostic only.
 - `src/ocrspace-quota-ledger.js`: atomic local JSON quota ledger with cross-process lock and fail-closed corruption behavior.
 - `src/bot.js`: geometry-first OCR.Space prepass before Tesseract, identity exclusion, then existing Tesseract and local image-processing pipeline; a bounded post-local refinement is used only if the prepass could not produce evidence.
-- `tests/ocrspace.test.js`, `tests/ocrspace-prepass.test.js` and `tests/ocrspace-reconciliation.test.js`: mocked request profile, default-on/key-interlock behavior, Engine 3 evidence, PDF fallback, privacy allowlists, quota, timeout, redirect, response-size, crop identity exclusion and diagnostic reconciliation coverage.
+- `tests/ocrspace.test.js`, `tests/ocrspace-prepass.test.js` and `tests/ocrspace-reconciliation.test.js`: mocked request profile, default-on/key-interlock behavior, Engine 3 evidence, PDF fallback, privacy allowlists, quota, timeout, redirect, response-size, crop identity exclusion (including missing/weak identity fail-closed cases) and diagnostic reconciliation coverage.
 - `package.json`: `npm run test:ocrspace`.
 
 ## Nine-field acceptance contract

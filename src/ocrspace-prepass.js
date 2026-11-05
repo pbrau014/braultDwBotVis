@@ -1,5 +1,7 @@
 'use strict';
 
+const MIN_IDENTITY_REGION_SCORE = 0.12;
+
 function finiteRect(rect, width, height) {
     if (!rect || typeof rect !== 'object') return null;
     const left = Number(rect.left), top = Number(rect.top);
@@ -18,13 +20,23 @@ function finiteRect(rect, width, height) {
 function buildSafeOcrSpacePrepassCropPlan({ regions = {}, width, height } = {}) {
     const w = Number(width), h = Number(height);
     if (!Number.isFinite(w) || !Number.isFinite(h) || w < 320 || h < 240) return [];
-    const identity = regions.identity?.rect;
-    const identityLeft = identity ? Number(identity.left) : 0;
-    const identityTop = identity ? Number(identity.top) : h * 0.205;
-    const identityRight = identity ? Number(identity.left) + Number(identity.width) : w * 0.58;
-    const identityBottom = identity ? Number(identity.top) + Number(identity.height) : h * 0.315;
-    const hasIdentityGeometry = [identityLeft, identityTop, identityRight, identityBottom].every(Number.isFinite);
-    if (!hasIdentityGeometry) return [];
+    // A nominal/fallback rectangle is not proof that the player's identity was excluded.
+    // Require the actual OpenCV identity proposal used by the local cvRegion() threshold.
+    const identityProposal = regions.identity;
+    const identity = identityProposal?.rect;
+    const identityScore = Number(identityProposal?.score);
+    if (!identity || !Number.isFinite(identityScore) || identityScore < MIN_IDENTITY_REGION_SCORE || identityScore > 1) return [];
+    const identityLeft = Number(identity.left);
+    const identityTop = Number(identity.top);
+    const identityWidth = Number(identity.width);
+    const identityHeight = Number(identity.height);
+    const identityRight = identityLeft + identityWidth;
+    const identityBottom = identityTop + identityHeight;
+    // Do not clamp an invalid identity ROI: clipping it could leave identity pixels outside
+    // the exclusion boundary. An invalid, undersized or out-of-bounds ROI disables remote OCR.
+    if (![identityLeft, identityTop, identityWidth, identityHeight, identityRight, identityBottom].every(Number.isFinite) ||
+        identityLeft < 0 || identityTop < 0 || identityWidth < 8 || identityHeight < 6 ||
+        identityRight > w || identityBottom > h) return [];
 
     const plan = [];
     const add = (field, source, rawRect, isTable = false) => {

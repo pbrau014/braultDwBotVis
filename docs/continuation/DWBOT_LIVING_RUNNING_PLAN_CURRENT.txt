@@ -35,6 +35,123 @@ END CURRENT CHAT OUTPUT AND FILE LIBRARY AUTHORIZATION RULES
 ================================================================================
 
 ================================================================================
+CURRENT IMPLEMENTATION CONTINUATION ADDENDUM — 2026-11-05
+================================================================================
+
+This addendum is the newest operational record and supersedes conflicting
+active-status wording below. Historical outcomes remain preserved.
+
+1. Canonical source and exact-head CI
+- Canonical repository: https://github.com/pbrau014/braultDwBotVis
+  (pbrau014/braultDwBotVis), branch main only.
+- Verified main before this update: e3169b6a671b8e663e42b3f66f90fae3253eefc5.
+- Exact-head workflow run 42101669149 was created for e3169b6a671b8e663e42b3f66f90fae3253eefc5
+  (commit message: "docs: add current-chat output and File Library authorization
+  rules"). At the latest check it remained pending with no jobs created. This is
+  a runner/queue state, not a test result; no pass is inferred.
+- The previous completed Windows workflow run 42088538702 tested ancestor
+  commit 9037e0b1f7c98378658413ef8c76b70f32ed3a4c, not current main. Its run
+  conclusion was failure. It completed Linux and PDF/clean-package jobs, and
+  uploaded Windows OCR evidence (artifact ID 13449780497; SHA-256
+  028490d3725e4523b3ac162c08f00ddc27520c4d8aab9be036e359b2562c140a).
+- Windows environment in that ancestor run: Node v22.16.0 / Windows x64;
+  native Tesseract 5.5.3.20260724; Tesseract.js 6.0.1 / core 6.1.2;
+  English model SHA-256
+  7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2;
+  ImageMagick 7.1.2; OpenCV Python 4.10.0.84. Network blocking was enabled
+  and the run reported no blocked network attempts.
+- On that ancestor source fingerprint 7b6b35a94afa8824fddb3dde255470354374c49e631dd6fd6d1694a647e40d3a
+  (100 source inputs), native Tesseract achieved 2/4 exact records on the
+  four-image set (3/4 complete) and 5/16 exact records on the 16-image set
+  (5/16 complete). CV-assisted Tesseract.js achieved 3/5 exact records on the
+  five-image sequence and 6/16 exact records on the 16-image sequence.
+  The full Windows acceptance script failed. These are diagnostic results on
+  an ancestor fingerprint, not current-main acceptance and not a Gate A pass.
+- image3.png did not pass the ancestor native run; the known XP path remained
+  unresolved rather than establishing a correct full record. Preserve the
+  original failed report and ground truth unchanged.
+- The PDF/manual and clean-package job on run 42088538702 passed. The package
+  SHA-256 was ae7e16dc932f59cdb7c91d0d4ef448551c837426eb08220f5d8390f96c63d7a9;
+  534 source files and manifest entries were verified, 536 ZIP entries were
+  present, clean extraction succeeded, and npm ci, npm test and prelive passed.
+  The PDF was rendered, but page-by-page visual inspection remains open.
+
+2. OCR.Space runtime policy and privacy correction
+- Current user policy is default-on when a local Free API key is configured:
+  unset/blank OCRSPACE_ENABLED or value 1 enables; value 0 explicitly disables;
+  invalid values fail closed; the key is mandatory. This supersedes older
+  default-off / explicit-1-required statements below. Keep the key local and
+  secret. No key is configured in this chat and no provider request has been
+  made.
+- The approved sequence remains OpenCV geometry/safe-crop planning, OCR.Space
+  Engine 3 remote evidence first, then independent Tesseract.js/local
+  recognition and exact local acceptance. Remote text remains separate,
+  diagnostic-only and unable to accept or overwrite a field. Engine 2 remains
+  PDF-only fallback if Engine 3 returns no safe PDF URL; its OCR text is
+  discarded.
+- A privacy-boundary defect was found in src/ocrspace-prepass.js: if OpenCV
+  did not return an identity ROI, the code substituted a nominal rectangle;
+  it also did not enforce the local geometry selector's minimum score. This
+  was not sufficient proof that identity pixels were excluded.
+- Corrected in this update: require an explicit in-bounds identity proposal
+  with score >= 0.12, matching the existing cvRegion() minimum. Missing,
+  weak, malformed, undersized or out-of-bounds identity geometry now returns
+  an empty crop plan and skips remote OCR for that image. No fallback box is
+  substituted. Tests cover missing/weak/out-of-bounds/undersized identity
+  geometry; adapter documentation records the same rule.
+- No user/player identity, Discord ID, full screenshot or production image was
+  transmitted. No live OCR.Space call or paid usage occurred.
+
+3. Source-tree cleanup reconciliation
+- Rechecked the exact 332-name local archive root-cleanup list against the
+  current main tree at e3169b6a671b8e663e42b3f66f90fae3253eefc5. Current main has 42 root entries;
+  zero of the 330 names recorded as removed from the local archive are present
+  at the GitHub repository root. Therefore no GitHub root deletion commit is
+  required on current main. Earlier statements that GitHub cleanup was still
+  open refer to an older inventory and are superseded by this exact-head
+  comparison. Nested paths and unrelated files are untouched.
+
+4. XP repair and next execution queue
+- Current main contains the XP trailing-adornment geometry/quorum helper and
+  its focused regression test, but a passing unit test is not OCR acceptance.
+  The exact XP-repair derivative ZIP bytes remain unavailable; the Library
+  contains only recorded sidecars for prior derivative packages. Do not
+  substitute the authenticated baseline or treat a sidecar hash as fresh
+  verification of a missing archive.
+- First: allow the new exact-head Windows workflow to run and inspect its
+  artifacts, per-image/per-field actual-vs-expected values, unresolved fields,
+  source fingerprint, engine/model versions and network diagnostics.
+- Then repair any remaining false accepts or unresolved fields using the
+  actual report evidence and regression-first changes. Do not tune against or
+  rewrite ground truth. Gate A requires all 16 approved development images to
+  complete with all nine fields exact, zero wrong accepted values, zero
+  unresolved mandatory fields and no unauthorized network activity.
+- Gate B remains a separate untouched independent holdout (50 minimum / 100
+  preferred) with independently established ground truth for all nine fields.
+  No tuning against Gate B. Gate C persistence/backup/restore/rollback and
+  Gate D release review follow only after Gates A and B pass.
+- Continue the desktop Player/Admin/OAuth/browser/upload verification,
+  isolated Discord staging, workbook behavior, security/secret review,
+  backup/recovery, manual/package visual inspection, and identification of the
+  four exact GrandYoloInstruct deliverables from authoritative source records.
+  Do not invent the four deliverable identities. Live Discord requires the
+  isolated development credentials and test identifiers; production remains
+  NO-GO. No paid services or production screenshot transmission are authorized.
+
+5. Authorization
+- The user's current message authorizes in-scope DWBOT project implementation
+  and GitHub changes in the canonical repository to complete the living plan.
+  Continue in this chat, preserve provenance and verify each mutation. Existing
+  safeguards remain: no paid usage, no production deployment, no production
+  screenshot/identity transmission, no secret exposure, and no claim of
+  staging/live acceptance without the required credentials and observed tests.
+
+================================================================================
+END CURRENT IMPLEMENTATION CONTINUATION ADDENDUM — 2026-11-05
+================================================================================
+
+
+================================================================================
 CURRENT EXECUTION RECONCILIATION — 2026-11-05 15:20 AMERICA/CHICAGO
 This is the newest operational status. Preserve all earlier addenda and
 historical records below; this section supersedes their stale active statuses.
