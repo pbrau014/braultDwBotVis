@@ -1712,6 +1712,9 @@ async function extractTextCore(imageBuffer) {
     // independent conflict evidence even when the fixed-band fallback is active.
     const fullScreenRewardConflictCandidates = [];
     for (const attempt of [standard, sparse]) {
+        const alreadyIncluded = legacyRewardCandidates.some(candidate =>
+            String(candidate.source) === String(attempt.pageSegmentationMode));
+        if (alreadyIncluded) continue;
         const parsed = extractRewards(attempt.text);
         if (/^\d{5,9}$/.test(String(parsed.credits || '')) &&
             /^\d{1,5}$/.test(String(parsed.xp || '')) &&
@@ -1796,9 +1799,9 @@ async function extractTextCore(imageBuffer) {
         const baseX = Number(anchorContext.baseX);
         if (!fieldSpec || !Number.isFinite(baseX)) return null;
         const limits = field === 'credits' ? /^\d{5,9}$/ : field === 'xp' ? /^\d{1,5}$/ : /^\d{1,7}$/;
-        const supportedValues = [...new Set((legacyRewardCandidates || [])
+        const supportedValues = [...new Set((rewardConflictCandidates || [])
             .map(candidate => normaliseOcrNumber(candidate?.[field]))
-            .filter(value => limits.test(value) && hasIndependentRewardFieldValueSupport(field, value, legacyRewardCandidates)))];
+            .filter(value => limits.test(value) && hasIndependentRewardFieldValueSupport(field, value, rewardConflictCandidates)))];
         if (!supportedValues.length) return null;
         const minX = baseX + imageWidth * fieldSpec.minOffset;
         const maxX = baseX + imageWidth * fieldSpec.maxOffset;
@@ -2010,7 +2013,7 @@ async function extractTextCore(imageBuffer) {
             // is independently supported, ask the existing geometry grouper to
             // locate the split token rather than crop from a clipped bbox.
             if (field === 'xp' && digits.length === 5 &&
-                hasIndependentRewardFieldValueSupport(field, digits.slice(0, -1), legacyRewardCandidates)) {
+                hasIndependentRewardFieldValueSupport(field, digits.slice(0, -1), rewardConflictCandidates)) {
                 const groupedAnchor = findRewardGeometryAnchor(field, rewardGeometrySources, anchorContext);
                 if (groupedAnchor && groupedAnchor.groupedDigits === digits.slice(0, -1) &&
                     groupedAnchor.groupBBox?.x0 < boxValues[0]) return groupedAnchor;
@@ -2453,6 +2456,7 @@ async function extractTextCore(imageBuffer) {
         rewards: focusedRewards,
         rewardCandidates,
         legacyRewardCandidates,
+        rewardConflictCandidates,
         localizedRewardEvidence,
         cvFieldIsolation: {
             ...cvAnalysis,
