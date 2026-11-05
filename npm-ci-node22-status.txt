@@ -1,4 +1,0 @@
-Command: npm ci
-Runtime: Node.js v22.16.0 / npm 10.9.2
-Result: the command did not complete within the 240-second execution window. The process was terminated after it stalled. The log contains an EBADENGINE warning because the package requires Node.js >=24.17.0; it does not establish the cause of the stall. A clean install is NOT claimed.
-For the completed diagnostic test run, node_modules was replaced with the dependency tree embedded in the hash-verified V4 archive. This is not equivalent to a clean install or target-runtime validation.

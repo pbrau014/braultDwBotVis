@@ -6,7 +6,7 @@ DWBOT is a local-first Node.js Discord tournament bot, strict screenshot OCR pip
 
 Repository: https://github.com/pbrau014/braultDwBotVis  
 Active delivery branch: main. The only active implementation branch is main.  
-Current main HEAD: 126a8d505bd1319cff770168c21fb57412286bfb  
+Current application-source baseline: 126a8d505bd1319cff770168c21fb57412286bfb; later commits update project authority and cleanup documentation.  
 The last inspected CI run (41942650363) tested ancestor 050b3a12aa64985d9a0a439ab84db8c116851a51; current-head CI has not yet been verified.
 
 Node.js 22.16.0 Linux offline job: PASS.
@@ -42,6 +42,8 @@ The current dated continuation/runbook is docs/continuation/NEXT_CHAT_HANDOFF_20
 Nine mandatory fields in exact order: result, player, map, mode, battleStart, credits, freeXp, damage, xp. XP is mandatory and ninth. Missing, invalid, ambiguous or conflicting values remain unresolved. Fuzzy name/numeric repair is prohibited.
 
 Grand Yolo tierWeight remains 0.9. Workbook Totals!H12 remains =0.54*G12/100; known default output $12.49.
+
+License text is preserved at docs/legal/LICENSE after the authorized root-only cleanup.
 
 ## Commands
 
