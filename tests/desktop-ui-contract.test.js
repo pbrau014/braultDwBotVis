@@ -32,6 +32,9 @@ test('desktop browser scripts use only same-origin local APIs and do not contain
   assert.match(read('desktop/upload.js'), /\/api\/upload/);
   assert.match(read('desktop/player.js'), /\/api\/overview/);
   assert.match(read('desktop/admin.js'), /\/api\/admin\/settings/);
+  assert.match(read('desktop/upload.js'), /25\s*\*\s*1024\s*\*\s*1024/);
+  assert.match(read('desktop/upload.html'), /maximum 25 MB/i);
+  assert.match(read('desktop/admin.html'), /private recovery JSON/i);
   assert.match(read('desktop/desktop.js'), /submission.requiredValues/);
   assert.match(read('desktop/desktop.js'), /submission.status==='awaiting-mapping'/);
 });

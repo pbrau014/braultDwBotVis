@@ -16,9 +16,10 @@
     <div class="user-area"><span id="signed-in-user">Checking Discord…</span><button id="logout" class="button quiet small">Sign out</button></div>
   </header>
   <main class="page">
-    <section class="page-heading"><div><p class="eyebrow">ADMIN WORKSPACE</p><h1>Tournament control</h1><p class="lede small">Roster, account links, scoring, OCR review and recovery exports. Every mutation is authorized again by the Node service.</p></div><a class="button secondary" href="/api/admin/backup">Download full recovery JSON</a></section>
+    <section class="page-heading"><div><p class="eyebrow">ADMIN WORKSPACE</p><h1>Tournament control</h1><p class="lede small">Roster, account links, scoring, OCR review and recovery exports. Every mutation is authorized again by the Node service.</p></div><a class="button secondary" href="/api/admin/backup" title="Contains private Discord account links and pending per-user workflows. Store securely; never post publicly.">Download full private recovery JSON</a></section>
     <section id="admin-denied" class="notice warning hidden"><h2>Administrator access required</h2><p>This page and its operations are restricted to Discord IDs listed in <code>TOURNAMENT_ADMIN_IDS</code> in the local bot environment.</p></section>
     <section id="admin-content" class="hidden">
+      <p class="notice warning">The full Admin recovery download contains private Discord account links and pending per-user workflow associations. Store it securely; do not post it in Discord or share it publicly. Public Discord snapshots intentionally omit this private data.</p>
       <div class="metric-grid">
         <article class="metric-card"><span>ACTIVE ROSTER</span><strong id="admin-roster-count">—</strong><small>of 50 supported slots</small></article>
         <article class="metric-card"><span>AGGREGATE TOTAL</span><strong id="admin-total">—</strong><small>doubloons</small></article>

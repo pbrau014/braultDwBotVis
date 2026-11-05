@@ -18,6 +18,7 @@ const {
     StringSelectMenuBuilder,
 } = require('discord.js');
 const { createWorker } = require('./ocr-worker');
+const { downloadImage } = require('./attachment-download');
 const { inspectTargetChannelPermissions } = require('./discord-gateway-diagnostics');
 const { isAdminOnlyCommand } = require('./tournament-command-policy');
 const { collectOcrSpaceFieldEvidence, getOcrSpaceActivation } = require('./ocrspace-field-evidence');
@@ -68,8 +69,10 @@ const { FIELD_SPECS, findRewardBaseX, findRewardGeometryAnchor, buildRewardGeome
 
 const BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
 const TARGET_CHANNEL_ID = process.env.TARGET_CHANNEL_ID;
+// Screenshot intake is capped at 25 MiB. Operators may lower MAX_IMAGE_MB,
+// but cannot raise the hard limit above the project-wide 25 MiB contract.
 const MAX_IMAGE_BYTES =
-    Math.max(1, Number(process.env.MAX_IMAGE_MB) || 10) * 1024 * 1024;
+    Math.min(25, Math.max(1, Number(process.env.MAX_IMAGE_MB) || 25)) * 1024 * 1024;
 const MAX_IMAGE_PIXELS = Math.max(1_000_000, Number(process.env.MAX_IMAGE_PIXELS) || 40_000_000);
 const MAX_IMAGE_DIMENSION = Math.max(2048, Number(process.env.MAX_IMAGE_DIMENSION) || 12000);
 const OCR_IMAGE_TIMEOUT_MS = Math.max(30_000, Number(process.env.OCR_IMAGE_TIMEOUT_MS) || 90_000);
@@ -141,45 +144,6 @@ const PENDING_CORRECTION_TTL_MS = 30 * 60 * 1000;
 // ============================================================
 // SECTION 3: ATTACHMENT DOWNLOAD
 // ============================================================
-async function downloadImage(attachment) {
-    if (attachment.size && attachment.size > MAX_IMAGE_BYTES) {
-        throw new Error(
-            `Image is too large. Maximum allowed size is ${formatMegabytes(MAX_IMAGE_BYTES)} MB.`,
-        );
-    }
-
-    const response = await fetch(attachment.url, {
-        signal: AbortSignal.timeout(30_000),
-    });
-
-    if (!response.ok) {
-        throw new Error(`Could not download the image (HTTP ${response.status}).`);
-    }
-
-    const declaredLength = Number(response.headers.get('content-length'));
-    if (declaredLength && declaredLength > MAX_IMAGE_BYTES) {
-        throw new Error(
-            `Image is too large. Maximum allowed size is ${formatMegabytes(MAX_IMAGE_BYTES)} MB.`,
-        );
-    }
-
-    const arrayBuffer = await response.arrayBuffer();
-
-    if (arrayBuffer.byteLength > MAX_IMAGE_BYTES) {
-        throw new Error(
-            `Image is too large. Maximum allowed size is ${formatMegabytes(MAX_IMAGE_BYTES)} MB.`,
-        );
-    }
-    if (arrayBuffer.byteLength === 0) {
-        throw new Error('The downloaded image was empty.');
-    }
-
-    return Buffer.from(arrayBuffer);
-}
-
-function formatMegabytes(bytes) {
-    return (bytes / (1024 * 1024)).toFixed(0);
-}
 
 // ============================================================
 // SECTION 4: OCR PROCESSING
@@ -2725,10 +2689,10 @@ function tournamentHelp() {
         '`!yolo rename-player <name or ID> | <new name>` — rename without losing scores (admin)',
         '`!yolo remove-player <name or ID>` — remove a player (admin)',
         '`!yolo result <player> | <event> | <game 1-7> | <DD|CA|BB> | <tier> | <metric>` — enter a result (admin)',
-        '`!yolo setting <event> <field> <number>` / `!yolo settings` — edit/show scoring (admin to edit)',
+        '`!yolo settings` — view scoring settings (admin); `!yolo setting <event> <field> <number>` — change a setting (admin)',
         '`!yolo standings [damage|kills|race|grand]` — leaderboard with all-player aggregate and estimated dollar value',
         '`!yolo totals` — precise all-player doubloon and dollar totals (Excel H12 formula: 0.54 × doubloons / 100)',
-        '`!yolo snapshot` — immediately attach a full-state recovery snapshot to the same channel (admin; automatic snapshots are coalesced)',
+        '`!yolo snapshot` — attach a public-safe recovery snapshot to the same channel (admin; private account links and per-user pending associations are omitted)',
         '`!yolo status` — filled game slots per player and event',
         '`!yolo missing [event] [| player or ID]` — list unfilled slots',
         '`!yolo clear-slot <player> | <event> | <game 1-7>` — clear a slot (admin)',
@@ -2895,7 +2859,7 @@ async function flushArchiveSnapshot() {
             if (!channel?.isTextBased()) throw new Error('Configured target channel is not text-based.');
             const snapshot = JSON.stringify(Tournament.makePublicArchiveSnapshot(tournamentState), null, 2);
             const name = `yolo-tourney-snapshot-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
-            await channel.send({ content: `Tournament recovery snapshot · ${tournamentState.players.length} players · ${new Date().toISOString()}`, files: [new AttachmentBuilder(Buffer.from(snapshot, 'utf8'), { name })], allowedMentions: { parse: [] } });
+            await channel.send({ content: `Public-safe tournament recovery snapshot · ${tournamentState.players.length} players · ${new Date().toISOString()}`, files: [new AttachmentBuilder(Buffer.from(snapshot, 'utf8'), { name })], allowedMentions: { parse: [] } });
             return true;
         } catch (error) { console.error('Could not archive tournament snapshot:', error.message); return false; }
         finally { archiveSnapshotInFlight = null; }
@@ -2955,7 +2919,7 @@ async function handleTournamentCommand(message) {
             return true;
         } else if (command === 'snapshot') {
             const sent = await flushArchiveSnapshot();
-            response = sent ? 'Full-state recovery snapshot attached to the configured public channel.' : 'Snapshot could not be attached. Check that TARGET_CHANNEL_ID is set and the bot has View Channel, Send Messages, and Attach Files permissions.';
+            response = sent ? 'Public-safe recovery snapshot attached to the configured channel. Private account links and per-user pending associations are omitted; use the authenticated Admin desktop backup for full private recovery.' : 'Snapshot could not be attached. Check that TARGET_CHANNEL_ID is set and the bot has View Channel, Send Messages, and Attach Files permissions.';
         } else if (command === 'players') {
             response = tournamentState.players.length ? `**Tournament roster**\n${tournamentState.players.map(p => `#${p.id} — ${p.name}`).join('\n')}` : 'No players yet. An admin can use `!yolo add-player <name>`.';
         } else if (command === 'player') {

@@ -17,7 +17,7 @@
     const allowed=['image/png','image/jpeg','image/webp','image/bmp','image/tiff'];
     const ext=(next.name.split('.').pop()||'').toLowerCase();
     if(!allowed.includes(next.type)&&!['png','jpg','jpeg','webp','bmp','tif','tiff'].includes(ext)){status('Choose a PNG, JPG, WEBP, BMP or TIFF screenshot.','error');return;}
-    if(next.size>10*1024*1024){status('The maximum upload size is 10 MB.','error');return;}
+    if(next.size>25*1024*1024){status('The maximum upload size is 25 MB.','error');return;}
     if(next.size===0){status('The selected file is empty.','error');return;}
     file=next;if(previewUrl)URL.revokeObjectURL(previewUrl);previewUrl=URL.createObjectURL(next);
     image.src=previewUrl;D.$('file-name').textContent=next.name;

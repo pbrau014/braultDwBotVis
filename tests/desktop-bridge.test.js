@@ -20,7 +20,7 @@ async function fixture(t,options={}){
     },
     async getOverview(p){return{role:p.role};},
     async listSubmissions(p){return{items:[{owner:p.discordUserId}]};},
-    async submitImage(p,file){actions.push({name:'upload',role:p.role,filename:file.filename,mime:file.contentType,bytes:file.buffer.length});return{submissionId:'a'.repeat(24),status:'processing'};},
+    async submitImage(p,file){actions.push({name:'upload',role:p.role,filename:file.filename,mime:file.contentType,bytes:file.buffer.length});if(options.submitImage)return options.submitImage(p,file);return{submissionId:'a'.repeat(24),status:'processing'};},
     async correctSubmission(p,id,body){actions.push({name:'correct',id,body});return{status:'corrected'};},
     async mapSubmission(p,id,body){actions.push({name:'map',id,body});return{status:'mapped'};},
     async addPlayer(p,body){actions.push({name:'add',body});return{id:7,name:body.name};},
@@ -45,7 +45,8 @@ async function fixture(t,options={}){
   const bridge=createDesktopBridge({
     host:'127.0.0.1',port:0,service,fetchImpl,
     oauth:{clientId:'test-client',clientSecret:'test-secret'},
-    maxUploadBytes:options.maxUploadBytes||1024,
+    maxUploadBytes:options.maxUploadBytes??25*1024*1024,
+    maxConcurrentUploads:options.maxConcurrentUploads??1,
     publicDirectory:options.publicDirectory||'/tmp/dwbot-desktop-static-test',
   });
   const info=await bridge.listen();
@@ -107,6 +108,26 @@ test('upload requires same-origin session, CSRF, image signature and bounded bod
   assert.equal(invalid.status,415);
   const wrongOrigin=await fetch(f.origin+'/api/upload',{method:'POST',headers:{...headers,Origin:'https://evil.example'},body:png});
   assert.equal(wrongOrigin.status,403);
+});
+test('desktop screenshot upload accepts the 25 MiB boundary and rejects larger bodies',async t=>{
+  const f=await fixture(t,{maxUploadBytes:40*1024*1024}),auth=await login(f.origin);
+  const headers={Cookie:auth.cookie,Origin:f.origin,'X-CSRF-Token':auth.session.csrfToken,'X-File-Name':'large-battle.png','X-File-Content-Type':'image/png','Content-Type':'application/octet-stream'};
+  const tooLarge=Buffer.alloc(25*1024*1024+1);tooLarge.set([137,80,78,71,13,10,26,10]);
+  const accepted=await fetch(f.origin+'/api/upload',{method:'POST',headers,body:tooLarge.subarray(0,25*1024*1024)});
+  assert.equal(accepted.status,202);
+  const rejected=await fetch(f.origin+'/api/upload',{method:'POST',headers,body:tooLarge});
+  assert.equal(rejected.status,413);assert.equal(f.actions.filter(x=>x.name==='upload').length,1);
+});
+test('desktop screenshot intake bounds concurrent uploads and releases the slot after completion',async t=>{
+  let releaseUpload,enteredUpload;const entered=new Promise(resolve=>{enteredUpload=resolve;});const held=new Promise(resolve=>{releaseUpload=resolve;});
+  const f=await fixture(t,{maxConcurrentUploads:1,submitImage:async()=>{enteredUpload();await held;return{submissionId:'b'.repeat(24),status:'processing'};}});
+  const auth=await login(f.origin),png=Buffer.from([137,80,78,71,13,10,26,10,0,0,0,0]);
+  const headers={Cookie:auth.cookie,Origin:f.origin,'X-CSRF-Token':auth.session.csrfToken,'X-File-Name':'battle.png','X-File-Content-Type':'image/png','Content-Type':'application/octet-stream'};
+  const first=fetch(f.origin+'/api/upload',{method:'POST',headers,body:png});await entered;
+  const second=await fetch(f.origin+'/api/upload',{method:'POST',headers,body:png});
+  assert.equal(second.status,429);assert.equal((await second.json()).error,'UPLOAD_BUSY');
+  releaseUpload();assert.equal((await first).status,202);
+  const third=await fetch(f.origin+'/api/upload',{method:'POST',headers,body:png});assert.equal(third.status,202);
 });
 test('participant cannot access admin static page or call admin endpoints',async t=>{
   const f=await fixture(t),auth=await login(f.origin);

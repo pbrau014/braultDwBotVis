@@ -10,6 +10,7 @@ const OAUTH_COOKIE = 'dwbot_oauth';
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000;
 const OAUTH_TTL_MS = 10 * 60 * 1000;
 const JSON_LIMIT = 64 * 1024;
+const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
 
 class DesktopHttpError extends Error {
   constructor(status,code,message){super(message);this.status=status;this.code=code;}
@@ -86,7 +87,9 @@ function createDesktopBridge(options={}){
   if(host!=='127.0.0.1')throw new Error('Desktop bridge must bind to IPv4 loopback 127.0.0.1 only.');
   const port=Number.isInteger(options.port)?options.port:Number(process.env.DESKTOP_UI_PORT||8787);
   if(!Number.isInteger(port)||port<0||port>65535)throw new RangeError('Desktop UI port must be from 0 through 65535.');
-  const maxUploadBytes=Math.max(1024,Number(options.maxUploadBytes)||10*1024*1024);
+  const maxUploadBytes=Math.min(MAX_UPLOAD_BYTES,Math.max(1024,Number(options.maxUploadBytes)||MAX_UPLOAD_BYTES));
+  const maxConcurrentUploads=Math.min(2,Math.max(1,Math.floor(Number(options.maxConcurrentUploads)||1)));
+  let activeUploads=0;
   const publicDirectory=path.resolve(options.publicDirectory||path.join(__dirname,'..','desktop'));
   const oauth=options.oauth||{};
   const clientId=String(oauth.clientId||''),clientSecret=String(oauth.clientSecret||'');
@@ -241,13 +244,18 @@ function createDesktopBridge(options={}){
     }
     if(req.method==='POST'&&p==='/api/upload'){
       csrf(req,session);role(principal,['admin','player']);
-      const buffer=await readBody(req,maxUploadBytes),mime=detectImageMime(buffer);
-      if(!mime)throw new DesktopHttpError(415,'IMAGE_TYPE_REJECTED','Upload must be a PNG, JPEG, WEBP, BMP, or TIFF image.');
-      const declared=String(req.headers['x-file-content-type']||'').toLowerCase();
-      if(declared&&declared!==mime&&!(declared==='image/jpg'&&mime==='image/jpeg'))
-        throw new DesktopHttpError(415,'IMAGE_TYPE_MISMATCH','Declared media type does not match the image data.');
-      const result=await call('submitImage',principal,{buffer,filename:safeFilename(req.headers['x-file-name']),contentType:mime});
-      audit(principal,'image-upload');sendJson(res,202,result);return true;
+      if(activeUploads>=maxConcurrentUploads)
+        throw new DesktopHttpError(429,'UPLOAD_BUSY','Another screenshot upload is already being processed. Wait for it to finish.');
+      activeUploads++;
+      try{
+        const buffer=await readBody(req,maxUploadBytes),mime=detectImageMime(buffer);
+        if(!mime)throw new DesktopHttpError(415,'IMAGE_TYPE_REJECTED','Upload must be a PNG, JPEG, WEBP, BMP, or TIFF image.');
+        const declared=String(req.headers['x-file-content-type']||'').toLowerCase();
+        if(declared&&declared!==mime&&!(declared==='image/jpg'&&mime==='image/jpeg'))
+          throw new DesktopHttpError(415,'IMAGE_TYPE_MISMATCH','Declared media type does not match the image data.');
+        const result=await call('submitImage',principal,{buffer,filename:safeFilename(req.headers['x-file-name']),contentType:mime});
+        audit(principal,'image-upload');sendJson(res,202,result);return true;
+      }finally{activeUploads--;}
     }
     const correction=p.match(/^\/api\/submissions\/([a-f0-9]{24})\/corrections$/i);
     if(req.method==='POST'&&correction){
@@ -314,6 +322,10 @@ function createDesktopBridge(options={}){
       if(server)throw new Error('Desktop bridge is already listening.');
       if(!clientId||!clientSecret)throw new Error('ENABLE_DESKTOP_UI requires DISCORD_OAUTH_CLIENT_ID and DISCORD_OAUTH_CLIENT_SECRET in the local .env file.');
       server=http.createServer(handle);
+      // Bound slow/oversized uploads and avoid accumulating unbounded request bodies.
+      server.requestTimeout=120_000;
+      server.headersTimeout=15_000;
+      server.keepAliveTimeout=5_000;
       await new Promise((resolve,reject)=>{
         server.once('error',reject);
         server.listen(port,host,()=>{server.removeListener('error',reject);resolve();});
