@@ -8,7 +8,7 @@ The only authorized DWBOT source and destination is pbrau014/braultDwBotVis; mai
 
 ## Chat-only execution and living-plan authority
 
-All DWBOT research, file review, planning, code changes, GitHub operations, testing, correction, packaging and reporting must remain in the current ChatGPT conversation. Do not hand off to Work mode or another execution environment. Every development step and status update must reference and reconcile with the current living running plan in the File Library and its checked-in project copy. Update the plan when decisions, implementation, evidence, risks or blockers change. Preserve dated history and distinguish attempted, implemented, tested, verified and accepted.
+All DWBOT research, file review, planning, code changes, GitHub operations, testing, correction, packaging and reporting must remain in the current ChatGPT conversation. Do not hand off to Work mode or another execution environment. Every development step and status update must reference and reconcile with the current living running plan in the File Library and its checked-in project copy. Update the plan when decisions, implementation, evidence, risks or blockers change. On every plan update or download/export, reconcile the complete accessible project context, active and historical narratives, recent/current/next steps and outcomes. Preserve dated history and distinguish attempted, implemented, tested, verified and accepted. Do not display progress narration or interim status text; provide one consolidated summary after operations are complete or blocked.
 
 ## Persistent implementation rule
 
