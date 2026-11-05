@@ -3,6 +3,7 @@ name: DWBOT verification
 on:
   push:
     branches:
+      - main
       - dwbotVis
   workflow_dispatch:
 
