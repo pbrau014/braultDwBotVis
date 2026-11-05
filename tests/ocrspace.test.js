@@ -197,7 +197,7 @@ test('field evidence rejects identity/unknown crops and submits allowlisted crop
 test('oversized crop is rejected before quota reservation and external request', async () => {
     let reserve = 0, calls = 0;
     const result = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'key' },
-        cropPlan: [{ field: 'xp', engine: 2, rect: { left: 0, top: 0, width: 1, height: 1 } }],
+        cropPlan: [{ field: 'xp', source: 'localized-reward-column', engine: 2, rect: { left: 0, top: 0, width: 8, height: 6 } }],
         quotaLedger: { reserve: async () => { reserve++; } }, client: async () => { calls++; },
         buildCrop: async () => Buffer.alloc(MAX_FREE_FILE_BYTES + 1) });
     assert.equal(reserve, 0); assert.equal(calls, 0);
@@ -208,8 +208,8 @@ test('quota exhaustion stops further provider calls', async () => {
     let calls = 0;
     const result = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'key' },
         cropPlan: [
-            { field: 'xp', engine: 2, rect: { left: 0, top: 0, width: 10, height: 10 } },
-            { field: 'freeXp', engine: 2, rect: { left: 0, top: 0, width: 10, height: 10 } },
+            { field: 'xp', source: 'localized-reward-column', engine: 2, rect: { left: 0, top: 0, width: 10, height: 10 } },
+            { field: 'freeXp', source: 'localized-reward-column', engine: 2, rect: { left: 0, top: 0, width: 10, height: 10 } },
         ],
         quotaLedger: { reserve: async () => { const e = new Error('limit'); e.code = 'OCRSPACE_QUOTA_EXHAUSTED'; throw e; } },
         client: async () => { calls++; }, buildCrop: async () => Buffer.from('crop') });

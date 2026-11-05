@@ -27,7 +27,9 @@ function createOcrReportMetadata(root) {
     const packageInfo = require(path.join(root, 'package.json'));
     const { version: tesseractJsVersion } = require(path.join(root, 'node_modules', 'tesseract.js', 'package.json'));
     const { version: tesseractCoreVersion } = require(path.join(root, 'node_modules', 'tesseract.js-core', 'package.json'));
-    const modelPath = path.join(root, 'eng.traineddata');
+    const { resolveLocalTesseractAssets } = require(path.join(root, 'src', 'ocr-worker'));
+    const assets = resolveLocalTesseractAssets('eng');
+    const modelPath = path.join(assets.langPath, 'eng.traineddata');
     const sourceFiles = [];
     const walk = relativeDir => {
         const absoluteDir = path.join(root, relativeDir);
@@ -44,8 +46,6 @@ function createOcrReportMetadata(root) {
     for (const relative of uniqueFiles) {
         sourceHash.update(relative).update('\0').update(fs.readFileSync(path.join(root, relative))).update('\0');
     }
-    const { resolveLocalTesseractAssets } = require(path.join(root, 'src', 'ocr-worker'));
-    const assets = resolveLocalTesseractAssets('eng');
     const assetPaths = [
         { role: 'language-model', path: modelPath },
         { role: 'worker-script', path: assets.workerPath },

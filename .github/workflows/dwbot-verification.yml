@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - dwbotVis
   workflow_dispatch:
 
 permissions:
@@ -28,6 +27,13 @@ jobs:
           node-version: 22.16.0
           cache: npm
           package-manager-cache: false
+      - name: Provision local English Tesseract.js model
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes tesseract-ocr-eng
+          model_path="$(find /usr/share/tesseract-ocr -type f -name eng.traineddata -print -quit)"
+          test -n "$model_path"
+          echo "TESSERACT_LANG_PATH=$(dirname "$model_path")" >> "$GITHUB_ENV"
       - name: Install locked dependencies
         run: |
           node --version
@@ -89,8 +95,11 @@ jobs:
           Write-Host "Native Tesseract: $version"
           if ($version -notmatch '^tesseract\s+v?5\.') { throw "Expected native Tesseract 5.x: $version" }
           & $tesseract.Source --list-langs
+          $tessdata = Join-Path (Split-Path $tesseract.Source -Parent) 'tessdata'
+          if (-not (Test-Path (Join-Path $tessdata 'eng.traineddata'))) { throw "English language model not found in $tessdata" }
           & $magick.Source -version | Select-Object -First 2
           "TESSERACT_BIN=$($tesseract.Source)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "TESSERACT_LANG_PATH=$tessdata" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           "IMAGEMAGICK_BIN=$($magick.Source)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
       - name: Install isolated OpenCV geometry runtime
         shell: powershell
@@ -121,7 +130,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: dwbot-windows-node24-native-ocr-and-recovery
+          name: dwbot-windows-node22-native-ocr-and-recovery
           path: |
             testdata/ocr-acceptance/**
             testdata/persistence-recovery/**
