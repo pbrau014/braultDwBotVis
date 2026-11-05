@@ -31,7 +31,9 @@ test('localized parser rejects unknown fields and invalid reward sizes', () => {
 test('reward selection uses localized agreement and never accepts XP from legacy broad candidates alone', () => {
     assert.equal(selectLocalizedRewardValue('xp', ['14390', '14390'], ['143905', '143905']), '14390');
     assert.equal(selectLocalizedRewardValue('xp', ['14390', '143905'], ['143905', '143905']), '');
-    assert.equal(selectLocalizedRewardValue('credits', ['940180', '540180'], ['540180', '540180']), '540180');
+    // Conflicting isolated reads must abstain; broad agreement cannot outvote them.
+    assert.equal(selectLocalizedRewardValue('credits', ['940180', '540180'], ['540180', '540180']), '');
+    assert.equal(selectLocalizedRewardValue('credits', ['540180', '540180'], ['540180', '540180']), '540180');
     assert.equal(selectLocalizedRewardValue('freeXp', ['1336', '1536'], ['1536', '1536']), '1536');
     assert.equal(selectLocalizedRewardValue('credits', ['940180', '540180'], ['123456', '654321']), '');
 });
