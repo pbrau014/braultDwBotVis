@@ -62,3 +62,14 @@ test('desktop styles provide narrow-screen layouts without a third-party style d
   assert.match(css, /@media\(max-width:620px\)/);
   assert.match(css, /:root/);
 });
+
+test('desktop binary screenshot upload sends the session CSRF token required by the bridge', () => {
+  const desktopScript = read('desktop/desktop.js');
+  const uploadScript = read('desktop/upload.js');
+  const bridge = read('src/desktop-bridge.js');
+  assert.ok(desktopScript.includes("csrfToken:()=>session?.csrfToken||''"));
+  assert.ok(uploadScript.includes('const csrfToken=D.csrfToken();'));
+  assert.ok(uploadScript.includes("xhr.setRequestHeader('X-CSRF-Token',csrfToken)"));
+  assert.ok(uploadScript.indexOf("xhr.setRequestHeader('X-CSRF-Token',csrfToken)") < uploadScript.indexOf('xhr.send(file)'));
+  assert.match(bridge, /if\(req\.method==='POST'&&p==='\/api\/upload'\)\{\s*csrf\(req,session\)/);
+});

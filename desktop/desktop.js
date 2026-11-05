@@ -179,5 +179,5 @@
     }
     return card;
   }
-  window.DWDesktop={api,initSession,setStatus,$,node,number,money,date,eventLabel,renderSubmission};
+  window.DWDesktop={api,initSession,csrfToken:()=>session?.csrfToken||'',setStatus,$,node,number,money,date,eventLabel,renderSubmission};
 })();

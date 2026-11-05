@@ -39,6 +39,9 @@
     result.classList.add('hidden');D.$('progress-label').textContent='Uploading screenshot…';
     D.$('progress-detail').textContent='The image is sent to the local Node bot service and enters the shared OCR queue.';
     const xhr=new XMLHttpRequest();xhr.open('POST','/api/upload');xhr.withCredentials=true;
+    const csrfToken=D.csrfToken();
+    if(!csrfToken){button.disabled=false;progress.classList.add('hidden');status('Your local session expired. Refresh and sign in again.','error');return;}
+    xhr.setRequestHeader('X-CSRF-Token',csrfToken);
     xhr.setRequestHeader('X-File-Name',file.name);
     if(file.type)xhr.setRequestHeader('X-File-Content-Type',file.type);
     xhr.upload.addEventListener('progress',e=>{
