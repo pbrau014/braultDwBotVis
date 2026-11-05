@@ -234,7 +234,7 @@ function cleanMapOcrPrefix(value) {
     // debris: punctuation-only, numeric, one/two characters, or short all-caps UI
     // fragments. Preserve plausible title-case map words such as `Sea of Fortune`.
     const source = String(value || '').replace(/^[\s|=:+–—-]+/, '').replace(/[|=]+/g, ' ')
-        .replace(/[\s\]\[{}~&^®©]+$/g, '').replace(/\s+/g, ' ').trim();
+        .replace(/[\s\]\[{}~&^®©]+$/g, '').replace(/[\s—–-]+$/u, '').replace(/\s+/g, ' ').trim();
     const words = source.split(' ').filter(Boolean);
     // A stray bracket/pipe inside a leading OCR fragment is a strong sign that
     // the first one or two tokens came from the Victory banner, not the map title
