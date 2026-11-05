@@ -1,4 +1,106 @@
 ================================================================================
+EXECUTIVE SUMMARY — CURRENT STATE AND RECOMMENDED NEXT WORK — 2026-11-05
+================================================================================
+
+Canonical source: https://github.com/pbrau014/braultDwBotVis.git
+Repository: pbrau014/braultDwBotVis | delivery branch: main
+Current main HEAD at this summary: cb204feb30f7a2eadb2ffadd97addfb548dc24f4
+
+CURRENT DECISION
+- Production remains NO-GO. No OCR accuracy, Gate A/B, live provider, live
+  Discord, release or production claim may be inferred from source changes or
+  mocked tests alone.
+- Exact-head CI run 42108218338 is pending for cb204feb30f7a2eadb2ffadd97addfb548dc24f4.
+- Preceding run 42104276952 is still in progress on ancestor
+  5a6ad4044b1aa67f3d02a5ab02f676607fa265d6. Its Linux offline suite and
+  PDF/clean-package job completed successfully; Windows process-level
+  persistence/recovery and the full Windows test suite completed successfully,
+  while current-source screenshot acceptance was still running. Do not
+  transfer that ancestor run's result to the newer main head.
+- The preceding clean-package artifact was inspected: 536 source files,
+  536 manifest entries, 538 ZIP entries; manifest, clean extraction, npm ci,
+  npm test and prelive passed. Its operations PDF rendered to four pages and
+  was visually inspected; its content still had stale OCR.Space activation
+  wording, now being corrected. The operations manual is not the five-chapter
+  user manual required by Plan 5.
+
+LATEST IMPLEMENTATION CHANGE
+- Commit cb204feb30f7a2eadb2ffadd97addfb548dc24f4 adds a bounded streaming
+  Discord attachment downloader, a 25 MiB hard maximum (operators may lower
+  it), bounded desktop upload concurrency, upload/request timeouts, and
+  matching 25 MiB browser/server limits with regression tests.
+- It also clarifies that public Discord snapshots omit private account links
+  and pending per-user associations, while the authenticated Admin browser
+  backup is the full private recovery archive.
+- The new exact-head CI run is pending; the implementation is committed but
+  not yet tested/verified on this head.
+
+IMMEDIATE PRIORITIES
+1. Inspect run 42108218338 on its exact triggering SHA. Require Linux OCR and
+   full tests, Windows full suite, persistence/recovery, screenshot acceptance,
+   PDF render and clean-package checks to pass. Fix failures at root cause and
+   rerun on the new exact head.
+2. Inspect the Windows screenshot reports for every fixture and all nine
+   mandatory fields. Target image3 XP first: accept 6646 only with independent
+   evidence; otherwise abstain. Never accept 66465. Then run Gate A on the
+   approved 16-image development corpus with zero wrongly accepted mandatory
+   values, zero unresolved required fields and zero unauthorized network
+   requests.
+3. After Gate A passes, run independent Gate B with at least 50, preferably
+   100, independently labeled screenshots and no holdout tuning. Run Gate C
+   isolated persistence/backup/restore/rollback only after A and B pass; make
+   the Gate D release decision last.
+4. Before a live OCR.Space smoke test, recheck current Free-tier terms/privacy,
+   configure a local Free key (never in chat), and send only synthetic,
+   non-identifying safe crops. No full screenshot, player identity or
+   production data. OCR.Space is default-on only when a valid local Free key
+   exists; blank/unset or 1 enables, 0 opts out, invalid values fail closed.
+5. Complete the five-chapter Player/Admin user manual PDF, keep it separate
+   from technical developer documentation, visually inspect every rendered
+   page, and include both manuals in the verified handoff package. Complete
+   live Discord integration tests only with isolated development credentials,
+   guild and channel; no production token or data in this workspace.
+6. Continue workbook/scoring parity, Pilot/Full lifecycle, event-night,
+   25 MiB ingestion, desktop security/accessibility, release packaging and
+   the remaining project roadmap after the OCR gates in the plan's order.
+
+SIX SUPPORTING WORK PLANS — RECONCILED
+1. Source/repository reconciliation (includes archive review and handoff ZIP).
+2. Requirements/architecture/schemas.
+3. Live Discord integration tests.
+4. Player/Admin HTML interfaces.
+5. Source code comments and the five-chapter user manual PDF:
+   - General Overview — HTML and Discord Usage and Purpose
+   - How-to Instructions — Admin Use of the HTML Interface
+   - How-to Instructions — Player Participant Use of the HTML Interface
+   - How-to Instructions — Admin Use of Discord
+   - How-to Instructions — Player Participant Use of Discord
+   Plan 5 requires page 1 clickable contents/index, page 2 a one- or two-
+   paragraph summary, chapters beginning on page 3, and validation of order,
+   page starts, links, numbering, selectable text, layout and implementation
+   accuracy.
+6. Separate developer and user documentation, followed by a quality review.
+   Technical architecture, implementation, validation, data flow and
+   maintenance belong in developer documentation/comments. The user PDF must
+   remain plain-language and role-oriented.
+
+REMAINING SOURCE-IDENTITY GAPS
+- The accessible canonical roadmap defines Phases 0–10; no authoritative
+  Phase 11–20 specifications were found in the current repository tree.
+  Preserve the 20-phase requirement but do not invent the missing phases.
+- The exact four deliverables called GrandYoloInstruct remain unidentified.
+  The crosswalk records the distinct v3.15, v3.19 and v3.22 document families;
+  do not guess which four are intended.
+- Plan 1 and Plan 2 are named above, but their full original detailed
+  acceptance specifications are not present in the retrieved authoritative
+  context. Continue the evidence-based source/requirements crosswalk without
+  pretending those missing specifications were recovered.
+
+================================================================================
+END EXECUTIVE SUMMARY — CURRENT STATE AND RECOMMENDED NEXT WORK
+================================================================================
+
+================================================================================
 CURRENT CHAT OUTPUT AND FILE LIBRARY AUTHORIZATION RULES — 2026-11-05
 ================================================================================
 
@@ -553,11 +655,12 @@ G. FILE-LIBRARY PLAN RECONCILIATION AND CANONICAL PLAN NAME — 2026-11-05
   a field. Both `OCRSPACE_ENABLED=1` and a local key are required; default-off
   remains mandatory.
 - Older text describing OCR.Space as quarantined/mock-only, local Tesseract
-  before the remote pass, key-only auto-activation, Node.js 24+ as a mandatory
-  runtime, the XP-repair derivative as still missing, or other repository/
-  branch names as active is historical and superseded by later user decisions
-  and current verified source/configuration. Preserve those older statements
-  in their original historical records; do not restore them as active rules.
+  before the remote pass, default-off/explicit-1-only activation, Node.js 24+
+  as a mandatory runtime, the XP-repair derivative as still missing, or other
+  repository/branch names as active is historical and superseded by later user
+  decisions and current verified source/configuration. Preserve those older
+  statements in their original historical records; do not restore them as
+  active rules.
 - Keep the 20-phase history, six supporting deliverables, four
   GrandYoloInstruct deliverables, nine-field contract, workbook/tournament
   behavior, Pilot/Full lifecycle, event-night metadata, backup separation,
@@ -678,11 +781,11 @@ C. OCR.SPACE REQUEST PROFILE — REQUIRED WHEN THE PROVIDER IS USED
   authority; OCR.Space cannot independently accept, rewrite, normalize,
   fuzzy-correct or overwrite a mandatory value. PaddleOCR remains optional
   local comparison/fallback.
-- This changes request order, not remote activation policy: remote processing
-  remains default-off. Both `OCRSPACE_ENABLED=1` and a locally stored Free API
-  key are required. A key alone never activates remote use. The current user
-  authorized the request profile defaults whenever OCR.Space is used, not
-  silently enabling network transmission in all installations.
+- This changes request order and uses the user's later explicit activation
+  policy: remote processing is default-on when a valid local Free API key is
+  configured. Unset/blank `OCRSPACE_ENABLED` or value `1` enables; explicit
+  `0` opts out; invalid nonblank values fail closed. No key means no request.
+  This does not authorize paid usage or bypass safe-crop/privacy safeguards.
 - Required API profile on every OCR.Space text request:
   * `detectOrientation=true` — OCR.Space detects orientation and autorotates
     when required; record returned orientation metadata where available.
@@ -864,9 +967,10 @@ E. REQUIRED NEXT STEPS AND CLOSURE CONDITIONS
    mandatory acceptance or network restriction failure blocks a pass.
 7. Before a first live OCR.Space request, recheck current Free-tier signup,
    privacy and retention terms; configure the key locally, never in chat; use
-   synthetic non-identifying crops only. Remote processing remains default-off
-   and requires both `OCRSPACE_ENABLED=1` and a local key. A key alone never
-   enables network use. No live provider call or accuracy benefit is claimed.
+   synthetic non-identifying crops only. Remote processing is default-on when
+   a valid local Free key exists; unset/blank or `OCRSPACE_ENABLED=1` enables,
+   explicit `0` opts out, invalid values fail closed, and no key means no
+   request. No live provider call or accuracy benefit is claimed.
 8. Proceed to isolated Gate C persistence/backup/restore/rollback only after
    Gates A and B pass. Continue desktop/browser/OAuth, synthetic upload,
    isolated Discord, workbook, security, accessibility, packaging and manual

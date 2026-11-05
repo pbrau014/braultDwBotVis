@@ -31,7 +31,7 @@ OCR.Space is the highest-priority DWBOT development workstream until project-wid
 
 ---
 
-**Plan authority and revision:** This file (`plan1.txt`) remains the authoritative roadmap. Updated on 2026-10-25 after implementing targeted recommendations in a separate RC2-derived work copy. The new **Phase 3 RC3 targeted implementation** section immediately below is now the current status authority and supersedes earlier statements that code changes were not yet authorized or that the work was still only in review. The original RC2 source and ZIP are preserved unchanged. All earlier test output and reports remain historical evidence tied to their recorded source fingerprint/runtime; no historical result is relabelled as an RC3 pass. Production stays NO-GO until RC3 passes full target-runtime validation.
+**Plan authority and revision:** This is the supporting historical OCR reliability roadmap. The checked-in `docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt` on canonical repository `pbrau014/braultDwBotVis`, branch `main`, is the active operational plan and controls the current work queue. This file preserves the Phase 0–10 source history and does not define the later Phase 11–20 specifications referenced by broader project instructions; those missing phase definitions must be recovered from an authoritative source rather than invented. Historical test output remains bound to its source fingerprint/runtime and is never relabelled as a current-main pass. Production stays NO-GO until every mandatory gate passes.
 
 ## Phase 3 RC3 targeted implementation and current go/no-go — 2026-10-25
 

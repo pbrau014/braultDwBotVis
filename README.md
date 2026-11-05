@@ -6,19 +6,32 @@ DWBOT is a local-first Node.js Discord tournament bot, strict screenshot OCR pip
 
 Repository: https://github.com/pbrau014/braultDwBotVis  
 Active delivery/current working branch: `main`.  
-Last verified main HEAD before this plan/status refresh: `fc59a52591673250ef289ef5cea68f1c25ea648c`. Exact-head run `42095870483` is pending on that commit; this refresh will trigger a newer exact-head run. Re-fetch `main` and Actions before relying on any result.
+Current main HEAD: `cb204feb30f7a2eadb2ffadd97addfb548dc24f4`. Exact-head run
+`42108218338` is pending; do not transfer results from earlier commits.
 
-Run `42088538702` Linux offline job: **PASS** on Node.js 22.16.0. The full project suite reported 269 tests, 267 passed, 0 failed and 2 skipped. OCR.Space mocked contract/prepass tests, reconciliation/report metadata, Discord policy, desktop service/bridge, persistence and recovery steps passed on that run.
+Preceding run `42104276952` on ancestor `5a6ad4044b1aa67f3d02a5ab02f676607fa265d6`:
+- Linux offline suite and PDF/clean-package job completed successfully.
+- Windows process-level persistence/recovery and full Windows test suite
+  completed successfully; current-source screenshot acceptance remained in
+  progress at the last check.
+- Clean-package artifact verified 536 source files, 536 manifest entries,
+  538 ZIP entries, clean extraction, `npm ci`, `npm test` and prelive.
+  ZIP SHA-256: `551711a72f32e8896e056fb5e0706ea7b96455b8111194cf30359c66b985372c`.
+  Workflow artifact digest:
+  `sha256:4d1e12aa2d01efc444557be63778cf8573b0ba013266d6279f131740ef698748`.
+  The four-page operations PDF was visually inspected; its layout rendered,
+  but stale OCR.Space activation wording was found and is being corrected.
+- This is ancestor evidence only, not a pass for the current main head.
 
-Run `42088538702` PDF/manual/clean-package job: **PASS**. The release-package verification reports 534 source files, 534 manifest entries, 536 ZIP entries, verified manifest, clean extraction, `npm ci`, `npm test` and prelive checks passing. Release ZIP SHA-256: `ae7e16dc932f59cdb7c91d0d4ef448551c837426eb08220f5d8390f96c63d7a9`. Workflow artifact digest: `sha256:339a1d2afa776899dd26ef0bf2c8d0b5a337e5d9f8deffb37b7d77083ddcecd6`. The PDF rendered; page-by-page visual inspection remains open.
+Commit `cb204feb30f7a2eadb2ffadd97addfb548dc24f4` adds bounded streaming
+Discord image downloads, a 25 MiB hard maximum, bounded desktop upload
+concurrency/timeouts, matching browser/server limits and regression tests. It
+also clarifies public-safe Discord snapshots versus the full private Admin
+recovery export. This implementation is committed but awaits exact-head CI.
 
-Run `42088538702` Windows Node.js 22.16.0 job: process-level persistence/recovery and the full Windows test suite **PASS**. The separate current-source Tesseract.js/native-Tesseract screenshot-acceptance step was still **IN PROGRESS** at the latest check. Its artifact-upload step had not run, no Windows screenshot-acceptance report was available, and a live log-download attempt returned GitHub BlobNotFound (404) while the job remained active. Do not claim the Windows screenshot gate passed.
-
-Run `42088032492` had a clean-package failure because `eng.traineddata` was absent. The pinned native Tesseract 5.5.3.20260724/model provisioning correction was verified by the later successful package job on `42088538702`; preserve the earlier failure as history.
-
-The documentation/workflow rename commit is `5d2c5e3268b7e20f16c982fea4264d7093bc6977`; the explicit image3 XP regression test was added in `fc59a52591673250ef289ef5cea68f1c25ea648c`. Run `42095870483` is pending for the latter commit; this plan/status refresh will trigger a newer exact-head run. Earlier runs `42094998273`, `42091979664` and `42091840336` refer to older commits and are not current-head passes.
-
-Production remains **NO-GO** pending current-source Windows screenshot acceptance, Gate A/B, page-by-page PDF inspection, desktop/OAuth/browser/upload, isolated live Discord, recovery/security and remaining release gates.
+Production remains **NO-GO** pending current-source Windows screenshot
+acceptance, Gate A/B, live provider and Discord gates, user manual PDF
+render/inspection, desktop/OAuth/browser/upload, security and release gates.
 
 ## Current handoff
 
@@ -88,3 +101,11 @@ Current branch source ZIP:
 https://github.com/pbrau014/braultDwBotVis/archive/refs/heads/main.zip
 
 Production remains NO-GO until all mandatory screenshot OCR, Windows/native, local UI/OAuth/browser, isolated live Discord, security/recovery, manual and final package gates pass with current evidence.
+
+
+## User and developer documentation
+
+- [DWBOT User Manual](docs/user/DWBOT_USER_MANUAL.md) — five-chapter Player/Admin guide; rendered PDF is generated and packaged by the verification workflow.
+- [Local Operations and Release Verification Manual](docs/iteration23/DWBOT_LOCAL_OPERATIONS_AND_RELEASE_VERIFICATION_MANUAL_2026-11-04.md) — developer/operator verification runbook.
+- [Requirements, Architecture and Schema Crosswalk](docs/continuation/REQUIREMENTS_ARCHITECTURE_SCHEMA_CROSSWALK_2026-11-05.md) — evidence-based component and acceptance mapping.
+- [GrandYoloInstruct Deliverable Crosswalk](docs/continuation/GRANDYOLOINSTRUCT_DELIVERABLE_CROSSWALK.md) — identity remains unresolved; no four outputs are guessed.

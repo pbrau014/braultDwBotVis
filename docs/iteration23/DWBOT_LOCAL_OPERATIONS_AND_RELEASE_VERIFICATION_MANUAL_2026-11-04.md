@@ -8,7 +8,7 @@
 - Use a separate development Discord application, bot, guild, channel and test accounts. Use synthetic screenshots and participant data only.
 - Never commit or share bot tokens, OAuth secrets, webhook URLs, .env files, private databases, or real participant screenshots.
 - Keep the desktop bridge bound to 127.0.0.1; do not expose it through LAN, tunnel, reverse proxy or port forwarding.
-- Keep slash commands, OCR.space, PaddleOCR fallback and OpenCV assist disabled unless a separately approved isolated test requires them.
+- Keep slash commands disabled unless a separately approved isolated test requires them. OCR.Space is default-on only when a valid local Free API key is configured; set `OCRSPACE_ENABLED=0` for local-only acceptance. Only safe non-identifying crops may be transmitted, and remote results remain diagnostic. Keep PaddleOCR fallback disabled unless a paired benchmark justifies it; OpenCV assist is evaluated as a separate candidate, not assumed better.
 - Preserve the nine mandatory OCR fields in order: result, player, map, mode, battleStart, credits, freeXp, damage, xp. XP is mandatory and ninth. Missing, ambiguous, invalid, conflicting or incorrect values fail exact acceptance. Never fuzzy-correct or weaken validation.
 - Record source commit, runtime, lockfile hash, fixture hashes, engine versions, command, exit code, logs, report and checksum.
 - Hosted Windows CI is not the user's local Windows verification. Offline mocks and preflights do not prove real OAuth, browser or Discord behavior.
@@ -24,13 +24,13 @@ Use the active main checkout and confirm a clean working tree:
     npm ci
     npm ls --depth=0
 
-Current Windows acceptance uses the governing Node.js 22.16.0 baseline, native Tesseract 5.x with English traineddata, and ImageMagick. Run any separately identified test that genuinely requires Node.js 24 or later with the installed Node 24+ runtime and record it as a distinct version-specific result. Verify tesseract.exe --version, tesseract.exe --list-langs and magick.exe -version. Set TESSERACT_BIN and IMAGEMAGICK_BIN to exact executable paths if PATH is ambiguous.
+Current Windows acceptance uses the authorized Node.js 22.16.0 baseline, native Tesseract 5.x with English traineddata, and ImageMagick. Use Node.js 24+ only for a separately identified test/tool that demonstrably requires it, and record that as a distinct version-specific result. Verify tesseract.exe --version, tesseract.exe --list-langs and magick.exe -version. Set TESSERACT_BIN and IMAGEMAGICK_BIN to exact executable paths if PATH is ambiguous.
 
 ## 3. Full OCR screenshot acceptance
 
 Run: npm run test:windows-native-ocr
 
-The runner executes the current-source Tesseract.js acceptance launcher, then native Tesseract reported-screenshot, four-image and additional-image suites. Network is blocked and optional OCR engines are disabled. Reports and logs must include runtime, source identity, engine versions and SHA-256.
+The runner executes the current-source Tesseract.js acceptance launcher, then native Tesseract reported-screenshot, four-image and additional-image suites, followed by paired OpenCV-assisted Tesseract.js/native candidates. It explicitly sets `OCRSPACE_ENABLED=0` and blocks network access for deterministic local-only acceptance. Reports and logs must include runtime, source identity, engine versions and SHA-256.
 
 PASS requires every Tesseract.js stage to pass, including local assets, known-good baseline, deliberately wrong expected-value negative control, sequential corpus and lifecycle checks. Native runs must complete all fixtures and match every approved mandatory value exactly. No missing required field, especially XP, and no blocked network attempts are allowed. Any mismatch or nonzero exit is FAIL. Preserve diagnostics; do not change ground truth to make a pass.
 

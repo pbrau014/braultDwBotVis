@@ -1,3 +1,32 @@
+# CURRENT MAIN IMPLEMENTATION AND VERIFICATION ADDENDUM — 2026-11-05
+
+This addendum supersedes stale branch/head/run statements in the historical
+handoff body below. Canonical repository remains
+`pbrau014/braultDwBotVis`, branch `main`; current head at this addendum is
+`cb204feb30f7a2eadb2ffadd97addfb548dc24f4`. Exact-head workflow run
+`42108218338` is pending. Ancestor run `42104276952` is still in progress
+on `5a6ad4044b1aa67f3d02a5ab02f676607fa265d6`: Linux and PDF/package jobs
+passed, Windows persistence/recovery and full suite passed, screenshot
+acceptance remained in progress. Never transfer that result to the current
+head.
+
+The current commit adds a streamed, byte-bounded Discord attachment downloader,
+a 25 MiB hard image limit, desktop upload concurrency/timeouts and regression
+tests. Public Discord snapshots are explicitly described as public-safe; the
+full private recovery export remains in authenticated Admin HTML. Production
+is NO-GO until the current-source Windows screenshot acceptance, Gate A/B,
+live provider/Discord, documentation and release gates pass.
+
+The current living plan is the source of truth:
+`docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt`. Read its executive
+summary first. The Plan 5 five-chapter user manual and Plan 6 separation review
+are being completed; the current four-page operations manual is not a
+substitute for the user manual. The 20-phase roadmap's Phase 11–20 definitions
+and the exact four GrandYoloInstruct deliverable identities remain unresolved;
+do not invent them.
+
+---
+
 # CURRENT AUTHORITY ADDENDUM — 2026-11-05
 
 This addendum supersedes conflicting default-off language in older handoff sections; historical records remain unchanged. OCR.Space is default-on when a local Free key is configured. An unset/blank OCRSPACE_ENABLED value or 1 enables; explicit 0 disables; invalid values fail closed. No key means no request. Only safe, allowlisted, pre-localized non-identifying crops may be transmitted; remote results remain diagnostic and cannot accept or alter mandatory fields. Engine 3 searchable PDF is marked Supported in DWBOT's comparison, based on the provider feature description; the conflicting provider matrix remains documented, actual SearchablePDFURL is checked, and Engine 2 remains a PDF-only fallback with its text discarded.

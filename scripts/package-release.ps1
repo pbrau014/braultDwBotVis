@@ -19,6 +19,10 @@ $pdfSource=Join-Path $OutputRoot 'DWBOT_LOCAL_OPERATIONS_AND_RELEASE_VERIFICATIO
 if(!(Test-Path -LiteralPath $pdfSource -PathType Leaf)){throw 'Rendered PDF manual is missing; package cannot be release-verified'}
 $pdfRel='docs/iteration23/DWBOT_LOCAL_OPERATIONS_AND_RELEASE_VERIFICATION_MANUAL_2026-11-04.pdf'
 $pdfDest=Join-Path $stage $pdfRel; New-Item -ItemType Directory -Force -Path (Split-Path -Parent $pdfDest)|Out-Null; Copy-Item -LiteralPath $pdfSource -Destination $pdfDest; $included+=$pdfRel
+$userPdfSource=Join-Path $OutputRoot 'DWBOT_USER_MANUAL.pdf'
+if(!(Test-Path -LiteralPath $userPdfSource -PathType Leaf)){throw 'Rendered user manual PDF is missing; package cannot be release-verified'}
+$userPdfRel='docs/user/DWBOT_USER_MANUAL.pdf'
+$userPdfDest=Join-Path $stage $userPdfRel; New-Item -ItemType Directory -Force -Path (Split-Path -Parent $userPdfDest)|Out-Null; Copy-Item -LiteralPath $userPdfSource -Destination $userPdfDest; $included+=$userPdfRel
 $entries=@($included|Sort-Object|ForEach-Object{$p=Join-Path $stage $_; [pscustomobject]@{path=$_;sizeBytes=(Get-Item $p).Length;sha256=(Get-FileHash $p -Algorithm SHA256).Hash.ToLowerInvariant()}})
 $manifest=@{schemaVersion=1;sourceCommit=$commit;createdAt=(Get-Date).ToUniversalTime().ToString('o');excluded=@('.env*','node_modules','.git','.cache','coverage','runtime state/databases','private backups');files=$entries}
 $manifest|ConvertTo-Json -Depth 6|Set-Content -LiteralPath (Join-Path $stage 'RELEASE_PACKAGE_MANIFEST.json') -Encoding utf8

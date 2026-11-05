@@ -54,6 +54,7 @@ jobs:
           node --check src/ocrspace-field-evidence.js
           node --check src/ocrspace-prepass.js
           node --check src/ocrspace-reconciliation.js
+          node --check src/attachment-download.js
           node --check src/discord-test-preflight.js
           node --check src/ocr-sequence-checkpoint.js
           node --check scripts/run-ocr-sequence.js
@@ -183,8 +184,11 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force release-artifacts | Out-Null
           pandoc docs/iteration23/DWBOT_LOCAL_OPERATIONS_AND_RELEASE_VERIFICATION_MANUAL_2026-11-04.md -o release-artifacts/DWBOT_LOCAL_OPERATIONS_AND_RELEASE_VERIFICATION_MANUAL_2026-11-04.pdf --pdf-engine=typst --toc --number-sections -V geometry:margin=0.75in -V colorlinks=true
-          if ($LASTEXITCODE -ne 0) { throw "PDF render failed: $LASTEXITCODE" }
-          if ((Get-Item release-artifacts/DWBOT_LOCAL_OPERATIONS_AND_RELEASE_VERIFICATION_MANUAL_2026-11-04.pdf).Length -lt 10000) { throw 'PDF output unexpectedly small' }
+          if ($LASTEXITCODE -ne 0) { throw "Operations PDF render failed: $LASTEXITCODE" }
+          if ((Get-Item release-artifacts/DWBOT_LOCAL_OPERATIONS_AND_RELEASE_VERIFICATION_MANUAL_2026-11-04.pdf).Length -lt 10000) { throw 'Operations PDF output unexpectedly small' }
+          pandoc docs/user/DWBOT_USER_MANUAL.md -o release-artifacts/DWBOT_USER_MANUAL.pdf --pdf-engine=typst --toc --toc-depth=1 --number-sections --include-in-header=docs/user/user-manual-header.typ -V geometry:margin=0.75in -V colorlinks=true
+          if ($LASTEXITCODE -ne 0) { throw "User PDF render failed: $LASTEXITCODE" }
+          if ((Get-Item release-artifacts/DWBOT_USER_MANUAL.pdf).Length -lt 10000) { throw 'User PDF output unexpectedly small' }
       - name: Package tracked source and verify clean extraction
         shell: powershell
         run: ./scripts/package-release.ps1
