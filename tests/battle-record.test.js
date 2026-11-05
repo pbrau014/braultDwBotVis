@@ -88,6 +88,8 @@ test('parseBattleStartTime accepts a labeled nine-digit compact date only after 
 });
 
 test('parseModeMap strips malformed banner fragments and trailing OCR punctuation', () => {
+    assert.deepEqual(parseModeMap('Crash Zone Alpha — Brawl'), { map: 'Crash Zone Alpha', mode: 'Brawl' });
+    assert.deepEqual(parseModeMap('— Crash Zone Alpha — Brawl —'), { map: 'Crash Zone Alpha', mode: 'Brawl' });
     assert.deepEqual(parseModeMap('Hil avi] Big Race — Random Battle'), { map: 'Big Race', mode: 'Random Battle' });
     assert.deepEqual(parseModeMap('North& — Random Battle'), { map: 'North', mode: 'Random Battle' });
     // Native Tesseract can capture the map separator but omit the following mode.
