@@ -266,4 +266,6 @@ test('bot runs the geometry-only OCR.Space prepass before Tesseract and excludes
     assert.equal(bot.includes("'localized-player-identity'"), false);
     assert.ok(bot.includes('reconcileOcrSpaceEvidence(extractedFields.ocrSpaceEvidence, record)'));
     assert.ok(bot.includes('ocrSpaceReconciliation,'));
+    assert.ok(bot.includes('OCR.Space diagnostic cross-check (no acceptance authority)'));
+    assert.ok(bot.includes("player: 'excluded_by_privacy_policy'"));
 });
