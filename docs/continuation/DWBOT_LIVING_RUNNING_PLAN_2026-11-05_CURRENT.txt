@@ -1,0 +1,37 @@
+# DWBOT — Current Living Plan Authority (2026-11-05)
+
+## Canonical source
+- Sole repository: https://github.com/pbrau014/braultDwBotVis.git
+- Sole active implementation/delivery branch: main.
+- Never use another similarly named repository as source or destination. Historical references are provenance only. Do not delete other repositories or remote branch refs unless separately instructed.
+- All work stays in the current ChatGPT conversation; no Work-mode handoff.
+
+## Standing implementation rules
+- THINK → REASON → ACT. Preserve original sources, derivatives, history, hashes, manifests, fixtures, ground truth and provenance.
+- Improve the existing Node.js DWBOT; preserve tournament behavior and server-side authority over identity, permissions, records, scoring, persistence and exports.
+- Exactly nine mandatory OCR fields, in order: result, player, map, mode, battleStart, credits, freeXp, damage, xp. XP is mandatory and ninth. Abstain on missing, invalid, ambiguous, conflicting or questionable values. No fuzzy repair, expected-value injection or ground-truth edits.
+- Tesseract.js is the local baseline; OpenCV is geometry/ROI assistance; PaddleOCR is an optional local comparison. OCR.Space is the secondary/last-resort remote evidence provider.
+- OCR.Space must remain default-off and requires explicit OCRSPACE_ENABLED=1 plus a local key. A key alone must not enable network calls. No player identity/name, Discord ID, credentials, private account data or full screenshots may be transmitted. Only minimum-necessary allowlisted non-identifying field crops. No paid usage. Keep provider evidence separate and diagnostic-only; it cannot accept or overwrite mandatory fields.
+- Preserve bounded requests, fixed HTTPS endpoint, redirect rejection, complete request/response timeout, body/size/MIME limits, sequential calls, no automatic retry, conservative quotas and fail-closed quota ledger.
+- Zero wrongly accepted mandatory values is required; no promise of perfect accuracy. Mock tests are not live-provider verification.
+- Node.js 22.16.0 is acceptable for general DWBOT tests. Keep Windows-native OCR and other OS-specific acceptance separate.
+- No production deployment/release, paid services, live Discord operations or real-player screenshot transmission without separate scoped authorization.
+
+## Current source state
+- Observed main HEAD: 126a8d505bd1319cff770168c21fb57412286bfb.
+- This commit adds desktop upload CSRF-token propagation; preserve it.
+- Current main contains OCR.Space client, quota ledger, field-evidence collector, bot integration, mocked tests and npm run test:ocrspace.
+- Current main still has gaps requiring implementation: key-only auto-enable; timeout ends before response JSON parsing; redirect policy not explicit; WebP accepted; documentation/test configuration permits Engine 3 player identity; crop allowlist must categorically exclude identity and unknown fields.
+- Last inspected CI run 41942650363 tested ancestor 050b3a12...; current 126a8d5 CI is not yet verified. Do not claim current screenshot acceptance.
+
+## Active queue
+1. Reconcile README, authority docs, handoff, package docs and active references to the sole canonical repository/main branch; preserve historical provenance and do not delete remote repositories/branches.
+2. Complete exact root-only cleanup from DWBOT_ROOT_CLEANUP_REPORT_2026-11-05.json on current working branch/main only. Preserve nested copies and unrelated files. Archive root LICENSE and distinct legacy root sources before removal; inspect downstream references and verify exact results.
+3. Fix OCR.Space default-off configuration, field allowlist/privacy, redirect/timeout/body/MIME handling and evidence separation; update callers, tests, docs, examples and workflows.
+4. Run focused OCR.Space tests, affected integration suites, full npm test, syntax checks, and clean-extracted package tests. Correct failures and rerun.
+5. Review provider terms/privacy/retention and, only with a locally configured Free key, perform one bounded synthetic live smoke. No key or live request is currently verified.
+6. Compare local-only and OCR.Space-assisted evidence on the same independently labeled safe corpus. Report exact nine-field accuracy, wrong accepts, unresolved fields, disagreements, latency and quota use.
+7. Run targeted XP regression, Windows/native OCR and Gate A (16 images), then independent Gate B (50 minimum/100 preferred). Gate C recovery follows A/B only. Production remains NO-GO until every mandatory gate passes.
+
+## Execution and reporting
+Re-fetch main before every write, use expected-head protection, preserve ancestry, never force-push or rewrite history. Distinguish attempted, implemented, committed, tested, verified and accepted. Update the full downloadable living plan after each verified milestone.

@@ -5,10 +5,9 @@ DWBOT is a local-first Node.js Discord tournament bot, strict screenshot OCR pip
 ## Current verification — 2026-11-05
 
 Repository: https://github.com/pbrau014/braultDwBotVis  
-Active delivery branch: main. Historical integration/testing snapshot: dwbotVis.  
-Current main HEAD: 050b3a12aa64985d9a0a439ab84db8c116851a51  
-Current tree: 784644fbda57d6b29e499a846a336c98ad78d780 (939 entries, 855 files, 84 directories).  
-Latest CI run for this exact HEAD: https://github.com/pbrau014/braultDwBotVis/actions/runs/41942650363
+Active delivery branch: main. The only active implementation branch is main.  
+Current main HEAD: 126a8d505bd1319cff770168c21fb57412286bfb  
+The last inspected CI run (41942650363) tested ancestor 050b3a12aa64985d9a0a439ab84db8c116851a51; current-head CI has not yet been verified.
 
 Node.js 22.16.0 Linux offline job: PASS.
 - OCR.space mocked contract/crop/quota: 15/15 PASS.
@@ -32,7 +31,7 @@ The current dated continuation/runbook is docs/continuation/NEXT_CHAT_HANDOFF_20
 - src/bot.js: Discord runtime, command routing, channel preflight and shared OCR entry point.
 - src/tournament.js: authoritative 50-player tournament state/scoring, four events and seven games/event, JSON/SQLite persistence.
 - src/battle-record.js: strict nine-field validation and exact corrections.
-- OCR.space Free API is the preferred remote evidence service for unresolved localized crops when a free-tier key is configured. Tesseract.js remains the local baseline; OpenCV performs geometry/ROI isolation; PaddleOCR is an optional local comparison/fallback. OCR.space receives crops only, is bounded by per-image and local quota limits, and its output remains separate diagnostic evidence that cannot weaken or bypass exact nine-field validation. A configured OCRSPACE_API_KEY enables the service by default; set OCRSPACE_ENABLED=0 to opt out. See docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md.
+- OCR.space Free API is the preferred remote evidence service for unresolved localized crops when a free-tier key is configured. Tesseract.js remains the local baseline; OpenCV performs geometry/ROI isolation; PaddleOCR is an optional local comparison/fallback. OCR.space receives crops only, is bounded by per-image and local quota limits, and its output remains separate diagnostic evidence that cannot weaken or bypass exact nine-field validation. Remote OCR.Space is default-off and requires both OCRSPACE_ENABLED=1 and a locally configured key. Only non-identifying, field-localized crops are eligible; player identity, Discord identifiers and full screenshots are prohibited. Provider output is diagnostic evidence only and cannot independently accept or overwrite a mandatory field. See docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md.
 - src/ocr-sequence-checkpoint.js and scripts/run-ocr-sequence.js persist atomic per-image progress.
 - desktop/ contains Player, Admin, Upload and shared style/script assets.
 - src/desktop-bridge.js provides authenticated loopback-only Node HTTP/OAuth/CSRF transport.
@@ -71,7 +70,9 @@ Public channel snapshots omit private Discord account links and per-user pending
 - DWBOT_PROJECT_COMPLETE_HANDOFF_2026-11-04.txt: end-to-end history and evidence; historical statuses should be read using the current handoff's addendum.
 - docs/continuation/PROJECT_AUTHORITY_AND_IMPLEMENTATION_RULES.md: authority/security/phase-order rules.
 - docs/continuation/NEXT_CHAT_HANDOFF_2026-11-05.md: exact current branch/CI state, stepwise continuation and all active rules.
-- GITHUB_TRANSFER_STATUS.md: transfer and provenance.
+- docs/continuation/DWBOT_CURRENT_AUTHORITY_2026-11-05.md: canonical repository and active OCR/security rules.
+- docs/continuation/DWBOT_LIVING_RUNNING_PLAN_2026-11-05_CURRENT.txt: current active plan summary.
+- docs/history/GITHUB_TRANSFER_STATUS_2026-11-05_HISTORICAL.md: preserved historical transfer evidence; not an active repository/branch instruction.
 - docs/iteration23/PHASE9_DISCORD_INTEGRATION_STATUS_2026-11-04.md: Discord readiness.
 - docs/iteration23/DISCORD_LIVE_TEST_QUICKSTART.md: isolated live smoke.
 - docs/iteration23/DESKTOP_UI_PRELIVE_QUICKSTART_2026-11-04.md: local OAuth/desktop procedure.

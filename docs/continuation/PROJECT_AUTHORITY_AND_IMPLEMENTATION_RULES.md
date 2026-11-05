@@ -2,10 +2,9 @@
 
 **Canonical GitHub repository:** https://github.com/pbrau014/braultDwBotVis.git  
 **Repository:** `pbrau014/braultDwBotVis`  
-**Active implementation/delivery branch:** `main`  
-**Historical integration snapshot:** `dwbotVis`
+**Only active implementation/delivery branch:** `main`
 
-The user explicitly authorized synchronizing main to the verified 850-file dwbotVis tree and making main the active implementation branch. Synchronization commit 6270f6e56c9064fb98df9976098ddf77ad74b837 preserves the former main head as its parent and uses the exact dwbotVis tree; no force-push or history rewrite occurred. dwbotVis remains a historical snapshot. Before every remote write, re-read main, use an expected-head lease, then fetch and verify the resulting commit and tree. Do not substitute another repository.
+The only authorized DWBOT source and destination is pbrau014/braultDwBotVis; main is the sole active implementation/delivery branch. Do not use, sync from, or push to any other DWBOT repository or branch. Older repository/branch references in historical records are provenance only and never current instructions. Do not delete other repositories or remote branch refs as part of documentation reconciliation. Before every remote write, re-read main, use an expected-head lease, then fetch and verify the resulting commit and tree. Never force-push or rewrite history.
 
 ## Persistent implementation rule
 

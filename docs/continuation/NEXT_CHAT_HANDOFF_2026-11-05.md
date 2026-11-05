@@ -1,3 +1,16 @@
+# CURRENT CHAT AUTHORITY OVERRIDE — 2026-11-05
+
+This override supersedes every older active repository, branch, OCR configuration and status instruction below. Historical details remain provenance only.
+
+- Sole canonical repository: https://github.com/pbrau014/braultDwBotVis.git (pbrau014/braultDwBotVis).
+- Sole active implementation/delivery branch: main. No alternate repository or branch is an implementation source or destination. Do not delete other repositories or remote branch refs as part of this reference cleanup.
+- Current observed main HEAD: 126a8d505bd1319cff770168c21fb57412286bfb (fix: send CSRF token with desktop screenshot upload). Re-fetch before every write.
+- All DWBOT work remains in the current ChatGPT conversation; do not hand off to Work mode.
+- OCR.Space is the active development focus. Tesseract.js remains the local baseline; OCR.Space is secondary/last-resort only, requires explicit OCRSPACE_ENABLED=1 and a local key, and must receive only allowlisted non-identifying localized crops. Never send player identity, Discord IDs, credentials or full screenshots. Remote evidence cannot independently accept or overwrite required fields. No paid use.
+- The old branch/repository names in the historical body below are not active instructions. Preserve historical commit provenance; never substitute another repository.
+- Last inspected CI run 41942650363 belongs to ancestor 050b3a12aa64985d9a0a439ab84db8c116851a51; current-head CI has not yet been re-queried.
+
+---
 # DWBOT current continuation handoff — 2026-11-05
 
 **Observation cut-off:** 2026-11-05 01:00 UTC (latest API evidence inspected in this update).  
