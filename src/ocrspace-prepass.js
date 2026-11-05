@@ -46,7 +46,7 @@ function buildSafeOcrSpacePrepassCropPlan({ regions = {}, width, height } = {}) 
         const intersectsIdentity = rect.left < identityRight && rect.left + rect.width > identityLeft &&
             rect.top < identityBottom && rect.top + rect.height > identityTop;
         if (intersectsIdentity) return;
-        plan.push({ field, source, engine: 3, isTable, scale: true, rect });
+        plan.push({ field, source, engine: 3, isTable, scale: true, rect, identityBoundaryVerified: true });
     };
 
     const result = regions.result?.rect;

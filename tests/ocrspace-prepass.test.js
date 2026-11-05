@@ -14,6 +14,7 @@ const regions = {
 test('OCR.Space prepass creates only bounded non-identifying crops and marks only reward table mode', () => {
     const plan = buildSafeOcrSpacePrepassCropPlan({ regions, width: 1920, height: 1080 });
     assert.deepEqual(plan.map(x => x.field), ['result', 'battleMetadata', 'rewardBand', 'damage']);
+    assert.ok(plan.every(x => x.identityBoundaryVerified === true));
     for (const crop of plan) {
         assert.equal(crop.engine, 3);
         assert.equal(crop.scale, true);

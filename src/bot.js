@@ -22,7 +22,7 @@ const { downloadImage } = require('./attachment-download');
 const { inspectTargetChannelPermissions } = require('./discord-gateway-diagnostics');
 const { isAdminOnlyCommand } = require('./tournament-command-policy');
 const { collectOcrSpaceFieldEvidence, getOcrSpaceActivation } = require('./ocrspace-field-evidence');
-const { buildSafeOcrSpacePrepassCropPlan } = require('./ocrspace-prepass');
+const { buildSafeOcrSpacePrepassCropPlan, filterSafeOcrSpaceCropPlan } = require('./ocrspace-prepass');
 const { reconcileOcrSpaceEvidence } = require('./ocrspace-reconciliation');
 const path = require('node:path');
 const { createHash } = require('node:crypto');
@@ -2536,8 +2536,10 @@ async function extractTextCore(imageBuffer) {
             const cropPlan = [];
             const addCrop = (field, engine, rect, source, imageSource, outputWidth) => {
                 if (rect && Number(rect.width) >= 8 && Number(rect.height) >= 6) {
+                    const coordinateWidth = imageSource === 'prepared' ? imageWidth : sourceWidth;
+                    const coordinateHeight = imageSource === 'prepared' ? imageHeight : sourceHeight;
                     cropPlan.push({ field, engine: 3, rect: { ...rect }, source, imageSource, outputWidth,
-                        isTable: source === 'localized-reward-column' });
+                        coordinateWidth, coordinateHeight, isTable: source === 'localized-reward-column' });
                 }
             };
             for (const field of ['xp', 'freeXp', 'credits']) {
@@ -2553,9 +2555,17 @@ async function extractTextCore(imageBuffer) {
             }
             const remainingBudget = OCR_IMAGE_TIMEOUT_MS - (Date.now() - imageStartedAt) - 1500;
             if (remainingBudget >= 1500) {
+                const safeCropPlan = filterSafeOcrSpaceCropPlan({
+                    cropPlan,
+                    regions: cvAnalysis?.regions || {},
+                    width: sourceWidth,
+                    height: sourceHeight,
+                    analysisWidth: cvAnalysis?.width,
+                    analysisHeight: cvAnalysis?.height,
+                });
                 extractedFields.ocrSpaceRefinementEvidence = await collectOcrSpaceFieldEvidence({
                     env: { ...process.env, OCRSPACE_STAGE_BUDGET_MS: String(Math.min(20000, remainingBudget)) },
-                    cropPlan,
+                    cropPlan: safeCropPlan,
                     buildCrop: async (spec) => imageProcessor.cropResize(
                         spec.imageSource === 'prepared' ? preparedBuffer : imageBuffer,
                         spec.rect,

@@ -23,7 +23,7 @@ function isEnabled(v, apiKey) {
 }
 function parseCropCap(v) { const n = Number(v); return Number.isFinite(n) ? Math.max(1, Math.min(7, Math.floor(n))) : 2; }
 function isEligibleCrop(spec) {
-    if (!spec || !ALLOWED_REMOTE_FIELDS.has(String(spec.field || ''))) return false;
+    if (!spec || spec.identityBoundaryVerified !== true || !ALLOWED_REMOTE_FIELDS.has(String(spec.field || ''))) return false;
     if (!ALLOWED_REMOTE_SOURCES.has(String(spec.source || ''))) return false;
     if (Number(spec.engine || 3) !== 3) return false;
     const r = spec.rect;

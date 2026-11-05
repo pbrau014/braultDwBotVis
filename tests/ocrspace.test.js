@@ -7,6 +7,7 @@ const path = require('node:path');
 const { recognizeCrop, API_URL, MAX_FREE_FILE_BYTES, MAX_RESPONSE_BYTES } = require('../src/ocrspace-client');
 const { OcrSpaceQuotaLedger, PROVIDER_LIMITS } = require('../src/ocrspace-quota-ledger');
 const { collectOcrSpaceFieldEvidence, parseCropCap } = require('../src/ocrspace-field-evidence');
+const { isEligibleCrop } = require('../src/ocrspace-field-evidence');
 
 function payload(text = '43110', engine = 3) {
     return { OCRExitCode: 1, IsErroredOnProcessing: false, ProcessingTimeInMilliseconds: '143',
@@ -53,7 +54,7 @@ test('Engine 2 is used only as a searchable-PDF fallback when Engine 3 returns n
     };
     const result = await collectOcrSpaceFieldEvidence({
         env: { OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'key' },
-        cropPlan: [{ field: 'rewardBand', source: 'opencv-reward-band', engine: 3, isTable: true,
+        cropPlan: [{ field: 'rewardBand', source: 'opencv-reward-band', engine: 3, isTable: true, identityBoundaryVerified: true,
             rect: { left: 10, top: 40, width: 300, height: 50 } }],
         quotaLedger, client, buildCrop: async () => Buffer.from('safe-crop'),
     });
@@ -188,7 +189,7 @@ test('corrupt quota ledger fails closed', async () => {
 
 test('OCR.Space defaults on with a local key; explicit opt-out and missing/invalid keys fail closed', async () => {
     let builds = 0, network = 0;
-    const cropPlan = [{ field: 'xp', source: 'localized-reward-column', engine: 3, rect: { left: 1, top: 2, width: 10, height: 8 } }];
+    const cropPlan = [{ field: 'xp', source: 'localized-reward-column', engine: 3, identityBoundaryVerified: true, rect: { left: 1, top: 2, width: 10, height: 8 } }];
     const buildCrop = async () => { builds++; return Buffer.from('crop'); };
     const quotaLedger = { reserve: async () => ({ reserved: true }) };
     const client = async () => { network++; return { engine: 3, parsedText: '451', overlay: [], partial: false,
@@ -219,8 +220,8 @@ test('field evidence rejects identity/unknown crops and submits allowlisted crop
     const cropPlan = [
         { field: 'player', source: 'localized-player-identity', engine: 3, rect: { left: 1, top: 1, width: 20, height: 6 } },
         { field: 'unknown', source: 'localized-reward-column', engine: 2, rect: { left: 1, top: 1, width: 20, height: 6 } },
-        { field: 'xp', source: 'localized-reward-column', engine: 3, rect: { left: 2, top: 2, width: 20, height: 8 } },
-        { field: 'freeXp', source: 'localized-reward-column', engine: 3, rect: { left: 3, top: 3, width: 20, height: 8 } },
+        { field: 'xp', source: 'localized-reward-column', engine: 3, identityBoundaryVerified: true, rect: { left: 2, top: 2, width: 20, height: 8 } },
+        { field: 'freeXp', source: 'localized-reward-column', engine: 3, identityBoundaryVerified: true, rect: { left: 3, top: 3, width: 20, height: 8 } },
     ];
     const result = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'key', OCRSPACE_MAX_CROPS: '2' },
         cropPlan, quotaLedger, client, buildCrop: async spec => { events.push('build:' + spec.field); return Buffer.from(spec.field); } });
@@ -230,10 +231,28 @@ test('field evidence rejects identity/unknown crops and submits allowlisted crop
     assert.equal(result.evidence[0].providerConfidence, null);
     assert.match(result.disclaimer, /cannot accept or change mandatory fields/);
 });
+test('field evidence rejects otherwise-allowlisted crops without a verified identity boundary', async () => {
+    let builds = 0, calls = 0;
+    const result = await collectOcrSpaceFieldEvidence({
+        env: { OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'key' },
+        cropPlan: [{ field: 'xp', source: 'localized-reward-column', engine: 3,
+            rect: { left: 10, top: 10, width: 80, height: 20 } }],
+        quotaLedger: { reserve: async () => { throw new Error('must not reserve quota'); } },
+        client: async () => { calls++; },
+        buildCrop: async () => { builds++; return Buffer.from('crop'); },
+    });
+    assert.equal(isEligibleCrop({ field: 'xp', source: 'localized-reward-column', engine: 3,
+        rect: { left: 10, top: 10, width: 80, height: 20 } }), false);
+    assert.equal(result.status, 'skipped');
+    assert.equal(result.requests, 0);
+    assert.equal(builds, 0);
+    assert.equal(calls, 0);
+});
+
 test('oversized crop is rejected before quota reservation and external request', async () => {
     let reserve = 0, calls = 0;
     const result = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'key' },
-        cropPlan: [{ field: 'xp', source: 'localized-reward-column', engine: 3, rect: { left: 0, top: 0, width: 8, height: 6 } }],
+        cropPlan: [{ field: 'xp', source: 'localized-reward-column', engine: 3, identityBoundaryVerified: true, rect: { left: 0, top: 0, width: 8, height: 6 } }],
         quotaLedger: { reserve: async () => { reserve++; } }, client: async () => { calls++; },
         buildCrop: async () => Buffer.alloc(MAX_FREE_FILE_BYTES + 1) });
     assert.equal(reserve, 0); assert.equal(calls, 0);
@@ -244,7 +263,7 @@ test('quota exhaustion stops further provider calls', async () => {
     let calls = 0;
     const result = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'key' },
         cropPlan: [
-            { field: 'xp', source: 'localized-reward-column', engine: 3, rect: { left: 0, top: 0, width: 10, height: 10 } },
+            { field: 'xp', source: 'localized-reward-column', engine: 3, identityBoundaryVerified: true, rect: { left: 0, top: 0, width: 10, height: 10 } },
             { field: 'freeXp', source: 'localized-reward-column', engine: 3, rect: { left: 0, top: 0, width: 10, height: 10 } },
         ],
         quotaLedger: { reserve: async () => { const e = new Error('limit'); e.code = 'OCRSPACE_QUOTA_EXHAUSTED'; throw e; } },
@@ -266,6 +285,8 @@ test('bot runs the geometry-only OCR.Space prepass before Tesseract and excludes
     assert.ok(prepass >= 0 && prepass < worker);
     assert.ok(prepass < bot.indexOf('await paddleOcrFieldFallback.applyFieldFallback'));
     assert.ok(bot.includes('force: ocrSpaceConfigured'));
+    assert.ok(bot.includes('filterSafeOcrSpaceCropPlan'));
+    assert.ok(bot.includes('cropPlan: safeCropPlan'));
     assert.ok(bot.includes('getOcrSpaceActivation(process.env)'));
     assert.ok(bot.includes('const ocrSpaceConfigured = ocrSpaceActivation.enabled'));
     assert.equal(bot.includes("addCrop('player'"), false);
