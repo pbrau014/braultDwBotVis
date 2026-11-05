@@ -75,7 +75,7 @@ test('identity geometry must be valid and fully inside the source image', () => 
 });
 
 test('last-resort crop filter excludes identity and rejects missing or weak identity geometry', () => {
- const cropPlan=[{field:'xp',rect:{left:300,top:400,width:100,height:30}},{field:'result',rect:{left:240,top:440,width:100,height:30}}];
+ const cropPlan=[{field:'xp',rect:{left:300,top:400,width:100,height:30}},{field:'result',rect:{left:120,top:220,width:100,height:30}}];
  const safe=filterSafeOcrSpaceCropPlan({cropPlan,regions,width:1920,height:1080,analysisWidth:1920,analysisHeight:1080});
  assert.deepEqual(safe.map(x=>x.field),['xp']);
  assert.equal(safe[0].identityBoundaryVerified,true);
@@ -83,7 +83,7 @@ test('last-resort crop filter excludes identity and rejects missing or weak iden
 });
 test('last-resort crop filter scales the identity exclusion into prepared-image coordinates', () => {
  const cropPlan=[{field:'xp',coordinateWidth:3840,coordinateHeight:2160,rect:{left:300,top:700,width:100,height:30}},
-  {field:'damage',coordinateWidth:1920,coordinateHeight:1080,rect:{left:120,top:220,width:100,height:30}}];
+  {field:'damage',coordinateWidth:1920,coordinateHeight:1080,rect:{left:240,top:440,width:100,height:30}}];
  const safe=filterSafeOcrSpaceCropPlan({cropPlan,regions,width:1920,height:1080,analysisWidth:960,analysisHeight:540});
  assert.deepEqual(safe.map(x=>x.field),['xp']);
 });
