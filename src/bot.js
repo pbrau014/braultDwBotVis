@@ -2189,6 +2189,9 @@ async function extractTextCore(imageBuffer) {
                 const anchorHasSupportedPrefixConflict = hasIndependentRewardFieldPrefixConflict(
                     field, anchorValue, rewardConflictCandidates,
                 );
+                const anchorHasIndependentConflict = hasIndependentRewardFieldConflict(
+                    field, anchorValue, rewardConflictCandidates,
+                );
                 // A field can enter the sweep with no accepted localized value.
                 // In that case `currentValue` is empty, so checking only conflicts
                 // against the old value misses a dangerous case: a stable crop
@@ -2230,7 +2233,7 @@ async function extractTextCore(imageBuffer) {
                 // and the only stable crop value is exactly its one-digit prefix or
                 // suffix, retain the full anchored value rather than saving a fragment.
                 const clippedFreeXpQuorums = field === 'freeXp' && anchorHasIndependentSupport &&
-                    !anchorHasSupportedPrefixConflict
+                    !anchorHasSupportedPrefixConflict && !anchorHasIndependentConflict
                     ? stable.filter(group => {
                         const cropValue = String(group.value);
                         const oneDigitClipped = anchorValue.length === cropValue.length + 1 &&
@@ -2254,17 +2257,25 @@ async function extractTextCore(imageBuffer) {
                     // reinforce the original error. Require the replacement to match
                     // independent field evidence, the bounded anchor, or the strict
                     // three-width Credits suffix quorum above.
-                    const supportedStable = stable.filter(group =>
-                        !hasIndependentRewardFieldConflict(field, group.value, rewardConflictCandidates) &&
-                        (!conflictRequiresIndependentSupport ||
-                        hasIndependentRewardFieldValueSupport(field, group.value, rewardConflictCandidates) ||
-                        strongCreditSuffixQuorums.includes(group) || strongSplitCreditQuorums.includes(group) ||
-                        (anchorValue && String(group.value) === anchorValue && !anchorHasSupportedPrefixConflict) ||
-                        rewardGeometryQuorumCanResolveXpTrailingAdornment(field, anchorValue, group.value, {
-                            reads: group.reads.length,
-                            geometries: group.geometries.size,
-                            psms: group.psms.size,
-                        })));
+                    const supportedStable = stable.filter(group => {
+                        const xpTrailingAdornmentResolved = rewardGeometryQuorumCanResolveXpTrailingAdornment(
+                            field, anchorValue, group.value, {
+                                reads: group.reads.length,
+                                geometries: group.geometries.size,
+                                psms: group.psms.size,
+                            },
+                        );
+                        const explicitGeometryResolution = strongCreditSuffixQuorums.includes(group) ||
+                            strongSplitCreditQuorums.includes(group) || xpTrailingAdornmentResolved;
+                        const hasCompetingIndependentValue = hasIndependentRewardFieldConflict(
+                            field, group.value, rewardConflictCandidates,
+                        );
+                        return (!hasCompetingIndependentValue || explicitGeometryResolution) &&
+                            (!conflictRequiresIndependentSupport ||
+                                hasIndependentRewardFieldValueSupport(field, group.value, rewardConflictCandidates) ||
+                                explicitGeometryResolution ||
+                                (anchorValue && String(group.value) === anchorValue && !anchorHasSupportedPrefixConflict));
+                    });
                     if (supportedStable.length === 1) {
                         fieldEvidence.selectedValue = String(supportedStable[0].value);
                         if (strongCreditSuffixQuorums.includes(supportedStable[0])) {

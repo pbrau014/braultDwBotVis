@@ -289,6 +289,8 @@ test('bot runs the geometry-only OCR.Space prepass before Tesseract and excludes
     assert.ok(bot.includes('cropPlan: safeCropPlan'));
     assert.ok(bot.includes('localized-column-unavailable-fail-closed'));
     assert.ok(bot.includes('stableConflictsWithSupportedCandidate'));
+    assert.ok(bot.includes('anchorHasIndependentConflict'));
+    assert.ok(bot.includes('explicitGeometryResolution'));
     assert.ok(bot.includes('legacyRewardCandidates.some(candidate =>'));
     assert.ok(bot.includes('rewardConflictCandidates'));
     assert.ok(bot.includes('localizedRewardEvidence.attempted && !localizedTupleComplete'));
