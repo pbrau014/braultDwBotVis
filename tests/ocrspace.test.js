@@ -6,8 +6,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { recognizeCrop, API_URL, MAX_FREE_FILE_BYTES, MAX_RESPONSE_BYTES } = require('../src/ocrspace-client');
 const { OcrSpaceQuotaLedger, PROVIDER_LIMITS } = require('../src/ocrspace-quota-ledger');
-const { collectOcrSpaceFieldEvidence, parseCropCap } = require('../src/ocrspace-field-evidence');
-const { isEligibleCrop } = require('../src/ocrspace-field-evidence');
+const { collectOcrSpaceFieldEvidence, parseCropCap, isEligibleCrop } = require('../src/ocrspace-field-evidence');
 
 function payload(text = '43110', engine = 3) {
     return { OCRExitCode: 1, IsErroredOnProcessing: false, ProcessingTimeInMilliseconds: '143',
@@ -264,7 +263,7 @@ test('quota exhaustion stops further provider calls', async () => {
     const result = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'key' },
         cropPlan: [
             { field: 'xp', source: 'localized-reward-column', engine: 3, identityBoundaryVerified: true, rect: { left: 0, top: 0, width: 10, height: 10 } },
-            { field: 'freeXp', source: 'localized-reward-column', engine: 3, rect: { left: 0, top: 0, width: 10, height: 10 } },
+            { field: 'freeXp', source: 'localized-reward-column', engine: 3, identityBoundaryVerified: true, rect: { left: 0, top: 0, width: 10, height: 10 } },
         ],
         quotaLedger: { reserve: async () => { const e = new Error('limit'); e.code = 'OCRSPACE_QUOTA_EXHAUSTED'; throw e; } },
         client: async () => { calls++; }, buildCrop: async () => Buffer.from('crop') });
