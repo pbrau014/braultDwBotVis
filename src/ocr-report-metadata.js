@@ -13,6 +13,9 @@ function describeOcrConfiguration(env = process.env) {
         const parsed = Number(value);
         return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : fallback;
     };
+    const ocrSpaceKeyConfigured = Boolean(String(env.OCRSPACE_API_KEY || '').trim());
+    const ocrSpaceExplicitlyEnabled = String(env.OCRSPACE_ENABLED || '').trim() === '1';
+    const ocrSpaceEnabled = ocrSpaceExplicitlyEnabled && ocrSpaceKeyConfigured;
     return {
         engine: String(env.OCR_ENGINE || 'auto').trim().toLowerCase(),
         opencvAssistEnabled: String(env.OCR_CV_ASSIST || '').trim() === '1',
@@ -20,6 +23,31 @@ function describeOcrConfiguration(env = process.env) {
         networkBlockingEnabled: String(env.OCR_NETWORK_BLOCK_ENABLED || '').trim() === '1',
         imageTimeoutMs: positiveInteger(env.OCR_IMAGE_TIMEOUT_MS, 90_000),
         operationTimeoutMs: positiveInteger(env.OCR_OPERATION_TIMEOUT_MS, 15_000),
+        ocrSequence: ocrSpaceEnabled
+            ? ['opencv-geometry', 'ocrspace-engine3', 'tesseractjs-local', 'ocrspace-diagnostic-reconciliation']
+            : ['tesseractjs-local'],
+        ocrSpace: {
+            enabled: ocrSpaceEnabled,
+            explicitlyEnabled: ocrSpaceExplicitlyEnabled,
+            apiKeyConfigured: ocrSpaceKeyConfigured,
+            engine: 3,
+            requestProfile: {
+                detectOrientation: true,
+                scale: true,
+                tableMode: 'rewardBand-only',
+                searchablePdf: true,
+                searchablePdfHideTextLayer: false,
+                explicitTextOverlayResponse: false,
+                pdfFallbackEngine: 2,
+            },
+            limits: {
+                maxCrops: positiveInteger(env.OCRSPACE_MAX_CROPS, 2),
+                stageBudgetMs: positiveInteger(env.OCRSPACE_STAGE_BUDGET_MS, 20_000),
+                maxPerDay: positiveInteger(env.OCRSPACE_MAX_PER_DAY, 450),
+                maxPerMonth: positiveInteger(env.OCRSPACE_MAX_PER_MONTH, 22_000),
+                maxEngine3PerMonth: positiveInteger(env.OCRSPACE_MAX_ENGINE3_PER_MONTH, 900),
+            },
+        },
     };
 }
 
