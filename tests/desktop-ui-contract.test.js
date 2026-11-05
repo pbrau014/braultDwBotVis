@@ -46,7 +46,7 @@ test('upload page supports one image preview, drag and drop, type/size validatio
   assert.doesNotMatch(html, /multiple/i);
   assert.match(script, /dragover/);
   assert.match(script, /URL\.createObjectURL/);
-  assert.match(script, /10\*1024\*1024/);
+  assert.match(script, /25\s*\*\s*1024\s*\*\s*1024/);
   assert.match(script, /image\/png/);
   assert.match(script, /xhr\.upload/);
   assert.match(script, /X-File-Name/);

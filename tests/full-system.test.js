@@ -381,7 +381,7 @@ test('complete synthetic Discord tour: all commands, every slot, formulas, persi
   // A failing Discord typing indicator must not stop queue admission. This image
   // is deliberately rejected by size before fetch/OCR, proving the processing
   // path ran and did not create an empty required-field correction workflow.
-  const oversizedImage = new Map([['a', { name: 'large.png', contentType: 'image/png', size: 11 * 1024 * 1024, url: 'https://example.invalid/large.png' }]]);
+  const oversizedImage = new Map([['a', { name: 'large.png', contentType: 'image/png', size: 26 * 1024 * 1024, url: 'https://example.invalid/large.png' }]]);
   const typingLogs = [];
   const oldConsoleError = console.error;
   let oversizedResult;
