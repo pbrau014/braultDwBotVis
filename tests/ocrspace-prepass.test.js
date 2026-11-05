@@ -34,7 +34,8 @@ test('identity geometry that expands into reward or damage bands pushes crops be
     const plan = buildSafeOcrSpacePrepassCropPlan({ regions: extended, width: 1920, height: 1080 });
     for (const crop of plan) {
         const r = crop.rect;
-        assert.equal(r.top < 460 && r.left < 750 && r.left + r.width > 100, false);
+        const overlaps = r.left < 750 && r.left + r.width > 100 && r.top < 460 && r.top + r.height > 210;
+        assert.equal(overlaps, false, crop.field + ' overlaps the expanded identity ROI');
     }
 });
 
