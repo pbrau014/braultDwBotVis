@@ -211,11 +211,26 @@ function packageRoot(entry, packageName) {
 }
 
 function resolveLocalTesseractAssets(language = 'eng') {
-    const langPath = path.resolve(process.env.TESSERACT_LANG_PATH || path.join(__dirname, '..'));
-    const languageFile = path.join(langPath, `${language}.traineddata`);
-    if (!fs.existsSync(languageFile)) {
-        throw new Error(`Tesseract.js local language model not found at ${languageFile}. Set TESSERACT_LANG_PATH to a directory containing ${language}.traineddata, or install native Tesseract with that language model.`);
+    const explicitPath = String(process.env.TESSERACT_LANG_PATH || '').trim();
+    const candidates = explicitPath ? [explicitPath] : [
+        process.env.TESSDATA_PREFIX,
+        process.env.ProgramFiles ? path.join(process.env.ProgramFiles, 'Tesseract-OCR', 'tessdata') : null,
+        process.env['ProgramFiles(x86)'] ? path.join(process.env['ProgramFiles(x86)'], 'Tesseract-OCR', 'tessdata') : null,
+        '/usr/share/tesseract-ocr/5/tessdata',
+        '/usr/share/tesseract-ocr/4.00/tessdata',
+        '/usr/share/tesseract-ocr/tessdata',
+        '/usr/share/tessdata',
+        '/opt/homebrew/share/tessdata',
+        '/usr/local/share/tessdata',
+        path.join(__dirname, '..'),
+    ].filter(Boolean);
+    const resolvedCandidates = [...new Set(candidates.map(candidate => path.resolve(candidate)))];
+    const langPath = resolvedCandidates.find(candidate => fs.existsSync(path.join(candidate, `${language}.traineddata`)));
+    if (!langPath) {
+        const expected = resolvedCandidates.map(candidate => path.join(candidate, `${language}.traineddata`)).join('; ');
+        throw new Error(`Tesseract.js local language model not found. Checked: ${expected}. Set TESSERACT_LANG_PATH to a directory containing ${language}.traineddata, or install the local Tesseract language pack.`);
     }
+    const languageFile = path.join(langPath, `${language}.traineddata`);
 
     const workerCandidates = [process.env.TESSERACT_WORKER_PATH].filter(Boolean).map(candidate => path.resolve(candidate));
     if (!workerCandidates.length) {
