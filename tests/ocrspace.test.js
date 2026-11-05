@@ -166,7 +166,17 @@ test('provider requires explicit OCRSPACE_ENABLED=1 and a configured key', async
         quotaLedger: { reserve: async () => ({ reserved: true }) },
         client: async () => { network++; return { engine: 2, parsedText: '451', overlay: [], partial: false, processingTimeMs: 5 }; },
         buildCrop });
-    assertest('field evidence rejects identity/unknown crops and submits allowlisted crops sequentially', async () => {
+    assert.equal(keyOnly.status, 'disabled');
+    assert.equal(explicitlyOff.status, 'disabled');
+    assert.equal(noKey.status, 'disabled');
+    assert.equal(explicitOn.status, 'complete');
+    assert.equal(explicitOn.requests, 1);
+    assert.equal(explicitOn.evidence[0].text, '451');
+    assert.equal(builds, 1);
+    assert.equal(network, 1);
+});
+
+test('field evidence rejects identity/unknown crops and submits allowlisted crops sequentially', async () => {
     const events = [];
     const quotaLedger = { reserve: async ({ engine }) => { events.push('reserve:' + engine); } };
     const client = async ({ imageBuffer, engine }) => { events.push('client:' + engine + ':' + imageBuffer.toString()); return { engine, parsedText: '451', overlay: [], partial: false, processingTimeMs: 5 }; };
