@@ -254,9 +254,13 @@ test('crop cap parser is bounded to seven', () => {
     assert.equal(parseCropCap('99'), 7);
 });
 
-test('bot runs OCR.space only after local Paddle fallback and never builds player identity crops', async () => {
+test('bot runs the geometry-only OCR.Space prepass before Tesseract and excludes identity crops', async () => {
     const bot = await fs.readFile(path.join(__dirname, '..', 'src', 'bot.js'), 'utf8');
-    assert.ok(bot.indexOf('await paddleOcrFieldFallback.applyFieldFallback') < bot.lastIndexOf('collectOcrSpaceFieldEvidence'));
+    const prepass = bot.indexOf('OCR.Space-first prepass');
+    const worker = bot.indexOf('const worker = await getOcrWorker()');
+    assert.ok(prepass >= 0 && prepass < worker);
+    assert.ok(prepass < bot.indexOf('await paddleOcrFieldFallback.applyFieldFallback'));
+    assert.ok(bot.includes('force: ocrSpaceConfigured'));
     assert.ok(bot.includes("process.env.OCRSPACE_ENABLED === '1'"));
     assert.equal(bot.includes("addCrop('player'"), false);
     assert.equal(bot.includes("'localized-player-identity'"), false);
