@@ -1,4 +1,112 @@
 ================================================================================
+CURRENT USER AUTHORITY ADDENDUM — 2026-11-05 14:56 AMERICA/CHICAGO
+This addendum is the newest active rule and supersedes conflicting default-off
+statements in older active sections. Historical evidence and records remain.
+================================================================================
+
+1. REMOTE OCR.SPACE DEFAULT — USER-AUTHORIZED CHANGE
+- OCR.Space remote use is DEFAULT-ON whenever a local Free API key is configured.
+- An unset or blank OCRSPACE_ENABLED value means the default-on behavior.
+  OCRSPACE_ENABLED=1 explicitly enables; OCRSPACE_ENABLED=0 is an explicit
+  local-only opt-out; any other non-empty value fails closed.
+- The local OCRSPACE_API_KEY remains mandatory. No key means no provider request.
+  The key must remain local, untracked, unlogged and absent from packages.
+- The explicit OCRSPACE_ENABLED=0 in scripts/run-windows-ocr-acceptance.ps1 is
+  retained because that script deliberately enforces a network-free local-primary
+  baseline. It is not the runtime default. Gate A local-only comparisons must
+  continue to set the explicit opt-out.
+- Default-on does not bypass OpenCV safe-crop planning, field/source allowlists,
+  identity exclusion, size/time/crop limits, quota reservations, fixed HTTPS
+  endpoint, redirect rejection, no automatic retries, or fail-closed behavior.
+  Only minimum-necessary pre-localized non-identifying crops may be transmitted.
+  Full screenshots, player identity/name, Discord identifiers, credentials,
+  private account data and unrelated UI remain prohibited.
+- Tesseract.js remains the local baseline and final acceptance authority.
+  OCR.Space output remains separate diagnostic evidence. The independent
+  src/ocrspace-reconciliation.js cross-check reports agreement, disagreement,
+  remote-only, remote-conflict and missing-candidate states; it never mutates
+  the local record or promotes remote-only candidates into acceptance.
+
+2. ENGINE 3 SEARCHABLE-PDF CAPABILITY RULE
+- DWBOT's Engine comparison table marks Engine 3 searchable PDF as SUPPORTED,
+  following the Engine 3 feature-description text.
+- The OCR.Space provider documentation remains internally inconsistent: its
+  Engine 3 feature description says searchable PDF is supported with the same
+  parameters as Engine 1/2, while its comparison matrix still marks it
+  unsupported. Do not claim that the provider's matrix itself has changed.
+- DWBOT requests the visible searchable PDF with Engine 3 and checks the actual
+  SearchablePDFURL. If no safe URL is returned, it retains the separately
+  quota-reserved Engine 2 PDF-only fallback and discards Engine 2 OCR text.
+  No paid service or paid usage is authorized.
+
+3. ENTERPRISEOCRPIPELINE.PY — ROOT-FILE REVIEW
+- The root file is a standalone Python/FastAPI/SQLAlchemy document-OCR service
+  prototype, not the existing Node.js Discord bot's OCR implementation.
+  It uses PaddleOCR as primary recognition and optional native Tesseract CLI
+  comparison, plus image normalization/deskew, layout reconstruction, table
+  extraction, entity parsing, page/document persistence, a review endpoint,
+  metrics and webhook-outbox code.
+- The identical duplicate at services/cv_ocr/EnterpriseOCRPipeline.py has the
+  same Git blob SHA cadf83d1627f69120f2442e5ccdb27a97108598c (61,235 bytes).
+  The tracked tree has no tasks.py/worker module for the tasks import/queue call,
+  no dedicated Enterprise service dependency manifest, and no tests for this
+  service. The upload route therefore cannot be treated as a complete runnable
+  pipeline from the current tracked files.
+- The wows profile does not implement DWBOT's strict nine-field battle-record
+  parsing/acceptance. It is not wired into src/bot.js and would replace or
+  bypass the existing Node/Tesseract.js architecture if adopted as-is.
+- Useful reusable ideas: bounded Paddle model pooling, local preprocessing and
+  deskew, text-block geometry/reading order, table extraction, optional local
+  Tesseract comparison, metrics and page-level evidence persistence. These may
+  inform isolated benchmarks or carefully ported modules after OCR.Space gates.
+- Do not integrate or deploy this service as-is. Before any future reuse, resolve
+  its missing worker/dependency packaging, add tests, enforce authentication on
+  document retrieval/upload, verify review candidate identifiers, and establish
+  an explicit nine-field DWBOT adapter that preserves local acceptance authority.
+  The root and duplicate files remain unchanged in this review.
+
+4. CURRENT IMPLEMENTATION AND VERIFICATION STATE
+- Code commit implementing default-on/key-interlock semantics:
+  3ad588fc0b4ed3923ca76703b78edd87d73bea74. It updates the activation helper,
+  bot activation path, OCR report metadata, regression tests and desktop env
+  example. Exact-head CI run 42099925079 is pending; do not call the change
+  tested or CI-verified until its jobs and artifacts are inspected.
+- The current main HEAD before this documentation refresh was
+  3ad588fc0b4ed3923ca76703b78edd87d73bea74. The previous exact-main run
+  42096644506 was cancelled; run 42095870483 was also cancelled. Older queued
+  runs refer to ancestor commits and cannot verify the new default-on change.
+- Earlier run 42088538702 Linux offline and PDF/clean-package jobs passed; its
+  Windows persistence/recovery and full Node 22 suite passed, but its native
+  Tesseract/Tesseract.js screenshot-acceptance step was still in progress at the
+  last check and no acceptance artifact was available. Do not infer acceptance.
+- No local OCR.Space key is configured in this session and no live provider
+  request has been made. Live synthetic provider smoke remains blocked until a
+  local Free key and current terms/privacy review are available.
+- Gate A, independent Gate B, PDF page-by-page visual inspection, Windows
+  screenshot acceptance, real browser/OAuth/Discord checks, and final recovery
+  and release gates remain open. Production remains NO-GO.
+- A targeted cross-project search reviewed 117 OCR-relevant tracked text files
+  spanning source, tests, scripts, configuration, README, continuation docs,
+  OCR.Space docs, workflow and plans. It found default-off language in the
+  integration guide, README, handoff, authority rules, current plan, sample
+  environment files, activation code/tests and the local-only Windows acceptance
+  script. The script's explicit 0 remains intentional. This is not a claim that
+  all 537 tracked blobs or all 362 text candidates were read line-by-line; other
+  unrelated files and binary artifacts were not fully inspected.
+
+5. CHAT RULES NOW ACTIVE
+- The user-authorized default-on rule and Engine 3 searchable-PDF Supported
+  comparison rule apply to this chat and future DWBOT work.
+- Continue in this ChatGPT conversation; use this plan as the living running
+  record and update the Library copy after verified major milestones.
+- Preserve historical default-off statements as provenance where they record
+  what was true at the time; this addendum supersedes them prospectively.
+
+================================================================================
+END CURRENT USER AUTHORITY ADDENDUM — 2026-11-05
+================================================================================
+
+================================================================================
 CURRENT CHAT + GITHUB + OCR.SPACE AUTHORITY ADDENDUM — 2026-11-05
 This addendum is the newest active authority and supersedes conflicting active
 instructions in older sections below. Historical records remain unchanged.
@@ -648,8 +756,8 @@ This section governs current work. The historical plan follows unchanged below.
   Tesseract then processes pixels independently. Remote text is parsed and
   compared to the local record by `src/ocrspace-reconciliation.js` as a
   diagnostic only; no remote-only value is accepted and no remote candidate is
-  merged into local acceptance. OCR.Space remains default-off and requires both
-  `OCRSPACE_ENABLED=1` and a local Free API key. Only minimum-necessary
+  merged into local acceptance. OCR.Space is default-on when a local Free API key is configured; explicit
+  `OCRSPACE_ENABLED=0` is reserved for local-only runs. Only minimum-necessary
   non-identifying crops are permitted; no player identity, Discord identifiers,
   credentials, private account data or full screenshots. No paid service or paid
   usage is authorized. Recheck current terms/privacy/retention before live use;
@@ -882,7 +990,7 @@ Implementation now present on canonical main:
   written to that summary.
 - Quota ledger, configuration, README, adapter guide, authority rules,
   continuation handoff, complete living plan, mock tests and CI syntax checks
-  are updated. `OCRSPACE_ENABLED=0` remains the default.
+  are updated. `OCRSPACE_ENABLED=1` is the documented default when a local key is configured; explicit 0 is the local-only opt-out.
 Verification completed on preceding candidate: run `42088538702` Linux
 offline PASS (269 total / 267 pass / 0 fail / 2 skipped; OCR.Space contract /
 prepass 24/24; focused suites 21/21 and 29/29) and PDF/manual clean-package
@@ -947,7 +1055,7 @@ production-authoritative merely because its ZIP verifies.
 6. NEXT STEPS AND PREREQUISITES (IMMEDIATE)
 
 Immediate state: OCR.Space is the active priority and the Engine 3 first-pass
-implementation is committed to canonical main. Remote use remains default-off.
+implementation is committed to canonical main. Remote use is default-on when a local Free key is configured.
 The exact 332-name root-cleanup list has zero matches in the current main root;
 no GitHub deletion commit is needed. Linux and clean-package gates passed on
 run `42088538702`; Windows screenshot acceptance is still in progress. The new
@@ -968,7 +1076,7 @@ Next sequence:
    already verified, npm ci/test/prelive PASS. Inspect the rendered PDF visually
    page by page and preserve the result; do not claim visual approval yet.
 4. Run the OCR.Space mocked contract, prepass and reconciliation tests on the
-   final main head. Verify default-off, Engine 3 request profile, orientation,
+   final main head. Verify default-on/key interlock, explicit local-only opt-out, Engine 3 request profile, orientation,
    scale, per-crop table flag, visible searchable PDF, Engine 2 PDF-only fallback,
    identity exclusion, no full screenshots, quotas, timeout, redirects and
    remote-only/conflict fail-closed behavior.
@@ -1044,7 +1152,7 @@ Where historical factual statuses conflict with Sections 0–7 above, Sections
 7.2 COMPLETION HISTORY — OCR.SPACE FOCUS RULE AND INITIAL APPLICATION WIRING (2026-11-05)
 - User established OCR.Space as the active DWBOT development focus until full
   project-wide implementation and verification. This supersedes old quarantine
-  statements; the provider remains explicit opt-in (`OCRSPACE_ENABLED=1` plus a
+  statements; the provider defaults on when a local key exists (unset/blank or `OCRSPACE_ENABLED=1`; explicit `0` opts out) with a
   local key) for safety, not quarantined. No paid usage is authorized.
 - Candidate working copy updated: `src/ocrspace-field-evidence.js` now supports
   explicitly enabled production use rather than mock-only tests; field allowlist

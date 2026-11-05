@@ -16,11 +16,11 @@ If OpenCV geometry is unavailable or does not yield a provably safe crop, the re
 
 ## Runtime enablement and configuration
 
-Remote use remains default-off. Both `OCRSPACE_ENABLED=1` and a locally stored valid Free API key are required. A key alone never enables network use. Keep the key only in the local environment; never commit, display, log, export or package it. No paid tier or paid use is permitted.
+Remote use is default-on when a locally stored valid Free API key is configured. An unset or blank `OCRSPACE_ENABLED` value uses the default-on behavior; `OCRSPACE_ENABLED=1` explicitly enables it; `OCRSPACE_ENABLED=0` is an explicit local-only opt-out; any other value fails closed. The API key remains mandatory, so no key means no remote request. Keep the key only in the local environment; never commit, display, log, export or package it. No paid tier or paid use is permitted.
 
 Recommended local configuration:
 
-    OCRSPACE_ENABLED=0
+    OCRSPACE_ENABLED=1
     OCRSPACE_API_KEY=
     OCRSPACE_MAX_CROPS=4
     OCRSPACE_STAGE_BUDGET_MS=20000
@@ -29,7 +29,15 @@ Recommended local configuration:
     OCRSPACE_MAX_ENGINE3_PER_MONTH=900
     OCRSPACE_QUOTA_PATH=./data/ocrspace-quota.json
 
-Set `OCRSPACE_ENABLED=1` only in a controlled environment with a locally configured Free key and after rechecking current provider terms, privacy, retention and quota. The request profile below is applied to every OCR.Space request when the provider is enabled. It does not silently enable remote processing in deployments.
+With a local Free key, remote processing is enabled by default; use `OCRSPACE_ENABLED=0` only when a test explicitly requires a local-only run. Before first live use, recheck current provider terms, privacy, retention and quota. The default does not bypass safe-crop, identity-exclusion, quota, transport or fail-closed checks.
+
+## Engine capability comparison — searchable PDF
+
+| Capability | Engine 2 | Engine 3 |
+|---|---|---|
+| Searchable PDF generation | Supported | **Supported** (per the Engine 3 feature description; the provider's comparison matrix still shows unsupported) |
+
+The provider's current API page is internally inconsistent: the Engine 3 feature description says searchable PDF is supported with the same parameters as Engine 1/2, while the comparison matrix marks it unsupported. DWBOT's capability comparison therefore records Engine 3 as supported in accordance with the feature description, but the runtime still verifies the actual SearchablePDFURL. If Engine 3 returns no safe URL, retain the quota-reserved Engine 2 PDF-only fallback and discard Engine 2 OCR text. This is a documented compatibility fallback, not a claim that every live Engine 3 response has been verified.
 
 ## Required OCR.Space request profile
 
@@ -57,10 +65,10 @@ The searchable PDF link is documented as valid for one hour. The Free tier adds 
 
 - `src/opencv-field-isolation.js`: local geometry-only proposals; supports an explicit forced geometry pass when OCR.Space is configured.
 - `src/ocrspace-client.js`: fixed HTTPS multipart request; Engine 3 default; orientation/table/scale/searchable-PDF flags; visible text layer; bounded response; safe provider PDF URL extraction; redirect and timeout safeguards.
-- `src/ocrspace-field-evidence.js`: explicit opt-in, allowlisted crops, Engine 3 first, quota reservation, visible-PDF request and Engine 2 PDF-only fallback when Engine 3 does not return a PDF URL. Evidence is diagnostic only.
+- `src/ocrspace-field-evidence.js`: default-on with local-key interlock and allowlisted crops, Engine 3 first, quota reservation, visible-PDF request and Engine 2 PDF-only fallback when Engine 3 does not return a PDF URL. Evidence is diagnostic only.
 - `src/ocrspace-quota-ledger.js`: atomic local JSON quota ledger with cross-process lock and fail-closed corruption behavior.
 - `src/bot.js`: geometry-first OCR.Space prepass before Tesseract, identity exclusion, then existing Tesseract and local image-processing pipeline; a bounded post-local refinement is used only if the prepass could not produce evidence.
-- `tests/ocrspace.test.js`, `tests/ocrspace-prepass.test.js` and `tests/ocrspace-reconciliation.test.js`: mocked request profile, default-off behavior, Engine 3 evidence, PDF fallback, privacy allowlists, quota, timeout, redirect, response-size, crop identity exclusion and diagnostic reconciliation coverage.
+- `tests/ocrspace.test.js`, `tests/ocrspace-prepass.test.js` and `tests/ocrspace-reconciliation.test.js`: mocked request profile, default-on/key-interlock behavior, Engine 3 evidence, PDF fallback, privacy allowlists, quota, timeout, redirect, response-size, crop identity exclusion and diagnostic reconciliation coverage.
 - `package.json`: `npm run test:ocrspace`.
 
 ## Nine-field acceptance contract

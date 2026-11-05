@@ -1,3 +1,7 @@
+# CURRENT AUTHORITY ADDENDUM — 2026-11-05
+
+This addendum supersedes conflicting default-off language in older handoff sections; historical records remain unchanged. OCR.Space is default-on when a local Free key is configured. An unset/blank OCRSPACE_ENABLED value or 1 enables; explicit 0 disables; invalid values fail closed. No key means no request. Only safe, allowlisted, pre-localized non-identifying crops may be transmitted; remote results remain diagnostic and cannot accept or alter mandatory fields. Engine 3 searchable PDF is marked Supported in DWBOT's comparison, based on the provider feature description; the conflicting provider matrix remains documented, actual SearchablePDFURL is checked, and Engine 2 remains a PDF-only fallback with its text discarded.
+
 # CURRENT CHAT AUTHORITY OVERRIDE — 2026-11-05 (RECONCILED)
 
 This block is the current operational authority. The detailed handoff body below
@@ -44,16 +48,12 @@ plan, use the canonical living plan.
   project-wide integration, tests, review and verification are complete. It
   is not quarantined. Tesseract.js remains the local baseline and final
   acceptance authority; OpenCV provides geometry only; PaddleOCR is optional
-  local comparison/fallback. When remote OCR is explicitly enabled, the
+  local comparison/fallback. When remote OCR is enabled by default through a local key, the
   sequence is local OpenCV geometry/safe-crop planning, OCR.Space Engine 3 as
   the first remote text-evidence pass, then independent Tesseract.js/local
   recognition. OCR.Space is secondary/last-resort evidence relative to local
   acceptance and cannot independently accept or overwrite any field.
-- Runtime activation is strictly default-off and requires BOTH
-  `OCRSPACE_ENABLED=1` and a locally stored key. A key alone never enables
-  network access. This is verified in `src/bot.js` and
-  `docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md`; any older handoff statement
-  saying key-only auto-activation is superseded and incorrect.
+- Runtime activation is default-on when a local Free key is configured. An unset/blank OCRSPACE_ENABLED value or 1 enables; explicit 0 disables; invalid values fail closed. The key remains mandatory. This is implemented through getOcrSpaceActivation in src/ocrspace-field-evidence.js and used by the bot and report metadata.
 - When enabled, use `detectOrientation=true`, `OCREngine=3`,
   `scale=true` by default (false only for verified 200–300 DPI input),
   `isTable=true` only for tabular reward/stat crops,
@@ -227,7 +227,7 @@ XP is mandatory and ninth. Any missing, invalid, ambiguous, conflicting or incor
 
 ### Current OCR.space configuration semantics
 
-The current code requires both OCRSPACE_ENABLED=1 and a locally configured OCRSPACE_API_KEY. A key alone never enables network access; absent either setting, the provider remains default-off. Never commit a real key or include it in chat, HTML, logs, fixtures or archives.
+The current code defaults OCR.Space on whenever a local OCRSPACE_API_KEY is configured. OCRSPACE_ENABLED may be unset/blank or 1; explicit 0 is a local-only opt-out and invalid values fail closed. A key remains mandatory; without it no remote request occurs. Never commit a real key or include it in chat, HTML, logs, fixtures or archives.
 
 Current conservative local quotas documented in the integration note/configuration:
 - 450/day
@@ -262,7 +262,7 @@ The reviewed image inventory includes 64 records: 56 eligible and 8 explicitly e
 6. Never remove failed fixtures, reduce the acceptance corpus, weaken exact value checks, change expected values to match OCR, or report aggregate counts without per-image detail.
 
 ### Step 3 — OCR.space and engine verification
-1. Keep the API key local only. Require both OCRSPACE_ENABLED=1 and a local key for activation; otherwise remain default-off.
+1. Keep the API key local only. Default remote activation is on when the local key exists; explicit OCRSPACE_ENABLED=0 is reserved for local-only acceptance and invalid settings fail closed.
 2. Review current provider policy/privacy and verify quotas, timeout, crop bounds, MIME/size limits, error handling and ledger concurrency/corruption behavior.
 3. Begin with synthetic crops. Only perform real screenshot/crop requests where the user has authorized that data transmission.
 4. Record provider, endpoint, purpose, crop field, input hash, configuration/engine, quota reservation, request/response/error, time, and whether evidence was used only diagnostically.
