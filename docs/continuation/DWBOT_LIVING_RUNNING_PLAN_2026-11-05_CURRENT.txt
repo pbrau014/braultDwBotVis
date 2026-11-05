@@ -4,6 +4,76 @@ This addendum is the newest active authority and supersedes conflicting active
 instructions in older sections below. Historical records remain unchanged.
 ================================================================================
 
+CURRENT EXECUTION RECONCILIATION — 2026-11-05 14:20 America/Chicago
+
+This is the latest verified status at the time of this plan revision. It updates
+only current operational facts; earlier records and historical results remain
+preserved below.
+
+- Canonical repository: pbrau014/braultDwBotVis, branch main.
+- Verified main HEAD before this plan revision:
+  fb09f52839619fafdec69d5d561481207efbc0cd.
+- Exact-head verification run 42091979664 (run 280) is queued. Its Windows
+  Node.js 22.16.0, Linux Node.js 22.16.0 and PDF/clean-package jobs are all
+  queued. Prior exact-head run 42091840336 (run 279) is also queued.
+- The earlier code-candidate run 42088538702 has completed successfully on its
+  Linux offline and PDF/clean-package jobs. Windows process-level persistence/
+  recovery and the full Windows Node 22 suite have also completed successfully.
+  The final current-source Tesseract.js/native-Tesseract screenshot-acceptance
+  step remains in progress; its evidence-upload step has not yet run and no
+  Windows screenshot-acceptance artifact is available. A log-download attempt
+  for that still-running job returned GitHub BlobNotFound (404), so no
+  screenshot-acceptance output was available to inspect at this check.
+- Run 42088538702's package artifact remains available:
+  artifact ID 13443014385, name dwbot-pdf-manual-and-clean-package,
+  digest sha256:339a1d2afa776899dd26ef0bf2c8d0b5a337e5d9f8deffb37b7d77083ddcecd6.
+  The already-recorded clean package checks passed, but PDF page-by-page visual
+  inspection remains open.
+- Earlier run 42088032492 has Linux success, PDF/package failure caused by
+  missing English Tesseract model in its clean package, and its Windows
+  screenshot-acceptance step also remains in progress. Its package failure is
+  superseded as a source-code blocker by the later pinned-model correction,
+  but the original failure remains preserved as history.
+- The Actions queue currently contains many older per-commit runs in queued or
+  in-progress states. This is an observed scheduling backlog, not evidence of
+  a source-code failure. Do not infer a GitHub outage or runner-capacity cause
+  without explicit platform evidence. Avoid unnecessary commits that trigger
+  redundant full workflows; consolidate changes and use the exact current-main
+  run as the primary acceptance signal.
+- No Gate A/B OCR acceptance, live OCR.Space accuracy, Windows screenshot
+  acceptance, visual PDF approval, or production readiness is established by
+  the above. Production remains NO-GO.
+
+Recommendations / next closure sequence:
+1. Let the existing Windows screenshot-acceptance job finish; retrieve and
+   inspect its uploaded evidence artifact, full report, exact-field outcomes,
+   engine/model versions, and network diagnostics. If it remains stuck, use
+   its step/job/run timestamps and available diagnostics to distinguish a
+   genuinely hung OCR process from queued post-steps; do not report success
+   based on earlier Windows test-suite/persistence steps.
+2. Inspect the PDF artifact page by page, not merely its successful render or
+   package job status. Preserve the package digest and manifest evidence.
+3. Verify run 42091979664 on the exact current main head after it starts and
+   completes. Its Windows job must include screenshot acceptance and evidence
+   upload; inspect artifacts even if the job reports success.
+4. Reduce CI churn by batching plan/source/documentation changes before the
+   next push. Keep per-commit historical runs; do not rewrite or delete run
+   history. If runner queue delays continue, record them as external scheduling
+   blockers and do not weaken checks.
+5. Only after current-source screenshot evidence is inspected should Gate A
+   be attempted. Gate A still requires all nine mandatory fields
+   (result, player, map, mode, battleStart, credits, freeXp, damage, xp), zero
+   wrongly accepted values, zero unresolved mandatory values, and no
+   unauthorized network attempts. Gate B remains a separate untouched
+   independent holdout; no tuning against it.
+6. Before first live OCR.Space request, verify current Free-tier terms/privacy
+   and local API-key handling; use synthetic non-identifying input only.
+   No key is present in this session and no provider request is authorized
+   by implication.
+7. Continue to Gate C persistence/backup/restore/rollback and final release
+   decision only after OCR gates A and B pass. Maintain provenance and
+   fingerprint binding across every new run/package.
+
 A. CHAT EXECUTION AND COMMUNICATION RULES (BINDING)
 
 - All DWBOT research, plan work, file review, code changes, GitHub operations,
