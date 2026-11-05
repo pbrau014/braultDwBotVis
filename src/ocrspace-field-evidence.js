@@ -4,7 +4,23 @@ const { recognizeCrop, MAX_FREE_FILE_BYTES } = require('./ocrspace-client');
 const { OcrSpaceQuotaLedger } = require('./ocrspace-quota-ledger');
 const ALLOWED_REMOTE_FIELDS = new Set(['xp', 'freeXp', 'credits', 'damage', 'result', 'battleMetadata', 'rewardBand']);
 const ALLOWED_REMOTE_SOURCES = new Set(['localized-reward-column', 'localized-damage-column', 'localized-result-title', 'localized-battle-metadata', 'opencv-result-title', 'opencv-battle-metadata', 'opencv-reward-band', 'opencv-damage']);
-function isEnabled(v, apiKey) { return String(v || '').trim() === '1' && Boolean(String(apiKey || '').trim()); }
+function getOcrSpaceActivation(env = {}) {
+    const setting = String(env.OCRSPACE_ENABLED ?? '').trim();
+    const apiKeyConfigured = Boolean(String(env.OCRSPACE_API_KEY || '').trim());
+    const validSetting = setting === '' || setting === '1' || setting === '0';
+    const enabled = validSetting && setting !== '0' && apiKeyConfigured;
+    const reason = !validSetting ? 'OCRSPACE_ENABLED must be 0 or 1 when explicitly set'
+        : setting === '0' ? 'OCRSPACE_ENABLED is explicitly disabled'
+            : !apiKeyConfigured ? 'OCRSPACE_API_KEY is not configured' : null;
+    return {
+        enabled, defaultEnabled: true, setting: setting || 'default-on',
+        explicitlyEnabled: setting === '1', explicitlyDisabled: setting === '0',
+        apiKeyConfigured, reason,
+    };
+}
+function isEnabled(v, apiKey) {
+    return getOcrSpaceActivation({ OCRSPACE_ENABLED: v, OCRSPACE_API_KEY: apiKey }).enabled;
+}
 function parseCropCap(v) { const n = Number(v); return Number.isFinite(n) ? Math.max(1, Math.min(7, Math.floor(n))) : 2; }
 function isEligibleCrop(spec) {
     if (!spec || !ALLOWED_REMOTE_FIELDS.has(String(spec.field || ''))) return false;
@@ -19,9 +35,9 @@ function isEligibleCrop(spec) {
 async function collectOcrSpaceFieldEvidence({ env = process.env, cropPlan = [], buildCrop, fetchImpl = globalThis.fetch,
     quotaLedger = null, client = recognizeCrop, now = () => new Date() }) {
     const apiKey = String(env.OCRSPACE_API_KEY || '').trim();
-    if (!isEnabled(env.OCRSPACE_ENABLED, apiKey)) {
-        return { status: 'disabled', reason: String(env.OCRSPACE_ENABLED || '').trim() !== '1'
-            ? 'OCRSPACE_ENABLED is not explicitly enabled' : 'OCRSPACE_API_KEY is not configured', requests: 0, evidence: [] };
+    const activation = getOcrSpaceActivation(env);
+    if (!activation.enabled) {
+        return { status: 'disabled', reason: activation.reason, enabled: false, activation, requests: 0, evidence: [] };
     }
     if (typeof buildCrop !== 'function') return { status: 'skipped', reason: 'crop builder unavailable', requests: 0, evidence: [] };
     const max = parseCropCap(env.OCRSPACE_MAX_CROPS);
@@ -87,7 +103,7 @@ async function collectOcrSpaceFieldEvidence({ env = process.env, cropPlan = [], 
         }
     }
     return { status: evidence.some(x => x.status === 'success') ? 'complete' : evidence.length ? 'failed' : 'skipped',
-        reason: stoppedReason, enabled: true, requests, evidence,
+        reason: stoppedReason, enabled: true, activation, requests, evidence,
         disclaimer: 'OCR.space text and overlays are isolated diagnostic evidence only; they are not merged into Tesseract/Paddle candidates and cannot accept or change mandatory fields.' };
 }
-module.exports = { collectOcrSpaceFieldEvidence, parseCropCap, isEnabled, isEligibleCrop, ALLOWED_REMOTE_FIELDS, ALLOWED_REMOTE_SOURCES };
+module.exports = { collectOcrSpaceFieldEvidence, parseCropCap, isEnabled, getOcrSpaceActivation, isEligibleCrop, ALLOWED_REMOTE_FIELDS, ALLOWED_REMOTE_SOURCES };

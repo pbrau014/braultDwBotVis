@@ -3,6 +3,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const { getOcrSpaceActivation } = require('./ocrspace-field-evidence');
 
 function sha256File(filePath) {
     return crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex');
@@ -14,9 +15,9 @@ function describeOcrConfiguration(env = process.env) {
         return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : fallback;
     };
     const bounded = (value, fallback, ceiling) => Math.max(1, Math.min(ceiling, positiveInteger(value, fallback)));
-    const ocrSpaceKeyConfigured = Boolean(String(env.OCRSPACE_API_KEY || '').trim());
-    const ocrSpaceExplicitlyEnabled = String(env.OCRSPACE_ENABLED || '').trim() === '1';
-    const ocrSpaceEnabled = ocrSpaceExplicitlyEnabled && ocrSpaceKeyConfigured;
+    const ocrSpaceActivation = getOcrSpaceActivation(env);
+    const ocrSpaceKeyConfigured = ocrSpaceActivation.apiKeyConfigured;
+    const ocrSpaceEnabled = ocrSpaceActivation.enabled;
     return {
         engine: String(env.OCR_ENGINE || 'auto').trim().toLowerCase(),
         opencvAssistEnabled: String(env.OCR_CV_ASSIST || '').trim() === '1',
@@ -29,7 +30,10 @@ function describeOcrConfiguration(env = process.env) {
             : ['tesseractjs-local'],
         ocrSpace: {
             enabled: ocrSpaceEnabled,
-            explicitlyEnabled: ocrSpaceExplicitlyEnabled,
+            defaultEnabled: ocrSpaceActivation.defaultEnabled,
+            explicitlyEnabled: ocrSpaceActivation.explicitlyEnabled,
+            explicitlyDisabled: ocrSpaceActivation.explicitlyDisabled,
+            activationReason: ocrSpaceActivation.reason,
             apiKeyConfigured: ocrSpaceKeyConfigured,
             engine: 3,
             requestProfile: {

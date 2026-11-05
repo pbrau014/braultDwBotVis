@@ -64,8 +64,22 @@ test('OCR configuration metadata makes optional engine and network feature flags
 test('OCR.Space report metadata records opt-in request profile without exposing the key', () => {
     const defaults = describeOcrConfiguration({});
     assert.equal(defaults.ocrSpace.enabled, false);
+    assert.equal(defaults.ocrSpace.defaultEnabled, true);
+    assert.equal(defaults.ocrSpace.explicitlyEnabled, false);
+    assert.equal(defaults.ocrSpace.explicitlyDisabled, false);
+    assert.equal(defaults.ocrSpace.activationReason, 'OCRSPACE_API_KEY is not configured');
     assert.equal(defaults.ocrSpace.apiKeyConfigured, false);
     assert.equal(defaults.ocrSequence.includes('ocrspace-engine3'), false);
+
+    const keyOnlyDefault = describeOcrConfiguration({ OCRSPACE_API_KEY: 'local-key' });
+    assert.equal(keyOnlyDefault.ocrSpace.enabled, true);
+    assert.equal(keyOnlyDefault.ocrSpace.defaultEnabled, true);
+    assert.equal(keyOnlyDefault.ocrSpace.explicitlyEnabled, false);
+    assert.deepEqual(keyOnlyDefault.ocrSequence, ['opencv-geometry', 'ocrspace-engine3', 'tesseractjs-local', 'ocrspace-diagnostic-reconciliation']);
+    const explicitlyOff = describeOcrConfiguration({ OCRSPACE_ENABLED: '0', OCRSPACE_API_KEY: 'local-key' });
+    assert.equal(explicitlyOff.ocrSpace.enabled, false);
+    assert.equal(explicitlyOff.ocrSpace.explicitlyDisabled, true);
+    assert.equal(explicitlyOff.ocrSequence.includes('ocrspace-engine3'), false);
 
     const enabled = describeOcrConfiguration({
         OCRSPACE_ENABLED: '1',

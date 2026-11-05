@@ -20,7 +20,7 @@ const {
 const { createWorker } = require('./ocr-worker');
 const { inspectTargetChannelPermissions } = require('./discord-gateway-diagnostics');
 const { isAdminOnlyCommand } = require('./tournament-command-policy');
-const { collectOcrSpaceFieldEvidence } = require('./ocrspace-field-evidence');
+const { collectOcrSpaceFieldEvidence, getOcrSpaceActivation } = require('./ocrspace-field-evidence');
 const { buildSafeOcrSpacePrepassCropPlan } = require('./ocrspace-prepass');
 const { reconcileOcrSpaceEvidence } = require('./ocrspace-reconciliation');
 const path = require('node:path');
@@ -379,12 +379,13 @@ async function extractTextCore(imageBuffer) {
     // OpenCV is a local geometry assistant only. It never emits accepted values;
     // the established Tesseract passes, parsers and ambiguity checks remain the
     // authority. Missing Python/OpenCV fails back to the existing OCR pipeline.
-    const ocrSpaceConfigured = process.env.OCRSPACE_ENABLED === '1' && Boolean(String(process.env.OCRSPACE_API_KEY || '').trim());
+    const ocrSpaceActivation = getOcrSpaceActivation(process.env);
+    const ocrSpaceConfigured = ocrSpaceActivation.enabled;
     // OCR.Space-first prepass: OpenCV supplies geometry only. Identity geometry is
     // used as an exclusion boundary and is never uploaded. If a safe crop cannot
     // be proven, the remote prepass skips it and local OCR continues unchanged.
     const cvAnalysis = await opencvFieldIsolation.analyze(imageBuffer, { force: ocrSpaceConfigured });
-    let ocrSpacePrepassEvidence = { status: 'disabled', reason: 'OCRSPACE_ENABLED/key not configured', requests: 0, evidence: [] };
+    let ocrSpacePrepassEvidence = { status: ocrSpaceConfigured ? 'pending' : 'disabled', reason: ocrSpaceActivation.reason, requests: 0, evidence: [] };
     if (ocrSpaceConfigured) {
         try {
             const cropPlan = buildSafeOcrSpacePrepassCropPlan({ regions: cvAnalysis?.regions || {}, width: sourceWidth, height: sourceHeight });
@@ -2608,8 +2609,8 @@ async function extractTextCore(imageBuffer) {
     } else if (ocrSpaceConfigured && ocrSpacePrepassEvidence.status === 'complete') {
         extractedFields.ocrSpaceRefinementEvidence = { status: 'skipped', reason: 'geometry-first prepass already produced remote evidence; duplicate requests suppressed', requests: 0, evidence: [] };
     } else {
-        extractedFields.ocrSpaceRefinementEvidence = { status: 'skipped', reason: process.env.OCRSPACE_ENABLED !== '1'
-            ? 'OCRSPACE_ENABLED is not explicitly enabled' : 'OCRSPACE_API_KEY is not configured', requests: 0, evidence: [] };
+        extractedFields.ocrSpaceRefinementEvidence = { status: 'skipped',
+            reason: ocrSpaceActivation.reason || 'No eligible OCR.Space refinement crops remained', requests: 0, evidence: [] };
     }
 
     // Only full-screen OCR attempts and the combined full-screen-derived text

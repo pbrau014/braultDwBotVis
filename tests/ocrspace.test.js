@@ -186,25 +186,30 @@ test('corrupt quota ledger fails closed', async () => {
     } finally { await fs.rm(dir, { recursive: true, force: true }); }
 });
 
-test('provider requires explicit OCRSPACE_ENABLED=1 and a configured key', async () => {
+test('OCR.Space defaults on with a local key; explicit opt-out and missing/invalid keys fail closed', async () => {
     let builds = 0, network = 0;
     const cropPlan = [{ field: 'xp', source: 'localized-reward-column', engine: 3, rect: { left: 1, top: 2, width: 10, height: 8 } }];
     const buildCrop = async () => { builds++; return Buffer.from('crop'); };
-    const keyOnly = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_API_KEY: 'key' }, cropPlan, buildCrop, client: async () => { network++; } });
-    const explicitlyOff = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '0', OCRSPACE_API_KEY: 'key' }, cropPlan, buildCrop, client: async () => { network++; } });
-    const noKey = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '1' }, cropPlan, buildCrop, client: async () => { network++; } });
-    const explicitOn = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'key' }, cropPlan,
-        quotaLedger: { reserve: async () => ({ reserved: true }) },
-        client: async () => { network++; return { engine: 3, parsedText: '451', overlay: [], partial: false, searchablePdfUrl: 'https://api.ocr.space/download/mock.pdf', processingTimeMs: 5 }; },
-        buildCrop });
-    assert.equal(keyOnly.status, 'disabled');
+    const quotaLedger = { reserve: async () => ({ reserved: true }) };
+    const client = async () => { network++; return { engine: 3, parsedText: '451', overlay: [], partial: false,
+        searchablePdfUrl: 'https://api.ocr.space/download/mock.pdf', processingTimeMs: 5 }; };
+    const defaultOn = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_API_KEY: 'key' }, cropPlan, buildCrop, quotaLedger, client });
+    const explicitlyOff = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '0', OCRSPACE_API_KEY: 'key' }, cropPlan, buildCrop, quotaLedger, client });
+    const noKey = await collectOcrSpaceFieldEvidence({ env: {}, cropPlan, buildCrop, quotaLedger, client });
+    const invalidSetting = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: 'true', OCRSPACE_API_KEY: 'key' }, cropPlan, buildCrop, quotaLedger, client });
+    const explicitOn = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'key' }, cropPlan, buildCrop, quotaLedger, client });
+    assert.equal(defaultOn.status, 'complete');
+    assert.equal(defaultOn.activation.defaultEnabled, true);
+    assert.equal(defaultOn.activation.explicitlyEnabled, false);
     assert.equal(explicitlyOff.status, 'disabled');
     assert.equal(noKey.status, 'disabled');
+    assert.equal(invalidSetting.status, 'disabled');
     assert.equal(explicitOn.status, 'complete');
+    assert.equal(defaultOn.requests, 1);
     assert.equal(explicitOn.requests, 1);
-    assert.equal(explicitOn.evidence[0].text, '451');
-    assert.equal(builds, 1);
-    assert.equal(network, 1);
+    assert.equal(defaultOn.evidence[0].text, '451');
+    assert.equal(builds, 2);
+    assert.equal(network, 2);
 });
 
 test('field evidence rejects identity/unknown crops and submits allowlisted crops sequentially', async () => {
@@ -261,7 +266,8 @@ test('bot runs the geometry-only OCR.Space prepass before Tesseract and excludes
     assert.ok(prepass >= 0 && prepass < worker);
     assert.ok(prepass < bot.indexOf('await paddleOcrFieldFallback.applyFieldFallback'));
     assert.ok(bot.includes('force: ocrSpaceConfigured'));
-    assert.ok(bot.includes("process.env.OCRSPACE_ENABLED === '1'"));
+    assert.ok(bot.includes('getOcrSpaceActivation(process.env)'));
+    assert.ok(bot.includes('const ocrSpaceConfigured = ocrSpaceActivation.enabled'));
     assert.equal(bot.includes("addCrop('player'"), false);
     assert.equal(bot.includes("'localized-player-identity'"), false);
     assert.ok(bot.includes('reconcileOcrSpaceEvidence(extractedFields.ocrSpaceEvidence, record)'));
