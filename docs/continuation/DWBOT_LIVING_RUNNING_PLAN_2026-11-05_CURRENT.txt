@@ -52,7 +52,7 @@ B. GITHUB AUTHORITY AND COMPLETED OPERATIONS
   remained to delete in the inspected main tree; therefore no deletion commit
   was made. Nested occurrences and all unrelated files were left alone. No
   historical branch or other repository was changed by this cleanup.
-- The OCR implementation source candidate was `e1993bf91f54a2f366d5b5739b4aafa0c318be1a`; subsequent docs/CI/plan synchronization advanced main. Current main HEAD before the full-plan synchronization commit: `9037e0b1f7c98378658413ef8c76b70f32ed3a4c`. This is a development candidate, not a release or production acceptance.
+- The OCR implementation source candidate was `e1993bf91f54a2f366d5b5739b4aafa0c318be1a`; subsequent docs/CI/plan synchronization advanced main. Current main HEAD before this continuation-plan refresh: `03204e87df9f438f57dc2ad456d4dbb397b63e92`. This is a development candidate, not a release or production acceptance.
 - OCR.Space and supporting implementation commits on main (in chronological
   order; verify the exact commit chain in GitHub when needed):
   `ce0b2b71d08366d2997b044a9e40390fefe11b6b`;
@@ -76,7 +76,7 @@ B. GITHUB AUTHORITY AND COMPLETED OPERATIONS
   `fbfcef51c24473bf3e56859a4f446358d74c9ec82`,
   `b101f054d91be6a070f022d2cb3f643aa47f5249`,
   `f1e6030d105647bb27c07f1037b202d9d88343e7`; and CI correction
-  `9037e0b1f7c98378658413ef8c76b70f32ed3a4c`.
+  `9037e0b1f7c98378658413ef8c76b70f32ed3a4c`, `940e1e7a7ca8a8f165c63f640444f35607ed2532`, and `03204e87df9f438f57dc2ad456d4dbb397b63e92`.
 - These commits implement OCR.Space request configuration, Engine 3 searchable-PDF
   fallback, OpenCV geometry-first crop planning, identity-exclusion tests,
   OCR.Space-first ordering before Tesseract.js, duplicate-call suppression,
@@ -190,19 +190,26 @@ D. IMPLEMENTATION MAP AND CURRENT VERIFICATION STATE
 - Corrective CI commit `9037e0b1f7c98378658413ef8c76b70f32ed3a4c` adds a pinned
   native Tesseract 5.5.3.20260724 + `eng.traineddata` provisioning step to the
   clean-package Windows job and sets `TESSERACT_LANG_PATH`/`TESSERACT_BIN`
-  before package verification. Exact-head workflow run `42088538702` is queued
-  at the time of this plan revision; it must be inspected before claiming the
-  fix works.
-- Windows Node 22.16.0 native Tesseract screenshot acceptance and
-  persistence/recovery remain in progress on earlier run `42088032492` and
-  must be inspected. No Windows screenshot acceptance pass is claimed.
+  before package verification. Run `42088538702` Linux job PASS: OCR.Space
+  tests 24/24, focused suites 21/21 and 29/29, full suite 269 total / 267
+  passed / 0 failed / 2 skipped. Its Windows and PDF/package jobs remain queued;
+  the model-provisioning correction is not yet verified by the package job.
+- On earlier run `42088032492`, Windows process-level persistence/recovery and
+  the full Windows Node 22 test suite both PASS. The current-source Tesseract.js
+  and native Tesseract screenshot acceptance step is still in progress, so no
+  Windows screenshot acceptance pass is claimed. The PDF/manual clean-package
+  job on that run failed at `npm test` because the clean package lacked
+  `eng.traineddata`; the model-metadata test correctly failed closed.
+- Latest exact-head run `42088804157` on current main
+  `03204e87df9f438f57dc2ad456d4dbb397b63e92` is queued. It follows the refreshed
+  continuation handoff and must be inspected before claiming current-head CI.
 - Mock tests do not prove live OCR.Space credentials, live provider accuracy,
   privacy review of production screenshots, or any accuracy improvement. No
   live provider request has been made. Production remains NO-GO.
 
 E. REQUIRED NEXT STEPS AND CLOSURE CONDITIONS
 
-1. Verify exact-head CI `42088538702` for `9037e0b1f7c98378658413ef8c76b70f32ed3a4c`. The run includes the corrective Tesseract model provisioning for the clean-package job.
+1. Verify exact-head CI `42088804157` for `03204e87df9f438f57dc2ad456d4dbb397b63e92`; also inspect Windows/PDF jobs on `42088538702` and finish the Windows screenshot-acceptance step from `42088032492`.
    If any job fails, inspect the failing step/log, correct the root cause,
    commit on main with fresh-head verification, and repeat until all supported
    jobs pass or a documented environment blocker remains.
@@ -259,6 +266,9 @@ F. COMPLETION / CORRECTION HISTORY — 2026-11-05 (CHAT CONTINUATION)
   pending and is the next verification target.
 - This addendum and all chat rules are authoritative over earlier active
   instructions. Historical content below remains unchanged.
+
+- Continuation handoff refreshed in commit `03204e87df9f438f57dc2ad456d4dbb397b63e92` with current main/CI state, the chat-only rule, no-interim-screen-text rule, and comprehensive plan update/download reconciliation rule.
+- Exact current-main CI run `42088804157` was queued at the time of this plan refresh. Linux pass on run `42088538702` is confirmed; Windows and clean-package results remain pending.
 
 ================================================================================
 END CURRENT CHAT + GITHUB + OCR.SPACE AUTHORITY ADDENDUM — 2026-11-05
