@@ -67,7 +67,7 @@ function buildSafeOcrSpacePrepassCropPlan({ regions = {}, width, height } = {}) 
     if (damage) {
         const left = Math.max(Number(damage.left), w * 0.025);
         const top = Math.max(Number(damage.top), h * 0.365, identityBottom + h * 0.004);
-        const right = Math.min(Number(damage.left) + Number(damage.width), w * 0.275, identityLeft - w * 0.004);
+        const right = Math.min(Number(damage.left) + Number(damage.width), w * 0.275);
         const bottom = Math.min(Number(damage.top) + Number(damage.height), h * 0.505);
         add('damage', 'opencv-damage', { left, top, width: right - left, height: bottom - top });
     }
