@@ -1719,7 +1719,7 @@ async function extractTextCore(imageBuffer) {
             fullScreenRewardConflictCandidates.push({
                 ...parsed,
                 confidence: Number(attempt.confidence) || 0,
-                source: \`full-screen-conflict-psm\${attempt.pageSegmentationMode}\`,
+                source: 'full-screen-conflict-psm' + attempt.pageSegmentationMode,
             });
         }
     }
