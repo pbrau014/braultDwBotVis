@@ -2599,11 +2599,12 @@ async function extractTextCore(imageBuffer) {
         preparedHeight: imageHeight,
         timeoutMs: fallbackRemainingMs,
     });
-    // OCR.Space is the last-resort remote evidence provider. It runs only after
-    // primary Tesseract and optional local PaddleOCR have completed, and only
-    // when explicitly enabled with a local key. Player identity crops are prohibited.
+    // After the geometry-first OCR.Space pass, use the more precise local crop
+    // geometry for one bounded refinement only if that first pass produced no
+    // remote evidence. This preserves OCR.Space-first ordering without duplicate
+    // provider calls when the prepass already succeeded.
     const ocrSpaceApiKeyPresent = Boolean(String(process.env.OCRSPACE_API_KEY || '').trim());
-    if (process.env.OCRSPACE_ENABLED === '1' && ocrSpaceApiKeyPresent) {
+    if (ocrSpaceConfigured && ocrSpaceApiKeyPresent && ocrSpacePrepassEvidence.status !== 'complete') {
         try {
             const previewRecord = buildBattleRecord(combined.text, extractedFields);
             const missingLabels = new Set(getMissingRequiredFields(previewRecord).map((item) => String(item.label)));
@@ -2644,6 +2645,8 @@ async function extractTextCore(imageBuffer) {
             console.warn('[OCR.space] Optional evidence stage failed; local OCR remains authoritative:', String(error && error.message || error).slice(0, 240));
             extractedFields.ocrSpaceRefinementEvidence = { status: 'failed', reason: String(error && error.code || 'OCRSPACE_STAGE_ERROR'), requests: 0, evidence: [] };
         }
+    } else if (ocrSpaceConfigured && ocrSpacePrepassEvidence.status === 'complete') {
+        extractedFields.ocrSpaceRefinementEvidence = { status: 'skipped', reason: 'geometry-first prepass already produced remote evidence; duplicate requests suppressed', requests: 0, evidence: [] };
     } else {
         extractedFields.ocrSpaceRefinementEvidence = { status: 'skipped', reason: process.env.OCRSPACE_ENABLED !== '1'
             ? 'OCRSPACE_ENABLED is not explicitly enabled' : 'OCRSPACE_API_KEY is not configured', requests: 0, evidence: [] };
