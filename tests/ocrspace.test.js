@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
-const { recognizeCrop, API_URL, MAX_FREE_FILE_BYTES } = require('../src/ocrspace-client');
+const { recognizeCrop, API_URL, MAX_FREE_FILE_BYTES, MAX_RESPONSE_BYTES } = require('../src/ocrspace-client');
 const { OcrSpaceQuotaLedger, PROVIDER_LIMITS } = require('../src/ocrspace-quota-ledger');
 const { collectOcrSpaceFieldEvidence, parseCropCap } = require('../src/ocrspace-field-evidence');
 
@@ -24,6 +24,7 @@ test('Engine 2 uses HTTPS multipart, apikey header, auto language and word overl
     const result = await recognizeCrop({ ...args(), fetchImpl: async (url, options) => { request = { url, options }; return reply(payload()); } });
     assert.equal(request.url, API_URL);
     assert.equal(request.options.method, 'POST');
+    assert.equal(request.options.redirect, 'error');
     assert.equal(request.options.headers.apikey, 'not-a-real-key-value');
     assert.ok(request.options.body instanceof FormData);
     assert.equal(request.options.body.get('OCREngine'), '2');
@@ -49,6 +50,7 @@ test('client rejects missing key, invalid buffer, unsupported MIME, retired Engi
     await assert.rejects(recognizeCrop({ ...args(), apiKey: '', fetchImpl }), { code: 'OCRSPACE_KEY_MISSING' });
     await assert.rejects(recognizeCrop({ ...args(), imageBuffer: Buffer.alloc(0), fetchImpl }), { code: 'OCRSPACE_INVALID_IMAGE' });
     await assert.rejects(recognizeCrop({ ...args(), mimeType: 'application/pdf', fetchImpl }), { code: 'OCRSPACE_UNSUPPORTED_MIME' });
+    await assert.rejects(recognizeCrop({ ...args(), mimeType: 'image/webp', fetchImpl }), { code: 'OCRSPACE_UNSUPPORTED_MIME' });
     await assert.rejects(recognizeCrop({ ...args(), engine: 1, fetchImpl }), { code: 'OCRSPACE_INVALID_ENGINE' });
     await assert.rejects(recognizeCrop({ ...args(), imageBuffer: Buffer.alloc(MAX_FREE_FILE_BYTES + 1), fetchImpl }), { code: 'OCRSPACE_FILE_TOO_LARGE' });
     assert.equal(calls, 0);
@@ -88,6 +90,25 @@ test('timeout is classified without exposing the API key', async () => {
     });
 });
 
+test('redirects away from the fixed provider endpoint are rejected', async () => {
+    const response = Object.assign(reply(payload()), { redirected: true, url: 'https://example.invalid/collect' });
+    await assert.rejects(recognizeCrop({ ...args(), fetchImpl: async (_url, options) => {
+        assert.equal(options.redirect, 'error'); return response;
+    } }), { code: 'OCRSPACE_REDIRECT_BLOCKED' });
+});
+
+test('oversized provider response bodies are rejected', async () => {
+    const large = { OCRExitCode: 1, ParsedResults: [], diagnostic: 'x'.repeat(MAX_RESPONSE_BYTES) };
+    await assert.rejects(recognizeCrop({ ...args(), fetchImpl: async () => reply(large) }), { code: 'OCRSPACE_RESPONSE_TOO_LARGE' });
+});
+
+test('timeout remains active while the response body is being parsed', async () => {
+    await assert.rejects(recognizeCrop({ ...args(), timeoutMs: 1000, fetchImpl: async () => ({
+        ok: true, status: 200, headers: { get: () => null },
+        json: async () => new Promise(() => {}),
+    }) }), { code: 'OCRSPACE_TIMEOUT' });
+});
+
 test('local quotas remain below current provider-published free limits', async () => {
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'ocrspace-limits-'));
     try {
@@ -125,42 +146,35 @@ test('corrupt quota ledger fails closed', async () => {
     } finally { await fs.rm(dir, { recursive: true, force: true }); }
 });
 
-test('provider auto-enables with a configured key and can be explicitly disabled', async () => {
+test('provider requires explicit OCRSPACE_ENABLED=1 and a configured key', async () => {
     let builds = 0, network = 0;
-    const cropPlan = [{ field: 'xp', engine: 2, rect: { left: 1, top: 2, width: 10, height: 4 } }];
+    const cropPlan = [{ field: 'xp', source: 'localized-reward-column', engine: 2, rect: { left: 1, top: 2, width: 10, height: 8 } }];
     const buildCrop = async () => { builds++; return Buffer.from('crop'); };
-    const noKey = await collectOcrSpaceFieldEvidence({ env: {}, cropPlan, buildCrop, client: async () => { network++; } });
+    const keyOnly = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_API_KEY: 'key' }, cropPlan, buildCrop, client: async () => { network++; } });
     const explicitlyOff = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '0', OCRSPACE_API_KEY: 'key' }, cropPlan, buildCrop, client: async () => { network++; } });
-    const auto = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_API_KEY: 'key' }, cropPlan,
+    const noKey = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '1' }, cropPlan, buildCrop, client: async () => { network++; } });
+    const explicitOn = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'key' }, cropPlan,
         quotaLedger: { reserve: async () => ({ reserved: true }) },
         client: async () => { network++; return { engine: 2, parsedText: '451', overlay: [], partial: false, processingTimeMs: 5 }; },
         buildCrop });
-    assert.equal(noKey.status, 'disabled');
-    assert.equal(explicitlyOff.status, 'disabled');
-    assert.equal(auto.status, 'complete');
-    assert.equal(auto.requests, 1);
-    assert.equal(builds, 1);
-    assert.equal(network, 1);
-});
-
-test('field evidence submits bounded crops sequentially and stays outside candidates', async () => {
+    assertest('field evidence rejects identity/unknown crops and submits allowlisted crops sequentially', async () => {
     const events = [];
     const quotaLedger = { reserve: async ({ engine }) => { events.push('reserve:' + engine); } };
     const client = async ({ imageBuffer, engine }) => { events.push('client:' + engine + ':' + imageBuffer.toString()); return { engine, parsedText: '451', overlay: [], partial: false, processingTimeMs: 5 }; };
     const cropPlan = [
-        { field: 'player', engine: 3, rect: { left: 1, top: 1, width: 20, height: 6 } },
-        { field: 'xp', engine: 2, rect: { left: 2, top: 2, width: 20, height: 8 } },
-        { field: 'freeXp', engine: 2, rect: { left: 3, top: 3, width: 20, height: 8 } },
+        { field: 'player', source: 'localized-player-identity', engine: 3, rect: { left: 1, top: 1, width: 20, height: 6 } },
+        { field: 'unknown', source: 'localized-reward-column', engine: 2, rect: { left: 1, top: 1, width: 20, height: 6 } },
+        { field: 'xp', source: 'localized-reward-column', engine: 2, rect: { left: 2, top: 2, width: 20, height: 8 } },
+        { field: 'freeXp', source: 'localized-reward-column', engine: 2, rect: { left: 3, top: 3, width: 20, height: 8 } },
     ];
     const result = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'key', OCRSPACE_MAX_CROPS: '2' },
-        cropPlan, quotaLedger, client, buildCrop: async spec => Buffer.from(spec.field) });
+        cropPlan, quotaLedger, client, buildCrop: async spec => { events.push('build:' + spec.field); return Buffer.from(spec.field); } });
     assert.equal(result.requests, 2);
-    assert.deepEqual(result.evidence.map(x => x.field), ['player', 'xp']);
-    assert.deepEqual(events, ['reserve:3', 'client:3:player', 'reserve:2', 'client:2:xp']);
+    assert.deepEqual(result.evidence.map(x => x.field), ['xp', 'freeXp']);
+    assert.deepEqual(events, ['build:xp', 'reserve:2', 'client:2:xp', 'build:freeXp', 'reserve:2', 'client:2:freeXp']);
     assert.equal(result.evidence[0].providerConfidence, null);
     assert.match(result.disclaimer, /cannot accept or change mandatory fields/);
 });
-
 test('oversized crop is rejected before quota reservation and external request', async () => {
     let reserve = 0, calls = 0;
     const result = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'key' },
@@ -188,4 +202,12 @@ test('crop cap parser is bounded to seven', () => {
     assert.equal(parseCropCap(undefined), 2);
     assert.equal(parseCropCap('5'), 5);
     assert.equal(parseCropCap('99'), 7);
+});
+
+test('bot runs OCR.space only after local Paddle fallback and never builds player identity crops', async () => {
+    const bot = await fs.readFile(path.join(__dirname, '..', 'src', 'bot.js'), 'utf8');
+    assert.ok(bot.indexOf('await paddleOcrFieldFallback.applyFieldFallback') < bot.lastIndexOf('collectOcrSpaceFieldEvidence'));
+    assert.ok(bot.includes("process.env.OCRSPACE_ENABLED === '1'"));
+    assert.equal(bot.includes("addCrop('player'"), false);
+    assert.equal(bot.includes("'localized-player-identity'"), false);
 });

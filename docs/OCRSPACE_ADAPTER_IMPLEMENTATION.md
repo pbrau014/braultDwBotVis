@@ -1,28 +1,26 @@
-# OCR.space Free API — remote OCR evidence integration
+# OCR.space Free API — restricted last-resort evidence integration
 
 ## Operating rule
 
-For DWBOT OCR work, prefer a configured non-local OCR API when an appropriate free-tier service is available. The selected provider is the official **OCR.space Free API**. Do not silently substitute an unrelated provider or a paid endpoint. Keep the API key local and never commit it.
+Tesseract.js remains the primary local OCR baseline. OpenCV performs local geometry/ROI isolation. PaddleOCR is an optional local comparison/fallback. OCR.space Free API is the secondary, last-resort remote evidence provider and runs only after local OCR (including an enabled local PaddleOCR fallback) has completed and mandatory fields remain unresolved.
 
-The API is used for unresolved mandatory fields after local ROI localization. It receives bounded, pre-localized crops only; it does not receive full screenshots. Tesseract.js remains the local baseline and PaddleOCR remains an optional local comparison/fallback. Remote OCR is preferred for additional evidence on unresolved crops, while local engines remain available when the API is unconfigured, rate-limited, unavailable, or over budget.
+Remote use is default-off. Both OCRSPACE_ENABLED=1 and a locally stored, valid Free API key are required. A key alone never enables network use. Do not silently substitute another provider or any paid endpoint. Never commit, display, log or package the API key.
 
-This is a hybrid, fail-open architecture: remote evidence is attempted when enabled and eligible; local OCR continues to operate if the service cannot be used. Do not claim a request occurred unless a real HTTP request and response are recorded.
+## Current implementation
 
-## Current implementation — dwbotVis
-
-- src/ocrspace-client.js: official HTTPS multipart client, API-key header, Engine 2/3 support, input MIME/size limits, bounded timeout, response/error classification, and no automatic retry after HTTP 429.
-- src/ocrspace-field-evidence.js: sequential localized-crop collection, per-image crop/time bounds, and evidence-only results.
-- src/ocrspace-quota-ledger.js: atomic local JSON quota ledger with cross-process lock, stale-lock handling, and fail-closed corruption behavior.
-- src/bot.js: integration after local OCR/ROI localization. It selects unresolved fields, builds localized crops, invokes OCR.space, and records separate ocrSpaceEvidence.
-- tests/ocrspace.test.js: mocked contract, input validation, API response, timeout, and quota tests.
+- src/ocrspace-client.js: fixed HTTPS multipart endpoint, API-key header, redirect rejection, complete request/response timeout, bounded response parsing, MIME/input limits, response/error classification and no automatic retry after HTTP 429.
+- src/ocrspace-field-evidence.js: explicit opt-in, strict non-identifying field/source allowlists, sequential crop collection, per-image crop/time bounds and evidence-only results.
+- src/ocrspace-quota-ledger.js: atomic local JSON quota ledger with cross-process lock, stale-lock handling and fail-closed corruption behavior.
+- src/bot.js: last-resort integration after Tesseract and optional local PaddleOCR; sends only unresolved allowlisted field crops and records separate ocrSpaceEvidence.
+- tests/ocrspace.test.js: mocked contract, default-off, identity/unknown-field rejection, redirect, timeout/body parsing, response bounds, quota and evidence-isolation tests.
 - package.json: npm run test:ocrspace.
 
 ## Configuration
 
-Copy .env.discord-test.example to a local .env, then replace the placeholder with a real OCR.space Free API key obtained directly from the provider. The example enables the stage for an isolated test, but a placeholder is not a credential and cannot authenticate a request. In normal configuration, a non-empty OCRSPACE_API_KEY enables OCR.space automatically unless OCRSPACE_ENABLED=0 is explicitly set.
+Default-off example:
 
-    OCRSPACE_API_KEY=your_private_free_tier_key
-    # Optional: set OCRSPACE_ENABLED=0 to disable explicitly
+    OCRSPACE_ENABLED=0
+    OCRSPACE_API_KEY=
     OCRSPACE_MAX_CROPS=2
     OCRSPACE_STAGE_BUDGET_MS=20000
     OCRSPACE_MAX_PER_DAY=450
@@ -30,34 +28,23 @@ Copy .env.discord-test.example to a local .env, then replace the placeholder wit
     OCRSPACE_MAX_ENGINE3_PER_MONTH=900
     OCRSPACE_QUOTA_PATH=./data/ocrspace-quota.json
 
-Never put a real key in Git, chat, logs, screenshots, or test fixtures. Store it only in the local environment. Do not use production credentials in an isolated test configuration.
-
-## Provider data handling
-
-The provider states that uploaded documents are deleted after processing and are not retained; it also states that API access IP addresses are logged for one month. Recheck the provider's current privacy policy and terms before changing what data is transmitted. DWBOT's default scope remains localized crops only, not complete battle screenshots. Source: https://ocr.space/privacypolicy.
+Only set OCRSPACE_ENABLED=1 for a specifically authorized isolated synthetic test after reviewing current provider terms/privacy/retention and confirming the Free tier. Keep the API key in the local environment only. Do not use production credentials.
 
 ## Data boundary and validation
 
-- Only unresolved mandatory fields are eligible for remote evidence.
-- The bot sends localized crops, not full screenshots.
-- The client enforces a 1 MiB input ceiling and supported image MIME types.
-- Requests are sequential and bounded by crop count and remaining per-image time.
-- The quota ledger reserves usage before a request and fails closed if its state is corrupt or locked.
-- Engine 3 is used for player identity; Engine 2 is used for other supported crops.
-- API text and word overlays remain separate diagnostics. They are not merged into accepted Tesseract/Paddle candidate arrays and cannot independently accept, rewrite, normalize, or repair any mandatory field.
-- The nine-field exact-value contract, including XP, remains authoritative. Missing, invalid, or ambiguous values remain unresolved.
-- API failure must not fail the local OCR job. Do not retry automatically after rate limiting.
-- Respect the provider's current free-tier limits and terms; internal quota limits are intentionally lower than published ceilings.
+- Eligible diagnostic crops are allowlisted: xp, freeXp, credits, damage, result and battleMetadata (a non-identifying map/mode/battle-start region).
+- Player name/identity, Discord IDs, credentials, private account data, unknown fields, arbitrary sources, unrelated UI and full screenshots are categorically excluded.
+- The DWBOT field collector currently uses Engine 2 only. Engine 3 is not used for player identity.
+- The client enforces a 1 MiB input ceiling, PNG/JPEG/BMP MIME allowlist and 256 KiB response ceiling. The timeout remains active through full body parsing; redirects are rejected.
+- Requests are sequential, bounded by crop count and remaining per-image time, and quota is reserved before each request. Internal quotas remain below provider-published free ceilings.
+- OCR.space text and overlays remain separate diagnostic evidence. They are never merged into Tesseract/Paddle accepted candidate arrays and cannot independently accept, rewrite, normalize, fuzzy-correct or repair any mandatory field.
+- Missing, invalid, ambiguous or conflicting mandatory values remain unresolved. The exact nine-field contract, including mandatory ninth field XP, remains authoritative.
+- API failure never fails or mutates the local OCR job. Do not retry automatically after rate limiting.
+
+## Provider data handling
+
+Before any live request, recheck the provider's current terms, privacy policy, retention and Free-tier quotas. The provider's published privacy statements must not be assumed permanent. Source to review: https://ocr.space/privacypolicy. Use synthetic crops for the first live smoke test.
 
 ## Verification status
 
-The repository's OCR.space tests use injected/mock fetch responses. They verify request shape and failure handling but do not prove live credentials, connectivity, current provider availability, or accuracy benefit.
-
-A live smoke test requires:
-1. A valid locally configured free-tier API key.
-2. Explicit confirmation that the user authorizes transmission of the selected synthetic or otherwise approved localized crop to OCR.space.
-3. A single bounded request with no secret or full screenshot in logs.
-4. Recording HTTP/provider status, elapsed time, engine, crop dimensions/size, returned text/overlay, and quota reservation without storing the API key.
-5. Separate comparison against the local result and known ground truth. Do not change exact validation based on a single provider response.
-
-A configured key enables the remote stage by default; OCRSPACE_ENABLED=0 is the explicit opt-out. Until a live test is performed, report the integration as implemented and mock-tested, but live API operation and accuracy gain as unverified.
+Mocked tests verify request shape, safeguards and failure behavior; they do not prove live credentials, network availability, provider accuracy or accuracy benefit. A live smoke test requires a valid locally configured Free key, explicit approved synthetic-crop transmission, one bounded request, redacted diagnostics, and separate comparison to local OCR plus known ground truth. Never log the key. No live request or accuracy improvement is claimed until a real HTTP request/response and paired benchmark are recorded.

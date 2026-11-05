@@ -2510,10 +2510,33 @@ async function extractTextCore(imageBuffer) {
         pageSegmentationMode: 'combined',
     };
 
-    // OCR.space is an explicitly opted-in external evidence provider. Only unresolved
-    // mandatory fields are eligible. Crops are sent sequentially; full screenshots
-    // are never uploaded by this stage. Provider output remains diagnostics only.
-    if (process.env.OCRSPACE_ENABLED !== '0' && Boolean(String(process.env.OCRSPACE_API_KEY || '').trim())) {
+    await worker.setParameters({ tessedit_pageseg_mode: '3' });
+    // Optional second-engine field-crop fallback. Disabled by default and strictly
+    // local-only. It runs only for unresolved, ambiguous, or contradictory fields;
+    // the output is capped below the single-read threshold and joins the established
+    // parser/consensus candidate lists as evidence only. The fallback is bounded by
+    // the remaining per-image budget and fails open to the Tesseract result.
+    const prePaddleRecord = buildBattleRecord(combined.text, extractedFields);
+    const hasUnresolvedBeforePaddle = getMissingRequiredFields(prePaddleRecord).length > 0;
+    const ocrSpaceConfigured = process.env.OCRSPACE_ENABLED === '1' && Boolean(String(process.env.OCRSPACE_API_KEY || '').trim());
+    const ocrSpaceReserveMs = ocrSpaceConfigured && hasUnresolvedBeforePaddle
+        ? Math.max(1000, Math.min(20000, Number(process.env.OCRSPACE_STAGE_BUDGET_MS) || 20000)) : 0;
+    const fallbackRemainingMs = Math.max(0, OCR_IMAGE_TIMEOUT_MS - (Date.now() - imageStartedAt) - 1500 - ocrSpaceReserveMs);
+    await paddleOcrFieldFallback.applyFieldFallback({
+        imageBuffer,
+        rawText: combined.text,
+        fields: extractedFields,
+        sourceWidth,
+        sourceHeight,
+        preparedWidth: imageWidth,
+        preparedHeight: imageHeight,
+        timeoutMs: fallbackRemainingMs,
+    });
+    // OCR.Space is the last-resort remote evidence provider. It runs only after
+    // primary Tesseract and optional local PaddleOCR have completed, and only
+    // when explicitly enabled with a local key. Player identity crops are prohibited.
+    const ocrSpaceApiKeyPresent = Boolean(String(process.env.OCRSPACE_API_KEY || '').trim());
+    if (process.env.OCRSPACE_ENABLED === '1' && ocrSpaceApiKeyPresent) {
         try {
             const previewRecord = buildBattleRecord(combined.text, extractedFields);
             const missingLabels = new Set(getMissingRequiredFields(previewRecord).map((item) => String(item.label)));
@@ -2523,7 +2546,6 @@ async function extractTextCore(imageBuffer) {
                     cropPlan.push({ field, engine, rect: { ...rect }, source, imageSource, outputWidth });
                 }
             };
-            if (missingLabels.has('Player')) addCrop('player', 3, identityTightRescueRect, 'localized-player-identity', 'original', 1800);
             for (const field of ['xp', 'freeXp', 'credits']) {
                 const label = field === 'freeXp' ? 'Free XP' : field === 'xp' ? 'XP' : 'Credits';
                 if (!missingLabels.has(label)) continue;
@@ -2551,31 +2573,14 @@ async function extractTextCore(imageBuffer) {
                 extractedFields.ocrSpaceEvidence = { status: 'skipped', reason: 'insufficient remaining per-image time budget', requests: 0, evidence: [] };
             }
         } catch (error) {
-            // Third-party OCR errors never fail or mutate local Tesseract results.
             console.warn('[OCR.space] Optional evidence stage failed; local OCR remains authoritative:', String(error && error.message || error).slice(0, 240));
             extractedFields.ocrSpaceEvidence = { status: 'failed', reason: String(error && error.code || 'OCRSPACE_STAGE_ERROR'), requests: 0, evidence: [] };
         }
     } else {
-        extractedFields.ocrSpaceEvidence = { status: 'disabled', reason: String(process.env.OCRSPACE_ENABLED || '').trim() === '0' ? 'OCRSPACE_ENABLED is explicitly disabled' : 'OCRSPACE_API_KEY is not configured', requests: 0, evidence: [] };
+        extractedFields.ocrSpaceEvidence = { status: 'disabled', reason: process.env.OCRSPACE_ENABLED !== '1'
+            ? 'OCRSPACE_ENABLED is not explicitly enabled' : 'OCRSPACE_API_KEY is not configured', requests: 0, evidence: [] };
     }
 
-    await worker.setParameters({ tessedit_pageseg_mode: '3' });
-    // Optional second-engine field-crop fallback. Disabled by default and strictly
-    // local-only. It runs only for unresolved, ambiguous, or contradictory fields;
-    // the output is capped below the single-read threshold and joins the established
-    // parser/consensus candidate lists as evidence only. The fallback is bounded by
-    // the remaining per-image budget and fails open to the Tesseract result.
-    const fallbackRemainingMs = Math.max(0, OCR_IMAGE_TIMEOUT_MS - (Date.now() - imageStartedAt) - 1500);
-    await paddleOcrFieldFallback.applyFieldFallback({
-        imageBuffer,
-        rawText: combined.text,
-        fields: extractedFields,
-        sourceWidth,
-        sourceHeight,
-        preparedWidth: imageWidth,
-        preparedHeight: imageHeight,
-        timeoutMs: fallbackRemainingMs,
-    });
     // Only full-screen OCR attempts and the combined full-screen-derived text
     // can be selected as the page record. Field-crop results enter through the
     // explicitly typed field candidate arrays and existing validators only.
