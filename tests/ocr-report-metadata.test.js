@@ -42,7 +42,47 @@ test('OCR configuration metadata makes optional engine and network feature flags
         networkBlockingEnabled: true,
         imageTimeoutMs: 120000,
         operationTimeoutMs: 9000,
+        ocrSequence: ['tesseractjs-local'],
+        ocrSpace: {
+            enabled: false,
+            explicitlyEnabled: false,
+            apiKeyConfigured: false,
+            engine: 3,
+            requestProfile: {
+                detectOrientation: true, scale: true, tableMode: 'rewardBand-only',
+                searchablePdf: true, searchablePdfHideTextLayer: false,
+                explicitTextOverlayResponse: false, pdfFallbackEngine: 2,
+            },
+            limits: { maxCrops: 2, stageBudgetMs: 20000, maxPerDay: 450, maxPerMonth: 22000, maxEngine3PerMonth: 900 },
+        },
     });
     assert.equal(describeOcrConfiguration({ OCR_CV_ASSIST: 'true', PADDLEOCR_FIELD_FALLBACK: 'yes' }).opencvAssistEnabled, false);
     assert.equal(describeOcrConfiguration({ OCR_CV_ASSIST: 'true', PADDLEOCR_FIELD_FALLBACK: 'yes' }).paddleOcrFieldFallbackEnabled, false);
+});
+
+
+test('OCR.Space report metadata records opt-in request profile without exposing the key', () => {
+    const defaults = describeOcrConfiguration({});
+    assert.equal(defaults.ocrSpace.enabled, false);
+    assert.equal(defaults.ocrSpace.apiKeyConfigured, false);
+    assert.equal(defaults.ocrSequence.includes('ocrspace-engine3'), false);
+
+    const enabled = describeOcrConfiguration({
+        OCRSPACE_ENABLED: '1',
+        OCRSPACE_API_KEY: 'never-log-this-secret',
+        OCRSPACE_MAX_CROPS: '4',
+        OCRSPACE_STAGE_BUDGET_MS: '18000',
+    });
+    assert.equal(enabled.ocrSpace.enabled, true);
+    assert.equal(enabled.ocrSpace.apiKeyConfigured, true);
+    assert.deepEqual(enabled.ocrSequence, ['opencv-geometry', 'ocrspace-engine3', 'tesseractjs-local', 'ocrspace-diagnostic-reconciliation']);
+    assert.equal(enabled.ocrSpace.engine, 3);
+    assert.deepEqual(enabled.ocrSpace.requestProfile, {
+        detectOrientation: true, scale: true, tableMode: 'rewardBand-only',
+        searchablePdf: true, searchablePdfHideTextLayer: false,
+        explicitTextOverlayResponse: false, pdfFallbackEngine: 2,
+    });
+    assert.equal(enabled.ocrSpace.limits.maxCrops, 4);
+    assert.equal(enabled.ocrSpace.limits.stageBudgetMs, 18000);
+    assert.equal(JSON.stringify(enabled).includes('never-log-this-secret'), false);
 });
