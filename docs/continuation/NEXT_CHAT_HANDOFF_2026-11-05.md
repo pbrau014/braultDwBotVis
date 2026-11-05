@@ -1,14 +1,18 @@
-# CURRENT CHAT AUTHORITY OVERRIDE — 2026-11-05
+# CURRENT CHAT AUTHORITY OVERRIDE — 2026-11-05 (RECONCILED)
 
-This override supersedes every older active repository, branch, OCR configuration and status instruction below. Historical details remain provenance only.
+This block supersedes every older active repository, branch, OCR order/configuration, and status instruction below. Historical details remain provenance only.
 
-- Sole canonical repository: https://github.com/pbrau014/braultDwBotVis.git (pbrau014/braultDwBotVis).
-- Sole active implementation/delivery branch: main. No alternate repository or branch is an implementation source or destination. Do not delete other repositories or remote branch refs as part of this reference cleanup.
-- Current observed main HEAD: 126a8d505bd1319cff770168c21fb57412286bfb (fix: send CSRF token with desktop screenshot upload). Re-fetch before every write.
-- All DWBOT work remains in the current ChatGPT conversation; do not hand off to Work mode.
-- OCR.Space is the active development focus. Tesseract.js remains the local baseline; OCR.Space is secondary/last-resort only, requires explicit OCRSPACE_ENABLED=1 and a local key, and must receive only allowlisted non-identifying localized crops. Never send player identity, Discord IDs, credentials or full screenshots. Remote evidence cannot independently accept or overwrite required fields. No paid use.
-- The old branch/repository names in the historical body below are not active instructions. Preserve historical commit provenance; never substitute another repository.
-- Last inspected CI run 41942650363 belongs to ancestor 050b3a12aa64985d9a0a439ab84db8c116851a51; current-head CI has not yet been re-queried.
+- Sole canonical repository: https://github.com/pbrau014/braultDwBotVis.git (`pbrau014/braultDwBotVis`).
+- Sole active implementation/delivery/current working branch: `main`. Do not write to another repository or branch. Do not delete unrelated repositories or remote branch refs.
+- All DWBOT work must remain in this ChatGPT conversation. No Work-mode handoff. Every development step and status update must reference the living running plan and update it when evidence/decisions change.
+- Current observed `main` HEAD: `e76d2c3dac483c3902c19ceb8377a1055877b2ae`; re-fetch before each write. Latest exact-head CI run: 42086616945 (in progress at the time this block was authored; no pass is claimed).
+- The exact 332-name root-cleanup list has zero matches in the current main root. No no-op deletion commit was made; nested copies and unrelated files were left unchanged.
+- OCR.Space order is now geometry-only OpenCV safe-crop planning, OCR.Space Engine 3 first remote text pass, then existing Tesseract.js and local image processing. Remote use remains default-off unless OCRSPACE_ENABLED=1 and a local Free key is configured. Apply detectOrientation=true, scale=true by default (scale=false only for verified 200–300 DPI input), isTable=true only for tabular reward/stat crops, and searchable PDF flags isCreateSearchablePdf=true plus isSearchablePdfHideTextLayer=false. If Engine 3 returns no SearchablePDFURL, Engine 2 is allowed only for a separately quota-reserved PDF-generation fallback; discard Engine 2 OCR text.
+- Never send full screenshots, player identity, Discord IDs, credentials, private account data or unrelated UI. Remote evidence cannot independently accept or overwrite any of the nine mandatory fields. No paid OCR use.
+- Repair commits on main: `ce0b2b71d08366d2997b044a9e40390fefe11b6b` (OCR.Space test structure); `f81badbb4044de73e1b84e0be2ee28055565e1b5` (test crop fixtures and resolved tessdata metadata/CI path); `2da5a20ec61aff9da4a6857882accc6a4d8e85a8` (Engine 3 request profile/PDF fallback); `38f359a2c0e4db19f5ec1a52dd52608363c950ed` (Engine 3/PDF fallback tests); `cff7b63be8e9f04c0de4dd4af98e93fe2070e7fc` (OpenCV-first OCR.Space prepass); `e76d2c3dac483c3902c19ceb8377a1055877b2ae` (prepass-order test). Verify each exact commit with its CI run before calling it passed.
+- Root cleanup had a downstream effect: root `eng.traineddata` was removed while code still assumed it existed. CI now sets `TESSERACT_LANG_PATH` to the system tessdata directory and report metadata resolves the configured model. Confirm current run before closing this issue.
+- Current OCR implementation remains incomplete until the new request profile, prepass, PDF fallback, privacy boundaries, tests, docs, plan and exact-head CI all pass; no live-provider accuracy or production readiness is claimed.
+
 
 ---
 # DWBOT current continuation handoff — 2026-11-05

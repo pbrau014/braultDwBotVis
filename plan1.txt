@@ -1,3 +1,11 @@
+# CURRENT AUTHORITY NOTE — 2026-11-05
+
+This historical append-only roadmap is subordinate to the DWBOT Living Running Plan. The current governing plan is maintained in the File Library and checked into `docs/continuation/DWBOT_LIVING_RUNNING_PLAN_2026-11-05_CURRENT.txt`. All DWBOT work stays in the current ChatGPT conversation and uses only canonical repository `pbrau014/braultDwBotVis`, branch `main`. Older RC2/RC3 work copies, other repository names and branch names below are historical provenance only, not active sources or destinations.
+
+The active OCR.Space design is now geometry-only OpenCV safe-crop planning -> OCR.Space Engine 3 diagnostic prepass -> existing Tesseract.js/local processing -> strict independent evidence reconciliation. Remote use remains default-off and requires an explicit local Free key. Engine 3 request flags: detectOrientation=true; scale=true by default, false only for verified high-DPI 200–300 DPI images; isTable=true for tabular reward/stat regions only; isCreateSearchablePdf=true; isSearchablePdfHideTextLayer=false. If Engine 3 returns no PDF URL, Engine 2 may generate the PDF only and its OCR text is discarded. Privacy boundaries and nine-field exact acceptance remain mandatory.
+
+---
+
 **Plan authority and revision:** This file (`plan1.txt`) remains the authoritative roadmap. Updated on 2026-10-25 after implementing targeted recommendations in a separate RC2-derived work copy. The new **Phase 3 RC3 targeted implementation** section immediately below is now the current status authority and supersedes earlier statements that code changes were not yet authorized or that the work was still only in review. The original RC2 source and ZIP are preserved unchanged. All earlier test output and reports remain historical evidence tied to their recorded source fingerprint/runtime; no historical result is relabelled as an RC3 pass. Production stays NO-GO until RC3 passes full target-runtime validation.
 
 ## Phase 3 RC3 targeted implementation and current go/no-go — 2026-10-25

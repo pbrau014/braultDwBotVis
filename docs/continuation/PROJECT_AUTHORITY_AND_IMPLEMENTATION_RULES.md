@@ -4,7 +4,11 @@
 **Repository:** `pbrau014/braultDwBotVis`  
 **Only active implementation/delivery branch:** `main`
 
-The only authorized DWBOT source and destination is pbrau014/braultDwBotVis; main is the sole active implementation/delivery branch. Do not use, sync from, or push to any other DWBOT repository or branch. Older repository/branch references in historical records are provenance only and never current instructions. Do not delete other repositories or remote branch refs as part of documentation reconciliation. Before every remote write, re-read main, use an expected-head lease, then fetch and verify the resulting commit and tree. Never force-push or rewrite history.
+The only authorized DWBOT source and destination is pbrau014/braultDwBotVis; main is the sole active implementation/delivery branch and current working branch. Do not use, sync from, or push to any other DWBOT repository or branch. Older repository/branch references in historical records are provenance only and never current instructions. Do not delete other repositories or remote branch refs as part of documentation reconciliation. Before every remote write, re-read main, use an expected-head lease, then fetch and verify the resulting commit and tree. Never force-push or rewrite history.
+
+## Chat-only execution and living-plan authority
+
+All DWBOT research, file review, planning, code changes, GitHub operations, testing, correction, packaging and reporting must remain in the current ChatGPT conversation. Do not hand off to Work mode or another execution environment. Every development step and status update must reference and reconcile with the current living running plan in the File Library and its checked-in project copy. Update the plan when decisions, implementation, evidence, risks or blockers change. Preserve dated history and distinguish attempted, implemented, tested, verified and accepted.
 
 ## Persistent implementation rule
 
@@ -18,7 +22,7 @@ Distinguish facts, assumptions, inferred design, and uncertainty. Never invent a
 - Preserve exactly nine mandatory OCR fields in order: `result`, `player`, `map`, `mode`, `battleStart`, `credits`, `freeXp`, `damage`, `xp`. XP is mandatory and ninth/final.
 - Missing, invalid, ambiguous, conflicting or incorrect mandatory values block acceptance. Do not fuzzy-correct values or modify approved ground truth to create a pass.
 - Prefer an appropriate configured non-local OCR API for OCR evidence when a suitable free service is available; the selected DWBOT provider is OCR.space Free API. Do not silently substitute a paid service or unrelated provider. Keep provider credentials local and never commit them.
-- OCR.space is the preferred remote evidence source for unresolved, pre-localized crops. Do not upload full screenshots by default. Keep remote output isolated as diagnostic evidence; it cannot independently accept, rewrite, normalize, or fuzzy-correct mandatory fields.
+- When explicitly enabled, OCR.Space runs first as a remote text-evidence prepass after local geometry-only OpenCV has isolated safe crops and before Tesseract.js. Use Engine 3 with detectOrientation=true, scale=true by default (scale=false only for verified 200–300 DPI input), isTable=true for the tabular reward/stat crop and false for non-tabular title/metadata crops, isCreateSearchablePdf=true and isSearchablePdfHideTextLayer=false. If Engine 3 does not return SearchablePDFURL, use Engine 2 only for a separately quota-reserved PDF-generation fallback; discard its OCR text. Do not upload full screenshots, player identity, Discord IDs, credentials or private account data. Keep remote output isolated as diagnostic evidence; it cannot independently accept, rewrite, normalize, or fuzzy-correct mandatory fields.
 - Tesseract.js remains the local baseline and must continue to work when the API is unavailable, unconfigured, rate-limited, or over budget. OpenCV proposes geometry/ROI only. PaddleOCR remains an optional local comparison/fallback engine.
 - Record whether API use was configured, attempted, succeeded, failed, or skipped. Mock tests are not live-provider verification; never claim a live request or accuracy benefit without measured evidence.
 - Preserve original archives and prior test reports. New reports must be tied to the actual source/runtime tested.
