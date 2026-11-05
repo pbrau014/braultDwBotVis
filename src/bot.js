@@ -3465,6 +3465,16 @@ async function handleIncomingMessage(message) {
             validations.sort((a, b) => a.missing.length - b.missing.length || b.confidence - a.confidence);
             const validation = validations[0];
             const record = validation.record;
+            const remoteCheck = validation.ocrSpaceReconciliation;
+            if (remoteCheck && remoteCheck.status !== 'disabled') {
+                const counts = Object.values(remoteCheck.fields || {}).reduce((out, field) => {
+                    out[field.status] = (out[field.status] || 0) + 1;
+                    return out;
+                }, {});
+                console.log('OCR.Space diagnostic cross-check (no acceptance authority): ' +
+                    JSON.stringify({ status: remoteCheck.status, requests: remoteCheck.requests, fields: counts,
+                        player: 'excluded_by_privacy_policy' }));
+            }
             const missing = getMissingRequiredFields(record);
             console.log(`OCR result for ${fileName}: ${missing.length ? `pending ${missing.map((f) => f.label).join(', ')}` : 'complete'}; resolved ${9 - missing.length}/9 required fields; mean OCR confidence ${validation.confidence.toFixed(1)}; PSM ${validation.pageSegmentationMode}.`);
             if (missing.length) {
