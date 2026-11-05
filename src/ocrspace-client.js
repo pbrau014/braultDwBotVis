@@ -73,9 +73,11 @@ async function recognizeCrop({ apiKey, imageBuffer, filename = 'dwbot-field-crop
     const form = new FormData();
     form.append('file', new Blob([imageBuffer], { type: selectedMime }), String(filename).slice(0, 120));
     form.append('OCREngine', String(selectedEngine));
-    // Searchable PDF text-layer options are independent of TextOverlay JSON.
-    // Engine 3 overlay adds 2–3x latency and is not needed for PDF creation.
-    form.append('isOverlayRequired', overlayRequired ? 'true' : 'false');
+    // OCR.space automatically enables its internal overlay when searchable-PDF
+    // generation is requested. Omit the explicit flag in that case; otherwise
+    // avoid Engine 3's optional 2–3x-slower TextOverlay response unless requested.
+    if (overlayRequired) form.append('isOverlayRequired', 'true');
+    else if (!createSearchablePdf) form.append('isOverlayRequired', 'false');
     form.append('language', 'auto');
     form.append('detectOrientation', detectOrientation ? 'true' : 'false');
     form.append('isTable', isTable ? 'true' : 'false');
