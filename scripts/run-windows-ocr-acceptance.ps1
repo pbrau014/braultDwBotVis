@@ -47,20 +47,30 @@ try {
   Write-Host "[WINDOWS-OCR] START $Label"
   $OutputLog=$Log+'.stdout.tmp'
   $ErrorLog=$Log+'.stderr.tmp'
-  # Windows PowerShell 5.1 can promote native stderr records to terminating
-  # NativeCommandError under ErrorActionPreference=Stop, even when the child
-  # exits successfully. Keep stderr out of the PowerShell error stream, retain
-  # it in the transcript, and still stream stdout live to the Actions log.
+  $Process=$null
+  $Code=1
   try {
-   & npm.cmd @Arguments 2> $ErrorLog | Tee-Object -FilePath $OutputLog
-   $Code=$LASTEXITCODE
+   # Launch npm.cmd through cmd.exe and redirect both child streams at the
+   # process boundary. PowerShell 5.1 otherwise promotes native stderr records
+   # to terminating NativeCommandError under ErrorActionPreference=Stop,
+   # even when npm exits 0 (for example, supervisor close diagnostics).
+   $CommandLine='""'+$Npm.Source+'" '+($Arguments -join ' ')+'"'
+   $Process=Start-Process -FilePath $env:ComSpec -ArgumentList @('/d','/s','/c',$CommandLine) -Wait -PassThru -NoNewWindow -RedirectStandardOutput $OutputLog -RedirectStandardError $ErrorLog
+   $Code=[int]$Process.ExitCode
    $Stdout=if(Test-Path -LiteralPath $OutputLog){Get-Content -LiteralPath $OutputLog -Raw}else{''}
    $Stderr=if(Test-Path -LiteralPath $ErrorLog){Get-Content -LiteralPath $ErrorLog -Raw}else{''}
    @("COMMAND: npm "+($Arguments -join ' '),"EXIT: $Code","--- stdout ---",$Stdout,"--- stderr ---",$Stderr) | Set-Content -LiteralPath $Log -Encoding utf8
+   if(-not [string]::IsNullOrWhiteSpace($Stdout)){Write-Host $Stdout}
    if(-not [string]::IsNullOrWhiteSpace($Stderr)){
     Write-Host '--- npm stderr (captured; not a PowerShell failure) ---'
     Write-Host $Stderr
    }
+  }
+  catch {
+   $Failure=$_.Exception.Message
+   @("COMMAND: npm "+($Arguments -join ' '),"EXIT: $Code","LAUNCH ERROR: $Failure") | Set-Content -LiteralPath $Log -Encoding utf8
+   Write-Host "[WINDOWS-OCR] LAUNCH ERROR $Label $Failure"
+   $Code=1
   }
   finally {
    Remove-Item -LiteralPath $OutputLog,$ErrorLog -Force -ErrorAction SilentlyContinue
