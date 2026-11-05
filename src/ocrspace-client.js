@@ -4,6 +4,10 @@ const MAX_FREE_FILE_BYTES = 1024 * 1024;
 const MAX_RESPONSE_BYTES = 256 * 1024;
 const SUPPORTED_MIME_TYPES = new Set(['image/png', 'image/jpeg', 'image/bmp']);
 function fail(message, code, extra = {}) { const e = new Error(message); e.code = code; Object.assign(e, extra); return e; }
+function safeSearchablePdfUrl(value) {
+    try { const url = new URL(String(value || '')); return url.protocol === 'https:' && ['api.ocr.space', 'ocr.space'].includes(url.hostname) ? url.toString() : null; }
+    catch { return null; }
+}
 function compactOverlay(results, maxWords = 500) {
     const out = []; let left = maxWords;
     for (const result of results || []) for (const line of (result && result.TextOverlay && result.TextOverlay.Lines) || []) {
@@ -56,7 +60,7 @@ async function readJsonBounded(response, maxBytes = MAX_RESPONSE_BYTES) {
     throw fail('OCR.space response body is unavailable.', 'OCRSPACE_INVALID_RESPONSE');
 }
 /** Returns OCR.space evidence only; callers must not use it to accept or rewrite DWBOT fields. */
-async function recognizeCrop({ apiKey, imageBuffer, filename = 'dwbot-field-crop.png', mimeType = 'image/png', engine = 2, overlayRequired = Number(engine) === 2, timeoutMs = 15000, fetchImpl = globalThis.fetch }) {
+async function recognizeCrop({ apiKey, imageBuffer, filename = 'dwbot-field-crop.png', mimeType = 'image/png', engine = 3, overlayRequired = false, detectOrientation = true, isTable = false, scale = true, createSearchablePdf = true, searchablePdfHideTextLayer = false, timeoutMs = 15000, fetchImpl = globalThis.fetch }) {
     const key = String(apiKey || '').trim();
     if (!key) throw fail('OCR.space API key is not configured.', 'OCRSPACE_KEY_MISSING');
     if (!Buffer.isBuffer(imageBuffer) || !imageBuffer.length) throw fail('OCR.space input crop is empty or invalid.', 'OCRSPACE_INVALID_IMAGE');
@@ -71,6 +75,11 @@ async function recognizeCrop({ apiKey, imageBuffer, filename = 'dwbot-field-crop
     form.append('OCREngine', String(selectedEngine));
     form.append('isOverlayRequired', overlayRequired ? 'true' : 'false');
     form.append('language', 'auto');
+    form.append('detectOrientation', detectOrientation ? 'true' : 'false');
+    form.append('isTable', isTable ? 'true' : 'false');
+    form.append('scale', scale ? 'true' : 'false');
+    form.append('isCreateSearchablePdf', createSearchablePdf ? 'true' : 'false');
+    form.append('isSearchablePdfHideTextLayer', searchablePdfHideTextLayer ? 'true' : 'false');
     const controller = new AbortController();
     let rejectTimeout;
     const timeoutPromise = new Promise((_, reject) => { rejectTimeout = reject; });
@@ -110,6 +119,7 @@ async function recognizeCrop({ apiKey, imageBuffer, filename = 'dwbot-field-crop
             parsedText: ok.map(x => String(x.ParsedText || '')).join('\n').slice(0, 12000),
             overlay: overlayRequired ? compactOverlay(ok) : [],
             providerConfidence: null,
+            searchablePdfUrl: createSearchablePdf ? safeSearchablePdfUrl(payload.SearchablePDFURL) : null,
             processingTimeMs: Number(payload.ProcessingTimeInMilliseconds) || null,
         };
     } catch (error) {
@@ -118,4 +128,4 @@ async function recognizeCrop({ apiKey, imageBuffer, filename = 'dwbot-field-crop
         throw fail('OCR.space request failed: ' + String(error && error.message || error).slice(0, 240), 'OCRSPACE_NETWORK_ERROR');
     } finally { clearTimeout(timer); }
 }
-module.exports = { API_URL, MAX_FREE_FILE_BYTES, MAX_RESPONSE_BYTES, SUPPORTED_MIME_TYPES, recognizeCrop, readJsonBounded, __test: { compactOverlay } };
+module.exports = { API_URL, MAX_FREE_FILE_BYTES, MAX_RESPONSE_BYTES, SUPPORTED_MIME_TYPES, recognizeCrop, readJsonBounded, safeSearchablePdfUrl, __test: { compactOverlay } };

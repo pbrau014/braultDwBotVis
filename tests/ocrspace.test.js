@@ -8,8 +8,9 @@ const { recognizeCrop, API_URL, MAX_FREE_FILE_BYTES, MAX_RESPONSE_BYTES } = requ
 const { OcrSpaceQuotaLedger, PROVIDER_LIMITS } = require('../src/ocrspace-quota-ledger');
 const { collectOcrSpaceFieldEvidence, parseCropCap } = require('../src/ocrspace-field-evidence');
 
-function payload(text = '43110', engine = 2) {
+function payload(text = '43110', engine = 3) {
     return { OCRExitCode: 1, IsErroredOnProcessing: false, ProcessingTimeInMilliseconds: '143',
+        SearchablePDFURL: 'https://api.ocr.space/download/mock.pdf',
         ParsedResults: [{ FileParseExitCode: 1, ParsedText: text, TextOverlay: engine === 2
             ? { Lines: [{ Words: [{ WordText: text, Left: 3, Top: 4, Width: 40, Height: 12 }] }] } : null }] };
 }
@@ -19,20 +20,26 @@ function reply(data, status = 200, headers = {}) {
 }
 function args() { return { apiKey: 'not-a-real-key-value', imageBuffer: Buffer.from('png-data'), fetchImpl: async () => reply(payload()) }; }
 
-test('Engine 2 uses HTTPS multipart, apikey header, auto language and word overlay', async () => {
+test('Engine 3 uses HTTPS multipart and required orientation, table, scaling and visible-PDF profile', async () => {
     let request;
-    const result = await recognizeCrop({ ...args(), fetchImpl: async (url, options) => { request = { url, options }; return reply(payload()); } });
+    const result = await recognizeCrop({ ...args(), fetchImpl: async (url, options) => { request = { url, options }; return reply(payload('43110', 3)); } });
     assert.equal(request.url, API_URL);
     assert.equal(request.options.method, 'POST');
     assert.equal(request.options.redirect, 'error');
     assert.equal(request.options.headers.apikey, 'not-a-real-key-value');
     assert.ok(request.options.body instanceof FormData);
-    assert.equal(request.options.body.get('OCREngine'), '2');
+    assert.equal(request.options.body.get('OCREngine'), '3');
     assert.equal(request.options.body.get('language'), 'auto');
-    assert.equal(request.options.body.get('isOverlayRequired'), 'true');
+    assert.equal(request.options.body.get('isOverlayRequired'), 'false');
+    assert.equal(request.options.body.get('detectOrientation'), 'true');
+    assert.equal(request.options.body.get('isTable'), 'false');
+    assert.equal(request.options.body.get('scale'), 'true');
+    assert.equal(request.options.body.get('isCreateSearchablePdf'), 'true');
+    assert.equal(request.options.body.get('isSearchablePdfHideTextLayer'), 'false');
     assert.equal(result.parsedText, '43110');
     assert.equal(result.providerConfidence, null);
-    assert.deepEqual(result.overlay[0], { text: '43110', left: 3, top: 4, width: 40, height: 12 });
+    assert.deepEqual(result.overlay, []);
+    assert.equal(result.searchablePdfUrl, 'https://api.ocr.space/download/mock.pdf');
 });
 
 test('Engine 3 defaults overlay off and returns no fabricated confidence', async () => {
@@ -40,6 +47,8 @@ test('Engine 3 defaults overlay off and returns no fabricated confidence', async
     const result = await recognizeCrop({ ...args(), engine: 3, fetchImpl: async (_url, options) => { form = options.body; return reply(payload('player text', 3)); } });
     assert.equal(form.get('OCREngine'), '3');
     assert.equal(form.get('isOverlayRequired'), 'false');
+    assert.equal(form.get('isCreateSearchablePdf'), 'true');
+    assert.equal(form.get('isSearchablePdfHideTextLayer'), 'false');
     assert.equal(result.providerConfidence, null);
     assert.deepEqual(result.overlay, []);
 });
@@ -179,7 +188,7 @@ test('provider requires explicit OCRSPACE_ENABLED=1 and a configured key', async
 test('field evidence rejects identity/unknown crops and submits allowlisted crops sequentially', async () => {
     const events = [];
     const quotaLedger = { reserve: async ({ engine }) => { events.push('reserve:' + engine); } };
-    const client = async ({ imageBuffer, engine }) => { events.push('client:' + engine + ':' + imageBuffer.toString()); return { engine, parsedText: '451', overlay: [], partial: false, processingTimeMs: 5 }; };
+    const client = async ({ imageBuffer, engine }) => { events.push('client:' + engine + ':' + imageBuffer.toString()); return { engine, parsedText: '451', overlay: [], partial: false, searchablePdfUrl: 'https://api.ocr.space/download/mock.pdf', processingTimeMs: 5 }; };
     const cropPlan = [
         { field: 'player', source: 'localized-player-identity', engine: 3, rect: { left: 1, top: 1, width: 20, height: 6 } },
         { field: 'unknown', source: 'localized-reward-column', engine: 2, rect: { left: 1, top: 1, width: 20, height: 6 } },
@@ -190,14 +199,14 @@ test('field evidence rejects identity/unknown crops and submits allowlisted crop
         cropPlan, quotaLedger, client, buildCrop: async spec => { events.push('build:' + spec.field); return Buffer.from(spec.field); } });
     assert.equal(result.requests, 2);
     assert.deepEqual(result.evidence.map(x => x.field), ['xp', 'freeXp']);
-    assert.deepEqual(events, ['build:xp', 'reserve:2', 'client:2:xp', 'build:freeXp', 'reserve:2', 'client:2:freeXp']);
+    assert.deepEqual(events, ['build:xp', 'reserve:3', 'client:3:xp', 'build:freeXp', 'reserve:3', 'client:3:freeXp']);
     assert.equal(result.evidence[0].providerConfidence, null);
     assert.match(result.disclaimer, /cannot accept or change mandatory fields/);
 });
 test('oversized crop is rejected before quota reservation and external request', async () => {
     let reserve = 0, calls = 0;
     const result = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'key' },
-        cropPlan: [{ field: 'xp', source: 'localized-reward-column', engine: 2, rect: { left: 0, top: 0, width: 8, height: 6 } }],
+        cropPlan: [{ field: 'xp', source: 'localized-reward-column', engine: 3, rect: { left: 0, top: 0, width: 8, height: 6 } }],
         quotaLedger: { reserve: async () => { reserve++; } }, client: async () => { calls++; },
         buildCrop: async () => Buffer.alloc(MAX_FREE_FILE_BYTES + 1) });
     assert.equal(reserve, 0); assert.equal(calls, 0);
@@ -208,8 +217,8 @@ test('quota exhaustion stops further provider calls', async () => {
     let calls = 0;
     const result = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'key' },
         cropPlan: [
-            { field: 'xp', source: 'localized-reward-column', engine: 2, rect: { left: 0, top: 0, width: 10, height: 10 } },
-            { field: 'freeXp', source: 'localized-reward-column', engine: 2, rect: { left: 0, top: 0, width: 10, height: 10 } },
+            { field: 'xp', source: 'localized-reward-column', engine: 3, rect: { left: 0, top: 0, width: 10, height: 10 } },
+            { field: 'freeXp', source: 'localized-reward-column', engine: 3, rect: { left: 0, top: 0, width: 10, height: 10 } },
         ],
         quotaLedger: { reserve: async () => { const e = new Error('limit'); e.code = 'OCRSPACE_QUOTA_EXHAUSTED'; throw e; } },
         client: async () => { calls++; }, buildCrop: async () => Buffer.from('crop') });
