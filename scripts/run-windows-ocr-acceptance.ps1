@@ -14,7 +14,8 @@ try {
  $NodeText=(& node.exe -p 'process.versions.node').Trim()
  if($LASTEXITCODE -ne 0){throw 'Could not determine Node.js version.'}
  if([version]::Parse($NodeText) -lt [version]::Parse($MinimumNodeVersion)){throw "Node.js $MinimumNodeVersion or newer is required. Found $NodeText."}
- $NpmVersion=(& npm.cmd --version).Trim()
+ $Npm=Get-Command npm.cmd -ErrorAction Stop
+ $NpmVersion=(& $Npm.Source --version).Trim()
  if($LASTEXITCODE -ne 0){throw 'Could not determine npm version.'}
  $TessName='tesseract.exe'; if($env:TESSERACT_BIN){$TessName=$env:TESSERACT_BIN}
  $MagickName='magick.exe'; if($env:IMAGEMAGICK_BIN){$MagickName=$env:IMAGEMAGICK_BIN}
