@@ -53,7 +53,7 @@ At meaningful milestones create a complete candidate archive with source, script
 
 The following remain OPEN and cannot be represented as passed based on Linux CI or mocks:
 
-1. Current-source complete screenshot OCR acceptance on Windows Node 24.22.1, including native Tesseract 5.x and paired Tesseract.js baseline.
+1. Current-source complete screenshot OCR acceptance on Windows using the governing Node.js 22.16.0 baseline, including native Tesseract 5.x and paired Tesseract.js baseline. Run a separate Node 24+ variant only if a concrete test/tool requirement is shown to need it.
 2. Real local Discord OAuth, browser visual QA, Player/Admin authorization checks and synthetic screenshot upload through the running bot.
 3. Isolated development-guild Discord smoke: READY, effective channel permissions, command policy, synthetic attachment processing, restart/recovery and natural rate-limit observations.
 4. Windows persistence/recovery: separate-process JSON/SQLite reopen, full private archive restore, physical SQLite copy/restore, WAL checkpoint and database integrity.

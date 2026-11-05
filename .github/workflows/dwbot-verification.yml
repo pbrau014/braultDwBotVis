@@ -59,8 +59,8 @@ jobs:
       - name: Full project suite
         run: npm test
 
-  windows-node24-native-ocr:
-    name: Windows Node.js 24.22.1 - native Tesseract and persistence
+  windows-node22-native-ocr:
+    name: Windows Node.js 22.16.0 - native Tesseract and persistence
     runs-on: windows-latest
     timeout-minutes: 180
     permissions:
@@ -70,10 +70,10 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Set up Node.js 24.22.1
+      - name: Set up Node.js 22.16.0
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 24.22.1
+          node-version: 22.16.0
           cache: npm
           package-manager-cache: false
       - name: Install native OCR prerequisites
@@ -111,7 +111,7 @@ jobs:
           npm ci --no-audit --no-fund
       - name: Windows process-level persistence and recovery
         run: npm run test:persistence-recovery
-      - name: Full Windows Node 24 test suite
+      - name: Full Windows Node 22 test suite
         run: npm test
       - name: Current-source Tesseract.js and native Tesseract screenshot acceptance
         shell: powershell
@@ -139,7 +139,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 24.22.1
+          node-version: 22.16.0
           cache: npm
           package-manager-cache: false
       - name: Install Pandoc and MiKTeX

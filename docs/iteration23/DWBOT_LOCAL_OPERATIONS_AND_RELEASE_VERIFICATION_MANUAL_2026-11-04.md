@@ -24,7 +24,7 @@ Use the active main checkout and confirm a clean working tree:
     npm ci
     npm ls --depth=0
 
-Current Windows acceptance requires Node 24.22.1 or newer stable Node 24, native Tesseract 5.x with English traineddata, and ImageMagick. Verify tesseract.exe --version, tesseract.exe --list-langs and magick.exe -version. Set TESSERACT_BIN and IMAGEMAGICK_BIN to exact executable paths if PATH is ambiguous.
+Current Windows acceptance uses the governing Node.js 22.16.0 baseline, native Tesseract 5.x with English traineddata, and ImageMagick. Run any separately identified test that genuinely requires Node.js 24 or later with the installed Node 24+ runtime and record it as a distinct version-specific result. Verify tesseract.exe --version, tesseract.exe --list-langs and magick.exe -version. Set TESSERACT_BIN and IMAGEMAGICK_BIN to exact executable paths if PATH is ambiguous.
 
 ## 3. Full OCR screenshot acceptance
 
