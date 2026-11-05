@@ -1739,7 +1739,7 @@ async function extractTextCore(imageBuffer) {
     const creditPrefixRecovery = reconcileCreditPrefix(
         localizedRewardEvidence.values.credits,
         localizedRewardEvidence.wordGeometry?.reads?.credits || localizedRewardEvidence.reads.credits,
-        legacyRewardCandidates,
+        rewardConflictCandidates,
         localizedRewardEvidence.wordGeometry?.words || [],
     );
     localizedRewardEvidence.creditPrefixRecovery = creditPrefixRecovery;
