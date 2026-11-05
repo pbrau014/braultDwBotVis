@@ -1,4 +1,160 @@
 ================================================================================
+CURRENT EXECUTION RECONCILIATION — 2026-11-05 (NEWEST ACTIVE STATUS)
+This block supersedes stale current-head, CI, package and deliverable-identity
+statements below. Preserve all dated history and source distinctions.
+================================================================================
+
+A. CANONICAL SOURCE AND TEST-FIX COMMITS
+- Sole canonical repository: https://github.com/pbrau014/braultDwBotVis.git;
+  active implementation/delivery branch is main only. Current main HEAD:
+  5a12a9c218cebe61d277999318b7ceef5a8dc3b1.
+- The plan's recorded 818f2a... and earlier cdb872... heads are ancestors of
+  current main, not competing active heads. The dated plan path
+  docs/continuation/DWBOT_LIVING_RUNNING_PLAN_2026-11-05_CURRENT.txt was
+  superseded by docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt.
+- Two fast-forward test-fix commits were pushed after rereading the expected main
+  head and verifying each update:
+  * 78558e68c414ec4ed5164fc0d7dbdbcb8e8d9d59 — aligned the desktop upload
+    assertion with the 25 MiB limit and changed the oversized Discord fixture
+    from 11 MiB to 26 MiB so it truly exceeds the current bound. Its first
+    identity-crop fixture edit changed the wrong occurrence; it is an
+    intermediate correction, not the final geometry fixture.
+  * 5a12a9c218cebe61d277999318b7ceef5a8dc3b1 — corrected both identity-overlap
+    fixtures: the result crop intersects the identity ROI in the same
+    coordinate space, and the scaled damage crop intersects after 2x conversion.
+    No production OCR code changed in these commits; they correct stale test
+    expectations/fixtures.
+- Run 42109503496 on ancestor 5054d558... exposed the stale 10 MiB UI assertion,
+  11 MiB attachment fixture and wrong identity-crop geometry. Run 42111316216
+  on 78558e68... confirmed the desktop/attachment test fixes but still failed
+  because the first geometry edit moved the result crop outside the identity
+  ROI. Do not transfer that failed result to the final 5a12a9c... head.
+
+B. EXACT-HEAD CI — RUN 42111470540 ON 5a12a9c...
+- Linux offline job PASS: npm ci, syntax, OCR.Space mocked contract 35/35,
+  Discord offline preflight/policy 21/21, desktop offline configuration
+  preflight 31/31, process-level JSON/SQLite recovery, and full project suite
+  284 total / 282 passed / 0 failed / 2 optional environment skips.
+- PDF manual and clean-package job PASS: 543 source files, 543 manifest entries,
+  545 ZIP entries, manifest verified, clean extraction, npm ci, npm test and
+  prelive all PASS. Source ZIP SHA-256:
+  1048a374d6d2a304d7a19f7f401eac9849c217bd8bfd87d8b202ef3607411646.
+  Outer artifact ID 13455425973, SHA-256:
+  716d7340bd1f495f1b87a442059e75e27ad37e63bf87961e200c1e1ccfb02153.
+- DWBOT_USER_MANUAL.pdf: 8 pages, all pages visually inspected. Page 1 has
+  internal named destinations/bookmarks; page 2 is the summary; chapter 1
+  begins page 3; all five chapters are present. No clipping/overlap found.
+  SHA-256 54ac820c738b3b55d505ec7d529ece4ac8ad6ad394ae037fd9203a37b3d81f5e.
+- DWBOT_LOCAL_OPERATIONS_AND_RELEASE_VERIFICATION_MANUAL_2026-11-04.pdf:
+  4 pages, all visually inspected. Legible and unclipped; final page is sparse
+  but usable. SHA-256
+  5674450e6fafb54b15989d226414fad5ee99736298ddb810203db4539c81ef5f.
+- Windows Node 22.16.0 job: native Tesseract 5.x, ImageMagick, isolated OpenCV,
+  locked dependency install, Windows process-level persistence/recovery and
+  full Windows Node 22 test suite PASS. Current-source Tesseract.js/native
+  screenshot acceptance remains IN PROGRESS. Do not claim Windows OCR
+  acceptance until its step completes and its report, per-image/per-field
+  evidence and network logs are inspected. The script sets OCRSPACE_ENABLED=0
+  and network blocking; this is local-only, not a live OCR.Space request.
+- These results are fingerprint-bound to 5a12a9c... only. Any later commit
+  requires fresh exact-head verification; do not transfer these results.
+
+C. OCR.SPACE AND NINE-FIELD RULES
+- OCR.Space is the active DWBOT development focus until project-wide
+  implementation, review and verification close. It is default-on when a local
+  Free API key is configured: blank/unset OCRSPACE_ENABLED or 1 enables;
+  explicit 0 disables; invalid non-empty values fail closed; a local key is
+  mandatory. No key is configured in this session; no live request or screenshot
+  transmission has occurred.
+- When used: OpenCV geometry-only safe-crop planning -> OCR.Space Engine 3
+  separate remote text evidence -> independent local Tesseract.js processing
+  and exact validation. Remote text cannot accept, merge, rewrite or override a
+  mandatory value. Only minimum-necessary, pre-localized, non-identifying crops;
+  never full screenshots, player identity, Discord IDs, credentials or private
+  account data. No paid tier/usage. Retain HTTPS, fixed endpoint, redirect
+  rejection, bounded sizes/timeouts, sequential calls, no retries, quotas and
+  fail-closed ledger.
+- Engine 3 searchable PDF is SUPPORTED in DWBOT's capability comparison based
+  on feature-description prose. Preserve the provider's conflicting comparison
+  matrix as a documentation conflict; check SearchablePDFURL at runtime and use
+  quota-reserved Engine 2 only for PDF generation if needed, discarding Engine 2
+  OCR text. No paid workaround.
+- Exact mandatory order: result, player, map, mode, battleStart, credits,
+  freeXp, damage, xp. XP is mandatory ninth. Missing, invalid, ambiguous,
+  conflicting or incorrect mandatory values prevent acceptance. Zero wrongly
+  accepted mandatory values is required.
+
+D. READ-ONLY MISSING-FILE / HISTORICAL BRANCH SEARCH
+- Current main contains the active living plan at
+  docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt. The old dated path is
+  a rename, not a missing required artifact. No OCR.Space source/test dependency
+  was found missing in the targeted current-main review.
+- The previously cited docs/continuation/TOURNAMENT_LIFECYCLE_ADMIN_GUIDE.md is
+  absent from current main and the inspected historical feature branches; no
+  exact replacement was found. Treat it as an unresolved historical reference.
+- Open PR #7 on feature/grand-yolo-format-lifecycle at
+  74137e218889da57b8674111189344323ea06070 lists the strongest four-file
+  GrandYoloInstruct candidate set: docs/yolo/IMPLEMENTATION_PLAN_AND_DECISIONS.md,
+  docs/yolo/grandYoloInstruct.md, grandYoloInstruct.html and grandYoloInstruct.txt.
+  Its exact-head offline Node 22/24 runs 41928708200 and 41928702763 passed;
+  Node 22 reported 283 tests, 281 passed, 0 failed, 2 optional skips. However
+  the PR is open and diverged 77 commits ahead / 113 behind current main, merge
+  base 3659d4701631f707f9e34d3818b11e1aa9a5ddc3. The PR body says later changes
+  after 4c2cef... were documentation-only, but compare shows 31 later commits
+  changed desktop UI, desktop bridge/service, src/yolo-formats.js and tests.
+- Competing PR #5/#11 and feature/pilot-full-yolo-lifecycle contain different
+  document sets. The latter branch is 103 ahead / 113 behind main; its TXT
+  numbering and implementation-plan DOCX page-count statements conflict.
+  The four-file identity remains UNCONFIRMED; do not copy/merge/publish these
+  drafts as current-main documentation. Full read-only findings are in
+  GRANDYOLOINSTRUCT_DELIVERABLE_CROSSWALK.md.
+- Search scope was targeted to known DWBOT repositories/branches and named
+  deliverables; it was not an exhaustive content audit of every repository.
+  No historical branch, repository or PR was modified, merged or deleted.
+
+E. CHAT RULES AND AUTHORIZATION
+- All DWBOT research, plan work, file review, edits, GitHub operations, testing
+  and reporting remain in this ChatGPT conversation; no Work-mode handoff.
+  Do not emit interim progress narration or partial status reports; give one
+  consolidated summary after authorized work completes or a concrete blocker
+  remains.
+- This is the governing living plan. Keep the active queue current and concise,
+  preserve history/provenance, and distinguish attempted, completed, tested,
+  verified and accepted. A queued/running job is not complete.
+- The user explicitly authorizes all File Library mutations (create, append,
+  update, move, rename and delete) for the remainder of this chat only, subject
+  to higher-priority safety/tool limits. This authorization expires at the end
+  of this chat and must not be carried into future chats without renewed
+  permission. Preserve provenance and verify each Library mutation.
+- GitHub write scope remains canonical pbrau014/braultDwBotVis main and the
+  described DWBOT plan/OCR.Space work only. Other branches/repos remain
+  read-only. No force push, history rewrite, production deployment, live Discord
+  operation, paid service or production screenshot transmission is authorized.
+
+F. OPEN GATES / NEXT STEPS
+1. Finish run 42111470540 Windows current-source screenshot acceptance. Inspect
+   its artifact and every nine-field value per image, exact/complete counts,
+   wrong accepted values, unresolved fields, runtime/engine/model fingerprint
+   and network logs. If failures occur, trace a demonstrated root cause, add
+   regression tests, correct on a fresh main head and rerun.
+2. Then complete Gate A on the approved 16-image development corpus, followed
+   by independent Gate B on 50 minimum / 100 preferred holdout images with
+   independent nine-field ground truth and no holdout tuning. Zero wrong
+   mandatory acceptances required.
+3. Before first live OCR.Space request, recheck current Free-tier/terms/privacy/
+   retention, configure a local Free key without sharing it, and run only a
+   synthetic non-identifying smoke. No production screenshots or identity data.
+4. Complete browser/OAuth/desktop visual and upload QA, isolated Discord
+   staging, security review, backup/restore/rollback and final release decision.
+   Production remains NO-GO until every applicable gate is accepted.
+5. Reconcile the GrandYoloInstruct candidate set after OCR priorities; do not
+   merge historical branches or publish draft manuals as current main.
+
+================================================================================
+END CURRENT EXECUTION RECONCILIATION — 2026-11-05
+================================================================================
+
+================================================================================
 EXECUTIVE SUMMARY — CURRENT STATE AND RECOMMENDED NEXT WORK — 2026-11-05
 ================================================================================
 

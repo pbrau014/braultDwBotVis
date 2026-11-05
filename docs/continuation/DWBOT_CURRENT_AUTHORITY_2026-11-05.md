@@ -1,3 +1,13 @@
+# Current authority override — 2026-11-05
+
+Canonical repository: pbrau014/braultDwBotVis; active branch: main; checkpoint head: 5a12a9c218cebe61d277999318b7ceef5a8dc3b1. Other branches and repositories are historical/read-only. No force-push, history rewrite, branch merge, production deployment, live Discord action, paid service or production screenshot transmission.
+
+OCR.Space is the active development focus. It is default-on when a local Free API key is configured; blank/unset or OCRSPACE_ENABLED=1 enables, explicit 0 disables, invalid non-empty values fail closed, and a local key is mandatory. OCR.Space Engine 3 supplies separate remote text evidence only after OpenCV geometry-only safe-crop planning; Tesseract.js remains the independent local acceptance authority. Remote evidence cannot accept or overwrite mandatory fields. Engine 3 searchable PDF is Supported in DWBOT's capability comparison; preserve the provider comparison-matrix conflict and Engine 2 PDF-only fallback with Engine 2 text discarded.
+
+Nine mandatory fields, in order: result, player, map, mode, battleStart, credits, freeXp, damage, xp; XP is ninth and mandatory. Zero wrongly accepted mandatory values required. Node 22.16.0 is authorized; Windows-only OCR, native Tesseract and process behavior must be verified on Windows.
+
+Run 42111470540 on head 5a12a9c218cebe61d277999318b7ceef5a8dc3b1: Linux and clean-package/PDF jobs PASS; Windows persistence/recovery and full Node 22 suite PASS; current-source Windows screenshot acceptance remains in progress. Production NO-GO. Current chat only: the user has authorized all File Library mutations through the end of this chat; this authorization does not carry into future chats.
+
 # DWBOT canonical repository and implementation authority
 
 Canonical repository: https://github.com/pbrau014/braultDwBotVis.git

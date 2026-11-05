@@ -1,3 +1,12 @@
+## Current execution checkpoint — 2026-11-05
+
+- Canonical main is 5a12a9c218cebe61d277999318b7ceef5a8dc3b1. The two test-only corrections are committed and verified: 78558e68c414ec4ed5164fc0d7dbdbcb8e8d9d59 and 5a12a9c218cebe61d277999318b7ceef5a8dc3b1.
+- Exact-head Actions run 42111470540 on 5a12a9c218cebe61d277999318b7ceef5a8dc3b1: Linux offline PASS (284 total, 282 pass, 0 fail, 2 optional skips; OCR.Space mocked 35/35; Discord preflight 21/21; desktop preflight 31/31); clean-package/PDF job PASS; Windows persistence/recovery and full Node 22 suite PASS. Windows screenshot acceptance is still running and is not a pass yet.
+- Clean package: 543 source files, 543 manifest entries, 545 ZIP entries; manifest, clean extraction, npm ci, npm test and prelive PASS. Source ZIP SHA-256: 1048a374d6d2a304d7a19f7f401eac9849c217bd8bfd87d8b202ef3607411646.
+- The 8-page user manual and 4-page operations manual were visually inspected page-by-page. The user manual's page-1 TOC internal destinations were verified. Production remains NO-GO.
+- OCR.Space is default-on only when a local Free API key is configured; explicit OCRSPACE_ENABLED=0 disables it, invalid non-empty values fail closed, and a local key remains mandatory. No live request or production screenshot transmission occurred.
+- See docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt for the full queue and evidence. Historical branches remain read-only; no PRs were merged.
+
 # World of Warships YOLO Tournament Discord Bot (DWBOT)
 
 DWBOT is a local-first Node.js Discord tournament bot, strict screenshot OCR pipeline, and desktop Player/Admin workspace.

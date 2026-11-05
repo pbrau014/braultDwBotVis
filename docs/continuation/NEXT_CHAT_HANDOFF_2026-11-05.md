@@ -1,3 +1,17 @@
+# Current continuation update — 2026-11-05
+
+Canonical repository: pbrau014/braultDwBotVis, branch main, checkpoint head 5a12a9c218cebe61d277999318b7ceef5a8dc3b1. Continue in this ChatGPT conversation only; do not use Work mode. Do not emit interim progress narration; update the living plan and report one consolidated result.
+
+The two current-main commits 78558e68c414ec4ed5164fc0d7dbdbcb8e8d9d59 and 5a12a9c218cebe61d277999318b7ceef5a8dc3b1 corrected stale 25 MiB upload/attachment test expectations and identity-ROI coordinate fixtures. Exact-head Actions run 42111470540: Linux offline PASS (284 total / 282 passed / 0 failed / 2 optional skips; OCR.Space 35/35, Discord 21/21, desktop 31/31); clean package/PDF PASS (543 source files, 543 manifest entries, 545 ZIP entries, npm ci/test/prelive pass); Windows persistence/recovery and full Node 22 suite PASS. Windows current-source Tesseract.js/native screenshot acceptance remains in progress and must be inspected before Gate A closure.
+
+The clean package SHA-256 is 1048a374d6d2a304d7a19f7f401eac9849c217bd8bfd87d8b202ef3607411646; workflow artifact 13455425973 SHA-256 716d7340bd1f495f1b87a442059e75e27ad37e63bf87961e200c1e1ccfb02153. The 8-page user manual and 4-page operations manual were visually inspected page-by-page; user-manual TOC internal destinations were verified.
+
+OCR.Space default-on rule: local Free key required; blank/unset or OCRSPACE_ENABLED=1 enables, explicit 0 disables, invalid non-empty values fail closed. Engine 3 searchable PDF is Supported in DWBOT's capability comparison while the provider matrix conflict remains documented; Engine 2 is PDF-only fallback and its OCR text is discarded. Nine required fields remain exactly result, player, map, mode, battleStart, credits, freeXp, damage, xp; XP mandatory ninth. Production remains NO-GO.
+
+Read-only historical search found a likely four-file GrandYoloInstruct candidate on open PR #7, but competing PR #5/#11 and divergent branches prevent confirming the user's exact four deliverables. Do not merge or copy drafts to main; see the updated crosswalk. No other branch/repository was mutated.
+
+Current next steps: inspect run 42111470540's Windows screenshot artifact; then Gate A 16-image, independent Gate B holdout, synthetic-only OCR.Space live smoke after current terms/privacy review and local Free key, browser/OAuth/desktop QA, isolated Discord staging, backup/restore/rollback and final release review. No paid use, production screenshots, live Discord or production deployment.
+
 # CURRENT MAIN IMPLEMENTATION AND VERIFICATION ADDENDUM — 2026-11-05
 
 This addendum supersedes stale branch/head/run statements in the historical
