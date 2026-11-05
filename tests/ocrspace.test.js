@@ -1,4 +1,5 @@
 'use strict';
+const { spawn } = require('node:child_process');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
@@ -299,4 +300,77 @@ test('bot runs the geometry-only OCR.Space prepass before Tesseract and excludes
     assert.ok(bot.includes('ocrSpaceReconciliation,'));
     assert.ok(bot.includes('OCR.Space diagnostic cross-check (no acceptance authority)'));
     assert.ok(bot.includes("player: 'excluded_by_privacy_policy'"));
+});
+
+
+test('quota ledger serializes independent Windows/Node processes and atomically replaces the existing state', async () => {
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'ocrspace-cross-process-'));
+    try {
+        const filePath = path.join(dir, 'quota.json');
+        const modulePath = path.join(__dirname, '..', 'src', 'ocrspace-quota-ledger.js');
+        const childScript = `
+            const { OcrSpaceQuotaLedger } = require(process.argv[1]);
+            (async () => {
+                try {
+                    const ledger = new OcrSpaceQuotaLedger({
+                        filePath: process.argv[2], maxPerDay: 2, maxPerMonth: 2,
+                        maxEngine3PerMonth: 2, lockWaitMs: 5000, staleLockMs: 30000,
+                    });
+                    const reservation = await ledger.reserve({
+                        engine: 3, now: new Date('2026-11-05T12:00:00.000Z'),
+                    });
+                    process.stdout.write(JSON.stringify({ ok: true, reservation }));
+                } catch (error) {
+                    if (error.code === 'OCRSPACE_QUOTA_EXHAUSTED') {
+                        process.stdout.write(JSON.stringify({ ok: false, code: error.code }));
+                    } else {
+                        process.stderr.write(String(error && error.stack || error));
+                        process.exitCode = 1;
+                    }
+                }
+            })();
+        `;
+        const runChild = () => new Promise((resolve, reject) => {
+            const child = spawn(process.execPath, ['-e', childScript, modulePath, filePath], {
+                stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true,
+            });
+            let stdout = '', stderr = '';
+            child.stdout.setEncoding('utf8');
+            child.stderr.setEncoding('utf8');
+            child.stdout.on('data', chunk => { stdout += chunk; });
+            child.stderr.on('data', chunk => { stderr += chunk; });
+            child.once('error', reject);
+            child.once('close', (code, signal) => {
+                if (code !== 0) return reject(new Error(`Quota child failed (code=${code}, signal=${signal}): ${stderr}`));
+                try { resolve(JSON.parse(stdout)); }
+                catch (error) { reject(new Error(`Quota child returned invalid JSON: ${stdout}; ${error.message}`)); }
+            });
+        });
+        const outcomes = await Promise.all([runChild(), runChild(), runChild()]);
+        assert.equal(outcomes.filter(item => item.ok).length, 2);
+        assert.equal(outcomes.filter(item => item.code === 'OCRSPACE_QUOTA_EXHAUSTED').length, 1);
+        assert.deepEqual(outcomes.filter(item => item.ok).map(item => item.reservation.daily).sort(), [1, 2]);
+        const state = JSON.parse(await fs.readFile(filePath, 'utf8'));
+        assert.equal(state.daily['2026-11-05'], 2);
+        assert.equal(state.monthly['2026-11'], 2);
+        assert.equal(state.engine3Monthly['2026-11'], 2);
+        await assert.rejects(fs.stat(filePath + '.lock'), { code: 'ENOENT' });
+        assert.deepEqual((await fs.readdir(dir)).sort(), ['quota.json']);
+    } finally { await fs.rm(dir, { recursive: true, force: true }); }
+});
+
+test('quota ledger reclaims a stale lock before reserving', async () => {
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'ocrspace-stale-lock-'));
+    try {
+        const filePath = path.join(dir, 'quota.json');
+        const lockPath = filePath + '.lock';
+        await fs.writeFile(lockPath, JSON.stringify({ pid: -1, createdAt: 'stale' }));
+        const stale = new Date(Date.now() - 7000);
+        await fs.utimes(lockPath, stale, stale);
+        const ledger = new OcrSpaceQuotaLedger({ filePath, lockWaitMs: 500, staleLockMs: 5000 });
+        const reservation = await ledger.reserve({ engine: 3, now: new Date('2026-11-05T12:00:00.000Z') });
+        assert.equal(reservation.reserved, true);
+        assert.equal(reservation.daily, 1);
+        await assert.rejects(fs.stat(lockPath), { code: 'ENOENT' });
+    } finally { await fs.rm(dir, { recursive: true, force: true }); }
 });

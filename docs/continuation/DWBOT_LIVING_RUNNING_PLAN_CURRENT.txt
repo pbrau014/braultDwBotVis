@@ -1,3 +1,123 @@
+================================================================================
+CURRENT EXECUTION OVERRIDE — 2026-11-05 (AFTER WINDOWS ARTIFACT REVIEW)
+================================================================================
+
+Canonical repository: pbrau014/braultDwBotVis
+Active branch: main only. Historical branches/repositories remain read-only.
+This status block is current at the commit that contains it; re-fetch main and
+record the exact SHA before the next write. It supersedes older current-head
+statements below without deleting historical evidence.
+
+RECENT MAIN IMPLEMENTATION CHANGES
+- 7fe2d9721eef6d08d0085e00f2d524f7e5c8d8f5: require verified identity-boundary
+  geometry for OCR.Space field crops. Both the OpenCV prepass and last-resort
+  local-crop filter mark a crop eligible only after checking it against the
+  identity ROI. Unverified crop plans are rejected before crop construction,
+  quota reservation or provider calls.
+- 5d6478bfe6a2125ff182ac72098727c449541e25: corrected the two scaled/unscaled
+  identity-overlap regression fixtures.
+- a78de416480acd4c09009dc128563ec386582c07 and
+  0dd3fd4314c433b58e546ca8a292aae5e7031408: fixed the Windows OCR acceptance
+  wrapper's native-stderr handling. Windows PowerShell 5.1 with
+  ErrorActionPreference=Stop could turn the OCR supervisor's normal stderr
+  close message into a terminating NativeCommandError after the child exited
+  successfully. The wrapper now redirects stdout and stderr to separate
+  temporary files, retains both in the command transcript, streams stdout,
+  and cleans both temporary files. A static regression test checks the contract.
+  This fix is committed but is not yet verified by a completed Windows run.
+- 3fdacf32401e5bbbe0720db38e0a2b2959938ee1 and
+  3f0eee8112d304a63ec8d3f234ff0acbc12766f0: tighten reward/damage conflict
+  handling. Numeric rewards require two agreeing isolated reads; independently
+  corroborated prefix/suffix conflicts trigger geometry adjudication or
+  abstention; broad-only reward guesses are no longer retained when localized
+  geometry is unavailable. A geometry-bounded damage crop conflict blocks a
+  conflicting broad full-screen consensus unless a specific geometry quorum
+  repair rule proves the value.
+- d7a1e99edb500b6423689789aad61b2e5714d391: deduplicate broad OCR conflict
+  evidence by PSM/source and make geometry-anchor support checks use the same
+  consolidated conflict-candidate set. These changes tighten conflict provenance;
+  they are not screenshot-accuracy acceptance evidence.
+
+EXACT-SOURCE WINDOWS ARTIFACT REVIEW — RUN 42111470540
+- This run is bound to source checkpoint 5a12a9c218cebe61d277999318b7ceef5a8dc3b1,
+  not the newer main source. Linux offline verification and PDF/clean-package
+  verification passed on that checkpoint. Windows JSON/SQLite persistence and
+  recovery passed 11 stages with 50 synthetic players; the full Windows Node
+  22 test suite passed. Do not transfer those results to newer SHAs.
+- The Windows OCR acceptance job failed. The captured report identifies Windows
+  x64, Node v22.16.0, npm 10.9.2, Tesseract.js 6.0.1 and core 6.1.2; native
+  Tesseract was installed and network blocking reported no blocked attempts.
+  Unit/contract tests passed 105/105 and local asset packaging passed.
+- The additional 16-image Tesseract.js report completed 16/16 images but only
+  6/16 had exact nine-field records and complete required fields. Four incorrect
+  numeric values were emitted: Screenshot_2024-11-14_133326.png Free XP 190
+  versus 1904; image1.png Free XP 695 versus 1695; image2.png damage 1349538
+  versus 134953; image3.png Free XP 2 versus 2350. Other records had unresolved
+  values, including XP (4), damage (2), Free XP (2) and Credits (1); several
+  identity/metadata fields were returned as the non-value sentinel "Not detected".
+  Sentinel values are unresolved, not correct OCR values.
+- image3.png's broad PSM 3/11 text included XP 6646 and Free XP 2350, while the
+  localized reward extraction selected XP as missing and Free XP as 2. This is
+  a demonstrated disagreement between broad OCR and the selected local crop.
+  image2.png's broad damage reads included 1349538 (the adjacent destroyed-ribbon
+  x6 digit was appended), while isolated crops read only 13495. The correct
+  response is abstention unless independent geometry can recover the complete
+  exact value; never accept either unsupported variant.
+- The Windows job stopped during the Tesseract.js baseline wrapper before the
+  native-Tesseract and CV-assisted comparisons completed. The uploaded artifact
+  did not contain a completed Windows final acceptance report. Native comparison
+  and CV-assisted results therefore remain unverified.
+
+OCR.SPACE REVIEW / PRIVACY
+- Current main contains the OCR.Space client, quota ledger, field-evidence
+  collector, geometry prepass, local fallback filter, reconciliation module,
+  bot call sites and mocked tests. No required OCR.Space source/test dependency
+  was found missing in the targeted current-main review.
+- The collector requires allowlisted field/source values and an explicit
+  identityBoundaryVerified marker. The geometry builders only set that marker
+  after verifying a valid identity ROI and non-overlap. Player identity is
+  excluded; remote OCR evidence is diagnostic only and cannot accept or rewrite
+  local mandatory fields. HTTPS fixed endpoint, redirect rejection, bounded
+  request/response sizes, timeouts, sequential requests, quotas and fail-closed
+  ledger are implemented.
+- OCR.Space is default-on only when a local API key is configured; explicit
+  OCRSPACE_ENABLED=0 disables it and invalid settings fail closed. No key is
+  configured in this session. No live request, screenshot transmission or paid
+  usage occurred. Live provider smoke remains blocked pending current Free-tier
+  terms/privacy review, a local key and explicit synthetic non-identifying test
+  authorization.
+- Quota-ledger code uses exclusive lock-file creation, fsync of a unique
+  temporary state file and rename. Existing tests covered same-process
+  contention; this update adds cross-process concurrent reservations and stale
+  lock recovery tests. They are committed but await exact-head Windows CI.
+
+CURRENT CI / NEXT EXECUTION
+- Older run 42115665732 is still running on ancestor ff797fe87bd4094a9e08f9195037d668681d6675.
+  Its Linux and clean-package jobs passed; its Windows screenshot step is still
+  in progress and uses the pre-fix PowerShell wrapper. Do not treat it as
+  verification of current main.
+- Run 42117234791 was queued on 3f0eee8112d304a63ec8d3f234ff0acbc12766f0
+  and was superseded by later source commits. Do not treat its cancelled status
+  as verification.
+- Immediate order: (1) verify exact-head Linux, Windows and package jobs; inspect
+  Windows baseline Tesseract.js, CV-assisted Tesseract.js and native Tesseract
+  reports plus network logs; (2) review each image/field, wrong accepted values
+  and unresolved fields; (3) correct demonstrated root causes with regression
+  tests and rerun; (4) complete Gate A's approved 16-image corpus with zero wrong
+  mandatory values and zero unresolved required fields; (5) only then run
+  independent Gate B on at least 50, preferably 100, holdout images with no
+  tuning; (6) continue desktop/OAuth, isolated Discord, backup/restore/rollback,
+  documentation and release work in plan order.
+- Preserve the exact nine mandatory fields and order:
+  result, player, map, mode, battleStart, credits, freeXp, damage, xp.
+  XP is mandatory ninth. Zero wrongly accepted mandatory values is required.
+  Production remains NO-GO. Do not bypass authentication, branch protection,
+  privacy controls, test gates or release acceptance criteria.
+
+================================================================================
+END CURRENT EXECUTION OVERRIDE — 2026-11-05
+================================================================================
+
 CURRENT BRANCH / TESTED-SOURCE STATUS OVERRIDE — 2026-11-05
 
 - Last source-code checkpoint is 5a12a9c218cebe61d277999318b7ceef5a8dc3b1.
