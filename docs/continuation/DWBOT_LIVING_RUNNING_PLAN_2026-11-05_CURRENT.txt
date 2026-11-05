@@ -47,12 +47,21 @@ B. GITHUB AUTHORITY AND COMPLETED OPERATIONS
   blob/tree; use a fast-forward commit and expected-head lease where the tool
   supports it; after each write, re-read the branch head and verify changed
   files. Never force-push or rewrite history.
-- The previously authorized root-only cleanup was checked against the current
-  main root using the exact supplied 332-name list. No listed root-level files
-  remained to delete in the inspected main tree; therefore no deletion commit
-  was made. Nested occurrences and all unrelated files were left alone. No
-  historical branch or other repository was changed by this cleanup.
-- The OCR implementation source candidate was `e1993bf91f54a2f366d5b5739b4aafa0c318be1a`; subsequent docs/CI/plan synchronization advanced main. Current main HEAD before this continuation-plan refresh: `f1f777e0192b058c94699f1c94e5379dc0722eb8`. This is a development candidate, not a release or production acceptance.
+- The previous local source-archive root cleanup report records source archive
+  SHA-256 `29268d399c9645b71a6974104a971c6eec12b303cc48d6facf866cd77e4b3cdc`,
+  cleaned archive SHA-256
+  `480f759c7e3ddbcd32932c3e934d9bdafc4c53b1e27bbf710e57eb23be190504`,
+  332 requested names, 350 root entries before, 20 after, 330 removed and 2
+  already absent; 161 nested occurrences were preserved and all remaining
+  bytes/unrequested entries were verified unchanged. This was a local archive
+  operation, not a GitHub deletion.
+- The exact 332-name list from that report was parsed and compared against the
+  current canonical GitHub `main` tree (42 root entries) at HEAD
+  `3a61e7632d3a891ace6d3bff3a4a53f4d88b070c`: zero matches. Therefore no
+  GitHub root deletion commit is needed. No historical branch or other
+  repository was changed; nested files and all unrelated root files remain.
+  The active branch scope remains canonical `main` only.
+- The OCR implementation source candidate was `e1993bf91f54a2f366d5b5739b4aafa0c318be1a`; subsequent docs/CI/plan synchronization advanced main. Current main HEAD before this continuation-plan refresh: `3a61e7632d3a891ace6d3bff3a4a53f4d88b070c`. This is a development candidate, not a release or production acceptance.
 - OCR.Space and supporting implementation commits on main (in chronological
   order; verify the exact commit chain in GitHub when needed):
   `ce0b2b71d08366d2997b044a9e40390fefe11b6b`;
@@ -76,7 +85,7 @@ B. GITHUB AUTHORITY AND COMPLETED OPERATIONS
   `fbfcef51c24473bf3e56859a4f446358d74c9ec82`,
   `b101f054d91be6a070f022d2cb3f643aa47f5249`,
   `f1e6030d105647bb27c07f1037b202d9d88343e7`; and CI correction
-  `9037e0b1f7c98378658413ef8c76b70f32ed3a4c`, `940e1e7a7ca8a8f165c63f640444f35607ed2532`, and `03204e87df9f438f57dc2ad456d4dbb397b63e92`, `8d4b4bc88d22e5c32aab8ce40df2ec583aec4a84`, `8789a101de7e28b1963baab2be27a23e9eab8681`, `d1c312d0342b0d4a9e711b342f971c7a4894f35f`, `a65d7b3a105125f846e1cf13c6518f8671d9490c`, `13db21e0659f6e364d2c36b94fa0c45d008690f0`, `c8b117bc8c04d9dc4af31bdc72fc3e2bc26b4a84`, `796dd9e477506d0a64b4d1025aa7f70d00c2b990`, and `ca2c37653d6299c310e8291ed62dc78148933b11`, `65bc54dc305aa9d24d31842d9ed545583e980411`, `79234b5cfaea2aba1a35678216f13cae0ee28edd`, `ec81a88470f5289eb1c0cb6e2662ea288e67e005`, and `f1f777e0192b058c94699f1c94e5379dc0722eb8`.
+  `9037e0b1f7c98378658413ef8c76b70f32ed3a4c`, `940e1e7a7ca8a8f165c63f640444f35607ed2532`, and `03204e87df9f438f57dc2ad456d4dbb397b63e92`, `8d4b4bc88d22e5c32aab8ce40df2ec583aec4a84`, `8789a101de7e28b1963baab2be27a23e9eab8681`, `d1c312d0342b0d4a9e711b342f971c7a4894f35f`, `a65d7b3a105125f846e1cf13c6518f8671d9490c`, `13db21e0659f6e364d2c36b94fa0c45d008690f0`, `c8b117bc8c04d9dc4af31bdc72fc3e2bc26b4a84`, `796dd9e477506d0a64b4d1025aa7f70d00c2b990`, and `ca2c37653d6299c310e8291ed62dc78148933b11`, `65bc54dc305aa9d24d31842d9ed545583e980411`, `79234b5cfaea2aba1a35678216f13cae0ee28edd`, `ec81a88470f5289eb1c0cb6e2662ea288e67e005`, and `f1f777e0192b058c94699f1c94e5379dc0722eb8`, and `3a61e7632d3a891ace6d3bff3a4a53f4d88b070c`.
 - These commits implement OCR.Space request configuration, Engine 3 searchable-PDF
   fallback, OpenCV geometry-first crop planning, identity-exclusion tests,
   OCR.Space-first ordering before Tesseract.js, duplicate-call suppression,
@@ -215,15 +224,15 @@ D. IMPLEMENTATION MAP AND CURRENT VERIFICATION STATE
 - Run `42089449390` on code commit
   `ca2c37653d6299c310e8291ed62dc78148933b11` is queued; it includes the new
   OCR.Space reconciliation helper, tests, bot validation integration and docs.
-  The helper code has not yet passed CI. Latest exact-head run `42089818654`
-  on current main `f1f777e0192b058c94699f1c94e5379dc0722eb8` is also queued.
+  The helper code has not yet passed CI. Latest exact-head run `42089953764`
+  on current main `3a61e7632d3a891ace6d3bff3a4a53f4d88b070c` is queued.
 - Mock tests do not prove live OCR.Space credentials, live provider accuracy,
   privacy review of production screenshots, or any accuracy improvement. No
   live provider request has been made. Production remains NO-GO.
 
 E. REQUIRED NEXT STEPS AND CLOSURE CONDITIONS
 
-1. Verify run `42089449390` for `ca2c37653d6299c310e8291ed62dc78148933b11` (especially the new diagnostic reconciliation tests), run `42089818654` for current main, and finish Windows screenshot acceptance on `42088538702`. Inspect the resulting artifacts before closing the gates.
+1. Verify run `42089449390` for `ca2c37653d6299c310e8291ed62dc78148933b11` (especially the new diagnostic reconciliation tests), run `42089953764` for current main, and finish Windows screenshot acceptance on runs `42088032492` and `42088538702`. Inspect the resulting artifacts before closing the gates.
    If any job fails, inspect the failing step/log, correct the root cause,
    commit on main with fresh-head verification, and repeat until all supported
    jobs pass or a documented environment blocker remains.
@@ -285,6 +294,7 @@ F. COMPLETION / CORRECTION HISTORY — 2026-11-05 (CHAT CONTINUATION)
 - Exact current-main CI run `42088804157` was queued at the time of the prior plan refresh; subsequent code integration advanced main. Latest exact-head run `42089449390` is queued. Linux pass on run `42088538702` is confirmed; Windows and clean-package results remain pending.
 - Cross-project review found that OCR.Space text was initially stored as separate diagnostic evidence but was not actually parsed against the local record. Added `src/ocrspace-reconciliation.js` and integrated it into screenshot validation: exact agreement/disagreement/remote-only/remote-conflict/no-candidate diagnostics are now emitted without merging remote candidates into the local record. Player remains excluded by privacy design. Added tests and CI syntax coverage. This is a material correction; do not claim it is tested until run `42089449390` completes.
 - Run `42088538702` now verifies the clean-package Tesseract-model provisioning correction: package manifest, clean extraction, dependency install, full npm test and prelive all PASS. The current-source Windows screenshot acceptance portion of the same run is still running.
+- Revalidated the historical 332-name root-cleanup list against the canonical GitHub `main` root: zero matches among 42 root entries. The local cleanup report was inspected; 330 requested names were removed from the local archive, 2 were already absent, and 161 nested occurrences were preserved. No GitHub deletion commit was necessary and no other branch/repository was changed.
 
 ================================================================================
 END CURRENT CHAT + GITHUB + OCR.SPACE AUTHORITY ADDENDUM — 2026-11-05
