@@ -6,7 +6,7 @@ DWBOT is a local-first Node.js Discord tournament bot, strict screenshot OCR pip
 
 Repository: https://github.com/pbrau014/braultDwBotVis  
 Active delivery/current working branch: main.  
-Current main HEAD at this update: 46f67311c8c7b3aba81f2864bed7843891f59f63. Exact-head CI run 42091326343 is queued; do not infer its result from earlier commits. OCR.Space reconciliation and report-metadata changes are included in main but await their first CI run (42091120857 and 42091326343).
+Current main HEAD at this update: 3fa151ce58e089d2e33023f459ce0f0da46c4abb. Exact-head CI run 42091655706 is queued; do not infer its result from earlier commits. OCR.Space reconciliation and report-metadata changes are included in main but await their first CI run (42091120857 and 42091655706).
 
 Node.js 22.16.0 Linux offline job on run 42088538702: PASS.
 - OCR.Space contract/prepass tests: 24/24.
