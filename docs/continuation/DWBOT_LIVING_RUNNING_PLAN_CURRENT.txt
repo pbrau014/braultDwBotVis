@@ -28,6 +28,101 @@ END PRIME DIRECTIVE
 ================================================================================
 
 ================================================================================
+CURRENT EXECUTION STATUS — 2026-11-05 17:15 AMERICA/CHICAGO
+This block supersedes older active-status statements below. Historical evidence
+is preserved and must not be projected onto a newer source fingerprint.
+================================================================================
+
+CANONICAL SOURCE AND ACTIVE PLAN
+- Repository: pbrau014/braultDwBotVis; active branch: main only.
+- Current main HEAD before this plan update: 6a3e3b57e0095967a9b05d6c4cb93c19c45607cf.
+- Canonical living-plan path: docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt.
+- The uploaded source attachment remains unchanged. This canonical derivative is
+  the working plan; update it after verified milestones and retain source/
+  derivative provenance.
+
+LATEST EXACT-HEAD CI — RUN 42127310691 ON 593a692dfc7220d77804d63ba2daf322f1a0159a
+- Linux Node 22.16.0 offline verification: completed SUCCESS. OCR.Space mocked
+  contract, Discord offline preflight/policy, desktop offline configuration,
+  desktop service/bridge, process recovery and full project suite passed.
+- Windows Node 22.16.0: process-level persistence/recovery passed; full suite
+  passed (291 tests, 289 passed, 0 failed, 2 skipped). Screenshot acceptance
+  is still running; do not infer its result.
+- PDF/clean-package: completed SUCCESS. PDF render, clean extraction, npm ci,
+  npm test and prelive checks passed. Source files 543; manifest entries 543;
+  ZIP entries 545; manifestVerified=true; cleanExtraction=true.
+- Package ZIP SHA-256: 529b40fe1e3dd60bcabc4fdb586c52e5bff77afaa0d0f496010b957d4223ff6c.
+- Outer package artifact SHA-256: ea20e781da7a12c32af437e7557aa3383110eb6661bc489da64dfa3c0a047aff.
+- Windows screenshot acceptance step 9 remains IN_PROGRESS. The run is not a
+  complete exact-head pass until this step and the full workflow complete.
+
+CURRENT-SOURCE OCR FINDINGS — RUN 42121716388 ON 3f0c0a2a7446414372f9db547d1e375f02fee5a0
+- Tesseract.js 6.0.1 / core 6.1.2; Windows x64; Node 22.16.0; npm 10.9.2.
+- Approved 16-image corpus: all 16 processed; 3/16 exact complete nine-field
+  records; 13/16 incomplete; 32 unresolved mandatory field values; zero wrong
+  non-empty accepted values within this 16-image corpus.
+- Unresolved counts by field: result 1, player 1, map 5, mode 2, battleStart 3,
+  credits 2, freeXp 5, damage 7, xp 6. The same field can be unresolved on
+  multiple images. Network blocking was enabled; no blocked attempts detected.
+- The repeated five-image regression batch was 3/5 exact in each of three
+  repetitions. One wrong accepted map value recurred:
+  "Crash Zone Alpha —" instead of "Crash Zone Alpha"; XP remained unresolved
+  on that screenshot. Hoffmann map and battleStart also remained unresolved.
+- These results are failures, not Gate A passes. The 16-image corpus is
+  fail-closed for uncertain values, but does not meet zero-unresolved criteria.
+
+WINDOWS ACCEPTANCE WRAPPER CORRECTION HISTORY
+- Run 42121716388 exposed PowerShell 5.1 promoting normal npm child stderr to a
+  terminating NativeCommandError. Commit e7d537bb91bc8ae70e051d6d20f96355f0605430
+  changed the wrapper to capture stdout/stderr at the cmd.exe process boundary.
+- Run 42126924638 then exposed the stale static test assertion expecting the old
+  wrapper command. Commit 781050218caebb018ce592a311560a8bf3c1b806 updated that
+  test. Its Linux job passed; Windows/package jobs still failed on the stale
+  assertion from their checked-out earlier source, so those failures are not
+  evidence against the later corrected test.
+- Run 42127038562 confirmed stderr no longer terminates PowerShell, but the
+  wrapper had not resolved $Npm before using $Npm.Source; commands therefore
+  did not launch and no OCR result from that run is valid.
+- Commit bea78fa09bcb7a228503575b7ea926812da31921 resolves npm.cmd explicitly.
+  Commit 593a692dfc7220d77804d63ba2daf322f1a0159a adds the regression assertion.
+  Run 42127310691 is the first current run exercising these combined wrapper
+  corrections; its Windows screenshot stage is still in progress.
+
+MAP NORMALIZATION CORRECTION
+- The repeated five-image report demonstrated a wrong accepted trailing em dash
+  in "Crash Zone Alpha —". Commit 70b00da5c96f7c8ca01d97870659c7949133fe1f
+  trims trailing whitespace/dash separators in cleanMapOcrPrefix; commit
+  6a3e3b57e0095967a9b05d6c4cb93c19c45607cf adds regression cases.
+- Exact-head workflow run 42127666357 for commit 6a3e3b57e0095967a9b05d6c4cb93c19c45607cf
+  is queued. Confirm the parser tests and five-image repeated sequence on that
+  exact source before accepting this correction.
+
+GATE STATUS AND NEXT ACTIONS
+1. Finish run 42127310691. Inspect its complete Windows artifact and all nine
+   fields for reported screenshot, four-image and 16-image runs; include
+   baseline Tesseract.js, native Tesseract, OpenCV-assisted comparisons, model/
+   engine versions, source/lock fingerprints and network diagnostics.
+2. Then verify the latest main head containing the map normalization fix with
+   exact-head CI. Correct only demonstrated defects; do not weaken the nine-field
+   fail-closed contract.
+3. Gate A requires all 16 approved development images to have exact complete
+   nine-field records, zero wrong accepted values, zero unresolved mandatory
+   fields and no unauthorized network activity. It is not yet passed.
+4. Gate B remains a separate, untouched 50-image minimum / 100-image preferred
+   independent holdout with independent ground truth for all nine fields and
+   no tuning. The canonical repository tree contains the 16-image development
+   set, four-image regression set and reported screenshot, but no independent
+   Gate B corpus. Targeted Library search did not surface the previously named
+   dwbot_56_image_ground_truth_review(3).xlsx file. Do not substitute the
+   development corpus or fabricate holdout labels.
+5. Gate C remains blocked until A and B pass; Gate D follows only after C.
+   Production remains NO-GO.
+
+================================================================================
+END CURRENT EXECUTION STATUS — 2026-11-05
+================================================================================
+
+================================================================================
 CURRENT EXECUTION STATUS — 2026-11-05 17:19 AMERICA/CHICAGO
 This block supersedes stale active-status statements below; historical evidence
 is retained without being projected onto newer source fingerprints.
