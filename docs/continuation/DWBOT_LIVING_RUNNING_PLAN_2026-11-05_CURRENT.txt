@@ -61,7 +61,7 @@ B. GITHUB AUTHORITY AND COMPLETED OPERATIONS
   GitHub root deletion commit is needed. No historical branch or other
   repository was changed; nested files and all unrelated root files remain.
   The active branch scope remains canonical `main` only.
-- The OCR implementation source candidate was `e1993bf91f54a2f366d5b5739b4aafa0c318be1a`; subsequent docs/CI/plan synchronization advanced main. Current main HEAD before this continuation-plan refresh: `f3dd074dc33fd5e18740315ad47941912ae1bc05`. This is a development candidate, not a release or production acceptance.
+- The OCR implementation source candidate was `e1993bf91f54a2f366d5b5739b4aafa0c318be1a`; subsequent docs/CI/plan synchronization advanced main. Current main HEAD before this continuation-plan refresh: `1c0a0d6c1a3ef2f321dfd88e08f9b60462674188`. This is a development candidate, not a release or production acceptance.
 - OCR.Space and supporting implementation commits on main (in chronological
   order; verify the exact commit chain in GitHub when needed):
   `ce0b2b71d08366d2997b044a9e40390fefe11b6b`;
@@ -85,7 +85,7 @@ B. GITHUB AUTHORITY AND COMPLETED OPERATIONS
   `fbfcef51c24473bf3e56859a4f446358d74c9ec82`,
   `b101f054d91be6a070f022d2cb3f643aa47f5249`,
   `f1e6030d105647bb27c07f1037b202d9d88343e7`; and CI correction
-  `9037e0b1f7c98378658413ef8c76b70f32ed3a4c`, `940e1e7a7ca8a8f165c63f640444f35607ed2532`, and `03204e87df9f438f57dc2ad456d4dbb397b63e92`, `8d4b4bc88d22e5c32aab8ce40df2ec583aec4a84`, `8789a101de7e28b1963baab2be27a23e9eab8681`, `d1c312d0342b0d4a9e711b342f971c7a4894f35f`, `a65d7b3a105125f846e1cf13c6518f8671d9490c`, `13db21e0659f6e364d2c36b94fa0c45d008690f0`, `c8b117bc8c04d9dc4af31bdc72fc3e2bc26b4a84`, `796dd9e477506d0a64b4d1025aa7f70d00c2b990`, and `ca2c37653d6299c310e8291ed62dc78148933b11`, `65bc54dc305aa9d24d31842d9ed545583e980411`, `79234b5cfaea2aba1a35678216f13cae0ee28edd`, `ec81a88470f5289eb1c0cb6e2662ea288e67e005`, and `f1f777e0192b058c94699f1c94e5379dc0722eb8`, and `3a61e7632d3a891ace6d3bff3a4a53f4d88b070c`, `0590dd294d39826022129d8202325f81ea139af2`, `6c6549cb51fe64bad5f0e06c04567b48991f64e6`, and `6a2a63ecb7cf6555495c86c7b6cf8b08061fbde9`, and `f3dd074dc33fd5e18740315ad47941912ae1bc05`.
+  `9037e0b1f7c98378658413ef8c76b70f32ed3a4c`, `940e1e7a7ca8a8f165c63f640444f35607ed2532`, and `03204e87df9f438f57dc2ad456d4dbb397b63e92`, `8d4b4bc88d22e5c32aab8ce40df2ec583aec4a84`, `8789a101de7e28b1963baab2be27a23e9eab8681`, `d1c312d0342b0d4a9e711b342f971c7a4894f35f`, `a65d7b3a105125f846e1cf13c6518f8671d9490c`, `13db21e0659f6e364d2c36b94fa0c45d008690f0`, `c8b117bc8c04d9dc4af31bdc72fc3e2bc26b4a84`, `796dd9e477506d0a64b4d1025aa7f70d00c2b990`, and `ca2c37653d6299c310e8291ed62dc78148933b11`, `65bc54dc305aa9d24d31842d9ed545583e980411`, `79234b5cfaea2aba1a35678216f13cae0ee28edd`, `ec81a88470f5289eb1c0cb6e2662ea288e67e005`, and `f1f777e0192b058c94699f1c94e5379dc0722eb8`, and `3a61e7632d3a891ace6d3bff3a4a53f4d88b070c`, `0590dd294d39826022129d8202325f81ea139af2`, `6c6549cb51fe64bad5f0e06c04567b48991f64e6`, and `6a2a63ecb7cf6555495c86c7b6cf8b08061fbde9`, and `f3dd074dc33fd5e18740315ad47941912ae1bc05`, `3161e3934d39131e39d10b15de1d60d552aabc86`, `602aafeff7c908a96c0504695699d63c1e3e2715`, `676e9315a6cb64ba4769244fff5b7b01299fb6a0`, `44689afa192abb710d5329d6048e56cb2c3e311e`, `0ea145adade01b4a21eb069132a54bb7642abf27`, `2479e68250415af913c0aeb46bee80fc5c043949`, `6dfacdb356903125ad9cd841769c343b2134d4d7`, `27588df266b9dfef11a9ef7e8a9ced9a55ffffde`, and `1c0a0d6c1a3ef2f321dfd88e08f9b60462674188`.
 - These commits implement OCR.Space request configuration, Engine 3 searchable-PDF
   fallback, OpenCV geometry-first crop planning, identity-exclusion tests,
   OCR.Space-first ordering before Tesseract.js, duplicate-call suppression,
@@ -184,10 +184,11 @@ D. IMPLEMENTATION MAP AND CURRENT VERIFICATION STATE
   enabled; then existing local Tesseract, local crop processing, validation and
   optional Paddle paths run. If prepass succeeded, duplicate later OCR.Space
   requests are suppressed; if not, bounded local-geometry refinement can run.
-- `tests/ocrspace.test.js`, `tests/ocrspace-prepass.test.js` and
-  `tests/ocrspace-reconciliation.test.js`: mocked API request profile, PDF
-  fallback, privacy, quotas, failure handling, crop bounds, identity exclusion,
-  OCR order and diagnostic reconciliation regression tests.
+- `tests/ocrspace.test.js`, `tests/ocrspace-prepass.test.js`,
+  `tests/ocrspace-reconciliation.test.js` and `tests/ocr-report-metadata.test.js`:
+  mocked API request profile, PDF fallback, privacy, quotas, failure handling,
+  crop bounds, identity exclusion, OCR order, key redaction and diagnostic
+  reconciliation regression tests.
 - `.env.desktop.example`, `README.md`,
   `docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md`,
   `docs/continuation/PROJECT_AUTHORITY_AND_IMPLEMENTATION_RULES.md`,
@@ -224,15 +225,15 @@ D. IMPLEMENTATION MAP AND CURRENT VERIFICATION STATE
 - Run `42089449390` on code commit
   `ca2c37653d6299c310e8291ed62dc78148933b11` is queued; it includes the new
   OCR.Space reconciliation helper, tests, bot validation integration and docs.
-  The helper code has not yet passed CI. Latest exact-head run `42090354073`
-  on current main `f3dd074dc33fd5e18740315ad47941912ae1bc05` is queued.
+  The helper code has not yet passed CI. Latest exact-head run `42091120857`
+  on current main `1c0a0d6c1a3ef2f321dfd88e08f9b60462674188` is queued.
 - Mock tests do not prove live OCR.Space credentials, live provider accuracy,
   privacy review of production screenshots, or any accuracy improvement. No
   live provider request has been made. Production remains NO-GO.
 
 E. REQUIRED NEXT STEPS AND CLOSURE CONDITIONS
 
-1. Verify run `42089449390` for `ca2c37653d6299c310e8291ed62dc78148933b11` (especially the new diagnostic reconciliation tests), run `42090239835` for current main, and finish Windows screenshot acceptance on runs `42088032492` and `42088538702`. Inspect the resulting artifacts before closing the gates.
+1. Verify run `42089449390` for `ca2c37653d6299c310e8291ed62dc78148933b11` (especially the new diagnostic reconciliation tests), run `42091120857` for current main (including report metadata and privacy-safe logs), and finish Windows screenshot acceptance on runs `42088032492` and `42088538702`. Inspect the resulting artifacts before closing the gates.
    If any job fails, inspect the failing step/log, correct the root cause,
    commit on main with fresh-head verification, and repeat until all supported
    jobs pass or a documented environment blocker remains.
@@ -294,6 +295,7 @@ F. COMPLETION / CORRECTION HISTORY — 2026-11-05 (CHAT CONTINUATION)
 - Exact current-main CI run `42088804157` was queued at the time of the prior plan refresh; subsequent code integration advanced main. Latest exact-head run `42089449390` is queued. Linux pass on run `42088538702` is confirmed; Windows and clean-package results remain pending.
 - Cross-project review found that OCR.Space text was initially stored as separate diagnostic evidence but was not actually parsed against the local record. Added `src/ocrspace-reconciliation.js` and integrated it into screenshot validation: exact agreement/disagreement/remote-only/remote-conflict/no-candidate diagnostics are now emitted without merging remote candidates into the local record. Player remains excluded by privacy design. Added tests and CI syntax coverage. This is a material correction; do not claim it is tested until run `42089449390` completes.
 - Run `42088538702` now verifies the clean-package Tesseract-model provisioning correction: package manifest, clean extraction, dependency install, full npm test and prelive all PASS. The current-source Windows screenshot acceptance portion of the same run is still running.
+- Cross-project review found OCR.Space request configuration was not represented in general OCR report metadata, and the Discord path did not emit a safe summary of the new remote/local diagnostic. Added `ocrSpace` activation/profile/effective quota metadata without exposing the key, tests for default-off/key redaction/quota bounds, and a Discord log summary containing only status counts with player explicitly excluded. Focused suite now includes `tests/ocr-report-metadata.test.js`. These changes are in commits `602aafeff7c908a96c0504695699d63c1e3e2715` through `1c0a0d6c1a3ef2f321dfd88e08f9b60462674188`; exact-head CI `42091120857` is queued.
 - Revalidated the historical 332-name root-cleanup list against the canonical GitHub `main` root: zero matches among 42 root entries. The local cleanup report was inspected; 330 requested names were removed from the local archive, 2 were already absent, and 161 nested occurrences were preserved. No GitHub deletion commit was necessary and no other branch/repository was changed.
 
 ================================================================================
@@ -698,6 +700,10 @@ Implementation now present on canonical main:
 - `src/ocrspace-reconciliation.js`: exact remote/local diagnostic comparison
   with agreement/disagreement/remote-only/remote-conflict/no-candidate states;
   it never mutates local record or promotes remote-only values.
+- `src/ocr-report-metadata.js`: records effective OCR.Space activation, request
+  profile, sequence and bounded quotas without exposing the API key. Discord
+  logs emit only privacy-safe cross-check status counts; raw remote text is not
+  written to that summary.
 - Quota ledger, configuration, README, adapter guide, authority rules,
   continuation handoff, complete living plan, mock tests and CI syntax checks
   are updated. `OCRSPACE_ENABLED=0` remains the default.
