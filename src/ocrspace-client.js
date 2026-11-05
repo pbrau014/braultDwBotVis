@@ -94,6 +94,9 @@ async function recognizeCrop({ apiKey, imageBuffer, filename = 'dwbot-field-crop
         try { payload = await Promise.race([readJsonBounded(response), timeoutPromise]); }
         catch (error) {
             if (error && error.code) throw error;
+            if (controller.signal.aborted || (error && error.name === 'AbortError')) {
+                throw fail('OCR.space request timed out.', 'OCRSPACE_TIMEOUT');
+            }
             throw fail('OCR.space returned invalid JSON.', 'OCRSPACE_INVALID_RESPONSE');
         }
         if (!payload || typeof payload !== 'object' || !Array.isArray(payload.ParsedResults)) throw fail('OCR.space response did not contain ParsedResults.', 'OCRSPACE_INVALID_RESPONSE');

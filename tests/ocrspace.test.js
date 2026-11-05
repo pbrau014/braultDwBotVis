@@ -102,6 +102,16 @@ test('oversized provider response bodies are rejected', async () => {
     await assert.rejects(recognizeCrop({ ...args(), fetchImpl: async () => reply(large) }), { code: 'OCRSPACE_RESPONSE_TOO_LARGE' });
 });
 
+test('streamed provider response bodies are bounded before JSON parsing', async () => {
+    const bodyText = JSON.stringify(payload());
+    const stream = new ReadableStream({
+        start(controller) { controller.enqueue(new TextEncoder().encode(bodyText)); controller.close(); },
+    });
+    const response = { ok: true, status: 200, headers: { get: () => String(MAX_RESPONSE_BYTES + 1) }, body,
+        json: async () => payload() };
+    await assert.rejects(recognizeCrop({ ...args(), fetchImpl: async () => response }), { code: 'OCRSPACE_RESPONSE_TOO_LARGE' });
+});
+
 test('timeout remains active while the response body is being parsed', async () => {
     await assert.rejects(recognizeCrop({ ...args(), timeoutMs: 1000, fetchImpl: async () => ({
         ok: true, status: 200, headers: { get: () => null },
