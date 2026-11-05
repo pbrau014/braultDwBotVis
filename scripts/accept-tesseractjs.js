@@ -167,8 +167,8 @@ function report() {
         // in this same runtime. The previous negative-control used an Asashio fixture
         // with a known player-identity mismatch, so it could not prove
         // that the injected wrong expectation alone caused rejection.
-        const negativeBaselinePath = path.join(runDir, 'negative-control-hoffmann-baseline.json');
-        const negativeBaseline = run('negative-control-hoffmann-known-good-baseline', ['scripts/run-ocr-sequence.js', 'hoffmann-victory.png'], {
+        const negativeBaselinePath = path.join(runDir, 'negative-control-image-baseline.json');
+        const negativeBaseline = run('negative-control-image-known-good-baseline', ['scripts/run-ocr-sequence.js', 'image.png'], {
             OCR_SEQUENCE_REPORT_PATH: negativeBaselinePath,
             OCR_NETWORK_BLOCK_LOG: blockLogPath,
             OCR_NETWORK_BLOCK_ENABLED: '1',
@@ -177,15 +177,15 @@ function report() {
         let baselineRow = null;
         try {
             const baselineReport = JSON.parse(fs.readFileSync(negativeBaselinePath, 'utf8'));
-            baselineRow = baselineReport.results?.find(item => item.fixtureKey === 'hoffmann-victory.png') || null;
+            baselineRow = baselineReport.results?.find(item => item.fixtureKey === 'image.png') || null;
             negativeBaselineValid = negativeBaseline.exitCode === 0 && baselineRow?.pipelineCompleted === true &&
                 baselineRow?.allRequiredFieldsPass === true && Array.isArray(baselineRow?.requiredMissing) &&
                 baselineRow.requiredMissing.length === 0 && baselineRow?.comparison?.damage?.pass === true &&
-                baselineRow?.actual?.damage === 303622 && baselineRow?.expected?.damage === 303622;
+                baselineRow?.actual?.damage === 255359 && baselineRow?.expected?.damage === 255359;
         } catch {}
         negativeBaseline.passed = negativeBaselineValid;
         negativeBaseline.exactBaselineValidated = negativeBaselineValid;
-        negativeBaseline.note = 'Negative control is only meaningful if this same-runtime Hoffmann baseline first matches all nine mandatory fields exactly, including XP.';
+        negativeBaseline.note = 'Negative control is only meaningful if this same-runtime image.png baseline first matches all nine mandatory fields exactly, including XP.';
         console.log(`[ACCEPTANCE] ${negativeBaseline.passed ? 'PASS' : 'FAIL'} known-good negative-control baseline; verified=${negativeBaselineValid}`);
 
         // Run the same fixture again with exactly one deliberately incorrect
@@ -195,7 +195,7 @@ function report() {
         const negativeReportPath = path.join(runDir, 'negative-expected-value.json');
         const negative = run('deliberately-wrong-expected-value-must-fail', ['scripts/run-ocr-sequence.js', 'hoffmann-victory.png'], {
             OCR_ACCEPTANCE_TEST_MODE: '1',
-            OCR_ACCEPTANCE_TEST_EXPECTED_OVERRIDE: 'hoffmann-victory.png.damage=303623',
+            OCR_ACCEPTANCE_TEST_EXPECTED_OVERRIDE: 'image.png.damage=255360',
             OCR_SEQUENCE_REPORT_PATH: negativeReportPath,
             OCR_NETWORK_BLOCK_LOG: blockLogPath,
             OCR_NETWORK_BLOCK_ENABLED: '1',
@@ -208,7 +208,7 @@ function report() {
         } catch {}
         negative.passed = negativeReportValid;
         negative.expectedFailureValidated = negativeReportValid;
-        negative.note = 'Expected nonzero exit is a pass only after an exact mandatory-field Hoffmann baseline, identical OCR actuals, and damage as the sole expected-value mismatch.';
+        negative.note = 'Expected nonzero exit is a pass only after an exact mandatory-field image.png baseline, identical OCR actuals, and damage as the sole expected-value mismatch.';
         console.log(`[ACCEPTANCE] ${negative.passed ? 'PASS' : 'FAIL'} negative expected-value test; verified=${negativeReportValid}`);
 
         // Independently gate the lifecycle sequence on the already known-good
