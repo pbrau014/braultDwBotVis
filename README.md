@@ -7,7 +7,7 @@ DWBOT is a local-first Node.js Discord tournament bot, strict screenshot OCR pip
 Repository: https://github.com/pbrau014/braultDwBotVis  
 Active delivery branch: main. The only active implementation branch is main.  
 Current application-source baseline: 126a8d505bd1319cff770168c21fb57412286bfb; later commits update project authority and cleanup documentation.  
-The last inspected CI run (41942650363) tested ancestor 050b3a12aa64985d9a0a439ab84db8c116851a51; current-head CI has not yet been verified.
+The current implementation head has been updated through the OCR.Space-first sequence and request-profile hardening. Exact-head CI is being run on the latest commit; Linux verification on the preceding code commit passed 267/267 with 2 environment-specific skips, while Windows native OCR and PDF/package gates remain pending. Do not infer a complete workflow pass from the Linux job alone.
 
 Node.js 22.16.0 Linux offline job: PASS.
 - OCR.space mocked contract/crop/quota: 15/15 PASS.
@@ -24,7 +24,7 @@ Production remains NO-GO pending current screenshot OCR acceptance, actual local
 
 ## Current handoff
 
-The current dated continuation/runbook is docs/continuation/NEXT_CHAT_HANDOFF_2026-11-05.md. It contains exact GitHub state, latest CI evidence, exact next actions, OCR field/engine rules, user standing rules, security boundaries and release gates. Older handoffs are preserved as history; use the 2026-11-05 current handoff for active state.
+The current dated continuation/runbook is docs/continuation/NEXT_CHAT_HANDOFF_2026-11-05.md. The complete living running plan is docs/continuation/DWBOT_LIVING_RUNNING_PLAN_2026-11-05_CURRENT.txt. All work stays in the current ChatGPT conversation; every development step and plan update reconciles the complete current/historical project context. No interim progress text is emitted; provide one consolidated summary after operations and verification.
 
 ## Architecture
 
@@ -73,7 +73,7 @@ Public channel snapshots omit private Discord account links and per-user pending
 - docs/continuation/PROJECT_AUTHORITY_AND_IMPLEMENTATION_RULES.md: authority/security/phase-order rules.
 - docs/continuation/NEXT_CHAT_HANDOFF_2026-11-05.md: exact current branch/CI state, stepwise continuation and all active rules.
 - docs/continuation/DWBOT_CURRENT_AUTHORITY_2026-11-05.md: canonical repository and active OCR/security rules.
-- docs/continuation/DWBOT_LIVING_RUNNING_PLAN_2026-11-05_CURRENT.txt: current active plan summary.
+- docs/continuation/DWBOT_LIVING_RUNNING_PLAN_2026-11-05_CURRENT.txt: complete current living plan with authoritative chat/GitHub/OCR.Space addendum and preserved historical context.
 - docs/history/GITHUB_TRANSFER_STATUS_2026-11-05_HISTORICAL.md: preserved historical transfer evidence; not an active repository/branch instruction.
 - docs/iteration23/PHASE9_DISCORD_INTEGRATION_STATUS_2026-11-04.md: Discord readiness.
 - docs/iteration23/DISCORD_LIVE_TEST_QUICKSTART.md: isolated live smoke.
