@@ -5,33 +5,31 @@ DWBOT is a local-first Node.js Discord tournament bot, strict screenshot OCR pip
 ## Current verification — 2026-11-05
 
 Repository: https://github.com/pbrau014/braultDwBotVis  
-Active delivery/current working branch: main.  
-Current main HEAD at this update: 3fa151ce58e089d2e33023f459ce0f0da46c4abb. Exact-head CI run 42091655706 is queued; do not infer its result from earlier commits. OCR.Space reconciliation and report-metadata changes are included in main but await their first CI run (42091120857 and 42091655706).
+Active delivery/current working branch: `main`.  
+Last verified main HEAD before this consolidated documentation/workflow update: `e49b6f64a68212cca84598d541a266cdf1232f1e`. Re-fetch `main` after this commit for the exact new head and its own Actions run; earlier queued runs do not validate later commits.
 
-Node.js 22.16.0 Linux offline job on run 42088538702: PASS.
-- OCR.Space contract/prepass tests: 24/24.
-- OCR.Space reconciliation tests: 4/4.
-- Other focused suites: 21/21 and 29/29.
-- Full npm test: 269 total / 266 passed / 0 failed / 3 skipped.
+Run `42088538702` Linux offline job: **PASS** on Node.js 22.16.0. The full project suite reported 269 tests, 267 passed, 0 failed and 2 skipped. OCR.Space mocked contract/prepass tests, reconciliation/report metadata, Discord policy, desktop service/bridge, persistence and recovery steps passed on that run.
 
-Windows Node.js 22.16.0 job on run 42088538702: process-level persistence/recovery PASS and full Windows npm test PASS. Current-source Tesseract.js/native Tesseract screenshot acceptance is still IN PROGRESS; do not call the overall Windows gate or screenshot acceptance PASS until the acceptance step finishes and its report/artifact is inspected.
+Run `42088538702` PDF/manual/clean-package job: **PASS**. The release-package verification reports 534 source files, 534 manifest entries, 536 ZIP entries, verified manifest, clean extraction, `npm ci`, `npm test` and prelive checks passing. Release ZIP SHA-256: `ae7e16dc932f59cdb7c91d0d4ef448551c837426eb08220f5d8390f96c63d7a9`. Workflow artifact digest: `sha256:339a1d2afa776899dd26ef0bf2c8d0b5a337e5d9f8deffb37b7d77083ddcecd6`. The PDF rendered; page-by-page visual inspection remains open.
 
-PDF/manual/clean-package job on run 42088538702: PASS after adding a pinned Tesseract 5.5.3.20260724 + English language-model provisioning step. The release-package verification reports 534 source files, 534 manifest entries, 536 ZIP entries, verified manifest, clean extraction, npm ci PASS, npm test PASS and prelive PASS. Release ZIP SHA-256: ae7e16dc932f59cdb7c91d0d4ef448551c837426eb08220f5d8390f96c63d7a9. The PDF manual rendered; page-by-page visual inspection remains distinct and is not yet accepted.
+Run `42088538702` Windows Node.js 22.16.0 job: process-level persistence/recovery and the full Windows test suite **PASS**. The separate current-source Tesseract.js/native-Tesseract screenshot-acceptance step was still **IN PROGRESS** at the latest check. Its artifact-upload step had not run, no Windows screenshot-acceptance report was available, and a live log-download attempt returned GitHub BlobNotFound (404) while the job remained active. Do not claim the Windows screenshot gate passed.
 
-The earlier package job on run 42088032492 failed because its isolated clean package lacked eng.traineddata; the OCR report model-identity test correctly failed closed. The workflow was corrected to provision the pinned native Tesseract model, and run 42088538702 now verifies that correction successfully.
+Run `42088032492` had a clean-package failure because `eng.traineddata` was absent. The pinned native Tesseract 5.5.3.20260724/model provisioning correction was verified by the later successful package job on `42088538702`; preserve the earlier failure as history.
 
-Production remains NO-GO pending current screenshot OCR acceptance, Gate A/B, actual local desktop/OAuth/browser/upload, isolated live Discord smoke and any remaining user-local recovery/security checks.
+Exact-head runs `42091979664` and `42091840336` were queued on earlier main commits at the last check. They are not passes and do not validate this later documentation/workflow update. Re-fetch Actions for the new exact main head.
+
+Production remains **NO-GO** pending current-source Windows screenshot acceptance, Gate A/B, page-by-page PDF inspection, desktop/OAuth/browser/upload, isolated live Discord, recovery/security and remaining release gates.
 
 ## Current handoff
 
-The current dated continuation/runbook is docs/continuation/NEXT_CHAT_HANDOFF_2026-11-05.md. The complete living running plan is docs/continuation/DWBOT_LIVING_RUNNING_PLAN_2026-11-05_CURRENT.txt. All work stays in the current ChatGPT conversation; every development step and plan update reconciles the complete current/historical project context. No interim progress text is emitted; provide one consolidated summary after operations and verification.
+The current dated continuation/runbook is `docs/continuation/NEXT_CHAT_HANDOFF_2026-11-05.md`. The canonical living running plan is `docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt`. Read the living plan first in every next chat. All work remains in this ChatGPT conversation; no interim progress narration is emitted.
 
 ## Architecture
 
 - src/bot.js: Discord runtime, command routing, channel preflight and shared OCR entry point.
 - src/tournament.js: authoritative 50-player tournament state/scoring, four events and seven games/event, JSON/SQLite persistence.
 - src/battle-record.js: strict nine-field validation and exact corrections.
-- When OCR.Space is explicitly enabled, a geometry-only OpenCV prepass runs first and proposes privacy-safe crops; OCR.Space Engine 3 then produces the first remote text evidence using orientation detection, auto-scaling, table mode on the tabular reward/stat band, and a visible searchable-PDF request. Tesseract.js then processes the original screenshot and its existing local crops. Remote/local evidence remains separate; src/ocrspace-reconciliation.js emits exact diagnostic agreement/disagreement/remote-only/conflict states without merging remote candidates into the local record. OCR.Space cannot independently accept or overwrite any field. Remote use remains default-off and requires both OCRSPACE_ENABLED=1 and a locally configured Free key. Player identity, Discord identifiers, credentials, private account data and full screenshots are prohibited. Engine 2 is used only as a PDF-generation fallback if Engine 3 returns no searchable-PDF URL; its OCR text is discarded. See docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md.
+- OCR.Space is the active development workstream until project-wide integration is complete. At runtime, when explicitly enabled, a geometry-only OpenCV prepass runs first and proposes privacy-safe crops; OCR.Space Engine 3 then produces the first remote text evidence using orientation detection, auto-scaling, table mode on the tabular reward/stat band, and a visible searchable-PDF request. Tesseract.js then processes the original screenshot and its existing local crops. Remote/local evidence remains separate; src/ocrspace-reconciliation.js emits exact diagnostic agreement/disagreement/remote-only/conflict states without merging remote candidates into the local record. OCR.Space cannot independently accept or overwrite any field. Remote use remains default-off and requires both OCRSPACE_ENABLED=1 and a locally configured Free key; a key alone never enables it. Player identity, Discord identifiers, credentials, private account data and full screenshots are prohibited. Engine 2 is used only as a PDF-generation fallback if Engine 3 returns no searchable-PDF URL; its OCR text is discarded. See docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md.
 - src/ocr-sequence-checkpoint.js and scripts/run-ocr-sequence.js persist atomic per-image progress.
 - desktop/ contains Player, Admin, Upload and shared style/script assets.
 - src/desktop-bridge.js provides authenticated loopback-only Node HTTP/OAuth/CSRF transport.
@@ -73,7 +71,7 @@ Public channel snapshots omit private Discord account links and per-user pending
 - docs/continuation/PROJECT_AUTHORITY_AND_IMPLEMENTATION_RULES.md: authority/security/phase-order rules.
 - docs/continuation/NEXT_CHAT_HANDOFF_2026-11-05.md: exact current branch/CI state, stepwise continuation and all active rules.
 - docs/continuation/DWBOT_CURRENT_AUTHORITY_2026-11-05.md: canonical repository and active OCR/security rules.
-- docs/continuation/DWBOT_LIVING_RUNNING_PLAN_2026-11-05_CURRENT.txt: complete current living plan with authoritative chat/GitHub/OCR.Space addendum and preserved historical context.
+- docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt: complete current living plan with authoritative chat/GitHub/OCR.Space addendum and preserved historical context.
 - docs/history/GITHUB_TRANSFER_STATUS_2026-11-05_HISTORICAL.md: preserved historical transfer evidence; not an active repository/branch instruction.
 - docs/iteration23/PHASE9_DISCORD_INTEGRATION_STATUS_2026-11-04.md: Discord readiness.
 - docs/iteration23/DISCORD_LIVE_TEST_QUICKSTART.md: isolated live smoke.

@@ -12,7 +12,9 @@ preserved below.
 
 - Canonical repository: pbrau014/braultDwBotVis, branch main.
 - Verified main HEAD before this plan revision:
-  fb09f52839619fafdec69d5d561481207efbc0cd.
+  e49b6f64a68212cca84598d541a266cdf1232f1e. Earlier exact-head run
+  42091979664 was queued on fb09f52839619fafdec69d5d561481207efbc0cd;
+  it does not validate this later commit.
 - Exact-head verification run 42091979664 (run 280) is queued. Its Windows
   Node.js 22.16.0, Linux Node.js 22.16.0 and PDF/clean-package jobs are all
   queued. Prior exact-head run 42091840336 (run 279) is also queued.
@@ -73,6 +75,62 @@ Recommendations / next closure sequence:
 7. Continue to Gate C persistence/backup/restore/rollback and final release
    decision only after OCR gates A and B pass. Maintain provenance and
    fingerprint binding across every new run/package.
+
+G. FILE-LIBRARY PLAN RECONCILIATION AND CANONICAL PLAN NAME — 2026-11-05
+
+- A targeted File Library listing/search identified ten separate saved plan
+  entries matching the DWBOT living running plan. Every plan text file was read
+  completely in bounded chunks and compared; duplicate copies were content-
+  identical. There are five distinct content snapshots:
+  * 264,584 bytes / 2,655 lines: the newest dated CURRENT plan, saved twice;
+  * 235,054 bytes / 2,283 lines: UPDATED (3)/(4), saved twice;
+  * 211,724 bytes / 1,998 lines: UPDATED (2), saved once;
+  * 208,753 bytes / 1,983 lines: UPDATED and UPDATED (1), saved twice;
+  * 205,329 bytes / 1,933 lines: the undated and dated base copies, saved
+    three times.
+- Reconciliation confirmed that the newest dated CURRENT snapshot preserves
+  the detailed historical phases, project requirements and earlier evidence.
+  Older snapshots contained additional active-context rules that are now
+  restored into this governing addendum: OCR.Space remains the highest-
+  priority development workstream until project-wide integration is complete;
+  project-wide review must include the shared OCR path, Discord and desktop
+  surfaces, configuration, quotas/restart, provenance, diagnostics, reports,
+  scripts, tests, workflows, docs, runbooks and package artifacts; provider
+  evidence remains separate; the objective is zero wrongly accepted mandatory
+  values, not a promise of perfect OCR; and first live provider validation is
+  synthetic, non-identifying and Free-tier only after terms/privacy review.
+- Reconcile the apparently conflicting OCR.Space instructions by separating
+  development priority from runtime authority: OCR.Space is the active
+  development focus, but remains a secondary/last-resort evidence provider
+  relative to local Tesseract.js. When explicitly enabled, the current approved
+  runtime sequence is local OpenCV geometry/safe-crop planning, OCR.Space
+  Engine 3 as the first remote text-evidence pass, then independent
+  Tesseract.js/local recognition and exact local acceptance. Remote text is
+  never fed to Tesseract as pixels and cannot independently accept or overwrite
+  a field. Both `OCRSPACE_ENABLED=1` and a local key are required; default-off
+  remains mandatory.
+- Older text describing OCR.Space as quarantined/mock-only, local Tesseract
+  before the remote pass, key-only auto-activation, Node.js 24+ as a mandatory
+  runtime, the XP-repair derivative as still missing, or other repository/
+  branch names as active is historical and superseded by later user decisions
+  and current verified source/configuration. Preserve those older statements
+  in their original historical records; do not restore them as active rules.
+- Keep the 20-phase history, six supporting deliverables, four
+  GrandYoloInstruct deliverables, nine-field contract, workbook/tournament
+  behavior, Pilot/Full lifecycle, event-night metadata, backup separation,
+  Admin authorization, 25 MB streamed intake and other valid project-wide
+  requirements. Their exact artifacts and acceptance status remain governed
+  by the evidence and open gates already recorded below.
+- The new canonical plan basename is
+  `DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt`. The checked-in canonical path is
+  `docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt`. Older dated
+  Library entries are retained as provenance; no Library files were deleted.
+  The user intends to remove older Library plan copies after downloading and
+  confirming the new canonical plan. Do not pre-emptively delete those copies.
+- File Library content synchronization is a separate verification item:
+  until the renamed canonical Library entry is replaced with the exact new
+  file content, the checked-in GitHub plan is the authoritative current copy
+  and older Library snapshots must not be treated as current.
 
 A. CHAT EXECUTION AND COMMUNICATION RULES (BINDING)
 
@@ -314,36 +372,63 @@ D. IMPLEMENTATION MAP AND CURRENT VERIFICATION STATE
 
 E. REQUIRED NEXT STEPS AND CLOSURE CONDITIONS
 
-1. Verify runs `42089449390`, `42091120857`, `42091326343`, `42091655706` and `42091710817` for reconciliation/report-metadata/logging/roadmap changes, and run `42091840336` for current main. Finish Windows screenshot acceptance on runs `42088032492` and `42088538702`. Inspect the resulting artifacts before closing the gates.
-   If any job fails, inspect the failing step/log, correct the root cause,
-   commit on main with fresh-head verification, and repeat until all supported
-   jobs pass or a documented environment blocker remains.
-2. Verify the current Windows Node 22.16.0 full test suite, native Tesseract
-   screenshot acceptance artifact and persistence/recovery output. A job pass
-   alone is not sufficient if the artifact is missing or not inspected.
-3. Verify the PDF/manual rendering and clean-package extraction/manifest/tests;
-   inspect available output artifacts and distinguish rendering from visual
-   page-by-page approval.
-4. Run the current OCR.Space mock/profile and privacy tests against the final
-   main head. Verify default-off, request profile, crop allowlist, identity
-   exclusion, no full screenshot, no paid usage, quota, timeout, redirect and
-   PDF fallback behavior.
-5. Before any first live API call, recheck current signup/Free tier/privacy
-   terms, configure a local Free key without sharing it, and use synthetic
-   non-identifying images only. Record redacted request/response and compare
-   Engine 3 with local Tesseract on independently labeled data. No production
-   screenshots or identity crops.
-6. Run Gate A on the approved 16-image development corpus and Gate B on an
-   independent 50 minimum / 100 preferred holdout corpus, all nine fields,
-   independent ground truth, no tuning on holdout, zero wrongly accepted
-   mandatory values. Gate C persistence/recovery follows only after A and B;
-   Gate D release decision follows all gates.
-7. Continue the broader living-plan open queue only after OCR.Space project-wide
-   implementation and verification are closed. Production stays NO-GO until
-   every applicable Windows, OCR, privacy/security, desktop/OAuth, Discord,
-   backup/restore and release gate is accepted.
-
-
+1. Verify the first exact-head Actions run for the final consolidated commit
+   after the plan rename, README/handoff/authority corrections, workflow
+   concurrency and Windows log-streaming changes. Re-fetch main before reading
+   run status; queued runs 42091979664 and 42091840336 refer to earlier commits
+   and cannot validate the new head. Inspect all three jobs and their artifacts.
+2. Finish the Windows screenshot acceptance gate. At the latest poll,
+   run 42088538702 remained in progress: process-level persistence/recovery and
+   the full Windows Node 22 suite passed, but the current-source
+   Tesseract.js/native-Tesseract screenshot acceptance step was still running.
+   Its artifact-upload step had not executed; no screenshot-acceptance report
+   was available. A log-download attempt while the job was running returned
+   BlobNotFound (404). Do not mark this step passed without its final report,
+   checksums, engine/model versions, exact nine-field outcomes and network
+   diagnostics. The improved script must stream per-command output to the
+   Actions log while also preserving complete files.
+3. Inspect the available PDF/manual/package artifact page by page. The
+   42088538702 package job passed, including 534 source files, 534 manifest
+   entries, clean extraction, npm ci, npm test and prelive checks. Artifact
+   ID 13443014385 has digest
+   `sha256:339a1d2afa776899dd26ef0bf2c8d0b5a337e5d9f8deffb37b7d77083ddcecd6`.
+   Rendering/package success is not page-by-page visual approval.
+4. Keep OCR.Space as the highest-priority DWBOT development workstream until
+   its project-wide integration, tests, review and verification are complete.
+   It is not quarantined. Preserve Tesseract.js as the local baseline and final
+   acceptance authority; OCR.Space is the secondary/last-resort evidence
+   provider for unresolved/disputed fields, but is the first remote text pass
+   in the explicitly enabled sequence after local OpenCV safe-crop planning.
+   Continue cross-project review of the shared extraction path and relevant
+   Discord, desktop, configuration, quota/restart, provenance, reports,
+   diagnostics, scripts, tests, workflows, docs, runbooks and package files.
+5. Preserve the image3 XP false-acceptance regression: expected XP is 6646;
+   a candidate that accepts 66465 is wrong. The only acceptable result is
+   exactly 6646 or abstention/unresolved pending human correction. Do not
+   inject expected values, trim digits heuristically or weaken acceptance.
+   Gate A still requires all nine fields (result, player, map, mode,
+   battleStart, credits, freeXp, damage, xp), zero wrongly accepted values,
+   zero unresolved mandatory fields and zero unauthorized network attempts.
+6. After the current source and Windows evidence are verified, run Gate A on
+   the approved 16-image development corpus with independent per-field
+   comparison. Do not tune against Gate B. Gate B requires at least 50,
+   preferably 100, independently labeled holdout screenshots; any wrong
+   mandatory acceptance or network restriction failure blocks a pass.
+7. Before a first live OCR.Space request, recheck current Free-tier signup,
+   privacy and retention terms; configure the key locally, never in chat; use
+   synthetic non-identifying crops only. Remote processing remains default-off
+   and requires both `OCRSPACE_ENABLED=1` and a local key. A key alone never
+   enables network use. No live provider call or accuracy benefit is claimed.
+8. Proceed to isolated Gate C persistence/backup/restore/rollback only after
+   Gates A and B pass. Continue desktop/browser/OAuth, synthetic upload,
+   isolated Discord, workbook, security, accessibility, packaging and manual
+   gates with separate evidence. Production remains NO-GO until all mandatory
+   gates are current and verified.
+9. Batch future source/documentation changes. The workflow now limits future
+   main verification to one running and one pending execution without
+   cancelling an in-progress run. Preserve historical runs; do not weaken
+   acceptance to reduce queue time. If the queue remains delayed, record an
+   external scheduling blocker rather than infer a platform cause.
 
 F. COMPLETION / CORRECTION HISTORY — 2026-11-05 (CHAT CONTINUATION)
 

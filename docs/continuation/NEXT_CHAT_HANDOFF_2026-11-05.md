@@ -1,27 +1,90 @@
 # CURRENT CHAT AUTHORITY OVERRIDE — 2026-11-05 (RECONCILED)
 
-This block supersedes every older active repository, branch, OCR order/configuration, and status instruction below. Historical details remain provenance only.
+This block is the current operational authority. The detailed handoff body below
+is retained as historical provenance; where its status, branch, runtime or
+configuration statements conflict with this block or the canonical living
+plan, use the canonical living plan.
 
-- Sole canonical repository: https://github.com/pbrau014/braultDwBotVis.git (`pbrau014/braultDwBotVis`).
-- Sole active implementation/delivery/current working branch: `main`. Do not write to another repository or branch. Do not delete unrelated repositories or remote branch refs.
-- All DWBOT work must remain in this ChatGPT conversation. No Work-mode handoff. Every development step and status update must reference the living running plan and update it when evidence/decisions change.
-- Do not display progress narration or interim status text during operations. Preserve findings in project artifacts and provide one consolidated summary only after work and verification are complete or a concrete blocker remains.
-- Every plan update or download/export must reconcile the entire accessible project context and all active/historical narratives, including completed, attempted, tested, verified, rejected, superseded, blocked, recent, current and next steps. Carry these rules into the next chat.
-- Do not display progress narration or interim status text during operations. Preserve findings in project artifacts and provide one consolidated summary only after work and verification are complete or a concrete blocker remains.
-- Every plan update or download/export must reconcile the entire accessible project context and all active/historical narratives, including completed, attempted, tested, verified, rejected, superseded, blocked, recent, current and next steps. Carry these rules into the next chat.
-- Current observed `main` HEAD: `3fa151ce58e089d2e33023f459ce0f0da46c4abb`; re-fetch before each write. Latest exact-head CI run: 42091655706 (queued at the time this block was authored). Run 42088538702: Linux offline PASS; PDF/manual clean-package PASS after pinned Tesseract model provisioning; Windows persistence/recovery and full Windows suite PASS, with screenshot acceptance still in progress. OCR.Space reconciliation, report metadata, privacy-safe status logging and the reconciled plan1 roadmap are in main but await CI runs 42091120857/42091655706. Earlier run 42088032492's PDF/package failure was corrected and superseded by the verified pass on 42088538702.
-- The exact 332-name root-cleanup list has zero matches in the current main root. No no-op deletion commit was made; nested copies and unrelated files were left unchanged.
-- OCR.Space order is now geometry-only OpenCV safe-crop planning, OCR.Space Engine 3 first remote text pass, then existing Tesseract.js and local image processing. Remote use remains default-off unless OCRSPACE_ENABLED=1 and a local Free key is configured. Apply detectOrientation=true, scale=true by default (scale=false only for verified 200–300 DPI input), isTable=true only for tabular reward/stat crops, and searchable PDF flags isCreateSearchablePdf=true plus isSearchablePdfHideTextLayer=false. If Engine 3 returns no SearchablePDFURL, Engine 2 is allowed only for a separately quota-reserved PDF-generation fallback; discard Engine 2 OCR text. `src/ocrspace-reconciliation.js` now parses remote evidence separately and compares exact values to the local record for diagnostic agreement/disagreement/remote-only/conflict states; it never merges remote candidates or changes acceptance.
-- Never send full screenshots, player identity, Discord IDs, credentials, private account data or unrelated UI. Remote evidence cannot independently accept or overwrite any of the nine mandatory fields. No paid OCR use.
-- Repair commits on main: `ce0b2b71d08366d2997b044a9e40390fefe11b6b` (OCR.Space test structure); `f81badbb4044de73e1b84e0be2ee28055565e1b5` (test crop fixtures and resolved tessdata metadata/CI path); `2da5a20ec61aff9da4a6857882accc6a4d8e85a8` (Engine 3 request profile/PDF fallback); `38f359a2c0e4db19f5ec1a52dd52608363c950ed` (Engine 3/PDF fallback tests); `cff7b63be8e9f04c0de4dd4af98e93fe2070e7fc` (OpenCV-first OCR.Space prepass); `e76d2c3dac483c3902c19ceb8377a1055877b2ae` (prepass-order test); `71d923da190f695a4a2318b7c3067d2a75c77fdc`, `ad3cba0d5bc32d3008901a8ec261bb0fd93944a9`, `bc354af0839cb7ffbc45c128bf87dedfd4afd858`, `66aa3d9b479589b2880e7a7ed0185c3103eff843`, `967899e89d603915130dab569f68642234d10246`, `325e8df2b07f69b1bc337f66a4eafa09f31cc2e4`, `e8f74023dce0fe572cf592bd446cba6d963e1c6b`, `87ae807e505caca4a4b4239f85a00e455f6b217c`, `a6f67b68ed5bb9ba7e0797a442f60f4c8ba19fb2`, `9b012654321202d8df1e732c9ae0d610e6f0c2d2`, `e1993bf91f54a2f366d5b5739b4aafa0c318be1a`, `b909f7eadfe6fc1acd9ff13b22a61ad5cb8bf652`, `f0a3e9d17f757d6dac36095c01aa834e5c27a71e`, `fbfcef51c24473bf3e56859a4f446358d74c9ec82`, `b101f054d91be6a070f022d2cb3f643aa47f5249`, `f1e6030d105647bb27c07f1037b202d9d88343e7`, `9037e0b1f7c98378658413ef8c76b70f32ed3a4c`, `940e1e7a7ca8a8f165c63f640444f35607ed2532`, `03204e87df9f438f57dc2ad456d4dbb397b63e92`, `8d4b4bc88d22e5c32aab8ce40df2ec583aec4a84`, `8789a101de7e28b1963baab2be27a23e9eab8681`, `d1c312d0342b0d4a9e711b342f971c7a4894f35f`, `a65d7b3a105125f846e1cf13c6518f8671d9490c`, `13db21e0659f6e364d2c36b94fa0c45d008690f0`, `c8b117bc8c04d9dc4af31bdc72fc3e2bc26b4a84`, `796dd9e477506d0a64b4d1025aa7f70d00c2b990`, `ca2c37653d6299c310e8291ed62dc78148933b11`, `65bc54dc305aa9d24d31842d9ed545583e980411`, `79234b5cfaea2aba1a35678216f13cae0ee28edd`, `ec81a88470f5289eb1c0cb6e2662ea288e67e005`. Verify each exact commit with its CI run before calling it passed.
-- Root cleanup had a downstream effect: root `eng.traineddata` was removed while code still assumed it existed. CI now sets `TESSERACT_LANG_PATH` to the system tessdata directory and report metadata resolves the configured model. Confirm current run before closing this issue.
-- Current OCR implementation remains incomplete until the new request profile, prepass, PDF fallback, privacy boundaries, tests, docs, plan and exact-head CI all pass; no live-provider accuracy or production readiness is claimed.
+- Sole canonical repository: https://github.com/pbrau014/braultDwBotVis.git
+  (`pbrau014/braultDwBotVis`), branch `main`. Other repositories and branches
+  are historical only; do not mutate them.
+- All DWBOT work stays in this ChatGPT conversation. No Work-mode handoff.
+  Do not emit interim progress narration; report after operations finish or a
+  concrete blocker remains.
+- Read `docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt` first in every next chat. It is the
+  checked-in current plan and governs the open work queue. The File Library
+  review found ten saved plan entries representing five distinct content
+  snapshots; duplicate copies were compared. The user intends to delete older
+  Library copies after downloading and confirming the new canonical plan.
+  No older Library entry has been deleted.
+- Last verified `main` HEAD before this consolidated documentation/workflow
+  update: `e49b6f64a68212cca84598d541a266cdf1232f1e`. Re-fetch `main` after
+  this commit. Run `42091979664` was queued on the earlier `fb09f528...`
+  commit; run `42091840336` was queued on `cdb872c...`. Neither validates
+  the new head.
+- Run `42088538702`: Linux Node.js 22.16.0 job PASS (269 total, 267 passed,
+  0 failed, 2 skipped); PDF/manual/clean-package job PASS; Windows
+  process-level persistence/recovery and full Windows Node 22 suite PASS.
+  The separate Windows Tesseract.js/native-Tesseract screenshot-acceptance
+  step remained IN PROGRESS at the latest poll. Its evidence-upload step had
+  not run; no screenshot-acceptance artifact/report was available. Log
+  download while still running returned BlobNotFound (404). Do not claim
+  Windows screenshot acceptance passed.
+- The PDF/package artifact from run `42088538702` is artifact ID
+  `13443014385`, digest
+  `sha256:339a1d2afa776899dd26ef0bf2c8d0b5a337e5d9f8deffb37b7d77083ddcecd6`.
+  Clean extraction, manifest, npm ci, npm test and prelive checks passed;
+  page-by-page PDF visual inspection remains open.
+- The Actions queue contains older queued/in-progress per-commit runs. Do not
+  infer a platform cause. The updated workflow limits future main verification
+  to one running and one pending run without cancelling an in-progress run.
+  The Windows OCR acceptance script now streams each command's output to the
+  Actions log while retaining full per-command logs.
+- OCR.Space is the highest-priority DWBOT development workstream until its
+  project-wide integration, tests, review and verification are complete. It
+  is not quarantined. Tesseract.js remains the local baseline and final
+  acceptance authority; OpenCV provides geometry only; PaddleOCR is optional
+  local comparison/fallback. When remote OCR is explicitly enabled, the
+  sequence is local OpenCV geometry/safe-crop planning, OCR.Space Engine 3 as
+  the first remote text-evidence pass, then independent Tesseract.js/local
+  recognition. OCR.Space is secondary/last-resort evidence relative to local
+  acceptance and cannot independently accept or overwrite any field.
+- Runtime activation is strictly default-off and requires BOTH
+  `OCRSPACE_ENABLED=1` and a locally stored key. A key alone never enables
+  network access. This is verified in `src/bot.js` and
+  `docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md`; any older handoff statement
+  saying key-only auto-activation is superseded and incorrect.
+- When enabled, use `detectOrientation=true`, `OCREngine=3`,
+  `scale=true` by default (false only for verified 200–300 DPI input),
+  `isTable=true` only for tabular reward/stat crops,
+  `isCreateSearchablePdf=true` and
+  `isSearchablePdfHideTextLayer=false`. If Engine 3 supplies no safe PDF URL,
+  Engine 2 may be used only for a separately quota-reserved PDF-generation
+  fallback; discard its OCR text. No paid tier/usage.
+- Never transmit full screenshots, player identity/name, Discord identifiers,
+  credentials, private account data or unrelated UI. Only minimum-necessary,
+  geometry-proven non-identifying crops are eligible. No live provider request,
+  API key, production screenshot transmission or accuracy gain is claimed.
+- Preserve exactly nine mandatory fields, in order:
+  `result`, `player`, `map`, `mode`, `battleStart`, `credits`,
+  `freeXp`, `damage`, `xp`. XP is ninth and mandatory. The image3 XP
+  regression must return 6646 or abstain; accepting 66465 is a false acceptance.
+- Node.js 22.16.0 is explicitly authorized for DWBOT. Do not reinstate a
+  Node 24+ requirement without new evidence.
+- The exact 332-name root-cleanup list had zero matches in canonical main's
+  42-entry root. No deletion commit was needed; nested copies and unrelated
+  files were preserved.
+- Production remains NO-GO. Gate A/B, current Windows screenshot acceptance,
+  live synthetic OCR.Space smoke, PDF visual approval, desktop/OAuth/browser,
+  isolated Discord, user-local recovery and final package/release checks remain
+  open unless separately verified by current evidence.
+
 
 
 ---
 # DWBOT current continuation handoff — 2026-11-05
 
-**Observation cut-off:** 2026-11-05 01:00 UTC (latest API evidence inspected in this update).  
+**Historical body snapshot:** 2026-11-05. The authority block above contains the latest operational status; the detailed body below is retained for provenance.  
 **Project:** World of Warships YOLO Tournament Discord Bot (DWBOT), strict screenshot OCR, computer-vision-assisted OCR, Discord integration, local Player/Admin desktop workspace, persistence and release hardening.  
 **Canonical repository:** https://github.com/pbrau014/braultDwBotVis  
 **Active implementation/delivery branch:** main  
@@ -164,7 +227,7 @@ XP is mandatory and ninth. Any missing, invalid, ambiguous, conflicting or incor
 
 ### Current OCR.space configuration semantics
 
-The current code auto-enables OCR.space when OCRSPACE_API_KEY is configured, unless OCRSPACE_ENABLED=0 explicitly disables it. Without a key, it remains disabled. The development example has a blank key placeholder; a blank value is not a credential. Never commit a real key or include it in chat, HTML, logs, fixtures or archives.
+The current code requires both OCRSPACE_ENABLED=1 and a locally configured OCRSPACE_API_KEY. A key alone never enables network access; absent either setting, the provider remains default-off. Never commit a real key or include it in chat, HTML, logs, fixtures or archives.
 
 Current conservative local quotas documented in the integration note/configuration:
 - 450/day
@@ -199,7 +262,7 @@ The reviewed image inventory includes 64 records: 56 eligible and 8 explicitly e
 6. Never remove failed fixtures, reduce the acceptance corpus, weaken exact value checks, change expected values to match OCR, or report aggregate counts without per-image detail.
 
 ### Step 3 — OCR.space and engine verification
-1. Keep API key local only. Keep service disabled when no key is configured; use OCRSPACE_ENABLED=0 to opt out.
+1. Keep the API key local only. Require both OCRSPACE_ENABLED=1 and a local key for activation; otherwise remain default-off.
 2. Review current provider policy/privacy and verify quotas, timeout, crop bounds, MIME/size limits, error handling and ledger concurrency/corruption behavior.
 3. Begin with synthetic crops. Only perform real screenshot/crop requests where the user has authorized that data transmission.
 4. Record provider, endpoint, purpose, crop field, input hash, configuration/engine, quota reservation, request/response/error, time, and whether evidence was used only diagnostically.
@@ -334,6 +397,6 @@ The archive does not contain the user's local private .env, live bot token, OAut
 
 ## 7. First message the next chat should act on
 
-Continue DWBOT from the current remote main branch. First re-fetch main HEAD/tree and the latest workflow status, then read this handoff and docs/continuation/PROJECT_AUTHORITY_AND_IMPLEMENTATION_RULES.md, plan1.txt, GITHUB_TRANSFER_STATUS.md, current OCR/Windows reports, and the package verification artifact. Do not start over or use dwbotVis as the current source. Inspect the Windows native screenshot-acceptance job/artifact for the exact current main SHA; diagnose and repair only evidence-backed failures without weakening the nine-field contract. Then complete the local Player/Admin/OAuth/browser, synthetic upload, isolated Discord smoke, security/recovery and final release gates. Keep production NO-GO until every gate has current evidence.
+Continue DWBOT from canonical main. First read docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt, then re-fetch main HEAD/tree and latest workflow status. Use this handoff, docs/continuation/PROJECT_AUTHORITY_AND_IMPLEMENTATION_RULES.md, plan1.txt, current OCR/Windows reports and package artifact as supporting context. Do not start over or use dwbotVis as the current source. Inspect the Windows native screenshot-acceptance job/artifact for the exact current main SHA; diagnose and repair only evidence-backed failures without weakening the nine-field contract. Then complete the local Player/Admin/OAuth/browser, synthetic upload, isolated Discord smoke, security/recovery and final release gates. Keep production NO-GO until every gate has current evidence.
 
 **END OF CURRENT HANDOFF.**

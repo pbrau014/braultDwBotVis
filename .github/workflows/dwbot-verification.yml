@@ -1,5 +1,9 @@
 name: DWBOT verification
 
+concurrency:
+  group: dwbot-verification-${{ github.ref }}
+  cancel-in-progress: false
+
 on:
   push:
     branches:

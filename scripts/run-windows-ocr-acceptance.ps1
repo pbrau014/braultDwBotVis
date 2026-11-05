@@ -46,13 +46,14 @@ try {
   $Log=Join-Path $RunDir ($Label+'.log')
   Write-Host "[WINDOWS-OCR] START $Label"
   $OutputLog=$Log+'.output.tmp'
-  $CommandLine='npm.cmd '+($Arguments -join ' ')+' > "'+$OutputLog+'" 2>&1'
-  & $env:ComSpec /d /c $CommandLine
+  # Stream output to the GitHub Actions log while retaining a complete
+  # per-command transcript. The prior cmd.exe redirection hid all progress
+  # until a potentially long OCR command exited, making a live stall opaque.
+  & npm.cmd @Arguments 2>&1 | Tee-Object -FilePath $OutputLog
   $Code=$LASTEXITCODE
   $Output=if(Test-Path -LiteralPath $OutputLog){Get-Content -LiteralPath $OutputLog -Raw}else{''}
   @("COMMAND: npm "+($Arguments -join ' '),"EXIT: $Code",$Output) | Set-Content -LiteralPath $Log -Encoding utf8
   Remove-Item -LiteralPath $OutputLog -Force -ErrorAction SilentlyContinue
-  Get-Content -LiteralPath $Log | ForEach-Object { Write-Host $_ }
   $Outcome=if($Code -eq 0){'PASS'}else{'FAIL'}
   $script:Results += [pscustomobject]@{label=$Label;arguments=$Arguments;exitCode=$Code;log=[System.IO.Path]::GetFileName($Log);passed=($Code -eq 0)}
   Write-Host "[WINDOWS-OCR] $Outcome $Label exit=$Code"
