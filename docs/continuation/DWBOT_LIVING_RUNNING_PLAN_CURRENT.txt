@@ -29,6 +29,52 @@ END PRIME DIRECTIVE
 ================================================================================
 
 ================================================================================
+CURRENT EVIDENCE CORRECTION — RUN 42121716388 ARTIFACT DEEP INSPECTION
+2026-11-05 America/Chicago
+================================================================================
+
+The downloaded Windows artifact 13461886316 was extracted and its 45 entries
+inspected. This correction supersedes only the numerical interpretation of the
+16-image Tesseract.js result recorded in the prior active override; prior text
+remains in history for provenance.
+
+- Artifact ZIP SHA-256:
+  48a696639e8001a7fb4d6bd9b0733fa60917c5098e1412a8168bdaa1d8a31fca.
+- Acceptance report sourceBuild SHA-256:
+  1d0a98592aa171be2d159c3c98ba5f4ec563f0c14ff2995e2e8f695d9d61fc60;
+  121 files. Runtime Windows x64, Node v22.16.0, npm 10.9.2,
+  Tesseract.js 6.0.1, core 6.1.2.
+- The approved 16-image Tesseract.js batch completed 16/16, with 3/16 exact
+  complete nine-field records. It had 32 unresolved field comparisons. Review
+  of every comparison shows each unresolved result was withheld as null or
+  the explicit "Not detected" sentinel; zero incorrect non-empty values were
+  emitted in this 16-image batch. Field counts remain result 1, player 1,
+  map 5, mode 2, battleStart 3, credits 2, freeXp 5, damage 7, xp 6.
+  Therefore the earlier phrase "20 missing and 12 incorrect non-empty
+  candidates" was incorrect and is superseded by this per-field review.
+- This does not pass Gate A: 13/16 records were incomplete and 32 mandatory
+  field comparisons unresolved.
+- The repeated five-image sequence is separate evidence: each of three
+  repetitions was 3/5 exact and each included one wrong non-empty map value
+  "Crash Zone Alpha —" versus "Crash Zone Alpha"; XP was unresolved on that
+  record. Hoffmann map and battleStart remained unresolved. This wrong value
+  must not be conflated with the 16-image batch above.
+- The real-image negative-control baseline image.png was incomplete: freeXp
+  and damage were withheld. The deliberately altered expected-value run
+  therefore does not qualify as a validated real-image negative control.
+- The wrapper aborted after the Tesseract.js baseline stage because PowerShell
+  5.1 promoted child stderr to NativeCommandError. Native Tesseract and
+  OpenCV-assisted comparative report sets were not produced in this run, even
+  though native Tesseract was installed. No comparison or acceptance result
+  for those engines may be inferred.
+- Network blocking was enabled and blockedAttemptsDetected=false; OCR.Space
+  was disabled. No live request or screenshot transmission occurred.
+
+================================================================================
+END CURRENT EVIDENCE CORRECTION — 2026-11-05
+================================================================================
+
+================================================================================
 STANDING CONTINUATION RULE — ACTIVE OVERRIDE
 ================================================================================
 
