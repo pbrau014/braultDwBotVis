@@ -134,6 +134,9 @@ source fingerprints.
 CANONICAL SOURCE
 - Repository: pbrau014/braultDwBotVis; sole active branch: main.
 - Main HEAD before this plan update: 277f935b66601febbd83c7b44a4e706721ee093a.
+- Current main HEAD after documentation-only plan sync commits c2aeddb, c95ed68,
+  and 7b8670b: 7b8670bd8c74fc16b27b48b219a4c6e0cf1dde90. The active code
+  fingerprint remains 277f935; these later commits changed only the living plan.
 - Canonical plan: docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt.
 - Seven commits separate this HEAD from 3f0c0a2. They include Windows wrapper
   corrections (e7d537b, 7810502, bea78fa, 593a692) and map normalization plus
