@@ -86,4 +86,34 @@ function buildSafeOcrSpacePrepassCropPlan({ regions = {}, width, height } = {}) 
     return plan;
 }
 
-module.exports = { buildSafeOcrSpacePrepassCropPlan, __test: { finiteRect } };
+
+function filterSafeOcrSpaceCropPlan({ cropPlan = [], regions = {}, width, height, analysisWidth, analysisHeight } = {}) {
+    const w = Number(width), h = Number(height), aw = Number(analysisWidth), ah = Number(analysisHeight);
+    if (![w, h, aw, ah].every(Number.isFinite) || w < 320 || h < 240 || aw < 1 || ah < 1 || !Array.isArray(cropPlan)) return [];
+    const identity = regions.identity;
+    const r = identity?.rect;
+    const score = Number(identity?.score);
+    if (!r || !Number.isFinite(score) || score < MIN_IDENTITY_REGION_SCORE || score > 1) return [];
+    const left = Number(r.left), top = Number(r.top), right = left + Number(r.width), bottom = top + Number(r.height);
+    if (![left, top, right, bottom].every(Number.isFinite) || left < 0 || top < 0 ||
+        Number(r.width) < 8 || Number(r.height) < 6 || right > aw || bottom > ah) return [];
+    const sourceIdentity = { left: Math.floor(left * w / aw), top: Math.floor(top * h / ah),
+        right: Math.ceil(right * w / aw), bottom: Math.ceil(bottom * h / ah) };
+    const safe = [];
+    for (const spec of cropPlan) {
+        const rect = spec?.rect;
+        if (!rect) continue;
+        const cw = Number(spec.coordinateWidth ?? w), ch = Number(spec.coordinateHeight ?? h);
+        const x = Number(rect.left), y = Number(rect.top), rw = Number(rect.width), rh = Number(rect.height);
+        const x2 = x + rw, y2 = y + rh;
+        if (![cw, ch, x, y, rw, rh, x2, y2].every(Number.isFinite) || cw < 320 || ch < 240 ||
+            x < 0 || y < 0 || rw < 8 || rh < 6 || Math.ceil(x2) > cw || Math.ceil(y2) > ch) continue;
+        const id = { left: Math.floor(sourceIdentity.left * cw / w), top: Math.floor(sourceIdentity.top * ch / h),
+            right: Math.ceil(sourceIdentity.right * cw / w), bottom: Math.ceil(sourceIdentity.bottom * ch / h) };
+        if (Math.floor(x) < id.right && Math.ceil(x2) > id.left && Math.floor(y) < id.bottom && Math.ceil(y2) > id.top) continue;
+        safe.push({ ...spec, rect: { left: Math.floor(x), top: Math.floor(y), width: Math.ceil(x2) - Math.floor(x), height: Math.ceil(y2) - Math.floor(y) }, identityBoundaryVerified: true });
+    }
+    return safe;
+}
+
+module.exports = { buildSafeOcrSpacePrepassCropPlan, filterSafeOcrSpaceCropPlan, __test: { finiteRect } };
