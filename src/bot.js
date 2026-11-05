@@ -22,6 +22,7 @@ const { inspectTargetChannelPermissions } = require('./discord-gateway-diagnosti
 const { isAdminOnlyCommand } = require('./tournament-command-policy');
 const { collectOcrSpaceFieldEvidence } = require('./ocrspace-field-evidence');
 const { buildSafeOcrSpacePrepassCropPlan } = require('./ocrspace-prepass');
+const { reconcileOcrSpaceEvidence } = require('./ocrspace-reconciliation');
 const path = require('node:path');
 const { createHash } = require('node:crypto');
 const os = require('node:os');
@@ -2619,6 +2620,9 @@ async function extractTextCore(imageBuffer) {
 
 function validateWorldOfWarshipsScreenshot(ocrResult, extractedFields = {}) {
     const record = buildBattleRecord(ocrResult.text || '', extractedFields);
+    // Compare OCR.Space's first-pass text with the final local record as a
+    // diagnostic only. Remote-only values and disagreements never alter acceptance.
+    const ocrSpaceReconciliation = reconcileOcrSpaceEvidence(extractedFields.ocrSpaceEvidence, record);
     const missing = getMissingRequiredFields(record);
     const requiredLabels = new Set(missing.map((field) => field.label));
     const checks = [
@@ -2634,6 +2638,7 @@ function validateWorldOfWarshipsScreenshot(ocrResult, extractedFields = {}) {
     return {
         accepted: missing.length === 0, checks, failed: missing, missing, record,
         text: cleanOcrText(ocrResult.text || ''),
+        ocrSpaceReconciliation,
         confidence: Number(ocrResult.confidence) || 0,
         pageSegmentationMode: ocrResult.pageSegmentationMode || 'unknown',
     };
