@@ -13,6 +13,7 @@ function describeOcrConfiguration(env = process.env) {
         const parsed = Number(value);
         return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : fallback;
     };
+    const bounded = (value, fallback, ceiling) => Math.max(1, Math.min(ceiling, positiveInteger(value, fallback)));
     const ocrSpaceKeyConfigured = Boolean(String(env.OCRSPACE_API_KEY || '').trim());
     const ocrSpaceExplicitlyEnabled = String(env.OCRSPACE_ENABLED || '').trim() === '1';
     const ocrSpaceEnabled = ocrSpaceExplicitlyEnabled && ocrSpaceKeyConfigured;
@@ -41,11 +42,11 @@ function describeOcrConfiguration(env = process.env) {
                 pdfFallbackEngine: 2,
             },
             limits: {
-                maxCrops: positiveInteger(env.OCRSPACE_MAX_CROPS, 2),
-                stageBudgetMs: positiveInteger(env.OCRSPACE_STAGE_BUDGET_MS, 20_000),
-                maxPerDay: positiveInteger(env.OCRSPACE_MAX_PER_DAY, 450),
-                maxPerMonth: positiveInteger(env.OCRSPACE_MAX_PER_MONTH, 22_000),
-                maxEngine3PerMonth: positiveInteger(env.OCRSPACE_MAX_ENGINE3_PER_MONTH, 900),
+                maxCrops: bounded(env.OCRSPACE_MAX_CROPS, 2, 7),
+                stageBudgetMs: Math.max(1000, Math.min(30_000, positiveInteger(env.OCRSPACE_STAGE_BUDGET_MS, 20_000))),
+                maxPerDay: bounded(env.OCRSPACE_MAX_PER_DAY, 450, 499),
+                maxPerMonth: bounded(env.OCRSPACE_MAX_PER_MONTH, 22_000, 24_999),
+                maxEngine3PerMonth: bounded(env.OCRSPACE_MAX_ENGINE3_PER_MONTH, 900, 999),
             },
         },
     };
