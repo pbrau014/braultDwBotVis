@@ -5,22 +5,22 @@ DWBOT is a local-first Node.js Discord tournament bot, strict screenshot OCR pip
 ## Current verification — 2026-11-05
 
 Repository: https://github.com/pbrau014/braultDwBotVis  
-Active delivery branch: main. The only active implementation branch is main.  
-Current application-source baseline: 126a8d505bd1319cff770168c21fb57412286bfb; later commits update project authority and cleanup documentation.  
-The current implementation head has been updated through the OCR.Space-first sequence and request-profile hardening. Exact-head CI is being run on the latest commit; Linux verification on the preceding code commit passed 267/267 with 2 environment-specific skips, while Windows native OCR and PDF/package gates remain pending. Do not infer a complete workflow pass from the Linux job alone.
+Active delivery/current working branch: main.  
+Current main HEAD at this update: 65bc54dc305aa9d24d31842d9ed545583e980411. Exact-head CI run 42089580541 is queued; do not infer its result from earlier commits.
 
-Node.js 22.16.0 Linux offline job: PASS.
-- OCR.space mocked contract/crop/quota: 15/15 PASS.
-- Discord offline preflight/command policy: 21/21 PASS.
-- Desktop offline preflight: PASS.
-- Desktop service/bridge/UI contract: 28/28 PASS.
-- Full npm test: 259 total / 257 passed / 0 failed / 2 skipped. Skips: ImageMagick-dependent red-channel crop and optional OpenCV helper because the Linux runner lacked ImageMagick/Python cv2.
+Node.js 22.16.0 Linux offline job on run 42088538702: PASS.
+- OCR.Space contract/prepass tests: 24/24.
+- OCR.Space reconciliation tests: 4/4.
+- Other focused suites: 21/21 and 29/29.
+- Full npm test: 269 total / 266 passed / 0 failed / 3 skipped.
 
-Windows Node.js 22.16.0 job: persistence/recovery PASS; full npm test PASS; current-source Tesseract.js/native Tesseract screenshot-acceptance step was still IN PROGRESS at the last status check. Do not call the overall workflow or screenshot acceptance PASS until that step finishes and its artifact/report is inspected.
+Windows Node.js 22.16.0 job on run 42088538702: process-level persistence/recovery PASS and full Windows npm test PASS. Current-source Tesseract.js/native Tesseract screenshot acceptance is still IN PROGRESS; do not call the overall Windows gate or screenshot acceptance PASS until the acceptance step finishes and its report/artifact is inspected.
 
-PDF/manual/clean-package job: SUCCESS. The release-package-verification.json tied to this commit reports 854 source files, 854 manifest entries, verified manifest, clean extraction, npm ci PASS, npm test PASS and prelive PASS. The generated release ZIP SHA-256 is 87dafabc3e3f7475aa36c195be03b37cc7c58a66f21f837142cea895c7dc6ca7; ZIP CRC and embedded checksum were independently verified. PDF was rendered; page-by-page visual inspection remains distinct.
+PDF/manual/clean-package job on run 42088538702: PASS after adding a pinned Tesseract 5.5.3.20260724 + English language-model provisioning step. The release-package verification reports 534 source files, 534 manifest entries, 536 ZIP entries, verified manifest, clean extraction, npm ci PASS, npm test PASS and prelive PASS. Release ZIP SHA-256: ae7e16dc932f59cdb7c91d0d4ef448551c837426eb08220f5d8390f96c63d7a9. The PDF manual rendered; page-by-page visual inspection remains distinct and is not yet accepted.
 
-Production remains NO-GO pending current screenshot OCR acceptance, actual local desktop/OAuth/browser/upload, isolated live Discord smoke and any remaining user-local recovery/security checks.
+The earlier package job on run 42088032492 failed because its isolated clean package lacked eng.traineddata; the OCR report model-identity test correctly failed closed. The workflow was corrected to provision the pinned native Tesseract model, and run 42088538702 now verifies that correction successfully.
+
+Production remains NO-GO pending current screenshot OCR acceptance, Gate A/B, actual local desktop/OAuth/browser/upload, isolated live Discord smoke and any remaining user-local recovery/security checks.
 
 ## Current handoff
 
@@ -31,7 +31,7 @@ The current dated continuation/runbook is docs/continuation/NEXT_CHAT_HANDOFF_20
 - src/bot.js: Discord runtime, command routing, channel preflight and shared OCR entry point.
 - src/tournament.js: authoritative 50-player tournament state/scoring, four events and seven games/event, JSON/SQLite persistence.
 - src/battle-record.js: strict nine-field validation and exact corrections.
-- When OCR.Space is explicitly enabled, a geometry-only OpenCV prepass runs first and proposes privacy-safe crops; OCR.Space Engine 3 then produces the first remote text evidence using orientation detection, auto-scaling, table mode on the tabular reward/stat band, and a visible searchable-PDF request. Tesseract.js then processes the original screenshot and its existing local crops. Remote/local evidence remains separate and is compared under the strict nine-field validators; OCR.Space cannot independently accept or overwrite any field. Remote use remains default-off and requires both OCRSPACE_ENABLED=1 and a locally configured Free key. Player identity, Discord identifiers, credentials, private account data and full screenshots are prohibited. Engine 2 is used only as a PDF-generation fallback if Engine 3 returns no searchable-PDF URL; its OCR text is discarded. See docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md.
+- When OCR.Space is explicitly enabled, a geometry-only OpenCV prepass runs first and proposes privacy-safe crops; OCR.Space Engine 3 then produces the first remote text evidence using orientation detection, auto-scaling, table mode on the tabular reward/stat band, and a visible searchable-PDF request. Tesseract.js then processes the original screenshot and its existing local crops. Remote/local evidence remains separate; src/ocrspace-reconciliation.js emits exact diagnostic agreement/disagreement/remote-only/conflict states without merging remote candidates into the local record. OCR.Space cannot independently accept or overwrite any field. Remote use remains default-off and requires both OCRSPACE_ENABLED=1 and a locally configured Free key. Player identity, Discord identifiers, credentials, private account data and full screenshots are prohibited. Engine 2 is used only as a PDF-generation fallback if Engine 3 returns no searchable-PDF URL; its OCR text is discarded. See docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md.
 - src/ocr-sequence-checkpoint.js and scripts/run-ocr-sequence.js persist atomic per-image progress.
 - desktop/ contains Player, Admin, Upload and shared style/script assets.
 - src/desktop-bridge.js provides authenticated loopback-only Node HTTP/OAuth/CSRF transport.
