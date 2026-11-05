@@ -1,3 +1,10 @@
+'use strict';
+const fs = require('node:fs');
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const path = require('node:path');
+const { createOcrReportMetadata, describeOcrConfiguration } = require('../src/ocr-report-metadata');
+
 test('Windows OCR acceptance wrapper captures native npm stderr without PowerShell error-stream promotion', () => {
     const script = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'run-windows-ocr-acceptance.ps1'), 'utf8');
     assert.match(script, /& npm\.cmd @Arguments 2> \$ErrorLog \| Tee-Object -FilePath \$OutputLog/);
@@ -6,11 +13,6 @@ test('Windows OCR acceptance wrapper captures native npm stderr without PowerShe
     assert.match(script, /Remove-Item -LiteralPath \$OutputLog,\$ErrorLog/);
 });
 
-'use strict';
-const test = require('node:test');
-const assert = require('node:assert/strict');
-const path = require('node:path');
-const { createOcrReportMetadata, describeOcrConfiguration } = require('../src/ocr-report-metadata');
 
 test('OCR reports include reproducible build, engine, language-model and local asset identity', () => {
     const metadata = createOcrReportMetadata(path.join(__dirname, '..'));
