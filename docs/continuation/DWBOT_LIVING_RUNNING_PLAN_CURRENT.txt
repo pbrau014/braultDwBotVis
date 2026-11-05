@@ -76,6 +76,42 @@ END CURRENT EVIDENCE CORRECTION — 2026-11-05
 
 ================================================================================
 STANDING CONTINUATION RULE — ACTIVE OVERRIDE
+
+ACTIVE REPLACEMENT TEXT FOR BINDING RULES 1, 2, 5, 10, AND 26
+- Rule 1 (compliant execution): complete every authorized action through
+  authenticated, least-privilege means. If an action lacks a required credential,
+  role, approval, environment, or permission, mark that action BLOCKED, record
+  the exact missing dependency, and continue all independent authorized work.
+  Never bypass a required control.
+- Rule 2 (THINK → REASON → ACT): investigate evidence, source, runtime, behavior,
+  risks, and dependencies before changes. Distinguish fact, assumption, inference,
+  attempted, completed, tested, verified, and accepted. Keep the investigation /
+  implementation / test / correction / verification loop moving across all
+  authorized independent work; do not halt the overall project for one blocked
+  dependency.
+- Rule 5 (chat-only execution): all DWBOT work remains in this ChatGPT chat.
+  Do not hand off to Work mode or another executor. Avoid routine progress
+  narration; keep the living plan current and provide a consolidated report when
+  the requested work is complete or when a concrete decision is needed.
+- Rule 10 (OCR.Space privacy): preserve the exact privacy, crop-isolation,
+  HTTPS, key-handling, size, timeout, quota, no-retry, and evidence-separation
+  safeguards. If live-request prerequisites or approval are absent, keep live
+  activity disabled and continue local/offline work; this restriction applies
+  only to live requests, not independent work.
+- Rule 26 (repeat-until-verified): continue authorized work through inspection,
+  implementation, targeted and full relevant tests, report/artifact inspection,
+  correction, and re-verification. A routine checkpoint or one unfinished
+  independent task does not suspend the rest of the queue. Preserve genuine
+  safety, authentication, data-integrity, legal, privacy, and release gates.
+
+This active replacement supersedes conflicting ordinary workflow checkpoint,
+wait-for-acknowledgment, and unnecessary stop/pause wording in the active text
+of Rules 1, 2, 5, 10, and 26. It does not remove narrowly scoped safeguards
+that prevent unauthorized actions, unsafe process continuation, data loss,
+privacy/security violations, or release before mandatory gates pass. Historical
+source text and historical status records below remain unchanged as provenance.
+
+
 ================================================================================
 
 Continue all authorized DWBOT work automatically in dependency order. Ordinary
