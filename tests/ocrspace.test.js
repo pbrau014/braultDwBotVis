@@ -42,6 +42,28 @@ test('Engine 3 uses HTTPS multipart and required orientation, table, scaling and
     assert.equal(result.searchablePdfUrl, 'https://api.ocr.space/download/mock.pdf');
 });
 
+test('Engine 2 is used only as a searchable-PDF fallback when Engine 3 returns no PDF URL', async () => {
+    const calls = [];
+    const quotaLedger = { reserve: async ({ engine }) => { calls.push('reserve:' + engine); } };
+    const client = async ({ engine, createSearchablePdf, searchablePdfHideTextLayer }) => {
+        calls.push('client:' + engine + ':' + createSearchablePdf + ':' + searchablePdfHideTextLayer);
+        return engine === 3
+            ? { engine: 3, parsedText: 'remote-first-text', overlay: [], partial: false, searchablePdfUrl: null }
+            : { engine: 2, parsedText: 'do-not-use-this-text', overlay: [], partial: false, searchablePdfUrl: 'https://api.ocr.space/download/fallback.pdf' };
+    };
+    const result = await collectOcrSpaceFieldEvidence({
+        env: { OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'key' },
+        cropPlan: [{ field: 'rewardBand', source: 'opencv-reward-band', engine: 3, isTable: true,
+            rect: { left: 10, top: 40, width: 300, height: 50 } }],
+        quotaLedger, client, buildCrop: async () => Buffer.from('safe-crop'),
+    });
+    assert.equal(result.requests, 2);
+    assert.equal(result.evidence[0].text, 'remote-first-text');
+    assert.equal(result.evidence[0].searchablePdfUrl, 'https://api.ocr.space/download/fallback.pdf');
+    assert.equal(result.evidence[0].searchablePdfStatus, 'created-by-engine2-pdf-fallback');
+    assert.deepEqual(calls, ['reserve:3', 'client:3:true:false', 'reserve:2', 'client:2:true:false']);
+});
+
 test('Engine 3 defaults overlay off and returns no fabricated confidence', async () => {
     let form;
     const result = await recognizeCrop({ ...args(), engine: 3, fetchImpl: async (_url, options) => { form = options.body; return reply(payload('player text', 3)); } });
@@ -166,14 +188,14 @@ test('corrupt quota ledger fails closed', async () => {
 
 test('provider requires explicit OCRSPACE_ENABLED=1 and a configured key', async () => {
     let builds = 0, network = 0;
-    const cropPlan = [{ field: 'xp', source: 'localized-reward-column', engine: 2, rect: { left: 1, top: 2, width: 10, height: 8 } }];
+    const cropPlan = [{ field: 'xp', source: 'localized-reward-column', engine: 3, rect: { left: 1, top: 2, width: 10, height: 8 } }];
     const buildCrop = async () => { builds++; return Buffer.from('crop'); };
     const keyOnly = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_API_KEY: 'key' }, cropPlan, buildCrop, client: async () => { network++; } });
     const explicitlyOff = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '0', OCRSPACE_API_KEY: 'key' }, cropPlan, buildCrop, client: async () => { network++; } });
     const noKey = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '1' }, cropPlan, buildCrop, client: async () => { network++; } });
     const explicitOn = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'key' }, cropPlan,
         quotaLedger: { reserve: async () => ({ reserved: true }) },
-        client: async () => { network++; return { engine: 2, parsedText: '451', overlay: [], partial: false, processingTimeMs: 5 }; },
+        client: async () => { network++; return { engine: 3, parsedText: '451', overlay: [], partial: false, searchablePdfUrl: 'https://api.ocr.space/download/mock.pdf', processingTimeMs: 5 }; },
         buildCrop });
     assert.equal(keyOnly.status, 'disabled');
     assert.equal(explicitlyOff.status, 'disabled');
@@ -192,8 +214,8 @@ test('field evidence rejects identity/unknown crops and submits allowlisted crop
     const cropPlan = [
         { field: 'player', source: 'localized-player-identity', engine: 3, rect: { left: 1, top: 1, width: 20, height: 6 } },
         { field: 'unknown', source: 'localized-reward-column', engine: 2, rect: { left: 1, top: 1, width: 20, height: 6 } },
-        { field: 'xp', source: 'localized-reward-column', engine: 2, rect: { left: 2, top: 2, width: 20, height: 8 } },
-        { field: 'freeXp', source: 'localized-reward-column', engine: 2, rect: { left: 3, top: 3, width: 20, height: 8 } },
+        { field: 'xp', source: 'localized-reward-column', engine: 3, rect: { left: 2, top: 2, width: 20, height: 8 } },
+        { field: 'freeXp', source: 'localized-reward-column', engine: 3, rect: { left: 3, top: 3, width: 20, height: 8 } },
     ];
     const result = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'key', OCRSPACE_MAX_CROPS: '2' },
         cropPlan, quotaLedger, client, buildCrop: async spec => { events.push('build:' + spec.field); return Buffer.from(spec.field); } });
