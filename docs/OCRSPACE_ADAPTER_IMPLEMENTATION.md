@@ -10,7 +10,7 @@ When OCR.Space is explicitly enabled, the sequence is:
 4. Run the existing Tesseract.js/local pipeline on the original image and its established crops. Preserve local evidence independently and compare it to the remote result.
 5. Run the existing parsers, independent-read/geometry consensus and exact validators. Conflicts, ambiguous values and missing fields remain unresolved.
 
-Tesseract.js remains the local baseline and fallback. OCR.Space is the first remote OCR pass, not the authority for accepting a battle record. OCR.Space text is not input text for Tesseract; Tesseract recognizes pixels. Remote text may inform diagnostic comparison and crop review but cannot independently accept, normalize, rewrite, fuzzy-correct or overwrite any mandatory field. PaddleOCR remains an optional local comparison/fallback.
+Tesseract.js remains the local baseline and fallback. OCR.Space is the first remote OCR pass, not the authority for accepting a battle record. OCR.Space text is not input text for Tesseract; Tesseract recognizes pixels. After local OCR and parsing, `src/ocrspace-reconciliation.js` parses the remote text independently and emits an exact-value, field-by-field diagnostic cross-check against the local record. Agreement, disagreement, remote-only, remote-conflict and no-candidate states are reported separately. This diagnostic never merges remote candidates into local candidates and cannot independently accept, normalize, rewrite, fuzzy-correct or overwrite any mandatory field. PaddleOCR remains an optional local comparison/fallback.
 
 If OpenCV geometry is unavailable or does not yield a provably safe crop, the remote prepass is skipped and the local OCR pipeline proceeds. The existing post-local OCR.Space refinement stage is reserved for cases where the first remote prepass could not produce evidence; it does not replace the first-pass evidence.
 
@@ -60,7 +60,7 @@ The searchable PDF link is documented as valid for one hour. The Free tier adds 
 - `src/ocrspace-field-evidence.js`: explicit opt-in, allowlisted crops, Engine 3 first, quota reservation, visible-PDF request and Engine 2 PDF-only fallback when Engine 3 does not return a PDF URL. Evidence is diagnostic only.
 - `src/ocrspace-quota-ledger.js`: atomic local JSON quota ledger with cross-process lock and fail-closed corruption behavior.
 - `src/bot.js`: geometry-first OCR.Space prepass before Tesseract, identity exclusion, then existing Tesseract and local image-processing pipeline; a bounded post-local refinement is used only if the prepass could not produce evidence.
-- `tests/ocrspace.test.js`: mocked request profile, default-off behavior, Engine 3 evidence, PDF fallback, privacy allowlists, quota, timeout, redirect and response-size coverage.
+- `tests/ocrspace.test.js`, `tests/ocrspace-prepass.test.js` and `tests/ocrspace-reconciliation.test.js`: mocked request profile, default-off behavior, Engine 3 evidence, PDF fallback, privacy allowlists, quota, timeout, redirect, response-size, crop identity exclusion and diagnostic reconciliation coverage.
 - `package.json`: `npm run test:ocrspace`.
 
 ## Nine-field acceptance contract
