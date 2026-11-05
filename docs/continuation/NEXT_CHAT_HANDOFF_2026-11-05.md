@@ -1,3 +1,11 @@
+# Tested-source and current-branch clarification — 2026-11-05
+
+Last source-code checkpoint: 5a12a9c218cebe61d277999318b7ceef5a8dc3b1 (run 42111470540). Documentation-only sync commits after that source checkpoint: 846c125c039358b7b4d8e30f2a882409b5b6e526 and 88b81acec448d1c7307f36ba91ac0b276d5710b9. Re-fetch main before further writes; 5a12 is not the current branch head.
+
+Run 42111470540 remains in progress on Windows screenshot acceptance; Linux and clean-package/PDF jobs passed, as did Windows persistence/recovery and the full Node 22 suite. Exact-head documentation sync runs 42115213448 and 42115501194 are pending. Do not transfer test results across SHAs.
+
+The Library crosswalk update succeeded. The living-plan Library upload failed with container_session_unavailable, so the original linked Library plan remains unchanged; use the updated GitHub plan and its downloadable copy. Continue in this ChatGPT conversation only, no Work mode, no interim progress narration. Production remains NO-GO.
+
 # Main/source checkpoint clarification — 2026-11-05
 
 Last source-code checkpoint: 5a12a9c218cebe61d277999318b7ceef5a8dc3b1 (run 42111470540). Documentation sync commit: 846c125c039358b7b4d8e30f2a882409b5b6e526; exact-head run 42115213448 is pending. Main now includes documentation-only reconciliation after the source checkpoint; re-fetch main before further writes. Run 42111470540 is still running Windows current-source screenshot acceptance; its Linux and clean-package/PDF jobs passed, as did Windows persistence/recovery and the full Node 22 suite.

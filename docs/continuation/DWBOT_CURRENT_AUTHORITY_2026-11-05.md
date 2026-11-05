@@ -1,3 +1,9 @@
+# Tested-source and current-branch clarification — 2026-11-05
+
+Last source-code checkpoint: 5a12a9c218cebe61d277999318b7ceef5a8dc3b1. Documentation-only sync commits after that source checkpoint: 846c125c039358b7b4d8e30f2a882409b5b6e526 and 88b81acec448d1c7307f36ba91ac0b276d5710b9. Re-fetch main before further writes; 5a12 is not the current branch head.
+
+Run 42111470540 remains in progress on Windows screenshot acceptance; Linux and clean-package/PDF jobs passed, as did Windows persistence/recovery and the full Node 22 suite. Exact-head documentation sync runs 42115213448 and 42115501194 are pending. Production remains NO-GO. The linked File Library crosswalk was updated; the living-plan Library replacement failed because no active container session was available, so its original file remains unchanged.
+
 # Main/source checkpoint clarification — 2026-11-05
 
 Last source-code checkpoint: 5a12a9c218cebe61d277999318b7ceef5a8dc3b1. Documentation sync commit: 846c125c039358b7b4d8e30f2a882409b5b6e526; exact-head run 42115213448 is pending. Main includes subsequent documentation-only reconciliation; re-fetch main before further writes. Windows screenshot acceptance on run 42111470540 is still running; production remains NO-GO.

@@ -1,3 +1,26 @@
+CURRENT BRANCH / TESTED-SOURCE STATUS OVERRIDE — 2026-11-05
+
+- Last source-code checkpoint is 5a12a9c218cebe61d277999318b7ceef5a8dc3b1.
+  Run 42111470540 is the exact-source Windows/Linux/package run for that code.
+- Documentation-only reconciliation commits after that source checkpoint:
+  846c125c039358b7b4d8e30f2a882409b5b6e526 and
+  88b81acec448d1c7307f36ba91ac0b276d5710b9. They update the living plan,
+  README, handoff, authority and GrandYolo crosswalk; they do not change runtime
+  source code. Re-fetch main before the next write; do not call 5a12 the current
+  branch HEAD.
+- Actions run 42111470540 on source checkpoint 5a12 remains in progress on
+  Windows screenshot acceptance; its Linux and clean-package/PDF jobs passed,
+  and Windows persistence/recovery plus full Node 22 suite passed.
+- Exact-head run 42115213448 for documentation sync 846c is pending; exact-head
+  run 42115501194 for documentation sync 88b81 is pending. The next plan-only
+  refresh will also trigger a new exact-head run. Do not transfer results between
+  these different SHAs.
+- The File Library crosswalk was successfully updated to version 2. The
+  File Library living-plan replacement was attempted but failed with
+  container_session_unavailable; the original linked Library plan remains
+  unchanged. The updated canonical plan is committed in GitHub and an updated
+  downloadable copy is prepared; do not claim the Library plan was replaced.
+
 CURRENT MAIN / SOURCE-CHECKPOINT CLARIFICATION — 2026-11-05
 
 The last source-code checkpoint is 5a12a9c218cebe61d277999318b7ceef5a8dc3b1,
