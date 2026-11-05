@@ -1,4 +1,126 @@
 ================================================================================
+PRIME DIRECTIVE — GOVERNING RULE FOR ALL PLAN IMPLEMENTATION
+================================================================================
+
+The user authorizes appropriate implementation work within the clearly approved
+DWBOT plan scope, including reviews, corrections, edits, testing and verification.
+Use valid credentials and authenticated workflows with least privilege. This is
+not permission to bypass authentication, authorization, role checks, access
+controls, platform safeguards, rate limits, privacy/security controls, legal
+requirements, or mandatory acceptance/release gates.
+
+Never spoof, simulate, disable, evade, or bypass a required control to make
+progress appear complete. If a required credential, role, approval, environment
+or permission is missing, stop that action, record the exact blocker, and
+continue only with independent work that is genuinely authorized.
+
+A requirement is fulfilled only when its implementation, review and verification
+evidence is complete against the exact source and runtime where applicable.
+Authorization, a code change, a mock, a queued/running job, or an unverified
+report is not proof of acceptance. Preserve source/evidence provenance and
+distinguish attempted, completed, tested, verified and accepted. This Prime
+Directive governs every task, recommendation, implementation decision, handoff
+and release decision in this plan. Where lower-level text conflicts, preserve
+required controls and document the conflict rather than bypassing them.
+
+================================================================================
+END PRIME DIRECTIVE
+================================================================================
+
+================================================================================
+CURRENT EXECUTION STATUS — 2026-11-05 17:19 AMERICA/CHICAGO
+This block supersedes stale active-status statements below; historical evidence
+is retained without being projected onto newer source fingerprints.
+================================================================================
+
+CANONICAL SOURCE
+- Repository: https://github.com/pbrau014/braultDwBotVis
+- Branch: main only. Current main HEAD before this plan refresh:
+  8f79e78049d70686d3773eea199403951a43c904.
+- Canonical living-plan path:
+  docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt.
+- User-uploaded source file SHA-256:
+  9dae0d5c0dd290e83fbd11fb8caed092359a3e33f09daa59f05e6a75865f4ffd
+  (3,828 lines; 347,221 bytes). Its Prime Directive and integration/provenance
+  note are incorporated in this combined plan. Its active status blocks are
+  superseded by this current status and the detailed canonical plan below.
+- The prior canonical GitHub plan blob was
+  4d0d17d2f1b0ae8c82448ee33daaac8fe90bf502 (3,697 lines; 333,964 bytes).
+  The canonical plan already contained the substantive OCR.Space, nine-field,
+  Gate A/B/C/D, source-reconciliation and historical project material. The
+  uploaded file's non-duplicative Prime Directive/provenance additions are
+  carried forward. Original uploaded file remains unchanged.
+
+EXACT-HEAD CI — RUN 42118287683 ON 1e0eae750b3d357f44ffca0f0bb499afce383b4d
+- All three jobs completed with FAILURE; no job result is a green exact-head pass.
+- Windows Node 22.16.0 job: setup, native OCR prerequisites, isolated OpenCV
+  runtime, locked install, and Windows process-level JSON/SQLite persistence/
+  recovery passed. Full suite: 291 tests, 288 passed, 1 failed, 2 skipped.
+  Screenshot acceptance was skipped because the suite failed.
+- Linux Node 22.16.0 job: setup, locked install, syntax, OCR.Space mocked
+  contract, Discord offline preflight, desktop offline configuration, desktop
+  service/bridge tests, and process-level recovery passed. Full suite:
+  291 tests, 287 passed, 1 failed, 3 skipped.
+- PDF/clean-package job: PDF render passed. Clean extracted package tests failed
+  on the same single test. Artifact upload succeeded; upload is not package
+  acceptance.
+- The common failure was tests/localized-numeric-parser.test.js:31, test
+  "reward selection uses localized agreement and never accepts XP from legacy
+  broad candidates alone", line 34. It expected '540180' from conflicting
+  isolated Credits reads ['940180','540180'] plus agreeing broad reads
+  ['540180','540180']; actual was ''.
+- src/number-parser.js requires two agreeing localized reads and states that
+  broad reads cannot outvote localized reads. The production selector's
+  abstention was consistent with fail-closed behavior; the old assertion was
+  stale. Test-only correction commit
+  8f79e78049d70686d3773eea199403951a43c904 changes the conflicting-local-read
+  expectation to abstention and adds a positive agreeing-local-read assertion.
+  No OCR production logic was changed in this correction.
+- Windows artifact ID 13458685472, SHA-256
+  0c33696944a32462eb12f57837bae90b3ea134f2d027b5ab23fed62164533701.
+- PDF/package artifact ID 13458495771, SHA-256
+  3ace1229920e3f0329e612e81655c7e999c5219b9cc6dace7f44ed72d839424d.
+- Prior run 42115665732 on ancestor ff797fe87bd4094a9e08f9195037d668681d6675
+  also failed Windows screenshot acceptance. Its Linux and clean-package jobs
+  passed, but Windows used the pre-fix PowerShell wrapper. Do not transfer those
+  results to 1e0eae or later commits.
+- Screenshot acceptance was skipped on run 42118287683. There is no exact-head
+  OCR accuracy result, no Gate A pass, and no Gate B/C/D pass.
+
+NEXT MILESTONE — GREEN EXACT-HEAD TEST / PACKAGE BASELINE
+1. Run exact-head Linux and Windows Node 22.16.0 suites and clean-package tests
+   for the test-only correction commit. Inspect complete logs and artifacts.
+2. Require the Windows screenshot-acceptance step to execute; inspect its
+   reports separately. A test pass is not screenshot OCR acceptance.
+3. If a different failure appears, identify the actual failing assertion and
+   root cause; do not make speculative production changes.
+4. After exact-head suites pass, inspect Windows screenshot reports field-by-field
+   for all nine mandatory values and network diagnostics. Continue Gate A only
+   after current-source acceptance is understood. Gate A requires all 16
+   approved images to have exact complete nine-field records, zero wrong
+   accepted mandatory values, zero unresolved mandatory values, and no
+   unauthorized network activity. Gate B remains an untouched independent
+   holdout (50 minimum / 100 preferred) with no tuning. Gate C and Gate D follow
+   only after A and B pass. Production remains NO-GO.
+
+NINE-FIELD CONTRACT AND SAFEGUARDS
+- Exact required order: result, player, map, mode, battleStart, credits,
+  freeXp, damage, xp. XP is mandatory and ninth.
+- Fail closed on missing, invalid, ambiguous, conflicting or incorrect values.
+  Zero wrongly accepted mandatory values is required.
+- Preserve local Tesseract.js + OpenCV architecture and the approved OCR.Space
+  diagnostic-evidence boundary. OCR.Space requires a local Free key and current
+  terms/privacy review before any synthetic live smoke; no production screenshots,
+  identity data, paid usage or secrets in chat. Remote evidence cannot accept,
+  rewrite or override local mandatory values.
+- No production deployment, live Discord action, or release until all applicable
+  acceptance gates pass with exact source/runtime evidence.
+
+================================================================================
+END CURRENT EXECUTION STATUS — 2026-11-05
+================================================================================
+
+================================================================================
 CURRENT EXECUTION OVERRIDE — 2026-11-05 (AFTER WINDOWS ARTIFACT REVIEW)
 ================================================================================
 
@@ -3694,4 +3816,23 @@ NEXT ACTIONS
 STATUS: local package root cleanup PASS; GitHub repository/branch cleanup OPEN; production/release remains NO-GO pending all existing OCR and release gates.
 ================================================================================
 END DWBOT ROOT-LEVEL PACKAGE CLEANUP — 2026-11-05
+================================================================================
+
+================================================================================
+COMBINED-PLAN SOURCE INTEGRATION NOTE — 2026-11-05
+================================================================================
+
+- Combined source: canonical GitHub living plan as of main 1e0eae750b3d357f44ffca0f0bb499afce383b4d plus the user's uploaded
+  DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt (SHA-256
+  9dae0d5c0dd290e83fbd11fb8caed092359a3e33f09daa59f05e6a75865f4ffd).
+- The canonical plan already contained the detailed historical plan and the
+  substantive project requirements/addenda. The uploaded Prime Directive and
+  source/derivative provenance note were integrated as governing content rather
+  than duplicating the full historical plan. Older current-head statements remain
+  preserved as history and are superseded by the dated status block at the top.
+- This combined GitHub file is the canonical living running plan moving forward.
+  The uploaded attachment remains an unchanged source record.
+
+================================================================================
+END COMBINED-PLAN SOURCE INTEGRATION NOTE
 ================================================================================
