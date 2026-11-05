@@ -1,3 +1,11 @@
+test('Windows OCR acceptance wrapper captures native npm stderr without PowerShell error-stream promotion', () => {
+    const script = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'run-windows-ocr-acceptance.ps1'), 'utf8');
+    assert.match(script, /& npm\.cmd @Arguments 2> \$ErrorLog \| Tee-Object -FilePath \$OutputLog/);
+    assert.doesNotMatch(script, /& npm\.cmd @Arguments 2>&1/);
+    assert.match(script, /Get-Content -LiteralPath \$ErrorLog -Raw/);
+    assert.match(script, /Remove-Item -LiteralPath \$OutputLog,\$ErrorLog/);
+});
+
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');

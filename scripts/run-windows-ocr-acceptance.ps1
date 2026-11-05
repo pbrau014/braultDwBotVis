@@ -45,15 +45,26 @@ try {
   param([string]$Label,[string[]]$Arguments)
   $Log=Join-Path $RunDir ($Label+'.log')
   Write-Host "[WINDOWS-OCR] START $Label"
-  $OutputLog=$Log+'.output.tmp'
-  # Stream output to the GitHub Actions log while retaining a complete
-  # per-command transcript. The prior cmd.exe redirection hid all progress
-  # until a potentially long OCR command exited, making a live stall opaque.
-  & npm.cmd @Arguments 2>&1 | Tee-Object -FilePath $OutputLog
-  $Code=$LASTEXITCODE
-  $Output=if(Test-Path -LiteralPath $OutputLog){Get-Content -LiteralPath $OutputLog -Raw}else{''}
-  @("COMMAND: npm "+($Arguments -join ' '),"EXIT: $Code",$Output) | Set-Content -LiteralPath $Log -Encoding utf8
-  Remove-Item -LiteralPath $OutputLog -Force -ErrorAction SilentlyContinue
+  $OutputLog=$Log+'.stdout.tmp'
+  $ErrorLog=$Log+'.stderr.tmp'
+  # Windows PowerShell 5.1 can promote native stderr records to terminating
+  # NativeCommandError under ErrorActionPreference=Stop, even when the child
+  # exits successfully. Keep stderr out of the PowerShell error stream, retain
+  # it in the transcript, and still stream stdout live to the Actions log.
+  try {
+   & npm.cmd @Arguments 2> $ErrorLog | Tee-Object -FilePath $OutputLog
+   $Code=$LASTEXITCODE
+   $Stdout=if(Test-Path -LiteralPath $OutputLog){Get-Content -LiteralPath $OutputLog -Raw}else{''}
+   $Stderr=if(Test-Path -LiteralPath $ErrorLog){Get-Content -LiteralPath $ErrorLog -Raw}else{''}
+   @("COMMAND: npm "+($Arguments -join ' '),"EXIT: $Code","--- stdout ---",$Stdout,"--- stderr ---",$Stderr) | Set-Content -LiteralPath $Log -Encoding utf8
+   if(-not [string]::IsNullOrWhiteSpace($Stderr)){
+    Write-Host '--- npm stderr (captured; not a PowerShell failure) ---'
+    Write-Host $Stderr
+   }
+  }
+  finally {
+   Remove-Item -LiteralPath $OutputLog,$ErrorLog -Force -ErrorAction SilentlyContinue
+  }
   $Outcome=if($Code -eq 0){'PASS'}else{'FAIL'}
   $script:Results += [pscustomobject]@{label=$Label;arguments=$Arguments;exitCode=$Code;log=[System.IO.Path]::GetFileName($Log);passed=($Code -eq 0)}
   Write-Host "[WINDOWS-OCR] $Outcome $Label exit=$Code"
