@@ -6,7 +6,7 @@ DWBOT is a local-first Node.js Discord tournament bot, strict screenshot OCR pip
 
 Repository: https://github.com/pbrau014/braultDwBotVis  
 Active delivery/current working branch: `main`.  
-Last verified main HEAD before this consolidated documentation/workflow update: `e49b6f64a68212cca84598d541a266cdf1232f1e`. Re-fetch `main` after this commit for the exact new head and its own Actions run; earlier queued runs do not validate later commits.
+Last verified main HEAD before this plan/status refresh: `fc59a52591673250ef289ef5cea68f1c25ea648c`. Exact-head run `42095870483` is pending on that commit; this refresh will trigger a newer exact-head run. Re-fetch `main` and Actions before relying on any result.
 
 Run `42088538702` Linux offline job: **PASS** on Node.js 22.16.0. The full project suite reported 269 tests, 267 passed, 0 failed and 2 skipped. OCR.Space mocked contract/prepass tests, reconciliation/report metadata, Discord policy, desktop service/bridge, persistence and recovery steps passed on that run.
 
@@ -16,7 +16,7 @@ Run `42088538702` Windows Node.js 22.16.0 job: process-level persistence/recover
 
 Run `42088032492` had a clean-package failure because `eng.traineddata` was absent. The pinned native Tesseract 5.5.3.20260724/model provisioning correction was verified by the later successful package job on `42088538702`; preserve the earlier failure as history.
 
-Exact-head runs `42091979664` and `42091840336` were queued on earlier main commits at the last check. They are not passes and do not validate this later documentation/workflow update. Re-fetch Actions for the new exact main head.
+The documentation/workflow rename commit is `5d2c5e3268b7e20f16c982fea4264d7093bc6977`; the explicit image3 XP regression test was added in `fc59a52591673250ef289ef5cea68f1c25ea648c`. Run `42095870483` is pending for the latter commit; this plan/status refresh will trigger a newer exact-head run. Earlier runs `42094998273`, `42091979664` and `42091840336` refer to older commits and are not current-head passes.
 
 Production remains **NO-GO** pending current-source Windows screenshot acceptance, Gate A/B, page-by-page PDF inspection, desktop/OAuth/browser/upload, isolated live Discord, recovery/security and remaining release gates.
 

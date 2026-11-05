@@ -3,7 +3,7 @@
 Canonical repository: https://github.com/pbrau014/braultDwBotVis.git
 Repository slug: pbrau014/braultDwBotVis
 Only active implementation/delivery branch: main
-Last verified main HEAD before the current documentation/workflow consolidation: e49b6f64a68212cca84598d541a266cdf1232f1e. Re-fetch main after the consolidation commit.
+Last verified main HEAD before this plan/status refresh: fc59a52591673250ef289ef5cea68f1c25ea648c. Exact-head run 42095870483 is pending; re-fetch main and Actions after the refresh commit.
 
 ## Repository rule
 Use only this repository for DWBOT source, branches, CI, issues, documentation, packages and releases. Do not substitute or direct work to another similarly named repository. References to other repositories or branches in old reports are historical provenance only, not active source/destination instructions. Do not delete other repositories or remote branch refs as part of reference cleanup. Do not force-push or rewrite history. Re-fetch main immediately before every write and protect the expected head.

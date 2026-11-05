@@ -4,20 +4,22 @@ This addendum is the newest active authority and supersedes conflicting active
 instructions in older sections below. Historical records remain unchanged.
 ================================================================================
 
-CURRENT EXECUTION RECONCILIATION — 2026-11-05 14:20 America/Chicago
+CURRENT EXECUTION RECONCILIATION — 2026-11-05 14:45 America/Chicago
 
 This is the latest verified status at the time of this plan revision. It updates
 only current operational facts; earlier records and historical results remain
 preserved below.
 
 - Canonical repository: pbrau014/braultDwBotVis, branch main.
-- Verified main HEAD before this plan revision:
-  e49b6f64a68212cca84598d541a266cdf1232f1e. Earlier exact-head run
-  42091979664 was queued on fb09f52839619fafdec69d5d561481207efbc0cd;
-  it does not validate this later commit.
-- Exact-head verification run 42091979664 (run 280) is queued. Its Windows
-  Node.js 22.16.0, Linux Node.js 22.16.0 and PDF/clean-package jobs are all
-  queued. Prior exact-head run 42091840336 (run 279) is also queued.
+- Verified main HEAD immediately before this plan refresh:
+  fc59a52591673250ef289ef5cea68f1c25ea648c. The preceding consolidated
+  documentation/workflow rename commit was 5d2c5e3268b7e20f16c982fea4264d7093bc6977.
+  Exact-head run 42095870483 is pending on fc59a52591673250ef289ef5cea68f1c25ea648c;
+  it is not a pass. This plan refresh triggers a new exact-head run.
+- Exact-head run 42095870483 is pending on fc59a52591673250ef289ef5cea68f1c25ea648c.
+  Earlier run 42094998273 is queued on 5d2c5e3268b7e20f16c982fea4264d7093bc6977;
+  runs 42091979664 and 42091840336 refer to still older commits. None is a
+  completed pass for the current head. This plan refresh triggers a newer run.
 - The earlier code-candidate run 42088538702 has completed successfully on its
   Linux offline and PDF/clean-package jobs. Windows process-level persistence/
   recovery and the full Windows Node 22 suite have also completed successfully.
@@ -1225,7 +1227,22 @@ Where historical factual statuses conflict with Sections 0–7 above, Sections
   PSMs; 6645 remains rejected. This is unit-level regression coverage, not a
   full screenshot acceptance result. The Windows additional-sixteen screenshot
   stage must still verify image3 against the independently recorded XP=6646.
-  New source/test commit and exact-head CI result are recorded below when known.
+  Test commit fc59a52591673250ef289ef5cea68f1c25ea648c is now in main;
+  exact-head run 42095870483 is pending and must be inspected before claiming
+  this regression verified.
+
+- Consolidated documentation/workflow rename commit 5d2c5e3268b7e20f16c982fea4264d7093bc6977:
+  created docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt, removed the
+  old dated plan path from canonical main, reconciled README/handoff/authority/
+  plan1 references, corrected the stale OCR.Space key-only activation sentence,
+  added future-run concurrency control and changed the Windows OCR acceptance
+  script to stream live output while retaining per-command transcripts.
+  Exact-head run 42094998273 is queued on that commit.
+- XP regression commit fc59a52591673250ef289ef5cea68f1c25ea648c:
+  added explicit positive/negative unit assertions for image3's 66465 -> 6646
+  XP trailing-adornment case and updated this plan. Exact-head run 42095870483
+  is pending. The existing long-running Windows screenshot-acceptance run
+  42088538702 remains in progress; no screenshot artifact is available yet.
 
 ================================================================================
 END OF CURRENT GOVERNING SECTION — HISTORICAL PLAN FOLLOWS

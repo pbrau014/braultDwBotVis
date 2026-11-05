@@ -17,11 +17,11 @@ plan, use the canonical living plan.
   snapshots; duplicate copies were compared. The user intends to delete older
   Library copies after downloading and confirming the new canonical plan.
   No older Library entry has been deleted.
-- Last verified `main` HEAD before this consolidated documentation/workflow
-  update: `e49b6f64a68212cca84598d541a266cdf1232f1e`. Re-fetch `main` after
-  this commit. Run `42091979664` was queued on the earlier `fb09f528...`
-  commit; run `42091840336` was queued on `cdb872c...`. Neither validates
-  the new head.
+- Last verified `main` HEAD before this plan/status refresh:
+  `fc59a52591673250ef289ef5cea68f1c25ea648c`. Exact-head run `42095870483`
+  is pending for that commit; this refresh triggers a newer exact-head run.
+  Re-fetch `main` and Actions before relying on results. Earlier runs
+  `42094998273`, `42091979664` and `42091840336` refer to older commits.
 - Run `42088538702`: Linux Node.js 22.16.0 job PASS (269 total, 267 passed,
   0 failed, 2 skipped); PDF/manual/clean-package job PASS; Windows
   process-level persistence/recovery and full Windows Node 22 suite PASS.
