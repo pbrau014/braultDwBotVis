@@ -1,4 +1,142 @@
 ================================================================================
+CURRENT EXECUTION RECONCILIATION — 2026-11-05 15:20 AMERICA/CHICAGO
+This is the newest operational status. Preserve all earlier addenda and
+historical records below; this section supersedes their stale active statuses.
+================================================================================
+
+A. CURRENT MAIN AND OCR.SPACE DEFAULT-ON IMPLEMENTATION
+- Sole canonical repository: pbrau014/braultDwBotVis, branch main. Main HEAD
+  before this plan refresh: 14ca84b3dcf21f9e0f24efe6e6d60da38c98de65.
+- Code commit 3ad588fc0b4ed3923ca76703b78edd87d73bea74 implements default-on
+  activation when a local Free API key is configured. An unset/blank
+  OCRSPACE_ENABLED value or 1 enables; explicit 0 disables; invalid non-empty
+  values fail closed; a key is mandatory. The helper getOcrSpaceActivation in
+  src/ocrspace-field-evidence.js is used by src/bot.js and
+  src/ocr-report-metadata.js. Regression tests cover key-only default
+  activation, explicit opt-out, missing key and invalid setting.
+- Documentation commit 57646d07306e22f439229e96dcdd77cc729d0c81 updates the
+  desktop and Discord test environment examples, README, OCR.Space guide,
+  handoff and authority rules. Roadmap commit
+  14ca84b3dcf21f9e0f24efe6e6d60da38c98de65 carries the new rules into plan1.
+- This changes the remote activation default only. It does not remove the local
+  key requirement or any safe-crop, identity-exclusion, HTTPS, redirect, size,
+  timeout, quota, no-retry or fail-closed safeguard. The Windows local-primary
+  acceptance script intentionally sets OCRSPACE_ENABLED=0; retain that explicit
+  local-only override.
+- No local OCR.Space key is configured in this session. No live API request or
+  screenshot transmission has occurred. Mock tests do not prove live provider
+  accuracy or live terms/privacy compliance.
+
+B. ENGINE 3 SEARCHABLE-PDF COMPARISON RULE
+- DWBOT's Engine capability comparison now marks Engine 3 searchable PDF as
+  SUPPORTED, based on the Engine 3 feature-description text.
+- The provider's own comparison matrix still marks it unsupported. Preserve
+  this documentation conflict; do not claim the provider matrix changed.
+  Runtime must check SearchablePDFURL. If Engine 3 returns no safe URL, retain
+  the quota-reserved Engine 2 PDF-only fallback and discard Engine 2 OCR text.
+  No paid tier or usage is authorized.
+
+C. WINDOWS ACCEPTANCE ARTIFACT — RUN 42088538702
+- The run is now complete. Windows process-level persistence/recovery and the
+  full Windows Node 22.16.0 test suite passed. The Windows native/Tesseract.js
+  screenshot-acceptance step FAILED. Artifact
+  dwbot-windows-node22-native-ocr-and-recovery.zip was downloaded and ZIP-tested;
+  SHA-256:
+  028490d3725e4523b3ac162c08f00ddc27520c4d8aab9be036e359b2562c140a.
+- This artifact is fingerprint-bound to ancestor source commit
+  9037e0b1f7c98378658413ef8c76b70f32ed3a4c, not the current main head. Its
+  native 16-image report completed 16/16 but only 5/16 exact nine-field records
+  and 5/16 complete records. Its Tesseract.js 16-image report completed 16/16
+  but only 6/16 exact and 6/16 complete. The four-image native sequence was
+  2/4 exact and 3/4 complete; the reported screenshot alone was 1/1 exact.
+- The ancestor run contains wrongly accepted mandatory values:
+  * image1.png Free XP 695 vs expected 1695;
+  * image2.png Damage 1349538 vs expected 134953;
+  * schlieffen-defeat.jpg Map "Crash Zone Alpha —" vs "Crash Zone Alpha";
+  * Tesseract.js image3.png Free XP 2 vs expected 2350;
+  * CV-assisted Tesseract.js image.png Map "shards" vs "Shards".
+  Native image3.png XP was unresolved rather than the historical false acceptance
+  66465; this is fail-closed behavior for that field, not a Gate A pass.
+- Network blocking was active and reports showed zero blocked attempts. Runtime:
+  Windows x64, Node v22.16.0, npm 10.9.2, native Tesseract 5.5.3.20260724,
+  Tesseract.js 6.0.1/core 6.1.2, ImageMagick 7.1.2-25, eng/osd models.
+- These failures are ancestor evidence and must not be silently projected onto
+  current main. The exact-current-source screenshot acceptance is still open.
+  Run the current head, inspect all per-image/per-field artifacts, and only then
+  decide which of these errors persist. Do not tune from this older report if a
+  current-source report contradicts it; preserve both.
+
+D. ENTERPRISEOCRPIPELINE.PY REVIEW
+- Root EnterpriseOCRPipeline.py and services/cv_ocr/EnterpriseOCRPipeline.py
+  are identical (Git blob SHA
+  cadf83d1627f69120f2442e5ccdb27a97108598c; 61,235 bytes).
+- It is a standalone Python/FastAPI/SQLAlchemy document-OCR prototype using
+  PaddleOCR as primary recognition and optional native Tesseract CLI
+  comparison. It also contains preprocessing/deskew, layout ordering, table
+  extraction, regex entities, persistence, review routes, metrics and webhook
+  outbox code. It is not wired into the Node Discord bot or its OCR pipeline.
+- The tracked project has no tasks.py/worker implementation for its queue import,
+  no dedicated Enterprise service dependency manifest and no tests for this
+  service. The upload route cannot be considered a complete runnable pipeline.
+  Document retrieval and upload routes also need authenticated access before
+  exposure. Its wows profile does not implement the strict nine-field contract.
+- Reusable ideas include bounded Paddle model pooling, local image
+  normalization/deskew, layout geometry/reading order, table extraction,
+  optional local Tesseract comparison and page-level evidence persistence.
+  Do not integrate/deploy it as-is or replace Tesseract.js. Revisit only as an
+  isolated benchmark or ported helper after the OCR.Space and Gate A/B priorities.
+
+E. PROJECT-WIDE SEARCH SCOPE AND LIMITATION
+- The canonical main tree at the reviewed head contained 537 tracked blobs,
+  including 362 text-like candidates. A targeted OCR-relevant search covered
+  117 source, test, script, configuration, README, continuation, OCR.Space,
+  workflow and plan text files. It found and updated the active default-off
+  statements in implementation/configuration/documentation/tests.
+- This is not a claim that all 537 blobs or all 362 text candidates were read
+  line-by-line. Unrelated project materials and binary assets were not fully
+  inspected. Exact-head CI and the remaining environment gates are the required
+  practical verification substitute; do not report an exhaustive file audit.
+
+F. CURRENT CI AND OPEN GATES
+- Exact-head run 42100283977 on the immediately preceding main head was pending
+  with no jobs at the last check. This plan refresh changes main again; inspect
+  the new exact-head run and all artifacts. Earlier exact-head runs 42095870483,
+  42096644506, 42099925079 and 42100206579 were cancelled or superseded before
+  completing verification; do not transfer their ancestor results to this head.
+- The OCR.Space default-on implementation and documentation are committed but
+  are NOT yet exact-head CI-verified. If CI fails, inspect the failing log,
+  correct the root cause, and rerun on a freshly verified main head.
+- Still open: current-source Windows native/Tesseract.js screenshot acceptance;
+  Gate A 16-image exact nine-field acceptance; independent Gate B holdout;
+  synthetic live OCR.Space smoke after local key and terms/privacy review;
+  PDF page-by-page visual inspection; browser/OAuth/desktop QA; isolated Discord
+  staging; backup/restore/rollback and release decision. Production remains
+  NO-GO.
+- Keep the exact nine-field contract in order: result, player, map, mode,
+  battleStart, credits, freeXp, damage, xp. XP remains mandatory and ninth.
+  Zero wrongly accepted mandatory values is required; uncertain fields abstain.
+
+G. IMMEDIATE NEXT STEPS
+1. Inspect the new exact-head CI run created by this plan refresh; verify the
+   OCR.Space tests, report metadata, syntax, full suite, clean package and
+   Windows jobs. A queued run or job pass without artifact inspection is not
+   closure.
+2. Obtain current-source Windows screenshot-acceptance artifacts and inspect all
+   nine fields per image. If any ancestor failure persists, trace its current
+   crop geometry, raw OCR, independent evidence and candidate selection; fix
+   only a demonstrated root cause and add regression tests. Preserve originals.
+3. Recheck OCR.Space provider terms/privacy and perform a synthetic non-identifying
+   live smoke only after a local Free key is configured. Never transmit
+   production screenshots or identity data. Compare Engine 3 with local
+   Tesseract on independently labeled data.
+4. Run Gate A, then independent Gate B, then Gate C persistence/recovery and
+   Gate D release review in dependency order. Production remains NO-GO.
+
+================================================================================
+END CURRENT EXECUTION RECONCILIATION — 2026-11-05
+================================================================================
+
+================================================================================
 CURRENT USER AUTHORITY ADDENDUM — 2026-11-05 14:56 AMERICA/CHICAGO
 This addendum is the newest active rule and supersedes conflicting default-off
 statements in older active sections. Historical evidence and records remain.
