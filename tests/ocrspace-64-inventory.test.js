@@ -42,7 +42,8 @@ test('eligible-only 56 runner skips the eight absent user-excluded records befor
     const providerCall = runner.indexOf('await createOcrSpacePdfFirst', exclusionGuard);
     assert.ok(exclusionGuard >= 0);
     assert.ok(skip > exclusionGuard && providerCall > skip);
-    assert.match(runner, /providerSubmission:\s*false/);\n    assert.match(runner, /sourcePresent:\s*false/);
+    assert.match(runner, /providerSubmission:\s*false/);
+    assert.match(runner, /sourcePresent:\s*false/);
 });
 
 
@@ -72,7 +73,10 @@ test('Windows acceptance validates the 56 eligible and 8 excluded inventory part
     assert.match(runner, /\$Inventory64Data\.excludedSkipped -eq 8/);
     assert.match(runner, /\$Inventory64Data\.completedInventoryEntries -eq 64/);
     assert.match(runner, /\$Inventory64Data\.sourceMemberHashesVerified -eq 56/);
-    assert.match(runner, /\$Inventory64Data\.allSourceMembersVerifiedBeforeProvider -eq \$true/);\n    assert.match(runner, /\$Inventory64Data\.eligibleSourceHashesVerified -eq 56/);\n    assert.match(runner, /\$Inventory64Data\.archiveMembersVerified -eq 56/);\n    assert.match(runner, /\$Inventory64Data\.excludedRecordsAbsent -eq \$true/);
+    assert.match(runner, /\$Inventory64Data\.allSourceMembersVerifiedBeforeProvider -eq \$true/);
+    assert.match(runner, /\$Inventory64Data\.eligibleSourceHashesVerified -eq 56/);
+    assert.match(runner, /\$Inventory64Data\.archiveMembersVerified -eq 56/);
+    assert.match(runner, /\$Inventory64Data\.excludedRecordsAbsent -eq \$true/);
     assert.match(runner, /\$env:OCRSPACE_64_OUTPUT_DIR=Join-Path \$RunDir 'ocrspace-64-inventory'/);
     assert.match(runner, /\$EligibleRows\.Count -eq 56 -and \$ExcludedRows\.Count -eq 8/);
 });
