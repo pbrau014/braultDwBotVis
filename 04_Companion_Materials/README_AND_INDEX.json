@@ -3,7 +3,7 @@
   "prepared": "2026-10-29",
   "release_status": "GO — PRODUCTION DOCUMENTATION RELEASE UNDER USER-DIRECTED GATE WAIVER; IMPLEMENTATION TESTS NOT TESTED",
   "selected_policies": {
-    "C01": "Round 3 uses positive finite elapsed seconds and metric 1 / seconds; lower time scores better. Specification resolved; canonical implementation tests open.",
+    "C01": "Round 3 uses positive finite elapsed seconds and metric 1 / seconds; lower time scores better. Specification resolved; DWBOT core and standalone HTML updated on 2026-11-06; exact-head CI/browser verification pending.",
     "C02": "Shared mapping DD=4, CA=3, BB=2; unknown classes block scoring. Specification resolved; implementation/parity tests open.",
     "C03": "Retire/hide S10:S12 from participant controls, preserve historical cells; verify zero effect in canonical implementation.",
     "C04": "Retire/hide Round 4 F8 control, preserve historical cell; Rounds 1–3 pool use stays unchanged.",
@@ -91,6 +91,20 @@
         "Distinguishes Pilot, regular season, playoffs and Grand YOLO finale participant expectations"
       ],
       "publication_note": "The v1.1 DOCX/PDF remain the released publication until the v1.2 source is reviewed and rendered."
+    },
+    {
+      "file": "Admiralty_YOLO_Mock_Tournament_Field_Guide_v0.1_PROPOSAL.md",
+      "status": "PROPOSAL_NARRATIVE_COMPANION",
+      "derived_from": "Admiralty handbook PDF, CBStrat Tier X Clan Battles guide, supplied YOLO Pilot/recurring documents, Discord scoring texts, archival workbook and current public game/tournament references",
+      "changes": [
+        "Adds fictional Admiralty cast and six-group organizational translation",
+        "Separates Pilot from recurring weekly format",
+        "Explains bracket wins versus individual damage awards and cumulative Grand YOLO standings",
+        "Adapts CBStrat vision, focus-fire, crossfire, push/hold and objective principles to low-tier mixed bot/human play",
+        "Explains scoring formula and archival Race direct-time discrepancy versus C01 inverse-time policy",
+        "Labels playoff and finale details that remain proposals"
+      ],
+      "publication_note": "The Markdown guide and HTML visual companion are mock narrative materials, not event notices, signed settings, or approval of prizes/eligibility."
     }
   ],
   "narrative_companion": {
@@ -102,5 +116,6 @@
     "status": "PROPOSAL / MOCK TOURNAMENT; fictional narrative and visual companion; no event approval",
     "sources": "Admiralty handbook, CBStrat Tier X Clan Battles guide, YOLO recurring/Pilot documents, three preserved Discord source texts, archival workbook, and current public game/tournament references",
     "boundaries": "Pilot and recurring rules remain distinct; bracket wins advance; damage drives individual damage awards/cumulative Grand YOLO damage; race uses DWBOT C01 inverse-time policy; canonical workbook and event settings still govern live scoring"
-  }
+  },
+  "source_reconciliation": "Admiralty_YOLO_Source_Reconciliation_and_Visual_Provenance_v0.1.md"
 }
