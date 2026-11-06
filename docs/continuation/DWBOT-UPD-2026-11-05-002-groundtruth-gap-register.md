@@ -33,3 +33,15 @@ These are source review materials, not a complete nine-field ground-truth manife
 Per the user's explicit instruction, these omissions and missing cells do not prevent continuing corpus preparation and exploratory extraction. Keep them visible in reports; do not fabricate, infer, or silently fill expected values. The 36 fully populated rows may support retrospective comparisons only where exact source-image identity and label provenance are verified. The 10 partial rows support field-level comparison only for fields that are actually populated. No missing value counts as a correct OCR result.
 
 This register does not convert the 56-image review set or the new 63-image candidate set into an independent Gate B accuracy holdout. Gate B accuracy remains not accepted until each evaluated image has frozen, independently verified expected values for all nine required fields.
+
+
+## 2026-11-06 Gate B subset amendment
+
+The user subsequently approved the first 21 complete, eligible nine-field
+records in the current 63-image corpus as the Gate B holdout, replacing the
+former 50-image minimum / 100-image preferred target. The statement above
+remains accurate for the 56-image workbook and the 63-image corpus as a whole:
+neither entire set is fully labeled. Only the explicitly selected 21 records
+qualify for Gate B. All nine values must be present and frozen; no partial or
+uncertain record may be substituted. Preserve this addendum as the current
+authority while retaining the original gap-register statement as provenance.

@@ -88,8 +88,8 @@ Status: ACTIVE / GOVERNING / SUPERSEDES THE 64-IMAGE INVENTORY TEST REQUIREMENT.
   The post-hoc evaluator supports --inventory complete-ground-truth-21 and
   must report the selection, missing run rows and per-engine metrics.
 - The 21-image subset supplies an eligible complete-record evaluation scope
-  for the PDF-first pipeline. It is not a 50-image independent Gate B holdout,
-  does not certify the v6 workbook, and does not change Gate B: NOT_PASSED.
+  for the PDF-first pipeline and is also the approved 21-image Gate B holdout.
+  It does not certify the v6 workbook; Gate B remains pending actual evidence.
   The 4- and 16-image inventory requirements remain active.
 - The legacy 64-image inventory manifest, runner and tests may remain in the
   repository as historical/legacy integrity material, but they are no longer
@@ -139,7 +139,7 @@ Phase 0–10 roadmap. The canonical living plan on main remains controlling.
 - Eligible original-image intake explicitly requires OCRSPACE_ENABLED=1, OCRSPACE_NETWORK_ALLOWLIST=1 and OCRSPACE_API_KEY. OCRSPACE_ENABLED=0 is reserved for isolated offline mocks or local readers invoked only after a successful OCR.Space PDF-first stage; it is not an original-image fallback.
   Failure to produce/download/rasterize the PDF fails closed.
 - Exact nine fields remain mandatory; zero wrong accepted mandatory values.
-  The replacement 21-image subset has complete nine-field manual transcriptions for eligible post-hoc evaluation; it is not the independent 50-image minimum Gate B holdout.
+  The replacement 21-image subset is the approved Gate B holdout and post-hoc evaluation set, replacing the former 50-image minimum / 100-image preferred target. Gate B remains pending until actual evidence passes.
 - Current implementation: src/ocrspace-pdf-first.js, src/image-processor.js,
   src/bot.js. The old crop-only helper files are legacy, not active bot path.
   See docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md and the canonical living plan.

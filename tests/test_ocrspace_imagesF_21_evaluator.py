@@ -1,4 +1,5 @@
 import importlib.util
+import hashlib
 import json
 import unittest
 from pathlib import Path
@@ -16,6 +17,12 @@ class GateB21EvaluatorTests(unittest.TestCase):
     def setUpClass(cls):
         cls.gt = json.loads(GT_PATH.read_text(encoding="utf-8"))
         cls.selected = EVALUATOR.select_gate_b_records(cls.gt)
+
+    def test_ground_truth_json_checksum_sidecar_matches_exact_bytes(self):
+        sidecar = GT_PATH.with_suffix(GT_PATH.suffix + ".sha256")
+        expected = sidecar.read_text(encoding="ascii").split()[0]
+        actual = hashlib.sha256(GT_PATH.read_bytes()).hexdigest()
+        self.assertEqual(actual, expected)
 
     def test_exact_21_complete_nine_field_selection(self):
         self.assertEqual(len(self.selected), 21)
