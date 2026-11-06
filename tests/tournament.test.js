@@ -233,7 +233,7 @@ test('HTML calculator and live DWBOT engine match all four event formulas', asyn
     classWeightFor: code => ({ DD: 4, CA: 3, BB: 2 })[String(code || '-').toUpperCase()] || 0,
     eventTotal: (player, key) => player.events[key].reduce((sum, game) => sum + Number(key === 'grand' ? game.damage : game.metric), 0),
   };
-  const htmlEventRawScore = vm.runInNewContext(functionSource + '\\neventRawScore;', sandbox);
+  const htmlEventRawScore = vm.runInNewContext(functionSource + '\neventRawScore;', sandbox);
   for (const player of state.players) {
     for (const event of T.EVENTS) {
       const live = T.eventScore(state, player, event);
