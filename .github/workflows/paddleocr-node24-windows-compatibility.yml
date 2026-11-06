@@ -1,0 +1,44 @@
+name: PaddleOCR Windows Node 24 serialization compatibility
+
+on:
+  push:
+    branches: [fix/paddleocr-windows-json-output]
+  pull_request:
+    branches: [main]
+    paths:
+      - "scripts/paddleocr_field_crops.py"
+      - "src/paddleocr-field-fallback.js"
+      - "tests/paddleocr-field-fallback.test.js"
+      - ".github/workflows/paddleocr-node24-windows-compatibility.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  windows-node24:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact candidate
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Setup Node.js 24.22.1 (additional compatibility target)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.22.1
+          cache: npm
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Verify runtime versions
+        shell: powershell
+        run: |
+          node --version
+          npm --version
+          python --version
+      - name: PaddleOCR helper and ASCII-safe serialization tests
+        run: node --test tests/paddleocr-field-fallback.test.js
