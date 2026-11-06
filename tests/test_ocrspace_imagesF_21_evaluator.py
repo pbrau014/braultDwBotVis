@@ -12,7 +12,7 @@ EVALUATOR = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(EVALUATOR)
 
 
-class GateB21EvaluatorTests(unittest.TestCase):
+class GateB19EvaluatorTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.gt = json.loads(GT_PATH.read_text(encoding="utf-8"))
@@ -24,13 +24,16 @@ class GateB21EvaluatorTests(unittest.TestCase):
         actual = hashlib.sha256(GT_PATH.read_bytes()).hexdigest()
         self.assertEqual(actual, expected)
 
-    def test_exact_21_complete_nine_field_selection(self):
-        self.assertEqual(len(self.selected), 21)
-        self.assertEqual(self.selected, self.gt["records"][:21])
+    def test_exact_19_gate_b_complete_nine_field_selection(self):
+        self.assertEqual(len(self.selected), 19)
+        self.assertEqual(self.selected, self.gt["records"][:19])
         for row in self.selected:
             self.assertTrue(EVALUATOR.is_complete_reference(row))
             self.assertEqual(len([f for f in EVALUATOR.FIELDS
                                   if row["fieldStatus"][f]["eligible_for_exact_match"]]), 9)
+
+    def test_21_complete_records_remain_available_for_inventory_analysis(self):
+        self.assertEqual(len(EVALUATOR.select_analysis_21_records(self.gt)), 21)
 
     def test_gate_b_subset_has_no_source_hash_overlap_with_16_image_development_corpus(self):
         dev_path = ROOT / "testdata" / "additional-screenshot-ground-truth.json"
@@ -44,8 +47,8 @@ class GateB21EvaluatorTests(unittest.TestCase):
         manifest_path = ROOT / "testdata" / "imagesF-holdout-candidate-manifest.json"
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         subset = manifest["gateBSubset"]
-        self.assertEqual(subset["id"], "complete-ground-truth-21")
-        self.assertEqual(subset["imageCount"], 21)
+        self.assertEqual(subset["id"], "gate-b-complete-ground-truth-19")
+        self.assertEqual(subset["imageCount"], 19)
         self.assertEqual(subset["groundTruthSha256"], hashlib.sha256(GT_PATH.read_bytes()).hexdigest())
         expected = [{"filename": row["filename"], "bytes": row["sourceImage"]["bytes"], "sha256": row["sourceImage"]["sha256"], "width": row["sourceImage"]["width"], "height": row["sourceImage"]["height"]} for row in self.selected]
         self.assertEqual(subset["records"], expected)
@@ -78,10 +81,10 @@ class GateB21EvaluatorTests(unittest.TestCase):
             }]
         }]}
         metrics = EVALUATOR.evaluate_engine(run, "tesseractjs", self.selected)
-        self.assertEqual(metrics["missingRunResults"], 20)
+        self.assertEqual(metrics["missingRunResults"], 18)
         self.assertEqual(metrics["readerRowsAvailable"], 1)
         self.assertEqual(metrics["fieldLevelSummary"]["eligibleExpectedValues"], 189)
-        self.assertEqual(metrics["fieldLevelSummary"]["unresolvedOutputs"], 189)
+        self.assertEqual(metrics["fieldLevelSummary"]["unresolvedOutputs"], 171)
         self.assertEqual(metrics["fieldLevelSummary"]["exactMatches"], 0)
 
     def test_gate_b_requires_gate_a_pass_and_locked_matching_candidate_fingerprint(self):
