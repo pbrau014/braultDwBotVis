@@ -1,0 +1,44 @@
+📊 **YOLO TOURNEY WORKBOOK — SCORING GUIDE**
+
+🗂️ **EVENT TABS**
+💥 `Event1-Damage` — Damage-based rewards  
+🎯 `Event2-Kills` — Kill-based rewards  
+🏁 `Event3-Race` — Race-time rewards  
+👑 `Event4-GrandYolo` — Combined performance scoring  
+📈 `Tourney Totals` — Final totals, averages & dollar values
+
+✍️ **HOW IT WORKS**
+Enter each player's game data (class, class weight, tier, damage, kills, or time) in the appropriate event tab. Formulas calculate each event's *Dblns Earnd* automatically. The final tab pulls these results together.
+
+🧮 **EVENT SCORING**
+Rewards use performance, class weight, ship tier, and the Doubloon Pool.
+
+General formula:
+`2 × Pool × Σ(Class Weight × Performance Share ÷ Tier^Tier Weight)`
+
+Performance Share = your damage/kills ÷ the event-wide total. Race scoring uses recorded time values. Grand YOLO combines weighted class, tier, damage, kills, and time scores, totals 7 games, then divides by 3.
+
+🪙 **EXAMPLE — DBLNS EARND**
+Pool = 500 | Class weight = 4 | Tier = 2  
+Damage = 20,000 | Event total = 1,000,000  
+`2 × 500 × [4 × (20,000 ÷ 1,000,000) ÷ 2¹] = 40 Doubloons/game`
+
+If the same result applies to all 7 games: **40 × 7 = 280 Doubloons.** *(Illustrative example; actual results depend on workbook settings and inputs.)*
+
+📈 **FINAL RESULTS — TOURNEY TOTALS**
+• **Doubloons:** Sum of all 4 event rewards.  
+• **Avg. Dmg:** Average damage from Events 1 & 4.  
+• **Avg. Tier/Class:** Average across 21 entries from Events 1, 2 & 4.  
+• **Avg. Kills:** Average across 7 games in Event 2.  
+• **Avg. Class label:** DD > 3.6 | CA 2.7–3.6 | BB < 2.7  
+• **Dollars:** Doubloons × 0.54 ÷ 100.
+
+💰 Example: 280 + 100 + 50 + 170 = **600 Doubloons** → **$3.24** using the workbook's conversion.
+
+⚠️ **REMEMBER**
+✅ Enter results on the correct event tab.  
+🚫 Don't overwrite formula cells.  
+⚙️ Pool values, weights, and tiers affect rewards.  
+🔍 Check formulas if player counts or scoring rules change.
+
+**Enter scores → Event tabs calculate rewards → Tourney Totals combines everything.** 🚀
