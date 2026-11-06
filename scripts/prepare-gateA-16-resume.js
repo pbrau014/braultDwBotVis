@@ -39,6 +39,12 @@ function pngInfo(bytes) {
     return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
 }
 
+function originalNetworkEvidenceAllowsProvider(manifest) {
+    return manifest?.originalNetworkLogStatus === 'PRESENT'
+        && Number.isInteger(manifest.originalNetworkAttemptCount)
+        && manifest.originalNetworkAttemptCount === 0;
+}
+
 function parseJsonUtf8(input) {
     const text = Buffer.isBuffer(input) ? input.toString('utf8') : String(input);
     return JSON.parse(text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text);
@@ -259,6 +265,15 @@ async function prepare(options) {
         throw new Error('First image was not recovered as an exact nine-field record; no remaining provider requests were made.');
     }
 
+    if (!originalNetworkEvidenceAllowsProvider(recoveryReport)) {
+        recoveryReport.status = 'BLOCKED_MISSING_ORIGINAL_NETWORK_LOG';
+        recoveryReport.remainingProviderRequests = 0;
+        recoveryReport.completedProviderRequestsReused = 1;
+        recoveryReport.note = 'The original restricted-egress diagnostic log is absent or does not prove zero blocked attempts. The reconstructed job log and new local-only log are limited evidence, not a substitute. No remaining paid provider requests are permitted.';
+        await writeJson(path.join(sourceRoot, 'testdata', 'gateA-16', 'resume-manifest.json'), recoveryReport);
+        throw new Error('Original restricted-egress diagnostic evidence is missing; refusing all remaining paid OCR.Space requests.');
+    }
+
     // Metadata is generated for the exact future OCR run configuration. The
     // placeholder key is used only to record "configured"; it is never passed
     // to the local child or written into a report.
@@ -322,4 +337,4 @@ if (require.main === module) {
         process.exitCode = 1;
     });
 }
-module.exports = { prepare, samePreflight, pngInfo, extractStartedFixtures, parseJsonUtf8 };
+module.exports = { prepare, samePreflight, pngInfo, extractStartedFixtures, parseJsonUtf8, originalNetworkEvidenceAllowsProvider };
