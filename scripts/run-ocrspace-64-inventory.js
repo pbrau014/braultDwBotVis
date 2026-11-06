@@ -89,7 +89,8 @@ async function main() {
     await fs.mkdir(outputRoot, { recursive: true });
     const run = {
         schemaVersion: 1, status: 'running', createdAt: new Date().toISOString(),
-        sourceArchive: 'imgsHalf1-eligible-56.zip', sourceType: 'eligible-only-56', sourceArchiveBytes: archiveBytes.length, sourceArchiveSha256: archiveSha256,\n        archiveMembersVerified: 56, eligibleSourceHashesVerified: verifiedSources.size, excludedRecordsAbsent: true,
+        sourceArchive: 'imgsHalf1-eligible-56.zip', sourceType: 'eligible-only-56', sourceArchiveBytes: archiveBytes.length, sourceArchiveSha256: archiveSha256,
+        archiveMembersVerified: 56, eligibleSourceHashesVerified: verifiedSources.size, excludedRecordsAbsent: true,
         totalUncompressedImageBytes: summedImageBytes,
         inventorySha256: sha256(Buffer.from(JSON.stringify(inventory))),
         imageCount: 64, groundTruthStatus: 'not_transcribed_or_independently_reviewed',
@@ -169,7 +170,8 @@ async function main() {
     const reportPath = path.join(outputRoot, 'ocrspace-64-inventory-report.json');
     await fs.writeFile(reportPath, JSON.stringify(run, null, 2));
     const reportSha256 = sha256(await fs.readFile(reportPath));
-    await fs.writeFile(reportPath + '.sha256', reportSha256 + '  ' + path.basename(reportPath) + '\\n');
+    await fs.writeFile(reportPath + '.sha256', reportSha256 + '  ' + path.basename(reportPath) + '\
+');
     await bot.terminateOcrWorker().catch(() => {});
     console.log(`[OCRSPACE-64] COMPLETE: ${run.eligibleProcessed} eligible PDFs generated; ${run.excludedSkipped} user-excluded images skipped; exact accuracy NOT EVALUABLE without independent ground truth. Report: ${reportPath}`);
 }
