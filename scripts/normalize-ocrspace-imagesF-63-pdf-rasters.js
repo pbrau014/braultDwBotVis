@@ -21,6 +21,7 @@ async function normalizeInventory({
     renderPdf = imageProcessor.renderSearchablePdfPage,
     readMetadata = imageProcessor.metadata,
     normalizeRaster = imageProcessor.normalizeSearchablePdfPageRaster,
+    requiredImageCount = 63,
     toRawRgba = buffer => imageProcessor.__test.runImageMagick(
         ['png:-', '-depth', '8', 'rgba:-'], buffer,
         { timeoutMs: 60000, maxOutputBytes: 80_000_000 }
@@ -155,7 +156,7 @@ async function normalizeInventory({
         report.images.push(image);
     }
 
-    report.status = report.sourceResultCount === 63 && report.verifiedCount === 63
+    report.status = report.sourceResultCount === requiredImageCount && report.verifiedCount === requiredImageCount
         && report.failedCount === 0 ? 'PASS' : 'FAIL';
     report.completedAt = new Date().toISOString();
     if (output) {
