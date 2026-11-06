@@ -269,6 +269,9 @@ test('19-image Gate B artifact workflow verifies the completed run without provi
     assert.match(workflow, /--network-log-reconciliation/);
     assert.match(workflow, /evaluate-ocrspace-pdf-text-layer\.js/);
     assert.match(workflow, /pdf-text-layer-analysis-19\.json/);
+    assert.match(workflow, /Discover and download the latest Gate A report for this exact source commit/);
+    assert.match(workflow, /DWBOT_GATE_A_REPORT/);
+    assert.match(workflow, /--gate-a-report/);
     assert.match(workflow, /RECONSTRUCTED_LIMITED_EVIDENCE/);
     assert.match(workflow, /originalBlockedAttemptCount = \$null/);
     assert.match(workflow, /\$recoveryNetworkLog =/);
@@ -288,6 +291,11 @@ test('Gate A acceptance uses the accepted runtime, fail-closed network guard and
     assert.ok(workflow.includes('source/testdata/gateA-16/report.json.progress.json'));
     assert.ok(workflow.includes('cancel-in-progress: false'));
     assert.ok(workflow.includes('DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME'));
+    assert.ok(workflow.includes('DWBOT-GATE-A-16-PDF-FIRST-RESUME-15'));
+    assert.ok(workflow.includes('Prepare no-duplicate Gate A resume checkpoint from existing PDF'));
+    assert.ok(workflow.includes('Initialize Gate A restricted-egress diagnostic log'));
+    assert.ok(workflow.includes('OCR_SEQUENCE_RESUME_FROM'));
+    assert.ok(workflow.includes('originalNetworkEvidencePass'));
     assert.ok(workflow.includes('run-gateA-parallel-reader-matrix.js'));
     assert.ok(workflow.includes('parallelReaderMatrixPass'));
     assert.ok(workflow.includes('Provision pinned local PaddleOCR CPU runtime'));
