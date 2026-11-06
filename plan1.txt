@@ -1759,10 +1759,9 @@ Status: narrative materials are proposal/mock documentation. Exact-head CI for i
   majority and strict 3-of-4 consensus; tied votes remain unresolved. Separate
   21-image diagnostic runs in addition to 19-image Gate B, without provider
   requests. Latest artifact verification run #42199272644 is in progress.
-- Source extraction used Node 22.16.0, below accepted Node >=24.17.0; it is
-  exploratory only. Gate B remains NOT PASSED: Gate A pending, historical
-  network log missing, unresolved mandatory values, and source runtime below
-  acceptance baseline.
+- Source extraction used Node 22.16.0, which meets the accepted >=22.16.0
+  baseline. It remains exploratory only: Gate A is not passed, the historical
+  network log is missing, and mandatory outputs remain unresolved.
 - Gate A requires a PDF-first run on the approved 16-image development corpus,
   16/16 exact nine-field records, zero wrong accepted values, zero unresolved
   mandatory fields, restricted-egress proof and a locked candidate fingerprint.
