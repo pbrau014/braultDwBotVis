@@ -2399,10 +2399,15 @@ configured. Save per-image/per-field JSON, aggregate report, network attempts,
 engine/model/executable versions, source/acceptance fingerprints, ground-truth
 version, stdout/stderr and exit codes. Review all nine fields for every image.
 Acceptance: all records exact across all nine mandatory fields, zero wrongly
-accepted mandatory values, no unauthorized network requests, no unresolved
-mandatory values. Any unresolved or wrong value keeps Gate A FAIL/BLOCKED.
-No remote OCR during the local-primary baseline. Preserve original failed
-report byte-for-byte; the new report is separate even if it also fails.
+accepted mandatory values, zero unresolved mandatory values, and no unrelated
+outbound network attempts. For every eligible original image, OCR.Space Engine 2
+must run first, produce a searchable PDF, and retain the PDF/raster artifacts.
+Tesseract.js, native Tesseract, optional PaddleOCR and OpenCV geometry must
+consume only the PDF-derived raster. Require exactly one authorized OCR.Space
+request per image, only approved HTTPS provider hosts, and no additional
+OCR.Space request from downstream local readers. Any unresolved or wrong value
+keeps Gate A FAIL/BLOCKED. Preserve the original failed report byte-for-byte;
+the new report is separate even if it also fails.
 Closure: Gate A result is reproducible, fingerprint-bound and independently
 reviewed; pass only if every stated acceptance condition is met.
 
