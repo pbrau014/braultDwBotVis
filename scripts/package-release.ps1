@@ -20,7 +20,9 @@ if($isPullRequest){
 $commit=(& git -C $ProjectRoot rev-parse HEAD).Trim(); if($LASTEXITCODE -ne 0){throw 'Cannot resolve commit'}
 $status=@(& git -C $ProjectRoot status --porcelain); $unexpected=@($status | Where-Object { $_ -notmatch '^\?\? release-artifacts/' }); if($unexpected.Count){throw ('Working tree has non-artifact changes: '+($unexpected -join '; '))}
 New-Item -ItemType Directory -Force -Path $OutputRoot|Out-Null
-$stage=Join-Path $OutputRoot ('stage-'+$commit.Substring(0,12)); $packagePrefix=if($isPullRequest){$prNumber=($env:GITHUB_REF -replace '^refs/pull/','' -replace '/merge
+$stage=Join-Path $OutputRoot ('stage-'+$commit.Substring(0,12))
+if($isPullRequest){$prNumber=($env:GITHUB_REF -split '/')[2];if([string]::IsNullOrWhiteSpace($prNumber)){throw 'Pull-request number missing from GITHUB_REF.'};$packagePrefix='DWBOT-PR'+$prNumber}else{$packagePrefix='DWBOT'}
+$zip=Join-Path $OutputRoot ($packagePrefix+'-'+$commit.Substring(0,12)+'.zip')
 if(Test-Path $stage){Remove-Item $stage -Recurse -Force}; if(Test-Path $zip){Remove-Item $zip -Force}; New-Item -ItemType Directory -Force -Path $stage|Out-Null
 $tracked=@(& git -C $ProjectRoot ls-files); if($LASTEXITCODE -ne 0 -or !$tracked.Count){throw 'Tracked inventory empty'}
 $included=@()
