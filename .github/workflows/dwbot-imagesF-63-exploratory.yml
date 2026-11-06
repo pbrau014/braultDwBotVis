@@ -100,7 +100,7 @@ jobs:
           OCRSPACE_API_KEY: ${{ secrets.OCRSPACE_API_KEY }}
           OCRSPACE_NETWORK_ALLOWLIST: '1'
           OCR_NON_OCR_NETWORK_RESTRICTED: '1'
-          OCR_NON_OCR_NETWORK_LOG: ${{ github.workspace }}\\testdata\\ocr-acceptance\\imagesF-63-blocked-network-attempts.log
+          OCR_NON_OCR_NETWORK_LOG: ${{ github.workspace }}/testdata/ocr-acceptance/imagesF-63-blocked-network-attempts.log
           OCRSPACE_63_OUTPUT_DIR: ${{ github.workspace }}\testdata\ocrspace-imagesF-63-exploratory
         run: |
           if ([string]::IsNullOrWhiteSpace($env:OCRSPACE_API_KEY)) { throw 'Protected OCRSPACE_API_KEY secret is missing.' }
