@@ -1,6 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const crypto = require('node:crypto');
 const { createOcrSpacePdfFirst, downloadSearchablePdf, readPdfBounded } = require('../src/ocrspace-pdf-first');
 
 const pdf = Buffer.from('%PDF-1.7\\nmock-pdf-bytes\\n%%EOF');
@@ -41,6 +42,7 @@ test('OCR.Space Engine 2 processes the source image first and local readers rece
     assert.equal(result.status, 'complete');
     assert.equal(result.engine, 2);
     assert.equal(result.pdfSha256.length, 64);
+    assert.equal(result.rasterSha256, crypto.createHash('sha256').update(png).digest('hex'));
     assert.equal(result.pdfBuffer, pdf);
     assert.equal(result.rasterBuffer, png);
     assert.equal(result.providerText, 'Victory\\nShards');
