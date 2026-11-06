@@ -100,6 +100,13 @@ test('bounded PDF reader enforces the byte cap', async () => {
     const bytes = Buffer.alloc(100, 1);
     await assert.rejects(readPdfBounded({ headers: { get: () => '100' }, body: { getReader: () => { throw new Error('must reject from declared size first'); } } }, 50), { code: 'OCRSPACE_PDF_TOO_LARGE' });
     await assert.rejects(readPdfBounded({ headers: { get: () => null }, arrayBuffer: async () => bytes }, 50), { code: 'OCRSPACE_PDF_STREAM_UNAVAILABLE' });
+    let cancelled = false;
+    const oversizedStream = { headers: { get: () => null }, body: { getReader: () => ({
+        async read() { return { done: false, value: bytes }; },
+        async cancel() { cancelled = true; }, releaseLock() {}
+    }) } };
+    await assert.rejects(readPdfBounded(oversizedStream, 50), { code: 'OCRSPACE_PDF_TOO_LARGE' });
+    assert.equal(cancelled, true);
 });
 
 
