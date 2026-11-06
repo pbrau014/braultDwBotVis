@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#081321">
+<title>The Admiralty × YOLO Tournament — Mock Season</title>
+<style>
+:root{color-scheme:dark;--navy:#081321;--navy2:#0d1d31;--panel:#10233a;--panel2:#142b45;--gold:#d9b56d;--gold2:#f0d99e;--blue:#6bb5d8;--teal:#70c4b0;--violet:#a9a0df;--red:#e4a1a1;--ink:#edf2f7;--muted:#b3c0cf;--line:#34506a;--max:1160px}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--navy)}
+body{margin:0;background:radial-gradient(ellipse at 50% -12%,#1a3553 0,var(--navy) 42rem);color:var(--ink);font:16px/1.65 Georgia,"Times New Roman",serif}
+a{color:#9fd7f0;text-underline-offset:3px}
+a:hover{color:#fff}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--gold2);outline-offset:3px;border-radius:3px}
+.skip{position:absolute;left:-9999px;top:0;background:var(--gold2);color:#081321;padding:10px;z-index:5}
+.skip:focus{left:12px;top:12px}
+.wrap{max-width:var(--max);margin:auto;padding:0 22px}
+.mast{padding:18px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;align-items:center}
+.brand{font:700 12px/1.3 system-ui,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+.edition{font:11px system-ui,sans-serif;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;text-align:right}
+.hero{padding:52px 0 36px;border-bottom:1px solid var(--gold)}
+.kicker{font:700 11px system-ui,sans-serif;letter-spacing:.28em;text-transform:uppercase;color:var(--blue)}
+h1,h2,h3{font-weight:500;line-height:1.12}
+h1{font-size:clamp(38px,7vw,76px);max-width:880px;margin:14px 0 18px;letter-spacing:-.035em}
+h1 span{color:var(--gold2);font-style:italic}
+.dek{font-size:20px;color:#d2dce6;max-width:760px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:24px}
+.tag{border:1px solid var(--line);padding:5px 10px;color:var(--muted);font:11px system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase}
+.warning{margin:24px 0 0;padding:15px 18px;border-left:3px solid var(--gold);background:#16243a;color:#f3e6c7;font:14px/1.6 system-ui,sans-serif}
+nav{position:sticky;top:0;z-index:3;background:#081321ee;backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;gap:18px;overflow-x:auto;padding-top:10px;padding-bottom:10px;white-space:nowrap}
+nav a{font:11px system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;color:var(--muted)}
+nav a:hover{color:var(--gold2)}
+main{padding:22px 0 70px}
+section{padding:44px 0;border-bottom:1px solid var(--line);scroll-margin-top:62px}
+.section-no{font:700 11px system-ui,sans-serif;letter-spacing:.25em;color:var(--gold);text-transform:uppercase}
+h2{font-size:clamp(29px,4vw,43px);margin:9px 0 18px;color:var(--gold2)}
+h3{font-size:23px;color:#e8d6ac;margin:24px 0 10px}
+p{max-width:850px}
+.lead{font-size:19px;color:#d5dfeb}
+figure{margin:26px 0;padding:12px;border:1px solid var(--line);background:#091a2b}
+figure img{display:block;width:100%;height:auto;max-height:650px;object-fit:contain}
+figcaption{font:12px/1.5 system-ui,sans-serif;color:var(--muted);padding:10px 3px 2px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:20px 0}
+.card{background:linear-gradient(145deg,var(--panel),#0c1b2d);border:1px solid var(--line);padding:17px 18px}
+.card h3{margin:0 0 9px;font-size:20px}
+.card p,.card li{font-size:15px;color:#d3dce6}
+.card.executive{border-top:3px solid var(--gold)}
+.card.legislative{border-top:3px solid var(--blue)}
+.card.judicial{border-top:3px solid var(--violet)}
+.card.fleet{border-top:3px solid var(--teal)}
+.card.service{border-top:3px solid #9eb4cb}
+.card.members{border-top:3px solid #cf9c72}
+.callout{margin:20px 0;padding:17px 20px;background:#12263d;border:1px solid #45627d;border-left:4px solid var(--gold);font:14px/1.7 system-ui,sans-serif}
+.callout strong{color:var(--gold2)}
+table{width:100%;border-collapse:collapse;margin:20px 0;font:14px/1.55 system-ui,sans-serif}
+th,td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:#152b43;color:var(--gold2);font-size:11px;letter-spacing:.09em;text-transform:uppercase}
+td{color:#d7e0e9}
+tr:nth-child(even) td{background:#0d1d30}
+.timeline{border-left:1px solid var(--gold);margin:24px 0 24px 10px;padding-left:24px}
+.stop{position:relative;margin:0 0 24px}
+.stop:before{content:"";position:absolute;width:10px;height:10px;left:-30px;top:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px #d9b56d22}
+.stop h3{margin:0 0 6px}
+.formula{overflow-x:auto;padding:16px;background:#06101d;border:1px solid var(--line);color:#f5e5bd;font:14px/1.8 ui-monospace,Consolas,monospace}
+.small{font:12px/1.55 system-ui,sans-serif;color:var(--muted)}
+blockquote{margin:18px 0;padding:5px 0 5px 20px;border-left:2px solid var(--gold);font-size:19px;color:#e9dfc9}
+details{margin:12px 0;border:1px solid var(--line);background:#0e2034;padding:12px 15px}
+summary{cursor:pointer;color:var(--gold2);font:700 13px system-ui,sans-serif;letter-spacing:.04em}
+footer{padding:28px 0 50px;color:var(--muted);font:12px/1.6 system-ui,sans-serif}
+footer .seal{font:24px Georgia,serif;color:var(--gold)}
+@media(max-width:720px){.grid{grid-template-columns:1fr}.wrap{padding:0 15px}.mast{align-items:flex-start}.edition{max-width:120px}.hero{padding-top:36px}table{font-size:12px}th,td{padding:8px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+@media print{ :root{color-scheme:light;--navy:#fff;--navy2:#fff;--panel:#fff;--panel2:#fff;--ink:#111;--muted:#444;--line:#bbb;--gold:#73531b;--gold2:#49320d;--blue:#175a7b;--teal:#236c5d}body{background:#fff;color:#111}nav{position:static;background:#fff}nav .wrap{flex-wrap:wrap}a{color:#164f73}.card,.callout,figure,.formula,details,th,tr:nth-child(even) td{background:#fff!important;color:#111!important}section{break-inside:avoid}figure img{max-height:420px}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="wrap">
+  <div class="mast"><div class="brand">The Admiralty · Fleet & Tournament Office</div><div class="edition">Field Chronicle · Proposal v0.1<br>World of Warships · YOLO</div></div>
+  <div class="hero">
+    <div class="kicker">A mock season in strategy, governance & good records</div>
+    <h1>The Admiralty <span>× YOLO</span></h1>
+    <p class="dek">A story-led guide to the Pilot, weekly mixed battles, tactical doctrine, scoring, playoffs and the Grand YOLO finale.</p>
+    <div class="hero-meta"><span class="tag">Participant field guide</span><span class="tag">Fictional mock tournament</span><span class="tag">Navy · Gold · Quarterdeck</span></div>
+    <div class="warning"><strong>Read before sailing.</strong> This is a narrative companion and proposal, not an event notice or signed ruleset. Tournament configurations frequently change. Use the current event notice and approved settings for maps, modes, ship restrictions, team sizes, dates, eligibility, scoring and prizes.</div>
+  </div>
+</header>
+<nav aria-label="Guide sections"><div class="wrap">
+<a href="#admiralty">The Admiralty</a><a href="#pilot">Pilot night</a><a href="#weekly">Weekly event</a><a href="#tactics">Tactics</a><a href="#season">Season</a><a href="#scoring">Scoring</a><a href="#finale">Playoffs & finale</a><a href="#discord">Discord</a><a href="#sources">Sources</a>
+</div></nav>
+<main id="main" class="wrap">
+<section id="admiralty">
+<div class="section-no">01 · The command structure</div>
+<h2>One fleet, six responsibilities</h2>
+<p class="lead">The Admiralty handbook's fictional fifty-position clan is organized to keep policy, live command, member voice, dispute review and service work distinct. The tournament borrows that architecture; it does not inherit a fifty-player cap.</p>
+<figure><img src="../dwbotStuff/admiralty_organizational_chart.jpg" alt="Admiralty organizational chart showing executive, legislative, judicial, fleet command, service corps and general membership"><figcaption>Exact Admiralty source image. Use as the organizational model, not as a real tournament roster.</figcaption></figure>
+<div class="grid">
+<div class="card executive"><h3>Executive · Rowan “Anchor” Pierce</h3><p>Event director, calendar, approvals and official notices. Rowan wants a process that can be explained before and after a match.</p></div>
+<div class="card legislative"><h3>Legislative · Ava “Chartroom” Keene</h3><p>Member questions, rule proposals and budget review. Lucas “Soundings” Chen and Elena “Sparrow” Cruz make the process accessible.</p></div>
+<div class="card judicial"><h3>Judicial · Selene Ward</h3><p>Independent review of disputes and appeals. Rhea “Crosswind” Patel tests the count without being treated as a troublemaker.</p></div>
+<div class="card fleet"><h3>Fleet Command · Victor “Spear” Moreno</h3><p>Training, doctrine, caller development and live tactical command. Match commanders call the battle; they do not adjudicate their own disputes.</p></div>
+<div class="card service"><h3>Service Corps · Mira “Valkyrie” Solano</h3><p>Events, safety, moderation, recruitment, training, analytics, technical support and logistics keep the tournament running.</p></div>
+<div class="card members"><h3>General Membership</h3><p>Participants, mentors, volunteers and developing players. The system should give every entrant a clear route to contribute.</p></div>
+</div>
+<blockquote>“Wins move the bracket. Damage moves the individual awards. Record both, and never confuse one with the other.” — Rowan, fictional dialogue</blockquote>
+</section>
+<section id="pilot">
+<div class="section-no">02 · The first muster</div>
+<h2>Pilot night: learn the room before the season</h2>
+<p>The supplied Pilot source describes a drop-in rehearsal: no prior registration, entry closes one hour before play, and final lineups are announced thirty minutes before games. Rooms are planned for six humans and six bots; when fewer humans attend, the bot count mirrors the human count. Training Rooms and visible lineups are used.</p>
+<div class="grid">
+<div class="card"><h3>Before ready-up</h3><p>Confirm the game ID, map, mode, duration, side assignments, lineup and observers. Both representatives check independently. A mismatch goes to the referee before the room starts.</p></div>
+<div class="card"><h3>After the battle</h3><p>Save the original readable result screenshot. Verify the player, result and damage. DWBOT also requires all nine record fields: result, player, map, mode, battleStart, credits, freeXp, damage and xp.</p></div>
+</div>
+<div class="callout"><strong>Unresolved Pilot mode:</strong> The source lists an Ocean special-mode final match, but the Pilot and recurring materials disagree on the mode label and duration. Use the verified ten-minute Standard Battle baseline until a host verifies the current-client mode and the event settings approve it.</div>
+<blockquote>“If the room is wrong, we stop before ready-up. We do not improvise a new rule after the battle.” — Elias “Wake” Mercer, fictional dialogue</blockquote>
+</section>
+<section id="weekly">
+<div class="section-no">03 · The weekly tournament</div>
+<h2>Three rounds. New crew every week.</h2>
+<table><thead><tr><th>Stage</th><th>Source format</th><th>What decides the next step?</th></tr></thead><tbody>
+<tr><td>Round 1</td><td>Bot match; source describes 2v6, with a later note allowing 3v9 depending on turnout. First-come-first-served seeding.</td><td>Verified match win/loss advances the bracket.</td></tr>
+<tr><td>Round 2</td><td>Mixed human/bot teams, described as 6v6 or 9v9, with two or three humans per side.</td><td>Wins seed later pairings; random weekly draft assigns teammates.</td></tr>
+<tr><td>Round 3</td><td>Mixed human/bot teams; third-place/consolation bracket keeps teams playing.</td><td>Verified match outcome controls advancement; individual damage remains separately recorded.</td></tr>
+</tbody></table>
+<p>Each participant is expected to play about seven games. The recurring source estimates ten-minute battles, ten minutes between matches for reporting, fifteen-minute breaks between rounds and a two-to-three-hour evening. Exact event timings are set in the published notice.</p>
+<div class="callout"><strong>Two result lanes:</strong> A team's verified win advances its bracket path. Individual damage determines the announced damage awards and contributes to cumulative Grand YOLO damage standings. A short Discord summary blurred these two lanes; the mock tournament keeps them separate.</div>
+</section>
+<section id="tactics">
+<div class="section-no">04 · The tactical doctrine</div>
+<h2>See first. Call clearly. Push together.</h2>
+<figure><img src="../dwbotStuff/cb%20strat%20img%20ref.png" alt="CBStrat tactical infographic with spotting, crossfire, offensive push and defensive hold diagrams"><figcaption>Exact CBStrat visual. It is a Tier X Clan Battles reference; the YOLO guide adapts its general principles, not its ship lineups or Tier X consumable assumptions.</figcaption></figure>
+<div class="grid">
+<div class="card"><h3>Vision & information</h3><p>Spot approaches, share positions, and preserve concealment. Information matters when allies can act on it.</p></div>
+<div class="card"><h3>Focus fire</h3><p>Call one target and a firing window. A spotted ship under coordinated fire matters more than several ships taking unrelated shots.</p></div>
+<div class="card"><h3>Crossfire</h3><p>Use a second angle to make the enemy turn or retreat. Do not flank so far that your guns arrive after the fight.</p></div>
+<div class="card"><h3>Push or hold</h3><p>Push with local advantage, support and an exit route. Hold when ahead and controlling objectives; force the opponent to move first.</p></div>
+</div>
+<p class="small">Adapt roles rather than copying Tier X hulls: scout/vision, objective contest, anchor/fire support, crossfire support, caller and reserve. Radar, hydro, smoke and other consumables are ship-specific; use them only when the legal ship actually has them.</p>
+</section>
+<section id="season">
+<div class="section-no">05 · The season map</div>
+<h2>A twelve-stage route, not a booked calendar</h2>
+<div class="timeline">
+<div class="stop"><h3>Preparation & Pilot</h3><p>Rehearse room setup, identity mapping, evidence intake, scoring review and closeout.</p></div>
+<div class="stop"><h3>Baseline weeks</h3><p>Run the first fixtures, learn the random draft and establish the weekly score ledger.</p></div>
+<div class="stop"><h3>Mid-cycle & Race weeks</h3><p>Review replays and role coverage. The recurring source describes a separate Race for the lower half of cumulative damage standings every third week.</p></div>
+<div class="stop"><h3>Competitive push</h3><p>Use verified wins for bracket advancement; preserve damage awards and cumulative standings as separate records.</p></div>
+<div class="stop"><h3>Playoffs & Grand YOLO</h3><p>Only after qualification, bracket and finale settings are approved; close with verified placements, awards and an archive.</p></div>
+</div>
+<table><thead><tr><th>Week</th><th>Map label from source</th><th>Note</th></tr></thead><tbody>
+<tr><td>1</td><td>Islands</td><td>Standard Battle baseline</td></tr><tr><td>2</td><td>Polar</td><td>Standard Battle baseline</td></tr><tr><td>3</td><td>Big Race</td><td>Map name; separate Race side-event also appears in the template</td></tr><tr><td>4</td><td>Archipelago</td><td>Standard Battle baseline</td></tr><tr><td>5</td><td>Ring</td><td>Standard Battle baseline</td></tr><tr><td>6</td><td>Straight</td><td>Race side-event template</td></tr><tr><td>7</td><td>New Dawn</td><td>Standard Battle baseline</td></tr><tr><td>8</td><td>Islands</td><td>Standard Battle baseline</td></tr><tr><td>9</td><td>Polar</td><td>Race side-event template</td></tr><tr><td>10</td><td>Big Race</td><td>Map name, not the side-event</td></tr><tr><td>11</td><td>Archipelago</td><td>Standard Battle baseline</td></tr><tr><td>12</td><td>Ocean</td><td>Grand YOLO + Race listed; special mode and duration unresolved</td></tr>
+</tbody></table>
+<p class="small">The Admiralty handbook's ten-week clan-development arc is used only as a storytelling framework: preparation, baseline, mid-cycle, competitive push and review. It does not replace the YOLO source's candidate twelve-stage sequence.</p>
+</section>
+<section id="scoring">
+<div class="section-no">06 · The score ledger</div>
+<h2>Make every number explain itself</h2>
+<p>Four outputs must stay distinct: battle result, bracket result, individual event score, and award/cumulative damage standing. The supplied workbook is an archival example, not the designated canonical workbook. These formulas explain the historical sample and support regression tests; they do not certify live awards or a live match-outcome formula.</p>
+<h3>Damage & Kills — historical sample</h3>
+<div class="formula">Doubloons = 2 × eventMultiplier × pool
+          × Σ[classWeight × (gameMetric / eventTotalMetric)
+             / tier^tierPower]</div>
+<p>Sample defaults: pool 500, multiplier 1, tier power 1; DD=4, CA=3, BB=2. For a DD at tier 2 with 20,000 damage and 1,000,000 event-wide damage: 2 × 500 × [4 × (20,000 / 1,000,000) / 2] = 40 Doubloons for that game. Seven equal games produce 280.</p>
+<h3>Race — current C01 policy</h3>
+<div class="formula">RaceShare = (1 / elapsedSeconds)
+          / Σ(1 / every eligible player's elapsedSeconds)</div>
+<p>The archival workbook uses raw elapsed seconds and therefore rewards slower times. DWBOT policy C01 uses inverse seconds so lower time scores better. The DWBOT engine and HTML calculator have been changed to inverse time; exact-head CI must verify parity before the implementation is called passed.</p>
+<h3>Grand Yolo — historical sample formula</h3>
+<div class="formula">Grand = eventMultiplier / 3
+      × (playerTotalDamage / allPlayersTotalDamage)
+      × Σ[classWeight × (
+          100 × tierWeight / tier
+        + damage × damageWeight / (tier × 1000)
+        + 10 × kills × killsWeight / tier
+        + 5000 × timeWeight / elapsedSeconds
+      )]</div>
+<p>The sample uses Grand tier weight 0.9 and other Grand weights 1. The Grand pool cell is not used by the observed formula. The historical dollar conversion 0.54 × Doubloons / 100 is not an official Wargaming value or prize promise.</p>
+<div class="callout"><strong>Never confuse Round 4 with the finale.</strong> “Grand Yolo” is the name of the calculator's individual Round 4 sheet and a proposed name for the season-ending championship event. The sheet is not itself a team match-outcome formula or bracket engine.</div>
+<figure><img src="../dwbotStuff/mtheqfnl.jpg" alt="Historical YOLO workbook damage formula example and sample tables"><figcaption>Exact historical YOLO score example image. Kept as provenance and illustration, not as the canonical scoring workbook.</figcaption></figure>
+</section>
+<section id="finale">
+<div class="section-no">07 · Postseason & the finale</div>
+<h2>Earn the bracket. Then sail the final.</h2>
+<p>The supplied recurring YOLO rules describe weekly bracket advancement and a cumulative-damage-seeded Grand YOLO bracket. They do not fully define a separate regular-season playoff field, qualification threshold, bracket type or series length.</p>
+<div class="grid">
+<div class="card"><h3>Proposed playoffs</h3><p>Current planning proposal: top eight eligible entrants, minimum six of twelve regular-season events, seeds 1–8, single elimination, quarterfinals and semifinals best-of-three, championship best-of-five, third-place match best-of-three. All are proposals until ratified.</p></div>
+<div class="card"><h3>Grand YOLO finale</h3><p>A separately configured closing event. Wins determine bracket advancement; cumulative damage determines individual damage placement under the approved formula. Publish entrants, room format, maps, mode, series length, prizes and evidence route in advance.</p></div>
+</div>
+<blockquote>“The record must show what happened, the formula must show how it was counted, and the notice must show what we agreed to before battle.” — Ava “Chartroom” Keene, fictional dialogue</blockquote>
+</section>
+<section id="discord">
+<div class="section-no">08 · The digital quarterdeck</div>
+<h2>Clear channels. Clear ownership.</h2>
+<p>The Admiralty source treats Discord as the community's command room and record of decisions. The YOLO source uses it for registration, voice coordination, score reporting and help. A future channel map could include announcements, events, registration, competitive, training, score-reporting and support. These are proposed names, not a statement that such channels already exist. The current DWBOT intake is configured around one designated channel; any multi-channel design requires a separate implementation and permission review.</p>
+<table><thead><tr><th>Role</th><th>Event-night responsibility</th></tr></thead><tbody>
+<tr><td>Event director</td><td>Approves settings, calendar, notices and exceptions</td></tr><tr><td>Room host</td><td>Creates room, checks map/mode/lineup, invites opponent and approved streamers</td></tr><tr><td>Team representative</td><td>Confirms roster, readiness and team communications</td></tr><tr><td>Referee</td><td>Handles room faults, attendance, restarts and disputes</td></tr><tr><td>Scorekeeper</td><td>Links evidence to participant/game IDs and verifies accepted values</td></tr><tr><td>Participant</td><td>Uses correct identity, plays assigned game and submits original evidence</td></tr>
+</tbody></table>
+</section>
+<section id="sources">
+<div class="section-no">09 · Source library & current references</div>
+<h2>Know which chart you are reading</h2>
+<p>The Admiralty PDF supplies the fictional cast and governance story. The CBStrat PDF supplies Tier X Clan Battles tactics. The YOLO rules and Pilot documents supply the event formats. Discord messages are short summaries; the archival workbook is a sample, not the canonical scoring authority.</p>
+<div class="grid">
+<div class="card"><h3>Supplied sources</h3><ul>
+<li><a href="../dwbotStuff/admiralty_first_election_handbook.pdf">Admiralty handbook PDF</a></li>
+<li><a href="../dwbotStuff/Tier_X_Clan_Battles_Competitive_Strategy_Final_Page_Image.pdf">CBStrat guide PDF</a></li>
+<li><a href="../dwbotStuff/yolo_rules_xmpl.docx">YOLO recurring rules</a></li>
+<li><a href="../dwbotStuff/yolo_event.docx">YOLO Pilot rules</a></li>
+<li><a href="../dwbotStuff/discordMsgs/how%20yolo%20wkbk%20work%20discord.txt">Discord scoring explanation</a></li>
+<li><a href="Admiralty_YOLO_Mock_Tournament_Field_Guide_v0.1_PROPOSAL.md">Full participant field guide</a></li>
+<li><a href="Admiralty_YOLO_Source_Reconciliation_and_Visual_Provenance_v0.1.md">Source reconciliation</a></li>
+</ul></div>
+<div class="card"><h3>Game & tournament references</h3><ul>
+<li><a href="https://wargaming.net/en/games/wows">Wargaming: World of Warships</a></li>
+<li><a href="https://wiki.worldofwarships.com/Ship:Battleships">Wiki: Battleships</a></li>
+<li><a href="https://wiki.worldofwarships.com/Ship:Cruisers">Wiki: Cruisers</a></li>
+<li><a href="https://wiki.worldofwarships.com/Ship:Detection">Wiki: Detection</a></li>
+<li><a href="https://wows-tournaments.com/">WoWs Tournaments</a></li>
+<li><a href="https://na.wows-numbers.com/">WoWS Numbers NA</a></li>
+<li><a href="https://www.devstrike.net/topic/9388-destroyer-fundamentals-the-definitive-guide/">DevStrike: Destroyer Fundamentals</a></li>
+<li><a href="https://turnio.net/esports-tournament-guide/">Turnio: esports tournament guide</a></li>
+<li><a href="https://scoreleader.com/how-tournament-brackets-work/">ScoreLeader: bracket guide</a></li>
+</ul></div>
+</div>
+<figure><img src="../dwbotStuff/govRec1.png" alt="Admiralty visual concept board one, retained as a non-canonical design study"><figcaption>Visual study 1 — alternate generated names and chronology; not story canon.</figcaption></figure>
+<figure><img src="../dwbotStuff/govRec2.png" alt="Admiralty visual concept board two, retained as a non-canonical design study"><figcaption>Visual study 2 — a separate alternate concept; not story canon.</figcaption></figure>
+<div class="callout"><strong>Current configurations change frequently.</strong> Check the latest regional tournament notice for map pool, ship restrictions, team size, signups, schedule and mode. The mock season is a teaching narrative, not a live ruleset.</div>
+</section>
+</main>
+<footer><div class="wrap"><div class="seal">⚓ THE ADMIRALTY · YOLO</div><p>Mock tournament companion · v0.1 proposal · 6 November 2026</p><p>Fictional characters and dialogue are dramatized. Supplied source rules are distinguished from proposals. External community guides are contextual, not official Wargaming rules.</p></div></footer>
+</body>
+</html>
