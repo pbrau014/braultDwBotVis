@@ -27,7 +27,7 @@ async function writeProgress(outputRoot, run) {
     const target = path.join(outputRoot, 'progress.json');
     const temp = target + '.' + process.pid + '.tmp';
     try {
-        await fs.writeFile(temp, JSON.stringify(run, null, 2) + '\\n', { flag: 'wx' });
+        await fs.writeFile(temp, JSON.stringify(run, null, 2) + '\n', { flag: 'wx' });
         await fs.rename(temp, target);
     } catch (error) {
         await fs.rm(temp, { force: true }).catch(() => {});
@@ -81,6 +81,8 @@ async function main() {
     let run;
     let resultByName;
     if (resume) {
+        try { await fs.access(reportPath); throw new Error('The prior batch already has a final report; it is complete and must be evaluated, not resumed.'); }
+        catch (error) { if (error.code !== 'ENOENT') throw error; }
         let saved;
         try { saved = JSON.parse(await fs.readFile(progressPath, 'utf8')); }
         catch (error) { throw new Error('Resume requested but the prior progress.json is missing or unreadable: ' + error.message); }
@@ -131,7 +133,7 @@ async function main() {
         if (decision === 'skip-complete') {
             const pdfPath = path.resolve(outputRoot, String(prior.pdfPath || ''));
             const rasterPath = path.resolve(outputRoot, String(prior.rasterPath || ''));
-            const safeArtifactPath = target => path.dirname(target) === outputRoot && path.basename(target) === target.split(path.sep).pop();
+            const safeArtifactPath = target => path.dirname(target) === outputRoot && !path.isAbsolute(target) && path.basename(target) === target.split(path.sep).pop();
             let artifactsValid = safeArtifactPath(pdfPath) && safeArtifactPath(rasterPath);
             if (artifactsValid) {
                 try {
