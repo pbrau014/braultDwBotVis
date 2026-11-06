@@ -38,8 +38,10 @@ try {
  $env:PADDLEOCR_FIELD_FALLBACK='0'
  $env:OCR_CV_ASSIST='0'
  if(-not $env:OCRSPACE_API_KEY){throw 'OCRSPACE_API_KEY is not available. OCR.Space-first acceptance is blocked; no local-original-image substitute is permitted.'}
- $env:OCRSPACE_ENABLED='1'
- $env:OCRSPACE_NETWORK_ALLOWLIST='1'
+ Write-Host 'OCRSPACE_API_KEY configured: yes (value withheld).'
+ # Default to local-only. Explicitly enable OCR.Space only for the approved 4/16-image corpora.
+ $env:OCRSPACE_ENABLED='0'
+ $env:OCRSPACE_NETWORK_ALLOWLIST='0'
  $env:OCRSPACE_ARTIFACT_DIR=Join-Path $RunDir 'ocrspace-searchable-pdfs'
  $env:OCR_NON_OCR_NETWORK_RESTRICTED='1'
  $Guard=(Join-Path $ProjectRoot 'scripts\block-network.js').Replace('\','/')
@@ -83,19 +85,29 @@ try {
   $script:Results += [pscustomobject]@{label=$Label;arguments=$Arguments;exitCode=$Code;log=[System.IO.Path]::GetFileName($Log);passed=($Code -eq 0)}
   Write-Host "[WINDOWS-OCR] $Outcome $Label exit=$Code"
  }
+ $env:OCRSPACE_ENABLED='0'
+ $env:OCRSPACE_NETWORK_ALLOWLIST='0'
  $env:OCR_ENGINE='tesseractjs'
  $env:OCR_ACCEPTANCE_RUN_DIR=Join-Path $RunDir 'tesseractjs-baseline'
  Invoke-LoggedNpm -Label 'tesseractjs-full-current-source-acceptance' -Arguments @('run','test:tesseractjs')
  $BaselineJsReportPath=Join-Path $env:OCR_ACCEPTANCE_RUN_DIR 'acceptance-report.json'
  $BaselineJsReport=$null
  if(Test-Path -LiteralPath $BaselineJsReportPath -PathType Leaf){$BaselineJsReport=Get-Content -LiteralPath $BaselineJsReportPath -Raw | ConvertFrom-Json}
+ $env:OCRSPACE_ENABLED='0'
+ $env:OCRSPACE_NETWORK_ALLOWLIST='0'
  $env:OCR_ENGINE='native'
  $env:REPORTED_SCREENSHOT_REPORT_PATH=Join-Path $RunDir 'reported-native.json'
  $env:OCR_NON_OCR_NETWORK_LOG=Join-Path $RunDir 'reported-native-network-attempts.log'
  Invoke-LoggedNpm -Label 'native-reported-screenshot' -Arguments @('run','test:reported-screenshot')
+ $env:OCRSPACE_ENABLED='1'
+ $env:OCRSPACE_NETWORK_ALLOWLIST='1'
+ $env:OCRSPACE_ARTIFACT_DIR=Join-Path $RunDir 'native-four-ocrspace-pdfs'
  $env:FOUR_SCREENSHOT_REPORT_PATH=Join-Path $RunDir 'four-image-native.json'
  $env:OCR_NON_OCR_NETWORK_LOG=Join-Path $RunDir 'four-image-native-network-attempts.log'
  Invoke-LoggedNpm -Label 'native-four-screenshot-acceptance' -Arguments @('run','test:four-images')
+ $env:OCRSPACE_ENABLED='1'
+ $env:OCRSPACE_NETWORK_ALLOWLIST='1'
+ $env:OCRSPACE_ARTIFACT_DIR=Join-Path $RunDir 'native-sixteen-ocrspace-pdfs'
  $env:OCR_SEQUENCE_REPORT_PATH=Join-Path $RunDir 'additional-sixteen-native.json'
  $env:OCR_NON_OCR_NETWORK_LOG=Join-Path $RunDir 'additional-sixteen-native-network-attempts.log'
  Invoke-LoggedNpm -Label 'native-additional-sixteen-screenshot-acceptance' -Arguments @('run','test:additional-images')
@@ -125,6 +137,8 @@ try {
  $env:OCR_CV_ASSIST='1'
  $env:OCR_CV_DEBUG='1'
  $env:OCR_ACCEPTANCE_BATCH_REPEATS='1'
+ $env:OCRSPACE_ENABLED='0'
+ $env:OCRSPACE_NETWORK_ALLOWLIST='0'
  $env:OCR_ACCEPTANCE_RUN_DIR=Join-Path $RunDir 'tesseractjs-cv-assisted'
  $env:OCR_ENGINE='tesseractjs'
  Invoke-LoggedNpm -Label 'cv-assisted-tesseractjs-full-acceptance' -Arguments @('run','test:tesseractjs')
@@ -135,13 +149,21 @@ try {
   $CvJsReport=Get-Content -LiteralPath $CvJsReportPath -Raw | ConvertFrom-Json
   $CvJsExact=($CvJsReport.passed -eq $true) -and ($CvJsReport.networkIsolation.nonOcrDeniedAttemptsDetected -eq $false)
  }
+ $env:OCRSPACE_ENABLED='0'
+ $env:OCRSPACE_NETWORK_ALLOWLIST='0'
  $env:OCR_ENGINE='native'
  $env:REPORTED_SCREENSHOT_REPORT_PATH=Join-Path $RunDir 'reported-native-cv.json'
  $env:OCR_NON_OCR_NETWORK_LOG=Join-Path $RunDir 'reported-native-cv-network-attempts.log'
  Invoke-LoggedNpm -Label 'cv-assisted-native-reported-screenshot' -Arguments @('run','test:reported-screenshot')
+ $env:OCRSPACE_ENABLED='1'
+ $env:OCRSPACE_NETWORK_ALLOWLIST='1'
+ $env:OCRSPACE_ARTIFACT_DIR=Join-Path $RunDir 'native-cv-four-ocrspace-pdfs'
  $env:FOUR_SCREENSHOT_REPORT_PATH=Join-Path $RunDir 'four-image-native-cv.json'
  $env:OCR_NON_OCR_NETWORK_LOG=Join-Path $RunDir 'four-image-native-cv-network-attempts.log'
  Invoke-LoggedNpm -Label 'cv-assisted-native-four-screenshot-acceptance' -Arguments @('run','test:four-images')
+ $env:OCRSPACE_ENABLED='1'
+ $env:OCRSPACE_NETWORK_ALLOWLIST='1'
+ $env:OCRSPACE_ARTIFACT_DIR=Join-Path $RunDir 'native-cv-sixteen-ocrspace-pdfs'
  $env:OCR_SEQUENCE_REPORT_PATH=Join-Path $RunDir 'additional-sixteen-native-cv.json'
  $env:OCR_NON_OCR_NETWORK_LOG=Join-Path $RunDir 'additional-sixteen-native-cv-network-attempts.log'
  Invoke-LoggedNpm -Label 'cv-assisted-native-additional-sixteen-acceptance' -Arguments @('run','test:additional-images')
@@ -167,6 +189,8 @@ try {
  $Inventory64ExtractionComplete=$false
  $Inventory64=[ordered]@{status='BLOCKED';completedImages=0;exactAccuracy='NOT_EVALUABLE_NO_INDEPENDENT_GROUND_TRUTH'}
  if($env:OCRSPACE_64_ARCHIVE_PATH -and $env:OCRSPACE_64_IMAGE_ROOT){
+  $env:OCRSPACE_ENABLED='1'
+  $env:OCRSPACE_NETWORK_ALLOWLIST='1'
   $env:OCRSPACE_64_OUTPUT_DIR=Join-Path $env:TEMP ('dwbot-ocrspace-64-' + $PID)
   $env:OCR_NON_OCR_NETWORK_LOG=Join-Path $RunDir 'ocrspace-64-network-attempts.log'
   Invoke-LoggedNpm -Label 'ocrspace-64-inventory-pdf-first' -Arguments @('run','test:ocrspace-64')
