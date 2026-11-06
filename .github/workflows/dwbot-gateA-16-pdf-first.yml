@@ -1,6 +1,8 @@
 name: DWBOT Gate A 16-image OCR.Space PDF-first acceptance
 
 # One original Gate A development-corpus run plus one artifact-bound resume
+# Authorized continuation uses the exact run #42202563673 artifact; the first paid submission is reused, never repeated.
+# The resume path is gated by the exact commit message below and by artifact, source, and log fingerprints.
 # continuation. The resume reuses the already submitted first image and may
 # submit only the remaining 15 after local recovery proves that first record exact.
 
