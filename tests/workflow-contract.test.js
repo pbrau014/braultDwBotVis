@@ -258,6 +258,9 @@ test('21-image post-hoc artifact workflow is manual-only and never submits OCR.S
     assert.match(workflow, /prepare-ocrspace-imagesF-63\.py/);
     assert.match(workflow, /verify-ocrspace-imagesF-21-artifacts\.js/);
     assert.match(workflow, /complete-ground-truth-21/);
+    assert.match(workflow, /recover-ocrspace-imagesF-21-local-readers\.js/);
+    assert.match(workflow, /OCRSPACE_ENABLED: '0'/);
+    assert.match(workflow, /OCRSPACE_NETWORK_ALLOWLIST: '0'/);
     assert.match(workflow, /evaluate-ocrspace-imagesF-63-ground-truth\.py/);
     assert.doesNotMatch(workflow, /createOcrSpacePdfFirst|OCRSPACE_63_RESUME=1/);
 });
