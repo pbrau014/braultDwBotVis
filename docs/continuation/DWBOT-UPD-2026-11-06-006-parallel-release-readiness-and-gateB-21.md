@@ -1,3 +1,32 @@
+## Current Gate B revision — 2026-11-06: 19 images
+
+The authorized Gate B holdout is now exactly the first 19 corpus-order records
+in the v6 JSON with complete, non-empty, eligible values for all nine required
+fields. This supersedes the former 50-image minimum, 100-image preferred
+target, and the interim 21-image Gate B requirement. The 21 complete records
+remain available as a separate pipeline-analysis inventory; records 20–21 are
+analysis-only and are not Gate B labels. No provider resubmission is required.
+
+The original 63-image extraction #42160979140 has completed. Its downloaded
+artifact SHA-256 is
+`ac4ae071ee4737c2fe044b64456a8dab1cddf7073a02f8f427ec7b35af28629a`. All 63
+PDFs and 63 PDF-page rasters matched the recorded sizes and hashes; all PDFs
+contain searchable text. The 21-image preliminary analysis measured 65.08%
+field exact match for Tesseract.js and 61.38% for native Tesseract, but full
+nine-field exact records were only 2/21 and 0/21. This is not a Gate B pass.
+
+The source artifact omitted the original restricted-egress log because the
+triggering workflow did not configure `OCR_NON_OCR_NETWORK_LOG`. The new
+workflow records the source workflow/guard configuration, scans the source
+run logs and per-image failures, and writes a reconciliation record with
+`originalBlockedAttemptCount: null` and `zeroAttemptsClaimed: false`. This
+preserves the gap; it does not fabricate a zero-event log. The verifier's
+undefined recovery-network variables are being fixed, and a fresh 19-image
+no-provider verification will be required. Gate A remains FAIL/BLOCKED,
+Gate B NOT_PASSED, and production NO-GO.
+
+---
+
 # DWBOT parallel verification and Gate B artifact acceptance record
 
 Date: 2026-11-06
