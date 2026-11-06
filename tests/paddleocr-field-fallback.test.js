@@ -208,3 +208,34 @@ test('PaddleOCR reward conflict is left unresolved rather than arbitrated by con
 test('PaddleOCR field fallback uses a bounded 60-second CPU inference budget', () => {
     assert.equal(fallback.__test.DEFAULT_TIMEOUT_MS, 60_000);
 });
+
+test('PaddleOCR helper emits ASCII-safe JSON for non-ASCII OCR text on Windows code pages', async (t) => {
+    const helperPath = path.join(__dirname, '..', 'scripts', 'paddleocr_field_crops.py');
+    const helperSource = await fs.readFile(helperPath, 'utf8');
+    const serializers = [...helperSource.matchAll(/json\.dumps\(payload,\s*ensure_ascii=(True|False)/g)];
+    assert.equal(serializers.length, 1, 'all helper paths must use one shared serializer');
+    assert.equal(serializers[0][1], 'True', 'stdout JSON must escape non-ASCII text');
+    assert.doesNotMatch(helperSource, /print\(json\.dumps\(/);
+    assert.ok((helperSource.match(/emit_json\(/g) || []).length >= 6, 'success and error paths must use the shared serializer');
+
+    const python = process.platform === 'win32' ? 'python' : 'python3';
+    const probe = spawnSync(python, ['--version'], { encoding: 'utf8', timeout: 10000 });
+    if (probe.error || probe.status !== 0) { t.skip('Python interpreter not installed for helper protocol test'); return; }
+    const encoded = spawnSync(python, ['-c', [
+        'import importlib.util',
+        "spec=importlib.util.spec_from_file_location('helper','scripts/paddleocr_field_crops.py')",
+        'module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module)',
+        "module.emit_json({'text':chr(0x2606)})"
+    ].join(';')], { cwd: path.resolve(__dirname, '..'), encoding: 'utf8', timeout: 10000 });
+    assert.equal(encoded.status, 0, encoded.stderr);
+    assert.ok([...Buffer.from(encoded.stdout, 'utf8')].every(byte => byte < 0x80), 'serialized JSON must be ASCII-only');
+    assert.equal(encoded.stdout.trim(), '{"text":"\\u2606"}');
+    assert.equal(JSON.parse(encoded.stdout).text, '☆');
+});
+
+test('PaddleOCR fallback field request order preserves the canonical nine-field contract', () => {
+    const { __test } = require('../src/paddleocr-field-fallback');
+    assert.deepEqual(__test.FIELDS, [
+        'result', 'player', 'map', 'mode', 'battleStart', 'credits', 'freeXp', 'damage', 'xp',
+    ]);
+});

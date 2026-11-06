@@ -177,7 +177,7 @@ test('OCR attachment download is inside the bounded queue and unsafe timeout rec
     assert.match(botSource, /SERIAL_TASK_UNSETTLED.*SERIAL_QUEUE_CLOSED/s);
 });
 
-test('Node.js 22.16.0 is the accepted runtime baseline; Node 24 is not mandatory', () => {
+test('Node.js 26.13.0 is the exact project runtime baseline', () => {
     const root = path.join(__dirname, '..');
     const packageJson = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
     const packageLock = JSON.parse(fs.readFileSync(path.join(root, 'package-lock.json'), 'utf8'));
@@ -185,12 +185,12 @@ test('Node.js 22.16.0 is the accepted runtime baseline; Node 24 is not mandatory
     const nvmrc = fs.readFileSync(path.join(root, '.nvmrc'), 'utf8').trim();
     const windowsAcceptance = fs.readFileSync(path.join(root, 'scripts', 'run-windows-ocr-acceptance.ps1'), 'utf8');
 
-    assert.equal(nvmrc, '22.16.0');
-    assert.equal(packageJson.engines?.node, '>=22.16.0');
-    assert.equal(packageLock.packages?.['']?.engines?.node, '>=22.16.0');
-    assert.match(workflow, /node-version:\s*22\.16\.0/);
-    assert.doesNotMatch(workflow, /node-version:\s*24(?:\.|\s|$)/);
-    assert.match(windowsAcceptance, /MinimumNodeVersion\s*=\s*'22\.16\.0'/);
+    assert.equal(nvmrc, '26.13.0');
+    assert.equal(packageJson.engines?.node, '26.13.0');
+    assert.equal(packageLock.packages?.['']?.engines?.node, '26.13.0');
+    assert.match(workflow, /node-version:\s*26\.13\.0/);
+    assert.doesNotMatch(workflow, /node-version:\s*(?:22|24)(?:\.|\s|$)/);
+    assert.match(windowsAcceptance, /MinimumNodeVersion\s*=\s*'26\.13\.0'/);
 });
 
 
@@ -227,7 +227,7 @@ test('63-image exploratory workflow persists restricted-egress attempts for arti
 
 test('billable imagesF extraction workflow supports fingerprint-bound no-duplicate resume', () => {
     const workflow = read('.github/workflows/dwbot-imagesF-63-exploratory.yml');
-    assert.ok(workflow.includes('node-version: 22.16.0'));
+    assert.ok(workflow.includes('node-version: 26.13.0'));
     assert.ok(workflow.includes('Assert accepted Node.js runtime'));
     const runner = read('scripts/run-ocrspace-imagesF-63-exploratory.js');
     const resumeGuard = read('src/ocrspace-exploratory-resume.js');
@@ -281,7 +281,7 @@ test('19-image Gate B artifact workflow verifies the completed run without provi
 
 test('Gate A acceptance uses the accepted runtime, fail-closed network guard and preserves interruption checkpoints', () => {
     const workflow = read('.github/workflows/dwbot-gateA-16-pdf-first.yml').replace(/\r\n/g, '\n');
-    assert.ok(workflow.includes('node-version: 22.16.0'));
+    assert.ok(workflow.includes('node-version: 26.13.0'));
     assert.ok(workflow.includes('runtimePass'));
     assert.ok(workflow.includes('Configure fail-closed restricted-egress diagnostic preload'));
     assert.ok(workflow.includes('source/scripts/block-network.js'));
@@ -337,11 +337,17 @@ test('four-image PDF-first runner refuses duplicates and supports fingerprint-bo
 });
 
 
-test('ordinary verification uses Node 22.16 and cannot submit the legacy 56-image provider batch', () => {
+test('ordinary verification uses Node 26.13.0 and cannot submit the legacy 56-image provider batch', () => {
     const workflow = read('.github/workflows/dwbot-verification.yml');
     const pkg = JSON.parse(read('package.json'));
-    assert.equal(pkg.engines.node, '>=22.16.0');
-    assert.ok(workflow.includes('node-version: 22.16.0'));
+    assert.equal(pkg.engines.node, '26.13.0');
+    assert.ok(workflow.includes('node-version: 26.13.0'));
     assert.ok(workflow.includes('run_legacy_56_provider_acceptance'));
     assert.ok(workflow.includes("if: github.event_name == 'workflow_dispatch' && inputs.run_legacy_56_provider_acceptance == true"));
+    assert.ok(workflow.includes("OCRSPACE_56_PROVIDER_REQUESTS_AUTHORIZED: ${{ github.event_name == 'workflow_dispatch' && inputs.run_legacy_56_provider_acceptance == true }}"));
+    const preflight = read('scripts/prepare-ocrspace-eligible-56.py');
+    assert.ok(preflight.includes('provider_requests_authorized = os.environ.get'));
+    assert.match(preflight, /"providerRequestsPermitted": provider_requests_authorized/);
+    assert.match(preflight, /"providerRequestsMade": False/);
+    assert.doesNotMatch(preflight, /"providerRequestsPermitted": True/);
 });
