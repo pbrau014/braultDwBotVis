@@ -105,6 +105,13 @@ jobs:
           npm --version
           npm ci --no-audit --no-fund
 
+      - name: Configure fail-closed restricted-egress diagnostic preload
+        shell: powershell
+        run: |
+          $guard = Join-Path $env:GITHUB_WORKSPACE 'scripts/block-network.js'
+          if (-not (Test-Path $guard)) { throw 'Current fail-closed network guard is missing.' }
+          "NODE_OPTIONS=--require `"$guard`"" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+
       - name: Run the 16-image OCR.Space Engine 2 PDF-first Gate A acceptance
         working-directory: source
         env:
@@ -179,6 +186,7 @@ jobs:
             testdata/gateA-16-preflight.json
             source/testdata/additional-screenshot-ground-truth.json
             source/testdata/gateA-16/report.json
+            source/testdata/gateA-16/report.json.progress.json
             source/testdata/gateA-16/report.json.pdf-audit.json
             source/testdata/gateA-16/gate-a-acceptance.json
             source/testdata/gateA-16/non-ocr-network-attempts.log
