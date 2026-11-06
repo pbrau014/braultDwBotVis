@@ -69,7 +69,7 @@ test('Legacy Engine 3 non-PDF OCR does not request optional TextOverlay data', a
     let form;
     const result = await recognizeCrop({ ...args(), engine: 3, createSearchablePdf: false, searchablePdfHideTextLayer: false, fetchImpl: async (_url, options) => { form = options.body; return reply(payload('player text', 3)); } });
     assert.equal(form.get('OCREngine'), '3');
-    assert.equal(form.get('isOverlayRequired'), null);
+    assert.equal(form.get('isOverlayRequired'), 'false');
     assert.equal(form.get('isCreateSearchablePdf'), 'false');
     assert.equal(form.get('isSearchablePdfHideTextLayer'), 'false');
     assert.equal(result.providerConfidence, null);

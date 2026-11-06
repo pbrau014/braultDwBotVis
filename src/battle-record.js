@@ -318,8 +318,8 @@ function weightedTextWinner(groups, fieldKey) {
 
 function preferredMapSpelling(group) {
     const supported = group.candidates.filter((candidate) => {
-        const letters = String(candidate.value || '').match(/\\p{L}/gu) || [];
-        const first = String(candidate.value || '').trim().match(/^\\p{L}/u)?.[0];
+        const letters = String(candidate.value || '').match(/\p{L}/gu) || [];
+        const first = String(candidate.value || '').trim().match(/^\p{L}/u)?.[0];
         const initialIsUppercase = first && first === first.toLocaleUpperCase() && first !== first.toLocaleLowerCase();
         const hasLowercase = letters.some((letter) => letter === letter.toLocaleLowerCase() && letter !== letter.toLocaleUpperCase());
         return Boolean(initialIsUppercase && hasLowercase);
