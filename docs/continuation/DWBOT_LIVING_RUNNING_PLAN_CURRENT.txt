@@ -5672,3 +5672,28 @@ LATEST ARTIFACT AUDIT / GATE B DIAGNOSTICS — 2026-11-06
   verification #42236474159 are pending on commit
   a290730c057cd26d3abc7d5e24e8bf17593a99ba.
 - Gate A and Gate B remain NOT PASSED; production remains NO-GO.
+
+
+ 
+OCR SEQUENCE RESUME ARTIFACT CHECK HARDENING — 2026-11-06
+- Completed-row resume verification is now a separately tested helper. It
+  binds the row to the current source-image SHA-256, requires OCR.Space Engine
+  2 PDF-first completion evidence, resolves artifact paths through realpath
+  and confines both files to OCRSPACE_ARTIFACT_DIR, then checks PDF signature
+  and EOF, PNG signature/IHDR dimensions, byte counts and SHA-256 values.
+- The sequential OCR runner now calls this helper before skipping a previously
+  completed provider row. Invalid, missing, changed or out-of-root artifacts
+  are not resubmitted; they remain failed/ambiguous and fail closed.
+- Added unit tests for valid artifact reuse, tampering, missing files and
+  path escape. Commits:
+  2f8b45f523ccfbb4e0a6d0df3fbf4ae5d641e2b9 (helper),
+  d524e32b88f8139ad57427456d75648c41dfe674 (runner integration),
+  4f914838acdc21601485bbcbf233de8155184ea3 (tests).
+- Exact-head DWBOT verification #42237518551 is pending; this hardening is
+  implemented but not yet marked tested/verified. It performs no OCR.Space
+  requests.
+- Gate A partial artifact #42202563673 still contains only the first PDF and
+  PDF-derived raster; its original sequence report/progress checkpoint is
+  absent. The new verifier helps validate a future reconstructed checkpoint,
+  but the checkpoint reconstruction and 15-image safe continuation have not
+  been executed. Do not re-submit Screenshot_16.jpg or restart the full batch.
