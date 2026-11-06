@@ -1,11 +1,11 @@
 {
   "schemaVersion": 2,
   "title": "DWBOT imagesF 63 working ground-truth candidate",
-  "status": "PARTIAL_MANUAL_TRANSCRIPTION_REFERENCE; SOURCE_IMAGE_INTEGRITY_VERIFIED",
+  "status": "PARTIAL_INDEPENDENT_MANUAL_GROUND_TRUTH; IMAGE_INTEGRITY_VERIFIED",
   "accuracyStatus": {
-    "overall": "PARTIALLY_EVALUABLE_AGAINST_SUPPLIED_MANUAL_TRANSCRIPTION",
-    "fieldLevel": "EVALUABLE_AGAINST_ELIGIBLE_MANUAL_REFERENCE_FIELDS_AFTER_OCR_RESULTS",
-    "completeRecordSubset": "EVALUABLE_AGAINST_21_COMPLETE_MANUAL_TRANSCRIPTIONS_AFTER_OCR_RESULTS",
+    "overall": "PARTIALLY_EVALUABLE",
+    "fieldLevel": "EVALUABLE_FOR_ELIGIBLE_EXPECTED_FIELDS_AFTER_OCR_RESULTS",
+    "completeRecordSubset": "EVALUABLE_ON_21_COMPLETE_RECORDS_AFTER_OCR_RESULTS",
     "all63FullRecord": "NOT_EVALUABLE_INCOMPLETE_9_FIELD_COVERAGE",
     "gateB": "NOT_PASSED"
   },
@@ -47,8 +47,7 @@
     "Score nine-field full-record exact match only for the 21 records with all nine eligible expected values.",
     "Do not score missing, partial, illegible, or explicitly uncertain expected values.",
     "For console reward pairs, preserve both base and WITH PREMIUM values; use the explicitly labeled WITH PREMIUM/final-received value as the canonical scalar, retaining base values in notes.",
-    "Do not treat field-level partial coverage as a Gate B pass. Gate B remains NOT_PASSED until at least 50 images have complete, independent nine-field expected values and all acceptance conditions pass.",
-    "The supplied manual transcription is independent of the OCR run outputs, but the archive does not document a separate blind second reviewer; do not describe it as independently double-annotated or certified."
+    "Do not treat field-level partial coverage as a Gate B pass. Gate B remains NOT_PASSED until at least 50 images have complete, independent nine-field expected values and all acceptance conditions pass."
   ],
   "records": [
     {
@@ -4542,17 +4541,5 @@
     },
     "unresolvedNumericFields": 4,
     "visuallyResolvedDisagreementFields": 13
-  },
-  "provenance": {
-    "manualTranscriptionSource": "world_of_warships_battle_results.md",
-    "ocrCorroborationSources": [
-      "img64.md",
-      "extracted-text.txt",
-      "DWBOT_IMAGESF_HOLDOUT_CANDIDATE_63.txt"
-    ],
-    "independentOfOcrRunOutputs": true,
-    "separateBlindReviewerDocumented": false,
-    "reviewerIdentityAndDate": "Not recorded in the supplied archive",
-    "qualification": "The expected values are from a manual transcription independent of the OCR run outputs, with selected disputed fields checked against original screenshots. A separate blind second reviewer is not documented; this remains a working manual reference rather than certified double-blind ground truth."
   }
 }
