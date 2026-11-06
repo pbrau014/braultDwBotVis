@@ -476,7 +476,6 @@ function clone(v){ return JSON.parse(JSON.stringify(v)); }
 function num(v){ const n=Number(v); return Number.isFinite(n) ? n : 0; }
 function esc(v){ return String(v ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function fmt(v){ return (Number.isFinite(v)?v:0).toLocaleString(undefined,{maximumFractionDigits:2}); }
-function money(v){ return "$"+(Number.isFinite(v)?v:0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function normalizeClass(code){ const c=String(code ?? "-").trim().toUpperCase(); return ["DD","CA","BB"].includes(c)?c:"-"; }
 function classWeightFor(code){ return ({DD:4,CA:3,BB:2})[normalizeClass(code)] ?? 0; }
 function makeDefaultSettings(){ return clone(DEFAULT_SETTINGS); }
@@ -593,7 +592,6 @@ function eventRawScore(p,key){
 function eventScore(p,key){ const score=eventRawScore(p,key); return Number.isFinite(score)?score:0; }
 function eventGrandTotal(key){ return state.players.reduce((sum,p)=>sum+eventScore(p,key),0); }
 function totalDubs(){ return KEYS.reduce((sum,key)=>sum+eventGrandTotal(key),0); }
-function dollars(dubs){ return .54*dubs/100; }
 function avg(values){ return values.length?values.reduce((a,b)=>a+b,0)/values.length:0; }
 function tournamentRows(){
   return state.players.map(p=>{
@@ -611,8 +609,8 @@ function tournamentRows(){
   });
 }
 function leaderboardTable(rows){
-  return `<div class="table-wrap"><table class="summary-table"><thead><tr><th>Rank</th><th>Player</th><th>Doubloons</th><th>Estimated value</th></tr></thead><tbody>
-  ${rows.map((r,i)=>`<tr><td><span class="rank rank-${i+1}">${i+1}</span></td><td>${esc(r.name)}</td><td class="result">${fmt(r.dubs)}</td><td class="money">${money(dollars(r.dubs))}</td></tr>`).join("")||`<tr><td colspan="4" class="empty">No players to display.</td></tr>`}
+  return `<div class="table-wrap"><table class="summary-table"><thead><tr><th>Rank</th><th>Player</th><th>Total doubloons</th></tr></thead><tbody>
+  ${rows.map((r,i)=>`<tr><td><span class="rank rank-${i+1}">${i+1}</span></td><td>${esc(r.name)}</td><td class="result">${fmt(r.dubs)}</td></tr>`).join("")||`<tr><td colspan="3" class="empty">No players to display.</td></tr>`}
   </tbody></table></div>`;
 }
 function renderDashboard(){
@@ -632,8 +630,8 @@ function renderDashboard(){
 }
 function renderPlayers(){
   return `<section class="panel"><div class="panel-head"><div><div class="eyebrow">Roster management</div><h2>Player roster</h2><p>Add, rename, or remove players. Each new player is included in all four events.</p></div><button class="primary" id="addPlayer">＋ Add player</button></div>
-  <div class="table-wrap"><table class="summary-table"><thead><tr><th>#</th><th>Player name</th><th>All-event doubloons</th><th>Season dollars</th><th>Action</th></tr></thead><tbody>
-  ${state.players.map((p,i)=>{const d=KEYS.reduce((s,k)=>s+eventScore(p,k),0);return `<tr><td>${i+1}</td><td><input aria-label="Player name" data-player-name="${p.id}" value="${esc(p.name)}"></td><td class="result">${fmt(d)}</td><td class="money">${money(dollars(d))}</td><td><button class="danger" data-remove="${p.id}">Remove</button></td></tr>`}).join("")||`<tr><td colspan="5" class="empty">No players yet. Add a player to get started.</td></tr>`}
+  <div class="table-wrap"><table class="summary-table"><thead><tr><th>#</th><th>Player name</th><th>All-event doubloons</th><th>Action</th></tr></thead><tbody>
+  ${state.players.map((p,i)=>{const d=KEYS.reduce((s,k)=>s+eventScore(p,k),0);return `<tr><td>${i+1}</td><td><input aria-label="Player name" data-player-name="${p.id}" value="${esc(p.name)}"></td><td class="result">${fmt(d)}</td><td><button class="danger" data-remove="${p.id}">Remove</button></td></tr>`}).join("")||`<tr><td colspan="4" class="empty">No players yet. Add a player to get started.</td></tr>`}
   </tbody></table></div><div class="hint">Removing a player removes their results from every event. Export a backup before making major roster changes.</div></section>`;
 }
 function multiplierField(key, field, label, description, example, defaultValue=1){
@@ -681,16 +679,13 @@ function renderEvent(key){
 function renderTotals(){
   const rosterRows=tournamentRows();
   // Sum in roster order, matching the workbook's G12 SUM across its fixed rows.
-  // Sort only after the grand sum has been calculated for the H12-equivalent.
   const grandDubs=rosterRows.reduce((s,r)=>s+r.dubs,0);
-  // Match Totals!H12 exactly: H12 = 0.54 * G12 / 100, not a sum of rounded rows.
-  const grandDollars=dollars(grandDubs);
   const rows=rosterRows.sort((a,b)=>b.dubs-a.dubs);
   return `<section class="panel"><div class="panel-head"><div><div class="eyebrow">Season report</div><h2>Tournament totals</h2><p>Summary columns follow the supplied workbook's season formulas.</p></div><button onclick="window.print()">Print standings</button></div>
-  <div class="table-wrap"><table class="summary-table"><thead><tr><th>Player</th><th>Avg. damage</th><th>Avg. tier</th><th>Avg. kills</th><th>Avg. class weight</th><th>Doubloons</th><th>Dollars</th></tr></thead><tbody>
-  ${rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${fmt(r.damage)}</td><td>${fmt(r.tier)}</td><td>${fmt(r.kills)}</td><td>${fmt(r.class)}</td><td class="result">${fmt(r.dubs)}</td><td class="money">${money(dollars(r.dubs))}</td></tr>`).join("")||`<tr><td colspan="7" class="empty">No players yet.</td></tr>`}
-  <tr><td><strong>Totals</strong></td><td colspan="4"></td><td class="result">${fmt(grandDubs)}</td><td class="money" id="totalDollars" data-cell="Totals!H12-equivalent">${money(grandDollars)}</td></tr></tbody></table></div>
-  <div class="hint">Summary averages follow the supplied workbook formulas. Dollars follow the workbook formula H12 = 0.54 × G12 ÷ 100, using the unrounded Doubloons total.</div></section>`;
+  <div class="table-wrap"><table class="summary-table"><thead><tr><th>Player</th><th>Avg. damage</th><th>Avg. tier</th><th>Avg. kills</th><th>Avg. class weight</th><th>Total doubloons</th></tr></thead><tbody>
+  ${rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${fmt(r.damage)}</td><td>${fmt(r.tier)}</td><td>${fmt(r.kills)}</td><td>${fmt(r.class)}</td><td class="result">${fmt(r.dubs)}</td></tr>`).join("")||`<tr><td colspan="6" class="empty">No players yet.</td></tr>`}
+  <tr><td><strong>Totals</strong></td><td colspan="4"></td><td class="result">${fmt(grandDubs)}</td></tr></tbody></table></div>
+  <div class="hint">Summary averages follow the supplied workbook formulas. Participant-facing values are tournament doubloons only; the historical H12 dollar diagnostic is not displayed.</div></section>`;
 }
 let editRenderTimer = null;
 // Defer rebuilds after input changes so the click that caused blur can still reach its target.
