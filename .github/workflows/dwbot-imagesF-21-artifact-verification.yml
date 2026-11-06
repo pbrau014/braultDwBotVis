@@ -6,6 +6,8 @@ on:
     paths:
       - '.github/workflows/dwbot-imagesF-21-artifact-verification.yml'
       - 'scripts/verify-ocrspace-imagesF-21-artifacts.js'
+      - 'scripts/block-network.js'
+      - 'tests/ocrspace-network-policy.test.js'
       - 'scripts/recover-ocrspace-imagesF-21-local-readers.js'
       - 'scripts/evaluate-ocrspace-imagesF-63-ground-truth.py'
       - 'scripts/evaluate-ocrspace-pdf-text-layer.js'
