@@ -96,7 +96,8 @@ async function main() {
     }
 
     await fs.mkdir(path.dirname(networkLogPath), { recursive: true });
-    await fs.writeFile(networkLogPath, '', { flag: 'w' });
+    try { await fs.access(networkLogPath); }
+    catch { await fs.writeFile(networkLogPath, '', { flag: 'wx' }); }
 
     const byName = new Map((run.results || []).map(row => [row.filename, row]));
     if (byName.size !== (run.results || []).length) throw new Error('Duplicate run rows are not eligible for recovery.');
