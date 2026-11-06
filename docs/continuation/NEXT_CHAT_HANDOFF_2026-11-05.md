@@ -1,3 +1,41 @@
+# Current continuation override — 2026-11-06
+
+This dated handoff body is historical context. The canonical living plan
+`docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt` is the operational
+source of truth and its newest override controls any conflicting text below.
+
+- Canonical repository: `pbrau014/braultDwBotVis`, branch `main`.
+  Main HEAD before this handoff synchronization: `38ce43af2d2a1b928c335a97728c0d113964f78e`.
+- Stay in this ChatGPT conversation for all DWBOT work. Do not hand off to
+  Work mode or another executor. Do not emit progress narration or interim
+  screen text while authorized operations are underway; report once operations
+  are complete with a concise recommendation and next steps.
+- OCR.Space is the explicitly enabled, highest-priority text-extraction stage.
+  Eligible original screenshots require `OCRSPACE_ENABLED=1`,
+  `OCRSPACE_NETWORK_ALLOWLIST=1`, and a valid local `OCRSPACE_API_KEY`.
+  OCR.Space Engine 2 receives each original image first and creates one
+  searchable PDF. Download/validate/preserve that PDF, render it to a bounded
+  local raster, and run Tesseract.js, native Tesseract, optional PaddleOCR and
+  OpenCV geometry only on the PDF-derived raster. Never fall back to the
+  original screenshot after PDF-first processing begins.
+- The network guard must permit HTTPS to `api.ocr.space` and `ocr.space`.
+  `OCR_NON_OCR_NETWORK_RESTRICTED=1` restricts unrelated outbound destinations
+  only; it does not block OCR.Space. `OCRSPACE_ENABLED=0` is reserved for
+  isolated mocks or local readers after the PDF has already been created.
+- Windows acceptance stores PDF/raster artifacts under a per-run
+  `OCRSPACE_ARTIFACT_DIR`; the 64-image runner stores per-image artifacts.
+  Do not claim durable preservation without verified files and checksums.
+- Current implementation/test/docs commits include source enablement/network
+  policy `56f26a190ee5fcb5df2da10650d477a37423809a`, PDF contract test repair
+  `fceaf6e3bd28f3746c737e7306747f490088bbdf`, README `7d451dca07a832c44b0d6ee6c6622bdef59a46a2`,
+  and OCR.Space guide `b5c2a0d3c2b1adcd51ef644886da18cb1ca5818c`.
+- The latest exact main head and active queue must be re-read from the living
+  plan before any further operation. No live OCR.Space request or PDF has been
+  verified here; the local key is unavailable and Actions secret presence is
+  unverified. Production remains NO-GO.
+
+---
+
 # Tested-source and current-branch clarification — 2026-11-05
 
 Last source-code checkpoint: 5a12a9c218cebe61d277999318b7ceef5a8dc3b1 (run 42111470540). Documentation-only sync commits after that source checkpoint: 846c125c039358b7b4d8e30f2a882409b5b6e526 and 88b81acec448d1c7307f36ba91ac0b276d5710b9. Re-fetch main before further writes; 5a12 is not the current branch head.
