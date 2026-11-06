@@ -190,10 +190,10 @@ scripts/block-network.js, scripts/prepare-ocrspace-imagesF-63.py,
 tests/ocrspace-pdf-first.test.js and package-lock.json. package.json differs
 only in scripts: the current branch adds the 21-image test/evaluator command
 and removes the retired 64-image package command; package name/version,
-Node engine, dependencies and allowScripts are identical. Thus the active run's
-OCR implementation and locked dependencies match the current main source for
-the compared files; the report still remains fingerprint-bound to its original
-triggering commit.
+Node engine, dependencies and allowScripts are identical. Thus the active run's OCR implementation and locked dependencies match the
+current main source for the compared files. Later changes include evaluator,
+tests, metadata, UI copy and workflow controls/logging, not OCR pipeline code;
+the report remains fingerprint-bound to its original triggering commit.
 
 At the latest check, run 42160979140 remained in_progress at the
 "Run OCR.Space Engine 2 PDF-first exploratory extraction" step and listed no

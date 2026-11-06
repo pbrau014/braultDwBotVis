@@ -6,9 +6,10 @@ IMPLEMENTATION / VERIFICATION STATUS — 2026-11-06
 ## Current main / Gate B status — 2026-11-06
 
 - The source-comparison checkpoint was main commit
-  46810b5cd76a9148507b2aaa5f4262850c7cbbe4; later commits through the current
-  branch head updated only documentation and evaluator tests, not OCR source
-  or the dependency lockfile.
+  46810b5cd76a9148507b2aaa5f4262850c7cbbe4; later commits through the current branch head updated documentation,
+  evaluator/test code, ground-truth/manifest metadata, desktop UI copy/contract
+  tests, and workflow guards/network logging; OCR pipeline modules and the
+  dependency lockfile remain unchanged.
 - Exact-head DWBOT verification for the latest main commit is pending; no test
   pass is claimed until the current run's jobs finish and logs/artifacts are
   inspected.

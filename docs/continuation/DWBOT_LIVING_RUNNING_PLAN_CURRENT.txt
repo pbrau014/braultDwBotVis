@@ -61,9 +61,11 @@ SOURCE FINGERPRINT / RUN STATUS — 2026-11-06
   adaf4f8c3a9573f56d0348a4bba36686fc31c22e. OCR source files, 63-image runner,
   network guard, preflight script, PDF contract tests and package-lock blob
   hashes match main at the compared source checkpoint; subsequent commits
-  through the latest main head changed only docs/tests. package.json differs
-  only in test/evaluator scripts; dependencies and runtime declarations are
-  identical. This is a source-file comparison, not an artifact/accuracy pass.
+  through the latest main head changed documentation, evaluator/tests,
+  ground-truth/manifest metadata, desktop UI copy/contract tests and workflow
+  guards/logging, but not OCR pipeline modules or package-lock dependencies.
+  package.json differs only in scripts; dependencies and runtime declarations
+  are identical. This is a source-file comparison, not an artifact/accuracy pass.
 - Exact-head verification for the latest main commit remains pending. Existing
   extraction remains in progress at its provider step; no artifacts are listed.
 - Older push-triggered provider run 42171236931 is CANCELLED with no jobs.
