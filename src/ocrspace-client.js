@@ -24,40 +24,25 @@ function compactOverlay(results, maxWords = 500) {
 async function readJsonBounded(response, maxBytes = MAX_RESPONSE_BYTES) {
     const declared = Number(response.headers && response.headers.get && response.headers.get('content-length'));
     if (Number.isFinite(declared) && declared > maxBytes) throw fail('OCR.space response exceeds the configured size limit.', 'OCRSPACE_RESPONSE_TOO_LARGE');
-    if (response.body && typeof response.body.getReader === 'function') {
-        const reader = response.body.getReader();
-        const chunks = []; let total = 0;
-        try {
-            while (true) {
-                const part = await reader.read();
-                if (part.done) break;
-                const chunk = Buffer.from(part.value);
-                total += chunk.length;
-                if (total > maxBytes) {
-                    try { await reader.cancel(); } catch {}
-                    throw fail('OCR.space response exceeds the configured size limit.', 'OCRSPACE_RESPONSE_TOO_LARGE');
-                }
-                chunks.push(chunk);
+    if (!response.body || typeof response.body.getReader !== 'function') {
+        throw fail('OCR.space response does not support bounded streaming; refusing an unbounded body read.', 'OCRSPACE_RESPONSE_STREAM_UNAVAILABLE');
+    }
+    const reader = response.body.getReader();
+    const chunks = []; let total = 0;
+    try {
+        while (true) {
+            const part = await reader.read();
+            if (part.done) break;
+            const chunk = Buffer.from(part.value);
+            total += chunk.length;
+            if (total > maxBytes) {
+                try { await reader.cancel(); } catch {}
+                throw fail('OCR.space response exceeds the configured size limit.', 'OCRSPACE_RESPONSE_TOO_LARGE');
             }
-        } finally { try { reader.releaseLock(); } catch {} }
-        return JSON.parse(Buffer.concat(chunks, total).toString('utf8'));
-    }
-    if (typeof response.arrayBuffer === 'function') {
-        const bytes = Buffer.from(await response.arrayBuffer());
-        if (bytes.length > maxBytes) throw fail('OCR.space response exceeds the configured size limit.', 'OCRSPACE_RESPONSE_TOO_LARGE');
-        return JSON.parse(bytes.toString('utf8'));
-    }
-    if (typeof response.text === 'function') {
-        const body = await response.text();
-        if (Buffer.byteLength(body, 'utf8') > maxBytes) throw fail('OCR.space response exceeds the configured size limit.', 'OCRSPACE_RESPONSE_TOO_LARGE');
-        return JSON.parse(body);
-    }
-    if (typeof response.json === 'function') {
-        const payload = await response.json();
-        if (Buffer.byteLength(JSON.stringify(payload), 'utf8') > maxBytes) throw fail('OCR.space response exceeds the configured size limit.', 'OCRSPACE_RESPONSE_TOO_LARGE');
-        return payload;
-    }
-    throw fail('OCR.space response body is unavailable.', 'OCRSPACE_INVALID_RESPONSE');
+            chunks.push(chunk);
+        }
+    } finally { try { reader.releaseLock(); } catch {} }
+    return JSON.parse(Buffer.concat(chunks, total).toString('utf8'));
 }
 /** Returns OCR.Space evidence only; active PDF-first callers must pass Engine 2 and request a hidden-but-searchable PDF text layer. This generic client still supports Engine 3 for legacy non-PDF diagnostics. */
 async function recognizeCrop({ apiKey, imageBuffer, filename = 'dwbot-field-crop.png', mimeType = 'image/png', engine = 2, overlayRequired = false, detectOrientation = true, isTable = false, scale = true, createSearchablePdf = true, searchablePdfHideTextLayer = true, timeoutMs = 15000, fetchImpl = globalThis.fetch }) {
