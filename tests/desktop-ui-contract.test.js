@@ -33,7 +33,15 @@ test('desktop browser scripts use only same-origin local APIs and do not contain
   assert.match(read('desktop/player.js'), /\/api\/overview/);
   assert.match(read('desktop/admin.js'), /\/api\/admin\/settings/);
   assert.match(read('desktop/upload.js'), /25\s*\*\s*1024\s*\*\s*1024/);
-  assert.match(read('desktop/upload.html'), /maximum 25 MB/i);
+  const uploadPage = read('desktop/upload.html');
+  assert.match(uploadPage, /maximum 25 MB/i);
+  assert.doesNotMatch(uploadPage, /maximum 10 MB/i);
+  assert.match(uploadPage, /OCR.Space Engine 2/i);
+  assert.match(uploadPage, /PDF-derived raster/i);
+  assert.match(uploadPage, /OCRSPACE_ENABLED=1/i);
+  assert.match(uploadPage, /OCRSPACE_NETWORK_ALLOWLIST=1/i);
+  assert.match(uploadPage, /rather than falling back to OCR on the original screenshot/i);
+  assert.doesNotMatch(uploadPage, /safe-crop prepass is default-on|Full screenshots and player identity are never sent/i);
   assert.match(read('desktop/admin.html'), /private recovery JSON/i);
   assert.match(read('desktop/desktop.js'), /submission.requiredValues/);
   assert.match(read('desktop/desktop.js'), /submission.status==='awaiting-mapping'/);
