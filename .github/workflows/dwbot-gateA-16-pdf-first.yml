@@ -1,10 +1,9 @@
 name: DWBOT Gate A 16-image OCR.Space PDF-first acceptance
 
-# One original Gate A development-corpus run plus one artifact-bound resume
-# Authorized continuation uses the exact run #42202563673 artifact; the first paid submission is reused, never repeated.
-# The resume path is gated by the exact commit message below and by artifact, source, and log fingerprints.
-# continuation. The resume reuses the already submitted first image and may
-# submit only the remaining 15 after local recovery proves that first record exact.
+# Historical Gate A run #42202563673 is quarantined: its first provider request lacked proven restricted-egress enforcement.
+# Its PDF may be reused for local-only diagnosis, but it cannot count toward Gate A or authorize remaining provider requests.
+# A compliant Gate A result requires a fresh, fully guarded 16-image run with a new diagnostic log and locked source fingerprint.
+# The LOCAL-ONLY-RECOVERY and RESUME-15 paths remain fail-closed and must never repeat or extend the historical partial batch.
 
 on:
   push:
