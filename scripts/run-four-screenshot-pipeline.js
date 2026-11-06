@@ -50,7 +50,13 @@ async function auditArtifacts(report, selected) {
             sourceSha256,
             pdf: pdf ? { file: path.basename(pdfPath), bytes: pdf.length, sha256: sha256(pdf), headerValid: pdfHeaderValid, eofMarkerValid: pdfEofValid } : null,
             raster: raster ? { file: path.basename(rasterPath), bytes: raster.length, sha256: sha256(raster) } : null,
-            valid: validSourceHash && pdfHeaderValid && pdfEofValid && Boolean(raster?.length),
+            providerEvidence: result?.ocrSpacePdfFirst || null,
+            valid: validSourceHash && pdfHeaderValid && pdfEofValid && Boolean(raster?.length)
+                && result?.ocrSpacePdfFirst?.status === 'complete'
+                && result?.ocrSpacePdfFirst?.provider === 'ocr.space'
+                && result?.ocrSpacePdfFirst?.engine === 2
+                && result?.ocrSpacePdfFirst?.sourceSha256 === sourceSha256
+                && result?.ocrSpacePdfFirst?.pdfSha256 === (pdf ? sha256(pdf) : null),
         });
     }
     const audit = {
