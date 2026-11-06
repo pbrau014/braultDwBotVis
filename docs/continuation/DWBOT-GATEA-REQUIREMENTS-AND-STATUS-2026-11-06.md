@@ -13,7 +13,7 @@ Gate A is the PDF-first development acceptance gate, not the independent holdout
 Required evidence:
 
 1. Exact 16-image source archive, manifest and per-image SHA-256 values. The source archive fingerprint must be locked and recorded before processing.
-2. Windows runtime on the accepted Node baseline (Node >=22.16.0; Node 24.22.1 is also permitted but not required). The Gate A acceptance runner must be Windows x64; a Linux Node distribution does not satisfy this Windows-specific requirement.
+2. Windows runtime on the exact project standard Node.js 26.13.0 (LTS). All CI and local acceptance runs must use this exact version. The Gate A acceptance runner must be Windows x64; a Linux Node distribution does not satisfy this Windows-specific requirement.
 3. OCR.Space Engine 2 as the authorized primary extraction stage: original screenshot -> searchable PDF -> validated HTTPS PDF -> bounded local PDF-derived raster -> local OCR readers. No silent OCR fallback to the original screenshot.
 4. Verified PDF and PDF-derived raster for each of the 16 images, including source/PDF/raster hashes, PDF signature, page count, searchable text layer, raster dimensions and rerendered pixel provenance.
 5. Local readers and all field-specific reconciliation must operate only on the PDF-derived raster. Preserve engine/model versions, per-field candidates, disagreements, timeouts and unresolved fields.
@@ -58,7 +58,7 @@ The original `imgs2add.zip` container is still unavailable, but its 16 expected 
 
 The completed 63-image exploratory run produced 63 searchable PDFs and 63 PDF-derived raster files. Its downloaded artifact passed independent file-level checks for all 63 pairs: sizes, SHA-256 values, signatures, one-page PDFs, non-empty searchable text layers and raster dimensions. The 19 selected Gate B subset has separate artifact verification for PDF integrity, searchable text, raster integrity and PDF-derived raster provenance.
 
-However, the extraction run's original network diagnostic log is missing, and the 19-image post-hoc evaluation has many unresolved mandatory fields. Node 22.16.0 meets the currently authorized runtime floor (>=22.16.0). Gate B therefore remains NOT PASSED regardless of the exploratory field-level percentages.
+However, the extraction run's original network diagnostic log is missing, and the 19-image post-hoc evaluation has many unresolved mandatory fields. The historical exploratory run used Node 22.16.0 and is not current-runtime acceptance evidence under the new exact Node.js 26.13.0 project standard. Gate B therefore remains NOT PASSED regardless of the exploratory field-level percentages.
 
 The 19-image evaluation and separate 21-image diagnostic are recorded in the artifact-verification reports. They do not waive Gate A or upgrade the exploratory source run into a release acceptance run.
 
@@ -212,3 +212,21 @@ diagnostic log. Gate A remains NOT PASSED.
   authorized by this run.
 - Gate A remains NOT PASSED. The historical original blocked-attempt count is
   UNKNOWN and cannot be converted to zero by creating a new empty log.
+
+
+## 7. Superseding provider authorization and runtime decision — 2026-11-06 17:24 local
+
+The user has explicitly superseded the earlier blanket restriction on additional OCR.Space provider requests and authorized additional provider requests and project-wide changes. This permits new, deliberately initiated, guarded acceptance submissions for Gate A and other specifically planned test batches. The previous instruction “no new OCR.Space submissions” is no longer current.
+
+This authorization does not remove the safety requirements for a provider transaction:
+- record a new submission intent and source fingerprint before sending;
+- use the protected OCRSPACE_API_KEY secret only;
+- require OCR.Space allowlist access and restricted-egress diagnostics before provider calls;
+- validate each response, searchable PDF, download, signature, size, provenance, and derived raster;
+- do not automatically retry an ambiguous request that may have been accepted or charged; reconcile its transaction state first;
+- keep exploratory batches and acceptance batches explicitly labelled and separately reported;
+- do not treat a new batch as passing Gate A or B until all gate criteria are met.
+
+The first new guarded provider acceptance run is to be a fresh 16-image Gate A batch, bound to the current Node.js 26.13.0 source candidate and a verified source-run fingerprint. It is not a continuation of the quarantined partial historical request. The prior first-image duplicate restriction is superseded for a newly initiated, explicitly identified fresh acceptance run; it is not permission to repeat an ambiguous in-flight transaction.
+
+The project runtime standard is now exactly Node.js 26.13.0 (not “22.16.0 or newer” and not a Node 24 compatibility target). Historical run records retain their original runtime labels and cannot be upgraded retroactively.
