@@ -363,14 +363,14 @@ test('complete synthetic Discord tour: all commands, every slot, formulas, persi
   assert.match((await send('!yolo settings', { admin: false })).text, /restricted to tournament admins/i);
   assert.match((await send('!yolo setting damage multiplier 9', { admin: false })).text, /restricted to tournament admins/i);
   assert.match(help.text + '\n' + help.sends.map(x => x.content || '').join('\n'), /same configured channel/i);
-  const workbookDownload = await send('!yolo download-workbook', { admin: false });
+  const workbookDownload = await send('!yolo download-workbook', { admin: true });
   const workbookReply = workbookDownload.replies.find(r => Array.isArray(r.files) && r.files.length);
   assert.ok(workbookReply, `expected Excel attachment from download command: ${workbookDownload.text}`);
   const workbookFile = workbookReply.files.find(f => f.name === 'YOLO-Tournament-Workbook.xlsm');
   assert.ok(workbookFile && Buffer.isBuffer(workbookFile.attachment), 'download command must attach the source .xlsm bytes');
   assert.deepEqual(workbookFile.attachment, await fs.readFile(H.getWorkbookPath()));
   assert.match(workbookDownload.text, /\$12\.49/);
-  const workbookAlias = await send('!yolo workbook', { admin: false });
+  const workbookAlias = await send('!yolo workbook', { admin: true });
   assert.ok(workbookAlias.replies.some(r => Array.isArray(r.files) && r.files.some(f => f.name === 'YOLO-Tournament-Workbook.xlsm')),
     'workbook alias must also attach the Excel source workbook');
   assert.match((await send('!yolo players')).text, /No players yet/);
@@ -814,12 +814,13 @@ test('50-player randomized tournament: roster cap, all-player aggregates, dollar
   const totals = await send('!yolo totals');
   assert.match(totals.text, /Players: \*\*50\/50\*\*/);
   assert.ok(totals.text.includes(`**Total doubloons (G12-equivalent): ${totalDoubloons.toFixed(2)}**`));
-  assert.ok(totals.text.includes(`**Estimated total value (H12-equivalent): $${expectedDollars.toFixed(2)}**`));
+  assert.doesNotMatch(totals.text, /H12-equivalent|Estimated total value|\\$/);
   assert.ok(Math.abs(rows.reduce((sum,row) => sum + row.estimatedValue, 0) - expectedDollars) < 1e-7);
   const standings = await send('!yolo standings');
   const allStandingsMessages = standings.text + '\n' + standings.sends.map(x => x.content || '').join('\n');
   assert.match(allStandingsMessages, /All-player aggregate \(50\/50 players\)/);
-  assert.ok(allStandingsMessages.includes(`$${expectedDollars.toFixed(2)}`));
+  assert.ok(allStandingsMessages.includes(`Total doubloons (G12-equivalent): ${totalDoubloons.toFixed(2)}`));
+  assert.doesNotMatch(allStandingsMessages, /H12-equivalent|Estimated total value|\\$/);
   const before = archiveSends.length;
   const snapshot = await send('!yolo snapshot');
   assert.match(snapshot.text, /snapshot attached/i);
@@ -839,7 +840,7 @@ test('50-player randomized tournament: roster cap, all-player aggregates, dollar
   assertScoresMatchWorkbook(variedRestored, '50-player varied-settings workbook backup round-trip');
   const restoredTotal = Tournament.standings(archiveRestored).reduce((sum, row) => sum + row.total, 0);
   assert.ok(Math.abs((0.54 * restoredTotal / 100) - expectedDollars) < 1e-8,
-    'full archive restore must preserve the workbook H12-equivalent');
+    'full archive restore must preserve the internal legacy H12 diagnostic');
   assert.throws(() => Tournament.importBackup({ ...backup, players: [...backup.players, { id: 51, name: 'Over cap' }] }), /at most 50 players/i);
 });
 
@@ -868,7 +869,7 @@ test('public interactive panel renders controls, responds to totals/event select
     async update(payload) { updated = payload; },
   };
   assert.equal(await H.handleInteraction(totalsInteraction), true);
-  assert.match(updated.content, /H12-equivalent/);
+  assert.match(updated.content, /G12-equivalent/);
   assert.equal(updated.components.length, 2);
 
   const eventInteraction = {
