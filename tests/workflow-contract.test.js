@@ -305,3 +305,13 @@ test('four-image PDF-first runner refuses duplicates and supports fingerprint-bo
     assert.match(sequence, /ambiguous-prior-provider-submission-not-retried/);
     assert.match(resume, /OCR_SEQUENCE_RESUME_FINGERPRINT_MISMATCH/);
 });
+
+
+test('ordinary verification uses Node 24.17 and cannot submit the legacy 56-image provider batch', () => {
+    const workflow = read('.github/workflows/dwbot-verification.yml');
+    const pkg = JSON.parse(read('package.json'));
+    assert.equal(pkg.engines.node, '>=24.17.0');
+    assert.ok(workflow.includes('node-version: 24.17.0'));
+    assert.ok(workflow.includes('run_legacy_56_provider_acceptance'));
+    assert.ok(workflow.includes("if: github.event_name == 'workflow_dispatch' && inputs.run_legacy_56_provider_acceptance == true"));
+});
