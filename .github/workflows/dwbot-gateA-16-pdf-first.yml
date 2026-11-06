@@ -256,7 +256,7 @@ jobs:
           $preflightPath = Join-Path $env:GITHUB_WORKSPACE 'testdata/gateA-16-preflight.json'
           $nodeVersion = (node --version).Trim()
           $runtimePass = $false
-          try { $runtimePass = ([version]$nodeVersion.TrimStart('v')) -ge ([version]'26.13.0') } catch { $runtimePass = $false }
+          try { $runtimePass = ([version]$nodeVersion.TrimStart('v')) -eq ([version]'26.13.0') } catch { $runtimePass = $false }
           $report = if (Test-Path $reportPath) { Get-Content -Raw $reportPath | ConvertFrom-Json } else { $null }
           $audit = if (Test-Path $auditPath) { Get-Content -Raw $auditPath | ConvertFrom-Json } else { $null }
           $preflight = if (Test-Path $preflightPath) { Get-Content -Raw $preflightPath | ConvertFrom-Json } else { $null }
