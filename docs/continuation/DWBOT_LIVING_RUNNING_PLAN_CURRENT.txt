@@ -1211,31 +1211,35 @@ active-status wording below. Historical outcomes remain preserved.
   present, clean extraction succeeded, and npm ci, npm test and prelive passed.
   The PDF was rendered, but page-by-page visual inspection remains open.
 
-2. OCR.Space runtime policy and privacy correction
-- Current user policy is default-on when a local Free API key is configured:
-  unset/blank OCRSPACE_ENABLED or value 1 enables; value 0 explicitly disables;
-  invalid values fail closed; the key is mandatory. This supersedes older
-  default-off / explicit-1-required statements below. Keep the key local and
-  secret. No key is configured in this chat and no provider request has been
-  made.
-- The approved sequence remains OpenCV geometry/safe-crop planning, OCR.Space
-  Engine 3 remote evidence first, then independent Tesseract.js/local
-  recognition and exact local acceptance. Remote text remains separate,
-  diagnostic-only and unable to accept or overwrite a field. Engine 2 remains
-  PDF-only fallback if Engine 3 returns no safe PDF URL; its OCR text is
-  discarded.
-- A privacy-boundary defect was found in src/ocrspace-prepass.js: if OpenCV
-  did not return an identity ROI, the code substituted a nominal rectangle;
-  it also did not enforce the local geometry selector's minimum score. This
-  was not sufficient proof that identity pixels were excluded.
-- Corrected in this update: require an explicit in-bounds identity proposal
-  with score >= 0.12, matching the existing cvRegion() minimum. Missing,
-  weak, malformed, undersized or out-of-bounds identity geometry now returns
-  an empty crop plan and skips remote OCR for that image. No fallback box is
-  substituted. Tests cover missing/weak/out-of-bounds/undersized identity
-  geometry; adapter documentation records the same rule.
-- No user/player identity, Discord ID, full screenshot or production image was
-  transmitted. No live OCR.Space call or paid usage occurred.
+2. OCR.SPACE RUNTIME POLICY AND PRIVACY — CURRENT OVERRIDE
+- OCR.Space is the first OCR operation on each source image. Engine 2 creates
+  the searchable PDF with a hidden-but-searchable text layer; download/validate
+  it and render the PDF page locally to a bounded raster.
+- Tesseract.js, native Tesseract, optional PaddleOCR and OpenCV geometry operate
+  on that PDF-derived raster only. No local reader processes the original image
+  after successful PDF creation. The active bot makes one OCR.Space request/PDF
+  per source image and has no crop-based remote refinement.
+- OCR.Space provider text remains separate diagnostic evidence; no remote-only
+  value enters local candidate selection or acceptance. Nine-field local
+  validation remains authoritative.
+- Full screenshots, including visible player names, are authorized for the
+  named 4-, 16- and 64-image World of Warships inventories only. This supersedes
+  the earlier crop-only/non-identifying-image restriction for these named
+  inventories. Credentials, Discord IDs, private account data and unrelated
+  screenshots/UI remain excluded. API keys must never be exposed.
+- Production requires OCRSPACE_API_KEY. OCRSPACE_ENABLED=0 is explicit
+  local-only development/test mode. A missing key or PDF-first failure is a
+  blocker/fail-closed condition, not permission to fall back to the original
+  screenshot.
+- Use the Free API only, Engine 2, <=1 MiB uploads, bounded JPEG normalization,
+  strict HTTPS host/redirect/size/timeout checks, quota reservation, no automatic
+  retries, and OCR.Space-only network allowlisting.
+- The old OpenCV safe-crop identity boundary and crop-only adapter were part of
+  the superseded architecture. Their helper files remain for historical tests,
+  but the active bot no longer invokes them.
+- No live provider request has yet been verified in this chat. The local key
+  is absent; the Actions secret remains unverified. The new exact-head Windows
+  run must supply the live evidence.
 
 3. Source-tree cleanup reconciliation
 - Rechecked the exact 332-name local archive root-cleanup list against the
@@ -1413,10 +1417,11 @@ G. IMMEDIATE NEXT STEPS
    nine fields per image. If any ancestor failure persists, trace its current
    crop geometry, raw OCR, independent evidence and candidate selection; fix
    only a demonstrated root cause and add regression tests. Preserve originals.
-3. Recheck OCR.Space provider terms/privacy and perform a synthetic non-identifying
-   live smoke only after a local Free key is configured. Never transmit
-   production screenshots or identity data. Compare Engine 3 with local
-   Tesseract on independently labeled data.
+3. Recheck current OCR.Space Free terms/privacy and confirm OCRSPACE_API_KEY is
+   configured in the protected local/Actions secret store. Then run the user-
+   authorized 4- and 16-image inventories through Engine 2 PDF-first, and the
+   64-image inventory only after exact archive/member verification. Compare
+   local readers on the PDF raster; do not send unrelated screenshots/data.
 4. Run Gate A, then independent Gate B, then Gate C persistence/recovery and
    Gate D release review in dependency order. Production remains NO-GO.
 
@@ -1437,33 +1442,28 @@ statements in older active sections. Historical evidence and records remain.
   local-only opt-out; any other non-empty value fails closed.
 - The local OCRSPACE_API_KEY remains mandatory. No key means no provider request.
   The key must remain local, untracked, unlogged and absent from packages.
-- The explicit OCRSPACE_ENABLED=0 in scripts/run-windows-ocr-acceptance.ps1 is
-  retained because that script deliberately enforces a network-free local-primary
-  baseline. It is not the runtime default. Gate A local-only comparisons must
-  continue to set the explicit opt-out.
-- Default-on does not bypass OpenCV safe-crop planning, field/source allowlists,
-  identity exclusion, size/time/crop limits, quota reservations, fixed HTTPS
-  endpoint, redirect rejection, no automatic retries, or fail-closed behavior.
-  Only minimum-necessary pre-localized non-identifying crops may be transmitted.
-  Full screenshots, player identity/name, Discord identifiers, credentials,
-  private account data and unrelated UI remain prohibited.
-- Tesseract.js remains the local baseline and final acceptance authority.
-  OCR.Space output remains separate diagnostic evidence. The independent
-  src/ocrspace-reconciliation.js cross-check reports agreement, disagreement,
-  remote-only, remote-conflict and missing-candidate states; it never mutates
-  the local record or promotes remote-only candidates into acceptance.
+- That earlier statement described a historical local-only baseline script.
+  The current Windows OCR acceptance wrapper sets OCRSPACE_ENABLED=1, requires
+  OCRSPACE_API_KEY, and allows only OCR.Space HTTPS API/PDF hosts. Local-only
+  unit tests must explicitly set OCRSPACE_ENABLED=0.
+- PDF-first processing still enforces size/time/quota limits, fixed HTTPS
+  destination, redirect rejection, no automatic retries and fail-closed behavior.
+  The current user explicitly authorizes full screenshots, including visible
+  player names, for the 4-, 16- and 64-image World of Warships inventories only.
+  Credentials, Discord identifiers, private account data and unrelated UI or
+  screenshots remain prohibited.
+- Tesseract.js/native Tesseract remain local readers after PDF rasterization;
+  OCR.Space text remains separate diagnostic evidence and cannot accept or
+  overwrite a field. Local exact nine-field validation remains authoritative.
 
-2. ENGINE 3 SEARCHABLE-PDF CAPABILITY RULE
-- DWBOT's Engine comparison table marks Engine 3 searchable PDF as SUPPORTED,
-  following the Engine 3 feature-description text.
-- The OCR.Space provider documentation remains internally inconsistent: its
-  Engine 3 feature description says searchable PDF is supported with the same
-  parameters as Engine 1/2, while its comparison matrix still marks it
-  unsupported. Do not claim that the provider's matrix itself has changed.
-- DWBOT requests the visible searchable PDF with Engine 3 and checks the actual
-  SearchablePDFURL. If no safe URL is returned, it retains the separately
-  quota-reserved Engine 2 PDF-only fallback and discards Engine 2 OCR text.
-  No paid service or paid usage is authorized.
+2. ENGINE 2 SEARCHABLE-PDF FIRST-PASS RULE — CURRENT
+- The current provider comparison marks searchable-PDF creation supported for
+  Engine 2 and unsupported for Engine 3. The active PDF-first path therefore
+  uses Engine 2 directly; Engine 3 is not a first-pass fallback or PDF creator.
+- Request one Engine 2 searchable PDF per source screenshot with a hidden but
+  searchable text layer. Validate SearchablePDFURL and immediately download
+  the PDF. Render its page locally; local OCR readers use that raster.
+- The earlier Engine 3-first / Engine 2 PDF-only fallback design is superseded.
 
 3. ENTERPRISEOCRPIPELINE.PY — ROOT-FILE REVIEW
 - The root file is a standalone Python/FastAPI/SQLAlchemy document-OCR service
@@ -2117,19 +2117,17 @@ This section governs current work. The historical plan follows unchanged below.
 - Tesseract.js remains the baseline engine. CV/OpenCV and PaddleOCR are
   evaluated on identical labeled inputs and retained only when measured
   improvements justify them. Do not replace the OCR engine by preference.
-- Preserve Tesseract.js as the local baseline and acceptance authority. When
-  OCR.Space is explicitly enabled, it runs first as a remote text-evidence pass
-  after OpenCV geometry-only safe-crop planning and before Tesseract.js; local
-  Tesseract then processes pixels independently. Remote text is parsed and
-  compared to the local record by `src/ocrspace-reconciliation.js` as a
-  diagnostic only; no remote-only value is accepted and no remote candidate is
-  merged into local acceptance. OCR.Space is default-on when a local Free API key is configured; explicit
-  `OCRSPACE_ENABLED=0` is reserved for local-only runs. Only minimum-necessary
-  non-identifying crops are permitted; no player identity, Discord identifiers,
-  credentials, private account data or full screenshots. No paid service or paid
-  usage is authorized. Recheck current terms/privacy/retention before live use;
-  inspect any additional signup terms before obtaining an API key. No key or
-  production screenshot has been supplied/transmitted.
+- Preserve Tesseract.js as a local reader and acceptance authority after
+  OCR.Space Engine 2 creates the searchable PDF. Render the PDF page locally;
+  Tesseract.js/native Tesseract/PaddleOCR/OpenCV process only that raster.
+  OCR.Space text remains separate diagnostic evidence and cannot mutate local
+  fields. One OCR.Space request/PDF per screenshot; no crop refinement. The user
+  authorized full screenshots, including visible player names, for the named
+  4-, 16- and 64-image World of Warships inventories only. Do not send unrelated
+  screenshots, credentials, Discord identifiers or private account data.
+  OCRSPACE_ENABLED=0 is reserved for explicit local-only runs. Production
+  requires OCRSPACE_API_KEY. Use Free API only and recheck terms/privacy before
+  live use. No key or live provider request has been verified yet.
 - Keep ingestion bounded: support the specified 25 MB streamed intake without
   unbounded buffering; enforce bounded worker concurrency, timeouts,
   cancellation, cleanup and storage limits. Verify these behaviors with tests
