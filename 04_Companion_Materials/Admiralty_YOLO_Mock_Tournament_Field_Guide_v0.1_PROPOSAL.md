@@ -413,7 +413,7 @@ The Admiralty's promise becomes the tournament's lesson: a strong fleet is not o
 - [CBStrat strategy infographic](../dwbotStuff/cb%20strat%20img%20ref.png)
 - [YOLO recurring rules source](../dwbotStuff/yolo_rules_xmpl.docx)
 - [YOLO Pilot source](../dwbotStuff/yolo_event.docx)
-- [YOLO introductory design PDF](../dwbotStuff/yolo_description.pdf)
+- [YOLO tournament complete instruction set](../dwbotStuff/yolo_tournament_complete_instruction_set.pdf)
 - [Historical score example image](../dwbotStuff/mtheqfnl.jpg)
 - [Preserved Discord scoring explanation](../dwbotStuff/discordMsgs/how%20yolo%20wkbk%20work%20discord.txt)
 - [Preserved Discord scoring guide](../dwbotStuff/discordMsgs/yolo%20scoring%20guide%20discord.txt)
