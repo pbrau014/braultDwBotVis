@@ -27,7 +27,6 @@
   }
   D.$('browse-button').addEventListener('click',()=>input.click());
   zone.addEventListener('click',e=>{if(e.target.id!=='browse-button')input.click();});
-  zone.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();input.click();}});
   input.addEventListener('change',()=>choose(input.files?.[0]));
   for(const name of ['dragenter','dragover'])zone.addEventListener(name,e=>{e.preventDefault();zone.classList.add('dragover');});
   for(const name of ['dragleave','drop'])zone.addEventListener(name,e=>{e.preventDefault();zone.classList.remove('dragover');});
