@@ -161,3 +161,15 @@ test('randomized 50-player tournament aggregate matches Excel-style G12/H12 unro
   assert.equal(`$${excelH12Equivalent.toFixed(2)}`, `$${(0.54 * excelG12Equivalent / 100).toFixed(2)}`);
   assert.equal(T.MAX_PLAYERS, 50);
 });
+
+
+test('standalone HTML score calculator matches DWBOT Grand Yolo tier-weight default and migration', async () => {
+  const html = await fs.readFile(path.join(__dirname, '..', 'dwbotStuff', 'yolo_tournament_scoreCalculator.html'), 'utf8');
+  assert.match(html, /grand:\s*\{pool:500, multiplier:1, tierWeight:0\.9, damageWeight:1, killsWeight:1, timeWeight:1\}/);
+  assert.match(html, /savedEvent\.tierWeight=legacyTier===undefined \? 0\.9 : num\(legacyTier\)/);
+  assert.match(html, /const legacyTier=old\.grandTierWeight \?\? old\.grandTierPower \?\? old\.tierPower \?\? 0\.9/);
+  assert.match(html, /function defaultSettingValue\(key,field\)\{ return key===\"grand\"&&field===\"tierWeight\" \? 0\.9 : 1; \}/);
+  assert.match(html, /Reset \$\{label\} to \$\{defaultValue\}/);
+  assert.match(html, /cfg\(key\)\[field\]=defaultValue/);
+  assert.match(html, /Grand Yolo Tier weight is 0\.9/);
+});
