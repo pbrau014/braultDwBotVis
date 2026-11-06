@@ -124,7 +124,8 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
         sourceWidth: Number(sourceMetadata.width), sourceHeight: Number(sourceMetadata.height), sourceImageBuffer: imageBuffer,
     });
     if (!Buffer.isBuffer(normalized?.buffer) || !normalized.buffer.length
-        || normalized.normalization?.method !== 'source-aspect-top-aligned-crop-v1') {
+        || normalized.normalization?.method !== 'source-aspect-top-aligned-crop-v1'
+        || normalized.similarity?.method !== 'original-source-resized-to-normalized-raster-v1') {
         throw fail('Searchable-PDF raster normalization did not return verified source-aspect metadata.', 'OCRSPACE_PDF_RASTER_NORMALIZATION_FAILED');
     }
     const rasterBuffer = normalized.buffer;
