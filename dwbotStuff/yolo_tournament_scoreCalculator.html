@@ -538,7 +538,7 @@ function loadState(){
     // One-time migration from previous builds. They used the same storage origin
     // but could retain stale scoring multipliers. Preserve the saved roster/results,
     // while resetting scoring settings to the requested workbook defaults (pool 500,
-    // every multiplier 1). This fixes an old H12-equivalent display without forcing
+    // every multiplier 1). This corrects legacy summary rendering without forcing
     // a reset of the player's entered game data.
     for(const oldKey of PRIOR_STORAGE_KEYS){
       const legacy=localStorage.getItem(oldKey);
