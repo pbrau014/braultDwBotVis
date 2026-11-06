@@ -466,7 +466,7 @@ const DEFAULT_SETTINGS = {
     damage: {pool:500, multiplier:1, tierPower:1},
     kills:  {pool:500, multiplier:1, tierPower:1},
     race:   {pool:500, multiplier:1, tierPower:1},
-    grand:  {pool:500, multiplier:1, tierWeight:1, damageWeight:1, killsWeight:1, timeWeight:1}
+    grand:  {pool:500, multiplier:1, tierWeight:0.9, damageWeight:1, killsWeight:1, timeWeight:1}
   }
 };
 let activePage = "dashboard";
@@ -480,6 +480,7 @@ function money(v){ return "$"+(Number.isFinite(v)?v:0).toLocaleString(undefined,
 function normalizeClass(code){ const c=String(code ?? "-").trim().toUpperCase(); return ["DD","CA","BB"].includes(c)?c:"-"; }
 function classWeightFor(code){ return ({DD:4,CA:3,BB:2})[normalizeClass(code)] ?? 0; }
 function makeDefaultSettings(){ return clone(DEFAULT_SETTINGS); }
+function defaultSettingValue(key,field){ return key==="grand"&&field==="tierWeight" ? 0.9 : 1; }
 
 function normalizeState(input){
   const result={players:Array.isArray(input.players)?input.players:clone(SEED),settings:makeDefaultSettings()};
@@ -489,10 +490,11 @@ function normalizeState(input){
       const savedEvent={...(old.events[key]||{})};
       if(key==="grand"){
         // Older versions stored this Round 4 coefficient under tierPower.
-        // The old workbook's default was 0.9; migrate that former default to 1.
+        // Match the live DWBOT scoring engine: Grand Yolo tierWeight defaults to 0.9.
+        // Preserve explicit legacy values instead of silently converting 0.9 to 1.
         if(savedEvent.tierWeight===undefined){
           const legacyTier= savedEvent.tierPower;
-          savedEvent.tierWeight=(legacyTier===undefined || Number(legacyTier)===0.9) ? 1 : num(legacyTier);
+          savedEvent.tierWeight=legacyTier===undefined ? 0.9 : num(legacyTier);
         }
         delete savedEvent.tierPower;
       }
@@ -504,8 +506,8 @@ function normalizeState(input){
       result.settings.events[key].pool=num(pools[key] ?? old.pool ?? 500);
       result.settings.events[key].multiplier=num(old.classBonus ?? 1);
       if(key==="grand"){
-        const legacyTier=old.grandTierWeight ?? old.grandTierPower ?? old.tierPower ?? 1;
-        result.settings.events[key].tierWeight=num(Number(legacyTier)===0.9 ? 1 : legacyTier);
+        const legacyTier=old.grandTierWeight ?? old.grandTierPower ?? old.tierPower ?? 0.9;
+        result.settings.events[key].tierWeight=num(legacyTier);
         result.settings.events[key].damageWeight=num(old.damageWeight ?? 1);
         result.settings.events[key].killsWeight=num(old.killsWeight ?? 1);
         result.settings.events[key].timeWeight=num(old.timeWeight ?? 1);
@@ -634,11 +636,11 @@ function renderPlayers(){
   ${state.players.map((p,i)=>{const d=KEYS.reduce((s,k)=>s+eventScore(p,k),0);return `<tr><td>${i+1}</td><td><input aria-label="Player name" data-player-name="${p.id}" value="${esc(p.name)}"></td><td class="result">${fmt(d)}</td><td class="money">${money(dollars(d))}</td><td><button class="danger" data-remove="${p.id}">Remove</button></td></tr>`}).join("")||`<tr><td colspan="5" class="empty">No players yet. Add a player to get started.</td></tr>`}
   </tbody></table></div><div class="hint">Removing a player removes their results from every event. Export a backup before making major roster changes.</div></section>`;
 }
-function multiplierField(key, field, label, description, example){
+function multiplierField(key, field, label, description, example, defaultValue=1){
   const id=`${key}-${field}`;
   const value=cfg(key)[field];
   return `<div class="field multiplier-field">
-    <div class="multiplier-head"><label for="${id}">${label}</label><button type="button" class="reset-one" data-reset-setting="${key}|${field}" aria-label="Reset ${label} to 1">Reset to 1</button></div>
+    <div class="multiplier-head"><label for="${id}">${label}</label><button type="button" class="reset-one" data-reset-setting="${key}|${field}" aria-label="Reset ${label} to ${defaultValue}">Reset to ${defaultValue}</button></div>
     <input id="${id}" type="number" step="0.1" inputmode="decimal" data-setting="${key}|${field}" value="${esc(value)}" aria-describedby="${id}-note ${id}-example">
     <p class="field-note" id="${id}-note">${description}</p>
     <p class="field-example" id="${id}-example"><strong>Example:</strong> ${example}</p>
@@ -656,7 +658,7 @@ function renderEvent(key){
   const overallDescription="Scales the entire round score after its other calculations. At 1, the score is unchanged; 2 doubles it; 0 turns this round's award off.";
   const overallExample="Use 2 if this round should count twice as much toward the tournament total; return to 1 for the standard workbook weighting.";
   const multiplierControls=grand
-    ? `${multiplierField(key,"tierWeight","Tier weight","Scales only the base 100 ÷ tier contribution in each Grand Yolo game. At 1 it is unchanged; 2 doubles this part; 0 removes this part without removing damage, kills, or time.","Use 2 when tier-based points should matter twice as much while leaving the other three contributions unchanged.")}
+    ? `${multiplierField(key,"tierWeight","Tier weight","Scales only the base 100 ÷ tier contribution in each Grand Yolo game. The workbook/DWBOT default is 0.9; 1 uses the unscaled base term, 2 doubles it, and 0 removes it without removing damage, kills, or time.","Keep 0.9 for the workbook/DWBOT default; use 1 only when the organizer intentionally wants the base tier term increased by 1/0.9.",0.9)}
        ${multiplierField(key,"damageWeight","Damage weight","Scales the damage contribution (damage ÷ tier ÷ 1,000). Increasing it raises damage's influence; 0 ignores the damage term.","Use 2 when damage should count twice as much within Grand Yolo, without changing Kills or Time weights.")}
        ${multiplierField(key,"killsWeight","Kills weight","Scales the kills contribution (kills × 10 ÷ tier). Increasing it raises kill points; 0 ignores the kills term.","Use 2 when each game's kill contribution should be doubled while damage and time stay as they are.")}
        ${multiplierField(key,"timeWeight","Time weight","Scales the time contribution (5 ÷ time × 1,000). Larger weights make this term count more; 0 removes it. The formula rewards lower times with a larger base time term.","Use 2 if the time-derived contribution should have twice its current influence. Keep at 1 for the default formula.")}`
@@ -666,7 +668,7 @@ function renderEvent(key){
     : "Sets the pool factor used by this round's score formula. With all other values fixed, increasing the pool by 10% increases this round's calculated scores by 10%; event totals are not normalized to spend exactly the pool.";
   return `<section class="panel">
     <div class="panel-head"><div><div class="eyebrow">${grand?"Combined scoring":"Event scoring"}</div><h2>${meta.title}</h2><p>${meta.subtitle}</p></div><span class="chip">7 games per player</span></div>
-    <div class="explainer-banner"><strong>How to use these settings:</strong> Start at 1 for the standard weighting. Use the explanation and example under each control to understand the effect. <strong>Reset to 1</strong> resets only that multiplier and keeps all game results. The number steppers change each multiplier by exactly 0.1 (one tenth).</div>
+    <div class="explainer-banner"><strong>How to use these settings:</strong> Start with the displayed workbook/DWBOT defaults (Grand Yolo Tier weight is 0.9; other multipliers are 1). Use the explanation and example under each control to understand the effect. Each reset button restores that setting's actual default and keeps all game results. The number steppers change each multiplier by exactly 0.1 (one tenth).</div>
     <div class="controls no-print">
       <div class="field pool"><label for="${key}-poolInput">${grand?"Doubloon pool (not used in Round 4)":"Doubloon pool"}</label><input title="Workbook pool cell" type="number" min="0" step="any" id="${key}-poolInput" data-setting="${key}|pool" value="${esc(settings.pool)}"><p class="field-note">${poolDescription}</p></div>
       ${multiplierField(key,"multiplier","Overall multiplier",overallDescription,overallExample)}
@@ -739,7 +741,7 @@ function fieldLabel(field){
   return ({multiplier:"Overall multiplier",tierPower:"Tier power",tierWeight:"Tier weight",damageWeight:"Damage weight",killsWeight:"Kills weight",timeWeight:"Time weight"})[field]||field;
 }
 function resetEntireSite(){
-  if(!confirm("Reset the ENTIRE site to defaults? This replaces the current roster and every game result with the original workbook data, resets all pools to 500 and all multipliers to 1, and returns the layout to desktop. Export a backup first if you want to keep current work."))return;
+  if(!confirm("Reset the ENTIRE site to defaults? This replaces the current roster and every game result with the original workbook data, resets all pools to 500, standard multipliers to 1, and Grand Yolo tier weight to 0.9, and returns the layout to desktop. Export a backup first if you want to keep current work."))return;
   if(editRenderTimer!==null){clearTimeout(editRenderTimer);editRenderTimer=null;}
   state=normalizeState({players:clone(SEED),settings:makeDefaultSettings()});
   activePage="dashboard";
@@ -760,7 +762,7 @@ document.addEventListener("click",e=>{
   if(resetOne){
     const [key,field]=resetOne.dataset.resetSetting.split("|");
     if(cfg(key) && ["multiplier","tierPower","tierWeight","damageWeight","killsWeight","timeWeight"].includes(field) && Object.prototype.hasOwnProperty.call(cfg(key),field)){
-      cfg(key)[field]=1;persist();render();setStatus(`${EVENT_META[key].title}: ${fieldLabel(field)} reset to 1.`);
+      const defaultValue=defaultSettingValue(key,field);cfg(key)[field]=defaultValue;persist();render();setStatus(`${EVENT_META[key].title}: ${fieldLabel(field)} reset to ${defaultValue}.`);
     }
     return;
   }
