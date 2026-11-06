@@ -31,7 +31,7 @@ function fail(message) {
     process.exitCode = 1;
 }
 
-async function auditArtifacts(report, selected) {
+async function auditArtifacts(report, selected, networkLogReconciliation) {
     const rows = [];
     for (const key of selected) {
         const result = (report?.results || []).find(item => item.fixtureKey === key);
@@ -71,6 +71,7 @@ async function auditArtifacts(report, selected) {
         artifactDirectory: artifactDir,
         sourceCount: selected.length,
         verifiedPdfCount: rows.filter(row => row.valid).length,
+        networkLogReconciliation,
         images: rows,
     };
     const auditPath = reportPath + '.pdf-audit.json';
@@ -89,6 +90,27 @@ async function main() {
     if (!String(process.env.OCRSPACE_API_KEY || '').trim()) throw new Error('OCRSPACE_API_KEY is required; four-image PDF-first acceptance is blocked.');
     const resumeFromPath = String(process.env.FOUR_SCREENSHOT_RESUME_FROM || '').trim()
         ? path.resolve(process.env.FOUR_SCREENSHOT_RESUME_FROM) : null;
+    let priorProgress = null;
+    let networkLogReconciliation = { status: 'NOT_APPLICABLE_FRESH_RUN', originalLogPresent: true, originalZeroAttemptsClaimed: true };
+    if (resumeFromPath) {
+        priorProgress = JSON.parse(await fs.promises.readFile(resumeFromPath, 'utf8'));
+        const priorLogPath = String(priorProgress.networkDiagnosticLogPath || '').trim();
+        if (!priorLogPath) {
+            networkLogReconciliation = { status: 'MISSING_ORIGINAL_LOG_PATH', originalLogPresent: false, originalZeroAttemptsClaimed: false, originalBlockedAttemptCount: null };
+        } else {
+            try {
+                const priorLog = await fs.promises.readFile(priorLogPath);
+                networkLogReconciliation = {
+                    status: 'ORIGINAL_LOG_PRESENT', originalLogPath: priorLogPath,
+                    originalLogPresent: true, originalLogBytes: priorLog.length,
+                    originalLogSha256: sha256(priorLog), originalZeroAttemptsClaimed: priorLog.length === 0,
+                    originalBlockedAttemptCount: priorLog.length === 0 ? 0 : null,
+                };
+            } catch {
+                networkLogReconciliation = { status: 'MISSING_ORIGINAL_LOG', originalLogPath: priorLogPath, originalLogPresent: false, originalZeroAttemptsClaimed: false, originalBlockedAttemptCount: null };
+            }
+        }
+    }
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const actualReportPath = resumeFromPath ? reportPath + '.resume-' + timestamp + '.json' : reportPath;
     const actualProgressPath = actualReportPath + '.progress.json';
@@ -132,7 +154,7 @@ async function main() {
     let report;
     try { report = JSON.parse(await fs.promises.readFile(actualReportPath, 'utf8')); }
     catch (error) { throw new Error(`Sequence report was not written or is invalid: ${error.message}`); }
-    const auditResult = await auditArtifacts(report, selected);
+    const auditResult = await auditArtifacts(report, selected, networkLogReconciliation);
     const network = report.networkIsolation || {};
     const rowsExact = (report.results || []).length === selected.length
         && report.results.every(row => row.pipelineCompleted === true
@@ -156,7 +178,10 @@ async function main() {
         pdfAndRasterArtifactsVerified: auditResult.passed,
         childExitedZero: exit.code === 0 && !exit.signal,
         networkDiagnosticLogPresent: fs.existsSync(actualNetworkLogPath),
-        noDeniedLogEntries: fs.existsSync(actualNetworkLogPath) && (await fs.promises.stat(actualNetworkLogPath)).size === 0,
+        originalNetworkDiagnosticLogPresent: !resumeFromPath || networkLogReconciliation.originalLogPresent === true,
+        originalNetworkLogNoDeniedAttempts: !resumeFromPath || networkLogReconciliation.originalZeroAttemptsClaimed === true,
+        noDeniedLogEntries: fs.existsSync(actualNetworkLogPath) && (await fs.promises.stat(actualNetworkLogPath)).size === 0
+            && (!resumeFromPath || networkLogReconciliation.originalLogPresent === true && networkLogReconciliation.originalZeroAttemptsClaimed === true),
     };
     for (const [name, passed] of Object.entries(checks)) {
         console.log(`[FOUR-IMAGE] ${passed ? 'PASS' : 'FAIL'} ${name}`);
