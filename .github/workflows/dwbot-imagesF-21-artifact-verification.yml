@@ -35,6 +35,12 @@ jobs:
       - name: Install bounded PDF and image verification tools
         shell: powershell
         run: |
+          choco install tesseract --version=5.5.3.20260724 --yes --no-progress
+          $tesseract = Get-Command tesseract.exe -ErrorAction Stop
+          $tessdata = Join-Path (Split-Path $tesseract.Source -Parent) 'tessdata'
+          if (-not (Test-Path (Join-Path $tessdata 'eng.traineddata'))) { throw 'English Tesseract model is missing.' }
+          "TESSERACT_BIN=$($tesseract.Source)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "TESSERACT_LANG_PATH=$tessdata" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           $magick = Get-Command magick.exe -ErrorAction SilentlyContinue
           if (-not $magick) {
             choco install imagemagick --yes --no-progress
