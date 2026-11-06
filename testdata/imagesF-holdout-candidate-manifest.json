@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "title": "imagesF derived OCR.Space PDF-first evaluation candidate corpus",
+  "sourceArchive": {
+    "filename": "imagesF.zip",
+    "bytes": 30540663,
+    "sha256": "5e247c841701ee68a5c8179f8ee28dccbf6bc4cd3706d5c831a7e04473ce5e8a"
+  },
+  "derivedCandidateArchive": {
+    "filename": "DWBOT_IMAGESF_HOLDOUT_CANDIDATE_63.zip",
+    "bytes": 25862132,
+    "sha256": "6294944fbad9df05feeeac57b68acaf12642f8c883697748cad3b1a88f8bcba3"
+  },
+  "derivedFullManifest": {
+    "filename": "DWBOT_IMAGESF_HOLDOUT_CANDIDATE_MANIFEST.json",
+    "sha256": "c84f590e61ef835c9b53cf6baceb3f1937cf88b06cb9aafaf0472c65f796ffc6",
+    "containsPerImageSha256AndDimensions": true
+  },
+  "sourceImageCount": 69,
+  "candidateImageCount": 63,
+  "developmentOverlapExcluded": [
+    "Screenshot_16.jpg",
+    "Screenshot_2023-02-21_20-54-39.png",
+    "Screenshot_2024-11-14_133326.png"
+  ],
+  "duplicateDisposition": [
+    {
+      "kind": "exact_byte_duplicate",
+      "retained": "Screenshot_379.png",
+      "removed": "Scree7nshot_379.png",
+      "reason": "identical SHA-256 and byte length"
+    },
+    {
+      "kind": "same_battle_near_duplicate",
+      "retained": "pics-page1-image25.jpg",
+      "removed": "pics-page1-image26.jpg",
+      "reason": "visual review confirmed same battle/result screen; crop/framing differs"
+    },
+    {
+      "kind": "same_battle_near_duplicate",
+      "retained": "pics-page2-image6.jpg",
+      "removed": "pics-page2-image7.jpg",
+      "reason": "visual review confirmed same battle/result screen; crop/framing differs"
+    }
+  ],
+  "removedImageCount": 6,
+  "requiredFields": ["result", "player", "map", "mode", "battleStart", "credits", "freeXp", "damage", "xp"],
+  "groundTruthStatus": "incomplete_not_acceptance_grade",
+  "groundTruthQualification": "The supplied 56-image review workbook has 46 populated image rows, 36 complete nine-field rows, 10 partial rows, and 10 eligible images without a row. The supplied JSON is an integrity inventory, not full expected-value ground truth. Missing values remain unknown; no values were inferred or invented.",
+  "usePolicy": "Exploratory provider extraction and pipeline diagnostics only. Do not report independent Gate B accuracy acceptance until all retained images have frozen, independently verified expected values for all nine required fields."
+}
