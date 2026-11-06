@@ -68,6 +68,9 @@ async function prepare(options) {
     const originalJobLogPath = path.join(partialRoot, 'original-run.log');
     const originalJobLog = await fs.readFile(originalJobLogPath, 'utf8');
     const originalStartedFixtures = extractStartedFixtures(originalJobLog);
+    const preservedOriginalJobLogPath = path.join(sourceRoot, 'testdata', 'gateA-16', 'original-run-42202563673.log');
+    await fs.mkdir(path.dirname(preservedOriginalJobLogPath), { recursive: true });
+    await fs.writeFile(preservedOriginalJobLogPath, originalJobLog, { flag: 'wx' });
     if (originalStartedFixtures.length !== 1 || originalStartedFixtures[0].index !== 1
         || originalStartedFixtures[0].fixtureKey !== 'Screenshot_16.jpg') {
         throw new Error('Original job log does not prove exactly one start for Screenshot_16.jpg; refusing to resume any provider work.');
@@ -237,6 +240,7 @@ async function prepare(options) {
         originalNetworkLogStatus: 'MISSING_FROM_ORIGINAL_PARTIAL_ARTIFACT',
         originalNetworkAttemptCount: null,
         originalJobLogSha256: sha256(Buffer.from(originalJobLog, 'utf8')),
+        preservedOriginalJobLogPath: path.relative(sourceRoot, preservedOriginalJobLogPath),
         originalProviderStartCount: originalStartedFixtures.length,
         originalProviderStartedFixtureKeys: originalStartedFixtures.map(item => item.fixtureKey),
         orchestrationOverlay: { candidateRunnerSha256, runnerOverlaySha256, helperOverlaySha256 },
