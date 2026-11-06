@@ -120,3 +120,43 @@ The 16-image reference file exists, but its source archive `imgs2add.zip` is not
 - Four-source consensus strategies and tie rejection are covered by regression tests.
 - Exact-head CI for the latest code is pending; no passing result is claimed until the exact run completes.
 
+
+
+## 9. Gate A preflight and interrupted partial attempt
+
+The original `imgs2add.zip` archive bytes remain unavailable, but the repository
+contains the exact 16 individual fixture files referenced by the existing
+ground-truth manifest. The Gate A preflight verified all 16 per-image SHA-256
+values, unique membership, valid dimensions and all nine expected fields.
+The deterministic corpus fingerprint is
+`6c03d85173bb07103cee9a3075ffa708751b36da2ba3bb49d27fedcdb8468efe`; the
+manifest SHA-256 is
+`9e8ab701428a93e0ceb2306447e29bedd697b1c2ed50520d057414d8224e79bd`.
+The preflight matched the candidate source commit
+`adaf4f8c3a9573f56d0348a4bba36686fc31c22e` and made zero provider requests.
+
+Gate A run [#42202563673](https://github.com/pbrau014/braultDwBotVis/actions/runs/42202563673)
+was interrupted during image 1/16. Its uploaded artifact
+`dwbot-gateA-16-pdf-first-42202563673` (ID `13495008195`, ZIP SHA-256
+`398f8152847cd3ea58fb9e16ac01886fced0c880869ce6a430d3343e5cb4ecd8`)
+contains a searchable one-page PDF and PDF-derived raster for
+`Screenshot_16.jpg`, whose source SHA-256 matches the manifest. The PDF is
+535,706 bytes (SHA-256
+`98532da5058778aeee8a46515a8a6a12a3c20cb865565f974271706777b7ec93`) and
+contains 550 characters of searchable text. The raster is 1,033,392 bytes,
+1818×2573 (SHA-256
+`620fd7395a4736d6c95a3ab89a1cb2924cfb019e7547d534b1ffcde6458bda72`).
+
+The other 15 images were not processed. No local-reader report or complete
+sequence report was uploaded. The original run used Node 22.16.0, below the
+accepted Node >=24.17.0 runtime. Its restricted-egress log is missing, and
+the candidate's old guard silently catches log-write failures. The historical
+blocked-attempt count is therefore UNKNOWN; no zero-attempt claim is made.
+The second queued run was cancelled before execution, and no duplicate
+submission of the first image was made.
+
+The current Gate A workflow definition has been updated to Node 24.17.0 with
+an explicit runtime check. These changes cannot repair the interrupted run.
+Gate A remains NOT PASSED. Any continuation must verify and reuse the existing
+PDF/raster for image 1, process only the 15 remaining source hashes, and retain
+the original missing-log/runtime limitations in the report.
