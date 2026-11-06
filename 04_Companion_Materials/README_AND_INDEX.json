@@ -40,7 +40,10 @@
     "Training_Room_Host_and_Referee_Guide_v1.1_DRAFT.md",
     "Season_Logistics_and_Grand_YOLO_Finale_Blueprint_v0.1_PROPOSAL.md",
     "Participant_Quick_Start_Evidence_and_Results_v1.2_WORKING_UPDATE.md",
-    "Season_Logistics_and_Grand_YOLO_Finale_Blueprint_v0.2_PROPOSAL.md"
+    "Season_Logistics_and_Grand_YOLO_Finale_Blueprint_v0.2_PROPOSAL.md",
+    "Admiralty_YOLO_Source_Reconciliation_and_Visual_Provenance_v0.1.md",
+    "Admiralty_YOLO_Mock_Tournament_Field_Guide_v0.1_PROPOSAL.md",
+    "Admiralty_YOLO_Mock_Tournament_v0.1.html"
   ],
   "human_approval_status": "No event-specific approver name, signature timestamp, effective time, or event-specific values were supplied. This does not block documentation package publication under the waiver and does not constitute approval of a particular event.",
   "source_conflict_dispositions": {
@@ -89,5 +92,15 @@
       ],
       "publication_note": "The v1.1 DOCX/PDF remain the released publication until the v1.2 source is reviewed and rendered."
     }
-  ]
+  ],
+  "narrative_companion": {
+    "files": [
+      "Admiralty_YOLO_Mock_Tournament_Field_Guide_v0.1_PROPOSAL.md",
+      "Admiralty_YOLO_Mock_Tournament_v0.1.html",
+      "Admiralty_YOLO_Source_Reconciliation_and_Visual_Provenance_v0.1.md"
+    ],
+    "status": "PROPOSAL / MOCK TOURNAMENT; fictional narrative and visual companion; no event approval",
+    "sources": "Admiralty handbook, CBStrat Tier X Clan Battles guide, YOLO recurring/Pilot documents, three preserved Discord source texts, archival workbook, and current public game/tournament references",
+    "boundaries": "Pilot and recurring rules remain distinct; bracket wins advance; damage drives individual damage awards/cumulative Grand YOLO damage; race uses DWBOT C01 inverse-time policy; canonical workbook and event settings still govern live scoring"
+  }
 }
