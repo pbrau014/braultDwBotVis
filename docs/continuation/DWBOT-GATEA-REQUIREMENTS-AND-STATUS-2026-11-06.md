@@ -81,8 +81,7 @@ Preflight result:
 - Status: `PREFLIGHT_PASS_NO_PROVIDER_REQUESTS`
 - Candidate/source commit: `adaf4f8c3a9573f56d0348a4bba36686fc31c22e`
 - Deterministic corpus fingerprint: `6c03d85173bb07103cee9a3075ffa708751b36da2ba3bb49d27fedcdb8468efe`
-- Manifest SHA-256: `57fe533e7dd4b0d8df77629a5e48c6fdb58f466c` (Git blob SHA; the
-  preflight report separately records the SHA-256 of manifest bytes).
+- Manifest SHA-256: `9e8ab701428a93e0ceb2306447e29bedd697b1c2ed50520d057414d8224e79bd`.
 
 A one-time Gate A provider run was started at
 [#42202563673](https://github.com/pbrau014/braultDwBotVis/actions/runs/42202563673).
