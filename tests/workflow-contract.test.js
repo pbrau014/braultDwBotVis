@@ -227,7 +227,7 @@ test('63-image exploratory workflow persists restricted-egress attempts for arti
 
 test('billable imagesF extraction workflow supports fingerprint-bound no-duplicate resume', () => {
     const workflow = read('.github/workflows/dwbot-imagesF-63-exploratory.yml');
-    assert.ok(workflow.includes('node-version: 24.17.0'));
+    assert.ok(workflow.includes('node-version: 22.16.0'));
     assert.ok(workflow.includes('Assert accepted Node.js runtime'));
     const runner = read('scripts/run-ocrspace-imagesF-63-exploratory.js');
     const resumeGuard = read('src/ocrspace-exploratory-resume.js');
@@ -278,7 +278,7 @@ test('19-image Gate B artifact workflow verifies the completed run without provi
 
 test('Gate A acceptance uses the accepted runtime, fail-closed network guard and preserves interruption checkpoints', () => {
     const workflow = read('.github/workflows/dwbot-gateA-16-pdf-first.yml');
-    assert.ok(workflow.includes('node-version: 24.17.0'));
+    assert.ok(workflow.includes('node-version: 22.16.0'));
     assert.ok(workflow.includes('runtimePass'));
     assert.ok(workflow.includes('Configure fail-closed restricted-egress diagnostic preload'));
     assert.ok(workflow.includes('source/scripts/block-network.js'));
@@ -311,11 +311,11 @@ test('four-image PDF-first runner refuses duplicates and supports fingerprint-bo
 });
 
 
-test('ordinary verification uses Node 24.17 and cannot submit the legacy 56-image provider batch', () => {
+test('ordinary verification uses Node 22.16 and cannot submit the legacy 56-image provider batch', () => {
     const workflow = read('.github/workflows/dwbot-verification.yml');
     const pkg = JSON.parse(read('package.json'));
-    assert.equal(pkg.engines.node, '>=24.17.0');
-    assert.ok(workflow.includes('node-version: 24.17.0'));
+    assert.equal(pkg.engines.node, '>=22.16.0');
+    assert.ok(workflow.includes('node-version: 22.16.0'));
     assert.ok(workflow.includes('run_legacy_56_provider_acceptance'));
     assert.ok(workflow.includes("if: github.event_name == 'workflow_dispatch' && inputs.run_legacy_56_provider_acceptance == true"));
 });

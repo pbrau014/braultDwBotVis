@@ -184,3 +184,36 @@ The canonical living plan controls the operational queue and supersedes older da
   metrics and fingerprint/hash formats, but does not parse the underlying Gate
   A report. Preserve and manually verify the original Gate A report, its SHA-256
   and the candidate fingerprint against the Gate B run before recording PASS.
+
+ 
+## Parallel multi-reader OCR requirement — 2026-11-06
+
+- After OCR.Space Engine 2 creates a validated searchable PDF and the PDF is
+  locally rasterized, run Tesseract.js, native Tesseract and PaddleOCR as
+  independent concurrent diagnostic readers against the same PDF-derived
+  raster. Extract the PDF searchable text layer concurrently as a separate
+  evidence source. Keep OCR.Space provider-parsed text separate as well.
+- OpenCV is a local geometry/crop proposal stage for PaddleOCR, not an OCR text
+  engine. PaddleOCR must use explicitly staged local PP-OCRv6 model directories;
+  no implicit default model download or inference-time network access.
+- Preserve all prior OCR outputs. New reader outputs are separately bound to
+  the exact PDF and raster SHA-256 values. Isolated child processes use
+  Promise.allSettled so one reader failure does not discard other outputs.
+  Record engine/model versions, configuration, latency, candidates, conflicts,
+  missing fields, failures and restricted-egress diagnostics.
+- Compare each individual reader, pairwise combinations, existing four-source
+  fusion, five-source majority (3/5), strict five-source consensus (4/5), and
+  three-local-reader consensus (2/3). Player identity is excluded from PDF and
+  provider text; only local readers may contribute. Ties and conflicts remain
+  unresolved. No diagnostic candidate is auto-accepted.
+- Gate B's local-only workflow provisions PaddleOCR 3.7.0 / PaddlePaddle 3.3.1
+  and official PP-OCRv6 English medium models, verifies local inference offline,
+  then executes the concurrent matrix. This workflow makes no OCR.Space calls.
+- Gate A remains blocked: its original 16-image source archive is unavailable
+  and the interrupted run produced only one PDF/raster pair. Apply the same
+  matrix to the complete Gate A artifacts when available; do not invent or
+  substitute missing source images or PDFs. Existing Gate B PDFs are reused;
+  no duplicate provider submissions.
+- Runtime authority is Node.js >=22.16.0. Package manifest, lockfile, active
+  workflows and tests now agree. Historical workflow runtime reports remain
+  unchanged and are not rewritten.

@@ -115,10 +115,15 @@ async function main() {
         pdfTextPlusNativePlayer: { fields: FIELDS, eligible: 0, exact: 0, wrong: 0, unresolved: 0 },
         providerTextPlusTesseractJsPlayer: { fields: FIELDS, eligible: 0, exact: 0, wrong: 0, unresolved: 0 },
         providerTextPlusNativePlayer: { fields: FIELDS, eligible: 0, exact: 0, wrong: 0, unresolved: 0 },
+        pdfTextPlusPaddlePlayer: { fields: FIELDS, eligible: 0, exact: 0, wrong: 0, unresolved: 0 },
+        providerTextPlusPaddlePlayer: { fields: FIELDS, eligible: 0, exact: 0, wrong: 0, unresolved: 0 },
         pdfProviderConsensus: { fields: FIELDS, eligible: 0, exact: 0, wrong: 0, unresolved: 0 },
         fourSourceConsensus: { fields: FIELDS, eligible: 0, exact: 0, wrong: 0, unresolved: 0 },
         strictFourSourceConsensus: { fields: FIELDS, eligible: 0, exact: 0, wrong: 0, unresolved: 0 },
         strictThreeSourceConsensus: { fields: FIELDS, eligible: 0, exact: 0, wrong: 0, unresolved: 0 },
+        fiveSourceConsensus: { fields: FIELDS, eligible: 0, exact: 0, wrong: 0, unresolved: 0 },
+        strictFiveSourceConsensus: { fields: FIELDS, eligible: 0, exact: 0, wrong: 0, unresolved: 0 },
+        threeLocalReaderConsensus: { fields: FIELDS, eligible: 0, exact: 0, wrong: 0, unresolved: 0 },
     };
     const images = [];
     for (const expectedRow of selected) {
@@ -151,7 +156,7 @@ async function main() {
         const text = await extractPdfText(pdfPath);
         const pdfCandidates = parseTextLayer(text);
         const providerCandidates = parseProviderText(row.providerResponse?.parsedText || '');
-        const readers = Object.fromEntries(['tesseractjs', 'native'].map(engine => [
+        const readers = Object.fromEntries(['tesseractjs', 'native', 'paddleocr'].map(engine => [
             engine, (row.localReaders || []).find(reader => reader.engine === engine)?.record || {}
         ]));
         const combined = {
@@ -161,30 +166,46 @@ async function main() {
             pdfTextPlusNativePlayer: score(expectedRow.expected, { ...pdfCandidates, player: readers.native.player }, FIELDS),
             providerTextPlusTesseractJsPlayer: score(expectedRow.expected, { ...providerCandidates, player: readers.tesseractjs.player }, FIELDS),
             providerTextPlusNativePlayer: score(expectedRow.expected, { ...providerCandidates, player: readers.native.player }, FIELDS),
+            pdfTextPlusPaddlePlayer: score(expectedRow.expected, { ...pdfCandidates, player: readers.paddleocr.player }, FIELDS),
+            providerTextPlusPaddlePlayer: score(expectedRow.expected, { ...providerCandidates, player: readers.paddleocr.player }, FIELDS),
         };
         const pdfProviderRecord = {};
         const fourSourceRecord = {};
         const strictFourSourceRecord = {};
         const strictThreeSourceRecord = {};
+        const fiveSourceRecord = {};
+        const strictFiveSourceRecord = {};
+        const threeLocalReaderRecord = {};
         for (const field of FIELDS) {
             if (field === 'player') {
-                const playerCandidates = [readers.tesseractjs.player, readers.native.player];
+                const playerCandidates = [readers.tesseractjs.player, readers.native.player, readers.paddleocr.player];
                 pdfProviderRecord[field] = consensus(playerCandidates, field, 2);
                 fourSourceRecord[field] = consensus(playerCandidates, field, 2);
                 strictFourSourceRecord[field] = consensus(playerCandidates, field, 2);
                 strictThreeSourceRecord[field] = consensus(playerCandidates, field, 2);
+                fiveSourceRecord[field] = consensus(playerCandidates, field, 2);
+                strictFiveSourceRecord[field] = consensus(playerCandidates, field, 3);
+                threeLocalReaderRecord[field] = consensus(playerCandidates, field, 2);
             } else {
                 pdfProviderRecord[field] = consensus([pdfCandidates[field], providerCandidates[field]], field, 2);
                 const allCandidates = [pdfCandidates[field], providerCandidates[field], readers.tesseractjs[field], readers.native[field]];
+                const fiveCandidates = [...allCandidates, readers.paddleocr[field]];
+                const localCandidates = [readers.tesseractjs[field], readers.native[field], readers.paddleocr[field]];
                 fourSourceRecord[field] = consensus(allCandidates, field, 2);
                 strictFourSourceRecord[field] = consensus(allCandidates, field, 3);
                 strictThreeSourceRecord[field] = consensus([pdfCandidates[field], readers.tesseractjs[field], readers.native[field]], field, 2);
+                fiveSourceRecord[field] = consensus(fiveCandidates, field, 3);
+                strictFiveSourceRecord[field] = consensus(fiveCandidates, field, 4);
+                threeLocalReaderRecord[field] = consensus(localCandidates, field, 2);
             }
         }
         combined.pdfProviderConsensus = score(expectedRow.expected, pdfProviderRecord, FIELDS);
         combined.fourSourceConsensus = score(expectedRow.expected, fourSourceRecord, FIELDS);
         combined.strictFourSourceConsensus = score(expectedRow.expected, strictFourSourceRecord, FIELDS);
         combined.strictThreeSourceConsensus = score(expectedRow.expected, strictThreeSourceRecord, FIELDS);
+        combined.fiveSourceConsensus = score(expectedRow.expected, fiveSourceRecord, FIELDS);
+        combined.strictFiveSourceConsensus = score(expectedRow.expected, strictFiveSourceRecord, FIELDS);
+        combined.threeLocalReaderConsensus = score(expectedRow.expected, threeLocalReaderRecord, FIELDS);
         for (const [key, value] of Object.entries(combined)) {
             const target = aggregate[key];
             for (const metric of ['eligible', 'exact', 'wrong', 'unresolved']) target[metric] += value.metrics[metric];
@@ -197,9 +218,10 @@ async function main() {
         image.localReaderAvailability = {
             tesseractjs: Boolean((row.localReaders || []).some(reader => reader.engine === 'tesseractjs')),
             native: Boolean((row.localReaders || []).some(reader => reader.engine === 'native')),
+            paddleocr: Boolean((row.localReaders || []).some(reader => reader.engine === 'paddleocr' && ['complete', 'partial'].includes(reader.status))),
         };
         image.comparisons = Object.fromEntries(Object.entries(combined).map(([key, value]) => [key, value]));
-        image.consensusCandidates = { pdfProvider: pdfProviderRecord, fourSource: fourSourceRecord, strictFourSource: strictFourSourceRecord, strictThreeSource: strictThreeSourceRecord };
+        image.consensusCandidates = { pdfProvider: pdfProviderRecord, fourSource: fourSourceRecord, strictFourSource: strictFourSourceRecord, strictThreeSource: strictThreeSourceRecord, fiveSource: fiveSourceRecord, strictFiveSource: strictFiveSourceRecord, threeLocalReaders: threeLocalReaderRecord };
         images.push(image);
     }
     for (const metric of Object.values(aggregate)) metric.exactMatchRate = metric.eligible ? metric.exact / metric.eligible : null;
@@ -222,6 +244,9 @@ async function main() {
             fourSourceConsensus: 'Unique majority of at least two among PDF text layer, OCR.Space parsed text, Tesseract.js and native Tesseract; player uses the two local readers',
             strictFourSourceConsensus: 'Three of four non-identity sources must agree; player uses the two local readers',
             strictThreeSourceConsensus: 'Two matching candidates required; PDF text layer + Tesseract.js + native Tesseract for non-identity fields; local Tesseract.js + native Tesseract for player',
+            fiveSourceConsensus: 'At least three matching candidates among PDF text layer, OCR.Space parsed text, Tesseract.js, native Tesseract and PaddleOCR; player uses at least two local readers',
+            strictFiveSourceConsensus: 'At least four matching candidates among five non-identity sources; player requires all three local readers to agree',
+            threeLocalReaderConsensus: 'At least two matching candidates among Tesseract.js, native Tesseract and PaddleOCR; PDF/provider text excluded',
             acceptance: 'No candidate in this report is accepted or written to the production battle record; all results are diagnostic only.',
         },
         aggregate,

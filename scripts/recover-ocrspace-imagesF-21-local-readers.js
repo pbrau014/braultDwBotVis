@@ -6,6 +6,7 @@
 
 const fs = require('node:fs/promises');
 const path = require('node:path');
+const os = require('node:os');
 const crypto = require('node:crypto');
 
 process.env.OCRSPACE_ENABLED = '0';
@@ -21,9 +22,12 @@ require('./block-network');
 
 const imageProcessor = require('../src/image-processor');
 const bot = require('../src/bot');
+const { runSupervisedProcess } = require('../src/ocr-process-supervisor');
+const { extractPdfText } = require('./verify-ocrspace-imagesF-21-artifacts');
+const { parseTextLayer } = require('./evaluate-ocrspace-pdf-text-layer');
 
 const FIELDS = ['result', 'player', 'map', 'mode', 'battleStart', 'credits', 'freeXp', 'damage', 'xp'];
-const ENGINES = ['tesseractjs', 'native'];
+const ENGINES = ['tesseractjs', 'native', 'paddleocr'];
 const INVENTORY = 'complete-ground-truth-21';
 
 function sha256(buffer) {
@@ -53,21 +57,55 @@ function selectedRecords(gt) {
     return selected;
 }
 
-async function extractLocalReader(rasterBuffer, engine) {
-    process.env.OCR_ENGINE = engine;
-    const output = await bot.extractText(rasterBuffer);
-    const attempt = output.attempts?.[output.attempts.length - 1] || output.attempts?.[0] || { text: '' };
-    const validation = bot.validateWorldOfWarshipsScreenshot(attempt, output.fields || {});
-    return {
-        engine,
-        record: validation.record,
-        missing: validation.missing,
-        accepted: validation.accepted,
-        textCharacters: String(attempt.text || '').length,
-        confidence: validation.confidence,
-        pageSegmentationMode: validation.pageSegmentationMode,
-        ambiguities: validation.record?.ambiguities || {}
+async function extractLocalReader(rasterBuffer, engine, networkLogPath) {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'dwbot-parallel-reader-'));
+    const outputPath = path.join(tempDir, 'reader-output.json');
+    const projectRoot = path.resolve(__dirname, '..');
+    const scriptPath = path.join(__dirname, engine === 'paddleocr' ? 'paddleocr-image-child.js' : 'ocr-image-child.js');
+    const env = {
+        ...process.env,
+        OCRSPACE_ENABLED: '0',
+        OCRSPACE_NETWORK_ALLOWLIST: '0',
+        OCR_NON_OCR_NETWORK_RESTRICTED: '1',
+        OCR_NON_OCR_NETWORK_LOG: networkLogPath,
+        OCR_ENGINE: engine === 'paddleocr' ? 'tesseractjs' : engine,
+        OCR_CV_ASSIST: '0',
+        PADDLEOCR_FIELD_FALLBACK: engine === 'paddleocr' ? '1' : '0',
+        OCRSPACE_API_KEY: ''
     };
+    try {
+        await runSupervisedProcess({
+            command: process.execPath, args: [scriptPath, outputPath], cwd: projectRoot,
+            env, inputBuffer: rasterBuffer,
+            timeoutMs: Number(process.env.OCR_SUPERVISED_TIMEOUT_MS) || 185000,
+            terminationTimeoutMs: 7000, maxOutputBytes: 10_000_000
+        });
+        const payload = JSON.parse(await fs.readFile(outputPath, 'utf8'));
+        if (!payload.ok) {
+            const error = new Error(payload.error || (engine + ' child failed.'));
+            error.code = payload.code || 'PARALLEL_OCR_READER_FAILED';
+            throw error;
+        }
+        if (engine === 'paddleocr') {
+            if (!payload.output?.available) {
+                const error = new Error('PaddleOCR unavailable or incomplete: ' + String(payload.output?.status || 'unknown'));
+                error.code = 'PADDLEOCR_READER_UNAVAILABLE';
+                throw error;
+            }
+            return payload.output;
+        }
+        const output = payload.output || {};
+        const attempt = output.attempts?.[output.attempts.length - 1] || output.attempts?.[0] || { text: '' };
+        const validation = bot.validateWorldOfWarshipsScreenshot(attempt, output.fields || {});
+        return {
+            engine, status: 'complete', record: validation.record, missing: validation.missing,
+            accepted: validation.accepted, textCharacters: String(attempt.text || '').length,
+            confidence: validation.confidence, pageSegmentationMode: validation.pageSegmentationMode,
+            ambiguities: validation.record?.ambiguities || {}
+        };
+    } finally {
+        await fs.rm(tempDir, { recursive: true, force: true }).catch(() => {});
+    }
 }
 
 async function main() {
@@ -161,58 +199,60 @@ async function main() {
             }
 
             const priorReaders = Array.isArray(row.localReaders) ? row.localReaders : [];
-            const priorFailures = Array.isArray(row.localReaderFailures) ? row.localReaderFailures : [];
-            const priorFailureByEngine = new Map(priorFailures.map(failure => [failure.engine, failure]));
-            row.localReaderRecovery = {
-                mode: 'LOCAL_ONLY_FROM_HASH_VERIFIED_PDF_DERIVED_RASTER',
-                startedAt: new Date().toISOString(),
-                priorFailures: priorFailures.map(item => ({ ...item })),
-                timeoutMs: Number(process.env.OCR_IMAGE_TIMEOUT_MS),
-                providerRequests: 0
-            };
-            const readers = new Map(priorReaders.map(reader => [reader.engine, reader]));
-            const remainingFailures = priorFailures.filter(failure => !ENGINES.includes(failure.engine));
-
-            for (const engine of ENGINES) {
-                const previous = readers.get(engine);
-                const previousFailure = priorFailureByEngine.get(engine);
-                if (previous && !previousFailure) {
-                    image.preservedEngines.push(engine);
-                    continue;
-                }
-                const started = Date.now();
-                try {
-                    const recovered = await extractLocalReader(rasterBuffer, engine);
-                    readers.set(engine, recovered);
-                    image.recoveredEngines.push(engine);
-                    row.localReaderRecovery[engine] = {
-                        status: 'RECOVERED',
-                        elapsedMs: Date.now() - started,
-                        accepted: recovered.accepted === true
-                    };
-                } catch (error) {
-                    remainingFailures.push({
-                        engine,
-                        code: error.code || 'LOCAL_READER_RECOVERY_FAILED',
-                        message: String(error.message || error).slice(0, 400)
-                    });
-                    image.failures.push({
-                        engine,
-                        code: error.code || 'LOCAL_READER_RECOVERY_FAILED',
-                        message: String(error.message || error).slice(0, 400)
-                    });
-                    row.localReaderRecovery[engine] = {
-                        status: 'FAILED',
-                        elapsedMs: Date.now() - started,
-                        code: error.code || null
-                    };
+            row.priorLocalReaders = row.priorLocalReaders || priorReaders.map(item => ({ ...item }));
+            const startedAt = new Date().toISOString();
+            const tasks = [
+                ...ENGINES.map(engine => ({ engine, run: () => extractLocalReader(rasterBuffer, engine, networkLogPath) })),
+                { engine: 'pdf-text-layer', run: async () => {
+                    const text = await extractPdfText(pdfPath);
+                    return { engine: 'pdf-text-layer', status: 'complete', record: parseTextLayer(text),
+                        textCharacters: text.length, textSha256: sha256(Buffer.from(text, 'utf8')) };
+                } }
+            ];
+            const settled = await Promise.allSettled(tasks.map(task => task.run()));
+            const localReaders = [];
+            const failures = [];
+            let pdfTextLayer = null;
+            for (let index = 0; index < tasks.length; index += 1) {
+                const task = tasks[index];
+                const outcome = settled[index];
+                if (outcome.status === 'fulfilled') {
+                    if (task.engine === 'pdf-text-layer') pdfTextLayer = outcome.value;
+                    else { localReaders.push(outcome.value); image.recoveredEngines.push(task.engine); }
+                } else {
+                    const error = outcome.reason;
+                    const failure = { engine: task.engine, code: error.code || 'PARALLEL_READER_FAILED',
+                        message: String(error.message || error).slice(0, 400) };
+                    failures.push(failure);
+                    image.failures.push(failure);
                 }
             }
-            row.localReaders = ENGINES.filter(engine => readers.has(engine)).map(engine => readers.get(engine));
-            row.localReaderFailures = remainingFailures;
-            row.localReaderRecovery.completedAt = new Date().toISOString();
-            row.localReaderRecovery.status = remainingFailures.length ? 'PARTIAL' : 'COMPLETE';
-            row.localReaderRecovery.networkLogPath = path.basename(networkLogPath);
+            if (!pdfTextLayer) pdfTextLayer = { engine: 'pdf-text-layer', status: 'failed', record: {}, textCharacters: 0, textSha256: null };
+            row.localReaders = localReaders;
+            row.localReaderFailures = failures;
+            row.parallelReaderMatrix = {
+                schemaVersion: 1,
+                mode: 'CONCURRENT_LOCAL_READERS_FROM_HASH_VERIFIED_PDF_DERIVED_RASTER',
+                concurrency: 'Promise.allSettled; isolated child process per local OCR engine',
+                sourcePdfSha256: row.pdfSha256,
+                sourceRasterSha256: row.rasterSha256,
+                startedAt,
+                completedAt: new Date().toISOString(),
+                enginesRequested: [...ENGINES, 'pdf-text-layer'],
+                enginesCompleted: localReaders.map(item => item.engine),
+                pdfTextLayer, localReaders, failures,
+                providerRequests: 0, originalScreenshotFallback: false
+            };
+            row.localReaderRecovery = {
+                mode: 'PARALLEL_LOCAL_ONLY_READER_MATRIX_FROM_HASH_VERIFIED_PDF_DERIVED_RASTER',
+                startedAt, completedAt: row.parallelReaderMatrix.completedAt,
+                timeoutMs: Number(process.env.OCR_SUPERVISED_TIMEOUT_MS),
+                providerRequests: 0, networkLogPath: path.basename(networkLogPath),
+                status: failures.length ? 'PARTIAL' : 'COMPLETE'
+            };
+            image.parallelEngines = row.parallelReaderMatrix.enginesCompleted;
+            image.pdfTextLayer = pdfTextLayer.status;
+            if (pdfTextLayer.status !== 'complete') image.failures.push({ engine: 'pdf-text-layer', code: 'PDF_TEXT_LAYER_UNAVAILABLE', message: 'Searchable PDF text extraction failed.' });
             recovery.images.push(image);
         }
     } finally {

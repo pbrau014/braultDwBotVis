@@ -47,7 +47,7 @@ async function fixture(t) {
     results.push({index:i+1,filename,sourceBytes,sourceSha256:sourceSha,status:'pdf-first-complete',
       providerSubmissionAttempted:true,pdfBytes:pdf.length,pdfSha256:sha(pdf),pdfPath,
       rasterBytes:raster.length,rasterSha256:sha(raster),rasterPath,rasterWidth:1600,rasterHeight:900,
-      localReaders:[{engine:'tesseractjs'},{engine:'native'}],localReaderFailures:[]});
+      localReaders:[{engine:'tesseractjs',status:'complete'},{engine:'native',status:'complete'},{engine:'paddleocr',status:'complete'}],localReaderFailures:[]});
   }
   const gt={schemaVersion:2,requiredFields:FIELDS,candidateArchive:{sha256:sourceArchiveSha256},records};
   const preflight={status:'verified-imagesF-63-exploratory',archiveSha256:sourceArchiveSha256,

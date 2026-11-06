@@ -64,3 +64,12 @@ test('Gate B and 21-image analysis use separate deterministic complete-record in
     assert.equal(selectRecords(gt, GATE_B_19).length, 19);
     assert.equal(selectRecords(gt, ANALYSIS_21).length, 21);
 });
+
+
+test('five-source consensus requires a strict majority and is independent of reader ordering', () => {
+    const candidates = ['123456', '123456', '123456', '123465', null];
+    assert.equal(consensus(candidates, 'credits', 3), '123456');
+    assert.equal(consensus([...candidates].reverse(), 'credits', 3), '123456');
+    assert.equal(consensus(['123456', '123456', '123465', '123465', null], 'credits', 3), null);
+    assert.equal(consensus(['123456', '123456', '123465', '123465', '123465'], 'credits', 3), '123465');
+});

@@ -5554,3 +5554,35 @@ Gate A status:
 - 16-image ground truth exists, but original imgs2add.zip is not accessible. imgsHalf1.zip is a different 56-image archive with zero exact image-hash matches to the 16-image report. Do not substitute.
 - Existing native-16 report is historical local OCR only (5/16 exact records, 6/16 all-required-fields complete), not PDF-first Gate A evidence.
 ================================================================================
+
+ 
+PARALLEL OCR READER MATRIX — 2026-11-06
+- Governing diagnostic path: OCR.Space Engine 2 first produces the searchable
+  PDF; local rasterization is performed from that PDF; then Tesseract.js,
+  native Tesseract and PaddleOCR run concurrently in isolated processes on
+  the same PDF-derived raster. Ghostscript PDF text-layer extraction also
+  runs concurrently. OCR.Space provider-parsed text remains separate.
+- OpenCV supplies local crop geometry to PaddleOCR; it is not an OCR engine.
+  PaddleOCR must use explicit PP-OCRv6 local model directories and offline
+  inference. No default model fetching or cloud OCR is permitted.
+- New outputs are bound to source PDF/raster hashes; previous outputs are
+  preserved under priorLocalReaders. Promise.allSettled retains successful
+  peer results if one engine fails. Store per-engine versions, model hashes,
+  settings, timings, candidate fields, conflicts, missing values and failures.
+- Evaluate individual engines, pairwise combinations, four-source fusion,
+  five-source majority (3/5), strict five-source (4/5), and three-local-reader
+  consensus (2/3). Player identity cannot be sourced from PDF/provider text.
+  Ties/conflicts remain unresolved; no candidate is auto-accepted.
+- Gate B's no-provider artifact workflow provisions pinned PaddleOCR CPU
+  packages and PP-OCRv6 models, verifies offline inference, and executes the
+  parallel matrix on the already verified 19 PDFs. No OCR.Space requests are
+  repeated.
+- Gate A remains NOT PASSED: the original source archive is missing and the
+  interrupted run contains one of 16 PDF/raster pairs only. Run the same
+  matrix on all 16 only when a complete source-bound artifact set exists;
+  do not fabricate the remaining 15 records.
+- Node runtime declarations reconciled to >=22.16.0. The latest Gate B
+  verification failure was caused by package/lock still requiring >=24.17.0
+  despite the governing Node 22.16.0 authority; this mismatch is corrected.
+- Exact-head CI and the no-provider Gate B workflow are pending. Gate B and
+  production remain NOT PASSED / NO-GO.

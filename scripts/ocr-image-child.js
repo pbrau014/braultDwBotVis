@@ -5,6 +5,7 @@
 // progress. Screenshot bytes arrive only over stdin; the temp file contains only
 // the structured result, not the original image.
 process.env.OCR_IMAGE_CHILD = '1';
+if (process.env.OCR_NON_OCR_NETWORK_RESTRICTED === '1') require('./block-network');
 const fs = require('node:fs/promises');
 const bot = require('../src/bot');
 const outputPath = process.argv[2];

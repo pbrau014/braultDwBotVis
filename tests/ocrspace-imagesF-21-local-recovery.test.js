@@ -8,7 +8,7 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const read = relative => fs.readFileSync(path.join(root, relative), 'utf8');
 
-test('21-image local reader recovery is offline, source-bound, and never calls OCR.Space', () => {
+test('21-image parallel reader matrix is offline, source-bound, and never calls OCR.Space', () => {
     const script = read('scripts/recover-ocrspace-imagesF-21-local-readers.js');
     assert.match(script, /OCRSPACE_ENABLED = '0'/);
     assert.match(script, /OCRSPACE_NETWORK_ALLOWLIST = '0'/);
@@ -29,10 +29,14 @@ test('21-image local reader recovery is offline, source-bound, and never calls O
 
 test('local reader recovery preserves successful results and retries only failed or missing engines', () => {
     const script = read('scripts/recover-ocrspace-imagesF-21-local-readers.js');
-    assert.match(script, /if \(previous && !previousFailure\)/);
-    assert.match(script, /image\.preservedEngines\.push\(engine\)/);
-    assert.match(script, /extractLocalReader\(rasterBuffer, engine\)/);
-    assert.match(script, /row\.localReaderFailures = remainingFailures/);
+    assert.match(script, /CONCURRENT_LOCAL_READERS_FROM_HASH_VERIFIED_PDF_DERIVED_RASTER/);
+    assert.match(script, /priorLocalReaders/);
+    assert.match(script, /Promise\.allSettled/);
+    assert.match(script, /runSupervisedProcess/);
+    assert.match(script, /extractPdfText/);
+    assert.match(script, /parallelReaderMatrix/);
+    assert.match(script, /'paddleocr'/);
+    assert.match(script, /row\.localReaderFailures = failures/);
     assert.match(script, /derivedFromRunReportSha256/);
     assert.match(script, /COMPLETED_LOCAL_ONLY_RECOVERY/);
 });

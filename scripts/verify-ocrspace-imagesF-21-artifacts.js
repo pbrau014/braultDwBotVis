@@ -9,7 +9,7 @@ const imageProcessor = require('../src/image-processor');
 const FIELDS = ['result', 'player', 'map', 'mode', 'battleStart', 'credits', 'freeXp', 'damage', 'xp'];
 const INVENTORY = 'gate-b-complete-ground-truth-19';
 const MIN_GATE_B_IMAGES = 19;
-const REQUIRED_READERS = ['tesseractjs', 'native'];
+const REQUIRED_READERS = ['tesseractjs', 'native', 'paddleocr'];
 
 function sha256(buffer) {
     return crypto.createHash('sha256').update(buffer).digest('hex');
@@ -248,6 +248,7 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
         }
         const readers = new Set((row.localReaders || []).map(reader => reader.engine));
         const readerOk = REQUIRED_READERS.every(name => readers.has(name))
+            && REQUIRED_READERS.every(name => ['complete', 'partial'].includes((row.localReaders || []).find(reader => reader.engine === name)?.status || 'complete'))
             && !(row.localReaderFailures || []).length;
         image.checks.localReaders = readerOk ? 'PASS' : 'FAIL';
         if (!readerOk) all.localReaders = false;

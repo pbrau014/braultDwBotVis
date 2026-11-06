@@ -9,6 +9,12 @@ on:
       - 'scripts/block-network.js'
       - 'tests/ocrspace-network-policy.test.js'
       - 'scripts/recover-ocrspace-imagesF-21-local-readers.js'
+      - 'scripts/paddleocr-image-child.js'
+      - 'scripts/ocr-image-child.js'
+      - 'scripts/paddleocr_field_crops.py'
+      - 'src/paddleocr-field-fallback.js'
+      - 'src/opencv-field-isolation.js'
+      - 'tests/parallel-ocr-readers.test.js'
       - 'scripts/evaluate-ocrspace-imagesF-63-ground-truth.py'
       - 'scripts/evaluate-ocrspace-pdf-text-layer.js'
       - 'tests/ocrspace-pdf-text-layer.test.js'
@@ -38,7 +44,7 @@ permissions:
 jobs:
   verify:
     runs-on: windows-latest
-    timeout-minutes: 120
+    timeout-minutes: 240
     permissions:
       contents: read
       actions: read
@@ -51,7 +57,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 24.17.0
+          node-version: 22.16.0
           cache: npm
           package-manager-cache: false
 
@@ -87,12 +93,30 @@ jobs:
           "IMAGEMAGICK_BIN=$($magick.Source)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           "GHOSTSCRIPT_BIN=$($ghostscript.Source)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
 
+      - name: Provision pinned local PaddleOCR CPU runtime and PP-OCRv6 models
+        shell: powershell
+        run: |
+          $runtimeRoot = Join-Path $env:LOCALAPPDATA 'WoWSYOLO\PaddleOCR'
+          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/install-paddleocr-windows.ps1 -ProjectRoot $env:GITHUB_WORKSPACE -RuntimeRoot $runtimeRoot -SkipProjectBenchmark
+          if ($LASTEXITCODE -ne 0) { throw 'Pinned local PaddleOCR provisioning or offline smoke verification failed.' }
+          $python = Join-Path $runtimeRoot 'venv\Scripts\python.exe'
+          $det = Join-Path $runtimeRoot 'models\PP-OCRv6_medium_det'
+          $rec = Join-Path $runtimeRoot 'models\PP-OCRv6_medium_rec'
+          foreach ($item in @($python, $det, $rec)) { if (-not (Test-Path $item)) { throw "PaddleOCR local runtime component missing: $item" } }
+          "PADDLEOCR_PYTHON_BIN=$python" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "PADDLEOCR_DET_MODEL_DIR=$det" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "PADDLEOCR_REC_MODEL_DIR=$rec" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "PADDLE_PDX_ENABLE_MKLDNN_BYDEFAULT=False" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "PADDLEOCR_FIELD_FALLBACK_TIMEOUT_MS=15000" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+
       - name: Install locked dependencies and run no-provider contract tests
         run: |
           node --version
           npm --version
           npm ci --no-audit --no-fund
           node --check scripts/recover-ocrspace-imagesF-21-local-readers.js
+          node --check scripts/paddleocr-image-child.js
+          node --check scripts/ocr-image-child.js
           node --check scripts/evaluate-ocrspace-pdf-text-layer.js
           npm run test:ocrspace
           node --test tests/workflow-contract.test.js
@@ -220,6 +244,8 @@ jobs:
           OCR_NON_OCR_NETWORK_RESTRICTED: '1'
           OCR_IMAGE_TIMEOUT_MS: '180000'
           OCR_SUPERVISED_TIMEOUT_MS: '185000'
+          PADDLEOCR_FIELD_FALLBACK: '1'
+          PADDLEOCR_FIELD_FALLBACK_MAX_CROPS: '7'
           OCR_NON_OCR_NETWORK_LOG: ${{ github.workspace }}/testdata/ocr-acceptance/local-reader-recovery-network.log
         run: |
           $recoveredRun = Join-Path $env:GITHUB_WORKSPACE 'testdata\ocrspace-imagesF-63-exploratory\recovered-run-report-21.json'
