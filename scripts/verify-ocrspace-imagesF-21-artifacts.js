@@ -367,4 +367,4 @@ if (require.main === module) main().catch(error => {
     process.exitCode = 1;
 });
 
-module.exports = { verifyArtifacts, selectGateB, pngDimensions, safeArtifactPath, extractPdfText };
+module.exports = { verifyArtifacts, selectGateB, pngDimensions, safeArtifactPath, extractPdfText, parseJsonUtf8 };
