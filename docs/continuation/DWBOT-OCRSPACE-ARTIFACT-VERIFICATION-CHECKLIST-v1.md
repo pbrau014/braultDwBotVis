@@ -105,7 +105,7 @@ All selected images must pass source hash, PDF integrity, searchable text, raste
 
 ### Gate A
 
-Requires the exact 16-image development corpus, all nine expected fields, candidate fingerprint locked to Gate B source, accepted runtime (Node >=24.17.0), zero wrongly accepted mandatory values, zero unresolved mandatory values, and complete restricted-egress evidence with zero unauthorized attempts.
+Requires the exact 16-image development corpus, all nine expected fields, candidate fingerprint locked to Gate B source, accepted runtime (Node >=22.16.0), zero wrongly accepted mandatory values, zero unresolved mandatory values, and complete restricted-egress evidence with zero unauthorized attempts.
 
 ### Gate B
 
