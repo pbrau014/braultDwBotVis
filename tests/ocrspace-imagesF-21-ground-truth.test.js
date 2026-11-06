@@ -56,7 +56,7 @@ test('Gate B requires 19 labels, verified artifacts, zero wrong acceptance and c
     assert.match(evaluator, /gateAPassAndLockedCandidateFingerprintRequired/);
     assert.match(evaluator, /zeroWronglyAcceptedMandatoryFieldValues/);
     assert.match(evaluator, /zeroUnresolvedMandatoryFieldValues/);
-    assert.match(evaluator, /all19RecordsHaveAResolvedNineFieldOutputPerEngine/);
+    assert.match(evaluator, /all19GateBRecordsHaveAResolvedNineFieldOutputPerEngine/);
     assert.match(evaluator, /wrong but unaccepted candidates remain separately reported/);
     assert.match(evaluator, /engine_acceptance_complete/);
     assert.match(evaluator, /zeroUnauthorizedNetworkAttempts/);
