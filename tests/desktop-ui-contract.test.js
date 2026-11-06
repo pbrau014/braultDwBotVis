@@ -63,6 +63,15 @@ test('upload page supports one image preview, drag and drop, type/size validatio
   assert.match(script, /image\/png/);
   assert.match(script, /xhr\.upload/);
   assert.match(script, /X-File-Name/);
+  assert.match(css, /\.drop-zone:focus-within/);
+  assert.match(script, /xhr\.timeout=180000/);
+  assert.match(script, /Submission status uncertain/);
+  assert.match(script, /Check the Player page/);
+  assert.match(script, /showResult\('Screenshot received'/);
+  assert.match(script, /Receipt is not final OCR acceptance or score approval/);
+  assert.match(script, /clearFile\(\{ keepResult: true \}\)/);
+  assert.match(script, /submissionUncertain/);
+  assert.doesNotMatch(script, /Screenshot accepted into the OCR pipeline/);
 });
 
 test('the original workbook and OCR reader HTML baselines remain present and unchanged by desktop derivatives', () => {
