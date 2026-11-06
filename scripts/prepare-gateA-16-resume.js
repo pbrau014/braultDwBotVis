@@ -29,7 +29,7 @@ function samePreflight(a, b) {
     return stable(a) === stable(b);
 }
 function extractStartedFixtures(logText) {
-    return [...String(logText || '').matchAll(/\\[OCR-SEQUENCE\\]\\s+(\\d+)\\/16 START ([^\\r\\n]+)/g)]
+    return [...String(logText || '').matchAll(/\[OCR-SEQUENCE\]\s+(\d+)\/16 START ([^\r\n]+)/g)]
         .map(match => ({ index: Number(match[1]), fixtureKey: match[2].trim() }));
 }
 function pngInfo(bytes) {
