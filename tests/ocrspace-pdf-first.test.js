@@ -93,3 +93,36 @@ test('bounded PDF reader enforces the byte cap', async () => {
     const bytes = Buffer.alloc(100, 1);
     await assert.rejects(readPdfBounded({ headers: { get: () => '100' }, arrayBuffer: async () => bytes }, 50), { code: 'OCRSPACE_PDF_TOO_LARGE' });
 });
+
+
+test('durable provider-start checkpoint completes before the OCR.Space request', async () => {
+    const order = [];
+    const result = await createOcrSpacePdfFirst({
+        imageBuffer: png, filename: 'source.png', env: { OCRSPACE_API_KEY: 'test-key' },
+        quotaLedger: fakeLedger(),
+        onProviderRequestStarted: async detail => {
+            order.push('checkpoint');
+            assert.equal(detail.engine, 2);
+            assert.equal(detail.sourceSha256.length, 64);
+        },
+        client: async () => {
+            order.push('provider');
+            return { searchablePdfUrl: 'https://api.ocr.space/result.pdf' };
+        },
+        downloadPdf: async () => pdf,
+        renderPdf: async () => png,
+        readRasterMetadata: async () => ({ width: 1920, height: 1080 }),
+    });
+    assert.deepEqual(order, ['checkpoint', 'provider']);
+    assert.equal(result.status, 'complete');
+});
+
+test('failed durable provider-start checkpoint prevents any OCR.Space request', async () => {
+    let providerCalled = false;
+    await assert.rejects(createOcrSpacePdfFirst({
+        imageBuffer: png, env: { OCRSPACE_API_KEY: 'test-key' }, quotaLedger: fakeLedger(),
+        onProviderRequestStarted: async () => { throw new Error('checkpoint disk failure'); },
+        client: async () => { providerCalled = true; return { searchablePdfUrl: 'https://api.ocr.space/result.pdf' }; },
+    }), /checkpoint disk failure/);
+    assert.equal(providerCalled, false);
+});
