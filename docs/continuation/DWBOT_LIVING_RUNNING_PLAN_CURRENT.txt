@@ -5775,3 +5775,15 @@ OCR SEQUENCE RESUME ARTIFACT CHECK HARDENING — 2026-11-06
   absent. The new verifier helps validate a future reconstructed checkpoint,
   but the checkpoint reconstruction and 15-image safe continuation have not
   been executed. Do not re-submit Screenshot_16.jpg or restart the full batch.
+
+
+CURRENT CONNECTION-RESUME / GATE EVIDENCE RECONCILIATION — 2026-11-06 16:37 UTC
+
+- Detailed report: `docs/continuation/DWBOT-UPD-2026-11-06-008-gateA-network-reconciliation-and-imagesF-19-analysis.md`.
+- The original 63-image extraction artifact was downloaded and its ZIP SHA-256 verified against GitHub. Independent local inspection verified 63 one-page searchable PDFs with non-empty text and 63 PNG rasters; all PDF/raster sizes and hashes matched run records, raster dimensions matched, and source member hashes/bytes matched the included preflight list. No missing/mismatched PDF or raster was found.
+- The 19-image artifact-verification report from run #42202349114 verifies all 19 selected source/PDF/raster pairs, searchable text layers, PDF-derived raster provenance, local reader availability and secret scan. Its overall status is still FAILED because the original 63-run egress log is missing and Gate A is not passed. The separate local-recovery log is zero bytes and proves only that local recovery made zero blocked attempts; it does not replace the original run log.
+- Gate A original partial run #42202563673 had only a log-path variable. The exact workflow did not set `OCR_NON_OCR_NETWORK_RESTRICTED=1` or `OCRSPACE_NETWORK_ALLOWLIST=1`, and did not preload the guard. The guard writes denied-attempt events only when restriction is enabled. Thus the first paid provider request occurred without required restricted-egress enforcement; this cannot be retroactively repaired. Its existing PDF was reused locally without another provider request, but the map field remains unresolved. The other 15 requests were not started. Do not resume this paid batch.
+- 19-image post-hoc metrics and additional independent-source grouping experiments are recorded in the report. PDF text alone is insufficient; provider parsed text and PDF text are not independent votes; four-source majority yielded one wrong candidate; zero-wrong strict consensus left many unresolved. No holdout-derived thresholds are to be tuned or promoted.
+- The Gate A workflow is corrected for future runs: explicit provider allowlist/restriction flags and per-step Node preloads; local-only steps use the fail-closed guard with provider access disabled. This is a future-run correction, not retroactive evidence.
+- Exact-head verification after the parser export, Gate A regex test and runtime checklist fixes remains pending. No new OCR.Space provider requests were made. Production remains NO-GO.
+

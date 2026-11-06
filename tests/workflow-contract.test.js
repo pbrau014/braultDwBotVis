@@ -286,8 +286,14 @@ test('Gate A acceptance uses the accepted runtime, fail-closed network guard and
     assert.ok(workflow.includes('Configure fail-closed restricted-egress diagnostic preload'));
     assert.ok(workflow.includes('source/scripts/block-network.js'));
     assert.ok(workflow.includes('scripts/block-network.js'));
-    const preload = workflow.split(String.fromCharCode(10)).find(line => line.includes('NODE_OPTIONS='));
-    assert.ok(preload && preload.indexOf('$candidateGuard') < preload.indexOf('$failClosedGuard'), 'fail-closed logger must wrap the candidate guard');
+    const preloads = workflow.split(String.fromCharCode(10)).filter(line => line.includes('NODE_OPTIONS:'));
+    assert.ok(preloads.length >= 3, 'each local/provider Node step must preload its restricted-egress guard');
+    const dualGuard = preloads.find(line => line.includes('source/scripts/block-network.js'));
+    assert.ok(dualGuard && dualGuard.indexOf('source/scripts/block-network.js') < dualGuard.lastIndexOf('/scripts/block-network.js'), 'fail-closed wrapper must load after candidate guard');
+    assert.match(workflow, /OCRSPACE_ENABLED: '1'/);
+    assert.match(workflow, /OCRSPACE_NETWORK_ALLOWLIST: '1'/);
+    assert.match(workflow, /OCR_NON_OCR_NETWORK_RESTRICTED: '1'/);
+    assert.doesNotMatch(workflow, /NODE_OPTIONS=.*GITHUB_ENV/);
     assert.ok(workflow.includes('source/testdata/gateA-16/report.json.progress.json'));
     assert.ok(workflow.includes('cancel-in-progress: false'));
     assert.ok(workflow.includes('DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME'));
