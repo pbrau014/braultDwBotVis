@@ -3576,7 +3576,7 @@ function compactStandingsText() {
     lines.push('', `**All-player aggregate (${rows.length}/${Tournament.MAX_PLAYERS}): ${totalDoubloons.toFixed(2)} doubloons**`);
     if (rows.length > 20) lines.push(`Showing top 20 of ${rows.length}; run ` + '`!yolo standings`' + ` for the complete ranking.`);
     lines.push('Public standings show tournament points in doubloons only.');
-    return lines.join('\\n');
+    return lines.join('\n');
 }
 
 const YOLO_SLASH_COMMAND = {
