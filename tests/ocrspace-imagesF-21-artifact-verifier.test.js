@@ -107,6 +107,9 @@ test('missing network log or secret is not treated as a clean security result', 
   assert.equal(report.checks.originalNetworkLogStatus,'MISSING_FROM_SOURCE_ARTIFACT');
   assert.equal(report.checks.secretLeakScan,'NOT_VERIFIED');
   assert.equal(report.checks.unauthorizedNetworkAttempts,null);
+  assert.equal(report.inventorySelection.pdfRasterVerifiedImageCount,19);
+  assert.equal(report.inventorySelection.localReaderVerifiedImageCount,19);
+  assert.equal(report.inventorySelection.verifiedImageCount,0);
 });
 
 
