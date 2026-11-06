@@ -251,7 +251,7 @@ test('billable imagesF extraction workflow supports fingerprint-bound no-duplica
 });
 
 
-test('21-image post-hoc artifact workflow automatically verifies the completed run without provider requests', () => {
+test('19-image Gate B artifact workflow verifies the completed run without provider requests', () => {
     const workflow = read('.github/workflows/dwbot-imagesF-21-artifact-verification.yml');
     assert.match(workflow, /^  workflow_dispatch:/m);
     assert.match(workflow, /^  push:/m);
@@ -259,10 +259,14 @@ test('21-image post-hoc artifact workflow automatically verifies the completed r
     assert.match(workflow, /gh run download/);
     assert.match(workflow, /prepare-ocrspace-imagesF-63\.py/);
     assert.match(workflow, /verify-ocrspace-imagesF-21-artifacts\.js/);
-    assert.match(workflow, /complete-ground-truth-21/);
+    assert.match(workflow, /gate-b-complete-ground-truth-19/);
     assert.match(workflow, /recover-ocrspace-imagesF-21-local-readers\.js/);
     assert.match(workflow, /OCRSPACE_ENABLED: '0'/);
     assert.match(workflow, /OCRSPACE_NETWORK_ALLOWLIST: '0'/);
     assert.match(workflow, /evaluate-ocrspace-imagesF-63-ground-truth\.py/);
+    assert.match(workflow, /--network-log-reconciliation/);
+    assert.match(workflow, /RECONSTRUCTED_LIMITED_EVIDENCE/);
+    assert.match(workflow, /originalBlockedAttemptCount = \$null/);
+    assert.match(workflow, /\$recoveryNetworkLog =/);
     assert.doesNotMatch(workflow, /createOcrSpacePdfFirst|OCRSPACE_63_RESUME=1/);
 });
