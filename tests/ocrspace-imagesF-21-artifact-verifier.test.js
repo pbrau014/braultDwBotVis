@@ -87,6 +87,18 @@ test('verifies all 19 Gate B PDF/raster pairs, searchable text, source fingerpri
   assert.equal(report.checks.secretLeakScan,'PASS');
   assert.equal(report.checks.originalScreenshotFallback,false);
   assert.equal(report.gateA.status,'PENDING');
+  const gateAReport = {
+    status:'PASS', reportSha256:'a'.repeat(64), candidateFingerprint:'b'.repeat(40),
+    fingerprintLocked:true, matchesGateBRunSource:true, completeImages:16,
+    exactCompleteRecords:16, wronglyAcceptedMandatoryFieldValues:0,
+    unresolvedMandatoryFieldValues:0, unauthorizedNetworkAttempts:0, networkRestriction:'PASS'
+  };
+  const withGateA = await verifyArtifacts({...f,preflightReport:f.preflightPath,freshPreflightReport:f.freshPreflightPath,
+    groundTruth:f.gtPath,runReport:f.runPath,workflowSourceText,apiKey:'not-a-real-secret',gateAReport,
+    renderPdf:async()=>raster,readMetadata:metadataFor,toRawRgba:async()=>Buffer.from('same-pixels'),readPdfText:async()=> 'searchable text'});
+  assert.equal(withGateA.gateA.status,'PASS');
+  assert.equal(withGateA.gateA.candidateFingerprint,'b'.repeat(40));
+  assert.equal(withGateA.gateA.reportSha256,'a'.repeat(64));
 });
 
 test('does not pass when the saved raster cannot be reproduced from its PDF', async t => {
