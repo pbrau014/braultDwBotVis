@@ -266,4 +266,4 @@ async function renderSearchablePdfPage(pdfBuffer, { density = 220, maxDimension 
 }
 
 module.exports = { metadata, prepare, cropResize, prepareOcrSpaceUpload, renderSearchablePdfPage,
-    imageMagick, assertDimensions, __test: { runImageMagick } };
+    normalizeSearchablePdfPageRaster, sourceAspectCropRect, imageMagick, assertDimensions, __test: { runImageMagick } };
