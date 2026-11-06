@@ -1,13 +1,11 @@
-#!/usr/bin/env node
 'use strict';
 
-// Compatibility entry point for the established four-image acceptance suite.
-// All OCR work runs in the shared, isolated-child sequence runner so a native
-// or Tesseract.js worker timeout is bounded and the parent waits for confirmed
-// process closure before the next image starts. No external OCR service is used.
-
+// Authorized four-image PDF-first acceptance. Each original image is submitted
+// once to OCR.Space Engine 2; local readers consume the raster rendered from the
+// returned searchable PDF. Unrelated outbound traffic remains restricted.
 const fs = require('node:fs');
 const path = require('node:path');
+const crypto = require('node:crypto');
 const { spawn } = require('node:child_process');
 const { quoteRequireOption } = require('./node-options-path');
 
@@ -16,8 +14,10 @@ const sequencePath = path.join(__dirname, 'run-ocr-sequence.js');
 const networkBlockPath = path.join(__dirname, 'block-network.js');
 const reportPath = path.resolve(process.env.FOUR_SCREENSHOT_REPORT_PATH
     || path.join(root, 'testdata', 'four-screenshot-pipeline-results.json'));
-const blockedLogPath = path.resolve(process.env.OCR_NETWORK_BLOCK_LOG
-    || path.join(root, 'testdata', 'four-screenshot-blocked-network-attempts.log'));
+const nonOcrLogPath = path.resolve(process.env.OCR_NON_OCR_NETWORK_LOG
+    || path.join(path.dirname(reportPath), 'four-image-non-ocr-network-attempts.log'));
+const artifactDir = path.resolve(process.env.OCRSPACE_ARTIFACT_DIR
+    || path.join(path.dirname(reportPath), path.basename(reportPath, path.extname(reportPath)) + '-ocrspace-artifacts'));
 const fixtures = [
     'hoffmann-victory.png',
     'asashio-defeat.jpg',
@@ -25,9 +25,47 @@ const fixtures = [
     'schlieffen-defeat.jpg',
 ];
 
+function sha256(bytes) { return crypto.createHash('sha256').update(bytes).digest('hex'); }
 function fail(message) {
     console.error(`[FOUR-IMAGE] FAIL: ${message}`);
     process.exitCode = 1;
+}
+
+async function auditArtifacts(report, selected) {
+    const rows = [];
+    for (const key of selected) {
+        const result = (report?.results || []).find(item => item.fixtureKey === key);
+        const sourceSha256 = String(result?.imageSha256 || '').toLowerCase();
+        const validSourceHash = /^[a-f0-9]{64}$/.test(sourceSha256);
+        const pdfPath = validSourceHash ? path.join(artifactDir, sourceSha256 + '.ocrspace.pdf') : null;
+        const rasterPath = validSourceHash ? path.join(artifactDir, sourceSha256 + '.ocrspace-page.png') : null;
+        let pdf = null;
+        let raster = null;
+        try { if (pdfPath) pdf = await fs.promises.readFile(pdfPath); } catch {}
+        try { if (rasterPath) raster = await fs.promises.readFile(rasterPath); } catch {}
+        const pdfHeaderValid = Boolean(pdf && pdf.subarray(0, 5).toString('ascii') === '%PDF-');
+        const pdfEofValid = Boolean(pdf && pdf.subarray(Math.max(0, pdf.length - 1024)).includes(Buffer.from('%%EOF')));
+        rows.push({
+            fixtureKey: key,
+            sourceSha256,
+            pdf: pdf ? { file: path.basename(pdfPath), bytes: pdf.length, sha256: sha256(pdf), headerValid: pdfHeaderValid, eofMarkerValid: pdfEofValid } : null,
+            raster: raster ? { file: path.basename(rasterPath), bytes: raster.length, sha256: sha256(raster) } : null,
+            valid: validSourceHash && pdfHeaderValid && pdfEofValid && Boolean(raster?.length),
+        });
+    }
+    const audit = {
+        schemaVersion: 1,
+        createdAt: new Date().toISOString(),
+        provider: 'OCR.Space',
+        providerEngine: 2,
+        artifactDirectory: artifactDir,
+        sourceCount: selected.length,
+        verifiedPdfCount: rows.filter(row => row.valid).length,
+        images: rows,
+    };
+    const auditPath = reportPath + '.pdf-audit.json';
+    await fs.promises.writeFile(auditPath, JSON.stringify(audit, null, 2) + '\n');
+    return { audit, auditPath, passed: rows.length === selected.length && rows.every(row => row.valid) };
 }
 
 async function main() {
@@ -38,67 +76,69 @@ async function main() {
     if (unknown.length) throw new Error(`Unknown fixture(s): ${unknown.join(', ')}. Choose: ${fixtures.join(', ')}`);
     if (unique.size !== selected.length) throw new Error('Duplicate screenshot arguments are not allowed.');
     if (!selected.length) throw new Error('At least one screenshot fixture must be selected.');
-
+    if (!String(process.env.OCRSPACE_API_KEY || '').trim()) throw new Error('OCRSPACE_API_KEY is required; four-image PDF-first acceptance is blocked.');
     await fs.promises.mkdir(path.dirname(reportPath), { recursive: true });
+    await fs.promises.mkdir(artifactDir, { recursive: true });
     await fs.promises.rm(reportPath, { force: true });
-    await fs.promises.rm(blockedLogPath, { force: true });
+    await fs.promises.rm(nonOcrLogPath, { force: true });
 
     const preload = quoteRequireOption(networkBlockPath);
     const env = {
         ...process.env,
         OCR_ENGINE: process.env.OCR_ENGINE || 'tesseractjs',
+        OCRSPACE_ENABLED: '1',
+        OCRSPACE_NETWORK_ALLOWLIST: '1',
+        OCRSPACE_ARTIFACT_DIR: artifactDir,
+        OCR_NON_OCR_NETWORK_RESTRICTED: '1',
+        OCR_NON_OCR_NETWORK_LOG: nonOcrLogPath,
         OCR_SEQUENCE_REPORT_PATH: reportPath,
-        OCR_NETWORK_BLOCK_ENABLED: '1',
-        OCR_NETWORK_BLOCK_LOG: blockedLogPath,
         NODE_OPTIONS: [process.env.NODE_OPTIONS, preload].filter(Boolean).join(' '),
     };
 
-    console.log(`[FOUR-IMAGE] Running ${selected.length} image(s) using ${env.OCR_ENGINE}; network blocked.`);
+    console.log(`[FOUR-IMAGE] Running ${selected.length} image(s) with OCR.Space Engine 2 PDF-first; unrelated egress restricted.`);
     const child = spawn(process.execPath, [sequencePath, ...selected], {
-        cwd: root,
-        env,
-        stdio: 'inherit',
-        windowsHide: true,
-        shell: false,
+        cwd: root, env, stdio: 'inherit', windowsHide: true, shell: false,
     });
-
     const exit = await new Promise((resolve, reject) => {
         child.once('error', reject);
         child.once('close', (code, signal) => resolve({ code, signal }));
     });
 
     let report;
-    try {
-        report = JSON.parse(await fs.promises.readFile(reportPath, 'utf8'));
-    } catch (error) {
-        throw new Error(`Sequence report was not written or is invalid: ${error.message}`);
-    }
-
-    const expectedCount = selected.length;
+    try { report = JSON.parse(await fs.promises.readFile(reportPath, 'utf8')); }
+    catch (error) { throw new Error(`Sequence report was not written or is invalid: ${error.message}`); }
+    const auditResult = await auditArtifacts(report, selected);
+    const network = report.networkIsolation || {};
+    const rowsExact = (report.results || []).length === selected.length
+        && report.results.every(row => row.pipelineCompleted === true
+            && row.allExpectedFieldsPass === true
+            && row.allRequiredFieldsPass === true
+            && Array.isArray(row.requiredMissing) && row.requiredMissing.length === 0);
     const checks = {
-        imageCount: report.imageCount === expectedCount,
-        completedImages: report.completedImages === expectedCount,
-        mandatoryExactMatches: report.mandatoryExactMatches === expectedCount,
-        requiredFieldsComplete: report.requiredFieldsComplete === expectedCount,
+        imageCount: report.imageCount === selected.length,
+        completedImages: report.completedImages === selected.length,
+        exactMatches: report.exactMatches === selected.length,
+        mandatoryExactMatches: report.mandatoryExactMatches === selected.length,
+        requiredFieldsComplete: report.requiredFieldsComplete === selected.length,
+        allNineFieldsExact: rowsExact,
         fixtureOrder: Array.isArray(report.fixtureOrder)
-            && report.fixtureOrder.length === expectedCount
+            && report.fixtureOrder.length === selected.length
             && report.fixtureOrder.every((key, index) => key === selected[index]),
-        networkBlocked: report.networkBlocked === true,
+        ocrSpaceEnabled: network.ocrSpaceEnabled === true,
+        ocrSpaceNetworkAllowed: network.ocrSpaceNetworkAllowed === true,
+        unrelatedEgressRestricted: network.nonOcrNetworkRestricted === true,
+        noDeniedUnrelatedEgress: network.nonOcrDeniedAttemptsDetected === false,
+        pdfAndRasterArtifactsVerified: auditResult.passed,
         childExitedZero: exit.code === 0 && !exit.signal,
-        noNetworkAttempts: !fs.existsSync(blockedLogPath) || (await fs.promises.stat(blockedLogPath)).size === 0,
+        noDeniedLogEntries: !fs.existsSync(nonOcrLogPath) || (await fs.promises.stat(nonOcrLogPath)).size === 0,
     };
     for (const [name, passed] of Object.entries(checks)) {
         console.log(`[FOUR-IMAGE] ${passed ? 'PASS' : 'FAIL'} ${name}`);
         if (!passed) fail(`${name} did not meet acceptance criteria`);
     }
-
-    if (report.completedImages !== expectedCount) {
-        const failed = (report.results || []).filter(row => !row.pipelineCompleted);
-        for (const row of failed) console.error(`[FOUR-IMAGE] ${row.fixtureKey || row.filename}: ${row.error || 'incomplete'}`);
-    }
     console.log(`[FOUR-IMAGE] Report: ${path.relative(root, reportPath)}`);
-    if (process.exitCode === 1) return;
-    console.log(`[FOUR-IMAGE] PASS ${expectedCount}/${expectedCount} images completed with exact nine-field records.`);
+    console.log(`[FOUR-IMAGE] PDF audit: ${path.relative(root, auditResult.auditPath)}`);
+    if (process.exitCode !== 1) console.log(`[FOUR-IMAGE] PASS ${selected.length}/${selected.length} PDF-first images with exact nine-field records.`);
 }
 
 main().catch(error => {
