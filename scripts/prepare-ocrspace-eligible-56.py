@@ -40,20 +40,41 @@ def main() -> None:
     verified = []
     with zipfile.ZipFile(ARCHIVE, "r") as z:
         infos = z.infolist()
-        names = [i.filename for i in infos]
-        if len(names) != 56 or len(set(names)) != 56:
-            raise RuntimeError(f"ZIP must contain exactly 56 unique entries; found {len(names)} entries.")
-        if set(names) != set(expected):
-            missing = sorted(set(expected) - set(names)); extra = sorted(set(names) - set(expected))
-            raise RuntimeError(f"ZIP member set mismatch; missing={missing}; unexpected={extra}")
-        for info in infos:
-            name = info.filename
+        # The reviewed archive is stored with one explicit imgsHalf1/ directory
+        # entry and 56 files beneath it. Count file members separately; never
+        # treat the directory record as an image or extract its path.
+        directory_infos = [i for i in infos if i.is_dir()]
+        file_infos = [i for i in infos if not i.is_dir()]
+        if len(directory_infos) != 1 or directory_infos[0].filename not in ("imgsHalf1/", "imgsHalf1\\\\"):
+            raise RuntimeError(
+                "ZIP must contain exactly the reviewed imgsHalf1/ root directory entry; "
+                f"found {[i.filename for i in directory_infos]!r}"
+            )
+        if len(file_infos) != 56 or len(infos) != 57:
+            raise RuntimeError(
+                f"ZIP must contain 56 image files plus one imgsHalf1/ directory entry; "
+                f"found {len(file_infos)} files and {len(directory_infos)} directories."
+            )
+        normalized = {}
+        for info in file_infos:
+            member_name = info.filename
+            prefix = "imgsHalf1/"
+            if not member_name.startswith(prefix):
+                raise RuntimeError(f"Unexpected ZIP member path (expected {prefix} prefix): {member_name!r}")
+            name = member_name[len(prefix):]
             posix = PurePosixPath(name)
-            if posix.is_absolute() or len(posix.parts) != 1 or name in ("", ".", "..") or "\\" in name or info.is_dir():
-                raise RuntimeError(f"Unsafe or non-file ZIP entry rejected: {name!r}")
+            if posix.is_absolute() or len(posix.parts) != 1 or name in ("", ".", "..") or "\\\\" in name:
+                raise RuntimeError(f"Unsafe or nested ZIP member rejected: {member_name!r}")
+            if name in normalized:
+                raise RuntimeError(f"Duplicate normalized ZIP member rejected: {name}")
             unix_mode = (info.external_attr >> 16) & 0xFFFF
             if unix_mode and (unix_mode & 0o170000) == 0o120000:
-                raise RuntimeError(f"Symlink ZIP entry rejected: {name}")
+                raise RuntimeError(f"Symlink ZIP entry rejected: {member_name}")
+            normalized[name] = info
+        if set(normalized) != set(expected):
+            missing = sorted(set(expected) - set(normalized)); extra = sorted(set(normalized) - set(expected))
+            raise RuntimeError(f"ZIP member set mismatch; missing={missing}; unexpected={extra}")
+        for name, info in normalized.items():
             record = expected[name]
             if info.file_size != int(record["bytes"]):
                 raise RuntimeError(f"ZIP metadata size mismatch for {name}: expected {record['bytes']}, got {info.file_size}")
@@ -68,7 +89,7 @@ def main() -> None:
             actual = h.hexdigest()
             if size != int(record["bytes"]) or actual != str(record["sha256"]).lower():
                 raise RuntimeError(f"Image fingerprint mismatch for {name}: {size}/{actual}")
-            verified.append({"filename": name, "bytes": size, "sha256": actual})
+            verified.append({"filename": name, "archiveMember": info.filename, "bytes": size, "sha256": actual})
     if len(verified) != 56: raise RuntimeError("Not all 56 eligible source images were verified.")
     if any((IMAGE_ROOT / r["filename"]).exists() for r in excluded):
         raise RuntimeError("A user-excluded image unexpectedly exists in the extraction root.")
