@@ -173,3 +173,13 @@ test('standalone HTML score calculator matches DWBOT Grand Yolo tier-weight defa
   assert.match(html, /cfg\(key\)\[field\]=defaultValue/);
   assert.match(html, /Grand Yolo Tier weight is 0\.9/);
 });
+
+
+test('standalone HTML score calculator exposes mouseover and assistive scoring help', async () => {
+  const html = await fs.readFile(path.join(__dirname, '..', 'dwbotStuff', 'yolo_tournament_scoreCalculator.html'), 'utf8');
+  assert.match(html, /title="\$\{esc\(description\)\}"/);
+  assert.match(html, /title="\$\{esc\(poolDescription\)\}"/);
+  assert.match(html, /aria-describedby="\$\{key\}-pool-note"/);
+  assert.match(html, /Ship class weighting: DD = 4, CA = 3, BB = 2/);
+  assert.match(html, /Restore the workbook\/DWBOT default/);
+});
