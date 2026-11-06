@@ -1,94 +1,58 @@
-# OCR.Space Free API — OCR-first diagnostic prepass and searchable-PDF profile
+# OCR.Space PDF-first image processing — governing implementation
 
-## Governing sequence
+**Status:** Implemented in canonical main; live provider and inventory acceptance remain unverified.
+**Authority:** The user's 2026-11-05 instruction in this chat supersedes earlier crop-only and diagnostic-only OCR.Space descriptions.
 
-When OCR.Space is enabled by a locally configured Free API key (default-on unless explicitly disabled), the sequence is:
+## Required sequence
+1. Receive the original World of Warships screenshot.
+2. OCR.Space Engine 2 processes the complete source image first and creates a searchable PDF with a visible text layer. The current provider comparison lists searchable-PDF creation as supported for Engine 2 and unsupported for Engine 3.
+3. Download the temporary PDF immediately from an approved HTTPS OCR.Space host. Reject redirects, invalid URLs, non-PDF payloads, oversized responses and timeouts.
+4. Render the PDF page locally to a bounded PNG raster.
+5. Run Tesseract.js, native Tesseract, PaddleOCR (when enabled), OpenCV geometry and all other local image readers on that PDF-derived raster. After successful PDF creation, no local reader may return to the original screenshot.
+6. Run existing parsers, independent-read/geometry consensus and exact nine-field validation. OCR.Space text/PDF text-layer evidence remains separate; it is not injected into local OCR candidates or used to accept remote-only values.
 
-1. Inspect the original image locally and run geometry-only OpenCV region proposals. OpenCV does not recognize text or accept values.
-2. Require an explicit, valid OpenCV identity proposal with score >= 0.12 (the same minimum used by the local geometry-region selector), and require the complete identity rectangle to be inside the source image. A missing, weak, malformed or out-of-bounds identity proposal disables the entire remote prepass; never substitute a nominal/fallback rectangle. Exclude the player-identity region and construct only bounded, non-identifying crops. If a crop cannot be proven separate from identity content, skip it.
-3. Run OCR.Space Engine 3 first on those safe crops, with the request profile below. Preserve text, partial status, processing time, crop geometry, request settings and searchable-PDF status as separate remote evidence.
-4. Run the existing Tesseract.js/local pipeline on the original image and its established crops. Preserve local evidence independently and compare it to the remote result.
-5. Run the existing parsers, independent-read/geometry consensus and exact validators. Conflicts, ambiguous values and missing fields remain unresolved.
+If OCR.Space processing, PDF creation/download or rasterization fails, the image fails closed. Do not substitute OCR of the original screenshot. The production bot requires OCRSPACE_API_KEY; OCRSPACE_ENABLED=0 is explicit local-only development/test mode.
 
-Tesseract.js remains the local baseline and fallback. OCR.Space is the first remote OCR pass, not the authority for accepting a battle record. OCR.Space text is not input text for Tesseract; Tesseract recognizes pixels. After local OCR and parsing, `src/ocrspace-reconciliation.js` parses the remote text independently and emits an exact-value, field-by-field diagnostic cross-check against the local record. Agreement, disagreement, remote-only, remote-conflict and no-candidate states are reported separately. This diagnostic never merges remote candidates into local candidates and cannot independently accept, normalize, rewrite, fuzzy-correct or overwrite any mandatory field. PaddleOCR remains an optional local comparison/fallback.
+## Upload normalization and provenance
+The OCR.Space Free API file limit is 1 MiB. Images above that limit are re-encoded locally to a bounded JPEG using a descending size/quality profile. The original image is never modified. Record original image SHA-256/size; normalized upload SHA-256/size/dimensions/quality; OCR.Space engine, processing time and provider exit status; searchable PDF SHA-256/size; rendered raster dimensions/size; per-image local-reader outputs and exact comparisons.
 
-If OpenCV geometry is unavailable or does not yield a provably safe crop, the remote prepass is skipped and the local OCR pipeline proceeds. The existing post-local OCR.Space refinement stage is reserved for cases where the first remote prepass could not produce evidence; it does not replace the first-pass evidence.
+The user explicitly authorized OCR.Space processing of the 4-, 16-, and 64-image World of Warships inventories in this chat, including player names visible in those screenshots. This authorization is limited to those inventories. Never send credentials, Discord IDs, private account data, unrelated UI or unrelated images. Never log or package the API key.
 
-## Runtime enablement and configuration
+## Provider limits and privacy
+The official API currently documents a 1 MiB Free API upload limit, 500 requests/day, 25,000 requests/month and three PDF pages per document. Free searchable PDFs contain an OCR.Space watermark. Searchable-PDF URLs remain available for one hour. The privacy policy says uploads are deleted after processing, generated PDFs after 60 minutes, and API IP logs after one month. Verify current terms before live processing. Do not use paid tiers or automatically retry rate-limited requests. Reserve quota before every provider request and fail closed on quota-ledger errors.
 
-Remote use is default-on when a locally stored valid Free API key is configured. An unset or blank `OCRSPACE_ENABLED` value uses the default-on behavior; `OCRSPACE_ENABLED=1` explicitly enables it; `OCRSPACE_ENABLED=0` is an explicit local-only opt-out; any other value fails closed. The API key remains mandatory, so no key means no remote request. Keep the key only in the local environment; never commit, display, log, export or package it. No paid tier or paid use is permitted.
+Network acceptance allows only HTTPS to api.ocr.space and ocr.space for the API call and temporary PDF download. All other outbound requests remain blocked and logged.
 
-Recommended local configuration:
+## Implementation
+- src/ocrspace-pdf-first.js: Engine 2 image-first request, searchable PDF URL validation, bounded download, PDF signature check, provenance hashes and raster handoff.
+- src/image-processor.js: bounded JPEG upload normalization and searchable-PDF page rendering.
+- src/bot.js: performs PDF-first processing before OpenCV/Tesseract; subsequent readers receive only the PDF raster. Production entrypoint refuses normal startup without OCRSPACE_API_KEY; OCRSPACE_ENABLED=0 is local-only.
+- scripts/block-network.js: OCR.Space-only HTTPS allowlist for acceptance.
+- scripts/run-windows-ocr-acceptance.ps1: requires OCRSPACE_API_KEY, runs PDF-first acceptance, retains PDF/raster artifacts.
+- tests/ocrspace-pdf-first.test.js: mocked first-pass, upload-size normalization, PDF URL/redirect/signature/size and fail-closed tests.
+- npm run test:ocrspace includes PDF-first contract tests.
 
-    OCRSPACE_ENABLED=1
-    OCRSPACE_API_KEY=
-    OCRSPACE_MAX_CROPS=4
-    OCRSPACE_STAGE_BUDGET_MS=20000
-    OCRSPACE_MAX_PER_DAY=450
-    OCRSPACE_MAX_PER_MONTH=22000
-    OCRSPACE_MAX_ENGINE3_PER_MONTH=900
-    OCRSPACE_QUOTA_PATH=./data/ocrspace-quota.json
+## Inventory gates
+| Corpus | Source | Expected truth | Required handling |
+|---|---|---|---|
+| 4 images | fixtures/four-screenshots/ | Existing exact expected values | OCR.Space PDF first, then local readers, compare all nine fields |
+| 16 images | fixtures/additional-screenshots/ | testdata/additional-screenshot-ground-truth.json | OCR.Space PDF first, then local readers, compare all nine fields |
+| 64 images | imgsHalf1.zip / dwbotStuff/DWBOT_64_IMAGE_INVENTORY_REVIEWED.json | No independent nine-field ground truth | Process all 64 when archive is restored and SHA-verified; report extraction only, not accuracy. Preserve 56 eligible / 8 excluded classification |
 
-With a local Free key, remote processing is enabled by default; use `OCRSPACE_ENABLED=0` only when a test explicitly requires a local-only run. Before first live use, recheck current provider terms, privacy, retention and quota. The default does not bypass safe-crop, identity-exclusion, quota, transport or fail-closed checks.
+The 64-image archive is not in the current repository tree. Inventory sources contain conflicting archive byte-count/fingerprint information. Retrieve the exact original archive and verify all member hashes before processing; never reconstruct or select a candidate by guess.
 
-## Engine capability comparison — searchable PDF
+## Acceptance criteria
+- OCR.Space Engine 2 creates one searchable PDF per source image.
+- PDF is downloaded, signature-checked and rasterized locally.
+- Tesseract.js/native Tesseract and any enabled PaddleOCR/OpenCV processing use the PDF-derived raster only.
+- All nine fields remain mandatory: result, player, map, mode, battleStart, credits, freeXp, damage, xp.
+- Zero wrong accepted mandatory values and zero unresolved required fields for exact-ground-truth corpora. Any wrong accept or unresolved field fails.
+- No network destinations beyond the explicit OCR.Space HTTPS allowlist.
+- Preserve per-image logs, artifacts, checksums, engine versions and exact-source fingerprint.
+- No production release until all existing OCR, Windows/native, security, recovery, desktop/browser, Discord and package gates pass.
 
-| Capability | Engine 2 | Engine 3 |
-|---|---|---|
-| Searchable PDF generation | Supported | **Supported** (per the Engine 3 feature description; the provider's comparison matrix still shows unsupported) |
-
-The provider's current API page is internally inconsistent: the Engine 3 feature description says searchable PDF is supported with the same parameters as Engine 1/2, while the comparison matrix marks it unsupported. DWBOT's capability comparison therefore records Engine 3 as supported in accordance with the feature description, but the runtime still verifies the actual SearchablePDFURL. If Engine 3 returns no safe URL, retain the quota-reserved Engine 2 PDF-only fallback and discard Engine 2 OCR text. This is a documented compatibility fallback, not a claim that every live Engine 3 response has been verified.
-
-## Required OCR.Space request profile
-
-- `detectOrientation=true`: let OCR.Space detect orientation and auto-rotate when required.
-- `OCREngine=3`: use Engine 3 for the first text-extraction request.
-- `scale=true` by default: DWBOT screenshots are normally low-DPI digital captures. OCR.Space documents that auto-scaling helps low-DPI screenshots; if source metadata establishes a true 200–300 DPI image, use `scale=false` because scaling can worsen already-high-resolution input. Record the selected value.
-- `isTable=true` for the non-identifying reward/stat band, which is genuinely columnar; use `isTable=false` for result-title and map/mode/time metadata crops that are not tabular. The flag enables receipt/table line-order handling and must not be forced onto unrelated UI text.
-- `isCreateSearchablePdf=true` and `isSearchablePdfHideTextLayer=false` together, so the generated PDF has a visible/selectable text layer. Preserve a returned `SearchablePDFURL` only as a short-lived artifact reference.
-
-OCR.Space's current API documentation is inconsistent about Engine 3 searchable-PDF support: one Engine 3 description says the same PDF parameters are supported, while its engine comparison matrix marks searchable PDF unsupported. Therefore the client requests a visible searchable PDF with Engine 3 and checks the actual response. If Engine 3 does not return a safe `SearchablePDFURL`, it makes a separately quota-reserved Engine 2 request solely to generate the PDF with the same orientation/table/scale and visible-layer settings. Engine 2's parsed text is discarded and never replaces Engine 3 text evidence. No paid plan is used to resolve this provider-documentation inconsistency.
-
-The searchable PDF link is documented as valid for one hour. The Free tier adds an OCR.space watermark. Do not treat the link as durable storage or include it in long-lived records.
-
-## Privacy, bounds and quotas
-
-- Send only minimum-necessary, pre-localized, non-identifying crops. Never send player name/identity, Discord IDs, credentials, private account data, unrelated UI or full screenshots.
-- Identity exclusion is geometric and happens before transmission. The identity ROI must be an explicit in-bounds OpenCV proposal with score >= 0.12; missing, weak, malformed or out-of-bounds identity geometry disables remote OCR for that image. No nominal/fallback identity rectangle is accepted. If a crop intersects or may include the identity ROI, skip it and record the reason.
-- The client uses the fixed HTTPS endpoint `https://api.ocr.space/parse/image`, API key in the request header, redirect rejection, bounded MIME/input/response handling, request-plus-response timeout, and no automatic retry after HTTP 429.
-- Maximum upload is 1 MiB per image; JSON response is bounded at 256 KiB. Calls are sequential and bounded by crop count and per-image stage budget.
-- The local quota ledger reserves before every provider request, including the Engine 2 PDF-only fallback, and fails closed on corruption or lock contention.
-- Current provider documentation lists 500 requests/day, 25,000 requests/month and 1,000 Engine 3 conversions/month for the Free plan. Internal ceilings remain lower: 450/day, 22,000/month and 900 Engine 3/month.
-- The provider privacy policy currently states that uploads are deleted after processing, searchable PDFs after 60 minutes, and IP access logs are retained for one month. These terms may change; recheck before first live use and periodically.
-
-## Current implementation map
-
-- `src/opencv-field-isolation.js`: local geometry-only proposals; supports an explicit forced geometry pass when OCR.Space is configured.
-- `src/ocrspace-client.js`: fixed HTTPS multipart request; Engine 3 default; orientation/table/scale/searchable-PDF flags; visible text layer; bounded response; safe provider PDF URL extraction; redirect and timeout safeguards.
-- `src/ocrspace-field-evidence.js`: default-on with local-key interlock and allowlisted crops, Engine 3 first, quota reservation, visible-PDF request and Engine 2 PDF-only fallback when Engine 3 does not return a PDF URL. Evidence is diagnostic only.
-- `src/ocrspace-quota-ledger.js`: atomic local JSON quota ledger with cross-process lock and fail-closed corruption behavior.
-- `src/bot.js`: geometry-first OCR.Space prepass before Tesseract, identity exclusion, then existing Tesseract and local image-processing pipeline; a bounded post-local refinement is used only if the prepass could not produce evidence.
-- `tests/ocrspace.test.js`, `tests/ocrspace-prepass.test.js` and `tests/ocrspace-reconciliation.test.js`: mocked request profile, default-on/key-interlock behavior, Engine 3 evidence, PDF fallback, privacy allowlists, quota, timeout, redirect, response-size, crop identity exclusion (including missing/weak identity fail-closed cases) and diagnostic reconciliation coverage.
-- `package.json`: `npm run test:ocrspace`.
-
-## Nine-field acceptance contract
-
-The exact mandatory fields remain, in order: `result`, `player`, `map`, `mode`, `battleStart`, `credits`, `freeXp`, `damage`, `xp`. XP is mandatory and ninth. OCR.Space cannot independently accept or overwrite any field. No fuzzy numeric/name correction or expected-value injection is allowed. Wrong, conflicting, ambiguous or missing values remain unresolved; release acceptance requires zero wrongly accepted mandatory values.
-
-## Verification and live-use gates
-
-Mock tests verify request shape, bounds, privacy allowlists, quotas and failure behavior; they do not prove live credentials, provider accuracy or any accuracy improvement. No live API request or accuracy benefit is claimed until a real HTTP request/response and paired comparison to Tesseract.js with approved ground truth are recorded.
-
-Before a first live request: use a valid locally configured Free key, send only synthetic non-identifying crops, confirm the current Free tier and terms, retain redacted diagnostics, and verify the returned Engine 3 text and searchable-PDF URL. No production screenshot or production deployment is authorized by mocked test success.
-
-## Official provider references
-
-- API parameters and Engine 3: https://ocr.space/ocrapi
-- Orientation: https://ocr.space/ocrapi#detectorientation
-- Receipt/table recognition: https://ocr.space/receiptscanning and https://ocr.space/tablerecognition
-- Auto-scaling: https://ocr.space/autoscale
-- Searchable PDF: https://ocr.space/searchablepdf
-- Engine 3: https://ocr.space/ocrapi#ocrengine3
-- Handwriting: https://ocr.space/handwriting
-- Status: https://status.ocr.space/
+## Official references
+- API parameters and searchable PDF: https://ocr.space/ocrapi
 - Privacy policy: https://ocr.space/privacypolicy
+
+The API documentation contains mixed historical wording about Engine 3 PDF support. The current comparison table marks Engine 3 searchable PDF unsupported; this implementation therefore uses Engine 2 for the PDF-producing first pass.

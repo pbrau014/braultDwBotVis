@@ -1,4 +1,15 @@
-# DWBOT requirements, architecture and schema crosswalk — 2026-11-05
+# DWBOT requirements, architecture and schema crosswalk — updated 2026-11-05
+
+## OCR.Space PDF-first governing sequence
+The current implementation sequence is original screenshot → OCR.Space Engine 2 → searchable PDF → bounded local PDF-page raster → Tesseract.js/native Tesseract/PaddleOCR/OpenCV local readers → existing parser/consensus/validators. No downstream local image reader may process the original screenshot after a successful PDF-first stage. A failed OCR.Space/PDF/raster stage fails closed. Production requires OCRSPACE_API_KEY; OCRSPACE_ENABLED=0 is only for local-only development/tests.
+
+| Requirement | Implementation | Verification |
+|---|---|---|
+| OCR.Space is the first reader and produces the source PDF | src/ocrspace-pdf-first.js, src/bot.js, src/image-processor.js | Live Engine 2 request, searchable PDF SHA, bounded download and PDF raster evidence |
+| All local OCR readers consume the OCR.Space PDF raster | src/bot.js, src/image-processor.js, src/ocr-worker.js, src/paddleocr-field-fallback.js | Same PDF-raster fingerprint passed to each local reader; no original-image fallback |
+| Free API upload limit | src/image-processor.js, src/ocrspace-pdf-first.js | Record original/upload SHA, size, dimensions and quality; upload <=1 MiB |
+| Network privacy | scripts/block-network.js, scripts/run-windows-ocr-acceptance.ps1 | Allow only HTTPS OCR.Space API/PDF hosts; record all other blocked attempts |
+| Exact nine-field validation | src/battle-record.js, src/bot.js | All nine exact; zero wrong accepted; zero unresolved |
 
 ## Authority and scope
 
@@ -10,7 +21,7 @@ This is an evidence-based supporting crosswalk for Plan 2 (requirements/architec
 |---|---|---|
 | Nine mandatory OCR fields, in order: result, player, map, mode, battleStart, credits, freeXp, damage, xp | `src/battle-record.js`, `src/bot.js`, `src/desktop-service.js` | Unit/contract tests plus exact current-source Windows screenshot reports; zero wrong accepts and zero unresolved required fields for Gate A |
 | Local OCR baseline and fail-closed acceptance | `src/ocr-worker.js`, `src/bot.js`, `src/number-parser.js`, `src/reward-geometry.js`, `src/damage-consensus.js` | Tesseract.js current-source corpus, negative control, per-field reports and independent ground truth |
-| OCR.Space restricted remote evidence | `src/ocrspace-field-evidence.js`, `src/ocrspace-prepass.js`, `src/ocrspace-reconciliation.js` | Mocked request-profile tests; local Free key configured privately; synthetic non-identifying live smoke; remote candidates remain diagnostic and cannot mutate local acceptance |
+| OCR.Space searchable-PDF first pass | `src/ocrspace-pdf-first.js`, `src/bot.js`, `src/image-processor.js` | Live Engine 2 request and PDF URL; all local readers process PDF raster; source/upload/PDF hashes; zero original-image fallback |
 | Image intake limits and bounded downloads | `src/attachment-download.js`, `src/desktop-bridge.js`, `desktop/upload.js` | Exact 25 MiB boundary, streamed over-limit cancellation, concurrency and timeout tests on Linux and Windows |
 | Discord authority and channel isolation | `src/bot.js`, `src/tournament-command-policy.js`, `src/discord-gateway-diagnostics.js` | Isolated development bot/guild/channel test; READY, permissions, role denial, attachments, restart and recovery logs |
 | Browser role separation and local transport | `src/desktop-bridge.js`, `src/desktop-service.js`, `desktop/` | OAuth/browser integration; loopback-only binding, CSRF/origin checks, Player ownership and Admin authorization |

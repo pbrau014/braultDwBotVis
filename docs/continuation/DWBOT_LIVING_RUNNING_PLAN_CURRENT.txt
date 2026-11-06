@@ -1,4 +1,107 @@
 ================================================================================
+CURRENT OCR ARCHITECTURE OVERRIDE — OCR.SPACE SOURCE-IMAGE → SEARCHABLE PDF FIRST
+2026-11-05 / controlling user instruction
+================================================================================
+
+The user's latest instruction in this chat supersedes older active OCR pipeline
+descriptions. Historical reports and prior designs remain unchanged as provenance.
+
+REQUIRED PIPELINE
+1. Receive the original World of Warships battle-result screenshot.
+2. OCR.Space Engine 2 processes that source image FIRST and creates a searchable
+   PDF with a visible text layer. The provider's current engine comparison marks
+   searchable-PDF creation supported for Engine 2 and unsupported for Engine 3.
+   Engine 2 is therefore the PDF-producing first pass.
+3. Immediately download the temporary PDF. Validate HTTPS host, redirect
+   behavior, PDF signature, response size and timeout. Record source SHA-256,
+   normalized-upload SHA-256, PDF SHA-256, sizes, dimensions, engine and timing.
+4. Render the PDF page locally to a bounded PNG raster. Tesseract.js, native
+   Tesseract, PaddleOCR (when enabled), OpenCV geometry and every downstream
+   local image reader must operate on this PDF-derived raster, never on the
+   original screenshot after successful PDF creation.
+5. Keep OCR.Space provider text/PDF text-layer evidence separate. Local readers
+   independently recognize the PDF raster. Do not inject remote text into local
+   candidates or accept remote-only values.
+6. Apply existing parsers, field geometry, independent-read consensus and exact
+   validators. Nine mandatory fields remain: result, player, map, mode,
+   battleStart, credits, freeXp, damage, xp. XP is ninth and mandatory. Any
+   wrong accepted mandatory value fails; missing, ambiguous, conflicting or
+   invalid values remain unresolved. Gate A/B require zero wrong accepts and
+   zero unresolved required fields.
+
+FAIL-CLOSED AND PRIVACY RULES
+- If OCR.Space processing, searchable-PDF creation/download or rasterization
+  fails, fail that image. Never fall back to OCR on the original image.
+- Production requires OCRSPACE_API_KEY. The bot refuses normal startup without
+  it. OCRSPACE_ENABLED=0 is an explicit local-only development/test override.
+- Use the Free API only. Current docs list a 1 MiB per-file limit, 500 requests
+  per day, 25,000 per month and three PDF pages. Free searchable PDFs have a
+  watermark. PDF URLs last one hour; uploads are deleted after processing,
+  PDFs after 60 minutes, and API IP logs after one month. Recheck current terms.
+- Images over 1 MiB are locally re-encoded to bounded JPEG. Preserve original
+  hash and upload hash/size/dimensions/quality. Never modify the source image.
+- The user explicitly authorized OCR.Space processing of the 4-, 16- and
+  64-image World of Warships screenshot inventories in this chat, including
+  visible player names. Authorization is limited to those inventories. Never
+  send credentials, Discord IDs, private account data, unrelated UI or images.
+  Never expose the API key in logs, reports, artifacts or source.
+- Restrict acceptance egress to HTTPS OCR.Space API/PDF hosts. Block and log all
+  other destinations. Never auto-retry rate-limited requests. Quota reservation
+  remains fail-closed.
+
+IMPLEMENTATION STATUS
+Canonical repo pbrau014/braultDwBotVis, main.
+Head before this plan update: 8cabbd06bbcf579acab7134a4221914e6b91194b.
+Recent source commits:
+666d24dcd712ad65d6610404daeda78d35fdb266 — OpenCV reward-band geometry fallback.
+5ba3092580fb6804f5ff6eb77cbecde9c922b42d — corroborated title-case map consensus.
+74d16f556e96ffc827ddfc0cf558936b3a8c2da9 — Engine 2 source-image PDF-first path.
+c9d0c73ad7ee6ae7457d48ae76c422d860445b9a — bounded PDF download, upload
+normalization, PDF-first mocked tests and workflow registration.
+8cabbd06bbcf579acab7134a4221914e6b91194b — bot PDF-first enforcement,
+PDF/raster artifact retention, OCR.Space-only network allowlist and Windows
+acceptance secret wiring.
+These are implementation commits, not proof of live accuracy or acceptance.
+The OCRSPACE_API_KEY Actions secret has not been verified from this chat.
+
+INVENTORY QUEUE
+A. Four-image corpus: fixtures/four-screenshots. Exact expected values exist.
+   Run OCR.Space Engine 2 → PDF → local readers; compare all nine fields.
+B. Sixteen-image corpus: fixtures/additional-screenshots and
+   testdata/additional-screenshot-ground-truth.json. Preserve exact annotations.
+C. Sixty-four-image inventory: dwbotStuff/DWBOT_64_IMAGE_INVENTORY_REVIEWED.json
+   lists 64 unique images: 56 user-verified visible-field eligible and 8
+   user-excluded. It is image-integrity/provenance data, NOT ground truth.
+   Process all 64 once the exact source archive is available. Do not claim
+   accuracy without independent nine-field annotations.
+D. imgsHalf1.zip is absent from the canonical repository tree. Accessible
+   inventory sources disagree on archive size (58,090,288 vs 57,665,767 bytes);
+   the latter record gives SHA-256
+   e32e43991ab90d6e2ca3e060f264456d175d0e93390f273d7f3a3f5d93fa98a2.
+   Retrieve the original archive and verify all 64 member hashes. Do not guess.
+E. One OCR.Space request/PDF per image; local readers consume that PDF raster
+   without another OCR.Space request. Report corpora separately.
+
+BLOCKERS / UNVERIFIED
+- OCRSPACE_API_KEY Actions secret/local key availability is unverified.
+- 64-image archive is absent and archive provenance conflicts.
+- New PDF-first exact-head CI result is not yet inspected.
+- 4- and 16-image corpora have not yet been rerun through this sequence.
+- Production remains NO-GO until live requests, current Windows tests, exact
+  inventory comparisons, zero-wrong-acceptance gates and all release gates pass.
+
+All active docs, plans, scripts, workflows and runners must now describe:
+OCR.Space Engine 2 source image → searchable PDF → local PDF-page raster →
+Tesseract.js/native Tesseract/PaddleOCR/OpenCV downstream. Remove active claims
+that OCR.Space is diagnostic-only/last-resort, crop-only, or that local readers
+process the original screenshot after successful PDF creation. Preserve history
+verbatim and mark it superseded rather than rewriting provenance.
+
+================================================================================
+END CURRENT OCR ARCHITECTURE OVERRIDE
+================================================================================
+
+================================================================================
 PRIME DIRECTIVE — GOVERNING RULE FOR ALL PLAN IMPLEMENTATION
 ================================================================================
 
