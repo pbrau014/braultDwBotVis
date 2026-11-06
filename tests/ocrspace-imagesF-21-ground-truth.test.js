@@ -69,3 +69,9 @@ test('uncertain or partial ground-truth fields cannot count as eligible Gate B l
     assert.match(evaluator, /norm\(field, expected\.get\(field\)\) is not None/);
     assert.match(evaluator, /NOT_SCORED_REFERENCE_NOT_ELIGIBLE/);
 });
+
+
+test('the evaluator retains a separate 21-image diagnostic inventory in addition to 19-image Gate B', () => {
+    const evaluator = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'evaluate-ocrspace-imagesF-63-ground-truth.py'), 'utf8');
+    assert.match(evaluator, /ANALYSIS_21_INVENTORY = \\"complete-ground-truth-21\\"/);
+});
