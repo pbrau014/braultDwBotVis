@@ -108,6 +108,7 @@ def main() -> None:
         "groundTruthStatus": "NOT_EVALUABLE_NO_INDEPENDENT_GROUND_TRUTH",
     }
     REPORT.parent.mkdir(parents=True, exist_ok=True)
+    (REPORT.parent / "DWBOT_IMAGESF_HOLDOUT_CANDIDATE_MANIFEST.json").write_bytes(manifest_bytes)
     REPORT.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     report_sha = digest_file(REPORT)[1]
     REPORT.with_suffix(REPORT.suffix + ".sha256").write_text(f"{report_sha}  {REPORT.name}\n", encoding="ascii")
