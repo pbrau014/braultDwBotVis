@@ -77,7 +77,7 @@
       pool:{
         damage:'Doubloon pool factor for the Damage round. It scales the round formula; totals are not normalized to spend exactly the pool.',
         kills:'Doubloon pool factor for the Kills round. It scales the round formula; totals are not normalized to spend exactly the pool.',
-        race:'Doubloon pool factor for the Race round. It scales the round formula; totals are not normalized to spend exactly the pool.',
+        race:'Doubloon pool factor for the Race round. C01 uses inverse elapsed seconds, so faster times earn a larger performance share. It scales the round formula; totals are not normalized to spend exactly the pool. The historical workbook raw-time formula is not the active policy.',
         grand:'Reference-only setting. The Grand Yolo formula does not use the Doubloon pool.'
       },
       multiplier:'Overall event multiplier applied after the event formula. Default 1 leaves the calculated score unchanged; 2 doubles it; 0 disables the round score.',
