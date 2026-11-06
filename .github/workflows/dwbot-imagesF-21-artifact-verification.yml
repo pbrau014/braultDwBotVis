@@ -223,6 +223,70 @@ jobs:
           "DWBOT_SOURCE_WORKFLOW=$sourceWorkflowPath" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           Write-Host "Source run $sourceRunId at $sourceSha; artifact root $artifactRoot"
 
+      - name: Discover and download the latest Gate A report for this exact source commit
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $deadline = (Get-Date).AddMinutes(180)
+          $selectedRun = $null
+          $selectedArtifact = $null
+          while ((Get-Date) -lt $deadline -and $null -eq $selectedRun) {
+            $runsJson = gh api "repos/$env:GITHUB_REPOSITORY/actions/workflows/dwbot-gateA-16-pdf-first.yml/runs?per_page=100"
+            if ($LASTEXITCODE -ne 0) { throw 'Could not list Gate A workflow runs.' }
+            $matchingRuns = @(($runsJson | ConvertFrom-Json).workflow_runs | Where-Object {
+              $_.head_sha -eq $env:DWBOT_SOURCE_RUN_SHA -and $_.name -eq 'DWBOT Gate A 16-image OCR.Space PDF-first acceptance'
+            } | Sort-Object run_number -Descending)
+            $latest = $matchingRuns | Select-Object -First 1
+            if ($null -eq $latest) {
+              Start-Sleep -Seconds 30
+              continue
+            }
+            if ($latest.status -ne 'completed') {
+              Write-Host "Waiting for same-source Gate A run $($latest.id) ($($latest.status)) to complete before evaluating Gate B."
+              Start-Sleep -Seconds 30
+              continue
+            }
+            $artifactJson = gh api "repos/$env:GITHUB_REPOSITORY/actions/runs/$($latest.id)/artifacts"
+            if ($LASTEXITCODE -ne 0) { throw 'Could not inspect Gate A run artifacts.' }
+            $expectedName = "dwbot-gateA-16-pdf-first-$($latest.id)"
+            $candidateArtifact = (($artifactJson | ConvertFrom-Json).artifacts | Where-Object {
+              $_.name -eq $expectedName -and $_.expired -eq $false
+            } | Select-Object -First 1)
+            if ($null -eq $candidateArtifact) {
+              Write-Host "Latest completed Gate A run $($latest.id) has no unexpired acceptance artifact."
+              break
+            }
+            $selectedRun = $latest
+            $selectedArtifact = $candidateArtifact
+          }
+          if ($null -eq $selectedRun -or $null -eq $selectedArtifact) {
+            Write-Host 'No completed same-source Gate A artifact is available; Gate A will remain PENDING in the report.'
+            "DWBOT_GATE_A_REPORT=" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+            exit 0
+          }
+          $gateADir = Join-Path $env:RUNNER_TEMP ('dwbot-gateA-report-' + $selectedRun.id)
+          New-Item -ItemType Directory -Force $gateADir | Out-Null
+          gh run download $selectedRun.id --repo $env:GITHUB_REPOSITORY --name $selectedArtifact.name --dir $gateADir
+          if ($LASTEXITCODE -ne 0) { throw 'Could not download the same-source Gate A acceptance artifact.' }
+          $reports = @(Get-ChildItem -Path $gateADir -Filter 'gate-a-acceptance.json' -File -Recurse)
+          if ($reports.Count -ne 1) { throw 'Gate A artifact must contain exactly one gate-a-acceptance.json report.' }
+          $gateAReport = Get-Content -Raw $reports[0].FullName | ConvertFrom-Json
+          if ($gateAReport.candidateFingerprint -ne $env:DWBOT_SOURCE_RUN_SHA -or $gateAReport.gateBSourceRunId -ne $env:DWBOT_SOURCE_RUN_ID -or $gateAReport.gateBSourceCommitSha -ne $env:DWBOT_SOURCE_RUN_SHA) {
+            throw 'Gate A report is not locked to the exact 63-image source run/commit.'
+          }
+          $evidenceDir = Join-Path $env:GITHUB_WORKSPACE 'testdata/ocr-acceptance'
+          New-Item -ItemType Directory -Force $evidenceDir | Out-Null
+          $preservedReport = Join-Path $evidenceDir 'gate-a-acceptance-source.json'
+          Copy-Item -LiteralPath $reports[0].FullName -Destination $preservedReport -Force
+          $resumeManifests = @(Get-ChildItem -Path $gateADir -Filter 'resume-manifest.json' -File -Recurse)
+          if ($resumeManifests.Count -eq 1) { Copy-Item -LiteralPath $resumeManifests[0].FullName -Destination (Join-Path $evidenceDir 'gate-a-resume-manifest.json') -Force }
+          "DWBOT_GATE_A_REPORT=$preservedReport" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "DWBOT_GATE_A_RUN_ID=$($selectedRun.id)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "DWBOT_GATE_A_ARTIFACT_DIGEST=$($selectedArtifact.digest)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "DWBOT_GATE_A_REPORT_SHA256=$((Get-FileHash -Algorithm SHA256 $preservedReport).Hash.ToLowerInvariant())" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          Write-Host "Using Gate A run $($selectedRun.id), status=$($gateAReport.status), artifact=$($selectedArtifact.digest)."
+
       - name: Download and freshly verify the exact 63-image source archive
         shell: powershell
         run: |
@@ -276,7 +340,9 @@ jobs:
         run: |
           $output = Join-Path $env:GITHUB_WORKSPACE 'testdata\ocrspace-imagesF-63-exploratory\artifact-verification-19.json'
           New-Item -ItemType Directory -Force (Split-Path $output -Parent) | Out-Null
-          node scripts/verify-ocrspace-imagesF-21-artifacts.js --run-report $env:DWBOT_RUN_REPORT --ground-truth $env:DWBOT_GROUND_TRUTH --preflight-report $env:DWBOT_OLD_PREFLIGHT --fresh-preflight-report $env:DWBOT_FRESH_PREFLIGHT --source-image-root $env:DWBOT_SOURCE_IMAGE_ROOT --artifact-root $env:DWBOT_ARTIFACT_ROOT --network-log $env:DWBOT_NETWORK_LOG --recovery-network-log $env:DWBOT_LOCAL_READER_RECOVERY_NETWORK_LOG --network-log-reconciliation $env:DWBOT_NETWORK_RECONCILIATION --workflow-file $env:DWBOT_SOURCE_WORKFLOW --output $output
+          $verifyArgs = @('--run-report', $env:DWBOT_RUN_REPORT, '--ground-truth', $env:DWBOT_GROUND_TRUTH, '--preflight-report', $env:DWBOT_OLD_PREFLIGHT, '--fresh-preflight-report', $env:DWBOT_FRESH_PREFLIGHT, '--source-image-root', $env:DWBOT_SOURCE_IMAGE_ROOT, '--artifact-root', $env:DWBOT_ARTIFACT_ROOT, '--network-log', $env:DWBOT_NETWORK_LOG, '--recovery-network-log', $env:DWBOT_LOCAL_READER_RECOVERY_NETWORK_LOG, '--network-log-reconciliation', $env:DWBOT_NETWORK_RECONCILIATION, '--workflow-file', $env:DWBOT_SOURCE_WORKFLOW, '--output', $output)
+          if ($env:DWBOT_GATE_A_REPORT -and (Test-Path $env:DWBOT_GATE_A_REPORT)) { $verifyArgs += @('--gate-a-report', $env:DWBOT_GATE_A_REPORT) }
+          node scripts/verify-ocrspace-imagesF-21-artifacts.js @verifyArgs
           "DWBOT_ARTIFACT_VERIFICATION_REPORT=$output" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
 
       - name: Run 19-image Gate B post-hoc evaluation without provider requests
@@ -347,6 +413,8 @@ jobs:
             testdata/ocr-acceptance/local-reader-recovery-network.log
             testdata/ocr-acceptance/network-log-reconciliation.json
             testdata/ocr-acceptance/network-log-reconciliation.txt
+            testdata/ocr-acceptance/gate-a-acceptance-source.json
+            testdata/ocr-acceptance/gate-a-resume-manifest.json
             testdata/ocr-acceptance/fresh-imagesF-63-preflight.json*
             testdata/ocr-acceptance/paddleocr-model-manifest.json
             testdata/ocr-acceptance/paddleocr-install-manifest.json
