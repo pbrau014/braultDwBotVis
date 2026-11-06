@@ -318,6 +318,28 @@ jobs:
           "DWBOT_FRESH_PREFLIGHT=$freshPreflight" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           "DWBOT_SOURCE_IMAGE_ROOT=$imageRoot" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
 
+      - name: Normalize and verify all 63 existing searchable-PDF rasters (no provider requests)
+        id: normalize-63-pdf-rasters
+        continue-on-error: true
+        shell: powershell
+        env:
+          OCRSPACE_ENABLED: '0'
+          OCRSPACE_NETWORK_ALLOWLIST: '0'
+          OCR_NON_OCR_NETWORK_RESTRICTED: '1'
+          OCR_NON_OCR_NETWORK_LOG: ${{ github.workspace }}/testdata/ocr-acceptance/normalize-63-network.log
+        run: |
+          $output = Join-Path $env:GITHUB_WORKSPACE 'testdata\ocrspace-imagesF-63-exploratory\normalized-raster-audit-63.json'
+          $normalizedCopy = Join-Path $env:GITHUB_WORKSPACE 'testdata\ocrspace-imagesF-63-exploratory\normalized-63'
+          New-Item -ItemType Directory -Force (Split-Path $output -Parent) | Out-Null
+          New-Item -ItemType Directory -Force (Split-Path $env:OCR_NON_OCR_NETWORK_LOG -Parent) | Out-Null
+          [System.IO.File]::WriteAllText($env:OCR_NON_OCR_NETWORK_LOG, '')
+          node scripts/normalize-ocrspace-imagesF-63-pdf-rasters.js --run-report $env:DWBOT_RUN_REPORT --ground-truth $env:DWBOT_GROUND_TRUTH --source-image-root $env:DWBOT_SOURCE_IMAGE_ROOT --artifact-root $env:DWBOT_ARTIFACT_ROOT --output $output
+          $normalizerExit = $LASTEXITCODE
+          $normalizedSource = Join-Path $env:DWBOT_ARTIFACT_ROOT 'normalized-63'
+          if (Test-Path $normalizedSource) { Copy-Item -LiteralPath $normalizedSource -Destination $normalizedCopy -Recurse -Force }
+          "DWBOT_NORMALIZATION_63_REPORT=$output" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          if ($normalizerExit -ne 0) { Write-Host 'All-63 raster normalization report records one or more missing/failed source artifacts; continuing Gate B evaluation.' }
+
       - name: Recover only timed-out local readers from verified PDF-derived rasters
         id: local-reader-recovery
         continue-on-error: true
@@ -416,6 +438,8 @@ jobs:
         with:
           name: dwbot-imagesF-19-gateB-artifact-verification-${{ inputs.source_run_id || '42160979140' }}
           path: |
+            testdata/ocrspace-imagesF-63-exploratory/normalized-raster-audit-63.json
+            testdata/ocrspace-imagesF-63-exploratory/normalized-63/**
             testdata/ocrspace-imagesF-63-exploratory/artifact-verification-19.json
             testdata/ocrspace-imagesF-63-exploratory/posthoc-evaluation-19.json
             testdata/ocrspace-imagesF-63-exploratory/pdf-text-layer-analysis-19.json*
