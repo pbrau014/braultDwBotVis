@@ -153,6 +153,48 @@ async function main() {
             console.log('[OCRSPACE-IMAGESF-63] ' + index + '/63 ' + item.filename + ' artifact integrity failure; provider skipped');
             continue;
         }
+        if (decision === 'resume-local-only') {
+            const pdfPath = path.resolve(outputRoot, prior.pdfPath);
+            const rasterPath = path.resolve(outputRoot, prior.rasterPath);
+            const safeArtifactPath = (target, relative) => path.dirname(target) === outputRoot && !path.isAbsolute(relative) && path.basename(relative) === relative;
+            let pdfBuffer = null;
+            let rasterBuffer = null;
+            let artifactsValid = safeArtifactPath(pdfPath, prior.pdfPath) && safeArtifactPath(rasterPath, prior.rasterPath);
+            if (artifactsValid) {
+                try {
+                    pdfBuffer = await fs.readFile(pdfPath);
+                    rasterBuffer = await fs.readFile(rasterPath);
+                    artifactsValid = pdfBuffer.subarray(0, 5).toString('ascii') === '%PDF-'
+                        && sha256(pdfBuffer) === prior.pdfSha256
+                        && sha256(rasterBuffer) === prior.rasterSha256;
+                } catch { artifactsValid = false; }
+            }
+            if (!artifactsValid) {
+                prior.resumeDisposition = 'local-recovery-artifact-integrity-failure-no-provider-retry';
+                prior.status = 'artifact-integrity-failure-no-resubmit';
+                prior.failure = { code: 'OCRSPACE_RESUME_ARTIFACT_INVALID', message: 'Saved PDF/raster is missing, unsafe, invalid, or hash-mismatched; provider submission was not repeated.' };
+            } else {
+                prior.localReaders = [];
+                prior.localReaderFailures = [];
+                prior.localReaderRecoveryAttempts = (Number(prior.localReaderRecoveryAttempts) || 0) + 1;
+                prior.localReaderRecoveryAt = new Date().toISOString();
+                for (const engine of engines) {
+                    try { prior.localReaders.push(await extractWithEngine(rasterBuffer, engine)); }
+                    catch (readerError) {
+                        prior.localReaderFailures.push({ engine, code: readerError.code || null, message: String(readerError.message || readerError).slice(0, 400) });
+                    }
+                }
+                prior.status = prior.localReaderFailures.length === 0
+                    ? 'pdf-first-complete'
+                    : 'pdf-first-complete-local-reader-failure';
+                prior.resumeDisposition = 'local-readers-rerun-from-hash-verified-pdf-derived-raster';
+                if (prior.localReaderFailures.length === 0) delete prior.failure;
+            }
+            syncResults(run, resultByName);
+            await writeProgress(outputRoot, run);
+            console.log('[OCRSPACE-IMAGESF-63] ' + index + '/63 ' + item.filename + ' local-only recovery ' + prior.status);
+            continue;
+        }
         if (decision === 'skip-ambiguous') {
             prior.resumeDisposition = 'ambiguous-provider-submission-not-retried';
             prior.previousStatus = prior.status;
