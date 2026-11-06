@@ -79,7 +79,7 @@
       "xp"
     ],
     "provenanceQualification": "Manual transcriptions are independent of OCR outputs; the source archive does not document a separate blind second reviewer or double-blind certification.",
-    "tuningPolicy": "Do not tune against these 21 holdout images.",
+    "tuningPolicy": "Do not tune against these 19 Gate B holdout images. The next two complete reference records remain eligible only for the separate 21-image pipeline-analysis inventory.",
     "records": [
       {
         "filename": "PHX-1.jpg",
