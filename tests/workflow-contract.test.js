@@ -296,6 +296,7 @@ test('Gate A acceptance uses the accepted runtime, fail-closed network guard and
     assert.ok(workflow.includes('Initialize Gate A restricted-egress diagnostic log'));
     assert.ok(workflow.includes('OCR_SEQUENCE_RESUME_FROM'));
     assert.ok(workflow.includes('originalNetworkEvidencePass'));
+    assert.ok(workflow.includes('report.reportMetadata.sourceBuild.sha256'));
     assert.ok(workflow.includes('run-gateA-parallel-reader-matrix.js'));
     assert.ok(workflow.includes('parallelReaderMatrixPass'));
     assert.ok(workflow.includes('Provision pinned local PaddleOCR CPU runtime'));
