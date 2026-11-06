@@ -1,3 +1,5 @@
+> **Current architecture override (2026-11-05):** PaddleOCR is downstream of OCR.Space. It must process the locally rendered raster of the OCR.Space searchable PDF, never the original screenshot after the PDF-first stage. OCR.Space Engine 2 creates the PDF first. This note supersedes any earlier source-image/crop-first description below; historical benchmark details remain unchanged.
+
 # Iteration 20 — Local PaddleOCR field-crop fallback
 
 **Status:** fallback implementation and unit-level safeguards are complete; feature is disabled by default. The full Tesseract-only 16-image control and targeted fixtures were rerun. The integrated PaddleOCR field-crop candidate remains unmeasured; its paired Windows Node 24 runner now captures a Tesseract-only control and a hybrid candidate on the same host. **Production release remains NO-GO.**

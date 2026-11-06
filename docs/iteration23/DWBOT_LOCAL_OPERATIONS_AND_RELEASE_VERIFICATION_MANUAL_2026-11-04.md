@@ -8,7 +8,7 @@
 - Use a separate development Discord application, bot, guild, channel and test accounts. Use synthetic screenshots and participant data only.
 - Never commit or share bot tokens, OAuth secrets, webhook URLs, .env files, private databases, or real participant screenshots.
 - Keep the desktop bridge bound to 127.0.0.1; do not expose it through LAN, tunnel, reverse proxy or port forwarding.
-- Keep slash commands disabled unless a separately approved isolated test requires them. OCR.Space is default-on only when a valid local Free API key is configured; set `OCRSPACE_ENABLED=0` for local-only acceptance. Only safe non-identifying crops may be transmitted, and remote results remain diagnostic. Keep PaddleOCR fallback disabled unless a paired benchmark justifies it; OpenCV assist is evaluated as a separate candidate, not assumed better.
+- Keep slash commands disabled unless a separately approved isolated test requires them. OCR.Space Engine 2 processes each original World of Warships screenshot first and produces a searchable PDF; local Tesseract.js/native Tesseract/PaddleOCR/OpenCV processing then uses only the PDF-derived raster. Production requires OCRSPACE_API_KEY; OCRSPACE_ENABLED=0 is explicit local-only development/test mode. OCR.Space uploads of the specifically authorized 4-, 16-, and 64-image inventories are permitted; do not send unrelated screenshots, credentials, Discord IDs or private account data. Retain PDF/raster artifacts and source/upload/PDF hashes. Keep PaddleOCR fallback disabled unless a paired benchmark justifies it; OpenCV remains geometry-only.
 - Preserve the nine mandatory OCR fields in order: result, player, map, mode, battleStart, credits, freeXp, damage, xp. XP is mandatory and ninth. Missing, ambiguous, invalid, conflicting or incorrect values fail exact acceptance. Never fuzzy-correct or weaken validation.
 - Record source commit, runtime, lockfile hash, fixture hashes, engine versions, command, exit code, logs, report and checksum.
 - Hosted Windows CI is not the user's local Windows verification. Offline mocks and preflights do not prove real OAuth, browser or Discord behavior.
@@ -86,6 +86,8 @@ The release package must be created from the exact tested clean main commit and 
 PASS requires archive SHA-256, ZIP integrity, clean extraction, independent manifest verification, npm ci, npm test and relevant offline preflights from the extracted copy. Retain the verification report.
 
 ## 8. Evidence and disposition
+
+For OCR.Space-first runs, retain the original source hash, normalized upload hash/size/dimensions, Engine 2 response, searchable PDF hash/size, PDF-derived raster dimensions, and each local reader's exact output. Network access is restricted to the OCR.Space HTTPS API and temporary PDF hosts; all other destinations are blocked and logged.
 
 Retain one dated evidence directory per run. Include source commit and Git status; Windows/Node/npm details; OCR engine versions; fixture hashes; per-image JSON; blocked-network logs; report checksums; persistence stages and database hashes; redacted OAuth/browser screenshots and role matrix; Discord READY/permission/attachment/restart logs; PDF inspection checklist; package checksum and extraction verification.
 

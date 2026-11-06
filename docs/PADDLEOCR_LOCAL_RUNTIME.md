@@ -1,3 +1,5 @@
+> **Current architecture override (2026-11-05):** PaddleOCR runtime is a downstream local reader for the raster rendered from the OCR.Space Engine 2 searchable PDF. It must not independently read the original screenshot after the PDF-first stage. Historical install/benchmark notes remain provenance.
+
 # PaddleOCR local runtime
 
 The runtime is an optional local OCR benchmark engine. The Node/Tesseract bot remains the authoritative pipeline until identical-fixture results demonstrate that PaddleOCR improves field/record accuracy without unacceptable false acceptance.

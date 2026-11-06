@@ -1,3 +1,7 @@
+## OCR pipeline — current governing sequence
+
+OCR.Space Engine 2 processes each source screenshot first and creates a searchable PDF. The PDF is downloaded and rendered locally; Tesseract.js, native Tesseract, PaddleOCR (when enabled), and OpenCV geometry then operate on the PDF-derived raster. No local reader falls back to the original screenshot after successful PDF creation. Production requires OCRSPACE_API_KEY; OCRSPACE_ENABLED=0 is explicit local-only development/test mode. See docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md and docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt.
+
 ## Tested-source and current-branch clarification — 2026-11-05
 
 - Last source-code checkpoint: 5a12a9c218cebe61d277999318b7ceef5a8dc3b1 (run 42111470540).
