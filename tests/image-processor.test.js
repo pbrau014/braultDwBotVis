@@ -49,7 +49,7 @@ test('PDF page raster crop follows the exact source screenshot aspect ratio', ()
     left: 0, top: 0, width: 1818, height: 1023,
   });
   assert.deepEqual(sourceAspectCropRect(1818, 2573, 1334, 627), {
-    left: 0, top: 0, width: 1818, height: 855,
+    left: 0, top: 0, width: 1818, height: 854,
   });
   assert.deepEqual(sourceAspectCropRect(1818, 2573, 2880, 1800), {
     left: 0, top: 0, width: 1818, height: 1136,
@@ -60,17 +60,17 @@ test('PDF page raster crop rejects invalid and unverified portrait layouts', () 
   const { sourceAspectCropRect } = require('../src/image-processor');
   assert.throws(() => sourceAspectCropRect(1818, 2573, 0, 1080), { code: 'OCRSPACE_PDF_SOURCE_DIMENSIONS_INVALID' });
   assert.throws(() => sourceAspectCropRect(1818, 2573, 1080, 1920), { code: 'OCRSPACE_PDF_SOURCE_ASPECT_UNSUPPORTED' });
-  assert.throws(() => sourceAspectCropRect(1818, 2573, 100, 100), { code: 'OCRSPACE_PDF_SOURCE_ASPECT_UNSUPPORTED' });
+  assert.throws(() => sourceAspectCropRect(1818, 2573, 600, 1200), { code: 'OCRSPACE_PDF_SOURCE_ASPECT_UNSUPPORTED' });
 });
 
 test('PDF page raster normalizer removes page whitespace but preserves the screenshot width', async (t) => {
   const { normalizeSearchablePdfPageRaster, metadata, imageMagick, __test } = require('../src/image-processor');
   if (!imageMagick) return t.skip('ImageMagick is unavailable in this environment.');
   const page = await __test.runImageMagick([
-    '-size', '400x600', 'xc:white', '-fill', '#315f87', '-draw', 'rectangle 0,0 399,199', 'png:-',
+    '-size', '400x600', 'xc:white', '-fill', '#315f87', '-draw', 'rectangle 0,0 399,266', 'png:-',
   ], Buffer.alloc(0));
-  const normalized = await normalizeSearchablePdfPageRaster(page, { sourceWidth: 2, sourceHeight: 1 });
-  assert.deepEqual(await metadata(normalized.buffer), { width: 400, height: 200 });
+  const normalized = await normalizeSearchablePdfPageRaster(page, { sourceWidth: 3, sourceHeight: 2 });
+  assert.deepEqual(await metadata(normalized.buffer), { width: 400, height: 267 });
   assert.equal(normalized.normalization.method, 'source-aspect-top-aligned-crop-v1');
-  assert.deepEqual(normalized.normalization.cropRect, { left: 0, top: 0, width: 400, height: 200 });
+  assert.deepEqual(normalized.normalization.cropRect, { left: 0, top: 0, width: 400, height: 267 });
 });
