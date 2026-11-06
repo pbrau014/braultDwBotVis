@@ -74,15 +74,19 @@ function score(expected, actual, fields) {
     metrics.exactMatchRate = metrics.eligible ? metrics.exact / metrics.eligible : null;
     return { metrics, perField };
 }
-function consensus(values, field) {
+function consensus(values, field, minimumAgreement = 2) {
     const candidates = values.filter(value => norm(field, value) !== null);
     const groups = new Map();
     for (const value of candidates) {
         const key = norm(field, value);
         groups.set(key, [...(groups.get(key) || []), value]);
     }
-    const winner = [...groups.entries()].sort((a, b) => b[1].length - a[1].length)[0];
-    return winner && winner[1].length >= 2 ? winner[1][0] : null;
+    const ranked = [...groups.entries()].sort((a, b) => b[1].length - a[1].length);
+    const winner = ranked[0];
+    if (!winner || winner[1].length < minimumAgreement) return null;
+    // A 2–2 or other tied vote is a conflict, not a reason to prefer input order.
+    if (ranked[1] && ranked[1][1].length === winner[1].length) return null;
+    return winner[1][0];
 }
 async function main() {
     const args = process.argv.slice(2);
@@ -109,6 +113,11 @@ async function main() {
         providerParsedText: { fields: ['result', 'map', 'mode', 'battleStart', 'credits', 'freeXp', 'damage', 'xp'], eligible: 0, exact: 0, wrong: 0, unresolved: 0 },
         pdfTextPlusTesseractJsPlayer: { fields: FIELDS, eligible: 0, exact: 0, wrong: 0, unresolved: 0 },
         pdfTextPlusNativePlayer: { fields: FIELDS, eligible: 0, exact: 0, wrong: 0, unresolved: 0 },
+        providerTextPlusTesseractJsPlayer: { fields: FIELDS, eligible: 0, exact: 0, wrong: 0, unresolved: 0 },
+        providerTextPlusNativePlayer: { fields: FIELDS, eligible: 0, exact: 0, wrong: 0, unresolved: 0 },
+        pdfProviderConsensus: { fields: FIELDS, eligible: 0, exact: 0, wrong: 0, unresolved: 0 },
+        fourSourceConsensus: { fields: FIELDS, eligible: 0, exact: 0, wrong: 0, unresolved: 0 },
+        strictFourSourceConsensus: { fields: FIELDS, eligible: 0, exact: 0, wrong: 0, unresolved: 0 },
         strictThreeSourceConsensus: { fields: FIELDS, eligible: 0, exact: 0, wrong: 0, unresolved: 0 },
     };
     const images = [];
@@ -150,13 +159,32 @@ async function main() {
             providerParsedText: score(expectedRow.expected, providerCandidates, aggregate.providerParsedText.fields),
             pdfTextPlusTesseractJsPlayer: score(expectedRow.expected, { ...pdfCandidates, player: readers.tesseractjs.player }, FIELDS),
             pdfTextPlusNativePlayer: score(expectedRow.expected, { ...pdfCandidates, player: readers.native.player }, FIELDS),
+            providerTextPlusTesseractJsPlayer: score(expectedRow.expected, { ...providerCandidates, player: readers.tesseractjs.player }, FIELDS),
+            providerTextPlusNativePlayer: score(expectedRow.expected, { ...providerCandidates, player: readers.native.player }, FIELDS),
         };
-        const consensusRecord = {};
+        const pdfProviderRecord = {};
+        const fourSourceRecord = {};
+        const strictFourSourceRecord = {};
+        const strictThreeSourceRecord = {};
         for (const field of FIELDS) {
-            if (field === 'player') consensusRecord[field] = consensus([readers.tesseractjs.player, readers.native.player], field);
-            else consensusRecord[field] = consensus([pdfCandidates[field], readers.tesseractjs[field], readers.native[field]], field);
+            if (field === 'player') {
+                const playerCandidates = [readers.tesseractjs.player, readers.native.player];
+                pdfProviderRecord[field] = consensus(playerCandidates, field, 2);
+                fourSourceRecord[field] = consensus(playerCandidates, field, 2);
+                strictFourSourceRecord[field] = consensus(playerCandidates, field, 2);
+                strictThreeSourceRecord[field] = consensus(playerCandidates, field, 2);
+            } else {
+                pdfProviderRecord[field] = consensus([pdfCandidates[field], providerCandidates[field]], field, 2);
+                const allCandidates = [pdfCandidates[field], providerCandidates[field], readers.tesseractjs[field], readers.native[field]];
+                fourSourceRecord[field] = consensus(allCandidates, field, 2);
+                strictFourSourceRecord[field] = consensus(allCandidates, field, 3);
+                strictThreeSourceRecord[field] = consensus([pdfCandidates[field], readers.tesseractjs[field], readers.native[field]], field, 2);
+            }
         }
-        combined.strictThreeSourceConsensus = score(expectedRow.expected, consensusRecord, FIELDS);
+        combined.pdfProviderConsensus = score(expectedRow.expected, pdfProviderRecord, FIELDS);
+        combined.fourSourceConsensus = score(expectedRow.expected, fourSourceRecord, FIELDS);
+        combined.strictFourSourceConsensus = score(expectedRow.expected, strictFourSourceRecord, FIELDS);
+        combined.strictThreeSourceConsensus = score(expectedRow.expected, strictThreeSourceRecord, FIELDS);
         for (const [key, value] of Object.entries(combined)) {
             const target = aggregate[key];
             for (const metric of ['eligible', 'exact', 'wrong', 'unresolved']) target[metric] += value.metrics[metric];
@@ -171,7 +199,7 @@ async function main() {
             native: Boolean((row.localReaders || []).some(reader => reader.engine === 'native')),
         };
         image.comparisons = Object.fromEntries(Object.entries(combined).map(([key, value]) => [key, value]));
-        image.strictThreeSourceConsensus = consensusRecord;
+        image.consensusCandidates = { pdfProvider: pdfProviderRecord, fourSource: fourSourceRecord, strictFourSource: strictFourSourceRecord, strictThreeSource: strictThreeSourceRecord };
         images.push(image);
     }
     for (const metric of Object.values(aggregate)) metric.exactMatchRate = metric.eligible ? metric.exact / metric.eligible : null;
@@ -190,6 +218,9 @@ async function main() {
         combinationRules: {
             pdfTextPlusTesseractJsPlayer: 'PDF text-layer candidates for eight non-identity fields plus local Tesseract.js player candidate',
             pdfTextPlusNativePlayer: 'PDF text-layer candidates for eight non-identity fields plus local native Tesseract player candidate',
+            pdfProviderConsensus: 'PDF text-layer and OCR.Space parsed-text candidates must agree; player remains a two-local-reader consensus',
+            fourSourceConsensus: 'Unique majority of at least two among PDF text layer, OCR.Space parsed text, Tesseract.js and native Tesseract; player uses the two local readers',
+            strictFourSourceConsensus: 'Three of four non-identity sources must agree; player uses the two local readers',
             strictThreeSourceConsensus: 'Two matching candidates required; PDF text layer + Tesseract.js + native Tesseract for non-identity fields; local Tesseract.js + native Tesseract for player',
             acceptance: 'No candidate in this report is accepted or written to the production battle record; all results are diagnostic only.',
         },
