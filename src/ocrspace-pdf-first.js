@@ -73,7 +73,7 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
     fetchImpl = globalThis.fetch, client = recognizeCrop, quotaLedger = null,
     prepareUpload = imageProcessor.prepareOcrSpaceUpload,
     downloadPdf = downloadSearchablePdf, renderPdf = imageProcessor.renderSearchablePdfPage,
-    readRasterMetadata = imageProcessor.metadata, now = () => new Date() } = {}) {
+    readRasterMetadata = imageProcessor.metadata, onProviderRequestStarted = null, now = () => new Date() } = {}) {
     const apiKey = String(env.OCRSPACE_API_KEY || '').trim();
     if (!apiKey) return { status: 'blocked', reason: 'OCRSPACE_API_KEY is not configured', requests: 0 };
     if (!Buffer.isBuffer(imageBuffer) || !imageBuffer.length) throw fail('Source screenshot is empty.', 'OCRSPACE_INVALID_IMAGE');
@@ -94,6 +94,15 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
         maxEngine3PerMonth: env.OCRSPACE_MAX_ENGINE3_PER_MONTH,
     });
     await ledger.reserve({ engine: 2, now: now() });
+    // The caller can durably checkpoint the request boundary before any provider
+    // bytes are sent. If that checkpoint fails, the provider is not contacted.
+    if (onProviderRequestStarted !== null) {
+        if (typeof onProviderRequestStarted !== 'function') throw fail('Provider-start checkpoint must be a function.', 'OCRSPACE_INVALID_CHECKPOINT_CALLBACK');
+        await onProviderRequestStarted({ engine: 2,
+            sourceSha256: crypto.createHash('sha256').update(imageBuffer).digest('hex'),
+            uploadSha256: crypto.createHash('sha256').update(upload.buffer).digest('hex'),
+            uploadBytes: upload.buffer.length });
+    }
     const response = await client({
         apiKey, imageBuffer: upload.buffer, filename: upload.filename || filename,
         mimeType: upload.mimeType || 'image/jpeg', engine: 2, overlayRequired: false,
