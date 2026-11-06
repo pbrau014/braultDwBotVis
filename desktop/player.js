@@ -23,9 +23,10 @@
     const open=submissions.items.filter(x=>x.status!=='mapped').length;
     D.$('open-submissions').textContent=String(open);
     const eventList=D.$('event-totals');eventList.replaceChildren();
+    const eventScoreLabels={damage:'Damage event doubloons',kills:'Kills event doubloons',race:'Race C01 doubloons',grand:'Grand Yolo doubloons'};
     for(const [key,label] of Object.entries(overview.eventLabels)){
       const row=D.node('div','event-row');
-      row.append(D.node('span','',label),D.node('strong','',D.number(standing.events?.[key])));
+      row.append(D.node('span','',eventScoreLabels[key]||`${label} doubloons`),D.node('strong','',D.number(standing.events?.[key])));
       eventList.append(row);
     }
     const tbody=D.$('standings-body');tbody.replaceChildren();
