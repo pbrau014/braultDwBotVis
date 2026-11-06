@@ -1,6 +1,6 @@
 # Season Logistics and Grand YOLO Finale Blueprint
 
-**Version:** v0.1 proposal  
+**Version:** v0.2 proposal  
 **Status:** WORKING BLUEPRINT — NOT AN EVENT NOTICE, NOT A SIGNED SETTINGS RECORD, AND NOT AN APPROVED CALENDAR  
 **Purpose:** Join the existing Pilot, recurring-season, postseason, and Grand YOLO materials into one operational sequence without inventing dates, prizes, eligibility thresholds, or unapproved scoring rules.
 
@@ -226,3 +226,47 @@ The current bot is configured around one designated Discord channel for intake/p
 An event is not ready to announce merely because this blueprint or the reusable rulesets exist. A specific event requires a completed, signed Event Settings and Publication Approval Record; complete participant-facing rules; approved dates/time zone, map/mode/ship limits, eligibility, roster and schedule; exact prizes; named staff/contacts; tested evidence and manual fallback; and an approved scoring/formula version. Playoff advancement and Grand YOLO champion declarations additionally require verified match outcomes and an auditable bracket/award record.
 
 **Current disposition:** useful planning framework only. No event date, eligibility cutoff, prize, playoff format, finale format, or organizer approval has been invented or issued.
+
+
+## 10. Admiralty narrative and participant-facing mock season
+
+The public-facing narrative companion is:
+
+- `Admiralty_YOLO_Mock_Tournament_Field_Guide_v0.1_PROPOSAL.md`
+- `Admiralty_YOLO_Mock_Tournament_v0.1.html`
+
+These documents use the Admiralty handbook's fictional cast and organizational architecture as a story frame, the CBStrat guide as a tactical teaching source, and the supplied YOLO rules, Pilot document and Discord texts as the event foundation. Fictional dialogue and match events are labeled as dramatization. They do not create a live event, appoint real staff, approve prizes, or change event rules.
+
+The Admiralty handbook's Executive, Legislative, Judicial, Fleet Command, Service Corps and General Membership roles are translated into tournament functions. Policy and member voice remain separate from live tactical command; referee decisions and appeals remain separate from scorekeeping and match calling. The 50-position Admiralty roster is not a YOLO participant cap.
+
+The handbook PDF is the main character/narrative reference. The `govRec1.png` and `govRec2.png` boards contain alternate names and chronologies; they are retained as visual concept studies, not merged into the PDF's story canon. The exact Admiralty organization chart, CBStrat infographic and YOLO formula image are used as visual references with explicit source labels.
+
+## 11. Tactical teaching: CBStrat principles adapted to YOLO
+
+The CBStrat PDF is a Tier X Clan Battles guide. The mock field guide adapts its general concepts—vision, information sharing, objective control, focus fire, crossfire, push/hold decisions, target priority and disengagement—to the low-tier human/bot YOLO format.
+
+Do not copy Tier X ship compositions, radar coverage assumptions, ship restrictions or consumable availability into YOLO. A role is a job (scout/vision, objective contest, anchor/fire support, crossfire support, caller or reserve), not a required hull. Use radar, hydro, smoke and other tools only when the participant's legal ship actually has them.
+
+## 12. Source conflicts to keep visible in public instructions
+
+The new source reconciliation record is `Admiralty_YOLO_Source_Reconciliation_and_Visual_Provenance_v0.1.md`. It records the source archive hash, file hashes, exact source families and the following unresolved or reconciled distinctions:
+
+- **Pilot vs recurring:** Pilot is drop-in with visible lineups and six humans/six bots; recurring play uses weekly individual registration, a new random draft, hidden lineups until ready-up, and a different human/bot composition.
+- **Bracket wins vs damage awards:** the recurring rules require a win to advance. Individual damage determines the announced damage awards and contributes to cumulative Grand YOLO damage standings. The short Discord summary compresses these into one statement; participant documents now explain the two result lanes separately.
+- **Race formula:** the supplied archival workbook uses raw elapsed seconds and therefore rewards slower times. DWBOT policy C01 specifies inverse seconds so lower elapsed time scores better. The active DWBOT engine and standalone HTML calculator have been changed to inverse-time scoring; exact-head CI is pending and no parity pass is claimed until it succeeds.
+- **Special Ocean mode:** source materials conflict on the mode label and duration: Pilot describes a five-minute special match, the recurring map table describes a ten-minute special match, and the Race narrative describes thirty minutes. Do not announce the special match until the exact current-client mode and duration are approved in the event settings.
+- **Team sizes:** recurring source language includes 2v6 and a later 3v9 option for Round 1; later rounds include 6v6 or 9v9 with two or three humans per side. Publish the selected lineup for each event rather than assuming a single format.
+- **Playoffs:** the supplied YOLO rules do not fully define a separate season playoff field or bracket. The top-eight, 6-of-12, single-elimination and best-of series model in Section 2A remains a proposal only.
+- **Grand YOLO:** calculator Round 4 is an individual weighted score sheet; the season-ending Grand YOLO is a championship event. They are not automatically the same formula or process.
+- **Archival workbook:** `test27xlsm.xlsm` is an archival sample, not the designated canonical workbook. It informs historical explanation and regression design but does not certify current awards or match outcomes.
+
+## 13. Game terminology, external research and configuration changes
+
+The participant guide uses current World of Warships terminology for battleships, cruisers, destroyers, spotting/detection, concealment, broadside, angling, crossfire, kiting, caps, resets and consumables. The official Wargaming overview and Wiki are the primary game references; DevStrike is community guidance, WoWS Numbers is optional public statistical context, and tournament-format websites are general design references rather than event authority.
+
+The current WoWs Tournaments listing demonstrates why event settings must be versioned: King of the Sea XIX (NA) listed its own dates, signup window, 32-team field, team size of 9–15, map pool and combined ship restrictions. Those values are specific to that event, not YOLO defaults. Configurations frequently change; verify the current regional notice and event settings before registration and again before ready-up.
+
+## 14. Source archive provenance
+
+The supplied `yoloPaperWork(1).zip` archive was integrity-checked and safely extracted on 2026-11-06. Size: 22,976,255 bytes; SHA-256: `b7598ed96d9af8ff1bd564e7aed945621800e2299e2f262d86541c62f34cf7b2`; 19 ZIP members; `testzip()` reported no corrupt member. The three Discord text sources have been preserved verbatim under `dwbotStuff/discordMsgs/`. Detailed source hashes and boundaries are in the source reconciliation record.
+
