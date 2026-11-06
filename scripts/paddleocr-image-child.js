@@ -7,6 +7,7 @@ process.env.OCR_NON_OCR_NETWORK_RESTRICTED = '1';
 if (process.env.OCR_NON_OCR_NETWORK_LOG) require('./block-network');
 
 const fs = require('node:fs/promises');
+const crypto = require('node:crypto');
 const imageProcessor = require('../src/image-processor');
 const opencv = require('../src/opencv-field-isolation');
 const paddle = require('../src/paddleocr-field-fallback');
@@ -29,6 +30,9 @@ async function main() {
     }
     const imageBuffer = Buffer.concat(chunks);
     if (!imageBuffer.length) throw new Error('PaddleOCR received an empty raster.');
+    if (!process.env.PADDLEOCR_MODEL_MANIFEST) throw new Error('PADDLEOCR_MODEL_MANIFEST is required for provenance.');
+    const modelManifestBytes = await fs.readFile(process.env.PADDLEOCR_MODEL_MANIFEST);
+    const modelManifestSha256 = crypto.createHash('sha256').update(modelManifestBytes).digest('hex');
     const dimensions = await imageProcessor.metadata(imageBuffer);
     let cvAnalysis;
     try { cvAnalysis = await opencv.analyze(imageBuffer, { force: true, timeoutMs: 5000 }); }
@@ -52,7 +56,7 @@ async function main() {
         if (distinct.size > 1) conflicts[field] = [...distinct.values()];
     }
     const output = {
-        engine: 'paddleocr', status: fallback.status || 'unknown',
+        engine: 'paddleocr', modelManifestSha256, status: fallback.status || 'unknown',
         available: ['complete', 'partial'].includes(fallback.status),
         record, candidatesByField, conflicts,
         cvAnalysis: { status: cvAnalysis.status, opencvVersion: cvAnalysis.opencvVersion,

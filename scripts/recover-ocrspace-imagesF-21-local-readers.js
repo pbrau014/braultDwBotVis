@@ -87,6 +87,11 @@ async function extractLocalReader(rasterBuffer, engine, networkLogPath) {
             throw error;
         }
         if (engine === 'paddleocr') {
+            if (!payload.output?.modelManifestSha256) {
+                const error = new Error('PaddleOCR model manifest hash is missing.');
+                error.code = 'PADDLEOCR_MODEL_MANIFEST_MISSING';
+                throw error;
+            }
             if (!payload.output?.available) {
                 const error = new Error('PaddleOCR unavailable or incomplete: ' + String(payload.output?.status || 'unknown'));
                 error.code = 'PADDLEOCR_READER_UNAVAILABLE';

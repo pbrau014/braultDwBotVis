@@ -108,6 +108,7 @@ async function main() {
     const blocked=networkLog.toString('utf8').split(/\r?\n/).filter(line=>line.trim()).length;
     let modelManifestSha256=null;
     if(process.env.PADDLEOCR_MODEL_MANIFEST){try{modelManifestSha256=sha256(await fs.readFile(process.env.PADDLEOCR_MODEL_MANIFEST));}catch{}}
+    if(!modelManifestSha256)throw new Error('PaddleOCR model manifest is missing; refusing an unproven local reader matrix.');
     const report={
         schemaVersion:1,diagnosticOnly:true,noProviderRequests:true,originalScreenshotFallback:false,
         status:images.length===16&&images.every(item=>item.status==='ANALYZED')&&blocked===0?'COMPLETED_DIAGNOSTIC_MATRIX':blocked?'FAILED_NETWORK_RESTRICTION':'PARTIAL_DIAGNOSTIC_MATRIX',
