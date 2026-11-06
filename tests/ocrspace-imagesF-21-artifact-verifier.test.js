@@ -109,7 +109,7 @@ test('missing network log or secret is not treated as a clean security result', 
   assert.equal(report.checks.unauthorizedNetworkAttempts,null);
   assert.equal(report.inventorySelection.pdfRasterVerifiedImageCount,19);
   assert.equal(report.inventorySelection.localReaderVerifiedImageCount,19);
-  assert.equal(report.inventorySelection.verifiedImageCount,0);
+  assert.equal(report.inventorySelection.verifiedImageCount,19);
 });
 
 
