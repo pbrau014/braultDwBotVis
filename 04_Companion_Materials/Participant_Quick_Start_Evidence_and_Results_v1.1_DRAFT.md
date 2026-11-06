@@ -39,7 +39,7 @@ A concise participant-only workflow for confirming the correct event rules, subm
 | Map / mode | Matches the visible battle record and fixture. |
 | Battle start time | Date/time is associated with the correct game. |
 | Damage | Use the official post-battle Damage statistic specified by the rules; not potential damage. |
-| Credits | Required DWBOT field; compare with the original result screen. |\n| Free XP | Required DWBOT field; compare with the original result screen. |\n| XP | Required DWBOT field; compare with the original result screen. |\n| Record completeness | DWBOT requires all nine fields: result, player, map, mode, battleStart, credits, freeXp, damage and xp. Missing or unreadable values remain unresolved; do not guess or fill them from another source. |
+| Other OCR fields | Credits, Free XP or additional metadata only where the designated tool/event collects them; verify all against the source image. |
 
 ## 5. If something is wrong
 
@@ -59,19 +59,3 @@ A concise participant-only workflow for confirming the correct event rules, subm
 - Recurring bracket advancement uses the verified match outcome calculated from published individual-performance metrics under the approved scoring method, with D21 tie-breaks applied where needed; do not use a raw participant `dblns` value alone unless the published formula expressly specifies that use.
 - Pilot Damage ranking determines only the individual awards expressly announced for that Pilot.
 - The default participant-facing release suppresses H12; the historical $12.56 diagnostic is not cash value, official store price, prize valuation, or an award obligation.
-
-
-## 7. Know which tournament stage you are entering
-
-The latest official event notice controls. A reusable ruleset or planning proposal is not an event notice.
-
-| Stage | What participants should expect | What does not carry over automatically |
-| --- | --- | --- |
-| Pilot | Attendance/drop-in baseline, a published arrival cutoff, organizer-formed lineup, event-specific map/mode, evidence route and any announced individual awards | Pilot attendance or Damage placement does not automatically qualify or seed anyone for a season or playoffs |
-| Regular season | Individual registration, published eligibility, roster/team assignment, weekly fixture, map/mode/ship allowlist, match schedule, evidence and standings process | Do not assume a previous week's roster, map, lineup, or exception applies to the next fixture |
-| Playoffs | Qualification and seeding only from the verified standings and the published qualification/tie-break rules; follow the announced bracket, series length, host and substitution rules | Do not assume a top-four/top-eight bracket, best-of series, bye, or tie-break not stated in the notice |
-| Grand YOLO season finale | A separately announced season-ending championship event with its own entrants, format, schedule, scoring/outcome rules, awards and evidence process | Do not assume it is the same thing as the calculator's Grand Yolo Round 4, or that regular-season standings alone determine the champion |
-
-Before committing to an event, confirm the exact event stage, time zone, registration/arrival cutoff, eligibility, team/roster rules, map/mode and ship limits, prize details, official evidence route, referee/help contact, dispute deadline, and settings/rules version. If any required item is blank or contradictory, ask the organizer before play.
-
-The internal planning proposal `Season_Logistics_and_Grand_YOLO_Finale_Blueprint_v0.1_PROPOSAL.md` is not participant authority and does not create a date, eligibility rule, playoff bracket, prize, or finale format.
