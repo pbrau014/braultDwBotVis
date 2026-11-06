@@ -95,3 +95,17 @@ test('authenticated Admin backup retains private roster links and pending correc
   assert.equal(backup.pending_submissions[0].userId,PLAYER);
   assert.equal(backup.pending_ocr_corrections.length,1);
 });
+
+
+test('player overview suppresses historical H12 value while admin retains internal diagnostics', async () => {
+  const f=fixture();
+  const player=await f.service.resolvePrincipal({id:PLAYER});
+  const admin=await f.service.resolvePrincipal({id:ADMIN});
+  const playerView=await f.service.getOverview(player);
+  assert.equal(Object.prototype.hasOwnProperty.call(playerView,'aggregate'),false);
+  assert.equal(Object.prototype.hasOwnProperty.call(playerView.standing,'estimatedValue'),false);
+  assert.ok(playerView.publicStandings.every(row=>!Object.prototype.hasOwnProperty.call(row,'estimatedValue')));
+  const adminView=await f.service.getOverview(admin);
+  assert.equal(typeof adminView.aggregate.estimatedValue,'number');
+  assert.ok(adminView.standings.every(row=>typeof row.estimatedValue==='number'));
+});
