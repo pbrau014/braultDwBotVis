@@ -352,7 +352,7 @@ async function extractTextCore(imageBuffer) {
         // explicit OCR.Space-first authorization. The API key never enters logs.
         // All downstream OCR readers receive the returned PDF page raster.
         const pdfFirst = await createOcrSpacePdfFirst({
-            imageBuffer, filename: 'wows-battle-source.png', env: process.env,
+            imageBuffer, filename: 'wows-battle-source.png', env: process.env, sourceDimensions: metadata,
         });
         if (pdfFirst.status !== 'complete') {
             const error = new Error(pdfFirst.reason || 'OCR.Space searchable-PDF first pass did not complete.');
