@@ -102,22 +102,26 @@ reached artifact creation; no local-reader result or completed sequence report
 was uploaded. The remaining 15 images were not processed. The first image
 must not be resubmitted.
 
-The partial run used Node 22.16.0, below the required Node >=24.17.0. The
-source commit's older `scripts/block-network.js` only appends the diagnostic
-file when a blocked request occurs and silently catches log-write errors. The
-artifact contains no original network log; its historical denied-attempt
-count is unknown. Do not create an empty file after the fact and claim zero
-attempts. The partial Gate A report correctly records FAIL.
+The partial run used Node 22.16.0, which meets the currently authorized
+Node >=22.16.0 runtime floor. The source commit's older
+`scripts/block-network.js` only appends the diagnostic file when a blocked
+request occurs and silently catches log-write failures. The artifact contains
+no original network log; its historical denied-attempt count is unknown. Do
+not create an empty file after the fact and claim zero attempts. The partial
+Gate A report correctly records FAIL.
 
-The Gate A workflow definition has since been corrected to Node 24.17.0 and
-includes an explicit runtime check. Those changes do not retroactively alter
-the cancelled run. A second queued duplicate was cancelled before execution;
-no repeat submission of `Screenshot_16.jpg` was made. The latest Gate A
-status remains NOT PASSED. Any continuation must first implement and verify
-artifact-bound resume for the existing first PDF/raster, then process only
-the 15 unprocessed source hashes, preserving the first run's missing-log and
-runtime limitations in the final evidence. No Gate A PASS may be claimed from
-this mixed/interrupted evidence.
+The first artifact-bound continuation, run #42246737451, verified the exact
+prior run/artifact identity and completed preflight, but stopped before any
+new provider request. Its local resume-preparation step failed because the
+original `gate-a-acceptance.json` is UTF-8-BOM-prefixed and the helper did not
+strip the BOM before JSON parsing. The log confirms the 16-image OCR.Space
+step was skipped; the first image was not resubmitted and no remaining images
+were submitted. The parser has now been made BOM-safe and a regression test
+added. The next exact-trigger continuation is queued as #42247731956. It must
+again verify/reuse the original first PDF/raster and may process only the
+remaining 15 source hashes if the local nine-field recovery is exact. The
+original network-log absence remains a blocker; Gate A must not be reported
+as passed from reconstructed evidence.
 
 
 ## 7. Gate A workflow hardening after the interrupted run
