@@ -5269,3 +5269,22 @@ END DWBOT-UPD-2026-11-06-007
   legacy 0.9 values are preserved instead of silently converted to 1.
   Regression assertion added in tests/tournament.test.js. Exact-head CI and
   browser validation remain pending.
+
+- OCR reliability hardening: PDF and OCR JSON responses now require bounded
+  streaming; unbounded arrayBuffer/text/json fallback reads fail closed.
+  Declared length is checked before reading and streaming limits cancel the
+  reader at the cap. Regression tests cover over-limit streams and missing
+  streaming support.
+- Safe 63-image resume: durable checkpoint is written after quota reservation
+  and before each provider request; progress writes are atomic. Same-commit
+  artifact-based resume validates original preflight/report and all source
+  hashes. Completed rows are hash-checked and skipped; uncertain attempted
+  rows are never automatically resubmitted. Existing older run #42160979140
+  is not eligible for this resume path and remains untouched.
+- Tournament/UI parallel work: Grand Yolo HTML calculator default/reset now
+  matches DWBOT tierWeight 0.9; mouseover/assistive help added to calculator
+  and desktop Admin scoring settings. Added Season_Logistics_and_Grand_YOLO
+  Finale_Blueprint_v0.1_PROPOSAL.md, indexed as proposal-only; no event values
+  or official playoff/finale policy were invented.
+- Exact-head verification pending; do not mark these changes tested/passed
+  until the latest DWBOT verification run completes.
