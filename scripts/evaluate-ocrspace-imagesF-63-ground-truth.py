@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Post-hoc accuracy evaluation for an existing imagesF-63 OCR.Space run.
 
-This script does not call OCR.Space and never re-runs provider submissions.
-It compares saved local-reader records from the run report against the
-versioned working ground-truth JSON.
+This script never calls OCR.Space or repeats provider submissions. It compares
+saved PDF-derived local-reader records against the versioned manual reference.
 """
 from __future__ import annotations
 import argparse, hashlib, json, re
@@ -30,8 +29,7 @@ def norm(field: str, value):
         digits = re.sub(r"\D", "", text)
         return digits or None
     text = re.sub(r"\s+", " ", text).strip()
-    text = text.replace("—", "-").replace("–", "-")
-    return text.casefold()
+    return text.replace("—", "-").replace("–", "-").casefold()
 
 def evaluate_engine(run, gt, engine):
     gt_by_name = {r["filename"]: r for r in gt["records"]}
@@ -43,20 +41,27 @@ def evaluate_engine(run, gt, engine):
     raster_count = sum(1 for r in run.get("results", []) if r.get("rasterSha256"))
     attempted_count = sum(1 for r in run.get("results", []) if r.get("providerSubmissionAttempted") is True)
     reader_count = 0
+    source_hash_mismatches = 0
 
     for result in run.get("results", []):
         name = result.get("filename")
         expected_row = gt_by_name.get(name)
         if not expected_row:
+            per_image.append({"filename":name,"status":"NOT_IN_GROUND_TRUTH"})
             continue
+        expected_source_hash = (expected_row.get("sourceImage") or {}).get("sha256")
+        source_hash = result.get("sourceSha256")
+        source_ok = bool(expected_source_hash and source_hash == expected_source_hash)
+        if not source_ok:
+            source_hash_mismatches += 1
         reader = next((x for x in result.get("localReaders", []) if x.get("engine") == engine), None)
         if reader:
             reader_count += 1
         record = (reader or {}).get("record") or {}
         accepted = (reader or {}).get("accepted") is True
         image_fields = {}
-        all_exact = True
-        any_unresolved = False
+        all_exact = source_ok
+        any_unresolved = not source_ok
         full_eligible = expected_row.get("recordStatus") == "COMPLETE_9_FIELD_TRANSCRIPTION"
 
         for field in FIELDS:
@@ -66,8 +71,9 @@ def evaluate_engine(run, gt, engine):
             actual = record.get(field)
             n_expected = norm(field, expected)
             n_actual = norm(field, actual)
-            if not eligible or n_expected is None:
-                image_fields[field] = {"status":"NOT_SCORED", "expected":expected, "actual":actual}
+            if not eligible or n_expected is None or not source_ok:
+                status = "NOT_SCORED_SOURCE_HASH_MISMATCH" if not source_ok else "NOT_SCORED"
+                image_fields[field] = {"status":status, "expected":expected, "actual":actual}
                 continue
             metric = field_metrics[field]
             metric["eligible"] += 1
@@ -99,7 +105,7 @@ def evaluate_engine(run, gt, engine):
                 full_status = "EXACT_9_FIELD_MATCH"
             elif any_unresolved:
                 complete_unresolved += 1
-                full_status = "INCOMPLETE_LOCAL_READER_OUTPUT"
+                full_status = "INCOMPLETE_OR_SOURCE_HASH_MISMATCH"
             else:
                 complete_wrong += 1
                 full_status = "NINE_FIELD_MISMATCH"
@@ -108,23 +114,39 @@ def evaluate_engine(run, gt, engine):
 
         per_image.append({
             "filename":name,
+            "sourceImageHashStatus":"PASS" if source_ok else "MISMATCH_OR_MISSING",
+            "expectedSourceImageSha256":expected_source_hash,
+            "runSourceSha256":source_hash,
             "pdfFirstStatus":result.get("status"),
             "providerSubmissionAttempted":result.get("providerSubmissionAttempted") is True,
+            "providerFailure":result.get("failure"),
             "pdfSha256":result.get("pdfSha256"),
             "rasterSha256":result.get("rasterSha256"),
             "readerAvailable":reader is not None,
             "readerAccepted":accepted,
             "fullRecordStatus":full_status,
             "fields":image_fields,
-            "readerFailures":[x for x in result.get("localReaderFailures", []) if x.get("engine")==engine]
+            "localReaderFailures":[x for x in result.get("localReaderFailures", []) if x.get("engine")==engine]
         })
 
+    for metric in field_metrics.values():
+        metric["exactMatchRate"] = metric["correct"] / metric["eligible"] if metric["eligible"] else None
+    total_eligible = sum(m["eligible"] for m in field_metrics.values())
+    total_correct = sum(m["correct"] for m in field_metrics.values())
     return {
         "engine":engine,
         "readerRowsAvailable":reader_count,
         "providerSubmissionAttempts":attempted_count,
         "searchablePdfsWithHashes":pdf_count,
         "pdfDerivedRastersWithHashes":raster_count,
+        "sourceImageHashMismatches":source_hash_mismatches,
+        "fieldLevelSummary":{
+            "eligibleExpectedValues":total_eligible,
+            "exactMatches":total_correct,
+            "wrongValues":sum(m["wrong"] for m in field_metrics.values()),
+            "unresolvedOutputs":sum(m["unresolved"] for m in field_metrics.values()),
+            "exactMatchRate":total_correct/total_eligible if total_eligible else None
+        },
         "fieldMetrics":field_metrics,
         "completeNineFieldSubset":{
             "eligibleRecords":complete_total,"exactMatches":complete_correct,
@@ -145,6 +167,16 @@ def main():
     gt=json.loads(args.ground_truth.read_text(encoding="utf-8"))
     if gt.get("schemaVersion") != 2 or len(gt.get("records", [])) != 63:
         raise SystemExit("Ground-truth schema or image count mismatch.")
+    if gt.get("requiredFields") != FIELDS:
+        raise SystemExit("Ground-truth required-field schema mismatch.")
+    if run.get("sourceArchiveSha256") != (gt.get("candidateArchive") or {}).get("sha256"):
+        raise SystemExit("OCR run source archive fingerprint does not match the ground-truth candidate archive.")
+    names=[r.get("filename") for r in run.get("results", [])]
+    if len(names) != len(set(names)):
+        raise SystemExit("OCR run report contains duplicate image result rows.")
+    unknown=sorted(set(names)-set(r["filename"] for r in gt["records"]))
+    if unknown:
+        raise SystemExit("OCR run contains filenames absent from ground truth: "+", ".join(unknown))
     engines=[evaluate_engine(run,gt,e) for e in ("tesseractjs","native")]
     report={
         "schemaVersion":1,
@@ -155,11 +187,12 @@ def main():
         "groundTruthSha256":sha(args.ground_truth),
         "runStatus":run.get("status"),
         "imageCount":run.get("imageCount"),
+        "resultRows":len(run.get("results", [])),
         "sourceArchiveSha256":run.get("sourceArchiveSha256"),
         "accuracyStatus":{
-            "overall":"PARTIALLY_EVALUABLE",
-            "fieldLevel":"EVALUATED_ONLY_FOR_ELIGIBLE_EXPECTED_FIELDS",
-            "completeRecordSubset":"EVALUATED_ONLY_FOR_COMPLETE_NINE_FIELD_RECORDS",
+            "overall":"PARTIALLY_EVALUABLE_AGAINST_SUPPLIED_MANUAL_TRANSCRIPTION",
+            "fieldLevel":"EVALUATED_ONLY_FOR_ELIGIBLE_MANUAL_REFERENCE_FIELDS",
+            "completeRecordSubset":"EVALUATED_ONLY_FOR_COMPLETE_NINE_FIELD_MANUAL_TRANSCRIPTIONS",
             "all63FullRecord":"NOT_EVALUABLE_INCOMPLETE_9_FIELD_COVERAGE",
             "gateB":"NOT_PASSED"
         },
@@ -175,11 +208,13 @@ def main():
     print(json.dumps({
         "output":str(args.output),"sha256":digest,
         "runStatus":run.get("status"),
+        "resultRows":len(run.get("results", [])),
         "pdfsWithHashes":sum(1 for x in run.get("results",[]) if x.get("pdfSha256")),
-        "images":len(run.get("results",[])),
         "accuracyStatus":report["accuracyStatus"],
-        "engineSummaries":[{"engine":x["engine"],"completeNineFieldSubset":x["completeNineFieldSubset"],
-                            "wronglyAcceptedMandatoryFieldValues":x["wronglyAcceptedMandatoryFieldValues"]}
+        "engineSummaries":[{"engine":x["engine"],"fieldLevelSummary":x["fieldLevelSummary"],
+                            "completeNineFieldSubset":x["completeNineFieldSubset"],
+                            "wronglyAcceptedMandatoryFieldValues":x["wronglyAcceptedMandatoryFieldValues"],
+                            "sourceImageHashMismatches":x["sourceImageHashMismatches"]}
                            for x in engines]
     },indent=2))
 
