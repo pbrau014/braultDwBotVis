@@ -437,3 +437,9 @@ The Admiralty's promise becomes the tournament's lesson: a strong fleet is not o
 ---
 
 **Publication boundary:** This is a narrative teaching companion and mock event. It does not authorize a live event, create a prize pool, select a real participant, set a calendar, approve a ship list, or supersede the event-specific settings record. Configurations frequently change; use the current official event rules every time.
+
+
+### Current public tournament example (checked 2026-11-06)
+
+The WoWs Tournaments listing shows **King of the Sea XIX** scheduled 9 October–15 November 2026, with separate Europe, North America, APAC and International sections. Wargaming's official event page lists the International Finals over the weekends of 7–8 and 14–15 November, and the associated in-game event rewards page remains active through 2 December. These are KOTS dates, not YOLO dates. The example illustrates why event settings need a region, phase, signup window, match schedule and versioned notice rather than one ambiguous calendar entry. See [WoWs Tournaments](https://wows-tournaments.com/) and [Wargaming's King of the Sea XIX page](https://worldofwarships.com/en/content/king-of-the-sea-xix-tournament/).
+
