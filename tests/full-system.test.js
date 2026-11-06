@@ -219,7 +219,7 @@ function extractFunctionDeclaration(source, name) {
   }
   throw new Error(`HTML function ${name} is not closed`);
 }
-function assertScoresMatchWorkbook(state, context) {
+function assertScoresMatchPolicy(state, context) {
   for (const player of state.players) for (const event of Tournament.EVENTS) {
     const actual = Tournament.eventScore(state, player, event);
     const expected = referenceCurrentScore(state, player, event);
