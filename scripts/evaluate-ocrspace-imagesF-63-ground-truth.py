@@ -7,7 +7,7 @@ Gate B is the approved 19-image complete nine-field subset; a pass additionally
 requires a separately verified artifact/network report. Wrong but unaccepted candidates remain separately reported and do not count as accepted; any wrongly accepted mandatory field blocks Gate B.
 """
 from __future__ import annotations
-import argparse, hashlib, json, re
+import argparse, hashlib, json, re, unicodedata
 from pathlib import Path
 
 FIELDS = ["result", "player", "map", "mode", "battleStart", "credits", "freeXp", "damage", "xp"]
@@ -19,6 +19,7 @@ ANALYSIS_21_INVENTORY = "complete-ground-truth-21"
 
 
 def sha(path: Path) -> str:
+    """Raw working-tree/file-byte SHA-256; never normalize this value."""
     h = hashlib.sha256()
     with path.open("rb") as f:
         for block in iter(lambda: f.read(1024 * 1024), b""):
@@ -26,15 +27,71 @@ def sha(path: Path) -> str:
     return h.hexdigest()
 
 
+def _canonical_json_value(value):
+    if isinstance(value, str):
+        return unicodedata.normalize("NFC", value)
+    if isinstance(value, list):
+        return [_canonical_json_value(item) for item in value]
+    if isinstance(value, dict):
+        normalized = {}
+        for key, item in value.items():
+            canonical_key = unicodedata.normalize("NFC", str(key))
+            if canonical_key in normalized:
+                raise ValueError("JSON keys collide after Unicode NFC normalization.")
+            normalized[canonical_key] = _canonical_json_value(item)
+        return {key: normalized[key] for key in sorted(normalized)}
+    if isinstance(value, float) and not __import__("math").isfinite(value):
+        raise ValueError("Non-finite JSON numbers are not canonical.")
+    return value
+
+
+def canonical_json_bytes(raw: bytes) -> bytes:
+    """Stable semantic JSON bytes: UTF-8, no BOM, NFC strings, sorted keys, compact form."""
+    parsed = json.loads(raw.decode("utf-8-sig"))
+    canonical = _canonical_json_value(parsed)
+    return json.dumps(canonical, ensure_ascii=False, sort_keys=True,
+                      separators=(",", ":"), allow_nan=False).encode("utf-8")
+
+
+def canonical_json_sha(path: Path) -> str:
+    return hashlib.sha256(canonical_json_bytes(path.read_bytes())).hexdigest()
+
+
+def numeric_integer(value):
+    """Accept only non-negative integers with optional consistent 3-digit grouping."""
+    text = str(value).strip()
+    if not text:
+        return None
+    if re.fullmatch(r"[0-9]+", text):
+        digits = text
+    else:
+        separators = [",", ".", " ", "\u00a0", "\u202f", "'"]
+        separator = next((candidate for candidate in separators if candidate in text), None)
+        if separator is None:
+            return None
+        groups = text.split(separator)
+        if len(groups) < 2 or not (1 <= len(groups[0]) <= 3) or not groups[0].isascii() or not groups[0].isdigit():
+            return None
+        if any(len(group) != 3 or not group.isascii() or not group.isdigit() for group in groups[1:]):
+            return None
+        digits = "".join(groups)
+    try:
+        number = int(digits, 10)
+    except (TypeError, ValueError):
+        return None
+    if number > 9_007_199_254_740_991:
+        return None
+    return str(number)
+
+
 def norm(field: str, value):
     if value is None:
         return None
-    text = str(value).strip()
+    text = unicodedata.normalize("NFC", str(value)).strip()
     if text.casefold() in MISSING:
         return None
     if field in NUMERIC:
-        digits = re.sub(r"\D", "", text)
-        return digits or None
+        return numeric_integer(text)
     text = re.sub(r"\s+", " ", text).strip()
     return text.replace("—", "-").replace("–", "-").casefold()
 
@@ -265,9 +322,9 @@ def verify_artifact_report(artifact, run_path, gt_path, selected_records, select
     checks = artifact.get("checks") or {}
     if artifact.get("status") != "VERIFIED":
         reasons.append("Artifact report status is not VERIFIED.")
-    if artifact.get("runReportSha256") != sha(run_path):
+    if artifact.get("runReportSha256") != canonical_json_sha(run_path):
         reasons.append("Artifact report is not bound to this run-report SHA-256.")
-    if artifact.get("groundTruthSha256") != sha(gt_path):
+    if artifact.get("groundTruthSha256") != canonical_json_sha(gt_path):
         reasons.append("Artifact report is not bound to this ground-truth SHA-256.")
     if selection.get("id") != GATE_B_INVENTORY or selection.get("selectedImageCount") != MIN_GATE_B_IMAGES:
         reasons.append("Artifact report inventory selection is not the approved 19-image Gate B set.")
@@ -387,10 +444,15 @@ def main():
         "schemaVersion": 2,
         "status": "POST_HOC_EVALUATION" if not missing_selected else "POST_HOC_EVALUATION_INCOMPLETE_SELECTED_INVENTORY",
         "runReport": str(args.run_report),
-        "runReportSha256": sha(args.run_report),
+        "runReportSha256": canonical_json_sha(args.run_report),
+        "runReportRawSha256": sha(args.run_report),
         "groundTruth": str(args.ground_truth),
-        "groundTruthSha256": sha(args.ground_truth),
+        "groundTruthSha256": canonical_json_sha(args.ground_truth),
+        "groundTruthRawSha256": sha(args.ground_truth),
         "artifactVerificationReport": str(artifact_path) if artifact else None,
+        "artifactVerificationReportCanonicalSha256": canonical_json_sha(artifact_path) if artifact_path and artifact_path.exists() else None,
+        "artifactVerificationReportRawSha256": sha(artifact_path) if artifact_path and artifact_path.exists() else None,
+        "evaluatorWorkingTreeRawSha256": sha(Path(__file__).resolve()),
         "artifactVerification": artifact_verification,
         "runStatus": run.get("status"),
         "inventorySelection": {
@@ -439,10 +501,11 @@ def main():
     payload = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     args.output.write_text(payload, encoding="utf-8")
     digest = sha(args.output)
+    canonical_digest = canonical_json_sha(args.output)
     args.output.with_suffix(args.output.suffix + ".sha256").write_text(
         f"{digest}  {args.output.name}\n", encoding="ascii")
     print(json.dumps({
-        "output": str(args.output), "sha256": digest, "runStatus": run.get("status"),
+        "output": str(args.output), "sha256": digest, "canonicalJsonSha256": canonical_digest, "runStatus": run.get("status"),
         "inventorySelection": report["inventorySelection"],
         "artifactVerification": artifact_verification,
         "resultRows": len(selected_run_results), "gateB": gate_b,
