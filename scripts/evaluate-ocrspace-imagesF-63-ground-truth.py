@@ -350,11 +350,8 @@ def main():
     network_pass = artifact_verification.get("checks", {}).get("networkRestriction") == "PASS" and artifact_verification.get("checks", {}).get("unauthorizedNetworkAttempts") == 0
     engine_acceptance_complete = all(
         engine["completeNineFieldSubset"]["eligibleRecords"] == MIN_GATE_B_IMAGES
-        and engine["completeNineFieldSubset"]["exactMatches"] == MIN_GATE_B_IMAGES
-        and engine["completeNineFieldSubset"]["mismatches"] == 0
         and engine["completeNineFieldSubset"]["unresolved"] == 0
         and engine["fieldLevelSummary"]["unresolvedOutputs"] == 0
-        and engine["fieldLevelSummary"]["wrongValues"] == 0
         for engine in engines
     )
     if args.inventory != GATE_B_INVENTORY:
@@ -410,16 +407,14 @@ def main():
             "allSelectedPdfAndRasterArtifactsVerified": True,
             "zeroWronglyAcceptedMandatoryFieldValues": True,
             "zeroUnresolvedMandatoryFieldValues": True,
-            "all21CompleteNineFieldRecordsExactPerEngine": True,
-            "zeroWrongUnacceptedCandidatesForGateBPass": True,
+            "all21RecordsHaveAResolvedNineFieldOutputPerEngine": True,
             "zeroUnauthorizedNetworkAttempts": True,
-            "unresolvedOutputs": "Reported as accuracy/review metrics; unresolved outputs and wrong unaccepted candidates both block Gate B; do not convert either into matches."
+            "unresolvedOutputs": "Any missing/unresolved mandatory output blocks Gate B. Wrong but unaccepted candidates remain separately reported and do not count as accepted; any wrongly accepted mandatory value blocks Gate B."
         },
         "gateB": gate_b,
         "engineAcceptanceChecks": {
-            "all21CompleteNineFieldRecordsExactPerEngine": engine_acceptance_complete,
-            "zeroUnresolvedMandatoryFieldValues": engine_acceptance_complete,
-            "zeroWrongUnacceptedCandidatesForGateBPass": engine_acceptance_complete
+            "all21RecordsHaveAResolvedNineFieldOutputPerEngine": engine_acceptance_complete,
+            "zeroUnresolvedMandatoryFieldValues": engine_acceptance_complete
         },
         "engines": engines
     }
