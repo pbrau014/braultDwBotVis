@@ -309,6 +309,8 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
         originalScreenshotFallback: run.originalScreenshotFallback !== false
     };
     const verifiedCount = images.filter(image => image.status === 'VERIFIED').length;
+    const pdfRasterVerifiedCount = images.filter(image => ['sourceImageHash', 'pdfIntegrity', 'searchablePdfTextLayer', 'rasterIntegrity', 'pdfDerivedRasterProvenance'].every(key => image.checks[key] === 'PASS')).length;
+    const localReaderVerifiedCount = images.filter(image => image.checks.localReaders === 'PASS').length;
     const requiredChecks = ['sourceImageHashes', 'pdfIntegrity', 'searchablePdfTextLayer',
         'rasterIntegrity', 'pdfDerivedRasterProvenance', 'localReaders', 'networkRestriction',
         'localRecoveryNetworkRestriction', 'secretLeakScan'];
@@ -317,7 +319,7 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
         ? 'VERIFIED' : 'FAILED';
     return {
         schemaVersion: 1, status, createdAt: new Date().toISOString(),
-        inventorySelection: { id: INVENTORY, selectedImageCount: MIN_GATE_B_IMAGES, verifiedImageCount: verifiedCount, allSelectedImagesVerified: verifiedCount === MIN_GATE_B_IMAGES },
+        inventorySelection: { id: INVENTORY, selectedImageCount: MIN_GATE_B_IMAGES, verifiedImageCount: verifiedCount, pdfRasterVerifiedImageCount: pdfRasterVerifiedCount, localReaderVerifiedImageCount: localReaderVerifiedCount, allPdfRasterPairsVerified: pdfRasterVerifiedCount === MIN_GATE_B_IMAGES, allSelectedImagesVerified: verifiedCount === MIN_GATE_B_IMAGES },
         runReportSha256: sha256(runBytes), groundTruthSha256: sha256(gtBytes),
         sourceArchiveSha256: run.sourceArchiveSha256, gateA, checks, networkLogReconciliation: networkReconciliation, images,
         secretScan: { status: secret.status, scannedFiles: secret.scannedFiles },
@@ -349,7 +351,7 @@ async function main() {
     const workflowSourceText = await fs.readFile(workflowFile, 'utf8');
     const report = await verifyArtifacts({ runReport, groundTruth, preflightReport, freshPreflightReport, sourceImageRoot, artifactRoot, networkLogPath, recoveryNetworkLogPath, networkReconciliationPath, workflowSourceText });
     await fs.writeFile(output, JSON.stringify(report, null, 2) + '\n');
-    console.log('[DWBOT-ARTIFACT-VERIFY] ' + report.status + '; verified=' + report.inventorySelection.verifiedImageCount + '/19; Gate A=' + report.gateA.status + '; network=' + report.checks.networkRestriction + '; secret scan=' + report.checks.secretLeakScan);
+    console.log('[DWBOT-ARTIFACT-VERIFY] ' + report.status + '; pdf/raster=' + report.inventorySelection.pdfRasterVerifiedImageCount + '/19; full=' + report.inventorySelection.verifiedImageCount + '/19; Gate A=' + report.gateA.status + '; network=' + report.checks.networkRestriction + '; secret scan=' + report.checks.secretLeakScan);
     if (report.status !== 'VERIFIED') process.exitCode = 1;
 }
 
