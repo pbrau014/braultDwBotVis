@@ -1,0 +1,180 @@
+name: DWBOT Gate A 16-image OCR.Space PDF-first acceptance
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dwbot-gateA-16-pdf-first.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: dwbot-gateA-16-pdf-first-adaf4f8c
+  cancel-in-progress: false
+
+env:
+  GATEB_SOURCE_SHA: adaf4f8c3a9573f56d0348a4bba36686fc31c22e
+  GATEB_SOURCE_RUN_ID: '42160979140'
+
+jobs:
+  gate-a:
+    if: github.run_attempt == 1 && github.event_name == 'push' && github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME'
+    runs-on: windows-latest
+    timeout-minutes: 240
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - name: Check out current preflight tools
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js 24.17.0 for source preflight
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24.17.0
+          package-manager-cache: false
+
+      - name: Install preflight dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Verify completed Gate B source run fingerprint
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $run = gh run view $env:GATEB_SOURCE_RUN_ID --repo $env:GITHUB_REPOSITORY --json headSha,status,conclusion
+          if ($LASTEXITCODE -ne 0) { throw 'Could not inspect the completed Gate B source run.' }
+          $source = $run | ConvertFrom-Json
+          if ($source.status -ne 'completed' -or $source.conclusion -ne 'success') { throw 'Gate B source run is not completed successfully.' }
+          if ($source.headSha -ne $env:GATEB_SOURCE_SHA) { throw 'Gate A candidate SHA does not match the Gate B source run SHA.' }
+          "Gate B run $env:GATEB_SOURCE_RUN_ID is completed and bound to $($source.headSha)."
+
+      - name: Preflight all 16 development images and nine-field labels
+        shell: powershell
+        run: |
+          node scripts/preflight-additional-screenshot-corpus.js --candidate-sha $env:GATEB_SOURCE_SHA --gateb-run-id $env:GATEB_SOURCE_RUN_ID --gateb-source-sha $env:GATEB_SOURCE_SHA --output testdata/gateA-16-preflight.json
+          if ($LASTEXITCODE -ne 0) { throw 'Gate A source preflight failed; no OCR.Space requests were made.' }
+
+      - name: Check out the exact Gate B candidate source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: adaf4f8c3a9573f56d0348a4bba36686fc31c22e
+          path: source
+          persist-credentials: false
+
+      - name: Set up Node.js 22.16.0 to match the Gate B candidate runtime
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22.16.0
+          package-manager-cache: false
+
+      - name: Install local OCR and PDF runtime
+        shell: powershell
+        run: |
+          choco install tesseract --version=5.5.3.20260724 --yes --no-progress
+          choco install imagemagick --yes --no-progress
+          choco install ghostscript --yes --no-progress
+          Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+          refreshenv
+          $tesseract = Get-Command tesseract.exe -ErrorAction Stop
+          $magick = Get-Command magick.exe -ErrorAction Stop
+          $ghostscript = Get-Command gswin64c.exe -ErrorAction Stop
+          $tessdata = Join-Path (Split-Path $tesseract.Source -Parent) 'tessdata'
+          if (-not (Test-Path (Join-Path $tessdata 'eng.traineddata'))) { throw 'English Tesseract model is missing.' }
+          & $magick.Source -version
+          if ($LASTEXITCODE -ne 0) { throw 'ImageMagick is unavailable.' }
+          & $ghostscript.Source -version
+          if ($LASTEXITCODE -ne 0) { throw 'Ghostscript is unavailable.' }
+          "TESSERACT_BIN=$($tesseract.Source)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "TESSERACT_LANG_PATH=$tessdata" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "IMAGEMAGICK_BIN=$($magick.Source)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "GHOSTSCRIPT_BIN=$($ghostscript.Source)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Install exact candidate dependencies
+        working-directory: source
+        run: |
+          node --version
+          npm --version
+          npm ci --no-audit --no-fund
+
+      - name: Run the 16-image OCR.Space Engine 2 PDF-first Gate A acceptance
+        working-directory: source
+        env:
+          OCRSPACE_API_KEY: ${{ secrets.OCRSPACE_API_KEY }}
+          OCR_SEQUENCE_REPORT_PATH: testdata/gateA-16/report.json
+          OCR_NON_OCR_NETWORK_LOG: testdata/gateA-16/non-ocr-network-attempts.log
+          OCRSPACE_ARTIFACT_DIR: testdata/gateA-16/artifacts
+          OCR_IMAGE_TIMEOUT_MS: '180000'
+          OCR_SUPERVISED_TIMEOUT_MS: '185000'
+        run: node scripts/run-additional-screenshot-regression.js
+
+      - name: Create source-bound Gate A acceptance report
+        if: always()
+        shell: powershell
+        run: |
+          $sourceRoot = Join-Path $env:GITHUB_WORKSPACE 'source'
+          $reportPath = Join-Path $sourceRoot 'testdata/gateA-16/report.json'
+          $auditPath = $reportPath + '.pdf-audit.json'
+          $networkPath = Join-Path $sourceRoot 'testdata/gateA-16/non-ocr-network-attempts.log'
+          $preflightPath = Join-Path $env:GITHUB_WORKSPACE 'testdata/gateA-16-preflight.json'
+          $report = if (Test-Path $reportPath) { Get-Content -Raw $reportPath | ConvertFrom-Json } else { $null }
+          $audit = if (Test-Path $auditPath) { Get-Content -Raw $auditPath | ConvertFrom-Json } else { $null }
+          $preflight = if (Test-Path $preflightPath) { Get-Content -Raw $preflightPath | ConvertFrom-Json } else { $null }
+          $networkExists = Test-Path $networkPath
+          $networkBytes = if ($networkExists) { (Get-Item $networkPath).Length } else { -1 }
+          $network = $report.networkIsolation
+          $reportPass = $null -ne $report -and $report.imageCount -eq 16 -and $report.completedImages -eq 16 -and $report.exactMatches -eq 16 -and $report.mandatoryExactMatches -eq 16 -and $report.requiredFieldsComplete -eq 16 -and $report.results.Count -eq 16 -and @($report.results | Where-Object { $_.pipelineCompleted -ne $true -or $_.allExpectedFieldsPass -ne $true -or $_.allRequiredFieldsPass -ne $true -or $_.requiredMissing.Count -ne 0 }).Count -eq 0
+          $auditPass = $null -ne $audit -and $audit.sourceCount -eq 16 -and $audit.verifiedPdfCount -eq 16 -and $audit.images.Count -eq 16 -and @($audit.images | Where-Object { $_.valid -ne $true }).Count -eq 0
+          $networkPass = $null -ne $network -and $network.ocrSpaceEnabled -eq $true -and $network.ocrSpaceNetworkAllowed -eq $true -and $network.nonOcrNetworkRestricted -eq $true -and $network.nonOcrDeniedAttemptsDetected -eq $false -and $networkExists -and $networkBytes -eq 0
+          $fingerprintPass = $null -ne $preflight -and $preflight.status -eq 'PREFLIGHT_PASS_NO_PROVIDER_REQUESTS' -and $preflight.candidateFingerprint -eq $env:GATEB_SOURCE_SHA -and $preflight.candidateFingerprintMatchesGateBSource -eq $true
+          $gateAStatus = if ($reportPass -and $auditPass -and $networkPass -and $fingerprintPass) { 'PASS' } else { 'FAIL' }
+          $summary = [ordered]@{
+            schemaVersion = 1
+            gate = 'A'
+            status = $gateAStatus
+            candidateFingerprint = $env:GATEB_SOURCE_SHA
+            candidateFingerprintMatchesGateBSource = $fingerprintPass
+            gateBSourceRunId = $env:GATEB_SOURCE_RUN_ID
+            gateBSourceCommitSha = $env:GATEB_SOURCE_SHA
+            sourceImageCount = if ($preflight) { $preflight.imageCount } else { 0 }
+            exactMatches = if ($report) { $report.exactMatches } else { $null }
+            mandatoryExactMatches = if ($report) { $report.mandatoryExactMatches } else { $null }
+            requiredFieldsComplete = if ($report) { $report.requiredFieldsComplete } else { $null }
+            verifiedPdfCount = if ($audit) { $audit.verifiedPdfCount } else { 0 }
+            reportPass = $reportPass
+            pdfAuditPass = $auditPass
+            networkPass = $networkPass
+            networkLogBytes = $networkBytes
+            networkIsolation = $network
+            sourcePreflightSha256 = if (Test-Path $preflightPath) { (Get-FileHash -Algorithm SHA256 $preflightPath).Hash.ToLowerInvariant() } else { $null }
+            runReportSha256 = if (Test-Path $reportPath) { (Get-FileHash -Algorithm SHA256 $reportPath).Hash.ToLowerInvariant() } else { $null }
+            pdfAuditSha256 = if (Test-Path $auditPath) { (Get-FileHash -Algorithm SHA256 $auditPath).Hash.ToLowerInvariant() } else { $null }
+            networkLogSha256 = if ($networkExists) { (Get-FileHash -Algorithm SHA256 $networkPath).Hash.ToLowerInvariant() } else { $null }
+          }
+          $out = Join-Path $sourceRoot 'testdata/gateA-16/gate-a-acceptance.json'
+          New-Item -ItemType Directory -Force (Split-Path $out -Parent) | Out-Null
+          $summary | ConvertTo-Json -Depth 30 | Set-Content -Encoding utf8 $out
+          Write-Host "DWBOT GATE A: $gateAStatus; exact=$($summary.exactMatches)/16; PDF=$($summary.verifiedPdfCount)/16; network=$networkPass; fingerprint=$fingerprintPass"
+          if ($gateAStatus -ne 'PASS') { throw 'Gate A acceptance requirements were not all met. Evidence artifact will still be uploaded.' }
+
+      - name: Upload Gate A source, reports, PDFs and PDF-derived rasters
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dwbot-gateA-16-pdf-first-${{ github.run_id }}
+          path: |
+            testdata/gateA-16-preflight.json
+            source/testdata/additional-screenshot-ground-truth.json
+            source/testdata/gateA-16/report.json
+            source/testdata/gateA-16/report.json.pdf-audit.json
+            source/testdata/gateA-16/gate-a-acceptance.json
+            source/testdata/gateA-16/non-ocr-network-attempts.log
+            source/testdata/gateA-16/artifacts/**
+            source/package.json
+            source/package-lock.json
+          if-no-files-found: warn
+          retention-days: 30
