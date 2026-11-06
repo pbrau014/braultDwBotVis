@@ -561,19 +561,25 @@ function syncDerivedClassWeights(){
 }
 function getPlayer(id){ return state.players.find(p=>p.id===Number(id)); }
 function eventTotal(p,key){
-  return p.events[key].reduce((sum,g)=>sum+num(key==="grand"?g.damage:g.metric),0);
+  return p.events[key].reduce((sum,g)=>{
+    if(key==="grand") return sum+num(g.damage);
+    if(key==="race") return sum+(num(g.metric)>0?1/num(g.metric):0);
+    return sum+num(g.metric);
+  },0);
 }
 
-/* The score calculations below mirror the formulas in the supplied workbook.
-   The original workbook's per-event formulas are not normalized to force every
-   event to spend exactly its pool; this browser version preserves that behavior. */
+/* Damage and Kills preserve the supplied workbook's share formula. Race uses
+   the resolved C01 policy: inverse elapsed seconds, so a faster time earns a
+   larger share. The archival workbook's direct-time formula is retained only
+   as historical evidence and is not copied into the active scoring engine. */
 function eventRawScore(p,key){
   const games=p.events[key], settings=cfg(key);
   if(key!=="grand"){
     const total=state.players.reduce((sum,x)=>sum+eventTotal(x,key),0);
     if(!total || games.some(g=>num(g.tier)<=0)) return 0;
     return 2*num(settings.multiplier)*num(settings.pool)*games.reduce((sum,g)=>{
-      return sum+classWeightFor(g.class)*(num(g.metric)/total)/Math.pow(num(g.tier),num(settings.tierPower));
+      const metric=key==="race"?(num(g.metric)>0?1/num(g.metric):0):num(g.metric);
+      return sum+classWeightFor(g.class)*(metric/total)/Math.pow(num(g.tier),num(settings.tierPower));
     },0);
   }
   const totalDamage=state.players.reduce((sum,x)=>sum+eventTotal(x,"grand"),0);
