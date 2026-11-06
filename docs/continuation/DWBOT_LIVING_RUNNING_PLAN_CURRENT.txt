@@ -36,6 +36,39 @@ Status: ACTIVE / GOVERNING / SUPERSEDES THE 64-IMAGE INVENTORY TEST REQUIREMENT.
 END CURRENT OCR.SPACE INVENTORY REQUIREMENT
 ================================================================================
 
+IMPLEMENTATION / VERIFICATION STATUS — 2026-11-06
+- Requirement change committed on canonical main. Implementation commits:
+  66daf0df84532afd0699954d88dd08f2c313fc95 (evaluator, deterministic
+  21-record test, package command, living-plan/authority/guide update);
+  c767c79ef1a49f96fab4562de028dfafec4f1e71 (README and active authority
+  alignment); 74df17ace156507571d58bfe4b9ded38c61a3aca (manual-dispatch-only
+  guard for billable 63-image workflow); 505bfdb76ae8ff470f8e0966b70ea2fde9e239af
+  (README evaluator instructions).
+- Exact selection was checked against the v6 JSON: 21/63 records, precisely
+  corpus records 1–21, each COMPLETE_9_FIELD_TRANSCRIPTION and all nine
+  fieldStatus.eligible_for_exact_match flags true. The source file hashes,
+  byte sizes and dimensions remain bound to each original record. One record
+  is 1334x627; selection does not impose a new pixel threshold.
+- The post-hoc evaluator now accepts --inventory complete-ground-truth-21,
+  filters the existing 63-image report to those 21 names, reports missing
+  selected rows, per-engine field/full-record metrics and keeps Gate B
+  NOT_PASSED. It does not call OCR.Space.
+- The 63-image exploratory run already in progress remains run 42160979140.
+  An accidental duplicate push-triggered run 42168859431 was replaced in the
+  Actions concurrency queue and is confirmed CANCELLED before any job started.
+  The newer push-triggered workflow run 42168986594 uses the new
+  workflow_dispatch-only job guard; it is pending and must skip its provider
+  job. Future pushes cannot start this billable 63-image extraction.
+- Exact-head DWBOT verification run 42168986699 is pending. No test pass is
+  claimed until its jobs complete and are inspected. The 21-image post-hoc
+  evaluator has not run because the existing 63-image PDF/raster artifacts
+  are not yet available. No duplicate OCR.Space submissions were made.
+- The 4-image and 16-image tests remain required. The separate 64-image
+  inventory run is retired; its manifest/runner/tests remain legacy material.
+  Gate B remains NOT_PASSED and the v6 workbook remains a partial working
+  reference, not certified acceptance-grade ground truth. Production NO-GO.
+
+
 ================================================================================
 LATEST NODE.JS RUNTIME AUTHORIZATION — 2026-11-05
 ================================================================================
