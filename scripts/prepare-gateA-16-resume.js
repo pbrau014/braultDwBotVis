@@ -134,7 +134,22 @@ async function prepare(options) {
         throw new Error('Original partial PDF/raster failed signature, EOF or PNG IHDR validation.');
     }
 
-    const normalized = await imageProcessor.normalizeSearchablePdfPageRaster(raster, {
+    // Re-render the preserved PDF and prove the preserved page raster is
+    // pixel-identical before deriving the source-aspect crop. A matching filename,
+    // PNG header, or dimensions alone is not sufficient provenance.
+    const renderedPageRaster = await imageProcessor.renderSearchablePdfPage(pdf);
+    const toPixels = buffer => imageProcessor.__test.runImageMagick(
+        ['png:-', '-depth', '8', 'rgba:-'], buffer,
+        { timeoutMs: 60000, maxOutputBytes: 80_000_000 }
+    );
+    const [savedPagePixels, renderedPagePixels] = await Promise.all([
+        toPixels(raster), toPixels(renderedPageRaster),
+    ]);
+    if (!Buffer.isBuffer(savedPagePixels) || !Buffer.isBuffer(renderedPagePixels)
+        || !savedPagePixels.equals(renderedPagePixels)) {
+        throw new Error('Preserved Gate A page raster is not pixel-identical to a fresh rendering of its preserved searchable PDF.');
+    }
+    const normalized = await imageProcessor.normalizeSearchablePdfPageRaster(renderedPageRaster, {
         sourceWidth: sourceImageDimensions.width, sourceHeight: sourceImageDimensions.height,
     });
     const normalizedRaster = normalized.buffer;
