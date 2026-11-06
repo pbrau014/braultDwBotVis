@@ -13,7 +13,7 @@ Push-Location $ProjectRoot
 try {
  $NodeText=(& node.exe -p 'process.versions.node').Trim()
  if($LASTEXITCODE -ne 0){throw 'Could not determine Node.js version.'}
- if([version]::Parse($NodeText) -lt [version]::Parse($MinimumNodeVersion)){throw "Node.js $MinimumNodeVersion or newer is required. Found $NodeText."}
+ if([version]::Parse($NodeText) -ne [version]::Parse($MinimumNodeVersion)){throw "Node.js must be exactly $MinimumNodeVersion. Found $NodeText."}
  $Npm=Get-Command npm.cmd -ErrorAction Stop
  $NpmVersion=(& $Npm.Source --version).Trim()
  if($LASTEXITCODE -ne 0){throw 'Could not determine npm version.'}
