@@ -152,6 +152,9 @@ async function prepare(options) {
     const normalized = await imageProcessor.normalizeSearchablePdfPageRaster(renderedPageRaster, {
         sourceWidth: sourceImageDimensions.width, sourceHeight: sourceImageDimensions.height, sourceImageBuffer: sourceImage,
     });
+    if (normalized.similarity?.method !== 'original-source-resized-to-normalized-raster-v1') {
+        throw new Error('Gate A PDF raster normalization lacks original-source pixel similarity evidence.');
+    }
     const normalizedRaster = normalized.buffer;
     const normalizedRasterDimensions = await imageProcessor.metadata(normalizedRaster);
     const normalizedRasterSha256 = sha256(normalizedRaster);
