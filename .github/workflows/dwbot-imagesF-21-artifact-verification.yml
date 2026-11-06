@@ -79,6 +79,7 @@ jobs:
           node --version
           npm --version
           npm ci --no-audit --no-fund
+          node --check scripts/recover-ocrspace-imagesF-21-local-readers.js
           npm run test:ocrspace
           node --test tests/workflow-contract.test.js
 
