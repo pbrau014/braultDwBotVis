@@ -9,13 +9,19 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      run_legacy_56_provider_acceptance:
+        description: 'Submit the separate legacy 56-image OCR.Space provider batch; leave false for ordinary verification.'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 jobs:
-  node22-linux:
-    name: Node.js 22.16.0 - Linux offline verification
+  node24-linux:
+    name: Node.js 24.17.0 - Linux offline verification
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -25,10 +31,10 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Set up Node.js 22.16.0
+      - name: Set up Node.js 24.17.0
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 22.16.0
+          node-version: 24.17.0
           cache: npm
           package-manager-cache: false
       - name: Provision local English Tesseract.js model
@@ -78,8 +84,8 @@ jobs:
       - name: Full project suite
         run: npm test
 
-  windows-node22-native-ocr:
-    name: Windows Node.js 22.16.0 - native Tesseract and persistence
+  windows-node24-native-ocr:
+    name: Windows Node.js 24.17.0 - native Tesseract and persistence
     runs-on: windows-latest
     timeout-minutes: 180
     permissions:
@@ -89,10 +95,10 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Set up Node.js 22.16.0
+      - name: Set up Node.js 24.17.0
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 22.16.0
+          node-version: 24.17.0
           cache: npm
           package-manager-cache: false
       - name: Install native OCR prerequisites
@@ -158,6 +164,7 @@ jobs:
           Write-Host "OCRSPACE_API_KEY configured: $configured"
           if (-not $configured) { throw 'Protected OCRSPACE_API_KEY secret is missing or empty.' }
       - name: Current-source Tesseract.js and native Tesseract screenshot acceptance
+        if: github.event_name == 'workflow_dispatch' && inputs.run_legacy_56_provider_acceptance == true
         shell: powershell
         env:
           OCRSPACE_ENABLED: '1'
@@ -188,7 +195,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 22.16.0
+          node-version: 24.17.0
           cache: npm
           package-manager-cache: false
       - name: Install native Tesseract language model for clean-package tests
