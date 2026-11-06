@@ -62,7 +62,7 @@
     "id": "gate-b-complete-ground-truth-19",
     "status": "approved-holdout-scope-not-gate-pass",
     "groundTruthReference": "testdata/ground-truth/imagesF-63-working-ground-truth-v6.json",
-    "groundTruthSha256": "01be0979f094022ed884a5fdf8103eaffa0a5c5e3d16a30bcc10f0e609104028",
+    "groundTruthSha256": "62ea492c9d4a4a05b33d16c67bb4ec31ebdc07b67cbf47d3e4a3062ff8d1dfb3",
     "imageCount": 19,
     "replacesFormerMinimum": 50,
     "formerPreferredTarget": 100,
