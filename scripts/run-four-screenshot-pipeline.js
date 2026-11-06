@@ -105,7 +105,7 @@ async function main() {
                 const boundPriorBytes = Number(priorProgress.networkDiagnosticLogBytes);
                 const hashBound = /^[a-f0-9]{64}$/.test(boundPriorSha256)
                     && boundPriorSha256 === actualPriorSha256 && boundPriorBytes === priorLog.length;
-                const priorLogLines = priorLog.toString('utf8').split(/\\r?\\n/).filter(Boolean);
+                const priorLogLines = priorLog.toString('utf8').split(/\r?\n/).filter(Boolean);
                 const originalZeroAttemptsClaimed = hashBound && priorLog.length === 0
                     && priorProgress.networkIsolation?.networkDiagnosticLogPresent === true
                     && priorProgress.networkIsolation?.nonOcrDeniedAttemptsDetected === false;
