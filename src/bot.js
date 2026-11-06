@@ -2965,6 +2965,7 @@ async function handleTournamentCommand(message) {
     try {
         let response;
         if (!command || command === 'help') response = tournamentHelp();
+        else if (command === 'scoring') response = scoringGuideText();
         else if (command === 'panel') {
             await message.reply({ content: tournamentPanelText(), components: buildTournamentPanelComponents(), allowedMentions: { repliedUser: false, parse: [] } });
             return true;
