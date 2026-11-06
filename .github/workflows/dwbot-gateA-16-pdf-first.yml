@@ -100,6 +100,30 @@ jobs:
           "IMAGEMAGICK_BIN=$($magick.Source)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           "GHOSTSCRIPT_BIN=$($ghostscript.Source)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
 
+      - name: Provision pinned local PaddleOCR CPU runtime and PP-OCRv6 models
+        shell: powershell
+        run: |
+          $runtimeRoot = Join-Path $env:LOCALAPPDATA 'WoWSYOLO\PaddleOCR'
+          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/install-paddleocr-windows.ps1 -ProjectRoot $env:GITHUB_WORKSPACE -RuntimeRoot $runtimeRoot -SkipProjectBenchmark
+          if ($LASTEXITCODE -ne 0) { throw 'Pinned PaddleOCR setup or offline inference verification failed.' }
+          $python = Join-Path $runtimeRoot 'venv\Scripts\python.exe'
+          $det = Join-Path $runtimeRoot 'models\PP-OCRv6_medium_det'
+          $rec = Join-Path $runtimeRoot 'models\PP-OCRv6_medium_rec'
+          $modelManifest = Join-Path $runtimeRoot 'models\paddleocr-model-manifest.json'
+          $installManifest = Join-Path $runtimeRoot 'install-manifest.json'
+          foreach ($item in @($python,$det,$rec,$modelManifest,$installManifest)) { if (-not (Test-Path $item)) { throw "PaddleOCR runtime evidence missing: $item" } }
+          $evidence = Join-Path $env:GITHUB_WORKSPACE 'testdata\gateA-16'
+          New-Item -ItemType Directory -Force $evidence | Out-Null
+          Copy-Item $modelManifest (Join-Path $evidence 'paddleocr-model-manifest.json') -Force
+          Copy-Item $installManifest (Join-Path $evidence 'paddleocr-install-manifest.json') -Force
+          "PADDLEOCR_PYTHON_BIN=$python" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "PADDLEOCR_DET_MODEL_DIR=$det" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "PADDLEOCR_REC_MODEL_DIR=$rec" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "PADDLEOCR_MODEL_MANIFEST=$modelManifest" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "PADDLE_PDX_ENABLE_MKLDNN_BYDEFAULT=False" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "PADDLEOCR_FIELD_FALLBACK_TIMEOUT_MS=15000" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "PADDLEOCR_FIELD_FALLBACK_MAX_CROPS=7" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+
       - name: Install exact candidate dependencies
         working-directory: source
         run: |
@@ -129,6 +153,30 @@ jobs:
           OCR_SUPERVISED_TIMEOUT_MS: '185000'
         run: node scripts/run-additional-screenshot-regression.js
 
+      - name: Run Gate A parallel local-reader matrix on verified PDF artifacts
+        if: always()
+        shell: powershell
+        env:
+          OCR_NON_OCR_NETWORK_RESTRICTED: '1'
+          OCR_NON_OCR_NETWORK_LOG: ${{ github.workspace }}/testdata/gateA-16/parallel-reader-network.log
+          PADDLEOCR_FIELD_FALLBACK: '1'
+        run: |
+          $sourceRoot = Join-Path $env:GITHUB_WORKSPACE 'source'
+          $reportPath = Join-Path $sourceRoot 'testdata/gateA-16/report.json'
+          $auditPath = $reportPath + '.pdf-audit.json'
+          $manifestPath = Join-Path $sourceRoot 'testdata/additional-screenshot-ground-truth.json'
+          $artifactRoot = Join-Path $sourceRoot 'testdata/gateA-16/artifacts'
+          $outputPath = Join-Path $env:GITHUB_WORKSPACE 'testdata/gateA-16/parallel-reader-matrix.json'
+          $networkLog = $env:OCR_NON_OCR_NETWORK_LOG
+          New-Item -ItemType Directory -Force (Split-Path $networkLog -Parent) | Out-Null
+          [System.IO.File]::WriteAllText($networkLog, '')
+          if (-not (Test-Path $reportPath) -or -not (Test-Path $auditPath)) {
+            Write-Host 'Gate A matrix skipped: no completed source report/PDF audit; no provider requests made.'
+            exit 0
+          }
+          node scripts/run-gateA-parallel-reader-matrix.js --run-report $reportPath --manifest $manifestPath --pdf-audit $auditPath --artifact-root $artifactRoot --output $outputPath --network-log $networkLog
+          if ($LASTEXITCODE -ne 0) { throw 'Gate A parallel-reader matrix was incomplete or had a restricted-egress attempt.' }
+
       - name: Create source-bound Gate A acceptance report
         if: always()
         shell: powershell
@@ -147,11 +195,14 @@ jobs:
           $networkExists = Test-Path $networkPath
           $networkBytes = if ($networkExists) { (Get-Item $networkPath).Length } else { -1 }
           $network = $report.networkIsolation
+          $matrixPath = Join-Path $env:GITHUB_WORKSPACE 'testdata/gateA-16/parallel-reader-matrix.json'
+          $matrix = if (Test-Path $matrixPath) { Get-Content -Raw $matrixPath | ConvertFrom-Json } else { $null }
+          $matrixPass = $null -ne $matrix -and $matrix.status -eq 'COMPLETED_DIAGNOSTIC_MATRIX' -and $matrix.inventory.imageCount -eq 16 -and $matrix.network.blockedAttempts -eq 0
           $reportPass = $null -ne $report -and $report.imageCount -eq 16 -and $report.completedImages -eq 16 -and $report.exactMatches -eq 16 -and $report.mandatoryExactMatches -eq 16 -and $report.requiredFieldsComplete -eq 16 -and $report.results.Count -eq 16 -and @($report.results | Where-Object { $_.pipelineCompleted -ne $true -or $_.allExpectedFieldsPass -ne $true -or $_.allRequiredFieldsPass -ne $true -or $_.requiredMissing.Count -ne 0 }).Count -eq 0
           $auditPass = $null -ne $audit -and $audit.sourceCount -eq 16 -and $audit.verifiedPdfCount -eq 16 -and $audit.images.Count -eq 16 -and @($audit.images | Where-Object { $_.valid -ne $true }).Count -eq 0
           $networkPass = $null -ne $network -and $network.ocrSpaceEnabled -eq $true -and $network.ocrSpaceNetworkAllowed -eq $true -and $network.nonOcrNetworkRestricted -eq $true -and $network.nonOcrDeniedAttemptsDetected -eq $false -and $networkExists -and $networkBytes -eq 0
           $fingerprintPass = $null -ne $preflight -and $preflight.status -eq 'PREFLIGHT_PASS_NO_PROVIDER_REQUESTS' -and $preflight.candidateFingerprint -eq $env:GATEB_SOURCE_SHA -and $preflight.candidateFingerprintMatchesGateBSource -eq $true
-          $gateAStatus = if ($reportPass -and $auditPass -and $networkPass -and $fingerprintPass -and $runtimePass) { 'PASS' } else { 'FAIL' }
+          $gateAStatus = if ($reportPass -and $auditPass -and $networkPass -and $fingerprintPass -and $runtimePass -and $matrixPass) { 'PASS' } else { 'FAIL' }
           $summary = [ordered]@{
             schemaVersion = 1
             gate = 'A'
@@ -162,6 +213,11 @@ jobs:
             gateBSourceCommitSha = $env:GATEB_SOURCE_SHA
             nodeVersion = $nodeVersion
             runtimePass = $runtimePass
+            parallelReaderMatrixPass = $matrixPass
+            parallelReaderMatrixStatus = if ($matrix) { $matrix.status } else { 'MISSING' }
+            parallelReaderMatrixSha256 = if (Test-Path $matrixPath) { (Get-FileHash -Algorithm SHA256 $matrixPath).Hash.ToLowerInvariant() } else { $null }
+            parallelReaderMatrixAnalyzedImages = if ($matrix) { @($matrix.images | Where-Object { $_.status -eq 'ANALYZED' }).Count } else { 0 }
+            parallelReaderMatrixNetwork = if ($matrix) { $matrix.network } else { $null }
             sourceImageCount = if ($preflight) { $preflight.imageCount } else { 0 }
             exactMatches = if ($report) { $report.exactMatches } else { $null }
             mandatoryExactMatches = if ($report) { $report.mandatoryExactMatches } else { $null }
@@ -196,6 +252,10 @@ jobs:
             source/testdata/gateA-16/report.json.pdf-audit.json
             source/testdata/gateA-16/gate-a-acceptance.json
             source/testdata/gateA-16/non-ocr-network-attempts.log
+            testdata/gateA-16/parallel-reader-matrix.json*
+            testdata/gateA-16/parallel-reader-network.log
+            testdata/gateA-16/paddleocr-model-manifest.json
+            testdata/gateA-16/paddleocr-install-manifest.json
             source/testdata/gateA-16/artifacts/**
             source/package.json
             source/package-lock.json

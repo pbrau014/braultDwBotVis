@@ -229,3 +229,14 @@ The canonical living plan controls the operational queue and supersedes older da
 - Existing Gate A evidence is still incomplete and cannot pass until a complete
   source-bound 16-image artifact set exists. The workflow will not resubmit
   images as part of matrix evaluation.
+
+ 
+## Verification corrections — 2026-11-06
+- Corrected the 63-image runner's duplicate final-report path declaration.
+- Updated stale UI and local-reader contract assertions to match actual
+  whitespace and the newly required concurrent Tesseract.js/native/PaddleOCR
+  matrix.
+- Corrected the full-system workbook formula oracle calls to the existing
+  `assertScoresMatchPolicy` helper.
+- Gate A now has a no-provider parallel-reader step and requires its completion
+  in the acceptance summary; missing PDFs remain failures, not fabricated data.

@@ -75,13 +75,13 @@ async function main() {
     if (preflight.verifiedMembers.length !== 63) throw new Error('Preflight does not contain 63 verified member records.');
     await fs.mkdir(outputRoot, { recursive: true });
     const progressPath = path.join(outputRoot, 'progress.json');
-    const reportPath = path.join(outputRoot, 'ocrspace-imagesF-63-exploratory-report.json');
+    const existingReportPath = path.join(outputRoot, 'ocrspace-imagesF-63-exploratory-report.json');
     const preflightReportSha256 = sha256(await fs.readFile(preflightPath));
     const resume = process.env.OCRSPACE_63_RESUME === '1';
     let run;
     let resultByName;
     if (resume) {
-        try { await fs.access(reportPath); throw new Error('The prior batch already has a final report; it is complete and must be evaluated, not resumed.'); }
+        try { await fs.access(existingReportPath); throw new Error('The prior batch already has a final report; it is complete and must be evaluated, not resumed.'); }
         catch (error) { if (error.code !== 'ENOENT') throw error; }
         let saved;
         try { saved = JSON.parse(await fs.readFile(progressPath, 'utf8')); }
@@ -97,7 +97,7 @@ async function main() {
         run.status = 'resuming-exploratory';
         run.resumeStartedAt = new Date().toISOString();
     } else {
-        for (const existing of [progressPath, reportPath]) {
+        for (const existing of [progressPath, existingReportPath]) {
             try { await fs.access(existing); throw new Error('Existing OCR.Space output found at ' + existing + '; use OCRSPACE_63_RESUME=1 with its exact verified progress instead of starting a duplicate batch.'); }
             catch (error) { if (error.code !== 'ENOENT') throw error; }
         }

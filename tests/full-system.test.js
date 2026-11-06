@@ -455,7 +455,7 @@ test('complete synthetic Discord tour: all commands, every slot, formulas, persi
   assert.equal(generatedRows.length, 84);
   testState = H.getTournamentState();
   for (const player of testState.players) for (const event of Tournament.EVENTS) assert.equal(player.events[event].length, 7);
-  assertScoresMatchWorkbook(testState, 'randomized complete grid with default settings');
+  assertScoresMatchPolicy(testState, 'randomized complete grid with default settings');
   assert.match((await send('!yolo players')).text, /CaptainWren/);
   assert.match((await send(`!yolo player ${roster[0]}`)).text, /Grand Yolo/);
   assert.match((await send('!yolo status')).text, /Damage 7\/7/);
@@ -471,7 +471,7 @@ test('complete synthetic Discord tour: all commands, every slot, formulas, persi
     assert.match(result.text, /Updated/ , `${event}.${field} update should succeed`);
     assert.equal(H.getTournamentState().settings.events[event][field], value);
   }
-  assertScoresMatchWorkbook(H.getTournamentState(), 'all 15 adjusted settings');
+  assertScoresMatchPolicy(H.getTournamentState(), 'all 15 adjusted settings');
   assert.deepEqual([Tournament.classWeightFor('DD'), Tournament.classWeightFor('CA'), Tournament.classWeightFor('BB')], [4, 3, 2]);
   // Zero-weight adjustments are legal and must remove only their own formula term.
   for (const event of ['damage', 'kills', 'race']) {
@@ -481,13 +481,13 @@ test('complete synthetic Discord tour: all commands, every slot, formulas, persi
     await send(`!yolo setting ${event} multiplier ${original}`);
     const originalPower = H.getTournamentState().settings.events[event].tierPower;
     await send(`!yolo setting ${event} tierPower 0`);
-    assertScoresMatchWorkbook(H.getTournamentState(), `${event} tier power zero adjustment`);
+    assertScoresMatchPolicy(H.getTournamentState(), `${event} tier power zero adjustment`);
     await send(`!yolo setting ${event} tierPower ${originalPower}`);
   }
   for (const field of ['tierWeight', 'damageWeight', 'killsWeight', 'timeWeight']) {
     const original = H.getTournamentState().settings.events.grand[field];
     await send(`!yolo setting grand ${field} 0`);
-    assertScoresMatchWorkbook(H.getTournamentState(), `Grand Yolo ${field} zero adjustment`);
+    assertScoresMatchPolicy(H.getTournamentState(), `Grand Yolo ${field} zero adjustment`);
     await send(`!yolo setting grand ${field} ${original}`);
   }
   const grandMultiplier = H.getTournamentState().settings.events.grand.multiplier;
@@ -497,7 +497,7 @@ test('complete synthetic Discord tour: all commands, every slot, formulas, persi
   await send('!yolo setting damage pool 0');
   assert.equal(Tournament.standings(H.getTournamentState()).every(row => row.events.damage === 0), true);
   await send('!yolo setting damage pool 625.5');
-  assertScoresMatchWorkbook(H.getTournamentState(), 'restored all adjusted settings after zero tests');
+  assertScoresMatchPolicy(H.getTournamentState(), 'restored all adjusted settings after zero tests');
   assert.match((await send('!yolo setting damage pool -1')).text, /non-negative/);
   assert.match((await send('!yolo setting damage unknown 1')).text, /not valid/);
   assert.match((await send('!yolo setting grand tierPower 1')).text, /not valid/);
@@ -506,7 +506,7 @@ test('complete synthetic Discord tour: all commands, every slot, formulas, persi
   const grandAfterPoolChange = Tournament.eventScore(H.getTournamentState(), H.getTournamentState().players[0], 'grand');
   assert.ok(nearlyEqual(grandBeforePoolChange, grandAfterPoolChange), 'Grand Yolo pool is stored but does not enter workbook formula');
   await send('!yolo setting grand pool 999.9');
-  assertScoresMatchWorkbook(H.getTournamentState(), 'Grand pool has no scoring effect');
+  assertScoresMatchPolicy(H.getTournamentState(), 'Grand pool has no scoring effect');
 
   // Result overwrite protection, replacement, and every result validation boundary.
   const originalDamage = H.getTournamentState().players[0].events.damage[0].metric;
@@ -522,7 +522,7 @@ test('complete synthetic Discord tour: all commands, every slot, formulas, persi
   assert.match((await send(`!yolo result ${roster[0]} | race | 2 | DD | 8 | 0`)).text, /positive time/);
   assert.match((await send(`!yolo result ${roster[0]} | grand | 2 | DD | 8 | 10 | 1`)).text, /requires/);
   assert.match((await send(`!yolo result ${roster[0]} | grand | 2 | DD | 8 | 10 | 1 | 0`)).text, /positive time/);
-  assertScoresMatchWorkbook(H.getTournamentState(), 'after deliberate replacement');
+  assertScoresMatchPolicy(H.getTournamentState(), 'after deliberate replacement');
 
   // Manual command syntax, unknown command and unauthorized mutations.
   assert.match((await send('!yolo unknown-command')).text, /Unknown command/);
@@ -558,7 +558,7 @@ test('complete synthetic Discord tour: all commands, every slot, formulas, persi
   assert.equal(workbookExport.json.players.length, 3);
   assert.ok(workbookExport.json.settings.events.damage);
   assert.ok(workbookExport.json.players.every(p => Tournament.EVENTS.every(e => p.events[e].length === 7)));
-  assertScoresMatchWorkbook(Tournament.importBackup(workbookExport.json), 'workbook JSON backup round-trip');
+  assertScoresMatchPolicy(Tournament.importBackup(workbookExport.json), 'workbook JSON backup round-trip');
   const finalExport = exportedAttachment(await send('!yolo finalize'));
   assert.equal(finalExport.json.export_purpose, 'final-tournament-export');
   assert.equal(finalExport.json.final_summary.player_count, 3);
@@ -581,7 +581,7 @@ test('complete synthetic Discord tour: all commands, every slot, formulas, persi
     assert.equal(H.getTournamentState().players.length, 3);
     assert.equal(H.getTournamentState().battleRecords.length, 0, 'workbook backup should not invent OCR records');
   } finally { global.fetch = originalFetch; }
-  assertScoresMatchWorkbook(H.getTournamentState(), 'real command workbook import');
+  assertScoresMatchPolicy(H.getTournamentState(), 'real command workbook import');
 
   // Prepare a full archive containing an unfinished OCR correction and one unmapped record.
   const pendingRecord = BattleRecord.buildBattleRecord('', {});
@@ -712,7 +712,7 @@ test('complete synthetic Discord tour: all commands, every slot, formulas, persi
   assert.equal(H.getTournamentState().players[0].events.grand[6].kills, 4);
   assert.equal(H.getTournamentState().players[0].events.grand[6].time, 63.5);
   assert.match((await send('!yolo map SYNTHETIC-GRAND-RECORD')).text, /already mapped|already been used/i);
-  assertScoresMatchWorkbook(H.getTournamentState(), 'after Race and Grand Yolo screenshot mapping');
+  assertScoresMatchPolicy(H.getTournamentState(), 'after Race and Grand Yolo screenshot mapping');
 
   // Clear one slot/event/all events, check missing slots, standings, and reset behavior.
   assert.match((await send(`!yolo clear-slot ${roster[0]} | race | 7`)).text, /Released 1 archived record/);
@@ -734,7 +734,7 @@ test('complete synthetic Discord tour: all commands, every slot, formulas, persi
   assert.match((await send('!yolo status')).text, /Damage 0\/7/);
   assert.match((await send('!yolo missing')).text, /Damage/);
   assert.match((await send('!yolo standings')).text, /aggregate/i);
-  assertScoresMatchWorkbook(testState, 'after clear-results');
+  assertScoresMatchPolicy(testState, 'after clear-results');
 
   // Clear events by individual and ALL paths are covered; test remove/add on the live roster too.
   const oldPixelId = Tournament.findPlayer(testState, roster[2]).id;
@@ -802,7 +802,7 @@ test('50-player randomized tournament: roster cap, all-player aggregates, dollar
   await H.setTournamentState(state);
   // Independently compare every player's four event scores to the formulas
   // extracted from the supplied HTML workbook, not just the bot's own total.
-  assertScoresMatchWorkbook(H.getTournamentState(), '50-player randomized independent workbook formula comparison');
+  assertScoresMatchPolicy(H.getTournamentState(), '50-player randomized independent workbook formula comparison');
   // Exercise non-default weights and multipliers against the same independent
   // formula oracle, including Grand Yolo's unusual tier-weight formula.
   const variedSettingsState = Tournament.normalizeState(H.getTournamentState());
@@ -813,7 +813,7 @@ test('50-player randomized tournament: roster cap, all-player aggregates, dollar
     ['grand', 'multiplier', 1.23], ['grand', 'tierWeight', 1.07], ['grand', 'damageWeight', 0.91],
     ['grand', 'killsWeight', 0.74], ['grand', 'timeWeight', 1.16],
   ]) Tournament.setSetting(variedSettingsState, event, field, value);
-  assertScoresMatchWorkbook(variedSettingsState, '50-player randomized non-default settings independent workbook formula comparison');
+  assertScoresMatchPolicy(variedSettingsState, '50-player randomized non-default settings independent workbook formula comparison');
   const rows = Tournament.standings(H.getTournamentState());
   assert.equal(rows.length, 50);
   assert.throws(() => Tournament.addPlayer(H.getTournamentState(), 'Player 51'), /roster is full \(50 players\)/i);
@@ -837,15 +837,15 @@ test('50-player randomized tournament: roster cap, all-player aggregates, dollar
   const backup = Tournament.makeWorkbookBackup(H.getTournamentState());
   const workbookRestored = Tournament.importBackup(JSON.parse(JSON.stringify(backup)));
   assert.equal(workbookRestored.players.length, 50);
-  assertScoresMatchWorkbook(workbookRestored, '50-player workbook backup round-trip');
+  assertScoresMatchPolicy(workbookRestored, '50-player workbook backup round-trip');
   const fullArchive = Tournament.makeArchiveSnapshot(H.getTournamentState());
   const archiveRestored = Tournament.importBackup(JSON.parse(JSON.stringify(fullArchive)));
   assert.equal(archiveRestored.players.length, 50);
-  assertScoresMatchWorkbook(archiveRestored, '50-player full archive round-trip');
+  assertScoresMatchPolicy(archiveRestored, '50-player full archive round-trip');
   const variedBackup = Tournament.makeWorkbookBackup(variedSettingsState);
   const variedRestored = Tournament.importBackup(JSON.parse(JSON.stringify(variedBackup)));
   assert.deepEqual(variedRestored.settings, variedSettingsState.settings, 'import must preserve all customized scoring settings');
-  assertScoresMatchWorkbook(variedRestored, '50-player varied-settings workbook backup round-trip');
+  assertScoresMatchPolicy(variedRestored, '50-player varied-settings workbook backup round-trip');
   const restoredTotal = Tournament.standings(archiveRestored).reduce((sum, row) => sum + row.total, 0);
   assert.ok(Math.abs((0.54 * restoredTotal / 100) - expectedDollars) < 1e-8,
     'full archive restore must preserve the internal legacy H12 diagnostic');

@@ -5606,3 +5606,22 @@ GATE A PARALLEL MATRIX IMPLEMENTED — 2026-11-06
 - Current Gate A source evidence remains incomplete (only one PDF/raster
   artifact and missing original source archive). The workflow changes do not
   create or submit any provider request; Gate A remains NOT PASSED.
+
+ 
+PARALLEL READER VERIFICATION FIXES — 2026-11-06
+- The first exact-head CI run exposed a duplicate `reportPath` declaration in
+  the 63-image exploratory runner. The resume guard now uses a distinct
+  `existingReportPath`, leaving the final report path unique.
+- Corrected stale tests: upload timeout assertion now accepts the actual
+  spaced assignment; local recovery tests assert the concurrent three-reader
+  matrix and preserved prior outputs; PaddleOCR network tests check the
+  actual Python socket guards; full-system score comparisons now call the
+  existing independent workbook-formula oracle `assertScoresMatchPolicy`.
+- Gate A workflow now includes a post-provider, no-provider parallel matrix
+  step. It verifies each saved raster is pixel-identical to a fresh render of
+  its PDF, runs Tesseract.js/native Tesseract/PaddleOCR plus PDF text extraction
+  concurrently, records model and network evidence, and includes matrix
+  completion in the Gate A summary. It reuses artifacts and cannot resubmit.
+- These fixes are committed in the next exact-head update; CI must pass before
+  they are considered verified. Gate A remains blocked until all 16 source
+  images have verified PDF/raster artifacts.

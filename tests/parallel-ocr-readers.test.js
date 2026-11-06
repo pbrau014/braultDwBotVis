@@ -25,10 +25,10 @@ test('PaddleOCR uses OpenCV crop geometry and explicit local-only models', () =>
     assert.match(child, /OCRSPACE_ENABLED = '0'/);
     assert.match(child, /OCRSPACE_NETWORK_ALLOWLIST = '0'/);
     assert.match(helper, /explicit local detection\/recognition model files are unavailable/);
-    assert.match(helper, /block_network\(\)/);
+    assert.match(helper, /socket\.socket\.connect = _blocked_network/);
+    assert.match(helper, /socket\.create_connection = _blocked_network/);
     assert.match(child, /candidatesByField/);
     assert.match(child, /diagnostic candidates only/);
-    assert.match(child, /modelManifestSha256/);
     assert.match(child, /modelManifestSha256/);
 });
 

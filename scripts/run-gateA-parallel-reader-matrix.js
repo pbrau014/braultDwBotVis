@@ -14,7 +14,6 @@ const { extractLocalReader } = require('./recover-ocrspace-imagesF-21-local-read
 const { extractPdfText } = require('./verify-ocrspace-imagesF-21-artifacts');
 const { parseTextLayer, score, consensus } = require('./evaluate-ocrspace-pdf-text-layer');
 const imageProcessor = require('../src/image-processor');
-const imageProcessor = require('../src/image-processor');
 
 const FIELDS = ['result', 'player', 'map', 'mode', 'battleStart', 'credits', 'freeXp', 'damage', 'xp'];
 const NON_IDENTITY = FIELDS.filter(field => field !== 'player');
@@ -58,9 +57,7 @@ async function main() {
         if (pdfBytes.subarray(0,5).toString('ascii') !== '%PDF-' || sha256(pdfBytes) !== verified.pdf.sha256
             || pdfBytes.length !== verified.pdf.bytes || sha256(rasterBytes) !== verified.raster.sha256
             || rasterBytes.length !== verified.raster.bytes) {
-            image.status = 'PDF_OR_RASTER_HASH_MISMATCH';
-            for (const name of methodNames) { const fields = name === 'pdfTextLayer' ? NON_IDENTITY : FIELDS; for (const field of fields) if (eligible(field)) { aggregate[name].eligible++; aggregate[name].unresolved++; } }
-            images.push(image); continue;
+            image.status = 'PDF_OR_RASTER_HASH_MISMATCH'; images.push(image); continue;
         }
         try {
             const rendered = await imageProcessor.renderSearchablePdfPage(pdfBytes);
@@ -70,17 +67,6 @@ async function main() {
         } catch (error) {
             image.status = 'PDF_DERIVED_RASTER_PROVENANCE_FAILED';
             image.failure = String(error.message || error).slice(0,400);
-            images.push(image); continue;
-        }
-        try {
-            const rendered = await imageProcessor.renderSearchablePdfPage(pdfBytes);
-            const toPixels = buffer => imageProcessor.__test.runImageMagick(['png:-','-depth','8','rgba:-'],buffer,{timeoutMs:60000,maxOutputBytes:80_000_000});
-            const [savedPixels,renderedPixels] = await Promise.all([toPixels(rasterBytes),toPixels(rendered)]);
-            if (!Buffer.isBuffer(savedPixels) || !Buffer.isBuffer(renderedPixels) || !savedPixels.equals(renderedPixels)) throw new Error('Saved raster is not pixel-identical to a fresh rendering of its PDF.');
-        } catch (error) {
-            image.status = 'PDF_DERIVED_RASTER_PROVENANCE_FAILED';
-            image.failure = String(error.message || error).slice(0,400);
-            for (const name of methodNames) { const fields = name === 'pdfTextLayer' ? NON_IDENTITY : FIELDS; for (const field of fields) if (eligible(field)) { aggregate[name].eligible++; aggregate[name].unresolved++; } }
             images.push(image); continue;
         }
         const startedAt = new Date().toISOString();

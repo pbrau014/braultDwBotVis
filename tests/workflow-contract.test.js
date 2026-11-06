@@ -289,6 +289,7 @@ test('Gate A acceptance uses the accepted runtime, fail-closed network guard and
     assert.ok(workflow.includes('cancel-in-progress: false'));
     assert.ok(workflow.includes('DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME'));
     assert.ok(workflow.includes('run-gateA-parallel-reader-matrix.js'));
+    assert.ok(workflow.includes('parallelReaderMatrixPass'));
     assert.ok(workflow.includes('Provision pinned local PaddleOCR CPU runtime'));
     assert.ok(read('scripts/run-gateA-parallel-reader-matrix.js').includes('Promise.allSettled'));
     assert.ok(read('scripts/run-gateA-parallel-reader-matrix.js').includes('renderSearchablePdfPage'));
