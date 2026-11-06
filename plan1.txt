@@ -1,7 +1,49 @@
 ================================================================================
 CURRENT GATE B HOLDOUT REQUIREMENT — 2026-11-06
 ================================================================================
-Status: ACTIVE / GOVERNING / SUPERSEDES THE FORMER 50-IMAGE MINIMUM.
+Status: ACTIVE / GOVERNING / SUPERSEDES THE 21-IMAGE GATE B RULE BELOW.
+
+- Gate B now uses exactly 19 screenshots: the first 19 corpus-order records in
+  testdata/ground-truth/imagesF-63-working-ground-truth-v6.json with
+  COMPLETE_9_FIELD_TRANSCRIPTION and all nine non-empty eligible expected
+  fields. The former 50-image minimum / 100-image preferred target and interim
+  21-image Gate B requirement are superseded.
+- The 21 complete records remain the separate PDF-first pipeline-analysis
+  inventory. Records 20–21 are analysis-only and do not count toward Gate B.
+  Reuse the existing 63-image extraction; no duplicate provider requests.
+- The 4-image regression and 16-image Gate A/development requirements remain
+  separate. All nine fields remain mandatory and ordered: result, player, map,
+  mode, battleStart, credits, freeXp, damage, xp.
+- The supplied manual transcription is independent of OCR outputs but has no
+  documented blind second reviewer; do not call it double-blind or certified.
+- Gate A remains FAIL/BLOCKED. Gate B requires Gate A PASS on the locked
+  matching candidate fingerprint, all 19 source/PDF/raster records verified,
+  zero unresolved mandatory outputs, zero wrongly accepted values, clean
+  network evidence and a passing secret scan. Production remains NO-GO.
+- The original extraction artifact contains 63 searchable PDFs and 63
+  PDF-derived rasters, all independently hash/size/format verified. Preliminary
+  21-image analysis measured 65.08% Tesseract.js and 61.38% native field-level
+  exact match, but only 2/21 and 0/21 exact nine-field records. These are
+  preliminary metrics, not acceptance.
+- The original restricted-egress log is missing because the triggering
+  workflow did not configure OCR_NON_OCR_NETWORK_LOG. A reconciliation report
+  now records the source workflow/guard configuration and observations while
+  leaving originalBlockedAttemptCount null and zeroAttemptsClaimed false.
+  This gap is not converted into a fabricated empty original log.
+- The first 21-image verifier attempt failed because of undefined recovery-log
+  variables; its green workflow conclusion was not a verifier pass. The
+  verifier/workflow/tests are corrected and a new no-provider 19-image run
+  will report its actual status and upload evidence even on failure.
+
+================================================================================
+END CURRENT GATE B HOLDOUT REQUIREMENT
+================================================================================
+
+
+================================================================================
+CURRENT GATE B HOLDOUT REQUIREMENT — 2026-11-06
+================================================================================
+Status: SUPERSEDED HISTORICAL REQUIREMENT; SEE CURRENT 19-IMAGE OVERRIDE ABOVE.
 
 - Gate B now uses exactly 21 screenshots: the first 21 corpus-order records in
   testdata/ground-truth/imagesF-63-working-ground-truth-v6.json whose
