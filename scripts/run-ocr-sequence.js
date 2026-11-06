@@ -105,15 +105,29 @@ async function verifyCompletedSequenceArtifacts(row, imageSha256) {
 function getNetworkIsolation() {
     const logPath = String(process.env.OCR_NON_OCR_NETWORK_LOG || '').trim();
     let denied = false;
+    let logPresent = false;
+    let logBytes = null;
+    let logSha256 = null;
     if (logPath) {
-        try { denied = fsSync.existsSync(logPath) && fsSync.statSync(logPath).size > 0; }
-        catch { denied = true; }
+        try {
+            logPresent = fsSync.existsSync(logPath);
+            if (logPresent) {
+                const log = fsSync.readFileSync(logPath);
+                logBytes = log.length;
+                logSha256 = crypto.createHash('sha256').update(log).digest('hex');
+                denied = log.length > 0;
+            }
+        } catch { denied = true; }
     }
     return {
         ocrSpaceEnabled: process.env.OCRSPACE_ENABLED === '1',
         ocrSpaceNetworkAllowed: process.env.OCRSPACE_NETWORK_ALLOWLIST === '1',
         nonOcrNetworkRestricted: process.env.OCR_NON_OCR_NETWORK_RESTRICTED === '1',
         nonOcrDeniedAttemptsDetected: denied,
+        networkDiagnosticLogPath: logPath || null,
+        networkDiagnosticLogPresent: logPresent,
+        networkDiagnosticLogBytes: logBytes,
+        networkDiagnosticLogSha256: logSha256,
     };
 }
 
@@ -192,6 +206,7 @@ function getNetworkIsolation() {
             startedAt: new Date().toISOString(),
         };
     }
+    progress.networkDiagnosticLogPath = String(process.env.OCR_NON_OCR_NETWORK_LOG || '').trim() || null;
     activeProgress = progress;
     activeProgressPath = progressPath;
     await writeJsonAtomically(progressPath, progress);
