@@ -264,7 +264,7 @@ def verify_artifact_report(artifact, run_path, gt_path, selected_records, select
     if selection.get("verifiedImageCount") != MIN_GATE_B_IMAGES or selection.get("allSelectedImagesVerified") is not True:
         reasons.append("Artifact report does not verify all 21 selected images.")
     for key in ("sourceImageHashes", "pdfIntegrity", "searchablePdfTextLayer",
-                "rasterIntegrity", "pdfDerivedRasterProvenance",
+                "rasterIntegrity", "pdfDerivedRasterProvenance", "localReaders",
                 "networkRestriction", "secretLeakScan"):
         if checks.get(key) != "PASS":
             reasons.append("Artifact check did not pass: " + key)
