@@ -50,6 +50,27 @@
     "Gate B uses exactly the 21 records with complete, independent nine-field expected values in this approved subset; all 21 must be processed and all acceptance conditions must pass.",
     "The supplied manual transcription is independent of the OCR run outputs, but the archive does not document a separate blind second reviewer; do not describe it as independently double-annotated or certified."
   ],
+  "gateBSelection": {
+    "id": "gate-b-complete-ground-truth-19",
+    "status": "APPROVED_HOLDOUT_SCOPE_NOT_GATE_PASS",
+    "imageCount": 19,
+    "selectionRule": "First 19 corpus-order records with COMPLETE_9_FIELD_TRANSCRIPTION and all nine non-empty expected values eligible_for_exact_match=true.",
+    "diagnosticOnlyAdditionalCompleteRecords": [
+      "Screenshot_55374.png",
+      "lllfrfgfgff.png"
+    ],
+    "requiredFields": [
+      "result",
+      "player",
+      "map",
+      "mode",
+      "battleStart",
+      "credits",
+      "freeXp",
+      "damage",
+      "xp"
+    ]
+  },
   "records": [
     {
       "corpusOrder": 1,
