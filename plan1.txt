@@ -66,13 +66,12 @@ Phase 0–10 roadmap. The canonical living plan on main remains controlling.
 - Engine 2 is the PDF-producing first pass because the current provider matrix
   marks Engine 3 searchable-PDF generation unsupported. The older Engine 3-first
   / Engine 2 PDF-only fallback design below is superseded.
-- The user explicitly authorized OCR.Space uploads for the 4-, 16- and
-  64-image World of Warships inventories, including visible player names, only.
+- The active OCR.Space inventory matrix is 4 images, 16 images, and the 21-image complete-ground-truth subset from the current 63-image exploratory corpus, including visible player names. The separate 64-image inventory requirement is retired.
   No unrelated images, credentials, Discord IDs or private account data.
 - Eligible original-image intake explicitly requires OCRSPACE_ENABLED=1, OCRSPACE_NETWORK_ALLOWLIST=1 and OCRSPACE_API_KEY. OCRSPACE_ENABLED=0 is reserved for isolated offline mocks or local readers invoked only after a successful OCR.Space PDF-first stage; it is not an original-image fallback.
   Failure to produce/download/rasterize the PDF fails closed.
 - Exact nine fields remain mandatory; zero wrong accepted mandatory values.
-  The 64-image inventory has no independent ground truth and is extraction-only.
+  The replacement 21-image subset has complete nine-field manual transcriptions for eligible post-hoc evaluation; it is not the independent 50-image minimum Gate B holdout.
 - Current implementation: src/ocrspace-pdf-first.js, src/image-processor.js,
   src/bot.js. The old crop-only helper files are legacy, not active bot path.
   See docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md and the canonical living plan.

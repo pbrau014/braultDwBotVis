@@ -30,7 +30,7 @@ The official API currently documents a 1 MiB Free API upload limit, 500 requests
 - src/bot.js: performs PDF-first processing before OpenCV/Tesseract; subsequent readers receive only the PDF raster. Production entrypoint refuses normal startup without OCRSPACE_API_KEY; OCRSPACE_ENABLED=0 is local-only.
 - scripts/block-network.js: OCR.Space-only HTTPS allowlist for acceptance.
 - scripts/run-windows-ocr-acceptance.ps1: requires OCRSPACE_API_KEY, runs PDF-first acceptance, retains PDF/raster artifacts.
-- `OCRSPACE_ARTIFACT_DIR` is set to a per-run directory by the Windows acceptance wrapper; the PDF and PDF-derived raster are retained there. The 64-image runner verifies all 64 member hashes, submits only the 56 eligible images, and records the 8 user-excluded images as skipped without OCR.Space requests. The normal bot only writes durable artifacts when `OCRSPACE_ARTIFACT_DIR` is configured; set it before any run that requires persistent evidence. No artifact is claimed until the file and checksum are inspected.
+- `OCRSPACE_ARTIFACT_DIR` is set to a per-run directory by the Windows acceptance wrapper; the PDF and PDF-derived raster are retained there. The current 63-image exploratory run includes the 21-image complete-ground-truth subset. Reuse its saved artifacts for the subset evaluation; do not submit those 21 images again. The normal bot only writes durable artifacts when `OCRSPACE_ARTIFACT_DIR` is configured; set it before any run that requires persistent evidence. No artifact is claimed until the file and checksum are inspected.
 - tests/ocrspace-pdf-first.test.js and tests/ocrspace-64-inventory.test.js: mocked PDF-first contracts plus 64-inventory eligibility, exclusion, preflight and path-containment regressions.
 - npm run test:ocrspace includes PDF-first contract tests.
 
@@ -41,7 +41,7 @@ The official API currently documents a 1 MiB Free API upload limit, 500 requests
 | 16 images | fixtures/additional-screenshots/ | testdata/additional-screenshot-ground-truth.json | OCR.Space PDF first, then local readers, compare all nine fields |
 | 21 images | First 21 corpus-order records in testdata/ground-truth/imagesF-63-working-ground-truth-v6.json | Complete manual transcription; all nine fields eligible | Reuse the current 63-image exploratory run's PDF/raster/local-reader outputs; post-hoc evaluate only these 21 records. No duplicate OCR.Space submissions. This is not Gate B. |
 
-The 64-image archive is not in the current repository tree. The reviewed provenance specifies imgsHalf1.zip as 57,665,767 bytes with SHA-256 e32e43991ab90d6e2ca3e060f264456d175d0e93390f273d7f3a3f5d93fa98a2. The 58,090,288-byte inventory total is the sum of the 64 uncompressed image files, not a competing ZIP size. Retrieve the exact archive, verify its size/hash, then verify all 64 member hashes before processing; never reconstruct or select a candidate by guess.
+The retired 64-image inventory and its archive are not required for the current project test matrix. The legacy manifest/runner remain only as historical regression material. The active 21-image selection is deterministically checked against the v6 ground-truth record statuses and all nine field-eligibility flags; source filename, byte size and SHA-256 must match the verified 63-image preflight. The evaluator is post-hoc only and does not submit images.
 
 ## Acceptance criteria
 - OCR.Space Engine 2 creates one searchable PDF per source image.
