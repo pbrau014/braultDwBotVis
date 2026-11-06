@@ -373,8 +373,11 @@ function getNetworkIsolation() {
                             engine: evidence.engine || null, sourceSha256: evidence.sourceSha256 || null,
                             uploadSha256: evidence.uploadSha256 || null, uploadBytes: evidence.uploadBytes || null,
                             pdfBytes: evidence.pdfBytes || null, pdfSha256: evidence.pdfSha256 || null,
+                            pageRasterBytes: evidence.pageRasterBytes || null, pageRasterSha256: evidence.pageRasterSha256 || null,
+                            pageRasterWidth: evidence.pageRasterWidth || null, pageRasterHeight: evidence.pageRasterHeight || null,
                             rasterBytes: evidence.rasterBytes || null, rasterSha256: evidence.rasterSha256 || null, rasterWidth: evidence.rasterWidth || null,
-                            rasterHeight: evidence.rasterHeight || null, artifacts: evidence.artifacts || null,
+                            rasterHeight: evidence.rasterHeight || null, rasterNormalization: evidence.rasterNormalization || null,
+                            artifacts: evidence.artifacts || null,
                             reason: evidence.reason || null, requests: evidence.requests ?? null,
                         };
                     })(),
