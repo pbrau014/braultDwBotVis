@@ -32,6 +32,14 @@ class GateB21EvaluatorTests(unittest.TestCase):
             self.assertEqual(len([f for f in EVALUATOR.FIELDS
                                   if row["fieldStatus"][f]["eligible_for_exact_match"]]), 9)
 
+    def test_gate_b_subset_has_no_source_hash_overlap_with_16_image_development_corpus(self):
+        dev_path = ROOT / "testdata" / "additional-screenshot-ground-truth.json"
+        dev = json.loads(dev_path.read_text(encoding="utf-8"))
+        dev_hashes = {row["sha256"] for row in dev["records"]}
+        gate_b_hashes = {row["sourceImage"]["sha256"] for row in self.selected}
+        self.assertEqual(len(dev_hashes), 16)
+        self.assertFalse(gate_b_hashes & dev_hashes)
+
     def test_partial_or_uncertain_rows_do_not_enter_gate_b(self):
         selected_names = {r["filename"] for r in self.selected}
         for row in self.gt["records"]:
