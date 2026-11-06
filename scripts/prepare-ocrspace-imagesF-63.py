@@ -44,7 +44,7 @@ def main() -> None:
             raise RuntimeError(f"Expected one embedded full manifest, found {len(manifest_names)}")
         manifest_name = manifest_names[0]
         manifest_path = PurePosixPath(manifest_name)
-        if manifest_path.is_absolute() or len(manifest_path.parts) != 1 or "\\\\" in manifest_name:
+        if manifest_path.is_absolute() or len(manifest_path.parts) != 1 or "\\" in manifest_name:
             raise RuntimeError(f"Unsafe manifest path: {manifest_name!r}")
         manifest_bytes = archive.read(manifest_name)
         manifest_sha = digest_bytes(manifest_bytes)
@@ -60,7 +60,7 @@ def main() -> None:
             if not isinstance(name, str) or not name or name in expected:
                 raise RuntimeError(f"Invalid or duplicate manifest filename: {name!r}")
             p = PurePosixPath(name)
-            if p.is_absolute() or len(p.parts) != 1 or name in (".", "..") or "\\\\" in name:
+            if p.is_absolute() or len(p.parts) != 1 or name in (".", "..") or "\\" in name:
                 raise RuntimeError(f"Unsafe manifest member path: {name!r}")
             if p.suffix.lower() not in (".jpg", ".jpeg", ".png", ".bmp"):
                 raise RuntimeError(f"Unsupported image extension: {name}")
