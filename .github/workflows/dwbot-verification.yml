@@ -8,6 +8,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       run_legacy_56_provider_acceptance:
@@ -20,7 +23,7 @@ permissions:
   contents: read
 
 jobs:
-  node24-linux:
+  node22-linux:
     name: Node.js 22.16.0 - Linux offline verification
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -87,7 +90,7 @@ jobs:
       - name: Full project suite
         run: npm test
 
-  windows-node24-native-ocr:
+  windows-node22-native-ocr:
     name: Windows Node.js 22.16.0 - native Tesseract and persistence
     runs-on: windows-latest
     timeout-minutes: 180
