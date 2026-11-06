@@ -24,7 +24,11 @@ permissions:
   contents: read
 
 jobs:
+  # This workflow submits billable external OCR requests. Pushes (including
+  # documentation/test updates) must never start a second exploratory batch.
+  # Run only after an explicit workflow_dispatch action.
   imagesf-63-exploratory:
+    if: github.event_name == 'workflow_dispatch'
     name: Windows OCR.Space Engine 2 - imagesF 63 exploratory PDF-first
     runs-on: windows-latest
     timeout-minutes: 240
