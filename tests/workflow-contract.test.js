@@ -217,6 +217,8 @@ test('63-image exploratory workflow persists restricted-egress attempts for arti
     assert.match(workflow, /OCR_NON_OCR_NETWORK_RESTRICTED: '1'/);
     assert.match(workflow, /OCR_NON_OCR_NETWORK_LOG:/);
     assert.match(workflow, /imagesF-63-blocked-network-attempts\.log/);
+    assert.match(workflow, /Initialize restricted-egress diagnostic log for a fresh batch/);
+    assert.match(workflow, /if: inputs\.resume_run_id == ''/);
     assert.match(workflow, /if: always\(\)/);
 });
 
@@ -233,6 +235,11 @@ test('billable imagesF extraction workflow supports fingerprint-bound no-duplica
     assert.match(workflow, /oldNetworkLogs\.Count -ne 1/);
     assert.match(workflow, /network provenance/);
     assert.match(runner, /onProviderRequestStarted/);
+    const rasterWrite = runner.indexOf("await fs.writeFile(rasterPath, pdfFirst.rasterBuffer, { flag: 'wx' });");
+    const localCheckpoint = runner.indexOf('await writeProgress(outputRoot, run);', rasterWrite);
+    const localReaders = runner.indexOf('for (const engine of engines)', rasterWrite);
+    assert.ok(rasterWrite >= 0 && localCheckpoint > rasterWrite && localCheckpoint < localReaders, 'PDF/raster must be durably checkpointed before local readers run');
+    assert.match(runner, /Keep progress\.json's terminal status aligned with the immutable final report/);
     assert.match(runner, /classifyResumeRow/);
     assert.match(runner, /resume-local-only/);
     assert.match(runner, /local-readers-rerun-from-hash-verified-pdf-derived-raster/);
@@ -245,7 +252,8 @@ test('billable imagesF extraction workflow supports fingerprint-bound no-duplica
 test('21-image post-hoc artifact workflow is manual-only and never submits OCR.Space requests', () => {
     const workflow = read('.github/workflows/dwbot-imagesF-21-artifact-verification.yml');
     assert.match(workflow, /^  workflow_dispatch:/m);
-    assert.doesNotMatch(workflow, /^  push:/m);
+    assert.match(workflow, /^  push:/m);
+    assert.match(workflow, /SOURCE_RUN_ID: \$\{\{ inputs\.source_run_id \|\| '42160979140' \}\}/);
     assert.match(workflow, /gh run download/);
     assert.match(workflow, /prepare-ocrspace-imagesF-63\.py/);
     assert.match(workflow, /verify-ocrspace-imagesF-21-artifacts\.js/);
