@@ -84,8 +84,10 @@ function childEnv({ injected = false, operationTimeoutMs = 15_000 } = {}) {
         OCR_OPERATION_TIMEOUT_MS: String(operationTimeoutMs),
         OCR_WORKER_TERMINATION_TIMEOUT_MS: '5000',
         OCR_DEBUG_TIMINGS: '1',
-        OCR_NETWORK_BLOCK_ENABLED: '1',
-        OCR_NETWORK_BLOCK_LOG: logPath,
+        OCRSPACE_ENABLED: '0',
+        OCRSPACE_NETWORK_ALLOWLIST: '0',
+        OCR_NON_OCR_NETWORK_RESTRICTED: '1',
+        OCR_NON_OCR_NETWORK_LOG: logPath,
         NODE_OPTIONS: [process.env.NODE_OPTIONS, ...preloads].filter(Boolean).join(' '),
         TOURNAMENT_STORAGE: 'json',
     };
