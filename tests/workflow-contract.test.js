@@ -296,6 +296,8 @@ test('four-image PDF-first runner refuses duplicates and supports fingerprint-bo
     assert.match(runner, /OCR_SEQUENCE_RESUME_FROM/);
     assert.match(runner, /Existing OCR.Space artifacts are present without a resume token/);
     assert.match(runner, /networkDiagnosticLogPresent: fs\.existsSync/);
+    assert.match(runner, /originalNetworkLogNoDeniedAttempts/);
+    assert.match(runner, /MISSING_ORIGINAL_LOG/);
     assert.match(sequence, /validateSequenceResume/);
     assert.match(sequence, /verifyCompletedSequenceArtifacts/);
     assert.match(sequence, /orphaned-provider-artifact-not-resubmitted/);
