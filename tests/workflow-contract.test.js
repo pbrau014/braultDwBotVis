@@ -240,3 +240,16 @@ test('billable imagesF extraction workflow supports fingerprint-bound no-duplica
     assert.match(resumeGuard, /skip-ambiguous/);
     assert.match(resumeGuard, /OCRSPACE_RESUME_FINGERPRINT_MISMATCH/);
 });
+
+
+test('21-image post-hoc artifact workflow is manual-only and never submits OCR.Space requests', () => {
+    const workflow = read('.github/workflows/dwbot-imagesF-21-artifact-verification.yml');
+    assert.match(workflow, /^  workflow_dispatch:/m);
+    assert.doesNotMatch(workflow, /^  push:/m);
+    assert.match(workflow, /gh run download/);
+    assert.match(workflow, /prepare-ocrspace-imagesF-63\.py/);
+    assert.match(workflow, /verify-ocrspace-imagesF-21-artifacts\.js/);
+    assert.match(workflow, /complete-ground-truth-21/);
+    assert.match(workflow, /evaluate-ocrspace-imagesF-63-ground-truth\.py/);
+    assert.doesNotMatch(workflow, /createOcrSpacePdfFirst|OCRSPACE_63_RESUME=1/);
+});
