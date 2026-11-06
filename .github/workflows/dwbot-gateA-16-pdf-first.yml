@@ -16,7 +16,7 @@ permissions:
 
 concurrency:
   group: dwbot-gateA-16-pdf-first-adaf4f8c
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 env:
   GATEB_SOURCE_SHA: adaf4f8c3a9573f56d0348a4bba36686fc31c22e
@@ -70,10 +70,10 @@ jobs:
           path: source
           persist-credentials: false
 
-      - name: Set up Node.js 22.16.0 to match the Gate B candidate runtime
+      - name: Set up accepted Node.js 24.17.0 runtime for Gate A acceptance
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 22.16.0
+          node-version: 24.17.0
           package-manager-cache: false
 
       - name: Install local OCR and PDF runtime
@@ -125,6 +125,9 @@ jobs:
           $auditPath = $reportPath + '.pdf-audit.json'
           $networkPath = Join-Path $sourceRoot 'testdata/gateA-16/non-ocr-network-attempts.log'
           $preflightPath = Join-Path $env:GITHUB_WORKSPACE 'testdata/gateA-16-preflight.json'
+          $nodeVersion = (node --version).Trim()
+          $runtimePass = $false
+          try { $runtimePass = ([version]$nodeVersion.TrimStart('v')) -ge ([version]'24.17.0') } catch { $runtimePass = $false }
           $report = if (Test-Path $reportPath) { Get-Content -Raw $reportPath | ConvertFrom-Json } else { $null }
           $audit = if (Test-Path $auditPath) { Get-Content -Raw $auditPath | ConvertFrom-Json } else { $null }
           $preflight = if (Test-Path $preflightPath) { Get-Content -Raw $preflightPath | ConvertFrom-Json } else { $null }
@@ -135,7 +138,7 @@ jobs:
           $auditPass = $null -ne $audit -and $audit.sourceCount -eq 16 -and $audit.verifiedPdfCount -eq 16 -and $audit.images.Count -eq 16 -and @($audit.images | Where-Object { $_.valid -ne $true }).Count -eq 0
           $networkPass = $null -ne $network -and $network.ocrSpaceEnabled -eq $true -and $network.ocrSpaceNetworkAllowed -eq $true -and $network.nonOcrNetworkRestricted -eq $true -and $network.nonOcrDeniedAttemptsDetected -eq $false -and $networkExists -and $networkBytes -eq 0
           $fingerprintPass = $null -ne $preflight -and $preflight.status -eq 'PREFLIGHT_PASS_NO_PROVIDER_REQUESTS' -and $preflight.candidateFingerprint -eq $env:GATEB_SOURCE_SHA -and $preflight.candidateFingerprintMatchesGateBSource -eq $true
-          $gateAStatus = if ($reportPass -and $auditPass -and $networkPass -and $fingerprintPass) { 'PASS' } else { 'FAIL' }
+          $gateAStatus = if ($reportPass -and $auditPass -and $networkPass -and $fingerprintPass -and $runtimePass) { 'PASS' } else { 'FAIL' }
           $summary = [ordered]@{
             schemaVersion = 1
             gate = 'A'
@@ -144,6 +147,8 @@ jobs:
             candidateFingerprintMatchesGateBSource = $fingerprintPass
             gateBSourceRunId = $env:GATEB_SOURCE_RUN_ID
             gateBSourceCommitSha = $env:GATEB_SOURCE_SHA
+            nodeVersion = $nodeVersion
+            runtimePass = $runtimePass
             sourceImageCount = if ($preflight) { $preflight.imageCount } else { 0 }
             exactMatches = if ($report) { $report.exactMatches } else { $null }
             mandatoryExactMatches = if ($report) { $report.mandatoryExactMatches } else { $null }
@@ -162,7 +167,7 @@ jobs:
           $out = Join-Path $sourceRoot 'testdata/gateA-16/gate-a-acceptance.json'
           New-Item -ItemType Directory -Force (Split-Path $out -Parent) | Out-Null
           $summary | ConvertTo-Json -Depth 30 | Set-Content -Encoding utf8 $out
-          Write-Host "DWBOT GATE A: $gateAStatus; exact=$($summary.exactMatches)/16; PDF=$($summary.verifiedPdfCount)/16; network=$networkPass; fingerprint=$fingerprintPass"
+          Write-Host "DWBOT GATE A: $gateAStatus; exact=$($summary.exactMatches)/16; PDF=$($summary.verifiedPdfCount)/16; network=$networkPass; fingerprint=$fingerprintPass; runtime=$nodeVersion/$runtimePass"
           if ($gateAStatus -ne 'PASS') { throw 'Gate A acceptance requirements were not all met. Evidence artifact will still be uploaded.' }
 
       - name: Upload Gate A source, reports, PDFs and PDF-derived rasters
