@@ -276,15 +276,16 @@ test('19-image Gate B artifact workflow verifies the completed run without provi
 
 test('Gate A acceptance uses the accepted runtime, fail-closed network guard and preserves interruption checkpoints', () => {
     const workflow = read('.github/workflows/dwbot-gateA-16-pdf-first.yml');
-    assert.match(workflow, /node-version: 24\\.17\\.0/);
-    assert.match(workflow, /runtimePass/);
-    assert.match(workflow, /Configure fail-closed restricted-egress diagnostic preload/);
-    assert.match(workflow, /source\\/scripts\\/block-network\\.js/);
-    assert.match(workflow, /scripts\\/block-network\\.js/);
-    assert.ok(workflow.indexOf('source/scripts/block-network.js') < workflow.indexOf("'scripts/block-network.js'"), 'fail-closed logger must wrap the candidate guard');
-    assert.match(workflow, /source\\/testdata\\/gateA-16\\/report\\.json\\.progress\\.json/);
-    assert.match(workflow, /cancel-in-progress: false/);
-    assert.match(workflow, /DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME/);
+    assert.ok(workflow.includes('node-version: 24.17.0'));
+    assert.ok(workflow.includes('runtimePass'));
+    assert.ok(workflow.includes('Configure fail-closed restricted-egress diagnostic preload'));
+    assert.ok(workflow.includes('source/scripts/block-network.js'));
+    assert.ok(workflow.includes('scripts/block-network.js'));
+    const preload = workflow.split('\\n').find(line => line.includes('NODE_OPTIONS='));
+    assert.ok(preload && preload.indexOf('source/scripts/block-network.js') < preload.lastIndexOf('scripts/block-network.js'), 'fail-closed logger must wrap the candidate guard');
+    assert.ok(workflow.includes('source/testdata/gateA-16/report.json.progress.json'));
+    assert.ok(workflow.includes('cancel-in-progress: false'));
+    assert.ok(workflow.includes('DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME'));
 });
 
 
