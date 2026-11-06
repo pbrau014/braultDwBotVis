@@ -1,0 +1,71 @@
+name: PDF raster normalization regression
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/image-processor.js"
+      - "src/ocrspace-pdf-first.js"
+      - "src/bot.js"
+      - "scripts/run-ocr-sequence.js"
+      - "scripts/run-ocrspace-imagesF-63-exploratory.js"
+      - "scripts/recover-ocrspace-imagesF-21-local-readers.js"
+      - "scripts/prepare-gateA-16-resume.js"
+      - "scripts/verify-ocrspace-imagesF-21-artifacts.js"
+      - "tests/**"
+      - ".github/workflows/pdf-raster-normalization.yml"
+  push:
+    branches: [fix/pdf-raster-source-aspect-normalization]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pdf-raster-normalization-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  offline-regression:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout exact candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup Node.js 22.16.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22.16.0
+          cache: npm
+          package-manager-cache: false
+      - name: Install ImageMagick and Ghostscript
+        shell: powershell
+        run: |
+          choco install imagemagick --yes --no-progress
+          choco install ghostscript --yes --no-progress
+          Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+          refreshenv
+          $magick = Get-Command magick.exe -ErrorAction Stop
+          $ghostscript = Get-Command gswin64c.exe -ErrorAction Stop
+          & $magick.Source -version | Select-Object -First 2
+          & $ghostscript.Source -version
+          if ($LASTEXITCODE -ne 0) { throw 'Ghostscript/ImageMagick PDF raster prerequisites failed.' }
+          "IMAGEMAGICK_BIN=$($magick.Source)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Syntax checks
+        shell: powershell
+        run: |
+          node --check src/image-processor.js
+          node --check src/ocrspace-pdf-first.js
+          node --check scripts/run-ocrspace-imagesF-63-exploratory.js
+          node --check scripts/recover-ocrspace-imagesF-21-local-readers.js
+          node --check scripts/prepare-gateA-16-resume.js
+          node --check scripts/verify-ocrspace-imagesF-21-artifacts.js
+      - name: PDF raster normalization and provenance tests
+        run: node --test tests/image-processor.test.js tests/ocrspace-pdf-first.test.js tests/gateA-resume.test.js tests/ocrspace-imagesF-21-artifact-verifier.test.js tests/ocrspace-imagesF-21-local-recovery.test.js
+      - name: Complete offline OCR contract suite
+        run: npm run test:ocrspace
+      - name: Full unit and contract suite
+        run: npm test
