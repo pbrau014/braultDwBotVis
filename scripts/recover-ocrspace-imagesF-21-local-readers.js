@@ -30,6 +30,7 @@ const { planReaderRecovery } = require('../src/ocrspace-local-reader-recovery');
 const FIELDS = ['result', 'player', 'map', 'mode', 'battleStart', 'credits', 'freeXp', 'damage', 'xp'];
 const ENGINES = ['tesseractjs', 'native', 'paddleocr'];
 const INVENTORY = 'complete-ground-truth-21';
+const EXPECTED_PIPELINE = 'source screenshot -> OCR.Space Engine 2 searchable PDF -> validated PDF -> local PDF raster -> local readers';
 
 function sha256(buffer) {
     return crypto.createHash('sha256').update(buffer).digest('hex');
@@ -136,7 +137,8 @@ async function main() {
     const run = JSON.parse(runBytes.toString('utf8'));
     const gt = JSON.parse(gtBytes.toString('utf8'));
     const selected = selectedRecords(gt);
-    if (run.sourceArchiveSha256 !== gt.candidateArchive?.sha256 || run.imageCount !== 63) {
+    if (run.sourceArchiveSha256 !== gt.candidateArchive?.sha256 || run.imageCount !== 63
+        || run.pipeline !== EXPECTED_PIPELINE) {
         throw new Error('Run source archive does not match the v6 reference corpus.');
     }
 
@@ -154,6 +156,7 @@ async function main() {
         sourceRunReportSha256: sha256(runBytes),
         groundTruthSha256: sha256(gtBytes),
         sourceArchiveSha256: run.sourceArchiveSha256,
+        sourcePipeline: run.pipeline,
         providerRequests: 0,
         provider: 'DISABLED',
         networkPolicy: 'ALL_NETWORK_DESTINATIONS_BLOCKED',
