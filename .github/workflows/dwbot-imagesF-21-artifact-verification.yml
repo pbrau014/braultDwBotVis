@@ -235,7 +235,7 @@ jobs:
             $runsJson = gh api "repos/$env:GITHUB_REPOSITORY/actions/workflows/dwbot-gateA-16-pdf-first.yml/runs?per_page=100"
             if ($LASTEXITCODE -ne 0) { throw 'Could not list Gate A workflow runs.' }
             $matchingRuns = @(($runsJson | ConvertFrom-Json).workflow_runs | Where-Object {
-              $_.head_branch -eq 'main' -and $_.name -eq 'DWBOT Gate A 16-image OCR.Space PDF-first acceptance'
+              $_.head_branch -eq 'main' -and $_.name -eq 'DWBOT Gate A 16-image OCR.Space PDF-first acceptance' -and $_.head_commit.message -in @('DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME','DWBOT-GATE-A-16-PDF-FIRST-RESUME-15')
             } | Sort-Object run_number -Descending)
             $latest = $matchingRuns | Select-Object -First 1
             if ($null -eq $latest) {
