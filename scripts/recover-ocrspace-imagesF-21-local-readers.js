@@ -187,31 +187,37 @@ async function main() {
             let pdfBuffer, rasterBuffer;
             try {
                 pdfBuffer = await fs.readFile(pdfPath);
-                const pageRasterPath = safePath(artifactRoot, row.pageRasterPath || row.rasterPath);
-                if (!pageRasterPath) throw new Error('Original PDF page-raster path is missing or unsafe.');
-                const pageRasterBuffer = await fs.readFile(pageRasterPath);
-                const pageRasterBytes = row.pageRasterBytes || row.rasterBytes;
-                const pageRasterSha256 = row.pageRasterSha256 || row.rasterSha256;
+                const normalization = row.rasterNormalization || row.ocrSpacePdfFirst?.rasterNormalization || null;
+                const pageRasterPath = safePath(artifactRoot, row.pageRasterPath || (!normalization ? row.rasterPath : null));
+                const pageRasterBuffer = pageRasterPath ? await fs.readFile(pageRasterPath) : null;
+                const pageRasterBytes = row.pageRasterBytes || row.ocrSpacePdfFirst?.pageRasterBytes || (!normalization ? row.rasterBytes : null);
+                const pageRasterSha256 = row.pageRasterSha256 || row.ocrSpacePdfFirst?.pageRasterSha256 || (!normalization ? row.rasterSha256 : null);
                 if (pdfBuffer.subarray(0, 5).toString('ascii') !== '%PDF-'
                     || pdfBuffer.length !== row.pdfBytes || sha256(pdfBuffer) !== row.pdfSha256
-                    || pageRasterBuffer.length !== pageRasterBytes || sha256(pageRasterBuffer) !== pageRasterSha256) {
+                    || (pageRasterBuffer && (pageRasterBuffer.length !== pageRasterBytes || sha256(pageRasterBuffer) !== pageRasterSha256))
+                    || (!pageRasterBuffer && !normalization)) {
                     throw new Error('Saved PDF/page-raster does not match the original run-report size and SHA-256.');
                 }
                 const rendered = await imageProcessor.renderSearchablePdfPage(pdfBuffer);
+                if (pageRasterSha256 && sha256(rendered) !== pageRasterSha256) {
+                    throw new Error('Fresh full-page PDF raster does not match the recorded page-raster fingerprint.');
+                }
                 const toPixels = buffer => imageProcessor.__test.runImageMagick(
                     ['png:-', '-depth', '8', 'rgba:-'], buffer,
                     { timeoutMs: 60000, maxOutputBytes: 80_000_000 }
                 );
-                const [savedPagePixels, renderedPagePixels] = await Promise.all([toPixels(pageRasterBuffer), toPixels(rendered)]);
-                if (!Buffer.isBuffer(savedPagePixels) || !Buffer.isBuffer(renderedPagePixels) || !savedPagePixels.equals(renderedPagePixels)) {
-                    throw new Error('Saved full-page raster is not pixel-identical to a fresh rendering of its saved PDF.');
+                if (pageRasterBuffer) {
+                    const [savedPagePixels, renderedPagePixels] = await Promise.all([toPixels(pageRasterBuffer), toPixels(rendered)]);
+                    if (!Buffer.isBuffer(savedPagePixels) || !Buffer.isBuffer(renderedPagePixels) || !savedPagePixels.equals(renderedPagePixels)) {
+                        throw new Error('Saved full-page raster is not pixel-identical to a fresh rendering of its saved PDF.');
+                    }
                 }
                 const normalized = await imageProcessor.normalizeSearchablePdfPageRaster(rendered, {
                     sourceWidth: expected.sourceImage.width, sourceHeight: expected.sourceImage.height,
                 });
                 const normalizedPath = safePath(artifactRoot, row.rasterPath);
                 if (!normalizedPath) throw new Error('Normalized raster path is missing or unsafe.');
-                if (row.rasterNormalization) {
+                if (normalization) {
                     rasterBuffer = await fs.readFile(normalizedPath);
                     if (rasterBuffer.length !== row.rasterBytes || sha256(rasterBuffer) !== row.rasterSha256) {
                         throw new Error('Previously normalized raster does not match its recorded size and SHA-256.');
