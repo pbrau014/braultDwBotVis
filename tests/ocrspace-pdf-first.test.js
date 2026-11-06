@@ -102,6 +102,7 @@ test('missing key is a blocked precondition and does not call the provider', asy
 test('missing searchable PDF is a hard failure; source image is not substituted', async () => {
     await assert.rejects(createOcrSpacePdfFirst({
         imageBuffer: png, env: { OCRSPACE_API_KEY: 'test-key' }, quotaLedger: fakeLedger(),
+        sourceDimensions, readRasterMetadata: async () => ({ width: 1920, height: 1080 }),
         client: async () => ({ parsedText: 'some OCR text', searchablePdfUrl: null }),
     }), { code: 'OCRSPACE_SEARCHABLE_PDF_MISSING' });
 });
