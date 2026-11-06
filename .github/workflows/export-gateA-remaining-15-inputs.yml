@@ -1,0 +1,83 @@
+name: Export Gate A remaining 15 original screenshots
+
+on:
+  push:
+    branches:
+      - tools/export-gateA-remaining-15-inputs
+    paths:
+      - .github/workflows/export-gateA-remaining-15-inputs.yml
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact branch commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Verify and package the 15 remaining Gate A source images
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, zipfile
+          from pathlib import Path
+
+          preflight = json.loads(Path("testdata/gateA-16-preflight.json").read_text(encoding="utf-8"))
+          rows = [r for r in preflight["rows"] if r["filename"] != "Screenshot_16.jpg"]
+          assert preflight["imageCount"] == 16, "Unexpected Gate A corpus size"
+          assert len(rows) == 15, f"Expected 15 remaining images, got {len(rows)}"
+          assert len({r["sha256"] for r in rows}) == 15, "Duplicate source hashes detected"
+
+          manifest = {
+              "schemaVersion": 1,
+              "purpose": "User-created searchable PDFs for the 15 remaining Gate A images",
+              "sourceCommit": "${{ github.sha }}",
+              "sourceCorpusFingerprint": preflight["corpusFingerprint"],
+              "preflightManifestSha256": preflight["manifestSha256"],
+              "excludedAlreadySubmittedImage": {
+                  "filename": "Screenshot_16.jpg",
+                  "sha256": next(r["sha256"] for r in preflight["rows"] if r["filename"] == "Screenshot_16.jpg"),
+                  "reason": "First image already has an OCR.Space submission; do not duplicate it."
+              },
+              "images": []
+          }
+
+          out = Path("gateA-remaining-15-original-images.zip")
+          with zipfile.ZipFile(out, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as z:
+              for row in rows:
+                  p = Path("fixtures/additional-screenshots") / row["filename"]
+                  data = p.read_bytes()
+                  digest = hashlib.sha256(data).hexdigest()
+                  assert len(data) == row["bytes"], f"Byte-count mismatch: {p.name}"
+                  assert digest == row["sha256"], f"SHA-256 mismatch: {p.name}"
+                  z.writestr(p.name, data)
+                  manifest["images"].append({
+                      "filename": p.name,
+                      "bytes": len(data),
+                      "sha256": digest,
+                      "width": row["width"],
+                      "height": row["height"]
+                  })
+              z.writestr("GATE_A_15_IMAGE_MANIFEST.json", json.dumps(manifest, indent=2) + "\n")
+
+          with zipfile.ZipFile(out) as z:
+              assert z.testzip() is None, "ZIP CRC test failed"
+              assert len([n for n in z.namelist() if n.lower().endswith((".png", ".jpg", ".jpeg"))]) == 15
+          print(json.dumps({
+              "status": "VERIFIED",
+              "archive": str(out),
+              "images": len(manifest["images"]),
+              "archiveSha256": hashlib.sha256(out.read_bytes()).hexdigest(),
+              "imageManifest": manifest["images"]
+          }, indent=2))
+          PY
+      - name: Upload verified image package
+        uses: actions/upload-artifact@v4
+        with:
+          name: gateA-remaining-15-original-images
+          path: gateA-remaining-15-original-images.zip
+          if-no-files-found: error
+          retention-days: 30
