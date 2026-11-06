@@ -133,6 +133,7 @@ jobs:
           OCRSPACE_63_OUTPUT_DIR: ${{ github.workspace }}\testdata\ocrspace-imagesF-63-exploratory
         run: |
           if ([string]::IsNullOrWhiteSpace($env:OCRSPACE_API_KEY)) { throw 'Protected OCRSPACE_API_KEY secret is missing.' }
+          node --check src/ocrspace-exploratory-resume.js
           node --check scripts/run-ocrspace-imagesF-63-exploratory.js
           npm run test:ocrspace
           if ($LASTEXITCODE -ne 0) { throw 'OCR.Space mocked contract tests failed; exploratory provider submissions are prohibited.' }
