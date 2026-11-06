@@ -1,5 +1,18 @@
 # Current DWBOT authority — updated 2026-11-06
 
+## Node.js runtime authorization — current and governing
+
+Node.js **22.16.0 is the authorized and acceptable DWBOT baseline**. It replaces
+older Node.js 24+, >=24.17.0 and v24.22.1 minimum/prerequisite statements.
+The current package manifest and lockfile require >=22.16.0; the tracked
+`.nvmrc` pins 22.16.0; and GitHub Actions uses 22.16.0 on Linux and Windows.
+Node 24 remains optional only when a specific dependency/tool is proven to
+require it. Do not block tests or release-candidate verification solely because
+the runtime is Node 22.16.0. Windows-specific acceptance must still run on
+Windows; this authorization does not convert Linux results into Windows proof.
+Keep actual historical Node 24 reports unchanged and bound to their original
+source fingerprints and runtime.
+
 ## Controlling OCR.Space architecture and activation
 
 OCR.Space is the explicitly enabled, highest-priority text-extraction stage for every eligible original image in the authorized DWBOT screenshot inventories. Set `OCRSPACE_ENABLED=1`, `OCRSPACE_NETWORK_ALLOWLIST=1`, and provide a valid local `OCRSPACE_API_KEY`. Do not describe the active path as default-off, secondary, last-resort, or diagnostic-only.
