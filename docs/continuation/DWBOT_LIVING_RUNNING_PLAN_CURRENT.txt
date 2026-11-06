@@ -5625,3 +5625,50 @@ PARALLEL READER VERIFICATION FIXES — 2026-11-06
 - These fixes are committed in the next exact-head update; CI must pass before
   they are considered verified. Gate A remains blocked until all 16 source
   images have verified PDF/raster artifacts.
+
+
+ 
+LATEST ARTIFACT AUDIT / GATE B DIAGNOSTICS — 2026-11-06
+- Original 63-image extraction #42160979140 completed successfully; artifact
+  13482219732, 81,886,966 bytes, ZIP SHA-256
+  ac4ae071ee4737c2fe044b64456a8dab1cddf7073a02f8f427ec7b35af28629a.
+  It contains 63 PDFs and 63 PDF-derived rasters; 63 successful PDF
+  extractions, zero failed images, Engine 2, no original-image fallback.
+- Latest 19-image no-provider verification #42210718226 uploaded artifact
+  13502190474, 267,125 bytes, ZIP SHA-256
+  a0254e8ec900b8cb695a3a1e? (see detailed audit report for full exact hash).
+  All 19 source hashes, PDF signatures/hashes, searchable text layers, raster
+  hashes and PDF-derived raster provenance passed. Secret scan passed.
+  Overall failed because local readers were incomplete (PaddleOCR failed-open
+  for 19/19) and original extraction network log is absent.
+- 19-image per-engine posthoc: Tesseract.js 110/171 exact (64.33%), 2 wrong
+  unaccepted, 59 unresolved, 2/19 complete exact; native Tesseract 103/171
+  exact (60.23%), 2 wrong unaccepted, 66 unresolved, 0/19 complete exact.
+- 19-image fusion: PDF+provider+Tesseract.js+native unique majority 131/171
+  exact (76.61%), 1 wrong candidate, 39 unresolved; only 1/19 fully exact,
+  1 record has a wrong candidate, 17 unresolved. Strict four-source
+  consensus has zero wrong but 112 unresolved. No method is safe for
+  automatic acceptance.
+- 21-image diagnostic-only fusion: four-source majority 147/189 exact
+  (77.78%), 1 wrong, 41 unresolved; 2 fully exact, 1 wrong, 18 unresolved.
+  The 21 set remains diagnostic only; Gate B inventory remains 19.
+- Original extraction network log is genuinely absent. Source job logs show
+  zero blocked markers and per-image rows show zero network-block failures,
+  but historical attempt count is UNKNOWN. Do not create an empty original
+  log or claim zero attempts. Reconstructed reconciliation JSON/text is
+  limited corroborating evidence only.
+- PaddleOCR install manifest records PaddleOCR 3.7.0/PaddlePaddle 3.3.1,
+  complete PP-OCRv6 models and successful offline smoke test. The 21-image
+  recovery still returned failed-open for all images; child output now
+  preserves underlying helper error and runtime diagnostics for the next
+  no-provider rerun.
+- Exact-head CI #42210718244 failed only at a stale public standings wording
+  assertion in the 50-player full-system test; Linux, Windows and clean
+  package runs shared the same assertion. Corrected test now checks the
+  current "All-player aggregate (50/50 players): ... doubloons" contract.
+  Desktop/UI checks and the HTML-vs-bot four-formula comparison passed in
+  that run; full suite still awaits new exact-head verification.
+- New exact-head verification #42236474184 and 19-image no-provider
+  verification #42236474159 are pending on commit
+  a290730c057cd26d3abc7d5e24e8bf17593a99ba.
+- Gate A and Gate B remain NOT PASSED; production remains NO-GO.
