@@ -155,7 +155,7 @@ test('preserves BOM-prefixed reconstructed network evidence without upgrading it
 
 
 test('artifact verifier parses BOM-prefixed Gate A and reconciliation JSON without changing provenance', () => {
-  const bytes = Buffer.from('\\uFEFF{"status":"FAIL","originalBlockedAttemptCount":null,"zeroAttemptsClaimed":false}', 'utf8');
+  const bytes = Buffer.from('\uFEFF{"status":"FAIL","originalBlockedAttemptCount":null,"zeroAttemptsClaimed":false}', 'utf8');
   assert.deepEqual(parseJsonUtf8(bytes), {
     status: 'FAIL', originalBlockedAttemptCount: null, zeroAttemptsClaimed: false
   });
