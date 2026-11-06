@@ -193,8 +193,11 @@ function sourceAspectCropRect(pageWidth, pageHeight, sourceWidth, sourceHeight) 
     return { left: 0, top: 0, width: pageW, height: cropHeight };
 }
 
+const SOURCE_SIMILARITY_LIMITS = Object.freeze({ meanAbsoluteError: 3, rootMeanSquareError: 8 });
+
 async function compareSourceSimilarity(sourceImageBuffer, normalizedRasterBuffer, {
-    maxMeanAbsoluteError = 3, maxRootMeanSquareError = 8,
+    maxMeanAbsoluteError = SOURCE_SIMILARITY_LIMITS.meanAbsoluteError,
+    maxRootMeanSquareError = SOURCE_SIMILARITY_LIMITS.rootMeanSquareError,
 } = {}) {
     if (!Buffer.isBuffer(sourceImageBuffer) || !sourceImageBuffer.length
         || !Buffer.isBuffer(normalizedRasterBuffer) || !normalizedRasterBuffer.length) {
@@ -333,4 +336,4 @@ async function renderSearchablePdfPage(pdfBuffer, { density = 220, maxDimension 
 }
 
 module.exports = { metadata, prepare, cropResize, prepareOcrSpaceUpload, renderSearchablePdfPage,
-    normalizeSearchablePdfPageRaster, sourceAspectCropRect, compareSourceSimilarity, imageMagick, assertDimensions, __test: { runImageMagick } };
+    normalizeSearchablePdfPageRaster, sourceAspectCropRect, compareSourceSimilarity, SOURCE_SIMILARITY_LIMITS, imageMagick, assertDimensions, __test: { runImageMagick } };
