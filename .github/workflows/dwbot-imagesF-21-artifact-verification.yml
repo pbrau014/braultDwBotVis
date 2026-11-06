@@ -10,6 +10,13 @@ on:
       - 'scripts/evaluate-ocrspace-imagesF-63-ground-truth.py'
       - 'scripts/evaluate-ocrspace-pdf-text-layer.js'
       - 'tests/ocrspace-pdf-text-layer.test.js'
+      - 'tests/ocrspace-imagesF-21-artifact-verifier.test.js'
+      - 'tests/ocrspace-imagesF-21-ground-truth.test.js'
+      - 'tests/ocrspace-imagesF-21-local-recovery.test.js'
+      - 'tests/workflow-contract.test.js'
+      - 'tests/test_ocrspace_imagesF_21_evaluator.py'
+      - 'package.json'
+      - 'testdata/imagesF-holdout-candidate-manifest.json'
       - 'testdata/ground-truth/imagesF-63-working-ground-truth-v6.json'
   workflow_dispatch:
     inputs:
