@@ -226,3 +226,10 @@ test('PaddleOCR helper emits ASCII-safe JSON for non-ASCII OCR text on Windows c
     assert.ok([...Buffer.from(encoded.stdout, 'utf8')].every(byte => byte < 0x80), 'serialized JSON must be ASCII-only');
     assert.equal(JSON.parse(encoded.stdout).text, '☆');
 });
+
+test('PaddleOCR fallback field request order preserves the canonical nine-field contract', () => {
+    const { __test } = require('../src/paddleocr-field-fallback');
+    assert.deepEqual(__test.FIELDS, [
+        'result', 'player', 'map', 'mode', 'battleStart', 'credits', 'freeXp', 'damage', 'xp',
+    ]);
+});
