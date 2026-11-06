@@ -209,7 +209,16 @@ function getNetworkIsolation() {
     progress.networkDiagnosticLogPath = String(process.env.OCR_NON_OCR_NETWORK_LOG || '').trim() || null;
     activeProgress = progress;
     activeProgressPath = progressPath;
-    await writeJsonAtomically(progressPath, progress);
+    const saveProgress = async () => {
+        const isolation = getNetworkIsolation();
+        progress.networkIsolation = isolation;
+        progress.networkDiagnosticLogPath = isolation.networkDiagnosticLogPath;
+        progress.networkDiagnosticLogSha256 = isolation.networkDiagnosticLogSha256;
+        progress.networkDiagnosticLogBytes = isolation.networkDiagnosticLogBytes;
+        progress.networkDiagnosticLogRecordedAt = new Date().toISOString();
+        await writeJsonAtomically(progressPath, progress);
+    };
+    await saveProgress();
     const saveRaw = process.env.OCR_SAVE_RAW_DIAGNOSTICS === '1';
     try {
         for (let position = 0; position < entries.length; position += 1) {
@@ -234,7 +243,7 @@ function getNetworkIsolation() {
                             error: artifactCheck.reason, code: 'OCR_SEQUENCE_RESUME_ARTIFACT_INVALID' };
                     results.push(resumedRow);
                     recordJobResult(progress, resumedRow);
-                    await writeJsonAtomically(progressPath, progress);
+                    await saveProgress();
                     if (!artifactCheck.valid) process.exitCode = 1;
                     console.log('[OCR-SEQUENCE] ' + (artifactCheck.valid ? 'SKIP-COMPLETE' : 'FAIL-ARTIFACT') + ' ' + spec.key + ' (provider not repeated)');
                     continue;
@@ -247,7 +256,7 @@ function getNetworkIsolation() {
                 };
                 results.push(ambiguous);
                 recordJobResult(progress, ambiguous);
-                await writeJsonAtomically(progressPath, progress);
+                await saveProgress();
                 process.exitCode = 1;
                 console.log('[OCR-SEQUENCE] SKIP-AMBIGUOUS ' + spec.key + ' (provider not repeated)');
                 continue;
@@ -262,7 +271,7 @@ function getNetworkIsolation() {
                 };
                 results.push(ambiguous);
                 recordJobResult(progress, ambiguous);
-                await writeJsonAtomically(progressPath, progress);
+                await saveProgress();
                 process.exitCode = 1;
                 console.log('[OCR-SEQUENCE] SKIP-AMBIGUOUS ' + spec.key + ' (prior in-flight request not repeated)');
                 continue;
@@ -288,7 +297,7 @@ function getNetworkIsolation() {
                     };
                     results.push(ambiguous);
                     recordJobResult(progress, ambiguous);
-                    await writeJsonAtomically(progressPath, progress);
+                    await saveProgress();
                     process.exitCode = 1;
                     console.log('[OCR-SEQUENCE] SKIP-AMBIGUOUS ' + spec.key + ' (orphan artifact; provider not repeated)');
                     continue;
@@ -296,7 +305,7 @@ function getNetworkIsolation() {
             }
             console.log(`[OCR-SEQUENCE] ${position + 1}/${entries.length} START ${spec.key}`);
             markJobStarted(progress, { index: position + 1, fixtureKey: spec.key, filename: spec.filename, startedAt: new Date().toISOString() });
-            await writeJsonAtomically(progressPath, progress);
+            await saveProgress();
             let supervision = null;
             let childTempDir = null;
             let resultRecorded = false;
@@ -420,7 +429,7 @@ function getNetworkIsolation() {
                 results.push(row);
                 recordJobResult(progress, row);
                 resultRecorded = true;
-                await writeJsonAtomically(progressPath, progress);
+                await saveProgress();
                 console.log(`[OCR-SEQUENCE] ${row.allRequiredFieldsPass && row.requiredMissing.length === 0 ? 'PASS' : 'FAIL'} ${spec.key} ${row.elapsedMs}ms (mandatoryExact=${row.allRequiredFieldsPass}, allComparedExact=${row.allExpectedFieldsPass}, missing=${row.requiredMissing.length})`);
                 if (!row.allRequiredFieldsPass || row.requiredMissing.length) process.exitCode = 1;
             } catch (error) {
@@ -440,7 +449,7 @@ function getNetworkIsolation() {
                 };
                 results.push(errorRow);
                 recordJobResult(progress, errorRow);
-                await writeJsonAtomically(progressPath, progress);
+                await saveProgress();
                 console.error(`[OCR-SEQUENCE] ERROR ${spec.key}: ${error.message}`);
                 process.exitCode = 1;
             } finally {
@@ -486,7 +495,7 @@ function getNetworkIsolation() {
             && report.mandatoryExactMatches === entries.length
             && report.requiredFieldsComplete === entries.length,
     });
-    await writeJsonAtomically(progressPath, progress);
+    await saveProgress();
     console.log('[OCR-SEQUENCE] Progress checkpoint: ' + progressPath);
     console.log(`[OCR-SEQUENCE] Report: ${outputPath}`);
     console.log(`[OCR-SEQUENCE] Summary ${report.completedImages}/${entries.length} completed, ${report.mandatoryExactMatches}/${entries.length} exact nine-field mandatory records, ${report.requiredFieldsComplete}/${entries.length} complete required fields; all compared values exact=${report.exactMatches}/${entries.length}`);
