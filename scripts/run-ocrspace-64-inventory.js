@@ -61,6 +61,18 @@ async function main() {
     const summedImageBytes = inventory.records.reduce((sum, item) => sum + Number(item.bytes || 0), 0);
     if (summedImageBytes !== Number(inventory.totalBytes)) throw new Error('Reviewed inventory totalBytes does not equal the sum of member image bytes.');
     const resolvedRoot = await fs.realpath(sourceRoot);
+    const verifiedSources = [];
+    for (const item of inventory.records) {
+        const sourcePath = path.resolve(resolvedRoot, item.archivePath);
+        if (!inside(resolvedRoot, sourcePath)) throw new Error(`Inventory path escapes source root: ${item.archivePath}`);
+        const source = await fs.readFile(sourcePath);
+        const actualHash = sha256(source);
+        if (source.length !== Number(item.bytes) || actualHash !== String(item.sha256).toLowerCase()) {
+            throw new Error(`Source archive member fingerprint mismatch: ${item.filename}; expected ${item.bytes}/${item.sha256}, got ${source.length}/${actualHash}`);
+        }
+        verifiedSources.push({ source, actualHash });
+    }
+    console.log('[OCRSPACE-64] Verified all 64 source members before any provider request.');
     await fs.mkdir(outputRoot, { recursive: true });
     const run = {
         schemaVersion: 1, status: 'running', createdAt: new Date().toISOString(),
@@ -71,13 +83,12 @@ async function main() {
         eligibleCount: eligibleRecords.length, excludedCount: excludedRecords.length,
         eligibleProcessed: 0, excludedSkipped: 0, completedInventoryEntries: 0,
         engines: requiredEngines, results: [], excludedRecords: [],
+        sourceMemberHashesVerified: verifiedSources.length,
+        allSourceMembersVerifiedBeforeProvider: true,
     };
     for (let index = 0; index < inventory.records.length; index++) {
         const item = inventory.records[index];
-        const sourcePath = path.resolve(resolvedRoot, item.archivePath);
-        if (!inside(resolvedRoot, sourcePath)) throw new Error(`Inventory path escapes source root: ${item.archivePath}`);
-        const source = await fs.readFile(sourcePath);
-        const actualHash = sha256(source);
+        const { source, actualHash } = verifiedSources[index];
         if (source.length !== Number(item.bytes) || actualHash !== String(item.sha256).toLowerCase()) {
             throw new Error(`Source archive member fingerprint mismatch: ${item.filename}; expected ${item.bytes}/${item.sha256}, got ${source.length}/${actualHash}`);
         }

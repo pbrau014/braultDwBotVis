@@ -44,3 +44,13 @@ test('64-image runner skips user-excluded records before the OCR.Space provider 
     assert.ok(skip > exclusionGuard && providerCall > skip);
     assert.match(runner, /providerSubmission:\s*false/);
 });
+
+
+test('all 64 source-member hashes are verified before the first OCR.Space request', () => {
+    const runner = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'run-ocrspace-64-inventory.js'), 'utf8');
+    const preflight = runner.indexOf('const verifiedSources = [];');
+    const preflightComplete = runner.indexOf("Verified all 64 source members before any provider request.");
+    const providerCall = runner.indexOf('await createOcrSpacePdfFirst');
+    assert.ok(preflight >= 0 && preflightComplete > preflight && providerCall > preflightComplete);
+    assert.match(runner, /sourceMemberHashesVerified:\s*verifiedSources\.length/);
+});

@@ -4880,3 +4880,32 @@ Verification and execution constraints:
 ================================================================================
 END DWBOT-UPD-2026-11-06-003
 ================================================================================
+
+
+================================================================================
+DWBOT-UPD-2026-11-06-004 — 64-IMAGE ALL-MEMBER PREFLIGHT BEFORE PROVIDER USE
+================================================================================
+
+The 64-image runner now performs a complete source-member preflight after
+verifying the exact imgsHalf1.zip archive fingerprint and before its first
+OCR.Space request. It reads and SHA-256/size-verifies all 64 extracted member
+files into a bounded in-memory buffer set, then starts the per-image processing
+loop. This prevents a late member mismatch or missing file from being
+discovered only after earlier images have already been transmitted.
+
+The preflight covers all 64 records, including the eight user-excluded images.
+After successful preflight, the processing loop skips those eight records with
+providerSubmission=false and only sends the 56 eligible images to Engine 2.
+The report records sourceMemberHashesVerified=64 and
+allSourceMembersVerifiedBeforeProvider=true. A regression test asserts the
+all-member preflight precedes the first provider call.
+
+No archive was present and no OCR.Space request was made. The code change is
+subject to the exact-head Actions run and must not be treated as verified until
+the new unit test passes. The OCRSPACE_API_KEY Actions secret remains missing;
+the source archive and extracted image root also remain required. Accuracy
+remains not evaluable without independent nine-field ground truth.
+
+================================================================================
+END DWBOT-UPD-2026-11-06-004
+================================================================================
