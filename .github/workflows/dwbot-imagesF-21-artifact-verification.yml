@@ -327,6 +327,7 @@ jobs:
           OCRSPACE_NETWORK_ALLOWLIST: '0'
           OCR_NON_OCR_NETWORK_RESTRICTED: '1'
           OCR_NON_OCR_NETWORK_LOG: ${{ github.workspace }}/testdata/ocr-acceptance/normalize-63-network.log
+          NODE_OPTIONS: '--require=./scripts/block-network.js'
         run: |
           $output = Join-Path $env:GITHUB_WORKSPACE 'testdata\ocrspace-imagesF-63-exploratory\normalized-raster-audit-63.json'
           $normalizedCopy = Join-Path $env:GITHUB_WORKSPACE 'testdata\ocrspace-imagesF-63-exploratory\normalized-63'
