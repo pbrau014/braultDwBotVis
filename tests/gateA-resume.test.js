@@ -34,6 +34,7 @@ test('Gate A resume preparation is local-only and cannot repeat the completed fi
     assert.match(source,/OCRSPACE_NETWORK_ALLOWLIST: '0'/);
     assert.match(source,/inputBuffer: normalizedRaster/);
     assert.match(source,/normalizeSearchablePdfPageRaster/);
+    assert.match(source,/original-source-resized-to-normalized-raster-v1/);
     assert.match(source,/renderSearchablePdfPage\(pdf\)/);
     assert.match(source,/Preserved Gate A page raster is not pixel-identical/);
     assert.match(source,/originalNetworkEvidenceAllowsProvider\(recoveryReport\)/);
