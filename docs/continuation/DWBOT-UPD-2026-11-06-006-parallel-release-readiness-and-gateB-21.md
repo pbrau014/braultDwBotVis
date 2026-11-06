@@ -135,11 +135,11 @@ after completing the checklist. This is a template, not completed evidence:
       },
       "images": [
         {
-          "filename": "<exact selected filename>",
+          "filename": "PHX-1.jpg",
           "status": "VERIFIED",
           "sourceSha256": "<source image SHA-256>",
-          "sourceWidth": 1920,
-          "sourceHeight": 1080,
+          "sourceWidth": 1334,
+          "sourceHeight": 627,
           "pdfSha256": "<PDF SHA-256>",
           "rasterSha256": "<PDF-derived PNG SHA-256>",
           "rasterWidth": 1920,
@@ -298,7 +298,9 @@ leave Gate B pending/blocked.
 
 
 The source-bound candidate manifest records each selected image's original
-width and height in addition to filename, byte size and SHA-256. The artifact
+width and height in addition to filename, byte size and SHA-256. The first
+selected source, PHX-1.jpg, is 1334x627; the remaining records retain their own
+recorded dimensions. This selection does not impose an arbitrary pixel cutoff. The artifact
 verification report must reproduce those source dimensions and the PDF-derived
 raster dimensions; the evaluator reconciles both against the v6 reference and
 the exact run report. No arbitrary minimum pixel threshold is introduced.
