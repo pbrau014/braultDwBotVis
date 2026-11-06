@@ -103,10 +103,10 @@ async function secretScan(paths, apiKey) {
     if (!apiKey) return { status: 'NOT_VERIFIED', scannedFiles: 0 };
     let scannedFiles = 0;
     for (const file of paths) {
-        const bytes = await fs.readFile(file);
+        const bytes = Buffer.isBuffer(file) ? file : await fs.readFile(file);
         scannedFiles++;
         if (bytes.includes(Buffer.from(apiKey, 'utf8'))) {
-            return { status: 'FAIL', scannedFiles, matchedFile: path.basename(file) };
+            return { status: 'FAIL', scannedFiles, matchedFile: Buffer.isBuffer(file) ? 'workflow-source.yml' : path.basename(file) };
         }
     }
     return { status: 'PASS', scannedFiles };
