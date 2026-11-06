@@ -6,9 +6,15 @@ concurrency:
 
 on:
   workflow_dispatch:
+    inputs:
+      resume_run_id:
+        description: 'Optional completed run ID with the same commit and verified progress artifact; leave blank for a new batch.'
+        required: false
+        type: string
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   # This workflow submits billable external OCR requests. Pushes (including
@@ -21,6 +27,7 @@ jobs:
     timeout-minutes: 240
     permissions:
       contents: read
+      actions: read
     steps:
       - name: Check out the exact triggering commit
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -74,13 +81,83 @@ jobs:
           $python = Get-Command python.exe -ErrorAction Stop
           & $python.Source scripts/prepare-ocrspace-imagesF-63.py
           if ($LASTEXITCODE -ne 0) { throw '63-image archive preflight failed; OCR.Space submissions are prohibited.' }
+      - name: Restore prior progress artifact for fingerprint-bound resume
+        if: inputs.resume_run_id != ''
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RESUME_RUN_ID: ${{ inputs.resume_run_id }}
+          CURRENT_SHA: ${{ github.sha }}
+        run: |
+          if ($env:RESUME_RUN_ID -notmatch '^\d+      - name: Run OCR.Space Engine 2 PDF-first exploratory extraction
+        shell: powershell
+        env:
+          OCRSPACE_API_KEY: ${{ secrets.OCRSPACE_API_KEY }}
+          OCRSPACE_NETWORK_ALLOWLIST: '1'
+          OCR_NON_OCR_NETWORK_RESTRICTED: '1'
+          OCR_NON_OCR_NETWORK_LOG: ${{ github.workspace }}/testdata/ocr-acceptance/imagesF-63-blocked-network-attempts.log
+          OCRSPACE_63_OUTPUT_DIR: ${{ github.workspace }}\testdata\ocrspace-imagesF-63-exploratory
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:OCRSPACE_API_KEY)) { throw 'Protected OCRSPACE_API_KEY secret is missing.' }
+          node --check scripts/run-ocrspace-imagesF-63-exploratory.js
+          npm run test:ocrspace
+          if ($LASTEXITCODE -ne 0) { throw 'OCR.Space mocked contract tests failed; exploratory provider submissions are prohibited.' }
+          npm run test:ocrspace-imagesF-63
+          if ($LASTEXITCODE -ne 0) { throw '63-image exploratory extraction completed with a runner-level failure; inspect the per-image report.' }
+      - name: Upload complete exploratory reports and PDF/raster artifacts
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dwbot-imagesF-63-ocrspace-exploratory
+          path: |
+            testdata/ocrspace-imagesF-63-exploratory/**
+            testdata/ocr-acceptance/imagesF-63-preflight.json*
+            testdata/ocr-acceptance/imagesF-63-blocked-network-attempts.log
+            testdata/ocr-acceptance/DWBOT_IMAGESF_HOLDOUT_CANDIDATE_MANIFEST.json
+            docs/continuation/DWBOT-UPD-2026-11-05-002-groundtruth-gap-register.md
+            docs/continuation/DWBOT-UPD-2026-11-06-004-imagesF-63-ground-truth.md
+            testdata/ground-truth/imagesF-63-working-ground-truth-v6.json*
+            scripts/evaluate-ocrspace-imagesF-63-ground-truth.py
+          if-no-files-found: warn
+          retention-days: 30
+) { throw 'resume_run_id must be a numeric GitHub Actions run ID.' }
+          $prior = gh run view $env:RESUME_RUN_ID --repo $env:GITHUB_REPOSITORY --json workflowName,headSha,status,conclusion | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { throw 'Could not inspect the requested prior run.' }
+          if ($prior.workflowName -ne 'DWBOT imagesF 63 exploratory OCR.Space') { throw 'Resume source is not the approved imagesF 63 exploratory workflow.' }
+          if ($prior.headSha -ne $env:CURRENT_SHA) { throw 'Resume source commit differs from the current workflow commit; refusing to mix runner versions.' }
+          if ($prior.status -ne 'completed') { throw 'Prior run must be completed so its always-upload artifact is immutable and available.' }
+          $downloadRoot = Join-Path $env:RUNNER_TEMP ('dwbot-resume-' + $env:RESUME_RUN_ID)
+          New-Item -ItemType Directory -Force $downloadRoot | Out-Null
+          gh run download $env:RESUME_RUN_ID --repo $env:GITHUB_REPOSITORY --name dwbot-imagesF-63-ocrspace-exploratory --dir $downloadRoot
+          if ($LASTEXITCODE -ne 0) { throw 'Could not download the exact prior exploratory artifact.' }
+          $progressFiles = @(Get-ChildItem -Path $downloadRoot -Filter 'progress.json' -File -Recurse)
+          $preflightFiles = @(Get-ChildItem -Path $downloadRoot -Filter 'imagesF-63-preflight.json' -File -Recurse)
+          if ($progressFiles.Count -ne 1 -or $preflightFiles.Count -ne 1) { throw 'Prior artifact must contain exactly one progress.json and one preflight report.' }
+          $progress = Get-Content -Raw $progressFiles[0].FullName | ConvertFrom-Json
+          $oldPreflight = Get-Content -Raw $preflightFiles[0].FullName | ConvertFrom-Json
+          $newPreflight = Get-Content -Raw (Join-Path $env:GITHUB_WORKSPACE 'testdata\ocr-acceptance\imagesF-63-preflight.json') | ConvertFrom-Json
+          $oldMembers = ConvertTo-Json -InputObject @($oldPreflight.verifiedMembers) -Depth 100 -Compress
+          $newMembers = ConvertTo-Json -InputObject @($newPreflight.verifiedMembers) -Depth 100 -Compress
+          if ($oldPreflight.archiveSha256 -ne $newPreflight.archiveSha256 -or $oldMembers -ne $newMembers) { throw 'Prior and current preflight archives/member hashes do not match.' }
+          $oldPreflightHash = (Get-FileHash -Algorithm SHA256 $preflightFiles[0].FullName).Hash.ToLowerInvariant()
+          if ($oldPreflightHash -ne $progress.preflightReportSha256) { throw 'Prior progress is not bound to its included preflight report.' }
+          $outputRoot = Join-Path $env:GITHUB_WORKSPACE 'testdata\ocrspace-imagesF-63-exploratory'
+          New-Item -ItemType Directory -Force $outputRoot | Out-Null
+          Copy-Item -Path (Join-Path $progressFiles[0].DirectoryName '*') -Destination $outputRoot -Recurse -Force
+          Copy-Item -Path $preflightFiles[0].FullName -Destination (Join-Path $env:GITHUB_WORKSPACE 'testdata\ocr-acceptance\imagesF-63-preflight.json') -Force
+          $oldNetworkLogs = @(Get-ChildItem -Path $downloadRoot -Filter 'imagesF-63-blocked-network-attempts.log' -File -Recurse)
+          if ($oldNetworkLogs.Count -gt 1) { throw 'Prior artifact contains ambiguous network diagnostic logs.' }
+          if ($oldNetworkLogs.Count -eq 1) {
+            Copy-Item -Path $oldNetworkLogs[0].FullName -Destination (Join-Path $env:GITHUB_WORKSPACE 'testdata\ocr-acceptance\imagesF-63-blocked-network-attempts.log') -Force
+          }
+          'OCRSPACE_63_RESUME=1' | Out-File $env:GITHUB_ENV -Append -Encoding utf8
       - name: Initialize restricted-egress diagnostic log
         shell: powershell
         run: |
           $dir = Join-Path $env:GITHUB_WORKSPACE 'testdata\ocr-acceptance'
           New-Item -ItemType Directory -Force $dir | Out-Null
           $log = Join-Path $dir 'imagesF-63-blocked-network-attempts.log'
-          [System.IO.File]::WriteAllText($log, '')
+          if (-not (Test-Path $log)) { [System.IO.File]::WriteAllText($log, '') }
       - name: Run OCR.Space Engine 2 PDF-first exploratory extraction
         shell: powershell
         env:
