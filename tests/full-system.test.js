@@ -933,3 +933,35 @@ test.after(async () => {
   H.pendingRecords.clear();
   await fs.rm(tempRoot, { recursive: true, force: true });
 });
+
+
+test('Discord score views label event scores as doubloons and separate bracket wins from damage awards', async () => {
+  const previous = Tournament.normalizeState(H.getTournamentState());
+  try {
+    const state = Tournament.createState();
+    const fast = Tournament.addPlayer(state, 'Race Fast');
+    const slow = Tournament.addPlayer(state, 'Race Slow');
+    Tournament.recordResult(state, { player: fast.id, event: 'race', gameNumber: 1, shipClass: 'DD', tier: 2, time: 60 });
+    Tournament.recordResult(state, { player: slow.id, event: 'race', gameNumber: 1, shipClass: 'DD', tier: 2, time: 120 });
+    await H.setTournamentState(state);
+
+    const standings = H.tournamentStandingsText();
+    assert.match(standings, /Damage dubs/);
+    assert.match(standings, /calculated doubloons, not raw damage\/kills\/time/);
+    assert.match(standings, /Match wins and weekly bracket advancement are tracked separately/);
+
+    const race = H.eventStandingsText('race');
+    assert.match(race, /C01 inverse-time/);
+    assert.ok(race.indexOf('Race Fast') < race.indexOf('Race Slow'));
+
+    const guide = H.scoringGuideText();
+    assert.match(guide, /1 ÷ that player's elapsed seconds/);
+    assert.match(guide, /high-damage loss does not become a bracket win/);
+
+    const player = H.playerDetailText('Race Fast');
+    assert.match(player, /60s/);
+    assert.match(player, /raw scoring inputs/);
+  } finally {
+    await H.setTournamentState(previous);
+  }
+});
