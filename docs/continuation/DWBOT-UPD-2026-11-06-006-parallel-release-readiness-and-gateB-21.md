@@ -400,3 +400,39 @@ the exact run report. No arbitrary minimum pixel threshold is introduced.
   artifacts listed. Job logs remain unavailable while the job is active.
 - No PDF, raster, OCR result, or 21-image post-hoc evaluation is available.
   No duplicate provider submissions have been started.
+
+
+## Automated 21-image artifact verification prepared — 2026-11-06
+
+- Added `scripts/verify-ocrspace-imagesF-21-artifacts.js` and fixture-based
+  tests. It verifies the run-report/preflight binding, freshly re-preflights
+  the exact 63-image archive, checks original source bytes/hashes/dimensions
+  for the selected 21, validates PDF signature/size/hash and non-empty text
+  extraction, validates PNG signature/size/hash/dimensions, rerenders each PDF
+  and compares decoded RGBA pixels to the saved raster, and requires both
+  local reader outputs.
+- It scans artifact, run/ground-truth/preflight and source-workflow files for
+  the exact configured OCR.Space API key without printing it. Missing key or
+  network log is NOT_VERIFIED/FAIL, never treated as clean.
+- The evaluator now requires the `localReaders` artifact check. A manual-only
+  post-hoc workflow downloads a completed source artifact, retrieves that
+  run's exact workflow source, freshly verifies the source archive, performs
+  the 21-image checks, runs the evaluator, and uploads reports. It makes no
+  OCR.Space calls.
+- The original workflow for run #42160979140 did not persist
+  `OCR_NON_OCR_NETWORK_LOG`; the verifier will therefore report network
+  evidence as failed/unverified even if PDF/raster artifacts are valid.
+  Accuracy metrics can still be calculated, but Gate B cannot pass on that
+  run without clean network provenance.
+- The verifier enforces the exact first 21 corpus-order complete records and
+  does not promote partial rows or certify the v6 workbook.
+
+### Local-only recovery refinement
+
+- Resume classification now distinguishes complete rows, ambiguous provider
+  attempts, and provider-complete rows whose local reader outputs need
+  recovery. If saved PDF/raster files exist and match the durable hashes, the
+  runner can rerun Tesseract/native readers on the saved PDF-derived raster
+  only. It never returns to the original screenshot or resubmits OCR.Space.
+- Missing/hash-invalid PDF or raster artifacts block for manual
+  reconciliation; no provider retry occurs.
