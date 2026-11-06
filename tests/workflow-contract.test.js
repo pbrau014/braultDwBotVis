@@ -299,8 +299,8 @@ test('Gate A acceptance uses the accepted runtime, fail-closed network guard and
     assert.ok(workflow.includes('DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME'));
     assert.ok(workflow.includes('DWBOT-GATE-A-16-PDF-FIRST-RESUME-15'));
     assert.ok(workflow.includes('DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'));
-    assert.match(workflow, /Prepare no-duplicate Gate A resume checkpoint from existing PDF\n        if: github\.event\.head_commit\.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' \|\| github\.event\.head_commit\.message == 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'/);
-    assert.match(workflow, /Run the 16-image OCR\.Space Engine 2 PDF-first Gate A acceptance\n        if: github\.event\.head_commit\.message != 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'/);
+    assert.match(workflow, /Prepare no-duplicate Gate A resume checkpoint from existing PDF\\r?\\n        if: github\.event\.head_commit\.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' \|\| github\.event\.head_commit\.message == 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'/);
+    assert.match(workflow, /Run the 16-image OCR\\.Space Engine 2 PDF-first Gate A acceptance\\r?\\n        if: github\.event\.head_commit\.message != 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'/);
     assert.match(workflow, /\$isResume = -not \[string\]::IsNullOrWhiteSpace\(\$env:GATEA_PARTIAL_ARTIFACT_ID\)/);
     assert.match(workflow, /MISSING_ORIGINAL_NETWORK_LOG/);
     assert.match(workflow, /FAIL_MISSING_ORIGINAL_EVIDENCE/);
