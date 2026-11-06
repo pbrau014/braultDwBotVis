@@ -64,3 +64,16 @@ Accordingly, the documentation publication waiver is not a DWBOT production-rele
 - Treat bot scoreboards as bot scoring output, not as verified official match/bracket advancement under v3.22 until workbook/policy parity is established.
 - Retain the v3.22 source documents in this folder and use the archive hash above to identify the exact source package.
 
+
+
+## Scoring parity correction — 2026-11-06
+
+A source-to-source comparison found that the standalone HTML score calculator
+used Grand Yolo tierWeight 1 and silently migrated a stored legacy 0.9 value
+to 1, while the live DWBOT scoring engine, its unit tests, and tournament admin
+settings use 0.9. The calculator now defaults to 0.9, preserves explicit
+legacy values, and resets that control to 0.9. Other multipliers continue to
+default/reset to 1. The underlying Grand Yolo formula and tournament award
+policy are unchanged. A regression assertion covers the default, migration,
+and reset contract. This is source-level coverage; browser rendering and
+end-to-end parity still require CI/browser verification.
