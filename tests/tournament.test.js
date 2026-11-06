@@ -188,8 +188,8 @@ test('standalone HTML score calculator exposes mouseover and assistive scoring h
 test('standalone HTML Grand Yolo formula matches the live DWBOT scoring engine', async () => {
   const html = await fs.readFile(path.join(__dirname, '..', 'dwbotStuff', 'yolo_tournament_scoreCalculator.html'), 'utf8');
   const core = await fs.readFile(path.join(__dirname, '..', 'src', 'tournament.js'), 'utf8');
-  const htmlFormula = html.match(/const perGame=([\\s\\S]*?);/)?.[1]?.replace(/\\s+/g, '');
-  const coreFormula = core.match(/const perGame\\s*=\\s*([\\s\\S]*?);/)?.[1]?.replace(/\\s+/g, '');
+  const htmlFormula = html.match(/const perGame=([\s\S]*?);/)?.[1]?.replace(/\s+/g, '');
+  const coreFormula = core.match(/const perGame\s*=\s*([\s\S]*?);/)?.[1]?.replace(/\s+/g, '');
   assert.ok(htmlFormula, 'HTML Grand Yolo formula must be present');
   assert.ok(coreFormula, 'DWBOT Grand Yolo formula must be present');
   assert.equal(htmlFormula, coreFormula);
