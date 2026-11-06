@@ -42,7 +42,7 @@ async function normalizeInventory({
     renderPdf = imageProcessor.renderSearchablePdfPage,
     readMetadata = imageProcessor.metadata,
     normalizeRaster = imageProcessor.normalizeSearchablePdfPageRaster,
-    resizeSource = (buffer, width, height) => imageProcessor.cropResize(buffer, { left: 0, top: 0, width, height }, width),
+    resizeSource = (buffer, sourceWidth, sourceHeight, targetWidth) => imageProcessor.cropResize(buffer, { left: 0, top: 0, width: sourceWidth, height: sourceHeight }, targetWidth),
     requiredImageCount = 63,
     toRawRgba = buffer => imageProcessor.__test.runImageMagick(
         ['png:-', '-depth', '8', 'rgba:-'], buffer,
