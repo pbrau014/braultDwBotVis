@@ -78,7 +78,7 @@ class GateB21EvaluatorTests(unittest.TestCase):
 
     def test_gate_b_requires_gate_a_pass_and_locked_matching_candidate_fingerprint(self):
         self.assertEqual(EVALUATOR.gate_a_evidence_status({}), "PENDING_GATE_A")
-        self.assertEqual(EVALUATOR.gate_a_evidence_status({"gateA": {"status": "FAIL"}}), "PENDING_GATE_A")
+        self.assertEqual(EVALUATOR.gate_a_evidence_status({"gateA": {"status": "FAIL"}}), "FAIL")
         good = {"gateA": {
             "status": "PASS", "reportSha256": "a" * 64,
             "candidateFingerprint": "b" * 64,

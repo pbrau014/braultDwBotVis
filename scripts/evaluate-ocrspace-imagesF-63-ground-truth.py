@@ -199,8 +199,10 @@ def evaluate_engine(run, engine, selected_records):
 
 def gate_a_evidence_status(artifact):
     evidence = (artifact or {}).get("gateA") or {}
-    if evidence.get("status") != "PASS":
+    if evidence.get("status") in (None, "PENDING"):
         return "PENDING_GATE_A"
+    if evidence.get("status") != "PASS":
+        return "FAIL"
     if not re.fullmatch(r"[0-9a-f]{64}", str(evidence.get("reportSha256", ""))):
         return "FAIL"
     if not re.fullmatch(r"[0-9a-f]{64}", str(evidence.get("candidateFingerprint", ""))):
