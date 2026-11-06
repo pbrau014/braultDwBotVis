@@ -150,7 +150,7 @@ async function prepare(options) {
         throw new Error('Preserved Gate A page raster is not pixel-identical to a fresh rendering of its preserved searchable PDF.');
     }
     const normalized = await imageProcessor.normalizeSearchablePdfPageRaster(renderedPageRaster, {
-        sourceWidth: sourceImageDimensions.width, sourceHeight: sourceImageDimensions.height,
+        sourceWidth: sourceImageDimensions.width, sourceHeight: sourceImageDimensions.height, sourceImageBuffer: sourceImage,
     });
     const normalizedRaster = normalized.buffer;
     const normalizedRasterDimensions = await imageProcessor.metadata(normalizedRaster);
@@ -265,7 +265,7 @@ async function prepare(options) {
             pageRasterWidth: rasterDimensions.width, pageRasterHeight: rasterDimensions.height,
             rasterBytes: normalizedRaster.length, rasterSha256: normalizedRasterSha256,
             rasterWidth: normalizedRasterDimensions.width, rasterHeight: normalizedRasterDimensions.height,
-            rasterNormalization: normalized.normalization,
+            rasterNormalization: normalized.normalization, rasterSourceSimilarity: normalized.similarity,
             artifacts: { pdf: pdfPath, pageRaster: rasterPath, raster: normalizedRasterPath },
             recoveredFromPriorRunId: expectedRunId, recoveredFromPriorArtifactId: expectedArtifactId,
         },
