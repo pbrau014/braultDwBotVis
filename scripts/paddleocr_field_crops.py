@@ -20,6 +20,11 @@ import time
 from typing import Any
 
 NETWORK_ATTEMPTS: list[str] = []
+def emit_json(payload: dict[str, Any]) -> None:
+    """Emit one ASCII-only JSON line so Windows stdout code pages cannot corrupt it."""
+    sys.stdout.write(json.dumps(payload, ensure_ascii=True, separators=(',', ':')) + '\n')
+    sys.stdout.flush()
+
 
 def _blocked_network(*args: Any, **kwargs: Any) -> Any:
     origin = str(args[0]) if args else 'socket'
@@ -180,21 +185,21 @@ def main() -> int:
     try:
         request = json.loads(sys.stdin.read())
     except Exception as exc:
-        print(json.dumps({'schemaVersion': 1, 'status': 'error', 'error': f'invalid request JSON: {exc}', 'networkAttemptCount': len(NETWORK_ATTEMPTS)}))
+        emit_json({'schemaVersion': 1, 'status': 'error', 'error': f'invalid request JSON: {exc}', 'networkAttemptCount': len(NETWORK_ATTEMPTS)})
         return 2
     if request.get('schemaVersion') != 1 or not isinstance(request.get('crops'), list):
-        print(json.dumps({'schemaVersion': 1, 'status': 'error', 'error': 'unsupported request schema', 'networkAttemptCount': len(NETWORK_ATTEMPTS)}))
+        emit_json({'schemaVersion': 1, 'status': 'error', 'error': 'unsupported request schema', 'networkAttemptCount': len(NETWORK_ATTEMPTS)})
         return 2
 
     det_dir = Path(os.environ.get('PADDLEOCR_DET_MODEL_DIR', '')).expanduser().resolve()
     rec_dir = Path(os.environ.get('PADDLEOCR_REC_MODEL_DIR', '')).expanduser().resolve()
     if not model_files_present(det_dir) or not model_files_present(rec_dir):
-        print(json.dumps({'schemaVersion': 1, 'status': 'blocked', 'error': 'explicit local detection/recognition model files are unavailable', 'networkAttemptCount': len(NETWORK_ATTEMPTS), 'results': []}))
+        emit_json({'schemaVersion': 1, 'status': 'blocked', 'error': 'explicit local detection/recognition model files are unavailable', 'networkAttemptCount': len(NETWORK_ATTEMPTS), 'results': []})
         return 3
 
     image_path = Path(str(request.get('imagePath') or '')).resolve()
     if not image_path.is_file():
-        print(json.dumps({'schemaVersion': 1, 'status': 'error', 'error': 'local source image is missing', 'networkAttemptCount': len(NETWORK_ATTEMPTS), 'results': []}))
+        emit_json({'schemaVersion': 1, 'status': 'error', 'error': 'local source image is missing', 'networkAttemptCount': len(NETWORK_ATTEMPTS), 'results': []})
         return 3
 
     # Import OpenCV/Paddle only after installing the no-network guard. Redirect
@@ -252,7 +257,7 @@ def main() -> int:
             'apiFamily': api_family, 'imageSha256': sha256(image_path), 'sourceWidth': width, 'sourceHeight': height,
             'results': results,
         }
-        print(json.dumps(payload, ensure_ascii=True, separators=(',', ':')))
+        emit_json(payload, ensure_ascii=True, separators=(',', ':'))
         # Keep valid per-crop results even when one ROI failed; the Node layer
         # filters each failed crop and preserves the rest. Network attempts still fail closed.
         return 3 if NETWORK_ATTEMPTS else 0
@@ -260,7 +265,7 @@ def main() -> int:
         payload = {'schemaVersion': 1, 'status': 'error', 'error': f'{type(exc).__name__}: {exc}',
                    'networkAttemptCount': len(NETWORK_ATTEMPTS), 'networkAttempts': NETWORK_ATTEMPTS,
                    'elapsedMs': round((time.perf_counter() - started_all) * 1000, 3), 'results': []}
-        print(json.dumps(payload, ensure_ascii=True, separators=(',', ':')))
+        emit_json(payload, ensure_ascii=True, separators=(',', ':'))
         return 3 if NETWORK_ATTEMPTS else 1
 
 
