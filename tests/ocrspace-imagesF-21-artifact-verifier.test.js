@@ -173,8 +173,8 @@ test('artifact verifier uses canonical JSON fingerprints and preserves raw worki
     toRawRgba:async()=>Buffer.from('same-pixels'),readPdfText:async()=> 'searchable text'});
   const runObject=JSON.parse(runBefore.toString('utf8'));
   const gtObject=JSON.parse(gtBefore.toString('utf8'));
-  const runReformatted=Buffer.from('\\uFEFF'+JSON.stringify(runObject,null,2).replace(/\\n/g,'\\r\\n'),'utf8');
-  const gtReformatted=Buffer.from('\\uFEFF'+JSON.stringify(gtObject,null,2).replace(/\\n/g,'\\r\\n'),'utf8');
+  const runReformatted=Buffer.from('\uFEFF'+JSON.stringify(runObject,null,2).replace(/\n/g,'\r\n'),'utf8');
+  const gtReformatted=Buffer.from('\uFEFF'+JSON.stringify(gtObject,null,2).replace(/\n/g,'\r\n'),'utf8');
   await fs.writeFile(f.runPath,runReformatted);
   await fs.writeFile(f.gtPath,gtReformatted);
   const reportAfter=await verifyArtifacts({...f,
