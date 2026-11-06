@@ -1,10 +1,61 @@
+CURRENT GOVERNING OCR GATE / INVENTORY OVERRIDE — 2026-11-06 15:55 UTC
+This block is authoritative over older historical plan sections below.
+
+- Gate A remains NOT PASSED. The 16-image preflight passed against the 16
+  repository fixtures and the original nine-field manifest. The original
+  imgs2add.zip archive bytes remain unavailable, but all 16 individual source
+  hashes were verified. The interrupted Gate A run #42202563673 produced one
+  searchable PDF/raster pair for Screenshot_16.jpg and was cancelled after
+  its single START marker. That first provider submission must never be
+  repeated.
+- Gate A continuation #42246737451 is running on the exact original partial
+  artifact. It has completed preflight, candidate checkout, runtime and OCR/PDF
+  setup and is provisioning the pinned PaddleOCR runtime. Its next critical
+  steps are original artifact/log verification and local-only recovery of the
+  first image. Only if that first record is exact may the remaining 15 new
+  provider submissions proceed. The original restricted-egress log is absent;
+  its historical attempt count remains UNKNOWN, not zero.
+- The original 63-image OCR.Space run #42160979140 completed with 63 searchable
+  PDFs and 63 PDF-derived rasters. The downloaded 81,886,966-byte artifact
+  independently matches GitHub SHA-256
+  ac4ae071ee4737c2fe044b64456a8dab1cddf7073a02f8f427ec7b35af28629a. All 63
+  PDFs are valid one-page files with non-empty searchable text; all 63 rasters
+  are valid PNGs. This source run's original restricted-egress log is absent.
+  Available job logs show the allowlist/restriction flags but no configured
+  OCR_NON_OCR_NETWORK_LOG path; the historical blocked-attempt count is UNKNOWN.
+  Never create an empty file and present it as original evidence.
+- Gate B is exactly the first 19 corpus-order records with complete, eligible,
+  non-empty expected values for all nine fields. The remaining two complete
+  records (Screenshot_55374.png and lllfrfgfgff.png) are diagnostic-only in
+  the separate 21-image PDF-first analysis inventory. The v6 JSON, checksum
+  sidecar and candidate manifest now agree on this 19-image Gate B policy.
+  Gate B remains NOT PASSED until Gate A passes, all 19 records are artifact-
+  verified, all mandatory outputs are resolved with zero wrong acceptance,
+  and original network/security evidence meets the gate.
+- No provider requests were made while verifying the 63-image source artifact.
+  The current 19-image artifact-verification run #42239832115 is still in its
+  local-only reader-recovery step; it has made zero provider requests. Its
+  final report/artifact is not yet available. The updated 19-policy run
+  #42247080407 is pending behind it.
+- Latest main at this update: 0d983f542b4b987faa3754429c3cf74ba23392d8.
+  Exact-head DWBOT verification #42247080424 is pending. Gate A run
+  #42246737451 is independent and running. Node.js >=22.16.0 is the accepted
+  runtime baseline; older >=24.17.0 wording below is superseded.
+- Production remains NO-GO. No production Discord deployment or production
+  data operation is authorized by these test runs.
+
+================================================================================
+END CURRENT GOVERNING OCR GATE / INVENTORY OVERRIDE
+================================================================================
+
 CURRENT PARALLEL IMPLEMENTATION UPDATE — 2026-11-06
 Status: changes committed; exact-head verification pending.
 
-- Runtime baseline is now Node.js >=24.17.0 in package.json/package-lock.
-  Current DWBOT verification, Gate A workflow and future 63-image workflow use
-  Node 24.17.0. Historical runs under Node 22.16.0 remain historical evidence,
-  not accepted-runtime passes.
+- Runtime baseline is Node.js >=22.16.0, as recorded in package.json and the
+  current runtime authorization. Node 24+ is optional, not mandatory. The
+  original 63-image run and the partial Gate A run both used the accepted
+  Node 22.16.0 baseline; their remaining blockers are evidence/provenance and
+  OCR completeness, not runtime version.
 - The legacy 56-image OCR.Space provider step in ordinary DWBOT verification
   is now gated behind workflow_dispatch input
   run_legacy_56_provider_acceptance (default false). Push verification does
@@ -16,10 +67,10 @@ Status: changes committed; exact-head verification pending.
   completed submissions; and never retries ambiguous in-flight or orphaned
   artifact rows. The original network log must be present and bound to claim
   zero denied attempts.
-- The 63-image exploratory runner now records and verifies runtime in its
-  resume fingerprint. Future 63-image runs use Node 24.17.0. The old 63-image
-  run remains a historical Node 22.16.0 run and is not eligible for a
-  cross-runtime resume.
+- The 63-image exploratory runner records and verifies runtime in its resume
+  fingerprint. Node 22.16.0 is the accepted baseline. The completed original
+  run remains bound to its exact older source build; it is not eligible for a
+  provider resume using a different runner/source fingerprint.
 - Added reproducible procedure:
   docs/continuation/DWBOT-OCRSPACE-ARTIFACT-VERIFICATION-CHECKLIST-v1.md.
   It covers exact run/artifact identity, source/PDF/raster hashes, searchable
@@ -104,13 +155,13 @@ Status: NOT PASSED / INTERRUPTED AFTER FIRST IMAGE.
   13495008195 contains one searchable one-page PDF and PDF-derived raster
   for Screenshot_16.jpg. The source hash matches the manifest. The other
   15 images were not processed. Do not resubmit the first image.
-- The interrupted run used Node 22.16.0 (<24.17.0) and has no original
-  restricted-egress diagnostic log. The source guard at that commit silently
-  catches log-write errors. Historical denied-attempt count is UNKNOWN;
-  no zero-attempt claim. Gate A remains NOT PASSED.
-- Gate A workflow definition now specifies Node 24.17.0 and checks runtime,
-  but this does not retroactively change the interrupted run. A queued
-  duplicate attempt was cancelled before execution.
+- The interrupted run used Node 22.16.0, which meets the currently authorized
+  >=22.16.0 runtime floor. It has no original restricted-egress diagnostic log.
+  The source guard at that commit silently catches log-write errors; historical
+  denied-attempt count is UNKNOWN and no zero-attempt claim is made. Gate A
+  remains NOT PASSED. A new artifact-bound continuation is now running as
+  #42246737451; it must reuse the existing first PDF/raster and may process
+  only the remaining 15 images after exact local recovery succeeds.
 - Next safe action, if Gate A continuation is authorized: verify/reuse the
   existing first PDF/raster, process only the remaining 15 hashes through a
   source-bound resumable runner, record mixed-runtime and missing-log
