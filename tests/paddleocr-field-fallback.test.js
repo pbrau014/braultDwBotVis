@@ -213,17 +213,23 @@ test('PaddleOCR helper emits ASCII-safe JSON for non-ASCII OCR text on Windows c
     const helperPath = path.join(__dirname, '..', 'scripts', 'paddleocr_field_crops.py');
     const helperSource = await fs.readFile(helperPath, 'utf8');
     const serializers = [...helperSource.matchAll(/json\.dumps\(payload,\s*ensure_ascii=(True|False)/g)];
-    assert.equal(serializers.length, 2, 'success and error payloads must both use the explicit serializer');
-    assert.ok(serializers.every(match => match[1] === 'True'), 'stdout JSON must escape non-ASCII text');
+    assert.equal(serializers.length, 1, 'all helper paths must use one shared serializer');
+    assert.equal(serializers[0][1], 'True', 'stdout JSON must escape non-ASCII text');
+    assert.doesNotMatch(helperSource, /print\(json\.dumps\(/);
+    assert.ok((helperSource.match(/emit_json\(/g) || []).length >= 6, 'success and error paths must use the shared serializer');
 
     const python = process.platform === 'win32' ? 'python' : 'python3';
     const probe = spawnSync(python, ['--version'], { encoding: 'utf8', timeout: 10000 });
     if (probe.error || probe.status !== 0) { t.skip('Python interpreter not installed for helper protocol test'); return; }
-    const encoded = spawnSync(python, ['-c', "import json; print(json.dumps({'text':chr(0x2606)}, ensure_ascii=True, separators=(',', ':')))"], {
-        encoding: 'utf8', timeout: 10000,
-    });
+    const encoded = spawnSync(python, ['-c', [
+        'import importlib.util',
+        "spec=importlib.util.spec_from_file_location('helper','scripts/paddleocr_field_crops.py')",
+        'module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module)',
+        "module.emit_json({'text':chr(0x2606)})"
+    ].join(';')], { cwd: path.resolve(__dirname, '..'), encoding: 'utf8', timeout: 10000 });
     assert.equal(encoded.status, 0, encoded.stderr);
     assert.ok([...Buffer.from(encoded.stdout, 'utf8')].every(byte => byte < 0x80), 'serialized JSON must be ASCII-only');
+    assert.equal(encoded.stdout.trim(), '{"text":"\\u2606"}');
     assert.equal(JSON.parse(encoded.stdout).text, '☆');
 });
 
@@ -232,22 +238,4 @@ test('PaddleOCR fallback field request order preserves the canonical nine-field 
     assert.deepEqual(__test.FIELDS, [
         'result', 'player', 'map', 'mode', 'battleStart', 'credits', 'freeXp', 'damage', 'xp',
     ]);
-});
-
-test('all PaddleOCR helper exit paths use one ASCII-safe JSON serializer', async () => {
-    const helperSource = await fs.readFile(path.join(__dirname, '..', 'scripts', 'paddleocr_field_crops.py'), 'utf8');
-    assert.match(helperSource, /def emit_json\(payload: dict\[str, Any\]\)/);
-    assert.match(helperSource, /json\.dumps\(payload, ensure_ascii=True, separators=\(',', ':'\)\)/);
-    assert.doesNotMatch(helperSource, /print\(json\.dumps\(/);
-    assert.ok((helperSource.match(/emit_json\(/g) || []).length >= 6);
-    const python = process.platform === 'win32' ? 'python' : 'python3';
-    const probe = spawnSync(python, ['-c', [
-        'import importlib.util',
-        "spec=importlib.util.spec_from_file_location('helper','scripts/paddleocr_field_crops.py')",
-        'module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module)',
-        "module.emit_json({'text':chr(0x2606)})"
-    ].join(';')], { cwd: path.resolve(__dirname, '..'), encoding: 'utf8', timeout: 10000 });
-    if (probe.error || probe.status !== 0) throw new Error(probe.stderr || probe.error?.message || String(probe.status));
-    assert.equal(probe.stdout.trim(), '{"text":"\\u2606"}');
-    assert.deepEqual(JSON.parse(probe.stdout), { text: '☆' });
 });
