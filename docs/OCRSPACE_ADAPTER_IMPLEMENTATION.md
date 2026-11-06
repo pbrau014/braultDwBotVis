@@ -1,7 +1,7 @@
 # OCR.Space PDF-first image processing — governing implementation
 
 **Status:** Implemented in canonical main; live provider and inventory acceptance remain unverified.
-**Authority:** The user's 2026-11-05 instruction in this chat supersedes earlier crop-only and diagnostic-only OCR.Space descriptions.
+**Authority:** The user's 2026-11-06 instruction in this chat supersedes earlier crop-only, diagnostic-only, default-off and local-original-image descriptions.
 
 ## Required sequence
 1. Receive the original World of Warships screenshot.
@@ -11,7 +11,7 @@
 5. Run Tesseract.js, native Tesseract, PaddleOCR (when enabled), OpenCV geometry and all other local image readers on that PDF-derived raster. After successful PDF creation, no local reader may return to the original screenshot.
 6. Run existing parsers, independent-read/geometry consensus and exact nine-field validation. OCR.Space text/PDF text-layer evidence remains separate; it is not injected into local OCR candidates or used to accept remote-only values.
 
-If OCR.Space processing, PDF creation/download or rasterization fails, the image fails closed. Do not substitute OCR of the original screenshot. The production bot requires OCRSPACE_API_KEY; OCRSPACE_ENABLED=0 is explicit local-only development/test mode.
+If OCR.Space processing, PDF creation/download or rasterization fails, the image fails closed. Do not substitute OCR of the original screenshot. Eligible original-image intake requires `OCRSPACE_ENABLED=1`, `OCRSPACE_NETWORK_ALLOWLIST=1`, and a valid local `OCRSPACE_API_KEY`. `OCRSPACE_ENABLED=0` is reserved for isolated mocks/offline tests and local-reader invocations on a raster already produced from a successful OCR.Space PDF-first pass; it must never be used to process an eligible original image as a local-only fallback.
 
 ## Upload normalization and provenance
 The OCR.Space Free API file limit is 1 MiB. Images above that limit are re-encoded locally to a bounded JPEG using a descending size/quality profile. The original image is never modified. Record original image SHA-256/size; normalized upload SHA-256/size/dimensions/quality; OCR.Space engine, processing time and provider exit status; searchable PDF SHA-256/size; rendered raster dimensions/size; per-image local-reader outputs and exact comparisons.
@@ -21,7 +21,7 @@ The user explicitly authorized OCR.Space processing of the 4-, 16-, and 64-image
 ## Provider limits and privacy
 The official API currently documents a 1 MiB Free API upload limit, 500 requests/day, 25,000 requests/month and three PDF pages per document. Free searchable PDFs contain an OCR.Space watermark. Searchable-PDF URLs remain available for one hour. The privacy policy says uploads are deleted after processing, generated PDFs after 60 minutes, and API IP logs after one month. Verify current terms before live processing. Do not use paid tiers or automatically retry rate-limited requests. Reserve quota before every provider request and fail closed on quota-ledger errors.
 
-Network acceptance allows only HTTPS to api.ocr.space and ocr.space for the API call and temporary PDF download. All other outbound requests remain blocked and logged.
+`OCRSPACE_NETWORK_ALLOWLIST=1` explicitly permits HTTPS to `api.ocr.space` for the API request and `ocr.space` / `api.ocr.space` for the temporary PDF download. The network guard does not block these provider hosts. When `OCR_NON_OCR_NETWORK_RESTRICTED=1`, it restricts and logs only unrelated outbound destinations; this is not blanket network blocking and does not prevent OCR.Space from using the network. Keep the provider allowlist narrow rather than enabling unrestricted outbound access.
 
 ## Implementation
 - src/ocrspace-pdf-first.js: Engine 2 image-first request, searchable PDF URL validation, bounded download, PDF signature check, provenance hashes and raster handoff.
@@ -30,6 +30,7 @@ Network acceptance allows only HTTPS to api.ocr.space and ocr.space for the API 
 - src/bot.js: performs PDF-first processing before OpenCV/Tesseract; subsequent readers receive only the PDF raster. Production entrypoint refuses normal startup without OCRSPACE_API_KEY; OCRSPACE_ENABLED=0 is local-only.
 - scripts/block-network.js: OCR.Space-only HTTPS allowlist for acceptance.
 - scripts/run-windows-ocr-acceptance.ps1: requires OCRSPACE_API_KEY, runs PDF-first acceptance, retains PDF/raster artifacts.
+- `OCRSPACE_ARTIFACT_DIR` is set to a per-run directory by the Windows acceptance wrapper; the PDF and PDF-derived raster are retained there. The 64-image runner also writes each PDF/raster and hashes them. The normal bot only writes durable artifacts when `OCRSPACE_ARTIFACT_DIR` is configured; set it before any run that requires persistent evidence. No artifact is claimed until the file and checksum are inspected.
 - tests/ocrspace-pdf-first.test.js: mocked first-pass, upload-size normalization, PDF URL/redirect/signature/size and fail-closed tests.
 - npm run test:ocrspace includes PDF-first contract tests.
 
