@@ -361,7 +361,7 @@ jobs:
           New-Item -ItemType Directory -Force (Split-Path $recoveryReport -Parent) | Out-Null
           New-Item -ItemType Directory -Force (Split-Path $recoveryNetworkLog -Parent) | Out-Null
           [System.IO.File]::WriteAllText($recoveryNetworkLog, '')
-          node scripts/recover-ocrspace-imagesF-21-local-readers.js --run-report $env:DWBOT_RUN_REPORT --ground-truth $env:DWBOT_GROUND_TRUTH --artifact-root $env:DWBOT_ARTIFACT_ROOT --output-run-report $recoveredRun --recovery-report $recoveryReport --network-log $env:OCR_NON_OCR_NETWORK_LOG
+          node scripts/recover-ocrspace-imagesF-21-local-readers.js --run-report $env:DWBOT_RUN_REPORT --ground-truth $env:DWBOT_GROUND_TRUTH --source-image-root $env:DWBOT_SOURCE_IMAGE_ROOT --artifact-root $env:DWBOT_ARTIFACT_ROOT --output-run-report $recoveredRun --recovery-report $recoveryReport --network-log $env:OCR_NON_OCR_NETWORK_LOG
           if (Test-Path $recoveredRun) {
             "DWBOT_RUN_REPORT=$recoveredRun" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           }
