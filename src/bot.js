@@ -2733,7 +2733,8 @@ function tournamentHelp() {
         '`!yolo remove-player <name or ID>` — remove a player (admin)',
         '`!yolo result <player> | <event> | <game 1-7> | <DD|CA|BB> | <tier> | <metric>` — enter a result (admin)',
         '`!yolo settings` — view scoring settings (admin); `!yolo setting <event> <field> <number>` — change a setting (admin)',
-        '`!yolo standings [damage|kills|race|grand]` — leaderboard and doubloon totals',
+        '`!yolo standings [damage|kills|race|grand]` — event doubloon leaderboards',
+        '`!yolo scoring` — explain event formulas, Race C01 and the difference between bracket wins and damage awards',
         '`!yolo totals` — precise all-player doubloon totals',
         '`!yolo snapshot` — attach a public-safe recovery snapshot to the same channel (admin; private account links and per-user pending associations are omitted)',
         '`!yolo status` — filled game slots per player and event',
@@ -2749,6 +2750,27 @@ function tournamentHelp() {
         '',
         `Roster capacity: ${Tournament.MAX_PLAYERS} participants, matching the expanded Excel workbook. Events: ` + '`damage`, `kills`, `race`, `grand`' + `. Screenshot submissions pass OCR verification, then the bot asks only for missing tournament values one at a time. State is saved locally on every change; recovery snapshots are coalesced and attached to the same configured channel as commands and screenshots. All bot replies and snapshots remain public in that channel.`
     ].join('\n');
+}
+
+function scoringGuideText() {
+    return [
+        '**YOLO scoring guide — formula outputs are doubloons**',
+        'The Damage, Kills, Race and Grand Yolo columns are calculated event scores in doubloons, not raw damage, kills or seconds.',
+        '',
+        '**Damage / Kills / Race**',
+        '`Event doubloons = 2 × multiplier × pool × Σ(classWeight × performanceShare ÷ tier^tierPower)`',
+        'Damage share = that game\'s damage ÷ total event damage. Kills share = that game\'s kills ÷ total event kills.',
+        'Race C01 share = (1 ÷ that player\'s elapsed seconds) ÷ Σ(1 ÷ every eligible player\'s elapsed seconds). Faster time earns the larger share.',
+        '',
+        '**Grand Yolo Round 4**',
+        'Combines tier, damage, kills and elapsed-time contributions, then weights the result by the player\'s share of total Grand Yolo damage. It is an individual score sheet, not a team bracket result.',
+        '',
+        '**Two separate result lanes**',
+        'Verified match/series wins determine weekly bracket advancement. Individual damage determines damage awards and contributes to cumulative Grand YOLO damage standings. A high-damage loss does not become a bracket win.',
+        '',
+        'The historical workbook uses raw Race time and differs from current C01. Source workbook values are archival; the current event notice and approved settings control the active weights and pools.',
+        'Use `!yolo standings` for doubloon scores, `!yolo player <name>` for raw game inputs plus event totals, and `!yolo settings` (admin) to inspect current formula settings.',
+    ].join('\\n');
 }
 
 function tournamentSettingsText() {
@@ -2775,10 +2797,10 @@ function tournamentStatusText() {
 function tournamentStandingsText() {
     const rows = Tournament.standings(tournamentState);
     if (!rows.length) return 'No players in the tournament yet. Use `!yolo add-player <name>` to start the roster. Current aggregate: **0.00 doubloons**.';
-    const lines = ['**YOLO Tourney standings**', '`Rank | Player | Damage | Kills | Race | Grand Yolo | Total doubloons`'];
+    const lines = ['**YOLO Tourney standings — calculated event doubloons**', '`Rank | Player | Damage dubs | Kills dubs | Race dubs | Grand Yolo dubs | Total dubs`'];
     rows.forEach((row, index) => lines.push(`**${index + 1}. ${row.name}** | ${row.events.damage.toFixed(2)} | ${row.events.kills.toFixed(2)} | ${row.events.race.toFixed(2)} | ${row.events.grand.toFixed(2)} | **${row.total.toFixed(2)}**`));
     const totalDoubloons = rows.reduce((sum, row) => sum + row.total, 0);
-    lines.push('', `**All-player aggregate (${rows.length}/${Tournament.MAX_PLAYERS} players): ${totalDoubloons.toFixed(2)} doubloons**`);
+    lines.push('', '`Per-event columns are calculated doubloons, not raw damage/kills/time. Match wins and weekly bracket advancement are tracked separately.`', `**All-player aggregate (${rows.length}/${Tournament.MAX_PLAYERS} players): ${totalDoubloons.toFixed(2)} doubloons**`);
     return lines.join('\n');
 }
 
@@ -2809,7 +2831,7 @@ function playerDetailText(nameOrId) {
     const player = Tournament.findPlayer(tournamentState, nameOrId);
     if (!player) throw new Error(`Player "${nameOrId}" was not found.`);
     const score = Tournament.standings(tournamentState).find(row => row.id === player.id);
-    const lines = [`**${player.name}** (#${player.id})`, `Total: **${score.total.toFixed(2)} doubloons**`];
+    const lines = [`**${player.name}** (#${player.id})`, `Total: **${score.total.toFixed(2)} doubloons**`, 'Event totals below are doubloons; each game line shows raw scoring inputs. Match wins/bracket advancement are separate.'];
     for (const event of Tournament.EVENTS) {
         const slots = player.events[event].map((game, index) => {
             if (!slotIsFilled(event, game)) return `G${index + 1}: —`;
@@ -3532,6 +3554,7 @@ function buildTournamentPanelComponents() {
         new ButtonBuilder().setCustomId('yolo:totals').setLabel('Totals').setStyle(ButtonStyle.Primary),
         new ButtonBuilder().setCustomId('yolo:standings').setLabel('Standings').setStyle(ButtonStyle.Primary),
         new ButtonBuilder().setCustomId('yolo:players').setLabel('Players').setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder().setCustomId('yolo:scoring').setLabel('Scoring guide').setStyle(ButtonStyle.Secondary),
     );
     const menu = new StringSelectMenuBuilder()
         .setCustomId('yolo:event')
@@ -3541,6 +3564,7 @@ function buildTournamentPanelComponents() {
 }
 
 function tournamentPanelText(view = 'home', event = null) {
+    if (view === 'scoring') return scoringGuideText();
     if (view === 'totals') return tournamentTotalsText();
     if (view === 'standings') return compactStandingsText();
     if (view === 'players') {
@@ -3562,7 +3586,7 @@ function tournamentPanelText(view = 'home', event = null) {
         `All-player aggregate: **${totalDoubloons.toFixed(2)} doubloons**`,
         `Storage: **${tournamentStore.engine || 'JSON'}** · Recovery snapshots: same public channel`,
         '',
-        'Use the buttons below to view totals, standings, and roster. Choose an event from the menu to view its leaderboard.',
+        'Use the buttons below to view totals, standings, roster and the scoring guide. Event columns are doubloons; match wins/bracket advancement are separate.',
         'Admin scoring changes remain available through the existing `!yolo` commands.',
     ].join('\n');
 }
@@ -3586,6 +3610,7 @@ const YOLO_SLASH_COMMAND = {
         { type: 1, name: 'help', description: 'Show tournament command guidance' },
         { type: 1, name: 'panel', description: 'Open the interactive tournament panel' },
         { type: 1, name: 'totals', description: 'Show all-player doubloon totals' },
+        { type: 1, name: 'scoring', description: 'Explain event formulas and Race C01 policy' },
         { type: 1, name: 'standings', description: 'Show leaderboard and doubloon totals', options: [{ type: 3, name: 'event', description: 'Optional event leaderboard', required: false, choices: Tournament.EVENTS.map(event => ({ name: Tournament.EVENT_LABELS[event], value: event })) }] },
         { type: 1, name: 'players', description: 'Show the active participant roster' },
         { type: 1, name: 'status', description: 'Show progress across all participants' },
@@ -3626,6 +3651,7 @@ async function handleInteraction(interaction) {
             if (subcommand === 'help') content = `**Public tournament commands**\n${tournamentHelp()}`.slice(0, 1850);
             else if (subcommand === 'panel') { content = tournamentPanelText(); components = buildTournamentPanelComponents(); }
             else if (subcommand === 'totals') { content = tournamentTotalsText(); components = buildTournamentPanelComponents(); }
+            else if (subcommand === 'scoring') { content = scoringGuideText(); components = buildTournamentPanelComponents(); }
             else if (subcommand === 'standings') {
                 const event = interaction.options.getString('event');
                 content = event ? tournamentPanelText('event', event) : compactStandingsText();
@@ -3642,7 +3668,7 @@ async function handleInteraction(interaction) {
             return true;
         }
         const action = interaction.customId.slice('yolo:'.length);
-        const view = ['home', 'totals', 'standings', 'players'].includes(action) ? action : 'home';
+        const view = ['home', 'totals', 'standings', 'players', 'scoring'].includes(action) ? action : 'home';
         await interaction.update({ content: tournamentPanelText(view), components: buildTournamentPanelComponents(), allowedMentions: { parse: [] } });
         return true;
     } catch (error) {
@@ -3809,6 +3835,10 @@ if (process.env.NODE_ENV === 'test') {
         buildTournamentPanelComponents,
         tournamentPanelText,
         compactStandingsText,
+        tournamentStandingsText,
+        eventStandingsText,
+        playerDetailText,
+        scoringGuideText,
         registerSlashCommands,
         runtimeSupported,
         buildSourceEvidence,
