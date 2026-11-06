@@ -18,7 +18,7 @@ test('desktop login, Player, Admin and upload HTML pages are present and link lo
     const html = read(file);
     for (const needle of needles) assert.ok(html.includes(needle), file + ' must contain ' + needle);
     assert.doesNotMatch(html, /https?:\/\/(?:cdn\.|unpkg\.com|cdnjs\.|discordapp\.com\/api\/webhooks)/i);
-    assert.doesNotMatch(html, /DISCORD_BOT_TOKEN|DISCORD_OAUTH_CLIENT_SECRET|OCR_SPACE_API_KEY/i);
+    assert.doesNotMatch(html, /DISCORD_BOT_TOKEN|DISCORD_OAUTH_CLIENT_SECRET|OCRSPACE_API_KEY|OCR_SPACE_API_KEY/i);
   }
 });
 
@@ -34,7 +34,7 @@ test('desktop browser scripts use only same-origin local APIs and do not contain
   assert.match(read('desktop/admin.js'), /\/api\/admin\/settings/);
   assert.match(read('desktop/upload.js'), /25\s*\*\s*1024\s*\*\s*1024/);
   const uploadPage = read('desktop/upload.html');
-  assert.match(uploadPage, /maximum 25 MB/i);
+  assert.match(uploadPage, /maximum 25 MiB/i);
   assert.doesNotMatch(uploadPage, /maximum 10 MB/i);
   assert.match(uploadPage, /OCR.Space Engine 2/i);
   assert.match(uploadPage, /PDF-derived raster/i);

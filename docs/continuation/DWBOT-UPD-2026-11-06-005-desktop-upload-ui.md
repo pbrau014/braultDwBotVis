@@ -27,3 +27,12 @@ The desktop screenshot upload page was reviewed while the existing 63-image OCR.
 
 ## OCR.Space workflow preservation
 The existing imagesF 63 exploratory run `42160979140` remained `in_progress` at the time of this note. Its provider-extraction step was still running and no run artifacts were listed. Desktop-only paths and the desktop UI contract test are now in `paths-ignore` for that provider workflow, preventing these UI commits from launching duplicate OCR.Space submissions. Continue polling the original run; download and verify artifacts only after its upload step completes.
+
+
+## Follow-up terminology and secret-name contract
+
+The upload limit is stated as 25 MiB to match the exact 25 * 1024 * 1024
+byte check. The desktop UI contract's credential exclusion now checks both
+OCRSPACE_API_KEY (the actual environment variable spelling) and the legacy
+OCR_SPACE_API_KEY spelling. This is a source/test correction; it does not
+replace exact-head CI or browser accessibility verification.

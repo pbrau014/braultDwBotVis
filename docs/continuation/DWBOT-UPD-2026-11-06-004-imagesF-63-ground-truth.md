@@ -30,7 +30,7 @@ The manual transcription is independent of the OCR run outputs, and selected dis
 - 42 records remain partial and can contribute only eligible field-level comparisons.
 - Eligible expected values by field: result 63; player 24; map 24; mode 26; battleStart 22; credits 62; freeXp 59; damage 62; xp 62.
 - Accuracy status: `PARTIALLY_EVALUABLE`. Field-level metrics can be calculated for eligible expected values; nine-field full-record accuracy can be calculated for the 21 complete records only.
-- Accuracy across all 63 complete records remains not evaluable. Gate B remains `NOT_PASSED`: 21 complete records are below the 50-image minimum.
+- Accuracy across all 63 complete records remains not evaluable. The user subsequently authorized the exact 21 complete nine-field records as the Gate B holdout, replacing the former 50-image minimum. Gate B remains `NOT_PASSED` until the current OCR run's 21 matching PDF/raster artifacts, post-hoc metrics, and network/security evidence are verified. The workbook remains a partial manual-transcription reference, not certified double-blind ground truth.
 
 ## Post-hoc evaluation
 
@@ -49,3 +49,16 @@ The workflow now ignores ground-truth, evaluation, and continuation-documentatio
 - Workbook attachment: `DWBOT_IMAGESF_63_ground_truth_working_v6.xlsx`; SHA-256 `fa5f5c6b15185678b93d917e9be49cb3dfef697bdf13bc939a73ceab4bd6df73`.
 - Machine-readable repository reference: `testdata/ground-truth/imagesF-63-working-ground-truth-v6.json`; SHA-256 `9db97e8fbb4f74eac423040cb0f99ce5da98e75758cb0b36b3f4cdac15ab340d`.
 - The v5 JSON snapshot is retained at its original path with its original checksum; v6 carries the reviewer-provenance qualification.
+
+
+## Gate B requirement amendment — 2026-11-06
+
+The user authorized reducing the project-specific Gate B holdout from a 50-image
+minimum (100 preferred) to exactly 21 images. The approved selection is the
+first 21 corpus-order records in the v6 JSON with complete, non-empty,
+eligible expected values for all nine required fields. These records are
+separate from the 16-image development corpus. They are not to be used for
+tuning. This amendment changes only the sample-size requirement; it does not
+change field requirements, source-image hash binding, reviewer-provenance
+qualification, zero-wrong-acceptance criteria, artifact checks, or network
+restrictions. Gate B remains NOT_PASSED until the extraction and evidence pass.

@@ -14,9 +14,11 @@ IMPLEMENTATION / VERIFICATION STATUS — 2026-11-06
   byte sizes and dimensions remain bound to each original record. One record
   is 1334x627; selection does not impose a new pixel threshold.
 - The post-hoc evaluator now accepts --inventory complete-ground-truth-21,
-  filters the existing 63-image report to those 21 names, reports missing
-  selected rows, per-engine field/full-record metrics and keeps Gate B
-  NOT_PASSED. It does not call OCR.Space.
+  filters the existing 63-image report to those 21 names, counts missing rows
+  and source-hash mismatches as unresolved, and computes per-engine field/full-
+  record metrics. Gate B requires a separate artifact/network verification
+  report and remains NOT_PASSED until all criteria pass. The evaluator never
+  calls OCR.Space.
 - The 63-image exploratory run already in progress remains run 42160979140.
   An accidental duplicate push-triggered run 42168859431 was replaced in the
   Actions concurrency queue and is confirmed CANCELLED before any job started.
@@ -29,8 +31,11 @@ IMPLEMENTATION / VERIFICATION STATUS — 2026-11-06
   are not yet available. No duplicate OCR.Space submissions were made.
 - The 4-image and 16-image tests remain required. The separate 64-image
   inventory run is retired; its manifest/runner/tests remain legacy material.
-  Gate B remains NOT_PASSED and the v6 workbook remains a partial working
-  reference, not certified acceptance-grade ground truth. Production NO-GO.
+  Gate B's user-authorized minimum is now exactly 21 complete nine-field images
+  from the v6 subset, replacing the former 50 minimum / 100 preferred target.
+  The v6 workbook remains a partial working reference, not certified corpus-
+  wide ground truth. Gate B remains NOT_PASSED pending actual evidence; production
+  NO-GO.
 
 
 ## Node.js runtime authorization — current and governing
@@ -77,7 +82,7 @@ Nine mandatory fields remain exactly: result, player, map, mode, battleStart, cr
 - PDF manual and clean-package job passed. Clean extracted package npm test: 308 passed, 0 failed, 3 skipped; prelive: 21 passed, 0 failed. Package manifest verified with 550 entries. Package ZIP SHA-256: `faeaa16b4d6b4a98582623a070c7778283543266d5138bc1b4e7848629d2d3d5`. Artifact ID `13471702699`, SHA-256 `37bd1b652c2bafd31301ce1ba4351be32e9d65b62a017c076fdc3e4cc256215c`.
 - Run 399 is an overall FAILURE because the Windows protected-secret check reported `OCRSPACE_API_KEY configured: False`. The current-source screenshot-acceptance step was skipped. No live OCR.Space request, searchable PDF, 4-/16-image acceptance or 64-image processing is verified.
 - The retired 64-image manifest/runner remain historical regression material only. The active replacement subset is exactly the first 21 corpus-order records in the v6 ground-truth JSON with COMPLETE_9_FIELD_TRANSCRIPTION and all nine eligible_for_exact_match flags true. This subset is not a 50-image Gate B holdout and does not certify the workbook.
-- The independent holdout (50 minimum / 100 preferred, independently labeled for all nine fields) remains unavailable. Production remains NO-GO.
+- The approved 21-image Gate B holdout is the first 21 corpus-order v6 records with complete, eligible values for all nine fields. The supplied manual transcription is independent of OCR outputs but not documented as blind double-annotated. Preserve that qualification; Gate B still requires artifact verification, zero wrong accepted values and clean network evidence. Production remains NO-GO.
 - The repository Actions secret is confirmed missing/empty. The repository owner must add `OCRSPACE_API_KEY` under Settings -> Secrets and variables -> Actions -> New repository secret; never paste the key into chat or logs. Rerun the exact-head workflow after it is configured.
 - Windows acceptance sets a per-run `OCRSPACE_ARTIFACT_DIR`; the current 63-image exploratory runner writes per-image PDF/raster artifacts. Reuse the 21 selected records from those outputs for post-hoc evaluation; do not repeat provider submissions. For other runs requiring durable evidence, configure `OCRSPACE_ARTIFACT_DIR` and verify the actual files/checksums.
 

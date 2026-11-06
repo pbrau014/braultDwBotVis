@@ -39,7 +39,7 @@ The official API currently documents a 1 MiB Free API upload limit, 500 requests
 |---|---|---|---|
 | 4 images | fixtures/four-screenshots/ | Existing exact expected values | OCR.Space PDF first, then local readers, compare all nine fields |
 | 16 images | fixtures/additional-screenshots/ | testdata/additional-screenshot-ground-truth.json | OCR.Space PDF first, then local readers, compare all nine fields |
-| 21 images | First 21 corpus-order records in testdata/ground-truth/imagesF-63-working-ground-truth-v6.json | Complete manual transcription; all nine fields eligible | Reuse the current 63-image exploratory run's PDF/raster/local-reader outputs; post-hoc evaluate only these 21 records. No duplicate OCR.Space submissions. This is not Gate B. |
+| 21 images / Gate B | First 21 corpus-order records in testdata/ground-truth/imagesF-63-working-ground-truth-v6.json | Complete manual transcription; all nine fields eligible | Approved Gate B holdout replacing the former 50-image minimum. Reuse the current 63-image exploratory run's PDF/raster/local-reader outputs; verify artifacts and post-hoc evaluate only these 21 records. No duplicate OCR.Space submissions or tuning. |
 
 The retired 64-image inventory and its archive are not required for the current project test matrix. The legacy manifest/runner remain only as historical regression material. The active 21-image selection is deterministically checked against the v6 ground-truth record statuses and all nine field-eligibility flags; source filename, byte size and SHA-256 must match the verified 63-image preflight. The evaluator is post-hoc only and does not submit images.
 
@@ -58,3 +58,15 @@ The retired 64-image inventory and its archive are not required for the current 
 - Privacy policy: https://ocr.space/privacypolicy
 
 The API documentation contains mixed historical wording about Engine 3 PDF support. The current comparison table marks Engine 3 searchable PDF unsupported; this implementation therefore uses Engine 2 for the PDF-producing first pass.
+
+
+## Gate B sample-size amendment
+
+The active Gate B holdout is exactly the 21-image complete-ground-truth subset
+from the v6 reference. This supersedes the former 50-image minimum / 100-image
+preferred target. The selection is deterministic, source-hash-bound and
+separate from the 16-image development corpus. Gate B does not pass on the
+ground-truth count alone: it requires 21/21 artifact verification, a complete
+post-hoc evaluation, zero wrongly accepted mandatory values, and zero
+unauthorized network attempts. The manual reference remains qualified as
+independent of OCR outputs but not documented as blind double-annotated.
