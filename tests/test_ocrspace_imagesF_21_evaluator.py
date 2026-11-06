@@ -50,6 +50,14 @@ class GateB21EvaluatorTests(unittest.TestCase):
         expected = [{"filename": row["filename"], "bytes": row["sourceImage"]["bytes"], "sha256": row["sourceImage"]["sha256"]} for row in self.selected]
         self.assertEqual(subset["records"], expected)
 
+    def test_gate_b_subset_has_no_source_hash_overlap_with_four_image_regression_corpus(self):
+        regression_dir = ROOT / "fixtures" / "four-screenshots"
+        regression_files = [p for p in regression_dir.iterdir() if p.suffix.lower() in {".png", ".jpg", ".jpeg"}]
+        self.assertEqual(len(regression_files), 4)
+        regression_hashes = {hashlib.sha256(p.read_bytes()).hexdigest() for p in regression_files}
+        gate_b_hashes = {row["sourceImage"]["sha256"] for row in self.selected}
+        self.assertFalse(gate_b_hashes & regression_hashes)
+
     def test_partial_or_uncertain_rows_do_not_enter_gate_b(self):
         selected_names = {r["filename"] for r in self.selected}
         for row in self.gt["records"]:

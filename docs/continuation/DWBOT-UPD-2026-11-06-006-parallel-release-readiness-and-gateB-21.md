@@ -271,3 +271,13 @@ percentage. The evaluator therefore reports the measured field-level and
 complete-record percentages without inventing a pass floor. Zero wrongly
 accepted mandatory values and zero unauthorized network attempts remain hard
 blockers; unresolved values remain visible and are not counted as matches.
+
+
+## Regression-corpus independence check
+
+The Python acceptance test also hashes the four checked-in regression screenshots
+under fixtures/four-screenshots and asserts zero SHA-256 overlap with the 21
+Gate B records. The 16-image development corpus has already been checked by
+source hash with zero overlap. These checks execute in the exact-head CI; until
+that run passes, the no-overlap assertions are implemented but not yet CI-
+verified.
