@@ -45,7 +45,7 @@ test('OCR.Space Engine 2 processes the source image first and local readers rece
         client: async options => { request = options; return { searchablePdfUrl: 'https://api.ocr.space/parse/image/temporary.pdf', parsedText: 'Victory\\nShards', exitCode: 1, processingTimeMs: 123 }; },
         downloadPdf: async url => { downloaded = url; return pdf; },
         renderPdf: async bytes => { rendered = bytes; return png; },
-        readRasterMetadata: async () => ({ width: 1920, height: 1080 }), sourceDimensions, normalizeRaster, sourceDimensions, normalizeRaster,
+        readRasterMetadata: async () => ({ width: 1920, height: 1080 }), sourceDimensions, normalizeRaster,
     });
     assert.equal(request.engine, 2);
     assert.equal(request.createSearchablePdf, true);
@@ -60,6 +60,9 @@ test('OCR.Space Engine 2 processes the source image first and local readers rece
     assert.equal(result.rasterSha256, crypto.createHash('sha256').update(png).digest('hex'));
     assert.equal(result.pdfBuffer, pdf);
     assert.equal(result.rasterBuffer, png);
+    assert.equal(result.rasterNormalization.method, 'source-aspect-top-aligned-crop-v1');
+    assert.equal(result.sourceWidth, 1920);
+    assert.equal(result.sourceHeight, 1080);
     assert.equal(result.providerText, 'Victory\\nShards');
 });
 
@@ -144,6 +147,7 @@ test('durable provider-start checkpoint completes before the OCR.Space request',
         downloadPdf: async () => pdf,
         renderPdf: async () => png,
         readRasterMetadata: async () => ({ width: 1920, height: 1080 }),
+        sourceDimensions, normalizeRaster,
     });
     assert.deepEqual(order, ['checkpoint', 'provider']);
     assert.equal(result.status, 'complete');
