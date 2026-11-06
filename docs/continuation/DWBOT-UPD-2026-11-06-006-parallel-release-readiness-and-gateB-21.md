@@ -208,3 +208,37 @@ source SHA-256 values, bound to the current v6 JSON SHA-256. Its usePolicy now
 distinguishes the full 63-image exploratory archive from the approved 21-image
 Gate B subset. The embedded manifest inside the original candidate ZIP and its
 fixed preflight fingerprint remain unchanged for provenance and reproducibility.
+
+
+## Intake, queue and process-resource audit
+
+Inspected attachment-download.js, desktop-bridge.js,
+serial-task-queue.js, ocr-process-supervisor.js and their corresponding
+download, desktop bridge, queue, supervisor and Windows cancellation tests.
+
+- Discord attachment downloads reject declared over-limit sizes before
+  transfer, use a 30-second AbortSignal timeout by default, enforce the
+  25 MiB cap while streaming, cancel the response reader when the cap is
+  exceeded, and reject empty bodies.
+- Desktop upload enforces the same 25 MiB cap, uses a 120-second request
+  timeout and 15-second header timeout, caps concurrent uploads at two
+  (default one), and has tests for exact 25 MiB acceptance, over-limit
+  rejection and concurrency-slot release.
+- The desktop bridge does not buffer bytes beyond the limit, but for
+  chunked requests without an oversized Content-Length it continues draining
+  the request after crossing the cap before returning 413. Memory is bounded
+  and request time is bounded by the server timeout, but early connection
+  termination would further reduce bandwidth/CPU exposure. Track as a
+  hardening opportunity; no production code changed in this audit.
+- The serial queue is single-consumer and bounded (default eight outstanding,
+  90-second task deadline). It performs timeout cleanup, waits for work to
+  settle, and halts the queue if cleanup or settlement cannot be confirmed.
+- The process supervisor uses no shell, caps combined child output at 10 MiB,
+  has an independent process deadline, kills process trees (Windows taskkill
+  /T /F with direct-child fallback), and requires child close confirmation.
+  Unconfirmed termination raises SERIAL_TASK_UNSETTLED and the queue fails
+  closed.
+- Contract tests exist for bounded attachment reads, 25 MiB desktop upload,
+  upload concurrency, queue backpressure/timeout/cleanup, process-tree
+  termination and Windows cancellation. Exact-head CI remains pending; no
+  pass is claimed until these tests execute on the final commit.

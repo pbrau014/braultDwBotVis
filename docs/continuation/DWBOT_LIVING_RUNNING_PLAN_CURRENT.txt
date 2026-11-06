@@ -5235,3 +5235,13 @@ END DWBOT-UPD-2026-11-06-007
   non-streaming OCR JSON response.json fallback, in addition to the PDF
   arrayBuffer fallback. Track both as hardening opportunities; streaming
   runtime paths are bounded.
+
+- Intake/worker source audit completed: Discord download is streamed/cancelled
+  at 25 MiB with a 30-second timeout; desktop uploads are 25 MiB with a
+  120-second request timeout, 15-second header timeout and max-two concurrency
+  (default one); the serial queue is single-consumer and fails closed if worker
+  cleanup/settlement cannot be confirmed; the process supervisor kills child
+  trees and waits for close confirmation. Remaining hardening opportunity:
+  desktop chunked uploads are drained after crossing the byte cap until request
+  completion/timeout rather than being immediately terminated. No source code
+  was changed for this audit.
