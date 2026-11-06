@@ -141,3 +141,19 @@ non-repeatable; the current 16-image runner has not yet gained an
 artifact-bound resume path. Do not re-trigger the full 16-image batch until
 such a path is implemented and the existing first-image artifacts are
 explicitly incorporated.
+
+
+## 8. Runtime floor reconciliation — 2026-11-06
+
+The later user-authorized runtime decision recorded in `plan1.txt`, the
+current living plan and `package.json` supersedes older Node 24.17.0 / 24.22.1
+minimum statements in this document. The current accepted minimum is
+**Node.js >=22.16.0**. Node.js 24+ remains permissible but is not mandatory.
+The current Gate A workflow uses Node 22.16.0 and its explicit runtime check
+uses the same floor.
+
+Accordingly, the earlier statements in sections 1, 5, 6 and 7 describing
+Node 22.16.0 as below the accepted runtime are historical and superseded.
+This correction does not change Gate A's status: the interrupted run still
+contains only 1/16 PDF/raster pairs and lacks its original restricted-egress
+diagnostic log. Gate A remains NOT PASSED.
