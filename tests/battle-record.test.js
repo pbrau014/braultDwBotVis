@@ -157,6 +157,32 @@ test('disagreement marks only the affected field as missing instead of silently 
     assert.equal(record.damage, '305916');
 });
 
+test('map consensus keeps title-case spelling over a higher-confidence lowercase CV read', () => {
+    const fields = completeFields({
+        metadataCandidates: [
+            { text: 'Shards — Asymmetric Battle\\nBattle start time: 22.10.2026 21:24', confidence: 93, weight: 1, source: 'source-metadata-psm6' },
+            { text: 'Shards — Asymmetric Battle\\nBattle start time: 22.10.2026 21:24', confidence: 93, weight: 1, source: 'source-metadata-psm11' },
+            { text: 'shards — Asymmetric Battle\\nBattle start time: 22.10.2026 21:24', confidence: 94, weight: 0.55, source: 'opencv-metadata' },
+        ],
+    });
+    const record = buildBattleRecord('Victory!', fields);
+    assert.equal(record.map, 'Shards');
+});
+
+test('map consensus fails closed when every OCR spelling is lowercase or all-uppercase', () => {
+    for (const spelling of ['shards', 'SHARDS']) {
+        const fields = completeFields({
+            metadataCandidates: [
+                { text: `${spelling} — Asymmetric Battle\\nBattle start time: 22.10.2026 21:24`, confidence: 95 },
+                { text: `${spelling} — Asymmetric Battle\\nBattle start time: 22.10.2026 21:24`, confidence: 91 },
+            ],
+        });
+        const record = buildBattleRecord('Victory!', fields);
+        assert.equal(record.map, NOT_DETECTED);
+        assert.match(record.ambiguities.map, /capitalization was not corroborated/i);
+    }
+});
+
 test('conflicting result, map or identity readings are sent for correction', () => {
     const fields = completeFields({
         identityCandidates: [

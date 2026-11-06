@@ -316,6 +316,18 @@ function weightedTextWinner(groups, fieldKey) {
     return null;
 }
 
+function preferredMapSpelling(group) {
+    const supported = group.candidates.filter((candidate) => {
+        const letters = String(candidate.value || '').match(/\\p{L}/gu) || [];
+        const first = String(candidate.value || '').trim().match(/^\\p{L}/u)?.[0];
+        const initialIsUppercase = first && first === first.toLocaleUpperCase() && first !== first.toLocaleLowerCase();
+        const hasLowercase = letters.some((letter) => letter === letter.toLocaleLowerCase() && letter !== letter.toLocaleUpperCase());
+        return Boolean(initialIsUppercase && hasLowercase);
+    });
+    supported.sort((a, b) => b.weight - a.weight || b.confidence - a.confidence);
+    return supported[0]?.value || null;
+}
+
 function consensus(candidates, fieldKey, ambiguities, label, singleReadConfidence = 85) {
     const usable = candidates
         .map((candidate) => typeof candidate === 'object' && candidate !== null
@@ -337,7 +349,17 @@ function consensus(candidates, fieldKey, ambiguities, label, singleReadConfidenc
     }
     if (grouped.size > 1) {
         const winner = weightedTextWinner(grouped, fieldKey);
-        if (winner) return winner.value;
+        if (winner) {
+            if (fieldKey === 'map') {
+                const spelling = preferredMapSpelling(winner);
+                if (!spelling) {
+                    ambiguities[fieldKey] = 'Map capitalization was not corroborated by a title-case OCR reading';
+                    return NOT_DETECTED;
+                }
+                return spelling;
+            }
+            return winner.value;
+        }
         ambiguities[fieldKey] = `${label} OCR passes disagreed: ${[...grouped.values()].map((group) => group.value).join(' vs ')}`;
         return NOT_DETECTED;
     }
@@ -346,6 +368,14 @@ function consensus(candidates, fieldKey, ambiguities, label, singleReadConfidenc
     if (onlyGroup.candidates.length < 2 && onlyGroup.candidates[0].confidence < singleReadConfidence) {
         ambiguities[fieldKey] = `${label} was readable in only one OCR pass (confidence ${Math.round(onlyGroup.candidates[0].confidence)}%); another agreeing read or manual correction is needed`;
         return NOT_DETECTED;
+    }
+    if (fieldKey === 'map') {
+        const spelling = preferredMapSpelling(onlyGroup);
+        if (!spelling) {
+            ambiguities[fieldKey] = 'Map capitalization was not corroborated by a title-case OCR reading';
+            return NOT_DETECTED;
+        }
+        return spelling;
     }
     return onlyGroup.value;
 }
