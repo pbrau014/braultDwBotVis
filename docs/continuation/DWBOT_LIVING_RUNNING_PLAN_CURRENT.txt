@@ -1,18 +1,18 @@
 ================================================================================
 LATEST NODE.JS RUNTIME AUTHORIZATION — 2026-11-05
 ================================================================================
-Status: ACTIVE / GOVERNING / SUPERSEDES ANY OLDER NODE 24+ MINIMUM OR BLOCKER. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
+Status: ACTIVE / GOVERNING / SUPERSEDES ANY OLDER NODE 24+ MINIMUM OR BLOCKER.
 
 - Node.js v22.16.0 is explicitly authorized and acceptable for DWBOT work,
   installation, tests, OCR acceptance and candidate verification. It is
   acceptable in place of previously stated Node.js 24+, >=24.17.0 or
-  v24.22.1 requirements. Do not block, defer, fail or label work unsupported [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
+  v24.22.1 requirements. Do not block, defer, fail or label work unsupported
   solely because it runs under Node.js v22.16.0.
 - Current package.json and package-lock.json both declare engines.node
   >=22.16.0. The current GitHub Actions Linux, Windows and package-verification
   lanes use Node.js 22.16.0. No manifest, lockfile or workflow version change
   is required to enact this authorization.
-- Node.js 24 remains permissible, but is not mandatory. Use it only when a [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
+- Node.js 24 remains permissible, but is not mandatory. Use it only when a
   specific dependency, tool or test is proven to require it; document that
   narrow reason and keep its result separate from the Node 22.16.0 baseline.
 - This runtime authorization does not waive operating-system or tool-specific
@@ -23,7 +23,7 @@ Status: ACTIVE / GOVERNING / SUPERSEDES ANY OLDER NODE 24+ MINIMUM OR BLOCKER. [
   exit codes and artifacts. Historical reports that actually ran on Node 24
   remain valid evidence for those exact runs; their runtime does not become
   the current minimum.
-- Older statements below that call Node 24+, >=24.17.0 or v24.22.1 mandatory, [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
+- Older statements below that call Node 24+, >=24.17.0 or v24.22.1 mandatory,
   unsupported, a release blocker or a prerequisite are superseded by this
   authorization. Their recorded historical test outcomes and provenance
   remain unchanged; apply this rule when interpreting their old next steps.
@@ -3096,7 +3096,7 @@ The original report completed 16/16 images, with 5/16 exact nine-field records, 
 
 ### Exact next actions, ordered
 
-1. Extract RC3 into a fresh Windows directory and use Node.js `v24.22.1` or later. Run `npm ci`, `npm ls --depth=0`, `npm test`, `npm run test:ocr-watchdog`, and `npm run test:tesseractjs`; preserve exit codes, full logs, the `acceptance-report.json`, negative-control baseline and all per-fixture JSON reports.
+1. Extract RC3 into a fresh Windows directory and use Node.js `v24.22.1` or later. Run `npm ci`, `npm ls --depth=0`, `npm test`, `npm run test:ocr-watchdog`, and `npm run test:tesseractjs`; preserve exit codes, full logs, the `acceptance-report.json`, negative-control baseline and all per-fixture JSON reports. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 2. Require **all 12 acceptance stages to pass**. If reward geometry helps a field but introduces regressions elsewhere, inspect geometry anchors, crop rectangles and each PSM/width read. Never trim a digit based solely on expected values. Leave ambiguous mandatory fields missing and routed for correction.
 3. Specifically recheck reported damage (`87373` vs `873131`), Hoffmann XP/Free XP and map, Libertad player/Credits/XP/Free XP/damage, and Schlieffen map/XP/Free XP. The generic map cleanup has unit tests but only the real exact-match corpus can establish the fix.
 4. After isolated lifecycle gate and accuracy corpus pass on the same current build, add first/middle/final recognition-pass stall injection and run sequential/no-overlap recovery tests. Do not assume old RC2 results cover changed RC3 source.
