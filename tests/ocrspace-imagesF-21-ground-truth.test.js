@@ -55,6 +55,10 @@ test('Gate B requires 21 labels, verified artifacts, zero wrong acceptance and c
     assert.match(evaluator, /\"localReaders\"/);
     assert.match(evaluator, /gateAPassAndLockedCandidateFingerprintRequired/);
     assert.match(evaluator, /zeroWronglyAcceptedMandatoryFieldValues/);
+    assert.match(evaluator, /zeroUnresolvedMandatoryFieldValues/);
+    assert.match(evaluator, /all21CompleteNineFieldRecordsExactPerEngine/);
+    assert.match(evaluator, /zeroWrongUnacceptedCandidatesForGateBPass/);
+    assert.match(evaluator, /engine_acceptance_complete/);
     assert.match(evaluator, /zeroUnauthorizedNetworkAttempts/);
     assert.match(evaluator, /gate_b = "PASS"/);
 });
