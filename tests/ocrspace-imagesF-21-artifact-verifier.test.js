@@ -72,13 +72,13 @@ const workflowSourceText="OCRSPACE_ENABLED: '0'\\nOCRSPACE_NETWORK_ALLOWLIST: '0
 const metadataFor = async buffer => buffer.toString('utf8').startsWith('source-image-bytes-')
   ? {width:1920,height:1080} : {width:1600,height:900};
 
-test('verifies all 21 PDF/raster pairs, searchable text, source fingerprints, local readers and security evidence', async t => {
+test('verifies all 19 Gate B PDF/raster pairs, searchable text, source fingerprints, local readers and security evidence', async t => {
   const f=await fixture(t);
   const raster=png(1600,900);
   const report=await verifyArtifacts({...f,preflightReport:f.preflightPath,freshPreflightReport:f.freshPreflightPath,groundTruth:f.gtPath,runReport:f.runPath,workflowSourceText,apiKey:'not-a-real-secret',
     renderPdf:async()=>raster,readMetadata:metadataFor,toRawRgba:async()=>Buffer.from('same-pixels'),readPdfText:async()=> 'searchable text'});
   assert.equal(report.status,'VERIFIED');
-  assert.equal(report.inventorySelection.verifiedImageCount,21);
+  assert.equal(report.inventorySelection.verifiedImageCount,19);
   assert.equal(report.checks.pdfIntegrity,'PASS');
   assert.equal(report.checks.searchablePdfTextLayer,'PASS');
   assert.equal(report.checks.pdfDerivedRasterProvenance,'PASS');
@@ -105,4 +105,16 @@ test('missing network log or secret is not treated as a clean security result', 
   assert.equal(report.checks.networkRestriction,'FAIL');
   assert.equal(report.checks.secretLeakScan,'NOT_VERIFIED');
   assert.equal(report.checks.unauthorizedNetworkAttempts,null);
+});
+
+
+test('missing local-recovery network log fails closed even when original log is present', async t => {
+  const f=await fixture(t);
+  const report=await verifyArtifacts({...f,recoveryNetworkLogPath:path.join(f.root,'missing-recovery.log'),
+    preflightReport:f.preflightPath,freshPreflightReport:f.freshPreflightPath,groundTruth:f.gtPath,runReport:f.runPath,
+    workflowSourceText,apiKey:'not-a-real-secret',renderPdf:async()=>png(1600,900),
+    readMetadata:metadataFor,toRawRgba:async()=>Buffer.from('same-pixels'),readPdfText:async()=> 'searchable text'});
+  assert.equal(report.status,'FAILED');
+  assert.equal(report.checks.localRecoveryNetworkRestriction,'FAIL');
+  assert.equal(report.checks.localRecoveryNetworkLogMatchesReport,false);
 });
