@@ -43,7 +43,9 @@ jobs:
           package-manager-cache: false
 
       - name: Install preflight dependencies
-        run: npm ci --no-audit --no-fund
+        run: |
+          npm ci --no-audit --no-fund
+          node --check scripts/run-gateA-parallel-reader-matrix.js
 
       - name: Verify completed Gate B source run fingerprint
         shell: powershell

@@ -5586,3 +5586,23 @@ PARALLEL OCR READER MATRIX — 2026-11-06
   despite the governing Node 22.16.0 authority; this mismatch is corrected.
 - Exact-head CI and the no-provider Gate B workflow are pending. Gate B and
   production remain NOT PASSED / NO-GO.
+
+ 
+GATE A PARALLEL MATRIX IMPLEMENTED — 2026-11-06
+- Added a Gate A post-extraction, no-provider diagnostic step. It reuses only
+  the existing 16-image Gate A report, PDF audit, searchable PDFs and saved
+  PDF-derived rasters. Each PDF/raster pair is hash-checked and the saved
+  raster must be pixel-identical to a fresh render of that PDF before any
+  local reader starts.
+- Tesseract.js, native Tesseract and PaddleOCR run concurrently in isolated
+  child processes; Ghostscript searchable-PDF text extraction runs concurrently.
+  OpenCV proposes PaddleOCR crops. The matrix records individual metrics,
+  four-source majority and three-local-reader consensus, model manifest hash,
+  per-image failures and blocked-egress evidence.
+- Gate A's acceptance summary now requires a complete 16-image matrix and
+  zero local restricted-egress attempts in addition to its existing exact
+  nine-field, PDF, fingerprint and network requirements. Matrix candidates
+  remain diagnostic; no reader output is auto-accepted.
+- Current Gate A source evidence remains incomplete (only one PDF/raster
+  artifact and missing original source archive). The workflow changes do not
+  create or submit any provider request; Gate A remains NOT PASSED.

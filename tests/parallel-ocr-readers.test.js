@@ -28,6 +28,8 @@ test('PaddleOCR uses OpenCV crop geometry and explicit local-only models', () =>
     assert.match(helper, /block_network\(\)/);
     assert.match(child, /candidatesByField/);
     assert.match(child, /diagnostic candidates only/);
+    assert.match(child, /modelManifestSha256/);
+    assert.match(child, /modelManifestSha256/);
 });
 
 test('parallel outputs are source-PDF and source-raster hash bound while prior readers are preserved', () => {
@@ -36,4 +38,14 @@ test('parallel outputs are source-PDF and source-raster hash bound while prior r
     assert.match(recovery, /sourceRasterSha256: row\.rasterSha256/);
     assert.match(recovery, /sourcePdfSha256: row\.pdfSha256/);
     assert.match(recovery, /originalScreenshotFallback: false/);
+});
+
+
+test('Gate A parallel matrix reuses verified artifacts and never submits OCR.Space requests', () => {
+    const matrix = read('scripts/run-gateA-parallel-reader-matrix.js');
+    assert.match(matrix, /Promise\.allSettled/);
+    assert.match(matrix, /noProviderRequests:true/);
+    assert.match(matrix, /fourSourceMajority/);
+    assert.match(matrix, /renderSearchablePdfPage/);
+    assert.match(matrix, /provider requests=0/);
 });

@@ -205,6 +205,7 @@ async function main() {
                 ...ENGINES.map(engine => ({ engine, run: () => extractLocalReader(rasterBuffer, engine, networkLogPath) })),
                 { engine: 'pdf-text-layer', run: async () => {
                     const text = await extractPdfText(pdfPath);
+                    if (!text.trim()) { const error = new Error('Searchable PDF text layer is empty.'); error.code = 'PDF_TEXT_LAYER_EMPTY'; throw error; }
                     return { engine: 'pdf-text-layer', status: 'complete', record: parseTextLayer(text),
                         textCharacters: text.length, textSha256: sha256(Buffer.from(text, 'utf8')) };
                 } }
@@ -252,7 +253,6 @@ async function main() {
             };
             image.parallelEngines = row.parallelReaderMatrix.enginesCompleted;
             image.pdfTextLayer = pdfTextLayer.status;
-            if (pdfTextLayer.status !== 'complete') image.failures.push({ engine: 'pdf-text-layer', code: 'PDF_TEXT_LAYER_UNAVAILABLE', message: 'Searchable PDF text extraction failed.' });
             recovery.images.push(image);
         }
     } finally {
@@ -292,8 +292,11 @@ async function main() {
     if (recovery.status !== 'COMPLETED_LOCAL_ONLY_RECOVERY') process.exitCode = 1;
 }
 
-main().catch(async error => {
-    await bot.terminateOcrWorker().catch(() => {});
-    console.error('[DWBOT-LOCAL-READER-RECOVERY] FAILED:', String(error.message || error).slice(0, 1000));
-    process.exitCode = 1;
-});
+if (require.main === module) {
+    main().catch(async error => {
+        await bot.terminateOcrWorker().catch(() => {});
+        console.error('[DWBOT-LOCAL-READER-RECOVERY] FAILED:', String(error.message || error).slice(0, 1000));
+        process.exitCode = 1;
+    });
+}
+module.exports = { extractLocalReader, sha256, safePath };

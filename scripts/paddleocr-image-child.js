@@ -30,7 +30,9 @@ async function main() {
     const imageBuffer = Buffer.concat(chunks);
     if (!imageBuffer.length) throw new Error('PaddleOCR received an empty raster.');
     const dimensions = await imageProcessor.metadata(imageBuffer);
-    const cvAnalysis = await opencv.analyze(imageBuffer, { force: true, timeoutMs: 5000 });
+    let cvAnalysis;
+    try { cvAnalysis = await opencv.analyze(imageBuffer, { force: true, timeoutMs: 5000 }); }
+    catch (error) { cvAnalysis = { status: 'failed', error: String(error.message || error).slice(0, 300), regions: {} }; }
     const fields = { cvFieldIsolation: cvAnalysis };
     await paddle.applyFieldFallback({
         imageBuffer, rawText: '', fields,

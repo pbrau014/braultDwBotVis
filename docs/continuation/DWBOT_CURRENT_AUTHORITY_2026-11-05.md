@@ -217,3 +217,15 @@ The canonical living plan controls the operational queue and supersedes older da
 - Runtime authority is Node.js >=22.16.0. Package manifest, lockfile, active
   workflows and tests now agree. Historical workflow runtime reports remain
   unchanged and are not rewritten.
+
+ 
+## Gate A parallel-reader implementation — 2026-11-06
+- The Gate A workflow now provisions pinned local PaddleOCR/PP-OCRv6 models,
+  then runs a no-provider matrix over its existing verified PDF artifacts.
+  Each saved raster must be pixel-identical to a fresh PDF render. Three local
+  readers and PDF text-layer extraction run concurrently. The Gate A summary
+  requires all 16 artifacts and all readers to complete with zero blocked
+  local egress; the diagnostic candidates themselves are not auto-accepted.
+- Existing Gate A evidence is still incomplete and cannot pass until a complete
+  source-bound 16-image artifact set exists. The workflow will not resubmit
+  images as part of matrix evaluation.

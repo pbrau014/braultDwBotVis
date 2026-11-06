@@ -102,6 +102,13 @@ jobs:
           $python = Join-Path $runtimeRoot 'venv\Scripts\python.exe'
           $det = Join-Path $runtimeRoot 'models\PP-OCRv6_medium_det'
           $rec = Join-Path $runtimeRoot 'models\PP-OCRv6_medium_rec'
+          $modelManifest = Join-Path $runtimeRoot 'models\paddleocr-model-manifest.json'
+          $installManifest = Join-Path $runtimeRoot 'install-manifest.json'
+          $evidence = Join-Path $env:GITHUB_WORKSPACE 'testdata\ocr-acceptance'
+          New-Item -ItemType Directory -Force $evidence | Out-Null
+          Copy-Item $modelManifest (Join-Path $evidence 'paddleocr-model-manifest.json') -Force
+          Copy-Item $installManifest (Join-Path $evidence 'paddleocr-install-manifest.json') -Force
+          "PADDLEOCR_MODEL_MANIFEST=$modelManifest" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           foreach ($item in @($python, $det, $rec)) { if (-not (Test-Path $item)) { throw "PaddleOCR local runtime component missing: $item" } }
           "PADDLEOCR_PYTHON_BIN=$python" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           "PADDLEOCR_DET_MODEL_DIR=$det" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
@@ -341,5 +348,7 @@ jobs:
             testdata/ocr-acceptance/network-log-reconciliation.json
             testdata/ocr-acceptance/network-log-reconciliation.txt
             testdata/ocr-acceptance/fresh-imagesF-63-preflight.json*
+            testdata/ocr-acceptance/paddleocr-model-manifest.json
+            testdata/ocr-acceptance/paddleocr-install-manifest.json
           if-no-files-found: warn
           retention-days: 30
