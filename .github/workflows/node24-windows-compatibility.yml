@@ -1,4 +1,4 @@
-name: Additional Windows Node 24 compatibility verification
+name: Windows Node 26.13.0 OCR and normalization verification
 
 on:
   push:
@@ -15,17 +15,17 @@ on:
       - "scripts/prepare-gateA-16-resume.js"
       - "scripts/verify-ocrspace-imagesF-21-artifacts.js"
       - "tests/**"
-      - ".github/workflows/node24-windows-compatibility.yml"
+      - ".github/workflows/node26-windows-compatibility.yml"
 
 permissions:
   contents: read
 
 concurrency:
-  group: node24-windows-compatibility-${{ github.ref }}
+  group: node26-windows-compatibility-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  windows-node24:
+  windows-node26:
     runs-on: windows-latest
     timeout-minutes: 90
     steps:
@@ -33,10 +33,10 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Setup Node.js 24.22.1 (additional compatibility target)
+      - name: Setup Node.js 26.13.0 (project standard)
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 24.22.1
+          node-version: 26.13.0
           cache: npm
           package-manager-cache: false
       - name: Verify ImageMagick for raster tests
