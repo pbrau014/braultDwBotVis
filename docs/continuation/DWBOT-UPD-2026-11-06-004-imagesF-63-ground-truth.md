@@ -43,3 +43,9 @@ The manual transcription is independent of the OCR run outputs, and selected dis
 - Archive download and 63-image preflight passed. At the time of this update, the PDF-first provider extraction step was still running; no provider/PDF/raster counts or accuracy results are claimed until the run completes and its artifact is inspected.
 
 The workflow now ignores ground-truth, evaluation, and continuation-documentation-only commits so these bookkeeping changes cannot accidentally trigger another billable 63-image provider submission run. Manual `workflow_dispatch` remains available.
+
+## Versioned working artifacts
+
+- Workbook attachment: `DWBOT_IMAGESF_63_ground_truth_working_v6.xlsx`; SHA-256 `fa5f5c6b15185678b93d917e9be49cb3dfef697bdf13bc939a73ceab4bd6df73`.
+- Machine-readable repository reference: `testdata/ground-truth/imagesF-63-working-ground-truth-v6.json`; SHA-256 `9db97e8fbb4f74eac423040cb0f99ce5da98e75758cb0b36b3f4cdac15ab340d`.
+- The v5 JSON snapshot is retained at its original path with its original checksum; v6 carries the reviewer-provenance qualification.
