@@ -27,6 +27,7 @@ const { numericValueOrNull } = require('../src/battle-record');
 const { compareExpected } = require('../src/acceptance-checks');
 const { createOcrReportMetadata } = require('../src/ocr-report-metadata');
 const { failProgressRecord, createProgressRecord, markJobStarted, recordJobResult, finishProgressRecord, writeJsonAtomically } = require('../src/ocr-sequence-checkpoint');
+const { validateSequenceResume, classifySequenceResumeRow } = require('../src/ocr-sequence-resume');
 const packageInfo = require('../package.json');
 const root = path.join(__dirname, '..');
 const specs = {
@@ -76,6 +77,30 @@ function selectedSpecs(args) {
 
 let activeProgress = null;
 let activeProgressPath = null;
+
+
+async function verifyCompletedSequenceArtifacts(row, imageSha256) {
+    const evidence = row?.ocrSpacePdfFirst || {};
+    const artifactDir = path.resolve(String(process.env.OCRSPACE_ARTIFACT_DIR || ''));
+    const pdfPath = path.resolve(String(evidence.artifacts?.pdf || ''));
+    const rasterPath = path.resolve(String(evidence.artifacts?.raster || ''));
+    const inside = target => Boolean(artifactDir) && target.startsWith(artifactDir + path.sep);
+    if (evidence.sourceSha256 !== imageSha256 || !inside(pdfPath) || !inside(rasterPath)) return { valid: false, reason: 'PDF/raster paths or source hash do not bind to this inventory and artifact directory.' };
+    try {
+        const [pdf, raster] = await Promise.all([fs.readFile(pdfPath), fs.readFile(rasterPath)]);
+        const pdfSha256 = crypto.createHash('sha256').update(pdf).digest('hex');
+        const rasterSha256 = crypto.createHash('sha256').update(raster).digest('hex');
+        const pdfEof = pdf.subarray(Math.max(0, pdf.length - 1024)).includes(Buffer.from('%%EOF'));
+        const pngSignature = raster.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+        const valid = pdf.subarray(0, 5).toString('ascii') === '%PDF-'
+            && pdfEof && pdfSha256 === evidence.pdfSha256
+            && rasterSha256 === evidence.rasterSha256 && pngSignature
+            && pdf.length === evidence.pdfBytes && raster.length === evidence.rasterBytes;
+        return { valid, reason: valid ? null : 'PDF/raster signature, byte count or SHA-256 mismatch.', pdfSha256, rasterSha256, pdfBytes: pdf.length, rasterBytes: raster.length };
+    } catch (error) {
+        return { valid: false, reason: 'Previously completed PDF/raster cannot be read: ' + String(error.message || error).slice(0, 300) };
+    }
+}
 
 function getNetworkIsolation() {
     const logPath = String(process.env.OCR_NON_OCR_NETWORK_LOG || '').trim();
