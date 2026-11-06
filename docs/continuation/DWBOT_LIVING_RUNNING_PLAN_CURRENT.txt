@@ -1,4 +1,94 @@
 ================================================================================
+CURRENT OCR.SPACE IMPLEMENTATION STATUS — 2026-11-05
+================================================================================
+
+Canonical main HEAD before this plan update: 2f34557a200341e818349ac0e072980961415ec2.
+
+Active pipeline now committed:
+- OCR.Space Engine 2 receives each original screenshot first and requests a
+  searchable PDF. The PDF text layer is hidden from page rendering but remains
+  searchable/extractable, preventing duplicate overlay text when local readers
+  rasterize the PDF.
+- The PDF is downloaded with HTTPS host/redirect/size/signature/timeout checks,
+  then rendered locally to a bounded PNG raster. Tesseract.js and native
+  Tesseract process that raster; OpenCV geometry and optional PaddleOCR also
+  operate downstream on that raster. No local reader falls back to the original
+  screenshot after successful PDF creation.
+- A configured OCR.Space/PDF/raster failure is fail-closed. Normal bot startup
+  requires OCRSPACE_API_KEY. OCRSPACE_ENABLED=0 is explicit local-only
+  development/test mode.
+- The former crop-only OCR.Space refinement path has been removed from the
+  active bot. src/ocrspace-field-evidence.js and src/ocrspace-prepass.js remain
+  only as legacy helpers/tests and are not called by the current pipeline.
+  Exactly one OCR.Space source-image request/PDF is made per screenshot.
+- The 4-/16-image Windows acceptance wrapper now runs with OCRSPACE_ENABLED=1,
+  requires OCRSPACE_API_KEY, permits only HTTPS OCR.Space API/PDF hosts, and
+  retains PDF/raster artifacts for the repo's existing public fixture corpora.
+- The 64-image runner is registered as npm run test:ocrspace-64. It requires
+  OCRSPACE_64_ARCHIVE_PATH and OCRSPACE_64_IMAGE_ROOT; verifies the exact ZIP
+  size 57,665,767 bytes and SHA-256
+  e32e43991ab90d6e2ca3e060f264456d175d0e93390f273d7f3a3f5d93fa98a2, then checks
+  every member's size and SHA before any OCR.Space request. It creates one PDF
+  per image and runs Tesseract.js/native Tesseract on each PDF-derived raster.
+  The Windows wrapper invokes it when both paths are provided; otherwise it
+  records the 64-image corpus as BLOCKED and the combined acceptance does not
+  pass. Its full PDF/text artifacts are kept outside the shared CI evidence
+  directory.
+- The 64 inventory has 64 source images, 56 user-verified visible-field eligible
+  and 8 user-excluded. It has no independently transcribed nine-field ground
+  truth; extraction may be reported, exact accuracy must remain NOT EVALUABLE.
+- Archive metrics are reconciled: 58,090,288 bytes is the sum of the 64
+  uncompressed image files; 57,665,767 bytes is the ZIP size. The expected ZIP
+  SHA above is the source provenance fingerprint, not a conflicting metric.
+
+Recent source commits:
+666d24dcd712ad65d6610404daeda78d35fdb266 — OpenCV reward-band fallback.
+5ba3092580fb6804f5ff6eb77cbecde9c922b42d — corroborated title-case map consensus.
+74d16f556e96ffc827ddfc0cf558936b3a8c2da9 — OCR.Space Engine 2 PDF-first path.
+c9d0c73ad7ee6ae7457d48ae76c422d860445b9a — PDF download/upload normalization
+and mocked tests.
+8cabbd06bbcf579acab7134a4221914e6b91194b — bot PDF-first enforcement,
+artifacts, network allowlist and Actions secret wiring.
+951cf23ac3fa7d1234674c1e2fb8a3a678e083d1 — hidden searchable PDF text layer.
+194d16c992219e07b79645c2ff91476cdf39994b — 64-image runner and npm script.
+508ac2952ae877cdb9f049e1639c0196d1e39a22 — exact archive/member provenance
+checks and archive metric correction.
+41e73dd65d73234fee8d53768d3a7913416cf97c — Windows acceptance invokes 64 runner
+when source archive paths are provided and reports missing prerequisites.
+cc227daf6bba049bc18c4967445415329de2c186 — keeps 64-image output outside
+shared CI evidence artifacts.
+2f34557a200341e818349ac0e072980961415ec2 — removes obsolete OCR.Space crop
+refinement from active bot; marks crop-only helper modules legacy.
+
+Local smoke evidence (not current Windows/provider acceptance):
+- Six PDF-first mocked contract tests passed, 6/6, in an isolated Node 22.16
+  scratch harness. This is not the full exact-head project suite.
+- ImageMagick successfully rendered a synthetic searchable-PDF page from
+  stdin to PNG (3200×1800). A 1,631,568-byte 16-corpus PNG fixture normalized
+  locally to 187,013 bytes (2558×1439, JPEG quality 86), below the 1 MiB limit.
+  This validates the local helper path only, not OCR.Space response behavior or
+  Windows PDF delegate behavior.
+
+CI and live-provider status:
+- Exact-head workflow run 42139344194 on the current code commit was PENDING
+  at last check, with no jobs started. It is queued behind older run
+  42133060580, whose Windows screenshot acceptance remains IN_PROGRESS on
+  older source 9dd3fa87a497894b4f84962a2a6a4c9293e94b7c. The old run is not
+  evidence for PDF-first acceptance; its log endpoint returned BlobNotFound.
+- The local container has no OCRSPACE_API_KEY. The GitHub Actions secret
+  OCRSPACE_API_KEY is referenced but its presence/value cannot be inspected
+  here. No live OCR.Space request, provider PDF or actual OCR.Space output has
+  been verified yet.
+- The 4-/16-image corpora have not completed a live PDF-first run. The 64-image
+  archive is absent from the accessible Library and canonical repo; its runner
+  is ready but cannot run until the exact archive and extraction root are
+  supplied. Production remains NO-GO.
+
+================================================================================
+END CURRENT OCR.SPACE IMPLEMENTATION STATUS
+================================================================================
+
+================================================================================
 CURRENT OCRSPACE IMPLEMENTATION UPDATE — 2026-11-05
 ================================================================================
 

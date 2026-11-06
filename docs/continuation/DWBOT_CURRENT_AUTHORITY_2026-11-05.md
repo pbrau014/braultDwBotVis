@@ -7,6 +7,10 @@ The current provider comparison marks Engine 2 searchable-PDF generation support
 
 Production requires OCRSPACE_API_KEY. OCRSPACE_ENABLED=0 is an explicit local-only development/test mode. Live OCR.Space and exact-inventory acceptance remain unverified until the current Windows run and provider reports are inspected.
 
+## Current source checkpoint
+
+Canonical main HEAD at this plan synchronization: 2f34557a200341e818349ac0e072980961415ec2. The current bot has one OCR.Space Engine 2 source-image request per screenshot; crop-only OCR.Space refinement is removed from the active bot. The 64-image PDF-first runner is registered but awaits the verified source archive and extraction root.
+
 ## Canonical source
 - Repository: pbrau014/braultDwBotVis
 - Active branch: main only

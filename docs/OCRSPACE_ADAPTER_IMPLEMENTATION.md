@@ -25,6 +25,7 @@ Network acceptance allows only HTTPS to api.ocr.space and ocr.space for the API 
 
 ## Implementation
 - src/ocrspace-pdf-first.js: Engine 2 image-first request, searchable PDF URL validation, bounded download, PDF signature check, provenance hashes and raster handoff.
+- src/ocrspace-field-evidence.js and src/ocrspace-prepass.js: legacy crop-only helpers retained for historical tests/provenance; not used by the active bot.
 - src/image-processor.js: bounded JPEG upload normalization and searchable-PDF page rendering.
 - src/bot.js: performs PDF-first processing before OpenCV/Tesseract; subsequent readers receive only the PDF raster. Production entrypoint refuses normal startup without OCRSPACE_API_KEY; OCRSPACE_ENABLED=0 is local-only.
 - scripts/block-network.js: OCR.Space-only HTTPS allowlist for acceptance.
