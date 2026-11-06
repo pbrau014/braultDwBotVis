@@ -2725,7 +2725,7 @@ function tournamentHelp() {
         '`!yolo help` — show this help',
         '`!yolo players` — list roster players and IDs',
         '`!yolo panel` — public interactive totals, standings, roster and event leaderboard panel',
-        '`!yolo download-workbook` / `!yolo workbook` — download the Excel source workbook',
+        '`!yolo download-workbook` / `!yolo workbook` — download the Excel source workbook (admin only)',
         '`!yolo export-workbook` — export workbook-compatible JSON (admin)',
         '`!yolo player <name or ID>` — show a player’s scores and 28 game slots',
         '`!yolo add-player <name>` — add a player (admin)',
@@ -3570,13 +3570,13 @@ function tournamentPanelText(view = 'home', event = null) {
 function compactStandingsText() {
     const rows = Tournament.standings(tournamentState);
     if (!rows.length) return 'No players in the tournament yet.';
-    const lines = ['**YOLO Tourney standings — top 20**', '`Rank · Player · Total doubloons · Value`'];
-    rows.slice(0, 20).forEach((row, index) => lines.push(`**${index + 1}. ${row.name}** · ${row.total.toFixed(2)} · $${row.estimatedValue.toFixed(2)}`));
+    const lines = ['**YOLO Tourney standings — top 20**', '`Rank · Player · Total doubloons`'];
+    rows.slice(0, 20).forEach((row, index) => lines.push(`**${index + 1}. ${row.name}** · ${row.total.toFixed(2)}`));
     const totalDoubloons = rows.reduce((sum, row) => sum + row.total, 0);
-    lines.push('', `**All-player aggregate (${rows.length}/${Tournament.MAX_PLAYERS}): ${totalDoubloons.toFixed(2)} doubloons · $${(0.54 * totalDoubloons / 100).toFixed(2)}**`);
-    if (rows.length > 20) lines.push(`Showing top 20 of ${rows.length}; run \`!yolo standings\` for the complete ranking.`);
-    lines.push('Dollar total matches the workbook rule: aggregate unrounded scores first, then apply `=0.54*G12/100`.');
-    return lines.join('\n');
+    lines.push('', `**All-player aggregate (${rows.length}/${Tournament.MAX_PLAYERS}): ${totalDoubloons.toFixed(2)} doubloons**`);
+    if (rows.length > 20) lines.push(`Showing top 20 of ${rows.length}; run ` + '`!yolo standings`' + ` for the complete ranking.`);
+    lines.push('Public standings show tournament points in doubloons only.');
+    return lines.join('\\n');
 }
 
 const YOLO_SLASH_COMMAND = {
