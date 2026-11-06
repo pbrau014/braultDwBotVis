@@ -132,6 +132,9 @@
     }
   },
   "source_reconciliation": "Admiralty_YOLO_Source_Reconciliation_and_Visual_Provenance_v0.1.md",
-  "implementation_verification": "Implementation changes are committed; latest exact-head GitHub verification is pending. Browser/visual verification and live Discord OAuth smoke tests remain open. Do not describe uncompleted checks as passed.",
-  "scoring_source_boundary": "The supplied workbook remains an archival historical source. Current DWBOT Race C01 uses inverse elapsed seconds; tests compare current core/HTML formulas separately from archival workbook formulas. Historical H12 remains internal QA and is not a public award calculation."
+  "implementation_verification": "Implementation changes are committed; latest exact-head GitHub CI is pending. Browser/visual verification and live Discord OAuth smoke tests remain open. Do not describe uncompleted checks as passed.",
+  "scoring_source_boundary": "The supplied workbook remains an archival historical source. Current DWBOT Race C01 uses inverse elapsed seconds; tests compare current core/HTML formulas separately from archival workbook formulas. Historical H12 remains internal QA and is not a public award calculation.",
+  "artifact_verification_checklist": "docs/continuation/DWBOT-OCRSPACE-ARTIFACT-VERIFICATION-CHECKLIST-v1.md",
+  "runtime_baseline": "Node.js >=24.17.0. The legacy 56-image OCR.Space provider acceptance step is opt-in only through workflow_dispatch input run_legacy_56_provider_acceptance; ordinary push verification never submits that batch.",
+  "safe_resume_status": "The 63-image exploratory runner and generic four-image sequence runner now bind resume to exact source/build/runtime/inventory evidence, verify completed PDF/raster hashes, skip completed submissions, and classify ambiguous started/orphan-artifact rows without automatic retry. The interrupted Gate A 16-image candidate run predates this support and remains non-resumable; its first image must not be resubmitted."
 }
