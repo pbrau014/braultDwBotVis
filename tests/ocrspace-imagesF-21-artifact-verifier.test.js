@@ -56,13 +56,17 @@ async function fixture(t) {
   await fs.writeFile(gtPath,JSON.stringify(gt));
   await fs.writeFile(preflightPath,JSON.stringify(preflight));
   await fs.writeFile(freshPreflightPath,JSON.stringify(preflight));
+  const recoveryNetworkLogBytes=await fs.readFile(recoveryNetworkLogPath);
   const run={sourceArchiveSha256,preflightReportSha256:sha(await fs.readFile(preflightPath)),
-    imageCount:63,requiredFields:FIELDS,originalScreenshotFallback:false,results};
+    imageCount:63,requiredFields:FIELDS,originalScreenshotFallback:false,
+    localReaderRecovery:{networkBlockedAttempts:0,networkLogSha256:sha(recoveryNetworkLogBytes)},results};
   const runPath=path.join(root,'run-report.json');
   await fs.writeFile(runPath,JSON.stringify(run));
   const networkLogPath=path.join(root,'blocked-network.log');
+  const recoveryNetworkLogPath=path.join(root,'recovery-network.log');
   await fs.writeFile(networkLogPath,'');
-  return {root,artifactRoot,sourceImageRoot,gtPath,preflightPath,freshPreflightPath,runPath,networkLogPath};
+  await fs.writeFile(recoveryNetworkLogPath,'');
+  return {root,artifactRoot,sourceImageRoot,gtPath,preflightPath,freshPreflightPath,runPath,networkLogPath,recoveryNetworkLogPath};
 }
 const workflowSourceText="OCR_NON_OCR_NETWORK_RESTRICTED: '1'\\nOCR_NON_OCR_NETWORK_LOG: logs/blocked.log";
 const metadataFor = async buffer => buffer.toString('utf8').startsWith('source-image-bytes-')
@@ -79,6 +83,7 @@ test('verifies all 21 PDF/raster pairs, searchable text, source fingerprints, lo
   assert.equal(report.checks.searchablePdfTextLayer,'PASS');
   assert.equal(report.checks.pdfDerivedRasterProvenance,'PASS');
   assert.equal(report.checks.networkRestriction,'PASS');
+  assert.equal(report.checks.localRecoveryNetworkRestriction,'PASS');
   assert.equal(report.checks.secretLeakScan,'PASS');
   assert.equal(report.gateA.status,'PENDING');
 });
