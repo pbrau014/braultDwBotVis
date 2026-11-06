@@ -45,7 +45,7 @@ def main() -> None:
         # treat the directory record as an image or extract its path.
         directory_infos = [i for i in infos if i.is_dir()]
         file_infos = [i for i in infos if not i.is_dir()]
-        if len(directory_infos) != 1 or directory_infos[0].filename not in ("imgsHalf1/", "imgsHalf1\\\\"):
+        if len(directory_infos) != 1 or directory_infos[0].filename != "imgsHalf1/":
             raise RuntimeError(
                 "ZIP must contain exactly the reviewed imgsHalf1/ root directory entry; "
                 f"found {[i.filename for i in directory_infos]!r}"
@@ -63,7 +63,7 @@ def main() -> None:
                 raise RuntimeError(f"Unexpected ZIP member path (expected {prefix} prefix): {member_name!r}")
             name = member_name[len(prefix):]
             posix = PurePosixPath(name)
-            if posix.is_absolute() or len(posix.parts) != 1 or name in ("", ".", "..") or "\\\\" in name:
+            if posix.is_absolute() or len(posix.parts) != 1 or name in ("", ".", "..") or "\\" in name:
                 raise RuntimeError(f"Unsafe or nested ZIP member rejected: {member_name!r}")
             if name in normalized:
                 raise RuntimeError(f"Duplicate normalized ZIP member rejected: {name}")
