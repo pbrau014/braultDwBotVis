@@ -61,7 +61,16 @@ The latest tournament-documentation authority located in the active DWBOT reposi
 - Archive: `Grand_Tournament_Instruction_Set_v3.22.zip`
 - SHA-256: `12a69ee2cf880d7d0ebdf97b4e5fa2eff5290c5808f4aed84bf8256204e48b7e`
 - Repository-preserved source material: `docs/source-baselines/grand-tournament-v3.22/`
+- Materialized Library archive: 27,901,317 bytes; 168 files; 167/167 embedded manifest entries matched; no manifest mismatch.
+- The source archive contains a nested v3.17 ZIP. Its exact size and SHA-256 match the newly uploaded v3.17 archive (`f8efba7f76260665992cbfd57652f2c47ed3f01ee2d0be2fa478f5997c17fa17`), confirming that v3.17 is the preserved historical baseline.
 - Release disposition: GO for publication of the documentation package and reusable templates only, under a prior user-directed documentation-release waiver. It does not certify scoring, OCR, Discord, credentials, an event instance, or production deployment.
+
+A second Library archive named `Grand_Tournament_Instruction_Set_v3.22_Production_Documentati.zip` is a derivative package, not the verified source archive:
+- 25,291,387 bytes; 181 ZIP entries; 169 files.
+- Its manifest lists 167 payloads, but only 166 match; the missing entry is the nested v3.17 ZIP.
+- It also contains two files not listed in its manifest: `yolo_tournament_complete_instruction_set.html` and `yolo_tournament_complete_instruction_set.pdf`.
+- All common files compared byte-for-byte by SHA-256 match the v3.22 source archive; the differences are the omitted nested baseline ZIP and the two unmanifested renderings.
+- Preserve this derivative as historical evidence, but do not describe its own manifest as fully verified.
 
 The newly uploaded v3.17 reorganized package is a verified historical source baseline embedded in the v3.22 history, not the newest governing package:
 
@@ -333,3 +342,5 @@ ADMIN-01 is ready for controlled use when:
 | SRC-11 | PR #12 | [fix/paddleocr-windows-json-output](https://github.com/pbrau014/braultDwBotVis/pull/12) | Draft PR, CI success at reviewed head; not merged |
 | SRC-12 | PR #13 | [fix/pdf-raster-source-aspect-normalization](https://github.com/pbrau014/braultDwBotVis/pull/13) | Draft PR, targeted Windows workflow queued at last check; not verified |
 | SRC-13 | User-authorized DWBOT constraints | Current conversation/project instructions | Nine mandatory fields, local OCR architecture, no duplicate provider calls, production restrictions |
+| SRC-14 | v3.22 source archive | Library `/Grand_Tournament_Instruction_Set_v3.22.zip`; SHA-256 `12a69ee2cf880d7d0ebdf97b4e5fa2eff5290c5808f4aed84bf8256204e48b7e` | 168 files; 167/167 manifest payloads verified; contains the exact v3.17 archive |
+| SRC-15 | v3.22 Production Documentation derivative ZIP | Library `/Grand_Tournament_Instruction_Set_v3.22_Production_Documentati.zip`; SHA-256 `de5a4b89f145f3332a6a82a78a68629ce3e3af94a8536b98ed65da967448a8a5` | 169 files; 166/167 manifest entries match; one nested baseline ZIP absent and two renderings unmanifested; not fully manifest-verified |
