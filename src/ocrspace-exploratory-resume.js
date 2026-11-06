@@ -32,8 +32,16 @@ function classifyResumeRow(row, item) {
         error.code = 'OCRSPACE_RESUME_ROW_MISMATCH';
         throw error;
     }
-    if (row.status === 'pdf-first-complete' && HASH.test(String(row.pdfSha256 || ''))
-        && HASH.test(String(row.rasterSha256 || ''))) return 'skip-complete';
+    const hasVerifiedArtifactReferences = HASH.test(String(row.pdfSha256 || ''))
+        && HASH.test(String(row.rasterSha256 || ''))
+        && typeof row.pdfPath === 'string' && row.pdfPath.length > 0
+        && typeof row.rasterPath === 'string' && row.rasterPath.length > 0;
+    if (row.status === 'pdf-first-complete' && hasVerifiedArtifactReferences) {
+        const readerNames = new Set((row.localReaders || []).map(reader => reader.engine));
+        const readerFailures = Array.isArray(row.localReaderFailures) && row.localReaderFailures.length > 0;
+        if (readerNames.has('tesseractjs') && readerNames.has('native') && !readerFailures) return 'skip-complete';
+    }
+    if (row.providerSubmissionAttempted === true && hasVerifiedArtifactReferences) return 'resume-local-only';
     if (row.providerSubmissionAttempted === true || row.status === 'provider-submission-started') return 'skip-ambiguous';
     return 'submit';
 }
