@@ -245,6 +245,6 @@ test('HTML calculator and live DWBOT engine match all four event formulas', asyn
 
 test('HTML calculator participant tables do not expose H12 dollar estimates', async () => {
   const html = await fs.readFile(path.join(__dirname, '..', 'dwbotStuff', 'yolo_tournament_scoreCalculator.html'), 'utf8');
-  assert.doesNotMatch(html, /Estimated value|Season dollars|H12-equivalent|function dollars\\(|function money\\(|totalDollars/);
+  assert.doesNotMatch(html, /Estimated value|Season dollars|H12-equivalent|function dollars\(|function money\(|totalDollars/);
   assert.match(html, /Total doubloons/);
 });
