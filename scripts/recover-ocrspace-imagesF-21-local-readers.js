@@ -1,0 +1,257 @@
+'use strict';
+
+// Recover only failed/missing local-reader outputs from verified OCR.Space PDFs.
+// This script has no OCR.Space client import and deliberately disables all
+// provider/network access. It never resubmits an image to the paid provider.
+
+const fs = require('node:fs/promises');
+const path = require('node:path');
+const crypto = require('node:crypto');
+
+process.env.OCRSPACE_ENABLED = '0';
+process.env.OCRSPACE_NETWORK_ALLOWLIST = '0';
+process.env.OCR_NON_OCR_NETWORK_RESTRICTED = '1';
+process.env.OCR_IMAGE_TIMEOUT_MS = process.env.OCR_IMAGE_TIMEOUT_MS || '180000';
+process.env.OCR_SUPERVISED_TIMEOUT_MS = process.env.OCR_SUPERVISED_TIMEOUT_MS || '185000';
+process.env.OCR_CV_ASSIST = '0';
+process.env.PADDLEOCR_FIELD_FALLBACK = '0';
+process.env.OCRSPACE_API_KEY = '';
+
+require('./block-network');
+
+const imageProcessor = require('../src/image-processor');
+const bot = require('../src/bot');
+
+const FIELDS = ['result', 'player', 'map', 'mode', 'battleStart', 'credits', 'freeXp', 'damage', 'xp'];
+const ENGINES = ['tesseractjs', 'native'];
+const INVENTORY = 'complete-ground-truth-21';
+
+function sha256(buffer) {
+    return crypto.createHash('sha256').update(buffer).digest('hex');
+}
+
+function safePath(root, relative) {
+    if (typeof relative !== 'string' || !relative || path.isAbsolute(relative)) return null;
+    const base = path.resolve(root);
+    const target = path.resolve(base, relative);
+    const rel = path.relative(base, target);
+    if (!rel || rel.startsWith('..') || path.isAbsolute(rel)) return null;
+    return target;
+}
+
+function selectedRecords(gt) {
+    if (gt.schemaVersion !== 2 || gt.records?.length !== 63
+        || JSON.stringify(gt.requiredFields) !== JSON.stringify(FIELDS)) {
+        throw new Error('Ground-truth schema or nine-field contract mismatch.');
+    }
+    const selected = gt.records.filter(row => row.recordStatus === 'COMPLETE_9_FIELD_TRANSCRIPTION'
+        && FIELDS.every(field => row.fieldStatus?.[field]?.eligible_for_exact_match === true
+            && String(row.expected?.[field] ?? '').trim() !== ''));
+    if (selected.length !== 21 || selected.some((row, index) => row !== gt.records[index])) {
+        throw new Error('Expected the exact first 21 complete nine-field reference records.');
+    }
+    return selected;
+}
+
+async function extractLocalReader(rasterBuffer, engine) {
+    process.env.OCR_ENGINE = engine;
+    const output = await bot.extractText(rasterBuffer);
+    const attempt = output.attempts?.[output.attempts.length - 1] || output.attempts?.[0] || { text: '' };
+    const validation = bot.validateWorldOfWarshipsScreenshot(attempt, output.fields || {});
+    return {
+        engine,
+        record: validation.record,
+        missing: validation.missing,
+        accepted: validation.accepted,
+        textCharacters: String(attempt.text || '').length,
+        confidence: validation.confidence,
+        pageSegmentationMode: validation.pageSegmentationMode,
+        ambiguities: validation.record?.ambiguities || {}
+    };
+}
+
+async function main() {
+    const args = process.argv.slice(2);
+    const arg = name => {
+        const index = args.indexOf(name);
+        return index >= 0 ? args[index + 1] : null;
+    };
+    const runPath = arg('--run-report');
+    const gtPath = arg('--ground-truth');
+    const artifactRoot = arg('--artifact-root');
+    const outputRunPath = arg('--output-run-report');
+    const outputRecoveryPath = arg('--recovery-report');
+    const networkLogPath = arg('--network-log');
+    if (![runPath, gtPath, artifactRoot, outputRunPath, outputRecoveryPath, networkLogPath].every(Boolean)) {
+        throw new Error('Missing required local recovery arguments.');
+    }
+
+    const runBytes = await fs.readFile(runPath);
+    const gtBytes = await fs.readFile(gtPath);
+    const run = JSON.parse(runBytes.toString('utf8'));
+    const gt = JSON.parse(gtBytes.toString('utf8'));
+    const selected = selectedRecords(gt);
+    if (run.sourceArchiveSha256 !== gt.candidateArchive?.sha256 || run.imageCount !== 63) {
+        throw new Error('Run source archive does not match the v6 reference corpus.');
+    }
+
+    await fs.mkdir(path.dirname(networkLogPath), { recursive: true });
+    await fs.writeFile(networkLogPath, '', { flag: 'w' });
+
+    const byName = new Map((run.results || []).map(row => [row.filename, row]));
+    if (byName.size !== (run.results || []).length) throw new Error('Duplicate run rows are not eligible for recovery.');
+
+    const recovery = {
+        schemaVersion: 1,
+        status: 'RUNNING_LOCAL_ONLY_RECOVERY',
+        inventorySelection: { id: INVENTORY, selectedImageCount: selected.length },
+        sourceRunReportSha256: sha256(runBytes),
+        groundTruthSha256: sha256(gtBytes),
+        sourceArchiveSha256: run.sourceArchiveSha256,
+        providerRequests: 0,
+        provider: 'DISABLED',
+        networkPolicy: 'ALL_NETWORK_DESTINATIONS_BLOCKED',
+        localReaderTimeoutMs: Number(process.env.OCR_IMAGE_TIMEOUT_MS),
+        startedAt: new Date().toISOString(),
+        images: []
+    };
+
+    try {
+        for (const expected of selected) {
+            const row = byName.get(expected.filename);
+            const image = { filename: expected.filename, recoveredEngines: [], preservedEngines: [], failures: [] };
+            if (!row || row.sourceSha256 !== expected.sourceImage.sha256
+                || row.sourceBytes !== expected.sourceImage.bytes) {
+                image.failures.push({ code: 'SOURCE_ROW_MISMATCH', message: 'Run row does not match the v6 source fingerprint.' });
+                recovery.images.push(image);
+                continue;
+            }
+
+            const pdfPath = safePath(artifactRoot, row.pdfPath);
+            const rasterPath = safePath(artifactRoot, row.rasterPath);
+            if (!pdfPath || !rasterPath) {
+                image.failures.push({ code: 'UNSAFE_ARTIFACT_PATH', message: 'PDF or raster path is missing or unsafe.' });
+                recovery.images.push(image);
+                continue;
+            }
+
+            let pdfBuffer, rasterBuffer;
+            try {
+                pdfBuffer = await fs.readFile(pdfPath);
+                rasterBuffer = await fs.readFile(rasterPath);
+                if (pdfBuffer.subarray(0, 5).toString('ascii') !== '%PDF-'
+                    || pdfBuffer.length !== row.pdfBytes || sha256(pdfBuffer) !== row.pdfSha256
+                    || rasterBuffer.length !== row.rasterBytes || sha256(rasterBuffer) !== row.rasterSha256) {
+                    throw new Error('Saved PDF/raster does not match the original run-report size and SHA-256.');
+                }
+                const rendered = await imageProcessor.renderSearchablePdfPage(pdfBuffer);
+                const toPixels = buffer => imageProcessor.__test.runImageMagick(
+                    ['png:-', '-depth', '8', 'rgba:-'], buffer,
+                    { timeoutMs: 60000, maxOutputBytes: 80_000_000 }
+                );
+                const [savedPixels, renderedPixels] = await Promise.all([toPixels(rasterBuffer), toPixels(rendered)]);
+                if (!Buffer.isBuffer(savedPixels) || !Buffer.isBuffer(renderedPixels) || !savedPixels.equals(renderedPixels)) {
+                    throw new Error('Saved raster is not pixel-identical to a fresh rendering of its saved PDF.');
+                }
+            } catch (error) {
+                image.failures.push({ code: 'PDF_RASTER_VERIFICATION_FAILED', message: String(error.message || error).slice(0, 400) });
+                recovery.images.push(image);
+                continue;
+            }
+
+            const priorReaders = Array.isArray(row.localReaders) ? row.localReaders : [];
+            const priorFailures = Array.isArray(row.localReaderFailures) ? row.localReaderFailures : [];
+            const priorFailureByEngine = new Map(priorFailures.map(failure => [failure.engine, failure]));
+            row.localReaderRecovery = {
+                mode: 'LOCAL_ONLY_FROM_HASH_VERIFIED_PDF_DERIVED_RASTER',
+                startedAt: new Date().toISOString(),
+                priorFailures: priorFailures.map(item => ({ ...item })),
+                timeoutMs: Number(process.env.OCR_IMAGE_TIMEOUT_MS),
+                providerRequests: 0
+            };
+            const readers = new Map(priorReaders.map(reader => [reader.engine, reader]));
+            const remainingFailures = priorFailures.filter(failure => !ENGINES.includes(failure.engine));
+
+            for (const engine of ENGINES) {
+                const previous = readers.get(engine);
+                const previousFailure = priorFailureByEngine.get(engine);
+                if (previous && !previousFailure) {
+                    image.preservedEngines.push(engine);
+                    continue;
+                }
+                const started = Date.now();
+                try {
+                    const recovered = await extractLocalReader(rasterBuffer, engine);
+                    readers.set(engine, recovered);
+                    image.recoveredEngines.push(engine);
+                    row.localReaderRecovery[engine] = {
+                        status: 'RECOVERED',
+                        elapsedMs: Date.now() - started,
+                        accepted: recovered.accepted === true
+                    };
+                } catch (error) {
+                    remainingFailures.push({
+                        engine,
+                        code: error.code || 'LOCAL_READER_RECOVERY_FAILED',
+                        message: String(error.message || error).slice(0, 400)
+                    });
+                    image.failures.push({
+                        engine,
+                        code: error.code || 'LOCAL_READER_RECOVERY_FAILED',
+                        message: String(error.message || error).slice(0, 400)
+                    });
+                    row.localReaderRecovery[engine] = {
+                        status: 'FAILED',
+                        elapsedMs: Date.now() - started,
+                        code: error.code || null
+                    };
+                }
+            }
+            row.localReaders = ENGINES.filter(engine => readers.has(engine)).map(engine => readers.get(engine));
+            row.localReaderFailures = remainingFailures;
+            row.localReaderRecovery.completedAt = new Date().toISOString();
+            row.localReaderRecovery.status = remainingFailures.length ? 'PARTIAL' : 'COMPLETE';
+            row.localReaderRecovery.networkLogPath = path.basename(networkLogPath);
+            recovery.images.push(image);
+        }
+    } finally {
+        await bot.terminateOcrWorker().catch(() => {});
+    }
+
+    const networkLog = await fs.readFile(networkLogPath);
+    recovery.networkBlockedAttempts = networkLog.toString('utf8').split(/\r?\n/).filter(line => line.trim()).length;
+    recovery.networkLogSha256 = sha256(networkLog);
+    recovery.completedAt = new Date().toISOString();
+    const failedImages = recovery.images.filter(image => image.failures.length > 0).length;
+    recovery.status = failedImages === 0 && recovery.networkBlockedAttempts === 0
+        ? 'COMPLETED_LOCAL_ONLY_RECOVERY'
+        : 'COMPLETED_WITH_LOCAL_RECOVERY_FAILURES';
+    run.localReaderRecovery = {
+        report: path.basename(outputRecoveryPath),
+        reportSha256: null,
+        sourceRunReportSha256: recovery.sourceRunReportSha256,
+        providerRequests: 0,
+        networkBlockedAttempts: recovery.networkBlockedAttempts
+    };
+    run.derivedFromRunReportSha256 = recovery.sourceRunReportSha256;
+    run.updatedAt = new Date().toISOString();
+
+    await fs.mkdir(path.dirname(outputRecoveryPath), { recursive: true });
+    const recoveryPayload = JSON.stringify(recovery, null, 2) + '\n';
+    await fs.writeFile(outputRecoveryPath, recoveryPayload);
+    run.localReaderRecovery.reportSha256 = sha256(Buffer.from(recoveryPayload));
+    const runPayload = JSON.stringify(run, null, 2) + '\n';
+    await fs.mkdir(path.dirname(outputRunPath), { recursive: true });
+    await fs.writeFile(outputRunPath, runPayload);
+    await fs.writeFile(outputRunPath + '.sha256', sha256(Buffer.from(runPayload)) + '  ' + path.basename(outputRunPath) + '\n');
+    console.log('[DWBOT-LOCAL-READER-RECOVERY] ' + recovery.status
+        + '; recovered images=' + recovery.images.filter(image => image.recoveredEngines.length > 0).length
+        + '; provider requests=0; network blocked attempts=' + recovery.networkBlockedAttempts);
+    if (recovery.status !== 'COMPLETED_LOCAL_ONLY_RECOVERY') process.exitCode = 1;
+}
+
+main().catch(async error => {
+    await bot.terminateOcrWorker().catch(() => {});
+    console.error('[DWBOT-LOCAL-READER-RECOVERY] FAILED:', String(error.message || error).slice(0, 1000));
+    process.exitCode = 1;
+});
