@@ -93,7 +93,8 @@ class GateB21EvaluatorTests(unittest.TestCase):
             "fingerprintLocked": True, "matchesGateBRunSource": True,
             "completeImages": 16, "exactCompleteRecords": 16,
             "wronglyAcceptedMandatoryFieldValues": 0,
-            "unresolvedMandatoryFieldValues": 0, "unauthorizedNetworkAttempts": 0
+            "unresolvedMandatoryFieldValues": 0, "unauthorizedNetworkAttempts": 0,
+            "networkRestriction": "PASS"
         }}
         self.assertEqual(EVALUATOR.gate_a_evidence_status(good), "PASS")
         good["gateA"]["matchesGateBRunSource"] = False

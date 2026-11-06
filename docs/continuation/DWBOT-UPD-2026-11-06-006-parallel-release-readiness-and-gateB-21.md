@@ -111,7 +111,8 @@ after completing the checklist. This is a template, not completed evidence:
         "exactCompleteRecords": 16,
         "wronglyAcceptedMandatoryFieldValues": 0,
         "unresolvedMandatoryFieldValues": 0,
-        "unauthorizedNetworkAttempts": 0
+        "unauthorizedNetworkAttempts": 0,
+        "networkRestriction": "PASS"
       },
       "runReportSha256": "<exact final run report hash>",
       "groundTruthSha256": "<exact v6 JSON hash>",

@@ -236,7 +236,7 @@ def gate_a_evidence_status(artifact):
         return "FAIL"
     if evidence.get("unresolvedMandatoryFieldValues") != 0:
         return "FAIL"
-    if evidence.get("unauthorizedNetworkAttempts") != 0:
+    if evidence.get("unauthorizedNetworkAttempts") != 0 or evidence.get("networkRestriction") != "PASS":
         return "FAIL"
     return "PASS"
 
