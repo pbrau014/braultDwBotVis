@@ -77,7 +77,7 @@ test('verifies all 19 Gate B PDF/raster pairs, searchable text, source fingerpri
   const raster=png(1600,900);
   const report=await verifyArtifacts({...f,preflightReport:f.preflightPath,freshPreflightReport:f.freshPreflightPath,groundTruth:f.gtPath,runReport:f.runPath,workflowSourceText,apiKey:'not-a-real-secret',
     renderPdf:async()=>raster,readMetadata:metadataFor,toRawRgba:async()=>Buffer.from('same-pixels'),readPdfText:async()=> 'searchable text'});
-  assert.equal(report.status,'VERIFIED');
+  assert.equal(report.status,'VERIFIED', JSON.stringify(report.checks));
   assert.equal(report.inventorySelection.verifiedImageCount,19);
   assert.equal(report.checks.pdfIntegrity,'PASS');
   assert.equal(report.checks.searchablePdfTextLayer,'PASS');
