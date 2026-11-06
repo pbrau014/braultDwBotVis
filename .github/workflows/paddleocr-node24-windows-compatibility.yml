@@ -1,4 +1,4 @@
-name: PaddleOCR Windows Node 24 serialization compatibility
+name: PaddleOCR Windows Node 26.13.0 serialization verification
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - "scripts/paddleocr_field_crops.py"
       - "src/paddleocr-field-fallback.js"
       - "tests/paddleocr-field-fallback.test.js"
-      - ".github/workflows/paddleocr-node26-windows-compatibility.yml"
+      - ".github/workflows/paddleocr-node24-windows-compatibility.yml"
 
 permissions:
   contents: read
@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Setup Node.js 26.13.0 (additional compatibility target)
+      - name: Setup Node.js 26.13.0 (project standard)
         uses: actions/setup-node@v4
         with:
           node-version: 26.13.0
