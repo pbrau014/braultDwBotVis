@@ -22,7 +22,8 @@ test('21-image local reader matrix is offline, source-bound, and never calls OCR
     assert.ok(script.includes('renderSearchablePdfPage'));
     assert.ok(script.includes('normalizeSearchablePdfPageRaster'));
     assert.ok(script.includes('sourcePageRasterSha256'));
-    assert.ok(script.includes('savedPixels.equals(renderedPixels)'));
+    assert.ok(script.includes('savedPagePixels.equals(renderedPagePixels)'));
+    assert.ok(script.includes('savedNormalizedPixels.equals(expectedNormalizedPixels)'));
     assert.ok(script.includes('Promise.allSettled'));
     assert.ok(script.includes('row.priorLocalReaders'));
     assert.ok(script.includes('providerRequests: 0'));
