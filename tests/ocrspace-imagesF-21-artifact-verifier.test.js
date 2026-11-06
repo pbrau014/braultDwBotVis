@@ -161,3 +161,30 @@ test('artifact verifier parses BOM-prefixed Gate A and reconciliation JSON witho
   });
   assert.deepEqual(parseJsonUtf8(Buffer.from('{"status":"PASS"}', 'utf8')), { status: 'PASS' });
 });
+
+test('artifact verifier uses canonical JSON fingerprints and preserves raw working-tree hashes', async t => {
+  const f=await fixture(t);
+  const runBefore=await fs.readFile(f.runPath);
+  const gtBefore=await fs.readFile(f.gtPath);
+  const reportBefore=await verifyArtifacts({...f,
+    preflightReport:f.preflightPath,freshPreflightReport:f.freshPreflightPath,
+    groundTruth:f.gtPath,runReport:f.runPath,workflowSourceText,apiKey:'not-a-real-secret',
+    renderPdf:async()=>png(1600,900),readMetadata:metadataFor,
+    toRawRgba:async()=>Buffer.from('same-pixels'),readPdfText:async()=> 'searchable text'});
+  const runObject=JSON.parse(runBefore.toString('utf8'));
+  const gtObject=JSON.parse(gtBefore.toString('utf8'));
+  const runReformatted=Buffer.from('\\uFEFF'+JSON.stringify(runObject,null,2).replace(/\\n/g,'\\r\\n'),'utf8');
+  const gtReformatted=Buffer.from('\\uFEFF'+JSON.stringify(gtObject,null,2).replace(/\\n/g,'\\r\\n'),'utf8');
+  await fs.writeFile(f.runPath,runReformatted);
+  await fs.writeFile(f.gtPath,gtReformatted);
+  const reportAfter=await verifyArtifacts({...f,
+    preflightReport:f.preflightPath,freshPreflightReport:f.freshPreflightPath,
+    groundTruth:f.gtPath,runReport:f.runPath,workflowSourceText,apiKey:'not-a-real-secret',
+    renderPdf:async()=>png(1600,900),readMetadata:metadataFor,
+    toRawRgba:async()=>Buffer.from('same-pixels'),readPdfText:async()=> 'searchable text'});
+  assert.equal(reportAfter.runReportSha256,reportBefore.runReportSha256);
+  assert.equal(reportAfter.groundTruthSha256,reportBefore.groundTruthSha256);
+  assert.notEqual(reportAfter.runReportRawSha256,reportBefore.runReportRawSha256);
+  assert.notEqual(reportAfter.groundTruthRawSha256,reportBefore.groundTruthRawSha256);
+  assert.match(reportAfter.verifierWorkingTreeRawSha256,/^[0-9a-f]{64}$/);
+});
