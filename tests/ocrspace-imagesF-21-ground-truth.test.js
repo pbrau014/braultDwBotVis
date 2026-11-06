@@ -75,3 +75,15 @@ test('the evaluator retains a separate 21-image diagnostic inventory in addition
     const evaluator = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'evaluate-ocrspace-imagesF-63-ground-truth.py'), 'utf8');
     assert.match(evaluator, /ANALYSIS_21_INVENTORY = "complete-ground-truth-21"/);
 });
+
+
+test('v6 ground-truth policy explicitly defines 19-image Gate B and diagnostic-only records 20–21', () => {
+    const rules = groundTruth.evaluationRules.join(' ');
+    assert.match(rules, /Gate B uses exactly the first 19 corpus-order records/);
+    assert.match(rules, /two additional complete records .* remain diagnostic-only/);
+    assert.equal(groundTruth.gateBSelection.id, 'gate-b-complete-ground-truth-19');
+    assert.equal(groundTruth.gateBSelection.imageCount, 19);
+    assert.deepEqual(groundTruth.gateBSelection.diagnosticOnlyAdditionalCompleteRecords,
+        groundTruth.records.slice(19, 21).map(record => record.filename));
+    assert.equal(groundTruth.accuracyStatus.gateB, 'NOT_PASSED');
+});
