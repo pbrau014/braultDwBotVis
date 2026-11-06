@@ -4,7 +4,7 @@
 This script never calls OCR.Space or repeats provider submissions. It compares
 saved PDF-derived local-reader records against the versioned manual reference.
 Gate B is the approved 19-image complete nine-field subset; a pass additionally
-requires a separately verified artifact/network report.
+requires a separately verified artifact/network report. Wrong but unaccepted candidates remain separately reported and do not count as accepted; any wrongly accepted mandatory field blocks Gate B.
 """
 from __future__ import annotations
 import argparse, hashlib, json, re
