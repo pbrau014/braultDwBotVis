@@ -171,6 +171,21 @@ jobs:
             limitation = 'The source workflow enabled the application-level non-OCR egress guard but did not set OCR_NON_OCR_NETWORK_LOG. The guard writes events only when that path is configured. Job-log and per-image scans are corroborating observations, not a complete reconstruction of the missing original event log; no zero-attempt claim is made.'
           }
           $reconciliation | ConvertTo-Json -Depth 20 | Set-Content -Encoding utf8 $networkReconciliationPath
+          $reconciliationTextPath = Join-Path $env:GITHUB_WORKSPACE 'testdata\\ocr-acceptance\\network-log-reconciliation.txt'
+          $reconciliationLines = @(
+            'RECONSTRUCTED LIMITED NETWORK EVIDENCE — NOT THE ORIGINAL EVENT LOG',
+            "Source run: $sourceRunId ($sourceSha)",
+            "Original diagnostic log: $($reconciliation.originalDiagnosticLog)",
+            "Source workflow egress guard enabled: $($reconciliation.sourceWorkflowRestrictedEgressEnabled)",
+            "OCR.Space allowlist enabled: $($reconciliation.sourceWorkflowOcrSpaceAllowlistEnabled)",
+            "Diagnostic path configured in source workflow: $($reconciliation.sourceWorkflowDiagnosticLogPathConfigured)",
+            "Blocked markers observed in available job logs: $blockedMarkers",
+            "Per-image network-block failure rows: $($networkFailureRows.Count)",
+            'Historical blocked-attempt count: UNKNOWN',
+            'No zero-attempt claim is made. This limited reconstruction does not satisfy Gate A or Gate B network proof.'
+          )
+          [System.IO.File]::WriteAllLines($reconciliationTextPath, $reconciliationLines, (New-Object System.Text.UTF8Encoding($false)))
+
           "DWBOT_NETWORK_RECONCILIATION=$networkReconciliationPath" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           "DWBOT_SOURCE_WORKFLOW=$sourceWorkflowPath" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           Write-Host "Source run $sourceRunId at $sourceSha; artifact root $artifactRoot"
