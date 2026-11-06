@@ -25,6 +25,7 @@ const bot = require('../src/bot');
 const { runSupervisedProcess } = require('../src/ocr-process-supervisor');
 const { extractPdfText } = require('./verify-ocrspace-imagesF-21-artifacts');
 const { parseTextLayer } = require('./evaluate-ocrspace-pdf-text-layer');
+const { planReaderRecovery } = require('../src/ocrspace-local-reader-recovery');
 
 const FIELDS = ['result', 'player', 'map', 'mode', 'battleStart', 'credits', 'freeXp', 'damage', 'xp'];
 const ENGINES = ['tesseractjs', 'native', 'paddleocr'];
@@ -55,24 +56,6 @@ function selectedRecords(gt) {
         throw new Error('Expected the exact first 21 complete nine-field reference records.');
     }
     return selected;
-}
-
-function isReusableLocalReader(reader, engine) {
-    return Boolean(reader && reader.engine === engine
-        && ['complete', 'partial'].includes(reader.status)
-        && reader.record && typeof reader.record === 'object' && !Array.isArray(reader.record));
-}
-
-function planReaderRecovery(priorReaders) {
-    const rows = Array.isArray(priorReaders) ? priorReaders : [];
-    const preserved = [];
-    const pending = [];
-    for (const engine of ENGINES) {
-        const matching = rows.filter(reader => reader?.engine === engine);
-        if (matching.length === 1 && isReusableLocalReader(matching[0], engine)) preserved.push(matching[0]);
-        else pending.push(engine);
-    }
-    return { preserved, pending };
 }
 
 async function extractLocalReader(rasterBuffer, engine, networkLogPath) {
@@ -226,7 +209,7 @@ async function main() {
             row.priorLocalReaders = row.priorLocalReaders || priorReaders.map(item => ({ ...item }));
             row.priorLocalReaderFailures = row.priorLocalReaderFailures
                 || (Array.isArray(row.localReaderFailures) ? row.localReaderFailures.map(item => ({ ...item })) : []);
-            const recoveryPlan = planReaderRecovery(priorReaders);
+            const recoveryPlan = planReaderRecovery(priorReaders, ENGINES);
             const preservedReaders = recoveryPlan.preserved.map(item => ({ ...item }));
             image.preservedEngines.push(...preservedReaders.map(item => item.engine));
             const startedAt = new Date().toISOString();
@@ -332,4 +315,4 @@ if (require.main === module) {
         process.exitCode = 1;
     });
 }
-module.exports = { extractLocalReader, sha256, safePath, isReusableLocalReader, planReaderRecovery };
+module.exports = { extractLocalReader, sha256, safePath };
