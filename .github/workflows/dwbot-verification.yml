@@ -296,6 +296,7 @@ jobs:
           OCRSPACE_63_OUTPUT_DIR: ${{ github.workspace }}\testdata\ocrspace-imagesF-63-exploratory
         run: |
           if ([string]::IsNullOrWhiteSpace($env:OCRSPACE_API_KEY)) { throw 'Protected OCRSPACE_API_KEY secret is missing.' }
+          node --check scripts/run-ocrspace-imagesF-63-exploratory.js
           npm run test:ocrspace
           if ($LASTEXITCODE -ne 0) { throw 'OCR.Space mocked contract tests failed; exploratory provider submissions are prohibited.' }
           npm run test:ocrspace-imagesF-63
@@ -308,6 +309,8 @@ jobs:
           path: |
             testdata/ocrspace-imagesF-63-exploratory/**
             testdata/ocr-acceptance/imagesF-63-preflight.json*
+            testdata/ocr-acceptance/DWBOT_IMAGESF_HOLDOUT_CANDIDATE_MANIFEST.json
+            docs/continuation/DWBOT-UPD-2026-11-05-002-groundtruth-gap-register.md
           if-no-files-found: warn
           retention-days: 30
 
