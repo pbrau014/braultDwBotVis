@@ -78,7 +78,7 @@ def main() -> None:
         "providerRequestsPermitted": True,
     }
     REPORT.parent.mkdir(parents=True, exist_ok=True)
-    REPORT.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    REPORT.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")\n    _, report_sha = digest_file(REPORT)\n    REPORT.with_suffix(REPORT.suffix + ".sha256").write_text(f"{report_sha}  {REPORT.name}\\n", encoding="ascii")
     envfile = os.environ.get("GITHUB_ENV")
     if envfile:
         with open(envfile, "a", encoding="utf-8") as f:
