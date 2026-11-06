@@ -2770,7 +2770,7 @@ function scoringGuideText() {
         '',
         'The historical workbook uses raw Race time and differs from current C01. Source workbook values are archival; the current event notice and approved settings control the active weights and pools.',
         'Use `!yolo standings` for doubloon scores, `!yolo player <name>` for raw game inputs plus event totals, and `!yolo settings` (admin) to inspect current formula settings.',
-    ].join('\\n');
+    ].join('\n');
 }
 
 function tournamentSettingsText() {
