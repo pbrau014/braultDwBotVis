@@ -57,16 +57,16 @@
   ],
   "groundTruthStatus": "incomplete_not_acceptance_grade",
   "groundTruthQualification": "The supplied 56-image review workbook has 46 populated image rows, 36 complete nine-field rows, 10 partial rows, and 10 eligible images without a row. The supplied JSON is an integrity inventory, not full expected-value ground truth. Missing values remain unknown; no values were inferred or invented.",
-  "usePolicy": "Exploratory provider extraction and pipeline diagnostics for the full 63-image archive. Gate B evaluation is permitted only for the explicit 21-record complete-ground-truth subset in gateBSubset; the remaining 42 records are not Gate B labels and the full 63-image archive is not a full-record accuracy holdout.",
+  "usePolicy": "Exploratory provider extraction and pipeline diagnostics for the full 63-image archive. Gate B evaluation is permitted only for the explicit first-19 complete-ground-truth subset in gateBSubset; the remaining 44 records are not Gate B labels and the full 63-image archive is not a full-record accuracy holdout. The 21-image complete-record inventory remains available for separate pipeline analysis.",
   "gateBSubset": {
-    "id": "complete-ground-truth-21",
+    "id": "gate-b-complete-ground-truth-19",
     "status": "approved-holdout-scope-not-gate-pass",
     "groundTruthReference": "testdata/ground-truth/imagesF-63-working-ground-truth-v6.json",
     "groundTruthSha256": "6344e176e8f0e9f894db6ab18a999055d51d62c696438e5d9b564a2128fa3dac",
-    "imageCount": 21,
+    "imageCount": 19,
     "replacesFormerMinimum": 50,
     "formerPreferredTarget": 100,
-    "selectionRule": "First 21 corpus-order records with recordStatus COMPLETE_9_FIELD_TRANSCRIPTION and all nine required fields eligible_for_exact_match=true with non-empty expected values.",
+    "selectionRule": "First 19 corpus-order records with COMPLETE_9_FIELD_TRANSCRIPTION and all nine required fields eligible_for_exact_match=true with non-empty expected values. The next two complete records remain eligible for 21-image pipeline inventory analysis but are not part of Gate B.",
     "requiredFields": [
       "result",
       "player",
@@ -213,21 +213,8 @@
         "sha256": "00b767cab9fa8d1f32b049c81b9b4a7345d93f6825e89f3c9fea42b3be3b3707",
         "width": 1920,
         "height": 1080
-      },
-      {
-        "filename": "Screenshot_55374.png",
-        "bytes": 648612,
-        "sha256": "b97ab3f904d0977601f741bd1b2d25600b73639aa890a36cd271e49defd21d4a",
-        "width": 1920,
-        "height": 1080
-      },
-      {
-        "filename": "lllfrfgfgff.png",
-        "bytes": 1223923,
-        "sha256": "d120d3bd4b07281aabf7e0e564320d1c403129d9b081931f98c79e09b3cfcff3",
-        "width": 1920,
-        "height": 1080
       }
-    ]
+    ],
+    "supersedesPrior21ImageGateB": true
   }
 }
