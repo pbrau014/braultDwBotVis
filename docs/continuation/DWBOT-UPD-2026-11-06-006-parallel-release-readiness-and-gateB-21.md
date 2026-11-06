@@ -101,6 +101,13 @@ after completing the checklist. This is a template, not completed evidence:
     {
       "schemaVersion": 1,
       "status": "VERIFIED",
+      "gateA": {
+        "status": "PASS",
+        "reportSha256": "<Gate A report SHA-256>",
+        "candidateFingerprint": "<locked candidate SHA-256>",
+        "fingerprintLocked": true,
+        "matchesGateBRunSource": true
+      },
       "runReportSha256": "<exact final run report hash>",
       "groundTruthSha256": "<exact v6 JSON hash>",
       "inventorySelection": {
@@ -242,3 +249,18 @@ download, desktop bridge, queue, supervisor and Windows cancellation tests.
   upload concurrency, queue backpressure/timeout/cleanup, process-tree
   termination and Windows cancellation. Exact-head CI remains pending; no
   pass is claimed until these tests execute on the final commit.
+
+
+## Gate A prerequisite and accuracy-threshold policy
+
+The living plan keeps Gate A (16-image development acceptance) as a
+prerequisite to Gate B. The evaluator now requires a Gate A PASS attestation
+bound to a hashed report and a locked candidate fingerprint that is confirmed
+to match the Gate B run source. Without it, the evaluator returns
+PENDING_GATE_A; an invalid/mismatched fingerprint blocks Gate B.
+
+The governing Gate B criteria do not specify a numerical minimum exact-match
+percentage. The evaluator therefore reports the measured field-level and
+complete-record percentages without inventing a pass floor. Zero wrongly
+accepted mandatory values and zero unauthorized network attempts remain hard
+blockers; unresolved values remain visible and are not counted as matches.

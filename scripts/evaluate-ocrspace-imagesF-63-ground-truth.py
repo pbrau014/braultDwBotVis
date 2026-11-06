@@ -197,10 +197,26 @@ def evaluate_engine(run, engine, selected_records):
     }
 
 
+def gate_a_evidence_status(artifact):
+    evidence = (artifact or {}).get("gateA") or {}
+    if evidence.get("status") != "PASS":
+        return "PENDING_GATE_A"
+    if not re.fullmatch(r"[0-9a-f]{64}", str(evidence.get("reportSha256", ""))):
+        return "FAIL"
+    if not re.fullmatch(r"[0-9a-f]{64}", str(evidence.get("candidateFingerprint", ""))):
+        return "FAIL"
+    if evidence.get("fingerprintLocked") is not True or evidence.get("matchesGateBRunSource") is not True:
+        return "FAIL"
+    return "PASS"
+
+
 def verify_artifact_report(artifact, run_path, gt_path, selected_records, selected_run_results):
     if not artifact:
         return {"status": "PENDING_ARTIFACT_VERIFICATION", "reasons": ["Artifact verification report is not present."]}
     reasons = []
+    gate_a_status = gate_a_evidence_status(artifact)
+    if gate_a_status != "PASS":
+        reasons.append("Gate A PASS and locked candidate-fingerprint evidence is missing or invalid.")
     selection = artifact.get("inventorySelection") or {}
     checks = artifact.get("checks") or {}
     if artifact.get("status") != "VERIFIED":
@@ -245,8 +261,9 @@ def verify_artifact_report(artifact, run_path, gt_path, selected_records, select
             reasons.append("PDF hash does not reconcile: " + name)
         if evidence.get("rasterSha256") != run_row.get("rasterSha256") or not evidence.get("rasterSha256"):
             reasons.append("PDF-derived raster hash does not reconcile: " + name)
-    return {"status": "PASS" if not reasons else "FAIL", "reasons": reasons,
-            "verifiedImageCount": len(image_rows), "checks": checks}
+    result_status = "PASS" if not reasons else ("PENDING_GATE_A" if gate_a_status == "PENDING_GATE_A" and len(reasons) == 1 else "FAIL")
+    return {"status": result_status, "reasons": reasons,
+            "verifiedImageCount": len(image_rows), "checks": checks, "gateAEvidenceStatus": gate_a_status}
 
 
 def main():
@@ -297,6 +314,8 @@ def main():
         gate_b = "NOT_APPLICABLE_WRONG_INVENTORY"
     elif artifact_verification["status"] == "PENDING_ARTIFACT_VERIFICATION":
         gate_b = "PENDING_ARTIFACT_VERIFICATION"
+    elif artifact_verification["status"] == "PENDING_GATE_A":
+        gate_b = "PENDING_GATE_A"
     elif artifact_verification["status"] != "PASS" or not rows_complete or not readers_complete or source_mismatches or wrong_accepted or not network_pass:
         gate_b = "NOT_PASSED"
     else:
@@ -334,6 +353,9 @@ def main():
         },
         "gateBCriteria": {
             "minimumCompleteGroundTruthImages": MIN_GATE_B_IMAGES,
+            "gateAPassAndLockedCandidateFingerprintRequired": True,
+            "minimumExactMatchRate": None,
+            "accuracyThresholdPolicy": "No numeric exact-match floor is defined in the governing plan; report measured rates. Zero wrongly accepted mandatory values remains a hard blocker.",
             "completeNineFieldLabelsRequired": True,
             "allSelectedPdfAndRasterArtifactsVerified": True,
             "zeroWronglyAcceptedMandatoryFieldValues": True,

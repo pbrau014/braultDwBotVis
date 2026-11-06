@@ -76,6 +76,18 @@ class GateB21EvaluatorTests(unittest.TestCase):
         self.assertEqual(metrics["fieldLevelSummary"]["unresolvedOutputs"], 189)
         self.assertEqual(metrics["fieldLevelSummary"]["exactMatches"], 0)
 
+    def test_gate_b_requires_gate_a_pass_and_locked_matching_candidate_fingerprint(self):
+        self.assertEqual(EVALUATOR.gate_a_evidence_status({}), "PENDING_GATE_A")
+        self.assertEqual(EVALUATOR.gate_a_evidence_status({"gateA": {"status": "FAIL"}}), "PENDING_GATE_A")
+        good = {"gateA": {
+            "status": "PASS", "reportSha256": "a" * 64,
+            "candidateFingerprint": "b" * 64,
+            "fingerprintLocked": True, "matchesGateBRunSource": True
+        }}
+        self.assertEqual(EVALUATOR.gate_a_evidence_status(good), "PASS")
+        good["gateA"]["matchesGateBRunSource"] = False
+        self.assertEqual(EVALUATOR.gate_a_evidence_status(good), "FAIL")
+
     def test_no_artifact_report_means_gate_b_pending(self):
         result = EVALUATOR.verify_artifact_report(
             None, Path("run-report.json"), GT_PATH, self.selected, []
