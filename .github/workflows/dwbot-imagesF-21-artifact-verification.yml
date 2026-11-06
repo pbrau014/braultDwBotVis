@@ -139,7 +139,7 @@ jobs:
           $sourceJobLogs = gh run view $sourceRunId --repo $env:GITHUB_REPOSITORY --log 2>$null
           $jobLogsAvailable = $LASTEXITCODE -eq 0
           $blockedMarkers = 0
-          if ($jobLogsAvailable) { $blockedMarkers = ([regex]::Matches(($sourceJobLogs -join ' '), 'OCR_NETWORK_BLOCKED|NON-OCR-SPACE-EGRESS-RESTRICTED')).Count }
+          if ($jobLogsAvailable) { $blockedMarkers = ([regex]::Matches(($sourceJobLogs -join ' '), '\[NON-OCR-SPACE-EGRESS-RESTRICTED\] denied')).Count }
           $runData = Get-Content -Raw $selectedRunReport | ConvertFrom-Json
           $networkFailureRows = @($runData.results | Where-Object { $_.failure.code -eq 'OCR_NETWORK_BLOCKED' -or $_.failure.message -match 'Non-OCR.Space network destination' })
           $reconciliation = [ordered]@{
@@ -148,8 +148,8 @@ jobs:
             sourceRunId = $sourceRunId
             sourceRunSha = $sourceSha
             originalDiagnosticLog = if ($networkLogs.Count -eq 1) { 'PRESENT_IN_SOURCE_ARTIFACT' } else { 'MISSING_FROM_SOURCE_ARTIFACT' }
-            sourceWorkflowRestrictedEgressEnabled = $sourceWorkflowText -match "OCR_NON_OCR_NETWORK_RESTRICTED:\s*['"]?1"
-            sourceWorkflowOcrSpaceAllowlistEnabled = $sourceWorkflowText -match "OCRSPACE_NETWORK_ALLOWLIST:\s*['"]?1"
+            sourceWorkflowRestrictedEgressEnabled = $sourceWorkflowText.Contains("OCR_NON_OCR_NETWORK_RESTRICTED: '1'")
+            sourceWorkflowOcrSpaceAllowlistEnabled = $sourceWorkflowText.Contains("OCRSPACE_NETWORK_ALLOWLIST: '1'")
             sourceWorkflowDiagnosticLogPathConfigured = $sourceWorkflowText -match 'OCR_NON_OCR_NETWORK_LOG:'
             guardWritesOnlyWhenLogPathConfigured = $blockGuardText -match 'if \(logPath\)'
             sourceJobLogsAvailable = $jobLogsAvailable
