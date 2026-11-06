@@ -138,3 +138,8 @@ The canonical living plan controls the operational queue and supersedes older da
   Gate A pass evidence has been located. Therefore the 21-image Gate B holdout
   is approved as the new sample-size requirement, but Gate B cannot pass until
   the 16-image Gate A is rerun and passes on the locked candidate fingerprint.
+
+- The Gate A evidence block is an attestation: evaluator checks its reported
+  metrics and fingerprint/hash formats, but does not parse the underlying Gate
+  A report. Preserve and manually verify the original Gate A report, its SHA-256
+  and the candidate fingerprint against the Gate B run before recording PASS.

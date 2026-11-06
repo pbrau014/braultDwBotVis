@@ -5255,3 +5255,9 @@ END DWBOT-UPD-2026-11-06-007
   desktop chunked uploads are drained after crossing the byte cap until request
   completion/timeout rather than being immediately terminated. No source code
   was changed for this audit.
+
+- Gate A evidence limitation: the evaluator validates the Gate A attestation
+  fields and SHA-256 formats but does not parse the original Gate A report.
+  Retain and manually inspect that report, verify its hash, and compare its
+  locked candidate fingerprint with the Gate B run source. Without the actual
+  source report, Gate A evidence remains pending; do not self-attest PASS.

@@ -66,3 +66,8 @@ testdata/imagesF-holdout-candidate-manifest.json under gateBSubset and is
 validated against the v6 ground-truth JSON by
 tests/test_ocrspace_imagesF_21_evaluator.py. The embedded manifest in the
 original 63-image ZIP remains unchanged and retains its original SHA-256.
+
+The Gate A report must be retained and manually reviewed; the post-hoc
+evaluator checks the attested metrics and fingerprint formats but does not
+parse the underlying Gate A report. Do not attest PASS without independently
+checking the report hash and candidate fingerprint against the Gate B run.

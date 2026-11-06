@@ -282,3 +282,12 @@ Gate B records. The 16-image development corpus has already been checked by
 source hash with zero overlap. These checks execute in the exact-head CI; until
 that run passes, the no-overlap assertions are implemented but not yet CI-
 verified.
+
+
+Gate A evidence handling limitation: the evaluator validates the Gate A
+attestation fields and SHA-256 formats, but it does not parse the underlying
+Gate A report file. The report itself must be retained, independently reviewed,
+and its actual SHA-256 compared with the attested value; the candidate
+fingerprint must be compared with the Gate B run source. If that underlying
+evidence is unavailable or mismatched, do not author a PASS attestation and
+leave Gate B pending/blocked.
