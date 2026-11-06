@@ -100,11 +100,22 @@ async function main() {
         } else {
             try {
                 const priorLog = await fs.promises.readFile(priorLogPath);
+                const actualPriorSha256 = sha256(priorLog);
+                const boundPriorSha256 = String(priorProgress.networkDiagnosticLogSha256 || '').toLowerCase();
+                const boundPriorBytes = Number(priorProgress.networkDiagnosticLogBytes);
+                const hashBound = /^[a-f0-9]{64}$/.test(boundPriorSha256)
+                    && boundPriorSha256 === actualPriorSha256 && boundPriorBytes === priorLog.length;
+                const priorLogLines = priorLog.toString('utf8').split(/\\r?\\n/).filter(Boolean);
+                const originalZeroAttemptsClaimed = hashBound && priorLog.length === 0
+                    && priorProgress.networkIsolation?.networkDiagnosticLogPresent === true
+                    && priorProgress.networkIsolation?.nonOcrDeniedAttemptsDetected === false;
                 networkLogReconciliation = {
-                    status: 'ORIGINAL_LOG_PRESENT', originalLogPath: priorLogPath,
-                    originalLogPresent: true, originalLogBytes: priorLog.length,
-                    originalLogSha256: sha256(priorLog), originalZeroAttemptsClaimed: priorLog.length === 0,
-                    originalBlockedAttemptCount: priorLog.length === 0 ? 0 : null,
+                    status: hashBound ? 'ORIGINAL_LOG_HASH_VERIFIED' : (boundPriorSha256 ? 'ORIGINAL_LOG_HASH_MISMATCH' : 'ORIGINAL_LOG_NOT_HASH_BOUND'),
+                    originalLogPath: priorLogPath, originalLogPresent: true,
+                    originalLogBytes: priorLog.length, originalLogSha256: actualPriorSha256,
+                    boundOriginalLogSha256: boundPriorSha256 || null, originalLogHashBound: hashBound,
+                    originalZeroAttemptsClaimed,
+                    originalBlockedAttemptCount: hashBound ? priorLogLines.length : null,
                 };
             } catch {
                 networkLogReconciliation = { status: 'MISSING_ORIGINAL_LOG', originalLogPath: priorLogPath, originalLogPresent: false, originalZeroAttemptsClaimed: false, originalBlockedAttemptCount: null };
