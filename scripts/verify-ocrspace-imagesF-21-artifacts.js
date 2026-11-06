@@ -269,7 +269,11 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
     const networkReconciliation = networkReconciliationPath
         ? await fs.readFile(networkReconciliationPath, 'utf8').then(JSON.parse).catch(() => null) : null;
     const files = await listFiles(artifactRoot);
-    const secretInputs = [...files, runReport, groundTruth, preflightReport, freshPreflightReport, ...(networkLog === null ? [] : [networkLogPath]), Buffer.from(workflowSourceText, 'utf8')];
+    const secretInputs = [...files, runReport, groundTruth, preflightReport, freshPreflightReport,
+        ...(networkLog === null ? [] : [networkLogPath]),
+        ...(recoveryNetworkLog === null ? [] : [recoveryNetworkLogPath]),
+        ...(networkReconciliation === null || !networkReconciliationPath ? [] : [networkReconciliationPath]),
+        Buffer.from(workflowSourceText, 'utf8')];
     const secret = await secretScan(secretInputs, apiKey);
     const gateA = gateAReport ? {
         status: gateAReport.status || 'PENDING',
