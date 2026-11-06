@@ -5348,3 +5348,57 @@ Source archive fingerprint: yoloPaperWork(1).zip, SHA-256 b7598ed96d9af8ff1bd564
 Scoring C01: core, HTML and regression changes committed; exact-head CI/browser verification pending. Historical source workbook remains archival, not canonical.
 Proposal boundary: mock narrative and playoff defaults are not event approval; tournament configurations frequently change and must be rechecked against current official/event-specific settings.
 ================================================================================
+
+================================================================================
+2026-11-06 — OCRSPACE 63 ARTIFACT / 19 GATE B POST-HOC / GATE A BLOCKER
+================================================================================
+- Existing OCR.Space extraction run #42160979140 completed successfully; its
+  81,886,966-byte artifact was downloaded and its SHA-256 verified against the
+  GitHub artifact digest: ac4ae071ee4737c2fe044b64456a8dab1cddf7073a02f8f427ec7b35af28629a.
+- Independent local checks verified all 63 PDFs and 63 raster PNGs against
+  report sizes/hashes/signatures/dimensions; all 63 PDFs are one-page and have
+  non-empty searchable text. Source run records originalScreenshotFallback=false.
+- The 19-image Gate B artifact verifier checked PDF integrity, searchable text,
+  raster integrity and PDF-derived raster provenance PASS for all 19 selected
+  records; secret leak scan PASS. First verification report had two reporting
+  defects (fallback boolean inverted and BOM-prefixed reconciliation JSON not
+  parsed); both were corrected in current source. Original historical network
+  log is genuinely absent because the source run did not configure
+  OCR_NON_OCR_NETWORK_LOG. Reconstructed evidence reports zero blocked markers
+  in available job logs and zero per-image network-block failure rows, but the
+  historical blocked-attempt count remains UNKNOWN. No zero-attempt claim.
+- 19-image post-hoc candidate metrics:
+  Tesseract.js 110/171 exact fields (64.33%), 2 wrong unaccepted, 59 unresolved;
+  2/19 full nine-field records exact (10.53%), 17 unresolved.
+  Native Tesseract 103/171 (60.23%), 2 wrong unaccepted, 66 unresolved;
+  0/19 full records exact.
+- Searchable PDF text alone: 73/152 exact (48.03%), 2 wrong, 77 unresolved;
+  player identity excluded. OCR.Space parsed text alone: 79/152 exact (51.97%),
+  17 wrong, 56 unresolved. Strict PDF+Tesseract.js+native consensus:
+  104/171 exact (60.82%), 1 wrong candidate, 66 unresolved. Only 1/19 full
+  nine-field records exact. PDF text layer alone is not sufficient; multi-reader
+  consensus is better but not safe to auto-accept.
+- Current workflow now tests PDF/provider/Tesseract.js/native 4-source unique
+  majority and strict 3-of-4 consensus; tied votes remain unresolved. Separate
+  21-image diagnostic runs in addition to 19-image Gate B, without provider
+  requests. Latest artifact verification run #42199272644 is in progress.
+- Source extraction used Node 22.16.0, below accepted Node >=24.17.0; it is
+  exploratory only. Gate B remains NOT PASSED: Gate A pending, historical
+  network log missing, unresolved mandatory values, and source runtime below
+  acceptance baseline.
+- Gate A requires a PDF-first run on the approved 16-image development corpus,
+  16/16 exact nine-field records, zero wrong accepted values, zero unresolved
+  mandatory fields, restricted-egress proof and a locked candidate fingerprint.
+  Ground-truth JSON exists, but original source archive imgs2add.zip is not
+  accessible. Available imgsHalf1.zip is a separate 56-image archive with zero
+  exact source-image hash matches to the 16-image report; do not substitute.
+  Existing native-16 report recorded only 5/16 exact records and 6/16 complete;
+  it is not PDF-first Gate A evidence.
+- Current source guard now requires a writable OCR_NON_OCR_NETWORK_LOG path
+  when restricted-egress mode is enabled and fails closed if missing/unwritable.
+  Current 63 workflow sets this path before provider calls. This prevents the
+  missing-log defect in future runs.
+- Detailed reports:
+  docs/continuation/DWBOT-GATEA-REQUIREMENTS-AND-STATUS-2026-11-06.md
+  docs/continuation/DWBOT-UPD-2026-11-06-009-ocrspace-63-artifact-audit-and-19-posthoc.md
+================================================================================
