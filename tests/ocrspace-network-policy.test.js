@@ -52,8 +52,8 @@ test('OCR.Space HTTPS API and searchable-PDF hosts remain reachable while unrela
     assert.equal(result.unrelatedDenied, true);
     assert.equal(result.httpDenied, true);
     const log = fs.readFileSync(logPath, 'utf8');
-    assert.match(log, /denied fetch https:\/\/example\\.invalid/);
-    assert.match(log, /denied fetch http:\/\/api\\.ocr\\.space/);
+    assert.ok(log.includes('denied fetch https://example.invalid/collect'));
+    assert.ok(log.includes('denied fetch http://api.ocr.space/parse/image'));
     fs.rmSync(logPath, { force: true });
 });
 
