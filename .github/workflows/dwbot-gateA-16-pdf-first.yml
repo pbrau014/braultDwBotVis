@@ -150,12 +150,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           $priorRunId = '42202563673'
+          $expectedWorkflowHeadSha = '036f31181272d89ed2d678ca1b512c953f563106'
           $priorArtifactId = 13495008195
           $expectedDigest = 'sha256:398f8152847cd3ea58fb9e16ac01886fced0c880869ce6a430d3343e5cb4ecd8'
           $priorJson = gh run view $priorRunId --repo $env:GITHUB_REPOSITORY --json name,headSha,status,conclusion
           if ($LASTEXITCODE -ne 0) { throw 'Could not inspect the original partial Gate A run.' }
           $prior = $priorJson | ConvertFrom-Json
-          if ($prior.name -ne 'DWBOT Gate A 16-image OCR.Space PDF-first acceptance' -or $prior.headSha -ne $env:GATEB_SOURCE_SHA -or $prior.status -ne 'completed' -or $prior.conclusion -ne 'cancelled') { throw 'Original Gate A run identity/state does not match the approved partial source run.' }
+          if ($prior.name -ne 'DWBOT Gate A 16-image OCR.Space PDF-first acceptance' -or $prior.headSha -ne $expectedWorkflowHeadSha -or $prior.status -ne 'completed' -or $prior.conclusion -ne 'cancelled') { throw 'Original Gate A run identity/state does not match the approved partial source run.' }
           $artifactJson = gh api "repos/$env:GITHUB_REPOSITORY/actions/runs/$priorRunId/artifacts"
           if ($LASTEXITCODE -ne 0) { throw 'Could not inspect original Gate A artifacts.' }
           $artifact = (($artifactJson | ConvertFrom-Json).artifacts | Where-Object { $_.id -eq $priorArtifactId })
