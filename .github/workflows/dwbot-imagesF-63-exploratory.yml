@@ -8,6 +8,14 @@ on:
   push:
     branches:
       - main
+    # Documentation and ground-truth/evaluation artifacts must not trigger
+    # another billable 63-image OCR.Space submission run.
+    paths-ignore:
+      - 'testdata/ground-truth/**'
+      - 'docs/continuation/**'
+      - 'scripts/evaluate-ocrspace-imagesF-63-ground-truth.py'
+      - 'reports/ocrspace-imagesF-63/**'
+      - '.github/workflows/dwbot-imagesF-63-exploratory.yml'
   workflow_dispatch:
 
 permissions:
