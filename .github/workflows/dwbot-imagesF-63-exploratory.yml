@@ -123,6 +123,14 @@ jobs:
             Copy-Item -LiteralPath $oldNetworkLogs[0].FullName -Destination (Join-Path $env:GITHUB_WORKSPACE 'testdata\ocr-acceptance\imagesF-63-blocked-network-attempts.log') -Force
           }
           'OCRSPACE_63_RESUME=1' | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+      - name: Initialize restricted-egress diagnostic log for a fresh batch
+        if: inputs.resume_run_id == ''
+        shell: powershell
+        run: |
+          $dir = Join-Path $env:GITHUB_WORKSPACE 'testdata\ocr-acceptance'
+          New-Item -ItemType Directory -Force $dir | Out-Null
+          $log = Join-Path $dir 'imagesF-63-blocked-network-attempts.log'
+          [System.IO.File]::WriteAllText($log, '')
       - name: Run OCR.Space Engine 2 PDF-first exploratory extraction
         shell: powershell
         env:
