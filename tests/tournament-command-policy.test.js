@@ -49,7 +49,7 @@ test('public Discord standings and totals contain doubloons only', () => {
         const output = section(start, end);
         assert.doesNotMatch(output, /estimatedValue|\\$\\{|Estimated value|H12-equivalent|totalDollars/);
     }
-    const help = section('function tournamentHelp()', 'function isTournamentAdmin(');
+    const help = section('function tournamentHelp()', 'function tournamentStandingsText()');
     assert.match(help, /download the Excel source workbook \(admin only\)/);
     assert.doesNotMatch(help, /estimated dollar value|doubloon and dollar totals/);
 });
