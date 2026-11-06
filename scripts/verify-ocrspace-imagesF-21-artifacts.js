@@ -268,7 +268,7 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
     const networkOk = networkAttempts === 0 && workflowRestrictionOk;
     const networkReconciliation = networkReconciliationPath
         ? await fs.readFile(networkReconciliationPath, 'utf8')
-            .then(text => JSON.parse(text.replace(/^\uFEFF/, ''))).catch(() => null) : null;
+            .then(text => JSON.parse(text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text)).catch(() => null) : null;
     const files = await listFiles(artifactRoot);
     const secretInputs = [...files, runReport, groundTruth, preflightReport, freshPreflightReport,
         ...(networkLog === null ? [] : [networkLogPath]),
