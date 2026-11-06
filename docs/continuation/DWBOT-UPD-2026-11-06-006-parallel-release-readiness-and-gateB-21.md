@@ -388,3 +388,15 @@ the exact run report. No arbitrary minimum pixel threshold is introduced.
   and per-request-checkpoint requirements. It is not eligible for this resume
   workflow. Continue to let it finish and inspect its own artifact.
 
+
+
+## Latest verification poll — 2026-11-06 06:30 UTC
+
+- Current main at this poll: 173a923c71e7c2fc556a496e4c12421b8e9ba797.
+- Exact-head DWBOT verification run #42174815581 is pending; no jobs have
+  been assigned/reported yet. No passing result is claimed.
+- Original extraction #42160979140 remains in progress at the same PDF-first
+  extraction step, with last GitHub run/job update at 04:11:11 UTC and no
+  artifacts listed. Job logs remain unavailable while the job is active.
+- No PDF, raster, OCR result, or 21-image post-hoc evaluation is available.
+  No duplicate provider submissions have been started.
