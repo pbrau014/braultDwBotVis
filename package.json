@@ -35,7 +35,8 @@
     "test:persistence-recovery": "node scripts/run-persistence-recovery.js",
     "test:windows-native-ocr": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/run-windows-ocr-acceptance.ps1",
     "test:ocrspace-64": "node scripts/run-ocrspace-64-inventory.js",
-    "test:windows-release-gates": "npm run test:persistence-recovery && npm run test:windows-native-ocr"
+    "test:windows-release-gates": "npm run test:persistence-recovery && npm run test:windows-native-ocr",
+    "test:ocrspace-imagesF-63": "node scripts/run-ocrspace-imagesF-63-exploratory.js"
   },
   "engines": {
     "node": ">=22.16.0"
