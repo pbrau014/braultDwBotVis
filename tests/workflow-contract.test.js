@@ -281,7 +281,7 @@ test('Gate A acceptance uses the accepted runtime, fail-closed network guard and
     assert.ok(workflow.includes('Configure fail-closed restricted-egress diagnostic preload'));
     assert.ok(workflow.includes('source/scripts/block-network.js'));
     assert.ok(workflow.includes('scripts/block-network.js'));
-    const preload = workflow.split('\\n').find(line => line.includes('NODE_OPTIONS='));
+    const preload = workflow.split(String.fromCharCode(10)).find(line => line.includes('NODE_OPTIONS='));
     assert.ok(preload && preload.indexOf('source/scripts/block-network.js') < preload.lastIndexOf('scripts/block-network.js'), 'fail-closed logger must wrap the candidate guard');
     assert.ok(workflow.includes('source/testdata/gateA-16/report.json.progress.json'));
     assert.ok(workflow.includes('cancel-in-progress: false'));
