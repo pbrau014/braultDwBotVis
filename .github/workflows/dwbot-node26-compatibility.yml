@@ -1,6 +1,9 @@
 name: DWBOT Node.js 26.13.0 compatibility
 
 on:
+  push:
+    branches:
+      - chore/node-26-13-runtime-reference-and-ci
   pull_request:
     branches:
       - main
