@@ -162,6 +162,7 @@ def main():
     ap.add_argument("--run-report", required=True, type=Path)
     ap.add_argument("--ground-truth", required=True, type=Path)
     ap.add_argument("--output", required=True, type=Path)
+    ap.add_argument("--inventory", choices=("all-63", "complete-ground-truth-21"), default="all-63")
     args=ap.parse_args()
     run=json.loads(args.run_report.read_text(encoding="utf-8"))
     gt=json.loads(args.ground_truth.read_text(encoding="utf-8"))
@@ -177,17 +178,39 @@ def main():
     unknown=sorted(set(names)-set(r["filename"] for r in gt["records"]))
     if unknown:
         raise SystemExit("OCR run contains filenames absent from ground truth: "+", ".join(unknown))
-    engines=[evaluate_engine(run,gt,e) for e in ("tesseractjs","native")]
+    source_corpus_count = len(gt["records"])
+    selected_records = gt["records"]
+    if args.inventory == "complete-ground-truth-21":
+        selected_records = [r for r in gt["records"]
+            if r.get("recordStatus") == "COMPLETE_9_FIELD_TRANSCRIPTION"
+            and all(r.get("fieldStatus", {}).get(field, {}).get("eligible_for_exact_match") is True for field in FIELDS)]
+        if len(selected_records) != 21 or selected_records != gt["records"][:21]:
+            raise SystemExit("The approved complete nine-field selection must be exactly the first 21 corpus-order records; refusing a changed or ambiguous selection.")
+    selected_names = {r["filename"] for r in selected_records}
+    selected_run_results = [r for r in run.get("results", []) if r.get("filename") in selected_names]
+    missing_selected = [r["filename"] for r in selected_records if r["filename"] not in {x.get("filename") for x in selected_run_results}]
+    evaluation_run = dict(run)
+    evaluation_run["results"] = selected_run_results
+    engines=[evaluate_engine(evaluation_run,gt,e) for e in ("tesseractjs","native")]
     report={
         "schemaVersion":1,
-        "status":"POST_HOC_EVALUATION",
+        "status":"POST_HOC_EVALUATION" if not missing_selected else "POST_HOC_EVALUATION_INCOMPLETE_SELECTED_INVENTORY",
         "runReport":str(args.run_report),
         "runReportSha256":sha(args.run_report),
         "groundTruth":str(args.ground_truth),
         "groundTruthSha256":sha(args.ground_truth),
         "runStatus":run.get("status"),
-        "imageCount":run.get("imageCount"),
-        "resultRows":len(run.get("results", [])),
+        "inventorySelection":{
+            "id":args.inventory,
+            "selectedImageCount":len(selected_records),
+            "evaluatedResultRows":len(selected_run_results),
+            "missingSelectedImages":missing_selected,
+            "sourceCorpusImageCount":source_corpus_count,
+            "selectionRule":"first 21 corpus-order records with COMPLETE_9_FIELD_TRANSCRIPTION and all nine fieldStatus.eligible_for_exact_match=true" if args.inventory == "complete-ground-truth-21" else "all 63 source-corpus records"
+        },
+        "imageCount":len(selected_records),
+        "sourceCorpusImageCount":source_corpus_count,
+        "resultRows":len(selected_run_results),
         "sourceArchiveSha256":run.get("sourceArchiveSha256"),
         "accuracyStatus":{
             "overall":"PARTIALLY_EVALUABLE_AGAINST_SUPPLIED_MANUAL_TRANSCRIPTION",
@@ -208,8 +231,9 @@ def main():
     print(json.dumps({
         "output":str(args.output),"sha256":digest,
         "runStatus":run.get("status"),
-        "resultRows":len(run.get("results", [])),
-        "pdfsWithHashes":sum(1 for x in run.get("results",[]) if x.get("pdfSha256")),
+        "inventorySelection":report["inventorySelection"],
+        "resultRows":len(selected_run_results),
+        "pdfsWithHashes":sum(1 for x in selected_run_results if x.get("pdfSha256")),
         "accuracyStatus":report["accuracyStatus"],
         "engineSummaries":[{"engine":x["engine"],"fieldLevelSummary":x["fieldLevelSummary"],
                             "completeNineFieldSubset":x["completeNineFieldSubset"],

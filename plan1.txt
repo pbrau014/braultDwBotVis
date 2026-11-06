@@ -1,4 +1,42 @@
 ================================================================================
+CURRENT OCR.SPACE INVENTORY REQUIREMENT — 2026-11-06
+================================================================================
+Status: ACTIVE / GOVERNING / SUPERSEDES THE 64-IMAGE INVENTORY TEST REQUIREMENT.
+
+- The user-authorized PDF-first inventory test set is now 4 images, 16 images,
+  and a 21-image complete-ground-truth subset selected from the current
+  imagesF 63-image exploratory corpus. The separate 64-image inventory test
+  requirement is withdrawn and must not block or be substituted for this set.
+- The 21-image selection is exactly the first 21 records in
+  testdata/ground-truth/imagesF-63-working-ground-truth-v6.json, in corpus
+  order, for which recordStatus is COMPLETE_9_FIELD_TRANSCRIPTION and all
+  nine required fields have fieldStatus.eligible_for_exact_match=true.
+  The selection is source-bound by each original filename, byte size and
+  SHA-256. Preserve the source image's actual dimensions; do not invent an
+  arbitrary minimum pixel threshold.
+- Reuse the already authorized 63-image exploratory extraction and its saved
+  PDF/raster/local-reader artifacts for the overlapping 21 records. Do not
+  make duplicate OCR.Space submissions merely to create a 21-row report.
+  The post-hoc evaluator supports --inventory complete-ground-truth-21 and
+  must report the selection, missing run rows and per-engine metrics.
+- The 21-image subset supplies an eligible complete-record evaluation scope
+  for the PDF-first pipeline. It is not a 50-image independent Gate B holdout,
+  does not certify the v6 workbook, and does not change Gate B: NOT_PASSED.
+  The 4- and 16-image inventory requirements remain active.
+- The legacy 64-image inventory manifest, runner and tests may remain in the
+  repository as historical/legacy integrity material, but they are no longer
+  an active inventory requirement or required execution step. Remove any
+  active package command or instruction that tells operators to run the
+  separate 64-image provider inventory.
+- No provider request is made by the post-hoc evaluator. The 21-row evaluation
+  is valid only when the existing run report and corresponding PDF/raster
+  artifacts are available and verified. Accuracy is not claimed before then.
+
+================================================================================
+END CURRENT OCR.SPACE INVENTORY REQUIREMENT
+================================================================================
+
+================================================================================
 CURRENT NODE.JS RUNTIME AUTHORIZATION — 2026-11-05
 ================================================================================
 Node.js 22.16.0 is explicitly authorized and acceptable for DWBOT in place of

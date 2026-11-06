@@ -16,7 +16,7 @@ If OCR.Space processing, PDF creation/download or rasterization fails, the image
 ## Upload normalization and provenance
 The OCR.Space Free API file limit is 1 MiB. Images above that limit are re-encoded locally to a bounded JPEG using a descending size/quality profile. The original image is never modified. Record original image SHA-256/size; normalized upload SHA-256/size/dimensions/quality; OCR.Space engine, processing time and provider exit status; searchable PDF SHA-256/size; rendered raster dimensions/size; per-image local-reader outputs and exact comparisons.
 
-The user explicitly authorized OCR.Space processing of the 4-, 16-, and 64-image World of Warships inventories in this chat, including player names visible in those screenshots. This authorization is limited to those inventories. Never send credentials, Discord IDs, private account data, unrelated UI or unrelated images. Never log or package the API key.
+The user explicitly authorized OCR.Space processing of the 4-image and 16-image inventories, plus the 21-image complete-ground-truth subset selected from the current 63-image exploratory corpus, including player names visible in those screenshots. Do not initiate a separate 64-image inventory run. Never send credentials, Discord IDs, private account data, unrelated UI or unrelated images. Never log or package the API key.
 
 ## Provider limits and privacy
 The official API currently documents a 1 MiB Free API upload limit, 500 requests/day, 25,000 requests/month and three PDF pages per document. Free searchable PDFs contain an OCR.Space watermark. Searchable-PDF URLs remain available for one hour. The privacy policy says uploads are deleted after processing, generated PDFs after 60 minutes, and API IP logs after one month. Verify current terms before live processing. Do not use paid tiers or automatically retry rate-limited requests. Reserve quota before every provider request and fail closed on quota-ledger errors.
@@ -39,7 +39,7 @@ The official API currently documents a 1 MiB Free API upload limit, 500 requests
 |---|---|---|---|
 | 4 images | fixtures/four-screenshots/ | Existing exact expected values | OCR.Space PDF first, then local readers, compare all nine fields |
 | 16 images | fixtures/additional-screenshots/ | testdata/additional-screenshot-ground-truth.json | OCR.Space PDF first, then local readers, compare all nine fields |
-| 64 images | imgsHalf1.zip / dwbotStuff/DWBOT_64_IMAGE_INVENTORY_REVIEWED.json | No independent nine-field ground truth | Verify all 64; submit only 56 user-verified eligible images, skip the 8 user-excluded images without provider requests; report extraction only, not accuracy |
+| 21 images | First 21 corpus-order records in testdata/ground-truth/imagesF-63-working-ground-truth-v6.json | Complete manual transcription; all nine fields eligible | Reuse the current 63-image exploratory run's PDF/raster/local-reader outputs; post-hoc evaluate only these 21 records. No duplicate OCR.Space submissions. This is not Gate B. |
 
 The 64-image archive is not in the current repository tree. The reviewed provenance specifies imgsHalf1.zip as 57,665,767 bytes with SHA-256 e32e43991ab90d6e2ca3e060f264456d175d0e93390f273d7f3a3f5d93fa98a2. The 58,090,288-byte inventory total is the sum of the 64 uncompressed image files, not a competing ZIP size. Retrieve the exact archive, verify its size/hash, then verify all 64 member hashes before processing; never reconstruct or select a candidate by guess.
 
