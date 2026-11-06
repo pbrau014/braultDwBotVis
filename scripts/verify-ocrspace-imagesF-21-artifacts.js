@@ -11,6 +11,11 @@ const INVENTORY = 'gate-b-complete-ground-truth-19';
 const MIN_GATE_B_IMAGES = 19;
 const REQUIRED_READERS = ['tesseractjs', 'native', 'paddleocr'];
 
+function parseJsonUtf8(input) {
+    const text = Buffer.isBuffer(input) ? input.toString('utf8') : String(input);
+    return JSON.parse(text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text);
+}
+
 function sha256(buffer) {
     return crypto.createHash('sha256').update(buffer).digest('hex');
 }
@@ -137,10 +142,10 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
     const gtBytes = await fs.readFile(groundTruth);
     const preflightBytes = await fs.readFile(preflightReport);
     const freshPreflightBytes = await fs.readFile(freshPreflightReport);
-    const run = JSON.parse(runBytes.toString('utf8'));
-    const gt = JSON.parse(gtBytes.toString('utf8'));
-    const preflight = JSON.parse(preflightBytes.toString('utf8'));
-    const freshPreflight = JSON.parse(freshPreflightBytes.toString('utf8'));
+    const run = parseJsonUtf8(runBytes);
+    const gt = parseJsonUtf8(gtBytes);
+    const preflight = parseJsonUtf8(preflightBytes);
+    const freshPreflight = parseJsonUtf8(freshPreflightBytes);
     const selected = selectGateB(gt);
     if (selected.length !== MIN_GATE_B_IMAGES || selected.some((record, index) => record !== gt.records[index])) throw new Error('Gate B selection is not exactly the first 19 complete nine-field records in corpus order.');
     if (run.sourceArchiveSha256 !== gt.candidateArchive?.sha256 || preflight.archiveSha256 !== run.sourceArchiveSha256) throw new Error('Run/preflight archive fingerprint does not match the v6 ground truth.');
@@ -269,7 +274,7 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
     const networkOk = networkAttempts === 0 && workflowRestrictionOk;
     const networkReconciliation = networkReconciliationPath
         ? await fs.readFile(networkReconciliationPath, 'utf8')
-            .then(text => JSON.parse(text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text)).catch(() => null) : null;
+            .then(text => parseJsonUtf8(text)).catch(() => null) : null;
     const files = await listFiles(artifactRoot);
     const secretInputs = [...files, runReport, groundTruth, preflightReport, freshPreflightReport,
         ...(networkLog === null ? [] : [networkLogPath]),
@@ -350,7 +355,7 @@ async function main() {
         throw new Error('Usage: node scripts/verify-ocrspace-imagesF-21-artifacts.js --run-report FILE --ground-truth FILE --preflight-report FILE --fresh-preflight-report FILE --source-image-root DIR --artifact-root DIR --network-log FILE --recovery-network-log FILE --workflow-file FILE --output FILE [--gate-a-report FILE]');
     }
     const workflowSourceText = await fs.readFile(workflowFile, 'utf8');
-    const gateAReport = gateAReportPath ? JSON.parse(await fs.readFile(gateAReportPath, 'utf8')) : null;
+    const gateAReport = gateAReportPath ? parseJsonUtf8(await fs.readFile(gateAReportPath)) : null;
     const report = await verifyArtifacts({ runReport, groundTruth, preflightReport, freshPreflightReport, sourceImageRoot, artifactRoot, networkLogPath, recoveryNetworkLogPath, networkReconciliationPath, workflowSourceText, gateAReport });
     await fs.writeFile(output, JSON.stringify(report, null, 2) + '\n');
     console.log('[DWBOT-ARTIFACT-VERIFY] ' + report.status + '; pdf/raster=' + report.inventorySelection.pdfRasterVerifiedImageCount + '/19; full=' + report.inventorySelection.verifiedImageCount + '/19; Gate A=' + report.gateA.status + '; network=' + report.checks.networkRestriction + '; secret scan=' + report.checks.secretLeakScan);
