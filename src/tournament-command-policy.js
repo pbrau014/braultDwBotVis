@@ -15,6 +15,8 @@ const ADMIN_ONLY_COMMANDS = new Set([
     'finalize',
     'export',
     'export-workbook',
+    'download-workbook',
+    'workbook',
     'snapshot',
 ]);
 
