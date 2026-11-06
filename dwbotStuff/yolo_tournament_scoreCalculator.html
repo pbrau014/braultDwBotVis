@@ -640,8 +640,8 @@ function multiplierField(key, field, label, description, example, defaultValue=1
   const id=`${key}-${field}`;
   const value=cfg(key)[field];
   return `<div class="field multiplier-field">
-    <div class="multiplier-head"><label for="${id}">${label}</label><button type="button" class="reset-one" data-reset-setting="${key}|${field}" aria-label="Reset ${label} to ${defaultValue}">Reset to ${defaultValue}</button></div>
-    <input id="${id}" type="number" step="0.1" inputmode="decimal" data-setting="${key}|${field}" value="${esc(value)}" aria-describedby="${id}-note ${id}-example">
+    <div class="multiplier-head"><label for="${id}">${label}</label><button type="button" class="reset-one" data-reset-setting="${key}|${field}" title="Restore the workbook/DWBOT default (${defaultValue}) without changing entered results." aria-label="Reset ${label} to ${defaultValue}">Reset to ${defaultValue}</button></div>
+    <input id="${id}" type="number" step="0.1" inputmode="decimal" data-setting="${key}|${field}" value="${esc(value)}" title="${esc(description)}" aria-describedby="${id}-note ${id}-example">
     <p class="field-note" id="${id}-note">${description}</p>
     <p class="field-example" id="${id}-example"><strong>Example:</strong> ${example}</p>
   </div>`;
@@ -650,7 +650,7 @@ function renderEvent(key){
   const meta=EVENT_META[key], settings=cfg(key), grand=key==="grand";
   let table=`<div class="table-wrap"><table><thead><tr><th>Player</th>${Array.from({length:7},(_,i)=>`<th>Game ${i+1}<br><span class="th-sub">${grand?"Class · Tier · Damage · Kills · Time":"Class · Tier · "+meta.metric}</span></th>`).join("")}<th>Total ${grand?"Damage":meta.metric}</th><th>Doubloons</th></tr></thead><tbody>`;
   table+=state.players.map(p=>`<tr><td class="name"><strong>${esc(p.name)}</strong></td>${p.events[key].map((g,i)=>`<td><div class="game-inputs ${grand?"grand-inputs":""}">
-    <select aria-label="Game ${i+1} class for ${esc(p.name)}" data-game="${key}|${p.id}|${i}|class"><option value="DD" ${g.class==="DD"?"selected":""}>DD</option><option value="CA" ${g.class==="CA"?"selected":""}>CA</option><option value="BB" ${g.class==="BB"?"selected":""}>BB</option><option value="-" ${g.class==="-"?"selected":""}>—</option></select>
+    <select title="Ship class weighting: DD = 4, CA = 3, BB = 2; — applies no class weight." aria-label="Game ${i+1} class for ${esc(p.name)}" data-game="${key}|${p.id}|${i}|class"><option value="DD" ${g.class==="DD"?"selected":""}>DD</option><option value="CA" ${g.class==="CA"?"selected":""}>CA</option><option value="BB" ${g.class==="BB"?"selected":""}>BB</option><option value="-" ${g.class==="-"?"selected":""}>—</option></select>
     <input title="Tier" aria-label="Tier" type="number" min="1" step="any" data-game="${key}|${p.id}|${i}|tier" value="${esc(g.tier)}">
     ${grand?`<input title="Damage" aria-label="Damage" type="number" min="0" step="any" data-game="${key}|${p.id}|${i}|damage" value="${esc(g.damage)}"><input title="Kills" aria-label="Kills" type="number" min="0" step="any" data-game="${key}|${p.id}|${i}|kills" value="${esc(g.kills)}"><input title="Time" aria-label="Time" type="number" min="0" step="any" data-game="${key}|${p.id}|${i}|time" value="${esc(g.time)}">`:`<input title="${meta.metric}" aria-label="${meta.metric}" type="number" min="0" step="any" data-game="${key}|${p.id}|${i}|metric" value="${esc(g.metric)}" >`}
     </div></td>`).join("")}<td class="result">${fmt(eventTotal(p,key))}</td><td class="result">${fmt(eventScore(p,key))}</td></tr>`).join("");
@@ -670,7 +670,7 @@ function renderEvent(key){
     <div class="panel-head"><div><div class="eyebrow">${grand?"Combined scoring":"Event scoring"}</div><h2>${meta.title}</h2><p>${meta.subtitle}</p></div><span class="chip">7 games per player</span></div>
     <div class="explainer-banner"><strong>How to use these settings:</strong> Start with the displayed workbook/DWBOT defaults (Grand Yolo Tier weight is 0.9; other multipliers are 1). Use the explanation and example under each control to understand the effect. Each reset button restores that setting's actual default and keeps all game results. The number steppers change each multiplier by exactly 0.1 (one tenth).</div>
     <div class="controls no-print">
-      <div class="field pool"><label for="${key}-poolInput">${grand?"Doubloon pool (not used in Round 4)":"Doubloon pool"}</label><input title="Workbook pool cell" type="number" min="0" step="any" id="${key}-poolInput" data-setting="${key}|pool" value="${esc(settings.pool)}"><p class="field-note">${poolDescription}</p></div>
+      <div class="field pool"><label for="${key}-poolInput">${grand?"Doubloon pool (not used in Round 4)":"Doubloon pool"}</label><input title="${esc(poolDescription)}" aria-describedby="${key}-pool-note" type="number" min="0" step="any" id="${key}-poolInput" data-setting="${key}|pool" value="${esc(settings.pool)}"><p class="field-note" id="${key}-pool-note">${poolDescription}</p></div>
       ${multiplierField(key,"multiplier","Overall multiplier",overallDescription,overallExample)}
       ${multiplierControls}
       <div class="action-group"><button class="primary" id="addPlayer">＋ Add player</button><button data-goto="totals">Season totals ↗</button><button class="danger" id="clearEventData" data-clear-event="${key}">Clear this event</button></div>
