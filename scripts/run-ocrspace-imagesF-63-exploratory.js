@@ -9,6 +9,7 @@ process.env.OCRSPACE_NETWORK_ALLOWLIST = '1';
 require('./block-network');
 
 const { createOcrSpacePdfFirst } = require('../src/ocrspace-pdf-first');
+const { validateResumeState, classifyResumeRow } = require('../src/ocrspace-exploratory-resume');
 const bot = require('../src/bot');
 const root = path.resolve(__dirname, '..');
 const imageRoot = path.resolve(process.env.OCRSPACE_63_IMAGE_ROOT || '');
@@ -19,6 +20,24 @@ const requiredFields = ['result', 'player', 'map', 'mode', 'battleStart', 'credi
 const engines = ['tesseractjs', 'native'];
 
 function sha256(buffer) { return crypto.createHash('sha256').update(buffer).digest('hex'); }
+
+async function writeProgress(outputRoot, run) {
+    run.completedImages = run.results.length;
+    run.updatedAt = new Date().toISOString();
+    const target = path.join(outputRoot, 'progress.json');
+    const temp = target + '.' + process.pid + '.tmp';
+    try {
+        await fs.writeFile(temp, JSON.stringify(run, null, 2) + '\\n', { flag: 'wx' });
+        await fs.rename(temp, target);
+    } catch (error) {
+        await fs.rm(temp, { force: true }).catch(() => {});
+        throw error;
+    }
+}
+
+function syncResults(run, rows) {
+    run.results = [...rows.values()].sort((a, b) => a.index - b.index);
+}
 
 async function extractWithEngine(rasterBuffer, engine) {
     process.env.OCRSPACE_ENABLED = '0';
@@ -55,31 +74,94 @@ async function main() {
     const verifiedRoot = await fs.realpath(imageRoot);
     if (preflight.verifiedMembers.length !== 63) throw new Error('Preflight does not contain 63 verified member records.');
     await fs.mkdir(outputRoot, { recursive: true });
-    const run = {
-        schemaVersion: 1,
-        status: 'running-exploratory',
-        createdAt: new Date().toISOString(),
-        sourceArchiveSha256: expectedArchiveSha,
-        preflightReportSha256: sha256(await fs.readFile(preflightPath)),
-        imageCount: 63,
-        requiredFields,
-        groundTruthStatus: 'NOT_EVALUABLE_NO_INDEPENDENT_GROUND_TRUTH',
-        accuracy: 'NOT_EVALUABLE_NO_INDEPENDENT_GROUND_TRUTH',
-        gateB: 'NOT_PASSED',
-        provider: 'OCR.Space',
-        providerEngine: 2,
-        pipeline: 'source screenshot -> OCR.Space Engine 2 searchable PDF -> validated PDF -> local PDF raster -> local readers',
-        originalScreenshotFallback: false,
-        results: [],
-        missingGroundTruthRegister: {
-            status: 'preserved-in-repository',
-            workbookCounts: { populatedRows: 46, completeNineFieldRows: 36, partialRows: 10, imagesWithoutRows: 10 },
-            missingCells: { damage: 8, xp: 2, map: 1 },
-            note: 'No missing expected values were inferred or fabricated. These are exploratory outputs, not Gate B accuracy evidence.'
+    const progressPath = path.join(outputRoot, 'progress.json');
+    const reportPath = path.join(outputRoot, 'ocrspace-imagesF-63-exploratory-report.json');
+    const preflightReportSha256 = sha256(await fs.readFile(preflightPath));
+    const resume = process.env.OCRSPACE_63_RESUME === '1';
+    let run;
+    let resultByName;
+    if (resume) {
+        let saved;
+        try { saved = JSON.parse(await fs.readFile(progressPath, 'utf8')); }
+        catch (error) { throw new Error('Resume requested but the prior progress.json is missing or unreadable: ' + error.message); }
+        resultByName = validateResumeState(saved, {
+            sourceArchiveSha256: expectedArchiveSha,
+            preflightReportSha256,
+            verifiedMembers: preflight.verifiedMembers,
+            requiredFields
+        });
+        run = saved;
+        run.status = 'resuming-exploratory';
+        run.resumeStartedAt = new Date().toISOString();
+    } else {
+        for (const existing of [progressPath, reportPath]) {
+            try { await fs.access(existing); throw new Error('Existing OCR.Space output found at ' + existing + '; use OCRSPACE_63_RESUME=1 with its exact verified progress instead of starting a duplicate batch.'); }
+            catch (error) { if (error.code !== 'ENOENT') throw error; }
         }
-    };
+        run = {
+            schemaVersion: 1,
+            status: 'running-exploratory',
+            createdAt: new Date().toISOString(),
+            sourceArchiveSha256: expectedArchiveSha,
+            preflightReportSha256,
+            imageCount: 63,
+            requiredFields,
+            groundTruthStatus: 'NOT_EVALUABLE_NO_INDEPENDENT_GROUND_TRUTH',
+            accuracy: 'NOT_EVALUABLE_NO_INDEPENDENT_GROUND_TRUTH',
+            gateB: 'NOT_PASSED',
+            provider: 'OCR.Space',
+            providerEngine: 2,
+            pipeline: 'source screenshot -> OCR.Space Engine 2 searchable PDF -> validated PDF -> local PDF raster -> local readers',
+            originalScreenshotFallback: false,
+            results: [],
+            missingGroundTruthRegister: {
+                status: 'preserved-in-repository',
+                workbookCounts: { populatedRows: 46, completeNineFieldRows: 36, partialRows: 10, imagesWithoutRows: 10 },
+                missingCells: { damage: 8, xp: 2, map: 1 },
+                note: 'No missing expected values were inferred or fabricated. These are exploratory outputs, not Gate B accuracy evidence.'
+            }
+        };
+        resultByName = new Map();
+    }
     for (let i = 0; i < preflight.verifiedMembers.length; i++) {
         const item = preflight.verifiedMembers[i];
+        const index = i + 1;
+        const prior = resultByName.get(item.filename);
+        const decision = classifyResumeRow(prior, { ...item, index });
+        if (decision === 'skip-complete') {
+            const pdfPath = path.resolve(outputRoot, String(prior.pdfPath || ''));
+            const rasterPath = path.resolve(outputRoot, String(prior.rasterPath || ''));
+            const safeArtifactPath = target => path.dirname(target) === outputRoot && path.basename(target) === target.split(path.sep).pop();
+            let artifactsValid = safeArtifactPath(pdfPath) && safeArtifactPath(rasterPath);
+            if (artifactsValid) {
+                try {
+                    artifactsValid = sha256(await fs.readFile(pdfPath)) === prior.pdfSha256
+                        && sha256(await fs.readFile(rasterPath)) === prior.rasterSha256;
+                } catch { artifactsValid = false; }
+            }
+            if (artifactsValid) {
+                console.log('[OCRSPACE-IMAGESF-63] ' + index + '/63 ' + item.filename + ' already complete; provider skipped');
+                continue;
+            }
+            prior.resumeDisposition = 'artifact-integrity-failure-no-provider-retry';
+            prior.status = 'artifact-integrity-failure-no-resubmit';
+            prior.failure = { code: 'OCRSPACE_RESUME_ARTIFACT_INVALID', message: 'Previously completed PDF/raster artifact is missing, unsafe, or hash-mismatched; provider submission was not repeated.' };
+            syncResults(run, resultByName);
+            await writeProgress(outputRoot, run);
+            console.log('[OCRSPACE-IMAGESF-63] ' + index + '/63 ' + item.filename + ' artifact integrity failure; provider skipped');
+            continue;
+        }
+        if (decision === 'skip-ambiguous') {
+            prior.resumeDisposition = 'ambiguous-provider-submission-not-retried';
+            prior.previousStatus = prior.status;
+            prior.status = 'ambiguous-provider-submission-not-retried';
+            prior.failure = prior.failure || { code: 'OCRSPACE_RESUME_AMBIGUOUS_SUBMISSION', message: 'A prior provider request may have been sent. Automatic resubmission is prohibited; reconcile provider/artifact evidence manually.' };
+            syncResults(run, resultByName);
+            await writeProgress(outputRoot, run);
+            console.log('[OCRSPACE-IMAGESF-63] ' + index + '/63 ' + item.filename + ' ambiguous prior request; provider skipped');
+            continue;
+        }
+
         const sourcePath = path.resolve(verifiedRoot, item.filename);
         const relative = path.relative(verifiedRoot, sourcePath);
         if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) throw new Error('Unsafe verified member path: ' + item.filename);
@@ -88,19 +170,35 @@ async function main() {
         const source = await fs.readFile(realSourcePath);
         const sourceSha = sha256(source);
         if (source.length !== item.bytes || sourceSha !== item.sha256) throw new Error('Source member changed after preflight: ' + item.filename);
-        const row = {
-            index: i + 1,
-            filename: item.filename,
-            sourceBytes: source.length,
-            sourceSha256: sourceSha,
-            exactAccuracy: 'NOT_EVALUABLE_NO_INDEPENDENT_GROUND_TRUTH',
-            providerSubmissionAttempted: false
+        const row = prior || {
+            index, filename: item.filename, sourceBytes: source.length, sourceSha256: sourceSha,
+            exactAccuracy: 'NOT_EVALUABLE_NO_INDEPENDENT_GROUND_TRUTH', providerSubmissionAttempted: false
         };
+        row.status = 'prepared';
+        row.providerSubmissionAttempted = false;
+        delete row.failure;
+        delete row.resumeDisposition;
+        resultByName.set(item.filename, row);
+        syncResults(run, resultByName);
+        await writeProgress(outputRoot, run);
+
         try {
-            row.providerSubmissionAttempted = true;
-            const pdfFirst = await createOcrSpacePdfFirst({ imageBuffer: source, filename: item.filename, env: process.env });
+            const pdfFirst = await createOcrSpacePdfFirst({
+                imageBuffer: source,
+                filename: item.filename,
+                env: process.env,
+                onProviderRequestStarted: async detail => {
+                    row.providerSubmissionAttempted = true;
+                    row.status = 'provider-submission-started';
+                    row.providerRequestStartedAt = new Date().toISOString();
+                    row.uploadBytes = detail.uploadBytes;
+                    row.uploadSha256 = detail.uploadSha256;
+                    syncResults(run, resultByName);
+                    await writeProgress(outputRoot, run);
+                }
+            });
             if (pdfFirst.status !== 'complete') throw new Error(pdfFirst.reason || 'PDF-first provider step did not complete');
-            const stem = String(i + 1).padStart(2, '0') + '-' + path.basename(item.filename).replace(/[^a-z0-9_.-]/gi, '_');
+            const stem = String(index).padStart(2, '0') + '-' + path.basename(item.filename).replace(/[^a-z0-9_.-]/gi, '_');
             const pdfName = stem + '.ocrspace.pdf';
             const rasterName = stem + '.pdf-page.png';
             const pdfPath = path.join(outputRoot, pdfName);
@@ -141,11 +239,9 @@ async function main() {
             row.failure = { code: error.code || null, message: String(error.message || error).slice(0, 500) };
         }
         if (row.status === 'failed' && row.pdfSha256) row.status = 'pdf-first-complete-local-artifact-error';
-        run.results.push(row);
-        run.completedImages = run.results.length;
-        run.updatedAt = new Date().toISOString();
-        await fs.writeFile(path.join(outputRoot, 'progress.json'), JSON.stringify(run, null, 2));
-        console.log('[OCRSPACE-IMAGESF-63] ' + (i + 1) + '/63 ' + item.filename + ' ' + row.status);
+        syncResults(run, resultByName);
+        await writeProgress(outputRoot, run);
+        console.log('[OCRSPACE-IMAGESF-63] ' + index + '/63 ' + item.filename + ' ' + row.status);
     }
     run.status = run.results.every(row => row.status === 'pdf-first-complete')
         ? 'completed-exploratory-extraction'
