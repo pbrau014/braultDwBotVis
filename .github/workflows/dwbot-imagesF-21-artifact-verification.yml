@@ -171,6 +171,7 @@ jobs:
             "DWBOT_RUN_REPORT=$recoveredRun" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           }
           "DWBOT_LOCAL_READER_RECOVERY_REPORT=$recoveryReport" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "DWBOT_LOCAL_READER_RECOVERY_NETWORK_LOG=$recoveryNetworkLog" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
 
       - name: Verify the 21 selected PDFs, text layers, rasters, provenance and security
         id: artifact-verification
@@ -181,7 +182,7 @@ jobs:
         run: |
           $output = Join-Path $env:GITHUB_WORKSPACE 'testdata\ocrspace-imagesF-63-exploratory\artifact-verification-21.json'
           New-Item -ItemType Directory -Force (Split-Path $output -Parent) | Out-Null
-          node scripts/verify-ocrspace-imagesF-21-artifacts.js --run-report $env:DWBOT_RUN_REPORT --ground-truth $env:DWBOT_GROUND_TRUTH --preflight-report $env:DWBOT_OLD_PREFLIGHT --fresh-preflight-report $env:DWBOT_FRESH_PREFLIGHT --source-image-root $env:DWBOT_SOURCE_IMAGE_ROOT --artifact-root $env:DWBOT_ARTIFACT_ROOT --network-log $env:DWBOT_NETWORK_LOG --workflow-file $env:DWBOT_SOURCE_WORKFLOW --output $output
+          node scripts/verify-ocrspace-imagesF-21-artifacts.js --run-report $env:DWBOT_RUN_REPORT --ground-truth $env:DWBOT_GROUND_TRUTH --preflight-report $env:DWBOT_OLD_PREFLIGHT --fresh-preflight-report $env:DWBOT_FRESH_PREFLIGHT --source-image-root $env:DWBOT_SOURCE_IMAGE_ROOT --artifact-root $env:DWBOT_ARTIFACT_ROOT --network-log $env:DWBOT_NETWORK_LOG --recovery-network-log $env:DWBOT_LOCAL_READER_RECOVERY_NETWORK_LOG --workflow-file $env:DWBOT_SOURCE_WORKFLOW --output $output
           "DWBOT_ARTIFACT_VERIFICATION_REPORT=$output" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
 
       - name: Run 21-image post-hoc evaluation without provider requests
