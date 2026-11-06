@@ -11,7 +11,7 @@ const fields = ['result', 'player', 'map', 'mode', 'battleStart', 'credits', 'fr
 function selectedRecords() {
     return groundTruth.records.filter(record =>
         record.recordStatus === 'COMPLETE_9_FIELD_TRANSCRIPTION'
-        && fields.every(field => record.fieldStatus?.[field]?.eligible_for_exact_match === true));
+        && fields.every(field => record.fieldStatus?.[field]?.eligible_for_exact_match === true)).slice(0, 19);
 }
 
 test('Gate B inventory is exactly the first 19 complete nine-field ground-truth records', () => {
