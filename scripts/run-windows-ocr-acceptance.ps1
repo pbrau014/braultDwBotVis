@@ -167,7 +167,7 @@ try {
  $Inventory64ExtractionComplete=$false
  $Inventory64=[ordered]@{status='BLOCKED';completedImages=0;exactAccuracy='NOT_EVALUABLE_NO_INDEPENDENT_GROUND_TRUTH'}
  if($env:OCRSPACE_64_ARCHIVE_PATH -and $env:OCRSPACE_64_IMAGE_ROOT){
-  $env:OCRSPACE_64_OUTPUT_DIR=Join-Path $RunDir 'ocrspace-64-pdf-first'
+  $env:OCRSPACE_64_OUTPUT_DIR=Join-Path $env:TEMP ('dwbot-ocrspace-64-' + $PID)
   $env:OCR_NETWORK_BLOCK_LOG=Join-Path $RunDir 'ocrspace-64-network-attempts.log'
   Invoke-LoggedNpm -Label 'ocrspace-64-inventory-pdf-first' -Arguments @('run','test:ocrspace-64')
   $Inventory64Path=Join-Path $env:OCRSPACE_64_OUTPUT_DIR 'ocrspace-64-inventory-report.json'
