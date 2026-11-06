@@ -45,7 +45,7 @@ Record the original tournament instruction archives and active DWBOT project sou
 - Nested archives: none.
 - Text-bearing files parsed: 56; zero extraction errors.
 - Visual material: nine JPG contact sheets covering the 67-page Participant Guide, Event Operations Manual and Technical Reference. All nine contact sheets were visually inspected for page presence, legibility/layout anomalies and broad consistency. This was not a line-by-line visual reading of every source page, nor a WCAG/legal certification.
-- The nested v3.17 ZIP in SRC-01 has the same size and SHA-256 as this newly uploaded archive. It is the exact historical source package preserved by v3.22.
+- The nested v3.17 ZIP in SRC-01 has the same size and SHA-256 as the Library-preserved archive. It is the exact historical source package preserved by v3.22.
 
 ## 3. Source precedence
 
