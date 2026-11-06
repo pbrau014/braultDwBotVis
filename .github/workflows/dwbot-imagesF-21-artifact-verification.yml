@@ -1,12 +1,23 @@
 name: DWBOT 21-image artifact verification and post-hoc evaluation
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dwbot-imagesF-21-artifact-verification.yml'
+      - 'scripts/verify-ocrspace-imagesF-21-artifacts.js'
+      - 'scripts/evaluate-ocrspace-imagesF-63-ground-truth.py'
+      - 'testdata/ground-truth/imagesF-63-working-ground-truth-v6.json'
   workflow_dispatch:
     inputs:
       source_run_id:
         description: 'Completed 63-image OCR.Space exploratory run ID; this workflow never submits OCR requests.'
         required: true
         type: string
+
+concurrency:
+  group: dwbot-imagesF-21-artifact-verification-${{ github.ref }}
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -75,7 +86,7 @@ jobs:
         shell: powershell
         env:
           GH_TOKEN: ${{ github.token }}
-          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+          SOURCE_RUN_ID: ${{ inputs.source_run_id || '42160979140' }}
         run: |
           $sourceRunId = 0L
           if (-not [long]::TryParse($env:SOURCE_RUN_ID, [ref]$sourceRunId)) { throw 'source_run_id must be a numeric GitHub Actions run ID.' }
