@@ -201,7 +201,7 @@ try {
    $ExcludedRows=@($Inventory64Data.excludedRecords)
    $InvalidEligibleRows=@($EligibleRows | Where-Object {
     $_.provider -ne 'ocr.space' -or $_.providerEngine -ne 2 -or
-    $_.sourceSha256 -notmatch '^[a-f0-9]{64}$' -or $_.pdfSha256 -notmatch '^[a-f0-9]{64}$' -or
+    $_.sourcePresent -ne $false -or $_.pdfSha256 -notmatch '^[a-f0-9]{64}$' -or
     [int]$_.pdfBytes -le 0 -or [int]$_.rasterBytes -le 0 -or
     -not $_.artifacts.pdf -or -not $_.artifacts.raster -or @($_.localReaders).Count -ne 2
    })
@@ -218,7 +218,7 @@ try {
     [int]$Inventory64Data.excludedCount -eq 8 -and
     [int]$Inventory64Data.excludedSkipped -eq 8 -and
     [int]$Inventory64Data.completedInventoryEntries -eq 64 -and
-    [int]$Inventory64Data.sourceMemberHashesVerified -eq 64 -and
+    [int]$Inventory64Data.sourceMemberHashesVerified -eq 56 -and\n    $Inventory64Data.eligibleSourceHashesVerified -eq 56 -and\n    $Inventory64Data.archiveMembersVerified -eq 56 -and\n    $Inventory64Data.excludedRecordsAbsent -eq $true -and
     $Inventory64Data.allSourceMembersVerifiedBeforeProvider -eq $true -and
     $EligibleRows.Count -eq 56 -and $ExcludedRows.Count -eq 8 -and
     $InvalidEligibleRows.Count -eq 0 -and $InvalidExcludedRows.Count -eq 0
@@ -228,7 +228,7 @@ try {
     eligibleCount=[int]$Inventory64Data.eligibleCount;eligibleProcessed=[int]$Inventory64Data.eligibleProcessed
     completedImages=[int]$Inventory64Data.completedImages;excludedCount=[int]$Inventory64Data.excludedCount
     excludedSkipped=[int]$Inventory64Data.excludedSkipped;completedInventoryEntries=[int]$Inventory64Data.completedInventoryEntries
-    sourceMemberHashesVerified=[int]$Inventory64Data.sourceMemberHashesVerified
+    sourceMemberHashesVerified=[int]$Inventory64Data.sourceMemberHashesVerified\n    eligibleSourceHashesVerified=[int]$Inventory64Data.eligibleSourceHashesVerified\n    archiveMembersVerified=[int]$Inventory64Data.archiveMembersVerified\n    excludedRecordsAbsent=($Inventory64Data.excludedRecordsAbsent -eq $true)
     allSourceMembersVerifiedBeforeProvider=($Inventory64Data.allSourceMembersVerifiedBeforeProvider -eq $true)
     resultCount=$EligibleRows.Count;excludedRecordCount=$ExcludedRows.Count
     invalidEligibleRecordCount=$InvalidEligibleRows.Count;invalidExcludedRecordCount=$InvalidExcludedRows.Count
@@ -240,7 +240,7 @@ try {
   }
  }else{
   $script:Results += [pscustomobject]@{label='ocrspace-64-inventory-pdf-first';arguments=@('run','test:ocrspace-64');exitCode=2;log=$null;passed=$false;blocked=$true}
-  Write-Host '[WINDOWS-OCR] BLOCKED 64-image inventory: set OCRSPACE_64_ARCHIVE_PATH and OCRSPACE_64_IMAGE_ROOT after verifying imgsHalf1.zip.'
+  Write-Host '[WINDOWS-OCR] BLOCKED 64-image inventory: reconstruct and preflight-verify the eligible-only 56 archive before OCR.Space submissions.'
  }
  $CvPythonVersion='not-available'
  if($env:OPENCV_PYTHON_BIN -and (Test-Path -LiteralPath $env:OPENCV_PYTHON_BIN -PathType Leaf)){
@@ -369,7 +369,7 @@ finally{Pop-Location}
     [int]$Inventory64Data.excludedCount -eq 8 -and
     [int]$Inventory64Data.excludedSkipped -eq 8 -and
     [int]$Inventory64Data.completedInventoryEntries -eq 64 -and
-    [int]$Inventory64Data.sourceMemberHashesVerified -eq 64 -and
+    [int]$Inventory64Data.sourceMemberHashesVerified -eq 56 -and
     $Inventory64Data.allSourceMembersVerifiedBeforeProvider -eq $true -and
     $EligibleRows.Count -eq 56 -and $ExcludedRows.Count -eq 8 -and
     $InvalidEligibleRows.Count -eq 0 -and $InvalidExcludedRows.Count -eq 0
