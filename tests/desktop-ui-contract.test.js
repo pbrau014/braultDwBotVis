@@ -125,5 +125,5 @@ test('participant desktop scoreboards suppress H12 dollar diagnostics', () => {
   assert.match(script, /D\\.number\\(row\\.total\\)/);
   assert.match(service, /const publicRow = row =>/);
   assert.match(service, /const \\{ estimatedValue, \.\.\.visible \\} = row/);
-  assert.match(service, /role:'admin'.*aggregate/);
+  assert.match(service, /return \{\.\.\.base,aggregate,role:'admin'/);
 });
