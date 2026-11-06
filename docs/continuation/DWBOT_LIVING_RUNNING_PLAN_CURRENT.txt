@@ -1,3 +1,13 @@
+CURRENT NODE.JS 26.13.0 SUPPLEMENTAL RUNTIME UPDATE — 2026-11-06
+
+- User supplied `node-v26.13.0-linux-x64.tar.xz` (34,083,252 bytes). SHA-256: `d28a96af6c38596f6d9d97c0ee531c13d238d757742387d1928de822d959e997`; matches the official Node.js v26.13.0 release checksum.
+- Archive was safely extracted to an isolated tool directory. Executed binary reports Node `v26.13.0`; its npm CLI reports `11.20.0`.
+- Node.js 26.13.0 is LTS; Node.js release notes state LTS support through April 2029. Linux binaries may require `libatomic` depending on distribution.
+- Existing governing runtime authorization is preserved: Node.js 22.16.0 remains the supported minimum (`>=22.16.0`). This upload does not authorize raising the package engine floor or changing `.nvmrc`.
+- A supplemental Node 26.13.0 Linux/Windows compatibility CI job is being added. It is offline/no-provider: it runs dependency install and local tests only. It must not dispatch OCR.Space, Discord production, deployment, or production-data actions.
+- Windows-specific OCR acceptance still runs on Windows. The uploaded Linux archive is not a Windows installation.
+- Exact-head CI results, not this isolated binary check, determine whether Node 26.13.0 is accepted as a tested supplemental runtime.
+
 CURRENT CONNECTION-RESUME RECONCILIATION — 2026-11-06 18:22 UTC
 This block supersedes older "current" status blocks below; historical evidence remains unchanged.
 

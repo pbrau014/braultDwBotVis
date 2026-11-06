@@ -1,4 +1,29 @@
 ================================================================================
+NODE.JS 26.13.0 SUPPLEMENTAL RUNTIME UPDATE — 2026-11-06
+================================================================================
+- Supplied archive: node-v26.13.0-linux-x64.tar.xz, 34,083,252 bytes.
+- SHA-256: d28a96af6c38596f6d9d97c0ee531c13d238d757742387d1928de822d959e997.
+  This exactly matches the official Node.js v26.13.0 signed release checksum.
+- Safely extracted to an isolated tool directory; actual binary reports
+  Node v26.13.0 and npm 11.20.0.
+- Existing user-authorized minimum remains Node >=22.16.0. .nvmrc and
+  package.json engines are intentionally unchanged. Node 26.13.0 is an
+  additional compatibility target, not a new minimum.
+- Dedicated PR #16 adds offline Node 26.13.0 Linux/Windows CI. It provisions
+  local English Tesseract.js model files, runs npm ci, OCR.Space mocked
+  contract tests, and npm test. Provider submission is disabled in this job.
+- Initial Linux attempt correctly exposed missing Tesseract language-model
+  provisioning; the workflow was corrected. The corrected exact-head run is
+  pending. Do not report Node 26 project compatibility as passed until both
+  OS jobs complete successfully.
+- No Gate A/B status changes. No OCR.Space provider request, production
+  Discord action, deployment, or production-data change was performed.
+
+================================================================================
+END NODE.JS 26.13.0 SUPPLEMENTAL RUNTIME UPDATE
+================================================================================
+
+================================================================================
 CURRENT GATE B HOLDOUT REQUIREMENT — 2026-11-06
 ================================================================================
 Status: ACTIVE / GOVERNING / SUPERSEDES THE 21-IMAGE GATE B RULE BELOW.

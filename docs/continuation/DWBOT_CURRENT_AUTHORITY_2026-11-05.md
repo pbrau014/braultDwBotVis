@@ -114,16 +114,7 @@ IMPLEMENTATION / VERIFICATION STATUS — 2026-11-06
 
 ## Node.js runtime authorization — current and governing
 
-Node.js **22.16.0 is the authorized and acceptable DWBOT baseline**. It replaces
-older Node.js 24+, >=24.17.0 and v24.22.1 minimum/prerequisite statements.
-The current package manifest and lockfile require >=22.16.0; the tracked
-`.nvmrc` pins 22.16.0; and GitHub Actions uses 22.16.0 on Linux and Windows.
-Node 24 remains optional only when a specific dependency/tool is proven to
-require it. Do not block tests or release-candidate verification solely because
-the runtime is Node 22.16.0. Windows-specific acceptance must still run on
-Windows; this authorization does not convert Linux results into Windows proof.
-Keep actual historical Node 24 reports unchanged and bound to their original
-source fingerprints and runtime.
+Node.js **22.16.0 remains the authorized minimum and compatibility baseline** (`>=22.16.0`). This prior user authorization is preserved; the supplied Node 26 archive does not silently revoke it. Node.js **26.13.0 LTS** is added as a supplemental supported/test target. The uploaded Linux x64 archive SHA-256 matches the official Node.js signed release checksum; it was extracted into an isolated tool directory and reports Node `v26.13.0` / npm `11.20.0`. A new CI matrix is proposed to exercise 26.13.0 on Linux and Windows without changing `.nvmrc`, `package.json` engines, or the existing 22.16.0 jobs. Treat Node 26 as tested only after exact-head CI succeeds. The Linux archive cannot substitute for Windows execution; Windows acceptance must run on Windows with the Windows Node binary. Keep historical runtime reports unchanged and source/runtime-bound. See `docs/toolchain/NODE_26_13_0_RUNTIME_ADOPTION_RECORD.md`.
 
 ## Controlling OCR.Space architecture and activation
 

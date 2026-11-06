@@ -4,12 +4,7 @@ OCR.Space is the explicitly enabled primary text-extraction stage for every elig
 
 ## Node.js runtime baseline
 
-The accepted DWBOT runtime baseline is Node.js **22.16.0** (`>=22.16.0`). This
-version is acceptable for installation, project tests, OCR acceptance and
-candidate verification; Node.js 24+ is not a prerequisite. The repository pins
-22.16.0 in `.nvmrc`, package manifests and GitHub Actions. Use Node 24 only for
-a specific dependency/tool requirement that is independently demonstrated.
-Windows-specific checks still run on Windows, regardless of Node version.
+The minimum supported and already-authorized DWBOT runtime remains Node.js **22.16.0** (`>=22.16.0`); this instruction is not withdrawn. The uploaded Node.js **26.13.0 LTS** distribution has now been independently SHA-256 verified against the official Node.js release checksum and installed in the isolated Linux tool environment. DWBOT adds Node 26.13.0 as a supplemental compatibility target, not as a replacement for the 22.16.0 baseline. `.nvmrc` and `package.json` remain pinned to the existing compatibility floor until the Node 26 CI matrix passes and a separate runtime-policy review approves any default change. The Linux archive cannot run on Windows; Windows-specific checks must execute on Windows using the corresponding Windows Node 26.13.0 binary. See `docs/toolchain/NODE_26_13_0_RUNTIME_ADOPTION_RECORD.md`.
 
 ## Historical tested-source checkpoint — 2026-11-05 (superseded by 2026-11-06 OCR.Space authority)
 
