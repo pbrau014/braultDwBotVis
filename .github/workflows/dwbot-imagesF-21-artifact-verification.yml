@@ -133,7 +133,8 @@ jobs:
           "DWBOT_OLD_PREFLIGHT=$($preflightFiles[0].FullName)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           $networkLogPath = if ($networkLogs.Count -eq 1) { $networkLogs[0].FullName } else { Join-Path $downloadRoot 'missing-network-log.log' }
           "DWBOT_NETWORK_LOG=$networkLogPath" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
-          $networkReconciliationPath = Join-Path $downloadRoot 'network-log-reconciliation.json'
+          $networkReconciliationPath = Join-Path $env:GITHUB_WORKSPACE 'testdata\ocr-acceptance\network-log-reconciliation.json'
+          New-Item -ItemType Directory -Force (Split-Path $networkReconciliationPath -Parent) | Out-Null
           $sourceWorkflowText = Get-Content -Raw $sourceWorkflowPath
           $blockGuardJson = gh api "repos/$env:GITHUB_REPOSITORY/contents/scripts/block-network.js?ref=$sourceSha"
           if ($LASTEXITCODE -ne 0) { throw 'Could not retrieve the network-guard source at the extraction commit.' }
@@ -202,6 +203,7 @@ jobs:
           $recoveryNetworkLog = Join-Path $env:GITHUB_WORKSPACE 'testdata\ocr-acceptance\local-reader-recovery-network.log'
           New-Item -ItemType Directory -Force (Split-Path $recoveryReport -Parent) | Out-Null
           New-Item -ItemType Directory -Force (Split-Path $recoveryNetworkLog -Parent) | Out-Null
+          [System.IO.File]::WriteAllText($recoveryNetworkLog, '')
           node scripts/recover-ocrspace-imagesF-21-local-readers.js --run-report $env:DWBOT_RUN_REPORT --ground-truth $env:DWBOT_GROUND_TRUTH --artifact-root $env:DWBOT_ARTIFACT_ROOT --output-run-report $recoveredRun --recovery-report $recoveryReport --network-log $env:OCR_NON_OCR_NETWORK_LOG
           if (Test-Path $recoveredRun) {
             "DWBOT_RUN_REPORT=$recoveredRun" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
