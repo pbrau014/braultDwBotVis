@@ -1,3 +1,35 @@
+CURRENT GATE A STATUS UPDATE — 2026-11-06
+Status: NOT PASSED / INTERRUPTED AFTER FIRST IMAGE.
+
+- The exact 16 individual development-corpus fixture files are present and
+  match all per-image SHA-256 values in additional-screenshot-ground-truth.json.
+  Gate A preflight passed with 16 unique images, nine expected fields per
+  image, zero provider requests, candidate SHA adaf4f8c3a9573f56d0348a4bba36686fc31c22e,
+  and deterministic corpus fingerprint
+  6c03d85173bb07103cee9a3075ffa708751b36da2ba3bb49d27fedcdb8468efe.
+  Original imgs2add.zip archive bytes remain unavailable; individual content
+  hashes are the verified source evidence, not a recovered archive.
+- Gate A run #42202563673 was cancelled during image 1/16. Artifact
+  13495008195 contains one searchable one-page PDF and PDF-derived raster
+  for Screenshot_16.jpg. The source hash matches the manifest. The other
+  15 images were not processed. Do not resubmit the first image.
+- The interrupted run used Node 22.16.0 (<24.17.0) and has no original
+  restricted-egress diagnostic log. The source guard at that commit silently
+  catches log-write errors. Historical denied-attempt count is UNKNOWN;
+  no zero-attempt claim. Gate A remains NOT PASSED.
+- Gate A workflow definition now specifies Node 24.17.0 and checks runtime,
+  but this does not retroactively change the interrupted run. A queued
+  duplicate attempt was cancelled before execution.
+- Next safe action, if Gate A continuation is authorized: verify/reuse the
+  existing first PDF/raster, process only the remaining 15 hashes through a
+  source-bound resumable runner, record mixed-runtime and missing-log
+  limitations, and never retry the first image. Do not call the mixed
+  evidence Gate A PASS.
+
+================================================================================
+END CURRENT GATE A STATUS UPDATE
+================================================================================
+
 CURRENT GATE B REQUIREMENT OVERRIDE — 2026-11-06
 Status: ACTIVE / GOVERNING / SUPERSEDES THE 21-IMAGE GATE B RULE BELOW.
 
