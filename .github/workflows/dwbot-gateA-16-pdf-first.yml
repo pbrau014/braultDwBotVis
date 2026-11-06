@@ -305,7 +305,7 @@ jobs:
             originalNetworkAttemptCount = if ($resumeManifest) { $resumeManifest.originalNetworkAttemptCount } else { 0 }
             resumeManifestSha256 = if (Test-Path $resumeManifestPath) { (Get-FileHash -Algorithm SHA256 $resumeManifestPath).Hash.ToLowerInvariant() } else { $null }
             resumeManifest = $resumeManifest
-            sourceBuildSha256 = if ($report -and $report.sourceMetadata) { $report.sourceMetadata.sourceBuild.sha256 } else { $null }
+            sourceBuildSha256 = if ($report -and $report.reportMetadata) { $report.reportMetadata.sourceBuild.sha256 } else { $null }
             sourcePreflightSha256 = if (Test-Path $preflightPath) { (Get-FileHash -Algorithm SHA256 $preflightPath).Hash.ToLowerInvariant() } else { $null }
             reportSha256 = $reportSha
             runReportSha256 = $reportSha
