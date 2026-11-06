@@ -91,11 +91,12 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Could not download the source run artifact.' }
           $runReports = @(Get-ChildItem -Path $downloadRoot -Filter 'ocrspace-imagesF-63-exploratory-report.json' -File -Recurse)
           $progressFiles = @(Get-ChildItem -Path $downloadRoot -Filter 'progress.json' -File -Recurse)
-          $groundTruthFiles = @(Get-ChildItem -Path $downloadRoot -Filter 'imagesF-63-working-ground-truth-v6.json' -File -Recurse)
+          $groundTruthPath = Join-Path $env:GITHUB_WORKSPACE 'testdata\ground-truth\imagesF-63-working-ground-truth-v6.json'
+          if (-not (Test-Path $groundTruthPath)) { throw 'Current source-bound v6 ground-truth JSON is missing from checkout.' }
           $preflightFiles = @(Get-ChildItem -Path $downloadRoot -Filter 'imagesF-63-preflight.json' -File -Recurse)
           $networkLogs = @(Get-ChildItem -Path $downloadRoot -Filter 'imagesF-63-blocked-network-attempts.log' -File -Recurse)
-          if ($runReports.Count -gt 1 -or $progressFiles.Count -ne 1 -or $groundTruthFiles.Count -ne 1 -or $preflightFiles.Count -ne 1 -or $networkLogs.Count -gt 1) {
-            throw 'Source artifact has duplicate or ambiguous report, progress, ground-truth, preflight, or network-log files.'
+          if ($runReports.Count -gt 1 -or $progressFiles.Count -ne 1 -or $preflightFiles.Count -ne 1 -or $networkLogs.Count -gt 1) {
+            throw 'Source artifact has duplicate or ambiguous report, progress, preflight, or network-log files.'
           }
           if ($runReports.Count -eq 0 -and $progressFiles.Count -ne 1) { throw 'Source artifact has neither a final run report nor a single progress file.' }
           $selectedRunReport = if ($runReports.Count -eq 1) { $runReports[0].FullName } else { $progressFiles[0].FullName }
@@ -110,7 +111,7 @@ jobs:
           "DWBOT_DOWNLOAD_ROOT=$downloadRoot" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           "DWBOT_ARTIFACT_ROOT=$artifactRoot" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           "DWBOT_RUN_REPORT=$selectedRunReport" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
-          "DWBOT_GROUND_TRUTH=$($groundTruthFiles[0].FullName)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "DWBOT_GROUND_TRUTH=$groundTruthPath" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           "DWBOT_OLD_PREFLIGHT=$($preflightFiles[0].FullName)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           $networkLogPath = if ($networkLogs.Count -eq 1) { $networkLogs[0].FullName } else { Join-Path $downloadRoot 'missing-network-log.log' }
           "DWBOT_NETWORK_LOG=$networkLogPath" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
