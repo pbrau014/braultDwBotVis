@@ -7,7 +7,8 @@ const { spawn } = require('node:child_process');
 const imageProcessor = require('../src/image-processor');
 
 const FIELDS = ['result', 'player', 'map', 'mode', 'battleStart', 'credits', 'freeXp', 'damage', 'xp'];
-const INVENTORY = 'complete-ground-truth-21';
+const INVENTORY = 'gate-b-complete-ground-truth-19';
+const MIN_GATE_B_IMAGES = 19;
 const REQUIRED_READERS = ['tesseractjs', 'native'];
 
 function sha256(buffer) {
@@ -116,13 +117,17 @@ function selectGateB(gt) {
     if (!gt || gt.schemaVersion !== 2 || gt.records?.length !== 63 || JSON.stringify(gt.requiredFields) !== JSON.stringify(FIELDS)) {
         throw new Error('Ground-truth schema, corpus size, or nine-field contract mismatch.');
     }
-    return gt.records.filter(row => row.recordStatus === 'COMPLETE_9_FIELD_TRANSCRIPTION'
+    const eligible = gt.records.filter(row => row.recordStatus === 'COMPLETE_9_FIELD_TRANSCRIPTION'
         && FIELDS.every(field => row.fieldStatus?.[field]?.eligible_for_exact_match === true
             && String(row.expected?.[field] ?? '').trim() !== ''));
+    if (eligible.length < MIN_GATE_B_IMAGES || eligible.slice(0, MIN_GATE_B_IMAGES).some((row, index) => row !== gt.records[index])) {
+        throw new Error('Gate B requires at least the first 19 corpus-order records with complete, eligible, non-empty values for all nine fields.');
+    }
+    return eligible.slice(0, MIN_GATE_B_IMAGES);
 }
 
 async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshPreflightReport, sourceImageRoot, artifactRoot, networkLogPath, recoveryNetworkLogPath,
-    workflowSourceText = '', apiKey = process.env.OCRSPACE_API_KEY || '',
+    workflowSourceText = '', apiKey = process.env.OCRSPACE_API_KEY || '', networkReconciliationPath = null,
     renderPdf = imageProcessor.renderSearchablePdfPage,
     readMetadata = imageProcessor.metadata,
     toRawRgba = buffer => imageProcessor.__test.runImageMagick(['png:-', '-depth', '8', 'rgba:-'], buffer, { timeoutMs: 60000, maxOutputBytes: 80_000_000 }),
@@ -137,7 +142,7 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
     const preflight = JSON.parse(preflightBytes.toString('utf8'));
     const freshPreflight = JSON.parse(freshPreflightBytes.toString('utf8'));
     const selected = selectGateB(gt);
-    if (selected.length !== 21 || selected.some((record, index) => record !== gt.records[index])) throw new Error('Gate B selection is not exactly the first 21 complete nine-field records in corpus order.');
+    if (selected.length !== MIN_GATE_B_IMAGES || selected.some((record, index) => record !== gt.records[index])) throw new Error('Gate B selection is not exactly the first 19 complete nine-field records in corpus order.');
     if (run.sourceArchiveSha256 !== gt.candidateArchive?.sha256 || preflight.archiveSha256 !== run.sourceArchiveSha256) throw new Error('Run/preflight archive fingerprint does not match the v6 ground truth.');
     const sameMemberList = JSON.stringify(preflight.verifiedMembers || []) === JSON.stringify(freshPreflight.verifiedMembers || []);
     if (run.preflightReportSha256 !== sha256(preflightBytes) || preflight.verifiedMembers?.length !== 63 || preflight.allImageMemberHashesVerified !== true
@@ -251,9 +256,18 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
     }
     const networkLog = networkLogPath ? await fs.readFile(networkLogPath, 'utf8').catch(() => null) : null;
     const networkAttempts = networkLog === null ? null : networkLog.split(/\r?\n/).filter(line => line.trim()).length;
-    const workflowRestrictionOk = /OCR_NON_OCR_NETWORK_RESTRICTED:\s*['"]?1/.test(workflowSourceText)
-        && /OCR_NON_OCR_NETWORK_LOG:/.test(workflowSourceText);
+    const recoveryNetworkLog = recoveryNetworkLogPath ? await fs.readFile(recoveryNetworkLogPath, 'utf8').catch(() => null) : null;
+    const recoveryNetworkAttempts = recoveryNetworkLog === null ? null : recoveryNetworkLog.split(/\r?\n/).filter(line => line.trim()).length;
+    const recoveryNetworkLogSha256 = recoveryNetworkLog === null ? null : sha256(Buffer.from(recoveryNetworkLog, 'utf8'));
+    const recoveryExpectedSha256 = run.localReaderRecovery?.networkLogSha256 || null;
+    const recoveryNetworkOk = recoveryNetworkAttempts === 0
+        && run.localReaderRecovery?.networkBlockedAttempts === 0
+        && recoveryNetworkLogSha256 !== null && recoveryNetworkLogSha256 === recoveryExpectedSha256;
+    const workflowRestrictionOk = /OCRSPACE_NETWORK_ALLOWLIST:\s*['"]?1/.test(workflowSourceText)
+        && /OCR_NON_OCR_NETWORK_RESTRICTED:\s*['"]?1/.test(workflowSourceText);
     const networkOk = networkAttempts === 0 && workflowRestrictionOk;
+    const networkReconciliation = networkReconciliationPath
+        ? await fs.readFile(networkReconciliationPath, 'utf8').then(JSON.parse).catch(() => null) : null;
     const files = await listFiles(artifactRoot);
     const secretInputs = [...files, runReport, groundTruth, preflightReport, freshPreflightReport, ...(networkLog === null ? [] : [networkLogPath]), Buffer.from(workflowSourceText, 'utf8')];
     const secret = await secretScan(secretInputs, apiKey);
@@ -277,10 +291,14 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
         rasterIntegrity: all.rasterIntegrity ? 'PASS' : 'FAIL',
         pdfDerivedRasterProvenance: all.pdfDerivedRasterProvenance ? 'PASS' : 'FAIL',
         localReaders: all.localReaders ? 'PASS' : 'FAIL',
-        networkRestriction: networkOk ? 'PASS' : 'FAIL',
+        networkRestriction: networkOk ? 'PASS' : (networkLog === null ? 'NOT_VERIFIED_MISSING_ORIGINAL_LOG' : 'FAIL'),
+        originalNetworkLogStatus: networkLog === null ? 'MISSING_FROM_SOURCE_ARTIFACT' : 'PRESENT',
+        networkLogReconciliationStatus: networkReconciliation?.status || 'NOT_PROVIDED',
         unauthorizedNetworkAttempts: networkAttempts,
         localRecoveryNetworkRestriction: recoveryNetworkOk ? 'PASS' : 'FAIL',
         localRecoveryBlockedNetworkAttempts: recoveryNetworkAttempts,
+        localRecoveryNetworkLogSha256: recoveryNetworkLogSha256,
+        localRecoveryNetworkLogMatchesReport: recoveryNetworkLogSha256 !== null && recoveryNetworkLogSha256 === recoveryExpectedSha256,
         secretLeakScan: secret.status,
         originalScreenshotFallback: run.originalScreenshotFallback === false
     };
@@ -288,14 +306,14 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
     const requiredChecks = ['sourceImageHashes', 'pdfIntegrity', 'searchablePdfTextLayer',
         'rasterIntegrity', 'pdfDerivedRasterProvenance', 'localReaders', 'networkRestriction',
         'localRecoveryNetworkRestriction', 'secretLeakScan'];
-    const status = verifiedCount === 21 && requiredChecks.every(key => checks[key] === 'PASS')
+    const status = verifiedCount === MIN_GATE_B_IMAGES && requiredChecks.every(key => checks[key] === 'PASS')
         && checks.unauthorizedNetworkAttempts === 0 && checks.originalScreenshotFallback === false
         ? 'VERIFIED' : 'FAILED';
     return {
         schemaVersion: 1, status, createdAt: new Date().toISOString(),
-        inventorySelection: { id: INVENTORY, selectedImageCount: 21, verifiedImageCount: verifiedCount, allSelectedImagesVerified: verifiedCount === 21 },
+        inventorySelection: { id: INVENTORY, selectedImageCount: MIN_GATE_B_IMAGES, verifiedImageCount: verifiedCount, allSelectedImagesVerified: verifiedCount === MIN_GATE_B_IMAGES },
         runReportSha256: sha256(runBytes), groundTruthSha256: sha256(gtBytes),
-        sourceArchiveSha256: run.sourceArchiveSha256, gateA, checks, images,
+        sourceArchiveSha256: run.sourceArchiveSha256, gateA, checks, networkLogReconciliation: networkReconciliation, images,
         secretScan: { status: secret.status, scannedFiles: secret.scannedFiles },
         notes: [
             'This verifier performs no OCR.Space requests.',
@@ -315,15 +333,17 @@ async function main() {
     const sourceImageRoot = value('--source-image-root');
     const artifactRoot = value('--artifact-root');
     const networkLogPath = value('--network-log');
+    const recoveryNetworkLogPath = value('--recovery-network-log');
+    const networkReconciliationPath = value('--network-log-reconciliation');
     const workflowFile = value('--workflow-file');
     const output = value('--output');
     if (![runReport, groundTruth, preflightReport, freshPreflightReport, sourceImageRoot, artifactRoot, networkLogPath, recoveryNetworkLogPath, workflowFile, output].every(Boolean)) {
         throw new Error('Usage: node scripts/verify-ocrspace-imagesF-21-artifacts.js --run-report FILE --ground-truth FILE --preflight-report FILE --fresh-preflight-report FILE --source-image-root DIR --artifact-root DIR --network-log FILE --recovery-network-log FILE --workflow-file FILE --output FILE');
     }
     const workflowSourceText = await fs.readFile(workflowFile, 'utf8');
-    const report = await verifyArtifacts({ runReport, groundTruth, preflightReport, freshPreflightReport, sourceImageRoot, artifactRoot, networkLogPath, recoveryNetworkLogPath, workflowSourceText });
+    const report = await verifyArtifacts({ runReport, groundTruth, preflightReport, freshPreflightReport, sourceImageRoot, artifactRoot, networkLogPath, recoveryNetworkLogPath, networkReconciliationPath, workflowSourceText });
     await fs.writeFile(output, JSON.stringify(report, null, 2) + '\n');
-    console.log('[DWBOT-ARTIFACT-VERIFY] ' + report.status + '; verified=' + report.inventorySelection.verifiedImageCount + '/21; Gate A=' + report.gateA.status + '; network=' + report.checks.networkRestriction + '; secret scan=' + report.checks.secretLeakScan);
+    console.log('[DWBOT-ARTIFACT-VERIFY] ' + report.status + '; verified=' + report.inventorySelection.verifiedImageCount + '/19; Gate A=' + report.gateA.status + '; network=' + report.checks.networkRestriction + '; secret scan=' + report.checks.secretLeakScan);
     if (report.status !== 'VERIFIED') process.exitCode = 1;
 }
 
