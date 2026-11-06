@@ -203,3 +203,8 @@ test('PaddleOCR reward conflict is left unresolved rather than arbitrated by con
     assert.equal(record.freeXp, 'Not detected');
     assert.match(record.ambiguities.freeXp, /disagreed/);
 });
+
+
+test('PaddleOCR field fallback uses a bounded 60-second CPU inference budget', () => {
+    assert.equal(fallback.__test.DEFAULT_TIMEOUT_MS, 60_000);
+});
