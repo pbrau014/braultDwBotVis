@@ -134,8 +134,10 @@ Status: ACTIVE / GOVERNING / SUPERSEDES THE 64-IMAGE INVENTORY TEST REQUIREMENT.
   The post-hoc evaluator supports --inventory complete-ground-truth-21 and
   must report the selection, missing run rows and per-engine metrics.
 - The 21-image subset supplies an eligible complete-record evaluation scope
-  for the PDF-first pipeline and is also the approved 21-image Gate B holdout.
-  It does not certify the v6 workbook; Gate B remains pending actual evidence.
+  for PDF-first pipeline analysis. Gate B is the separate 19-image holdout:
+  exactly the first 19 complete nine-field records. Records 20–21 are
+  diagnostic-only and do not count toward Gate B. Neither scope certifies the
+  v6 workbook; Gate B remains pending actual evidence.
   The 4- and 16-image inventory requirements remain active.
 - The legacy 64-image inventory manifest, runner and tests may remain in the
   repository as historical/legacy integrity material, but they are no longer
@@ -180,7 +182,7 @@ Phase 0–10 roadmap. The canonical living plan on main remains controlling.
 - Engine 2 is the PDF-producing first pass because the current provider matrix
   marks Engine 3 searchable-PDF generation unsupported. The older Engine 3-first
   / Engine 2 PDF-only fallback design below is superseded.
-- The active OCR.Space inventory matrix is 4 images, 16 images, and the 21-image complete-ground-truth subset from the current 63-image exploratory corpus, including visible player names. The separate 64-image inventory requirement is retired.
+- The active OCR.Space inventory matrix is 4 images, 16 images, and the 21-image complete-ground-truth pipeline-analysis subset from the current 63-image exploratory corpus, including visible player names. Gate B is exactly the first 19 records of that subset; records 20–21 are diagnostic-only. The separate 64-image inventory requirement is retired.
   No unrelated images, credentials, Discord IDs or private account data.
 - Eligible original-image intake explicitly requires OCRSPACE_ENABLED=1, OCRSPACE_NETWORK_ALLOWLIST=1 and OCRSPACE_API_KEY. OCRSPACE_ENABLED=0 is reserved for isolated offline mocks or local readers invoked only after a successful OCR.Space PDF-first stage; it is not an original-image fallback.
   Failure to produce/download/rasterize the PDF fails closed.
