@@ -40,7 +40,7 @@ test('19-image Gate B selection preserves source dimensions instead of imposing 
 test('post-hoc evaluator is reuse-only, source-bound and counts missing selected rows as unresolved', () => {
     const evaluator = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'evaluate-ocrspace-imagesF-63-ground-truth.py'), 'utf8');
     assert.match(evaluator, /gate-b-complete-ground-truth-19/);
-    assert.match(evaluator, /selected != records\[:MIN_GATE_B_IMAGES\]/);
+    assert.match(evaluator, /eligible\[:MIN_GATE_B_IMAGES\] != records\[:MIN_GATE_B_IMAGES\]/);
     assert.match(evaluator, /MISSING_RUN_RESULT/);
     assert.match(evaluator, /SOURCE_HASH_MISMATCH/);
     assert.match(evaluator, /artifact-verification-report\.json/);
