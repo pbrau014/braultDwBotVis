@@ -121,7 +121,7 @@ function selectGateB(gt) {
             && String(row.expected?.[field] ?? '').trim() !== ''));
 }
 
-async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshPreflightReport, sourceImageRoot, artifactRoot, networkLogPath,
+async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshPreflightReport, sourceImageRoot, artifactRoot, networkLogPath, recoveryNetworkLogPath,
     workflowSourceText = '', apiKey = process.env.OCRSPACE_API_KEY || '',
     renderPdf = imageProcessor.renderSearchablePdfPage,
     readMetadata = imageProcessor.metadata,
@@ -279,12 +279,15 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
         localReaders: all.localReaders ? 'PASS' : 'FAIL',
         networkRestriction: networkOk ? 'PASS' : 'FAIL',
         unauthorizedNetworkAttempts: networkAttempts,
+        localRecoveryNetworkRestriction: recoveryNetworkOk ? 'PASS' : 'FAIL',
+        localRecoveryBlockedNetworkAttempts: recoveryNetworkAttempts,
         secretLeakScan: secret.status,
         originalScreenshotFallback: run.originalScreenshotFallback === false
     };
     const verifiedCount = images.filter(image => image.status === 'VERIFIED').length;
     const requiredChecks = ['sourceImageHashes', 'pdfIntegrity', 'searchablePdfTextLayer',
-        'rasterIntegrity', 'pdfDerivedRasterProvenance', 'localReaders', 'networkRestriction', 'secretLeakScan'];
+        'rasterIntegrity', 'pdfDerivedRasterProvenance', 'localReaders', 'networkRestriction',
+        'localRecoveryNetworkRestriction', 'secretLeakScan'];
     const status = verifiedCount === 21 && requiredChecks.every(key => checks[key] === 'PASS')
         && checks.unauthorizedNetworkAttempts === 0 && checks.originalScreenshotFallback === false
         ? 'VERIFIED' : 'FAILED';
@@ -314,11 +317,11 @@ async function main() {
     const networkLogPath = value('--network-log');
     const workflowFile = value('--workflow-file');
     const output = value('--output');
-    if (![runReport, groundTruth, preflightReport, freshPreflightReport, sourceImageRoot, artifactRoot, networkLogPath, workflowFile, output].every(Boolean)) {
-        throw new Error('Usage: node scripts/verify-ocrspace-imagesF-21-artifacts.js --run-report FILE --ground-truth FILE --preflight-report FILE --fresh-preflight-report FILE --source-image-root DIR --artifact-root DIR --network-log FILE --workflow-file FILE --output FILE');
+    if (![runReport, groundTruth, preflightReport, freshPreflightReport, sourceImageRoot, artifactRoot, networkLogPath, recoveryNetworkLogPath, workflowFile, output].every(Boolean)) {
+        throw new Error('Usage: node scripts/verify-ocrspace-imagesF-21-artifacts.js --run-report FILE --ground-truth FILE --preflight-report FILE --fresh-preflight-report FILE --source-image-root DIR --artifact-root DIR --network-log FILE --recovery-network-log FILE --workflow-file FILE --output FILE');
     }
     const workflowSourceText = await fs.readFile(workflowFile, 'utf8');
-    const report = await verifyArtifacts({ runReport, groundTruth, preflightReport, freshPreflightReport, sourceImageRoot, artifactRoot, networkLogPath, workflowSourceText });
+    const report = await verifyArtifacts({ runReport, groundTruth, preflightReport, freshPreflightReport, sourceImageRoot, artifactRoot, networkLogPath, recoveryNetworkLogPath, workflowSourceText });
     await fs.writeFile(output, JSON.stringify(report, null, 2) + '\n');
     console.log('[DWBOT-ARTIFACT-VERIFY] ' + report.status + '; verified=' + report.inventorySelection.verifiedImageCount + '/21; Gate A=' + report.gateA.status + '; network=' + report.checks.networkRestriction + '; secret scan=' + report.checks.secretLeakScan);
     if (report.status !== 'VERIFIED') process.exitCode = 1;
