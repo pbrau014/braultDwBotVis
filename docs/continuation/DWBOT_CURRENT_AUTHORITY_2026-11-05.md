@@ -133,3 +133,8 @@ The canonical living plan controls the operational queue and supersedes older da
   imagesF-63-blocked-network-attempts.log. For the active run, inspect
   localReaderFailures and completed job logs; if zero unauthorized attempts
   cannot be established, Gate B remains blocked.
+
+- Latest recorded Gate A status remains FAIL/BLOCKED; no newer current-source
+  Gate A pass evidence has been located. Therefore the 21-image Gate B holdout
+  is approved as the new sample-size requirement, but Gate B cannot pass until
+  the 16-image Gate A is rerun and passes on the locked candidate fingerprint.

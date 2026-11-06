@@ -20,6 +20,9 @@ Status: ACTIVE / GOVERNING / SUPERSEDES THE FORMER 50-IMAGE MINIMUM.
   supplied manual-reference provenance qualification: the transcription is
   independent of OCR outputs, but the archive does not document a separate
   blind second reviewer or double-blind certification.
+- Latest recorded Gate A state remains FAIL/BLOCKED; no newer current-source
+  Gate A pass evidence has been located. The approved 21-image Gate B holdout
+  cannot pass until Gate A passes on the locked matching candidate fingerprint.
 - Gate B may proceed only after Gate A passes on all 16 development images with
   16 exact complete nine-field records, zero wrongly accepted values, zero
   unresolved mandatory values and zero unauthorized network attempts; the

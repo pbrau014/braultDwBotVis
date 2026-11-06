@@ -20,8 +20,12 @@ Status: ACTIVE / GOVERNING / SUPERSEDES THE FORMER 50-IMAGE MINIMUM.
   supplied manual-reference provenance qualification: the transcription is
   independent of OCR outputs, but the archive does not document a separate
   blind second reviewer or double-blind certification.
-- Gate B pass requires all 21 selected source images to be represented exactly
-  once; source hashes must match; all 21 searchable PDFs and PDF-derived
+- Gate B may proceed only after Gate A passes on all 16 development images
+  with 16 exact complete nine-field records, zero wrongly accepted values,
+  zero unresolved mandatory values and zero unauthorized network attempts on
+  a locked candidate fingerprint matching the Gate B run source. Gate B pass
+  then requires all 21 selected source images to be represented exactly once;
+  source hashes must match; all 21 searchable PDFs and PDF-derived
   rasters must be independently verified against the run report; searchable
   text layer and PDF-to-raster provenance must be confirmed; both configured
   local reader outputs must be present; there must be zero wrongly accepted
