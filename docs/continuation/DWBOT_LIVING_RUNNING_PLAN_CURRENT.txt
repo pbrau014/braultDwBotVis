@@ -1,4 +1,49 @@
 ================================================================================
+LATEST OCR RUNNER / NETWORK-POLICY SYNCHRONIZATION — 2026-11-06
+================================================================================
+This newest status supersedes earlier notes about the standalone additional-
+image and PaddleOCR acceptance scripts. Preserve earlier reports as history.
+
+- Main HEAD immediately before this plan synchronization:
+  1572457da5521c15c6477c667caccefa449fc422.
+- Recent runner corrections:
+  * cb63338496398ca23e45a0f91f173000d2e8fdf0 — run-ocr-sequence now reports
+    OCR.Space enablement/provider allowlist separately from unrelated-egress
+    restriction; its legacy networkBlocked field now means non-OCR egress is
+    restricted, not that OCR.Space is blocked.
+  * 297ea904b7759097325feeb19e05853789816535 — additional-screenshot runner
+    now requires OCRSPACE_API_KEY, sets OCRSPACE_ENABLED=1 and
+    OCRSPACE_NETWORK_ALLOWLIST=1, restricts/logs unrelated egress, and retains
+    PDF/raster artifacts.
+  * 0fafb9489b0638d1a6699238220506d2c6cb62c8 — PaddleOCR integrated acceptance
+    now uses the OCR.Space PDF-first path for both its baseline and candidate,
+    with separate artifact directories and the provider allowlist.
+  * 7eee9771d06c3bb1ecce56b9d16df15c5e678148 — PaddleOCR comparison now checks
+    that provider access is allowed while unrelated egress is restricted.
+  * 1572457da5521c15c6477c667caccefa449fc422 — isolated stall-recovery tests
+    now explicitly set OCRSPACE_ENABLED=0, OCRSPACE_NETWORK_ALLOWLIST=0 and
+    OCR_NON_OCR_NETWORK_RESTRICTED=1; this is a deliberate offline-only
+    synthetic test, not an eligible screenshot acceptance path.
+- OCR.Space provider traffic is never blocked by the current network guard.
+  The guard permits HTTPS to api.ocr.space / ocr.space when the allowlist is
+  enabled and restricts only unrelated outbound destinations. The PaddleOCR
+  Python helper independently blocks its own sockets because it must use
+  already-installed local models and must not download models at runtime.
+- The PaddleOCR integrated script remains conditional on local Python,
+  detection/recognition model directories and the protected OCR.Space key.
+  The standard Windows acceptance script still disables the optional
+  PaddleOCR field fallback; Tesseract.js and native Tesseract remain the
+  standard local text readers. Do not claim PaddleOCR ran until its separate
+  local-model acceptance report is produced and inspected.
+- The GitHub combined-status and PR-workflow endpoints still have not returned
+  a verifiable exact-head CI result. No test pass or live provider request is
+  claimed from these source edits alone.
+
+================================================================================
+END LATEST OCR RUNNER / NETWORK-POLICY SYNCHRONIZATION — 2026-11-06
+================================================================================
+
+================================================================================
 LATEST AUTHORITY / CROSSWALK SYNCHRONIZATION — 2026-11-06
 ================================================================================
 This newest synchronization supersedes older active OCR statements in the
@@ -27,10 +72,14 @@ preserved; the living plan remains the controlling operational queue.
   Tesseract.js and native Tesseract on the PDF-derived raster. Enable/benchmark
   PaddleOCR only after its local model prerequisites and PDF-derived input
   provenance are verified; its helper's own no-network rule remains valid.
-- The PaddleOCR fallback's separate historical integrated-acceptance script
-  uses a local-only network-blocked baseline/candidate and must not be treated
-  as OCR.Space PDF-first acceptance until it is adapted to consume the PDF
-  raster. It is not part of the current standard Windows acceptance path.
+- The separate PaddleOCR integrated-acceptance script has now been adapted
+  to require OCRSPACE_ENABLED=1, OCRSPACE_NETWORK_ALLOWLIST=1, a valid key,
+  per-run PDF/raster artifact directories and OCR_NON_OCR_NETWORK_RESTRICTED=1.
+  Its Tesseract-only baseline and PaddleOCR candidate each use the PDF-first
+  bot path; the Python PaddleOCR helper remains socket-isolated and requires
+  explicit local model directories. The standard Windows acceptance wrapper
+  still sets PADDLEOCR_FIELD_FALLBACK=0, so PaddleOCR is not claimed as run in
+  that standard workflow.
 - No exact-head CI status or workflow run was available through the connected
   GitHub endpoints at the preceding check. No tests are claimed as executed
   from these documentation/source inspections.
@@ -144,7 +193,7 @@ C. REQUIRED SOURCE IMAGE → SEARCHABLE PDF → LOCAL READER SEQUENCE
    Engine 2 first. Engine 2 is the active PDF-producing engine because the
    provider's current comparison matrix marks searchable-PDF creation
    supported for Engine 2 and unsupported for Engine 3.
-2. Make one OCR.Space request and obtain one searchable PDF per source image.
+2. Make one OCR.Space request and obtain one searchable PDF per source image per processing/acceptance pass. Do not make separate crop/field requests. All local readers in that pass reuse the PDF-derived raster. Separate engine-comparison passes may create distinct PDF artifacts; record each request and do not imply one provider request covered multiple independently launched passes.
    The searchable text layer is hidden from the rendered page to avoid
    duplicating/obscuring the page image while remaining searchable.
 3. Download the returned PDF immediately from an approved HTTPS OCR.Space host.
