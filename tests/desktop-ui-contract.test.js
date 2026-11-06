@@ -91,3 +91,17 @@ test('desktop binary screenshot upload sends the session CSRF token required by 
   assert.ok(uploadScript.indexOf("xhr.setRequestHeader('X-CSRF-Token',csrfToken)") < uploadScript.indexOf('xhr.send(file)'));
   assert.match(bridge, /if\(req\.method==='POST'&&p==='\/api\/upload'\)\{\s*csrf\(req,session\)/);
 });
+
+
+test('admin scoring settings provide contextual visible, hover and assistive help', () => {
+  const html = read('desktop/admin.html');
+  const script = read('desktop/admin.js');
+  assert.match(html, /id="setting-help"[^>]*role="note"/);
+  assert.match(html, /id="setting-field"[^>]*aria-describedby="setting-help"/);
+  assert.match(html, /id="setting-value"[^>]*aria-describedby="setting-help"/);
+  assert.match(script, /const settingHelp=\{/);
+  assert.match(script, /D\.\$\('setting-field'\)\.title=description/);
+  assert.match(script, /D\.\$\('setting-value'\)\.title=description/);
+  assert.match(script, /DWBOT default is 0\.9/);
+  assert.match(script, /Grand Yolo formula does not use the Doubloon pool/);
+});
