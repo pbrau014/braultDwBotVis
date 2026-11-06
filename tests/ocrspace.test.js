@@ -16,8 +16,11 @@ function payload(text = '43110', engine = 2) {
             ? { Lines: [{ Words: [{ WordText: text, Left: 3, Top: 4, Width: 40, Height: 12 }] }] } : null }] };
 }
 function reply(data, status = 200, headers = {}) {
+    const bytes = Buffer.from(JSON.stringify(data));
+    let sent = false;
     return { ok: status >= 200 && status < 300, status,
-        headers: { get: name => headers[String(name).toLowerCase()] || null }, json: async () => data };
+        headers: { get: name => headers[String(name).toLowerCase()] || null },
+        body: { getReader: () => ({ async read() { if (sent) return { done: true }; sent = true; return { done: false, value: bytes }; }, async cancel() {}, releaseLock() {} }) } };
 }
 function args() { return { apiKey: 'not-a-real-key-value', imageBuffer: Buffer.from('png-data'), fetchImpl: async () => reply(payload()) }; }
 
@@ -146,7 +149,7 @@ test('streamed provider response bodies are bounded before JSON parsing', async 
 test('timeout remains active while the response body is being parsed', async () => {
     await assert.rejects(recognizeCrop({ ...args(), timeoutMs: 1000, fetchImpl: async () => ({
         ok: true, status: 200, headers: { get: () => null },
-        json: async () => new Promise(() => {}),
+        body: { getReader: () => ({ read: () => new Promise(() => {}), cancel: async () => {}, releaseLock() {} }) },
     }) }), { code: 'OCRSPACE_TIMEOUT' });
 });
 
@@ -363,4 +366,16 @@ test('quota ledger reclaims a stale lock before reserving', async () => {
         assert.equal(reservation.daily, 1);
         await assert.rejects(fs.stat(lockPath), { code: 'ENOENT' });
     } finally { await fs.rm(dir, { recursive: true, force: true }); }
+});
+
+
+test('JSON response reader refuses unbounded arrayBuffer, text, and json fallbacks', async () => {
+    const { readJsonBounded } = require('../src/ocrspace-client');
+    for (const response of [
+        { arrayBuffer: async () => Buffer.from('{}') },
+        { text: async () => '{}' },
+        { json: async () => ({}) },
+    ]) {
+        await assert.rejects(readJsonBounded(response), { code: 'OCRSPACE_RESPONSE_STREAM_UNAVAILABLE' });
+    }
 });
