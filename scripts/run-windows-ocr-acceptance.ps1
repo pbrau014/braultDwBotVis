@@ -218,7 +218,10 @@ try {
     [int]$Inventory64Data.excludedCount -eq 8 -and
     [int]$Inventory64Data.excludedSkipped -eq 8 -and
     [int]$Inventory64Data.completedInventoryEntries -eq 64 -and
-    [int]$Inventory64Data.sourceMemberHashesVerified -eq 56 -and\n    $Inventory64Data.eligibleSourceHashesVerified -eq 56 -and\n    $Inventory64Data.archiveMembersVerified -eq 56 -and\n    $Inventory64Data.excludedRecordsAbsent -eq $true -and
+    [int]$Inventory64Data.sourceMemberHashesVerified -eq 56 -and
+    $Inventory64Data.eligibleSourceHashesVerified -eq 56 -and
+    $Inventory64Data.archiveMembersVerified -eq 56 -and
+    $Inventory64Data.excludedRecordsAbsent -eq $true -and
     $Inventory64Data.allSourceMembersVerifiedBeforeProvider -eq $true -and
     $EligibleRows.Count -eq 56 -and $ExcludedRows.Count -eq 8 -and
     $InvalidEligibleRows.Count -eq 0 -and $InvalidExcludedRows.Count -eq 0
@@ -228,7 +231,10 @@ try {
     eligibleCount=[int]$Inventory64Data.eligibleCount;eligibleProcessed=[int]$Inventory64Data.eligibleProcessed
     completedImages=[int]$Inventory64Data.completedImages;excludedCount=[int]$Inventory64Data.excludedCount
     excludedSkipped=[int]$Inventory64Data.excludedSkipped;completedInventoryEntries=[int]$Inventory64Data.completedInventoryEntries
-    sourceMemberHashesVerified=[int]$Inventory64Data.sourceMemberHashesVerified\n    eligibleSourceHashesVerified=[int]$Inventory64Data.eligibleSourceHashesVerified\n    archiveMembersVerified=[int]$Inventory64Data.archiveMembersVerified\n    excludedRecordsAbsent=($Inventory64Data.excludedRecordsAbsent -eq $true)
+    sourceMemberHashesVerified=[int]$Inventory64Data.sourceMemberHashesVerified
+    eligibleSourceHashesVerified=[int]$Inventory64Data.eligibleSourceHashesVerified
+    archiveMembersVerified=[int]$Inventory64Data.archiveMembersVerified
+    excludedRecordsAbsent=($Inventory64Data.excludedRecordsAbsent -eq $true)
     allSourceMembersVerifiedBeforeProvider=($Inventory64Data.allSourceMembersVerifiedBeforeProvider -eq $true)
     resultCount=$EligibleRows.Count;excludedRecordCount=$ExcludedRows.Count
     invalidEligibleRecordCount=$InvalidEligibleRows.Count;invalidExcludedRecordCount=$InvalidExcludedRows.Count
