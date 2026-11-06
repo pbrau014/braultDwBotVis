@@ -26,7 +26,7 @@ test('resume validation binds progress to exact archive, preflight, inventory, a
 
 test('completed image rows are skipped only when artifacts and both local readers are recorded', () => {
   const item = { filename: 'one.png', index: 1, sha256: 'a'.repeat(64) };
-  const complete = { ...item, status: 'pdf-first-complete', providerSubmissionAttempted: true,
+  const complete = { ...item, sourceSha256: item.sha256, status: 'pdf-first-complete', providerSubmissionAttempted: true,
     pdfSha256: 'e'.repeat(64), rasterSha256: 'f'.repeat(64), pdfPath: 'one.pdf', rasterPath: 'one.png',
     localReaders: [{ engine: 'tesseractjs' }, { engine: 'native' }], localReaderFailures: [] };
   assert.equal(classifyResumeRow(null, item), 'submit');
@@ -37,9 +37,9 @@ test('completed image rows are skipped only when artifacts and both local reader
 
 test('uncertain provider submissions are never automatically repeated', () => {
   const item = { filename: 'one.png', index: 1, sha256: 'a'.repeat(64) };
-  assert.equal(classifyResumeRow({ ...item, status: 'provider-submission-started', providerSubmissionAttempted: true }, item), 'skip-ambiguous');
-  assert.equal(classifyResumeRow({ ...item, status: 'failed', providerSubmissionAttempted: true }, item), 'skip-ambiguous');
-  assert.equal(classifyResumeRow({ ...item, status: 'failed', providerSubmissionAttempted: false }, item), 'submit');
+  assert.equal(classifyResumeRow({ ...item, sourceSha256: item.sha256, status: 'provider-submission-started', providerSubmissionAttempted: true }, item), 'skip-ambiguous');
+  assert.equal(classifyResumeRow({ ...item, sourceSha256: item.sha256, status: 'failed', providerSubmissionAttempted: true }, item), 'skip-ambiguous');
+  assert.equal(classifyResumeRow({ ...item, sourceSha256: item.sha256, status: 'failed', providerSubmissionAttempted: false }, item), 'submit');
 });
 
 test('resume rejects changed or reordered source rows', () => {
