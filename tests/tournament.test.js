@@ -183,3 +183,15 @@ test('standalone HTML score calculator exposes mouseover and assistive scoring h
   assert.match(html, /Ship class weighting: DD = 4, CA = 3, BB = 2/);
   assert.match(html, /Restore the workbook\/DWBOT default/);
 });
+
+
+test('standalone HTML Grand Yolo formula matches the live DWBOT scoring engine', async () => {
+  const html = await fs.readFile(path.join(__dirname, '..', 'dwbotStuff', 'yolo_tournament_scoreCalculator.html'), 'utf8');
+  const core = await fs.readFile(path.join(__dirname, '..', 'src', 'tournament.js'), 'utf8');
+  const htmlFormula = html.match(/const perGame=([\\s\\S]*?);/)?.[1]?.replace(/\\s+/g, '');
+  const coreFormula = core.match(/const perGame\\s*=\\s*([\\s\\S]*?);/)?.[1]?.replace(/\\s+/g, '');
+  assert.ok(htmlFormula, 'HTML Grand Yolo formula must be present');
+  assert.ok(coreFormula, 'DWBOT Grand Yolo formula must be present');
+  assert.equal(htmlFormula, coreFormula);
+  assert.equal(T.DEFAULT_SETTINGS.events.grand.tierWeight, 0.9);
+});
