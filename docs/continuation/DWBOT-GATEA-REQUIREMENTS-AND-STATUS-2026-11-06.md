@@ -28,7 +28,7 @@ There is no numeric exact-match threshold that replaces the hard requirements ab
 
 The repository contains `testdata/additional-screenshot-ground-truth.json`, with 16 complete nine-field reference records and explicit field eligibility. The record identifies its source archive as `imgs2add.zip`.
 
-The exact `imgs2add.zip` source bytes are not currently present in the accessible Library or repository. The Library contains `imgsHalf1.zip`, a different 56-image archive (54,346,878 bytes; SHA-256 `6c1ef64586a0e028f26de228766da63525314aeee923ed1b193caa02dfaba87f`). Its 56 member hashes were checked against the 16-image report's source-image hashes: zero exact matches. It is not a valid substitute for `imgs2add.zip`.
+The exact `imgs2add.zip` archive bytes are not currently present in the accessible Library or repository. However, the repository contains the 16 individual source fixtures under `fixtures/additional-screenshots/`; the Gate A preflight verified every filename, byte length and SHA-256 against the approved nine-field manifest. The separate `imgsHalf1.zip` archive is not a substitute and must not be used.
 
 The Library also contains `native-16-image-report.json` (1,360,612 bytes; SHA-256 `f6f4dd7a3b6c8cc6c300c480c20dcd44f0638797e20f32036726478b51cd0f5a`). Its report records:
 - 16 images completed;
@@ -52,15 +52,13 @@ This is historical local-reader evidence only. It is not Gate A, does not test s
 
 ## 4. Immediate next action required
 
-The exact `imgs2add.zip` source archive (or an explicitly approved replacement archive whose 16 images and hashes can be reconciled to the existing 16-image ground-truth file) must be made accessible. Until then, no provider request should be made against the 16-image corpus, because the original source images cannot be verified.
-
-Once the exact archive is available, run the PDF-first Gate A workflow once, with the new mandatory diagnostic-log guard. Do not reuse `imgsHalf1.zip` as a substitute and do not treat the existing native-16 report as a Gate A pass.
+The original `imgs2add.zip` container is still unavailable, but its 16 expected image files are individually present and have passed source-hash preflight. This is sufficient to bind each Gate A request to its approved fixture without inventing or substituting an archive. Continue only from the verified fixture manifest and preserve the missing original ZIP as a provenance limitation. Do not reuse `imgsHalf1.zip` as a substitute and do not treat the historical native-16 report as a Gate A pass.
 
 ## 5. Relationship to the current 19-image Gate B work
 
 The completed 63-image exploratory run produced 63 searchable PDFs and 63 PDF-derived raster files. Its downloaded artifact passed independent file-level checks for all 63 pairs: sizes, SHA-256 values, signatures, one-page PDFs, non-empty searchable text layers and raster dimensions. The 19 selected Gate B subset has separate artifact verification for PDF integrity, searchable text, raster integrity and PDF-derived raster provenance.
 
-However, the extraction run used Node 22.16.0, below the accepted Node >=24.17.0 runtime, and its original network diagnostic log is missing. The 19-image post-hoc evaluation also has many unresolved mandatory fields. Gate B therefore remains NOT PASSED regardless of the exploratory field-level percentages.
+However, the extraction run's original network diagnostic log is missing, and the 19-image post-hoc evaluation has many unresolved mandatory fields. Node 22.16.0 meets the currently authorized runtime floor (>=22.16.0). Gate B therefore remains NOT PASSED regardless of the exploratory field-level percentages.
 
 The 19-image evaluation and separate 21-image diagnostic are recorded in the artifact-verification reports. They do not waive Gate A or upgrade the exploratory source run into a release acceptance run.
 
@@ -157,3 +155,31 @@ Node 22.16.0 as below the accepted runtime are historical and superseded.
 This correction does not change Gate A's status: the interrupted run still
 contains only 1/16 PDF/raster pairs and lacks its original restricted-egress
 diagnostic log. Gate A remains NOT PASSED.
+
+
+## 7. Current artifact-bound continuation — run #42246737451
+
+- The continuation was started using the exact trigger commit message
+  `DWBOT-GATE-A-16-PDF-FIRST-RESUME-15`.
+- Preflight passed all 16 repository fixtures against the approved manifest;
+  the source run #42160979140 and locked candidate fingerprint matched.
+- Node 22.16.0 was provisioned for the candidate runtime. OCR/PDF tools and
+  pinned PaddleOCR runtime setup were underway at the latest poll.
+- The continuation is explicitly bound to cancelled run #42202563673,
+  artifact ID 13495008195, artifact ZIP SHA-256
+  `398f8152847cd3ea58fb9e16ac01886fced0c880869ce6a430d3343e5cb4ecd8`.
+  Its source log contains exactly one provider-start marker:
+  `1/16 START Screenshot_16.jpg`. Its artifact contains exactly one PDF and
+  one PDF-derived raster for that source hash. The first provider submission
+  is to be reused and must not be repeated.
+- The local-only preparation step will re-read the existing PDF-derived raster
+  and compare all nine fields. If it cannot recover the first record exactly,
+  the workflow must stop before any remaining provider request. If exact, it
+  may submit only the other 15 images.
+- The original restricted-egress log from run #42202563673 is absent.
+  The continuation records this as
+  `MISSING_FROM_ORIGINAL_PARTIAL_ARTIFACT`, with historical attempt count
+  `null`/UNKNOWN. A new empty log covers only the new continuation and cannot
+  reconstruct the prior run. Do not claim Gate A network proof from that
+  synthetic/current log.
+- At this update the run was still in progress and no Gate A pass was claimed.
