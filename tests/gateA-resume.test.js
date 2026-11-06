@@ -37,7 +37,7 @@ test('Gate A resume preparation is local-only and cannot repeat the completed fi
     assert.match(source,/providerRequests: 0/);
     assert.match(source,/originalNetworkLogStatus: 'MISSING_FROM_ORIGINAL_PARTIAL_ARTIFACT'/);
     assert.match(source,/localPayloadPath = path\.join/);
-    assert.match(source,/ocr-image-child\\.js.*localPayloadPath/);
+    assert.match(source,/ocr-image-child\.js.*localPayloadPath/);
     assert.match(source,/parseJsonUtf8\(await fs\.readFile\(localPayloadPath\)\)/);
     assert.match(source,/BLOCKED_MISSING_ORIGINAL_NETWORK_LOG/);
     assert.match(source,/checkpoint\.recordJobResult\(progress, row\)/);
