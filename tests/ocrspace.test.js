@@ -23,7 +23,7 @@ function args() { return { apiKey: 'not-a-real-key-value', imageBuffer: Buffer.f
 
 test('Engine 2 is the default PDF-first profile with hidden searchable text layer', async () => {
     let request;
-    const result = await recognizeCrop({ ...args(), fetchImpl: async (url, options) => { request = { url, options }; return reply(payload('43110', 3)); } });
+    const result = await recognizeCrop({ ...args(), fetchImpl: async (url, options) => { request = { url, options }; return reply(payload('43110', 2)); } });
     assert.equal(request.url, API_URL);
     assert.equal(request.options.method, 'POST');
     assert.equal(request.options.redirect, 'error');

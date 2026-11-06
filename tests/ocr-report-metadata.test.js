@@ -64,11 +64,11 @@ test('OCR configuration metadata makes optional engine and network feature flags
             apiKeyConfigured: false,
             engine: 2,
             requestProfile: {
-                detectOrientation: true, scale: true, tableMode: 'rewardBand-only',
-                searchablePdf: true, searchablePdfHideTextLayer: false,
-                explicitTextOverlayResponse: false, pdfFallbackEngine: 2,
+                detectOrientation: true, scale: true, tableMode: false,
+                searchablePdf: true, searchablePdfHideTextLayer: true,
+                oneRequestPerImage: true, sourceImageFirst: true, localReadersUsePdfRaster: true,
             },
-            limits: { maxCrops: 2, stageBudgetMs: 20000, maxPerDay: 450, maxPerMonth: 22000, maxEngine3PerMonth: 900 },
+            limits: { maxUploadBytes: 1048576, maxPdfBytes: 25 * 1024 * 1024, maxPdfPages: 3, maxPerDay: 450, maxPerMonth: 22000 },
         },
     });
     assert.equal(describeOcrConfiguration({ OCR_CV_ASSIST: 'true', PADDLEOCR_FIELD_FALLBACK: 'yes' }).opencvAssistEnabled, false);
