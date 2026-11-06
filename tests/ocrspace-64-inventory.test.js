@@ -73,5 +73,6 @@ test('Windows acceptance validates the 56 eligible and 8 excluded inventory part
     assert.match(runner, /\$Inventory64Data\.completedInventoryEntries -eq 64/);
     assert.match(runner, /\$Inventory64Data\.sourceMemberHashesVerified -eq 64/);
     assert.match(runner, /\$Inventory64Data\.allSourceMembersVerifiedBeforeProvider -eq \$true/);
+    assert.match(runner, /\$env:OCRSPACE_64_OUTPUT_DIR=Join-Path \$RunDir 'ocrspace-64-inventory'/);
     assert.match(runner, /\$EligibleRows\.Count -eq 56 -and \$ExcludedRows\.Count -eq 8/);
 });
