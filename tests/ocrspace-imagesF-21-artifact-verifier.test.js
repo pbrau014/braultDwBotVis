@@ -65,12 +65,14 @@ async function fixture(t) {
   return {root,artifactRoot,sourceImageRoot,gtPath,preflightPath,freshPreflightPath,runPath,networkLogPath};
 }
 const workflowSourceText="OCR_NON_OCR_NETWORK_RESTRICTED: '1'\\nOCR_NON_OCR_NETWORK_LOG: logs/blocked.log";
+const metadataFor = async buffer => buffer.toString('utf8').startsWith('source-image-bytes-')
+  ? {width:1920,height:1080} : {width:1600,height:900};
 
 test('verifies all 21 PDF/raster pairs, searchable text, source fingerprints, local readers and security evidence', async t => {
   const f=await fixture(t);
   const raster=png(1600,900);
   const report=await verifyArtifacts({...f,preflightReport:f.preflightPath,freshPreflightReport:f.freshPreflightPath,groundTruth:f.gtPath,runReport:f.runPath,workflowSourceText,apiKey:'not-a-real-secret',
-    renderPdf:async()=>raster,readMetadata:async()=>({width:1600,height:900}),toRawRgba:async()=>Buffer.from('same-pixels'),readPdfText:async()=> 'searchable text'});
+    renderPdf:async()=>raster,readMetadata:metadataFor,toRawRgba:async()=>Buffer.from('same-pixels'),readPdfText:async()=> 'searchable text'});
   assert.equal(report.status,'VERIFIED');
   assert.equal(report.inventorySelection.verifiedImageCount,21);
   assert.equal(report.checks.pdfIntegrity,'PASS');
@@ -84,7 +86,7 @@ test('verifies all 21 PDF/raster pairs, searchable text, source fingerprints, lo
 test('does not pass when the saved raster cannot be reproduced from its PDF', async t => {
   const f=await fixture(t);
   const report=await verifyArtifacts({...f,preflightReport:f.preflightPath,freshPreflightReport:f.freshPreflightPath,groundTruth:f.gtPath,runReport:f.runPath,workflowSourceText,apiKey:'not-a-real-secret',
-    renderPdf:async()=>png(1599,900),readMetadata:async()=>({width:1600,height:900}),toRawRgba:async()=>Buffer.from('same-pixels'),readPdfText:async()=> 'searchable text'});
+    renderPdf:async()=>png(1599,900),readMetadata:metadataFor,toRawRgba:async()=>Buffer.from('same-pixels'),readPdfText:async()=> 'searchable text'});
   assert.equal(report.status,'FAILED');
   assert.equal(report.checks.pdfDerivedRasterProvenance,'FAIL');
 });
@@ -93,7 +95,7 @@ test('missing network log or secret is not treated as a clean security result', 
   const f=await fixture(t);
   const report=await verifyArtifacts({...f,preflightReport:f.preflightPath,freshPreflightReport:f.freshPreflightPath,groundTruth:f.gtPath,runReport:f.runPath,networkLogPath:path.join(f.root,'missing.log'),
     workflowSourceText,apiKey:'',renderPdf:async()=>png(1600,900),
-    readMetadata:async()=>({width:1600,height:900}),toRawRgba:async()=>Buffer.from('same-pixels'),readPdfText:async()=> 'searchable text'});
+    readMetadata:metadataFor,toRawRgba:async()=>Buffer.from('same-pixels'),readPdfText:async()=> 'searchable text'});
   assert.equal(report.status,'FAILED');
   assert.equal(report.checks.networkRestriction,'FAIL');
   assert.equal(report.checks.secretLeakScan,'NOT_VERIFIED');
