@@ -1,5 +1,5 @@
 ================================================================================
-CURRENT OCR.SPACE PDF-FIRST OVERRIDE — 2026-11-05
+CURRENT OCR.SPACE PDF-FIRST / EXPLICIT ENABLE OVERRIDE — 2026-11-06
 ================================================================================
 This addendum supersedes older active OCR.Space statements in this historical
 Phase 0–10 roadmap. The canonical living plan on main remains controlling.
@@ -16,13 +16,17 @@ Phase 0–10 roadmap. The canonical living plan on main remains controlling.
 - The user explicitly authorized OCR.Space uploads for the 4-, 16- and
   64-image World of Warships inventories, including visible player names, only.
   No unrelated images, credentials, Discord IDs or private account data.
-- Production requires OCRSPACE_API_KEY; OCRSPACE_ENABLED=0 is local-only.
+- Eligible original-image intake explicitly requires OCRSPACE_ENABLED=1, OCRSPACE_NETWORK_ALLOWLIST=1 and OCRSPACE_API_KEY. OCRSPACE_ENABLED=0 is reserved for isolated offline mocks or local readers invoked only after a successful OCR.Space PDF-first stage; it is not an original-image fallback.
   Failure to produce/download/rasterize the PDF fails closed.
 - Exact nine fields remain mandatory; zero wrong accepted mandatory values.
   The 64-image inventory has no independent ground truth and is extraction-only.
 - Current implementation: src/ocrspace-pdf-first.js, src/image-processor.js,
   src/bot.js. The old crop-only helper files are legacy, not active bot path.
   See docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md and the canonical living plan.
+- The network guard must allow HTTPS to api.ocr.space and ocr.space. When
+  OCR_NON_OCR_NETWORK_RESTRICTED=1, only unrelated outbound destinations are
+  restricted; OCR.Space provider traffic remains enabled. Preserve PDF/raster
+  artifacts in OCRSPACE_ARTIFACT_DIR for every acceptance run.
 
 ================================================================================
 END CURRENT OCR.SPACE PDF-FIRST OVERRIDE
