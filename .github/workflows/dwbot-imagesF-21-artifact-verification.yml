@@ -67,7 +67,7 @@ jobs:
           node --version
           npm --version
           npm ci --no-audit --no-fund
-          npm run test:ocrspace
+          npm test
 
       - name: Validate source run and download its exact artifact
         id: source-artifact
