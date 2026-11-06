@@ -1,3 +1,46 @@
+CURRENT OCR / GATE EVIDENCE UPDATE — 2026-11-06
+Status: 19-image artifact review complete; Gate A and Gate B remain NOT PASSED.
+
+- The original 63-image OCR.Space run #42160979140 completed successfully.
+  Its exact artifact and all 63 PDF/raster pairs were independently checked.
+- Latest no-provider artifact review #42202349114 completed and uploaded
+  artifact 13496000656. For the 19 Gate B images, source hashes, PDFs,
+  searchable text layers, raster integrity, PDF-to-raster provenance,
+  local-reader availability and secret-leak scan all PASS.
+- The overall artifact report is FAILED/BLOCKED only for the missing original
+  63-run network log and absent Gate A PASS evidence. The original blocked
+  attempt count remains UNKNOWN; do not claim zero. Later local-only recovery
+  had zero provider requests, zero blocked attempts and an independently
+  recorded empty network log.
+- The 19-image post-hoc evaluation is complete. Tesseract.js: 110/171 exact
+  field candidates (64.33%), 2 wrong unaccepted, 59 unresolved; 2/19 full
+  nine-field records exact. Native Tesseract: 103/171 (60.23%), 2 wrong
+  unaccepted, 66 unresolved; 0/19 full records exact. Wrongly accepted
+  mandatory values are zero; unresolved mandatory outputs still block Gate B.
+- The 21-image analysis is diagnostic only: Tesseract.js 123/189 (65.08%),
+  2/21 full records exact; native Tesseract 116/189 (61.38%), 0/21 full
+  records exact. Do not count images 20–21 toward Gate B.
+- PDF text alone is not enough. Four-source majority improves field coverage
+  to 131/171 (76.61%) but has one wrong candidate and 39 unresolved values.
+  Strict four-source consensus has zero wrong candidates but 112 unresolved.
+  Keep ties/conflicts unresolved; do not auto-accept either arrangement.
+- Gate A preflight passed on all 16 individual fixture files and their
+  original manifest hashes. The original imgs2add.zip bytes remain missing.
+  The one-time Gate A run #42202563673 was cancelled during image 1/16; its
+  artifact has one searchable PDF/raster pair only. It used Node 22.16.0 and
+  has no original network log. No duplicate submission of image 1 occurred.
+  Gate A remains NOT PASSED. Current workflow definition now uses Node
+  24.17.0, adds a runtime check, preloads a fail-closed network logger, and
+  preserves progress artifacts; these changes do not alter the interrupted
+  run.
+- Exact-head DWBOT verification remains pending for the latest main commit;
+  no passing CI claim until exact run completes.
+- No production deployment. Gate B and production remain NO-GO.
+
+================================================================================
+END CURRENT OCR / GATE EVIDENCE UPDATE
+================================================================================
+
 CURRENT GATE A STATUS UPDATE — 2026-11-06
 Status: NOT PASSED / INTERRUPTED AFTER FIRST IMAGE.
 
