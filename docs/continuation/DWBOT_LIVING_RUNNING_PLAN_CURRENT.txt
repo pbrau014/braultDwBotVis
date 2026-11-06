@@ -52,11 +52,12 @@ SOURCE FINGERPRINT / RUN STATUS — 2026-11-06
 - Existing 63-image run 42160979140 uses trigger commit
   adaf4f8c3a9573f56d0348a4bba36686fc31c22e. OCR source files, 63-image runner,
   network guard, preflight script, PDF contract tests and package-lock blob
-  hashes match main at b58175e07ee1e47cb1fdbbecee398fc3af9e9fc4. package.json
-  differs only in test/evaluator scripts; dependencies and runtime declarations
-  are identical. This is a source-file comparison, not an artifact/accuracy pass.
-- Latest exact-head verification run 42170621125 is pending. Existing extraction
-  remains in progress at its provider step; no artifacts are listed.
+  hashes match main at the compared source checkpoint; subsequent commits
+  through the latest main head changed only docs/tests. package.json differs
+  only in test/evaluator scripts; dependencies and runtime declarations are
+  identical. This is a source-file comparison, not an artifact/accuracy pass.
+- Exact-head verification for the latest main commit remains pending. Existing
+  extraction remains in progress at its provider step; no artifacts are listed.
 - Push-triggered provider workflow run 42170489690 is pending with no jobs;
   the manual-dispatch-only job guard prevents push events from submitting.
 - No duplicate OCR.Space requests were started. Continue with artifact

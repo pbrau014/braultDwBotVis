@@ -5,9 +5,13 @@ IMPLEMENTATION / VERIFICATION STATUS — 2026-11-06
 
 ## Current main / Gate B status — 2026-11-06
 
-- Current canonical main HEAD: 46810b5cd76a9148507b2aaa5f4262850c7cbbe4.
-- Exact-head DWBOT verification run 42170841013 is pending; no test pass is
-  claimed until its jobs finish and their logs/artifacts are inspected.
+- The source-comparison checkpoint was main commit
+  46810b5cd76a9148507b2aaa5f4262850c7cbbe4; later commits through the current
+  branch head updated only documentation and evaluator tests, not OCR source
+  or the dependency lockfile.
+- Exact-head DWBOT verification for the latest main commit is pending; no test
+  pass is claimed until the current run's jobs finish and logs/artifacts are
+  inspected.
 - Existing imagesF-63 OCR.Space run 42160979140 remains in progress at its
   PDF-first extraction step. No artifacts are listed yet. Do not restart it.
 - The run's OCR implementation, PDF-first runner, quota ledger, network guard,
