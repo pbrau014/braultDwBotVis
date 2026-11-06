@@ -5,6 +5,7 @@ const fsConstants = require('node:fs').constants;
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { execFileSync } = require('node:child_process');
+const imageProcessor = require('../src/image-processor');
 
 function sha256(bytes) { return crypto.createHash('sha256').update(bytes).digest('hex'); }
 function parseArgs(args) {
@@ -109,11 +110,13 @@ async function prepare(options) {
     if (sha256(sourceImage) !== first.sha256 || sourceImage.length !== Number(firstPreflight.bytes)) {
         throw new Error('First source image bytes/hash do not match the approved Gate A manifest and preflight.');
     }
+    const sourceImageDimensions = await imageProcessor.metadata(sourceImage);
 
     const partialArtifactDir = path.join(partialRoot, 'source', 'testdata', 'gateA-16', 'artifacts');
     const partialFiles = await fs.readdir(partialArtifactDir);
     const expectedPdfName = first.sha256 + '.ocrspace.pdf';
     const expectedRasterName = first.sha256 + '.ocrspace-page.png';
+    const expectedNormalizedRasterName = first.sha256 + '.ocrspace-page.normalized.png';
     if (partialFiles.filter(name => name.endsWith('.ocrspace.pdf')).length !== 1
         || partialFiles.filter(name => name.endsWith('.ocrspace-page.png')).length !== 1
         || !partialFiles.includes(expectedPdfName) || !partialFiles.includes(expectedRasterName)) {
@@ -131,16 +134,42 @@ async function prepare(options) {
         throw new Error('Original partial PDF/raster failed signature, EOF or PNG IHDR validation.');
     }
 
+    // Re-render the preserved PDF and prove the preserved page raster is
+    // pixel-identical before deriving the source-aspect crop. A matching filename,
+    // PNG header, or dimensions alone is not sufficient provenance.
+    const renderedPageRaster = await imageProcessor.renderSearchablePdfPage(pdf);
+    const toPixels = buffer => imageProcessor.__test.runImageMagick(
+        ['png:-', '-depth', '8', 'rgba:-'], buffer,
+        { timeoutMs: 60000, maxOutputBytes: 80_000_000 }
+    );
+    const [savedPagePixels, renderedPagePixels] = await Promise.all([
+        toPixels(raster), toPixels(renderedPageRaster),
+    ]);
+    if (!Buffer.isBuffer(savedPagePixels) || !Buffer.isBuffer(renderedPagePixels)
+        || !savedPagePixels.equals(renderedPagePixels)) {
+        throw new Error('Preserved Gate A page raster is not pixel-identical to a fresh rendering of its preserved searchable PDF.');
+    }
+    const normalized = await imageProcessor.normalizeSearchablePdfPageRaster(renderedPageRaster, {
+        sourceWidth: sourceImageDimensions.width, sourceHeight: sourceImageDimensions.height, sourceImageBuffer: sourceImage,
+    });
+    if (normalized.similarity?.method !== 'original-source-resized-to-normalized-raster-v1') {
+        throw new Error('Gate A PDF raster normalization lacks original-source pixel similarity evidence.');
+    }
+    const normalizedRaster = normalized.buffer;
+    const normalizedRasterDimensions = await imageProcessor.metadata(normalizedRaster);
+    const normalizedRasterSha256 = sha256(normalizedRaster);
     const artifactRoot = path.join(sourceRoot, 'testdata', 'gateA-16', 'artifacts');
     await fs.mkdir(artifactRoot, { recursive: true });
     const pdfPath = path.join(artifactRoot, expectedPdfName);
     const rasterPath = path.join(artifactRoot, expectedRasterName);
-    for (const target of [pdfPath, rasterPath]) {
+    const normalizedRasterPath = path.join(artifactRoot, expectedNormalizedRasterName);
+    for (const target of [pdfPath, rasterPath, normalizedRasterPath]) {
         try { await fs.access(target); throw new Error('Gate A resume destination already exists; refusing to overwrite: ' + target); }
         catch (error) { if (error.code !== 'ENOENT') throw error; }
     }
     await fs.copyFile(partialPdfPath, pdfPath, fsConstants.COPYFILE_EXCL);
     await fs.copyFile(partialRasterPath, rasterPath, fs.constants.COPYFILE_EXCL);
+    await fs.writeFile(normalizedRasterPath, normalizedRaster, { flag: 'wx' });
 
     // The candidate OCR engine remains at the exact Gate B source commit.
     // Only the parent sequence orchestrator and its resume validator are overlaid.
@@ -189,7 +218,7 @@ async function prepare(options) {
         args: [path.join(sourceRoot, 'scripts', 'ocr-image-child.js'), localPayloadPath],
         cwd: sourceRoot,
         env: childEnv,
-        inputBuffer: raster,
+        inputBuffer: normalizedRaster,
         timeoutMs: 180000,
         terminationTimeoutMs: 5000,
     });
@@ -233,9 +262,14 @@ async function prepare(options) {
         ocrSpacePdfFirst: {
             status: 'complete', provider: 'ocr.space', engine: 2,
             sourceSha256: first.sha256, uploadSha256: first.sha256, uploadBytes: sourceImage.length,
-            pdfBytes: pdf.length, pdfSha256, rasterBytes: raster.length, rasterSha256,
-            rasterWidth: rasterDimensions.width, rasterHeight: rasterDimensions.height,
-            artifacts: { pdf: pdfPath, raster: rasterPath },
+            sourceWidth: sourceImageDimensions.width, sourceHeight: sourceImageDimensions.height,
+            pdfBytes: pdf.length, pdfSha256,
+            pageRasterBytes: raster.length, pageRasterSha256: rasterSha256,
+            pageRasterWidth: rasterDimensions.width, pageRasterHeight: rasterDimensions.height,
+            rasterBytes: normalizedRaster.length, rasterSha256: normalizedRasterSha256,
+            rasterWidth: normalizedRasterDimensions.width, rasterHeight: normalizedRasterDimensions.height,
+            rasterNormalization: normalized.normalization, rasterSourceSimilarity: normalized.similarity,
+            artifacts: { pdf: pdfPath, pageRaster: rasterPath, raster: normalizedRasterPath },
             recoveredFromPriorRunId: expectedRunId, recoveredFromPriorArtifactId: expectedArtifactId,
         },
         providerSubmissionAttempted: true,
@@ -247,7 +281,8 @@ async function prepare(options) {
             ? 'FIRST_IMAGE_RECOVERED_EXACT' : 'FIRST_IMAGE_NOT_EXACT',
         providerRequests: 0, sourceRunId: expectedRunId, sourceArtifactId: expectedArtifactId,
         sourceArtifactSha256: expectedArtifactSha256, sourceCommit: sourceCommit,
-        sourceImageSha256: first.sha256, pdfSha256, rasterSha256,
+        sourceImageSha256: first.sha256, pdfSha256, pageRasterSha256: rasterSha256,
+        rasterSha256: normalizedRasterSha256, rasterNormalization: normalized.normalization,
         localReader: { engine: 'tesseractjs', networkAttempts: 0, closeConfirmed: true },
         actual, expected: first.expected, comparison, allExpectedFieldsPass: allMatch,
         allRequiredFieldsPass: requiredFieldsPass, requiredMissing,
@@ -259,7 +294,9 @@ async function prepare(options) {
         preservedOriginalJobLogPath: path.relative(sourceRoot, preservedOriginalJobLogPath),
         originalProviderStartCount: originalStartedFixtures.length,
         originalProviderStartedFixtureKeys: originalStartedFixtures.map(item => item.fixtureKey),
-        orchestrationOverlay: { candidateRunnerSha256, runnerOverlaySha256, helperOverlaySha256 },
+        orchestrationOverlay: { candidateRunnerSha256, runnerOverlaySha256, helperOverlaySha256,
+            rasterNormalizerSha256: sha256(await fs.readFile(path.join(path.resolve(__dirname, '..'), 'src', 'image-processor.js'))) },
+        rasterNormalization: normalized.normalization,
         sourceBuildSha256: null,
         createdAt: new Date().toISOString(),
     };
@@ -328,6 +365,7 @@ async function prepare(options) {
     recoveryReport.sourceBuildSha256 = sourceMetadata.sourceBuild.sha256;
     recoveryReport.resumeProgressPath = path.relative(sourceRoot, progressPath);
     recoveryReport.remainingProviderRequests = 15;
+    recoveryReport.continueProviderRun = true;
     recoveryReport.completedProviderRequestsReused = 1;
     recoveryReport.resumeProgressSha256 = sha256(await fs.readFile(progressPath));
     recoveryReport.originalNetworkLogStatus = 'MISSING_FROM_ORIGINAL_PARTIAL_ARTIFACT';

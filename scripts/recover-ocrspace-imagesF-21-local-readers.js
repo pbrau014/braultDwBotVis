@@ -125,10 +125,11 @@ async function main() {
     const runPath = arg('--run-report');
     const gtPath = arg('--ground-truth');
     const artifactRoot = arg('--artifact-root');
+    const sourceImageRoot = arg('--source-image-root');
     const outputRunPath = arg('--output-run-report');
     const outputRecoveryPath = arg('--recovery-report');
     const networkLogPath = arg('--network-log');
-    if (![runPath, gtPath, artifactRoot, outputRunPath, outputRecoveryPath, networkLogPath].every(Boolean)) {
+    if (![runPath, gtPath, artifactRoot, sourceImageRoot, outputRunPath, outputRecoveryPath, networkLogPath].every(Boolean)) {
         throw new Error('Missing required local recovery arguments.');
     }
 
@@ -184,24 +185,100 @@ async function main() {
                 continue;
             }
 
-            let pdfBuffer, rasterBuffer;
+            let pdfBuffer, rasterBuffer, sourceBuffer;
             try {
+                const sourcePath = safePath(sourceImageRoot, expected.filename);
+                if (!sourcePath) throw new Error('Original source screenshot path is missing or unsafe.');
+                sourceBuffer = await fs.readFile(sourcePath);
+                const sourceMetadata = await imageProcessor.metadata(sourceBuffer);
+                if (sourceBuffer.length !== expected.sourceImage.bytes || sha256(sourceBuffer) !== expected.sourceImage.sha256
+                    || sourceMetadata.width !== expected.sourceImage.width || sourceMetadata.height !== expected.sourceImage.height) {
+                    throw new Error('Original source screenshot does not match the approved nine-field ground-truth fingerprint.');
+                }
+                image.sourceImage = { bytes: sourceBuffer.length, sha256: sha256(sourceBuffer), width: sourceMetadata.width, height: sourceMetadata.height };
                 pdfBuffer = await fs.readFile(pdfPath);
-                rasterBuffer = await fs.readFile(rasterPath);
+                const normalization = row.rasterNormalization || row.ocrSpacePdfFirst?.rasterNormalization || null;
+                if (normalization) row.rasterNormalization = normalization;
+                const pageRasterPath = safePath(artifactRoot, row.pageRasterPath || (!normalization ? row.rasterPath : null));
+                const pageRasterBuffer = pageRasterPath ? await fs.readFile(pageRasterPath) : null;
+                const pageRasterBytes = row.pageRasterBytes || row.ocrSpacePdfFirst?.pageRasterBytes || (!normalization ? row.rasterBytes : null);
+                const pageRasterSha256 = row.pageRasterSha256 || row.ocrSpacePdfFirst?.pageRasterSha256 || (!normalization ? row.rasterSha256 : null);
                 if (pdfBuffer.subarray(0, 5).toString('ascii') !== '%PDF-'
                     || pdfBuffer.length !== row.pdfBytes || sha256(pdfBuffer) !== row.pdfSha256
-                    || rasterBuffer.length !== row.rasterBytes || sha256(rasterBuffer) !== row.rasterSha256) {
-                    throw new Error('Saved PDF/raster does not match the original run-report size and SHA-256.');
+                    || (pageRasterBuffer && (pageRasterBuffer.length !== pageRasterBytes || sha256(pageRasterBuffer) !== pageRasterSha256))
+                    || (!pageRasterBuffer && !normalization)) {
+                    throw new Error('Saved PDF/page-raster does not match the original run-report size and SHA-256.');
                 }
                 const rendered = await imageProcessor.renderSearchablePdfPage(pdfBuffer);
+                if (pageRasterSha256 && sha256(rendered) !== pageRasterSha256) {
+                    throw new Error('Fresh full-page PDF raster does not match the recorded page-raster fingerprint.');
+                }
                 const toPixels = buffer => imageProcessor.__test.runImageMagick(
                     ['png:-', '-depth', '8', 'rgba:-'], buffer,
                     { timeoutMs: 60000, maxOutputBytes: 80_000_000 }
                 );
-                const [savedPixels, renderedPixels] = await Promise.all([toPixels(rasterBuffer), toPixels(rendered)]);
-                if (!Buffer.isBuffer(savedPixels) || !Buffer.isBuffer(renderedPixels) || !savedPixels.equals(renderedPixels)) {
-                    throw new Error('Saved raster is not pixel-identical to a fresh rendering of its saved PDF.');
+                if (pageRasterBuffer) {
+                    const [savedPagePixels, renderedPagePixels] = await Promise.all([toPixels(pageRasterBuffer), toPixels(rendered)]);
+                    if (!Buffer.isBuffer(savedPagePixels) || !Buffer.isBuffer(renderedPagePixels) || !savedPagePixels.equals(renderedPagePixels)) {
+                        throw new Error('Saved full-page raster is not pixel-identical to a fresh rendering of its saved PDF.');
+                    }
                 }
+                const normalized = await imageProcessor.normalizeSearchablePdfPageRaster(rendered, {
+                    sourceWidth: expected.sourceImage.width, sourceHeight: expected.sourceImage.height, sourceImageBuffer: sourceBuffer,
+                });
+                if (normalized.similarity?.method !== 'original-source-resized-to-normalized-raster-v1') {
+                    throw new Error('Normalized PDF raster is not pixel-verified against the original source screenshot.');
+                }
+                image.sourceSimilarity = normalized.similarity;
+                const normalizedPath = safePath(artifactRoot, row.rasterPath);
+                if (!normalizedPath) throw new Error('Normalized raster path is missing or unsafe.');
+                if (normalization) {
+                    rasterBuffer = await fs.readFile(normalizedPath);
+                    if (rasterBuffer.length !== row.rasterBytes || sha256(rasterBuffer) !== row.rasterSha256) {
+                        throw new Error('Previously normalized raster does not match its recorded size and SHA-256.');
+                    }
+                    const [savedNormalizedPixels, expectedNormalizedPixels] = await Promise.all([
+                        toPixels(rasterBuffer), toPixels(normalized.buffer),
+                    ]);
+                    if (!savedNormalizedPixels.equals(expectedNormalizedPixels)
+                        || JSON.stringify(normalized.normalization) !== JSON.stringify(normalization)) {
+                        throw new Error('Saved normalized raster or its metadata is not identical to the source-bound PDF crop.');
+                    }
+                } else {
+                    const priorRasterMetadata = await imageProcessor.metadata(pageRasterBuffer);
+                    const normalizedName = 'normalized/' + String(selected.indexOf(expected) + 1).padStart(2, '0')
+                        + '-' + sha256(Buffer.from(expected.filename)).slice(0, 16) + '.pdf-content.png';
+                    const destination = path.join(artifactRoot, normalizedName);
+                    await fs.mkdir(path.dirname(destination), { recursive: true });
+                    try { await fs.writeFile(destination, normalized.buffer, { flag: 'wx' }); }
+                    catch (error) {
+                        if (error.code !== 'EEXIST') throw error;
+                        const existing = await fs.readFile(destination);
+                        if (!existing.equals(normalized.buffer)) throw new Error('Existing normalized raster path contains different bytes; refusing overwrite.');
+                    }
+                    row.pageRasterPath = row.rasterPath;
+                    row.pageRasterBytes = pageRasterBuffer.length;
+                    row.pageRasterSha256 = pageRasterSha256;
+                    row.pageRasterWidth = priorRasterMetadata.width;
+                    row.pageRasterHeight = priorRasterMetadata.height;
+                    row.rasterPath = normalizedName;
+                    row.rasterBytes = normalized.buffer.length;
+                    row.rasterSha256 = sha256(normalized.buffer);
+                    row.rasterWidth = normalized.normalization.normalizedWidth;
+                    row.rasterHeight = normalized.normalization.normalizedHeight;
+                    row.rasterNormalization = normalized.normalization;
+                    rasterBuffer = normalized.buffer;
+                    if (row.ocrSpacePdfFirst) {
+                        Object.assign(row.ocrSpacePdfFirst, {
+                            pageRasterBytes: row.pageRasterBytes, pageRasterSha256: row.pageRasterSha256,
+                            pageRasterWidth: row.pageRasterWidth, pageRasterHeight: row.pageRasterHeight,
+                            rasterBytes: row.rasterBytes, rasterSha256: row.rasterSha256,
+                            rasterWidth: row.rasterWidth, rasterHeight: row.rasterHeight,
+                            rasterNormalization: row.rasterNormalization,
+                        });
+                    }
+                }
+                image.rasterNormalization = row.rasterNormalization;
             } catch (error) {
                 image.failures.push({ code: 'PDF_RASTER_VERIFICATION_FAILED', message: String(error.message || error).slice(0, 400) });
                 recovery.images.push(image);
@@ -253,6 +330,8 @@ async function main() {
                 concurrency: 'Promise.allSettled; isolated child process per local OCR engine',
                 sourcePdfSha256: row.pdfSha256,
                 sourceRasterSha256: row.rasterSha256,
+                sourcePageRasterSha256: row.pageRasterSha256 || row.ocrSpacePdfFirst?.pageRasterSha256 || null,
+                rasterNormalization: row.rasterNormalization || null,
                 startedAt,
                 completedAt: new Date().toISOString(),
                 enginesRequested: [...recoveryPlan.pending, 'pdf-text-layer'],
@@ -262,7 +341,7 @@ async function main() {
                 providerRequests: 0, originalScreenshotFallback: false
             };
             row.localReaderRecovery = {
-                mode: 'PARALLEL_LOCAL_ONLY_READER_MATRIX_FROM_HASH_VERIFIED_PDF_DERIVED_RASTER',
+                mode: 'PARALLEL_LOCAL_ONLY_READER_MATRIX_FROM_HASH_VERIFIED_SOURCE_ASPECT_NORMALIZED_PDF_RASTER',
                 startedAt, completedAt: row.parallelReaderMatrix.completedAt,
                 timeoutMs: Number(process.env.OCR_SUPERVISED_TIMEOUT_MS),
                 providerRequests: 0, networkLogPath: path.basename(networkLogPath),

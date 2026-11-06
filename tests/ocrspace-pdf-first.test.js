@@ -14,6 +14,22 @@ function streamResponse(bytes, headers = {}) {
 }
 const png = Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a,1,2,3]);
 
+const sourceDimensions = { width: 1920, height: 1080 };
+const normalizeRaster = async (buffer, dimensions) => ({
+    buffer,
+    similarity: { method: 'original-source-resized-to-normalized-raster-v1', meanAbsoluteError: 0, rootMeanSquareError: 0 },
+    normalization: {
+        method: 'source-aspect-top-aligned-crop-v1',
+        sourceWidth: dimensions.sourceWidth,
+        sourceHeight: dimensions.sourceHeight,
+        pageRasterWidth: 1920,
+        pageRasterHeight: 2573,
+        cropRect: { left: 0, top: 0, width: 1920, height: 1080 },
+        normalizedWidth: 1920,
+        normalizedHeight: 1080,
+    },
+});
+
 function fakeLedger() {
     const reservations = [];
     return { reservations, async reserve(value) { reservations.push(value); return { reserved: true }; } };
@@ -30,7 +46,7 @@ test('OCR.Space Engine 2 processes the source image first and local readers rece
         client: async options => { request = options; return { searchablePdfUrl: 'https://api.ocr.space/parse/image/temporary.pdf', parsedText: 'Victory\\nShards', exitCode: 1, processingTimeMs: 123 }; },
         downloadPdf: async url => { downloaded = url; return pdf; },
         renderPdf: async bytes => { rendered = bytes; return png; },
-        readRasterMetadata: async () => ({ width: 1920, height: 1080 }),
+        readRasterMetadata: async () => ({ width: 1920, height: 1080 }), sourceDimensions, normalizeRaster,
     });
     assert.equal(request.engine, 2);
     assert.equal(request.createSearchablePdf, true);
@@ -45,6 +61,9 @@ test('OCR.Space Engine 2 processes the source image first and local readers rece
     assert.equal(result.rasterSha256, crypto.createHash('sha256').update(png).digest('hex'));
     assert.equal(result.pdfBuffer, pdf);
     assert.equal(result.rasterBuffer, png);
+    assert.equal(result.rasterNormalization.method, 'source-aspect-top-aligned-crop-v1');
+    assert.equal(result.sourceWidth, 1920);
+    assert.equal(result.sourceHeight, 1080);
     assert.equal(result.providerText, 'Victory\\nShards');
 });
 
@@ -63,7 +82,7 @@ test('source images above the Free API cap are re-encoded before upload', async 
         client: async options => { request = options; return { searchablePdfUrl: 'https://ocr.space/result.pdf', exitCode: 1 }; },
         downloadPdf: async () => pdf,
         renderPdf: async () => png,
-        readRasterMetadata: async () => ({ width: 1600, height: 900 }),
+        readRasterMetadata: async () => ({ width: 1600, height: 900 }), sourceDimensions: { width: 1600, height: 900 }, normalizeRaster,
     });
     assert.equal(prepared, true);
     assert.equal(request.filename, 'normalized.jpg');
@@ -84,6 +103,7 @@ test('missing key is a blocked precondition and does not call the provider', asy
 test('missing searchable PDF is a hard failure; source image is not substituted', async () => {
     await assert.rejects(createOcrSpacePdfFirst({
         imageBuffer: png, env: { OCRSPACE_API_KEY: 'test-key' }, quotaLedger: fakeLedger(),
+        sourceDimensions, readRasterMetadata: async () => ({ width: 1920, height: 1080 }),
         client: async () => ({ parsedText: 'some OCR text', searchablePdfUrl: null }),
     }), { code: 'OCRSPACE_SEARCHABLE_PDF_MISSING' });
 });
@@ -129,6 +149,7 @@ test('durable provider-start checkpoint completes before the OCR.Space request',
         downloadPdf: async () => pdf,
         renderPdf: async () => png,
         readRasterMetadata: async () => ({ width: 1920, height: 1080 }),
+        sourceDimensions, normalizeRaster,
     });
     assert.deepEqual(order, ['checkpoint', 'provider']);
     assert.equal(result.status, 'complete');
@@ -137,7 +158,7 @@ test('durable provider-start checkpoint completes before the OCR.Space request',
 test('failed durable provider-start checkpoint prevents any OCR.Space request', async () => {
     let providerCalled = false;
     await assert.rejects(createOcrSpacePdfFirst({
-        imageBuffer: png, env: { OCRSPACE_API_KEY: 'test-key' }, quotaLedger: fakeLedger(),
+        imageBuffer: png, env: { OCRSPACE_API_KEY: 'test-key' }, quotaLedger: fakeLedger(), sourceDimensions,
         onProviderRequestStarted: async () => { throw new Error('checkpoint disk failure'); },
         client: async () => { providerCalled = true; return { searchablePdfUrl: 'https://api.ocr.space/result.pdf' }; },
     }), /checkpoint disk failure/);

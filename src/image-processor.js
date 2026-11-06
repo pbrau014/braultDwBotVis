@@ -3,6 +3,7 @@
 // Portable image preprocessing adapter. Sharp is intentionally not required:
 // ImageMagick's CLI is used to decode, resize, normalize, sharpen and crop images.
 // This avoids native Node ABI / platform-specific sharp binary install failures.
+const crypto = require('node:crypto');
 const { spawn, spawnSync } = require('node:child_process');
 
 function assertDimensions(width, height, options = {}) {
@@ -166,6 +167,133 @@ async function cropResize(inputBuffer, rect, outputWidth, options = {}) {
     return runImageMagick(args, inputBuffer);
 }
 
+function sourceAspectCropRect(pageWidth, pageHeight, sourceWidth, sourceHeight) {
+    const values = [pageWidth, pageHeight, sourceWidth, sourceHeight].map(Number);
+    if (!values.every(Number.isSafeInteger) || values.some(value => value < 1)) {
+        const error = new Error('PDF raster normalization requires positive integer page and source dimensions.');
+        error.code = 'OCRSPACE_PDF_SOURCE_DIMENSIONS_INVALID';
+        throw error;
+    }
+    const [pageW, pageH, sourceW, sourceH] = values;
+    const pageAspect = pageW / pageH;
+    const sourceAspect = sourceW / sourceH;
+    // DWBOT result screenshots are landscape and OCR.Space places the source
+    // image top-aligned at full PDF-page width. Portrait/letterboxed layouts are
+    // not guessed: they must use a separately verified layout strategy.
+    if (sourceAspect <= pageAspect) {
+        const error = new Error('Source screenshot aspect ratio is not compatible with the verified top-aligned landscape PDF layout.');
+        error.code = 'OCRSPACE_PDF_SOURCE_ASPECT_UNSUPPORTED';
+        throw error;
+    }
+    const cropHeight = Math.round(pageW * sourceH / sourceW);
+    if (cropHeight < 240 || cropHeight >= pageH) {
+        const error = new Error('Source screenshot aspect ratio produced an unsafe or empty PDF content crop.');
+        error.code = 'OCRSPACE_PDF_SOURCE_ASPECT_UNSUPPORTED';
+        throw error;
+    }
+    return { left: 0, top: 0, width: pageW, height: cropHeight };
+}
+
+const SOURCE_SIMILARITY_LIMITS = Object.freeze({ meanAbsoluteError: 3, rootMeanSquareError: 8 });
+
+async function compareSourceSimilarity(sourceImageBuffer, normalizedRasterBuffer, {
+    maxMeanAbsoluteError = SOURCE_SIMILARITY_LIMITS.meanAbsoluteError,
+    maxRootMeanSquareError = SOURCE_SIMILARITY_LIMITS.rootMeanSquareError,
+} = {}) {
+    if (!Buffer.isBuffer(sourceImageBuffer) || !sourceImageBuffer.length
+        || !Buffer.isBuffer(normalizedRasterBuffer) || !normalizedRasterBuffer.length) {
+        const error = new Error('Source similarity verification requires original and normalized image buffers.');
+        error.code = 'OCRSPACE_PDF_SOURCE_SIMILARITY_INPUT_INVALID';
+        throw error;
+    }
+    const [sourceMetadata, normalizedMetadata] = await Promise.all([
+        metadata(sourceImageBuffer), metadata(normalizedRasterBuffer),
+    ]);
+    const resizedSource = await cropResize(sourceImageBuffer, {
+        left: 0, top: 0, width: sourceMetadata.width, height: sourceMetadata.height,
+    }, normalizedMetadata.width);
+    const resizedMetadata = await metadata(resizedSource);
+    if (resizedMetadata.width !== normalizedMetadata.width || resizedMetadata.height !== normalizedMetadata.height) {
+        const error = new Error('Resized original screenshot dimensions do not match the normalized PDF raster.');
+        error.code = 'OCRSPACE_PDF_SOURCE_SIMILARITY_DIMENSIONS_MISMATCH';
+        throw error;
+    }
+    const toRawRgba = buffer => runImageMagick(
+        ['png:-', '-depth', '8', 'rgba:-'], buffer,
+        { timeoutMs: 60000, maxOutputBytes: 80_000_000 }
+    );
+    const [normalizedPixels, sourcePixels] = await Promise.all([
+        toRawRgba(normalizedRasterBuffer), toRawRgba(resizedSource),
+    ]);
+    if (!normalizedPixels.length || normalizedPixels.length !== sourcePixels.length || normalizedPixels.length % 4 !== 0) {
+        const error = new Error('Source similarity comparison produced incompatible RGBA pixel buffers.');
+        error.code = 'OCRSPACE_PDF_SOURCE_SIMILARITY_PIXEL_DIMENSIONS_MISMATCH';
+        throw error;
+    }
+    let absoluteSum = 0;
+    let squaredSum = 0;
+    for (let index = 0; index < normalizedPixels.length; index += 1) {
+        const difference = Math.abs(normalizedPixels[index] - sourcePixels[index]);
+        absoluteSum += difference;
+        squaredSum += difference * difference;
+    }
+    const channelCount = normalizedPixels.length;
+    const meanAbsoluteError = absoluteSum / channelCount;
+    const rootMeanSquareError = Math.sqrt(squaredSum / channelCount);
+    const similarity = {
+        method: 'original-source-resized-to-normalized-raster-v1',
+        sourceWidth: sourceMetadata.width,
+        sourceHeight: sourceMetadata.height,
+        normalizedWidth: normalizedMetadata.width,
+        normalizedHeight: normalizedMetadata.height,
+        sourceResizedSha256: crypto.createHash('sha256').update(resizedSource).digest('hex'),
+        pixelCount: channelCount / 4,
+        channelCount,
+        meanAbsoluteError,
+        rootMeanSquareError,
+        limits: { meanAbsoluteError: maxMeanAbsoluteError, rootMeanSquareError: maxRootMeanSquareError },
+    };
+    if (meanAbsoluteError > maxMeanAbsoluteError || rootMeanSquareError > maxRootMeanSquareError) {
+        const error = new Error(`Normalized PDF crop does not sufficiently match the original screenshot (MAE=${meanAbsoluteError.toFixed(3)}, RMSE=${rootMeanSquareError.toFixed(3)}; limits MAE<=${maxMeanAbsoluteError}, RMSE<=${maxRootMeanSquareError}).`);
+        error.code = 'OCRSPACE_PDF_SOURCE_SIMILARITY_FAILED';
+        error.similarity = similarity;
+        throw error;
+    }
+    return similarity;
+}
+
+async function normalizeSearchablePdfPageRaster(pageRasterBuffer, { sourceWidth, sourceHeight, sourceImageBuffer = null } = {}) {
+    if (!Buffer.isBuffer(pageRasterBuffer) || !pageRasterBuffer.length) {
+        const error = new Error('Searchable-PDF page raster is empty.');
+        error.code = 'OCRSPACE_PDF_RASTER_INVALID';
+        throw error;
+    }
+    const page = await metadata(pageRasterBuffer);
+    const cropRect = sourceAspectCropRect(page.width, page.height, sourceWidth, sourceHeight);
+    const buffer = await cropResize(pageRasterBuffer, cropRect, page.width);
+    const normalized = await metadata(buffer);
+    if (normalized.width !== cropRect.width || normalized.height !== cropRect.height) {
+        const error = new Error('Normalized PDF raster dimensions do not match the source-aspect crop.');
+        error.code = 'OCRSPACE_PDF_RASTER_NORMALIZATION_MISMATCH';
+        throw error;
+    }
+    const similarity = sourceImageBuffer ? await compareSourceSimilarity(sourceImageBuffer, buffer) : null;
+    return {
+        buffer,
+        similarity,
+        normalization: {
+            method: 'source-aspect-top-aligned-crop-v1',
+            sourceWidth: Number(sourceWidth),
+            sourceHeight: Number(sourceHeight),
+            pageRasterWidth: page.width,
+            pageRasterHeight: page.height,
+            cropRect,
+            normalizedWidth: normalized.width,
+            normalizedHeight: normalized.height,
+        },
+    };
+}
+
 async function prepareOcrSpaceUpload(inputBuffer, maxBytes = 1024 * 1024) {
     if (!Buffer.isBuffer(inputBuffer) || !inputBuffer.length) throw new Error('OCR.Space source image is empty.');
     const attempts = [
@@ -209,4 +337,4 @@ async function renderSearchablePdfPage(pdfBuffer, { density = 220, maxDimension 
 }
 
 module.exports = { metadata, prepare, cropResize, prepareOcrSpaceUpload, renderSearchablePdfPage,
-    imageMagick, assertDimensions, __test: { runImageMagick } };
+    normalizeSearchablePdfPageRaster, sourceAspectCropRect, compareSourceSimilarity, SOURCE_SIMILARITY_LIMITS, imageMagick, assertDimensions, __test: { runImageMagick } };

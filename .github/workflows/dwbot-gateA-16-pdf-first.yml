@@ -3,12 +3,13 @@ name: DWBOT Gate A 16-image OCR.Space PDF-first acceptance
 # Historical Gate A run #42202563673 is quarantined: its first provider request lacked proven restricted-egress enforcement.
 # Its PDF may be reused for local-only diagnosis, but it cannot count toward Gate A or authorize remaining provider requests.
 # A compliant Gate A result requires a fresh, fully guarded 16-image run with a new diagnostic log and locked source fingerprint.
+# User explicitly authorized a fresh guarded 16-image provider acceptance attempt on 2026-11-06. It must run against the current, exact Node 26.13.0 candidate and a successful candidate CI run; the 63-PDF source run is retained separately as historical extraction provenance.
 # The LOCAL-ONLY-RECOVERY and RESUME-15 paths remain fail-closed and must never repeat or extend the historical partial batch.
 # The local-only helper rebinds NODE_OPTIONS for its child process because its cwd is sourceRoot.
 
 on:
   push:
-    branches: [main]
+    branches: [main, fix/pdf-raster-source-aspect-normalization]
     paths:
       - '.github/workflows/dwbot-gateA-16-pdf-first.yml'
 
@@ -17,12 +18,11 @@ permissions:
   actions: read
 
 concurrency:
-  group: dwbot-gateA-16-pdf-first-adaf4f8c
+  group: dwbot-gateA-16-pdf-first-${{ github.ref }}
   cancel-in-progress: false
 
 env:
-  GATEB_SOURCE_SHA: adaf4f8c3a9573f56d0348a4bba36686fc31c22e
-  GATEB_SOURCE_RUN_ID: '42160979140'
+  GATEB_SOURCE_SHA: 7eda2759760651ffead3d64d3d3854295115a113
 
 jobs:
   gate-a:
@@ -38,10 +38,10 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Node.js 22.16.0 for source preflight
+      - name: Set up Node.js 26.13.0 for source preflight
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 22.16.0
+          node-version: 26.13.0
           package-manager-cache: false
 
       - name: Install preflight dependencies
@@ -50,17 +50,22 @@ jobs:
           node --check scripts/run-gateA-parallel-reader-matrix.js
           node --check scripts/prepare-gateA-16-resume.js
 
-      - name: Verify completed Gate B source run fingerprint
+      - name: Verify successful Node 26 candidate CI before provider submission
         shell: powershell
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $run = gh run view $env:GATEB_SOURCE_RUN_ID --repo $env:GITHUB_REPOSITORY --json headSha,status,conclusion
-          if ($LASTEXITCODE -ne 0) { throw 'Could not inspect the completed Gate B source run.' }
-          $source = $run | ConvertFrom-Json
-          if ($source.status -ne 'completed' -or $source.conclusion -ne 'success') { throw 'Gate B source run is not completed successfully.' }
-          if ($source.headSha -ne $env:GATEB_SOURCE_SHA) { throw 'Gate A candidate SHA does not match the Gate B source run SHA.' }
-          "Gate B run $env:GATEB_SOURCE_RUN_ID is completed and bound to $($source.headSha)."
+          $runsJson = gh api "repos/$env:GITHUB_REPOSITORY/actions/runs?head_sha=$env:GATEB_SOURCE_SHA&per_page=100"
+          if ($LASTEXITCODE -ne 0) { throw 'Could not list candidate CI runs.' }
+          $candidateRuns = @(($runsJson | ConvertFrom-Json).workflow_runs | Where-Object {
+            $_.name -eq 'Windows Node 26.13.0 OCR and normalization verification' -and
+            $_.head_sha -eq $env:GATEB_SOURCE_SHA -and
+            $_.status -eq 'completed' -and $_.conclusion -eq 'success'
+          } | Sort-Object run_number -Descending)
+          if ($candidateRuns.Count -eq 0) { throw 'No successful exact-SHA Windows Node 26.13.0 candidate verification exists; provider requests are blocked.' }
+          $candidateRun = $candidateRuns[0]
+          "GATEB_SOURCE_RUN_ID=$($candidateRun.id)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          Write-Host "Candidate CI run $($candidateRun.id) passed on $env:GATEB_SOURCE_SHA."
 
       - name: Preflight all 16 development images and nine-field labels
         shell: powershell
@@ -71,14 +76,14 @@ jobs:
       - name: Check out the exact Gate B candidate source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: adaf4f8c3a9573f56d0348a4bba36686fc31c22e
+          ref: 7eda2759760651ffead3d64d3d3854295115a113e
           path: source
           persist-credentials: false
 
-      - name: Set up accepted Node.js 22.16.0 runtime for Gate A acceptance
+      - name: Set up accepted Node.js 26.13.0 runtime for Gate A acceptance
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 22.16.0
+          node-version: 26.13.0
           package-manager-cache: false
 
       - name: Install local OCR and PDF runtime
@@ -251,7 +256,7 @@ jobs:
           $preflightPath = Join-Path $env:GITHUB_WORKSPACE 'testdata/gateA-16-preflight.json'
           $nodeVersion = (node --version).Trim()
           $runtimePass = $false
-          try { $runtimePass = ([version]$nodeVersion.TrimStart('v')) -ge ([version]'22.16.0') } catch { $runtimePass = $false }
+          try { $runtimePass = ([version]$nodeVersion.TrimStart('v')) -eq ([version]'26.13.0') } catch { $runtimePass = $false }
           $report = if (Test-Path $reportPath) { Get-Content -Raw $reportPath | ConvertFrom-Json } else { $null }
           $audit = if (Test-Path $auditPath) { Get-Content -Raw $auditPath | ConvertFrom-Json } else { $null }
           $preflight = if (Test-Path $preflightPath) { Get-Content -Raw $preflightPath | ConvertFrom-Json } else { $null }

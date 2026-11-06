@@ -1,0 +1,87 @@
+name: Windows Node 26.13.0 OCR and normalization verification
+
+on:
+  push:
+    branches: [fix/pdf-raster-source-aspect-normalization]
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/image-processor.js"
+      - "src/ocrspace-pdf-first.js"
+      - "src/bot.js"
+      - "scripts/run-ocr-sequence.js"
+      - "scripts/run-ocrspace-imagesF-63-exploratory.js"
+      - "scripts/recover-ocrspace-imagesF-21-local-readers.js"
+      - "scripts/prepare-gateA-16-resume.js"
+      - "scripts/verify-ocrspace-imagesF-21-artifacts.js"
+      - "tests/**"
+      - ".github/workflows/node26-windows-compatibility.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: node26-windows-compatibility-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  windows-node26:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout exact candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup Node.js 26.13.0 (project standard)
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26.13.0
+          cache: npm
+          package-manager-cache: false
+      - name: Verify ImageMagick for raster tests
+        shell: powershell
+        run: |
+          $magick = Get-Command magick.exe -ErrorAction SilentlyContinue
+          if (-not $magick) {
+            choco install imagemagick --yes --no-progress
+            if ($LASTEXITCODE -ne 0) { throw 'ImageMagick installation failed.' }
+            $profileModule = Join-Path $env:ChocolateyInstall 'helpers\chocolateyProfile.psm1'
+            if (Test-Path $profileModule) { Import-Module $profileModule; refreshenv }
+            $magick = Get-Command magick.exe -ErrorAction SilentlyContinue
+          }
+          if (-not $magick) { throw 'ImageMagick executable is unavailable.' }
+          & $magick.Source -version | Select-Object -First 2
+          "IMAGEMAGICK_BIN=$($magick.Source)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+      - name: Install local Tesseract and English language model
+        shell: powershell
+        run: |
+          choco install tesseract --version=5.5.3.20260724 --yes --no-progress
+          if ($LASTEXITCODE -ne 0) { throw 'Tesseract installation failed.' }
+          Import-Module "$env:ChocolateyInstall\\helpers\\chocolateyProfile.psm1"
+          refreshenv
+          $tesseract = Get-Command tesseract.exe -ErrorAction Stop
+          $tessdata = Join-Path (Split-Path $tesseract.Source -Parent) 'tessdata'
+          if (-not (Test-Path (Join-Path $tessdata 'eng.traineddata'))) { throw 'English Tesseract model is missing.' }
+          & $tesseract.Source --version
+          "TESSERACT_BIN=$($tesseract.Source)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "TESSERACT_LANG_PATH=$tessdata" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Syntax checks
+        shell: powershell
+        run: |
+          node --version
+          npm --version
+          node --check src/image-processor.js
+          node --check src/ocrspace-pdf-first.js
+          node --check scripts/run-ocrspace-imagesF-63-exploratory.js
+          node --check scripts/recover-ocrspace-imagesF-21-local-readers.js
+          node --check scripts/prepare-gateA-16-resume.js
+          node --check scripts/verify-ocrspace-imagesF-21-artifacts.js
+      - name: PDF raster normalization and provenance tests
+        run: node --test tests/image-processor.test.js tests/ocrspace-pdf-first.test.js tests/gateA-resume.test.js tests/ocrspace-imagesF-21-artifact-verifier.test.js tests/ocrspace-imagesF-21-local-recovery.test.js
+      - name: Complete offline OCR contract suite
+        run: npm run test:ocrspace
+      - name: Full unit and contract suite
+        run: npm test

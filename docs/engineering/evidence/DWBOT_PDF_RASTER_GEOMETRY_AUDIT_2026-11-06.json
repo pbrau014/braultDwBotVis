@@ -1,0 +1,214 @@
+{
+  "auditId": "PDFRASTER-GEOMETRY-2026-11-06-01",
+  "createdAtUtc": "2026-11-06T21:50:00Z",
+  "status": "PASS_GEOMETRY_AND_EMBEDDED_PDF_IMAGE_COMPARISON_WITH_SCOPE_LIMITATIONS",
+  "inputs": {
+    "pdfAndPageRasterArchive": {
+      "filename": "dwbot-imagesF-63-ocrspace-exploratory.zip",
+      "bytes": 81886966,
+      "sha256": "ac4ae071ee4737c2fe044b64456a8dab1cddf7073a02f8f427ec7b35af28629a",
+      "members": 133
+    },
+    "gateBReportsArchive": {
+      "filename": "dwbot-imagesF-19-gateB-artifact-verification.zip",
+      "bytes": 280514,
+      "sha256": "7883e48d7f206d2e2ba65d55d9b22a61c89b230454394825950a0328f8521cb1"
+    },
+    "gateARecoveryArchive": {
+      "filename": "dwbot-gateA-16-pdf-first-recovery.zip",
+      "bytes": 1641674,
+      "sha256": "d9774e950309a91396e61ae3232b8e5cd966cc8d1a39475cac08529592030ffa"
+    },
+    "groundTruthV6": {
+      "filename": "DWBOT_IMAGESF_63_ground_truth_working_v6.json",
+      "bytes": 185234,
+      "sha256": "9db97e8fbb4f74eac423040cb0f99ce5da98e75758cb0b36b3f4cdac15ab340d",
+      "candidateArchiveSha256": "6294944fbad9df05feeeac57b68acaf12642f8c883697748cad3b1a88f8bcba3"
+    },
+    "candidateManifest": {
+      "filename": "DWBOT_IMAGESF_HOLDOUT_CANDIDATE_MANIFEST.json",
+      "bytes": 22486,
+      "sha256": "c84f590e61ef835c9b53cf6baceb3f1937cf88b06cb9aafaf0472c65f796ffc6"
+    }
+  },
+  "method": {
+    "cropRule": "ECMAScript Math.round(pageRasterWidth * sourceHeight / sourceWidth), top-left origin, full page raster width.",
+    "pageRasterExpectedDimensions": [
+      1818,
+      2573
+    ],
+    "pdfPageExpectedPoints": [
+      595,
+      842
+    ],
+    "geometryChecks": [
+      "original source hash in run report equals v6 ground-truth source hash",
+      "PDF and page-raster byte hashes match recovered run report",
+      "exactly one embedded PDF image XObject",
+      "embedded image aspect ratio matches v6 source-image dimensions",
+      "embedded image is top-aligned at x=0,y=0 and spans full PDF page width",
+      "embedded image height matches source aspect ratio",
+      "derived crop remains inside page bounds"
+    ],
+    "pixelCheck": "Crop the archived full-page raster at source aspect ratio; resize the embedded PDF image to the crop dimensions with Pillow LANCZOS; compare RGB pixels. Limits MAE<=3 and RMSE<=8. This independently validates page placement/crop geometry, not byte-identical original-source pixels."
+  },
+  "gateA16": {
+    "corpusImageCount": 16,
+    "existingPdfCount": 1,
+    "notSubmittedPdfCount": 15,
+    "providerRequestsInPreflight": 0,
+    "firstImage": {
+      "filename": "Screenshot_16.jpg",
+      "sourceBytes": 482662,
+      "sourceSha256": "4a58aad7cb1d21f9bb457e1ad728fee59ebff3873a1e47938cf401d41f784bbc",
+      "sourceWidth": 3840,
+      "sourceHeight": 2160,
+      "pdfPath": "source/testdata/gateA-16/artifacts/4a58aad7cb1d21f9bb457e1ad728fee59ebff3873a1e47938cf401d41f784bbc.ocrspace.pdf",
+      "pdfBytes": 535706,
+      "pdfSha256": "98532da5058778aeee8a46515a8a6a12a3c20cb865565f974271706777b7ec93",
+      "reportedPdfSha256": "98532da5058778aeee8a46515a8a6a12a3c20cb865565f974271706777b7ec93",
+      "pageRasterPath": "source/testdata/gateA-16/artifacts/4a58aad7cb1d21f9bb457e1ad728fee59ebff3873a1e47938cf401d41f784bbc.ocrspace-page.png",
+      "pageRasterBytes": 1033392,
+      "pageRasterSha256": "620fd7395a4736d6c95a3ab89a1cb2924cfb019e7547d534b1ffcde6458bda72",
+      "reportedPageRasterSha256": "620fd7395a4736d6c95a3ab89a1cb2924cfb019e7547d534b1ffcde6458bda72",
+      "pdfPagePoints": {
+        "width": 595.0,
+        "height": 842.0
+      },
+      "embeddedImage": {
+        "width": 3840,
+        "height": 2160,
+        "format": "jpeg"
+      },
+      "imagePlacementPoints": {
+        "x0": 0.0,
+        "y0": 0.0,
+        "width": 595.0,
+        "height": 334.6875
+      },
+      "normalizedCrop": {
+        "method": "source-aspect-top-aligned-crop-v1",
+        "left": 0,
+        "top": 0,
+        "width": 1818,
+        "height": 1023
+      },
+      "embeddedImageComparison": {
+        "meanAbsoluteError": 0.3113506691170909,
+        "rootMeanSquareError": 1.5470278162571778,
+        "limits": {
+          "meanAbsoluteError": 3,
+          "rootMeanSquareError": 8
+        }
+      },
+      "checks": {
+        "sourceHashMatchesPreflight": true,
+        "pdfShaMatchesResume": true,
+        "rasterShaMatchesResume": true,
+        "pageRasterDimensions": true,
+        "embeddedAspectMatchesSource": true,
+        "imageTopAlignedFullWidth": true,
+        "imageHeightMatchesSourceAspect": true,
+        "embeddedPixelComparisonWithinLimits": true
+      },
+      "previousGateAResumeStatus": "FIRST_IMAGE_NOT_EXACT",
+      "previousLocalTesseractMapCandidate": "Not detected",
+      "expectedMap": "Aegis",
+      "pdfTextLayerExtract": "PERSONAL SCORE\nTEAM SCORE\nDETAILED REPORT\nCREDITS AND XP\nESC ×\nVictory!\nOur team completed the primary task.\n[HO-FL]VeritechCEO | XARCHERFISH\nReceived for the Battle\n583 5270 6872 ★ 2856 ★\nBattle performance\n401 597\nDamage\nx37\nx11\nTarget hits\nTarget hits\nIncapacitations\nCombat Missions\nAegis - Operations\nBattle start time: 09.10.2025 16:20\nDestroyed\nx11\nCaused flooding\nx9\nSpotted\nx27\nTarget hits\nEarn 1 500 Base XP\nEarn 3 000 Base XP\nComplete mission\nGet ribbons\n9 MISSIONS IN TOTAL\nBACK TO PORT\nSearchable PDF created by OCR.space (Free Version)\n"
+    },
+    "gateAAcceptanceStatus": "FAIL",
+    "gateAReportedNodeVersion": "v22.16.0",
+    "gateAParallelReaderMatrixStatus": "MISSING",
+    "gateAVerifiedPdfCount": 0,
+    "gateANetworkEvidence": "FAIL_MISSING_ORIGINAL_EVIDENCE",
+    "originalNetworkLogStatus": "MISSING_FROM_ORIGINAL_PARTIAL_ARTIFACT"
+  },
+  "limitations": [
+    "The original 63 screenshot byte files are not present in the supplied PDF/raster artifact ZIP; source-image hashes and dimensions are taken from the v6 ground-truth/manifest and prior artifact verification. This audit compares the PDF crop to the image embedded in the PDF, not directly to the original screenshot bytes.",
+    "Only one of the 16 Gate A screenshots has an existing searchable PDF in the supplied recovery artifact. The other 15 were not submitted; no new OCR.Space submissions were made or authorized.",
+    "The Gate A first-image crop geometry passes, but its previous Tesseract-only record remains FIRST_IMAGE_NOT_EXACT because map was unresolved. The searchable PDF text layer contains “Aegis - Operations”; that is a separate provider-derived text candidate, not a local OCR result.",
+    "This audit does not execute the PR #13 JavaScript/ImageMagick implementation on the Windows target. It is an independent geometry/pixel audit using PyMuPDF and Pillow against archived PDF/page-raster artifacts. PR #13 offline CI passed, while the corrected Gate B Windows recovery workflow is still pending.",
+    "The historical Gate B artifact verification remains FAILED due to localReaders failure and missing original network diagnostic log. The 0-byte local-recovery network log only supports the local recovery run; it cannot reconstruct historical network attempts."
+  ],
+  "noProviderRequestsMade": true,
+  "gateB63Summary": {
+    "pdfCount": 63,
+    "passCount": 63,
+    "failCount": 0,
+    "maeMedian": 0.866654897714168,
+    "maeMax": 1.7632310763291257,
+    "rmseMedian": 2.3563789672865028,
+    "rmseMax": 5.763339192962916
+  },
+  "gateB63PassCount": 63,
+  "gateB63FailCount": 0,
+  "historicalGateB19Summary": {
+    "artifactVerificationStatus": "FAILED",
+    "artifactChecks": {
+      "sourceImageHashes": "PASS",
+      "pdfIntegrity": "PASS",
+      "searchablePdfTextLayer": "PASS",
+      "rasterIntegrity": "PASS",
+      "pdfDerivedRasterProvenance": "PASS",
+      "localReaders": "FAIL",
+      "networkRestriction": "NOT_VERIFIED_MISSING_ORIGINAL_LOG",
+      "originalNetworkLogStatus": "MISSING_FROM_SOURCE_ARTIFACT",
+      "networkLogReconciliationStatus": "RECONSTRUCTED_LIMITED_EVIDENCE",
+      "unauthorizedNetworkAttempts": null,
+      "localRecoveryNetworkRestriction": "PASS",
+      "localRecoveryBlockedNetworkAttempts": 0,
+      "localRecoveryNetworkLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "localRecoveryNetworkLogMatchesReport": true,
+      "secretLeakScan": "PASS",
+      "originalScreenshotFallback": false
+    },
+    "postHocEngineMetrics": [
+      {
+        "engine": "tesseractjs",
+        "eligibleExpectedValues": 171,
+        "exactMatches": 110,
+        "wrongCandidates": 2,
+        "unresolvedOutputs": 59,
+        "wronglyAcceptedMandatoryFieldValues": 0,
+        "completeRecordExactMatches": 2,
+        "completeRecordCount": 19,
+        "completeRecordUnresolved": 17
+      },
+      {
+        "engine": "native",
+        "eligibleExpectedValues": 171,
+        "exactMatches": 103,
+        "wrongCandidates": 2,
+        "unresolvedOutputs": 66,
+        "wronglyAcceptedMandatoryFieldValues": 0,
+        "completeRecordExactMatches": 0,
+        "completeRecordCount": 19,
+        "completeRecordUnresolved": 19
+      }
+    ],
+    "pdfTextLayerConsensus": {
+      "fourSourceConsensus": {
+        "eligible": 171,
+        "exact": 131,
+        "wrong": 1,
+        "unresolved": 39,
+        "exactMatchRate": 0.7660818713450293
+      },
+      "strictFourSourceConsensus": {
+        "eligible": 171,
+        "exact": 59,
+        "wrong": 0,
+        "unresolved": 112,
+        "exactMatchRate": 0.34502923976608185
+      },
+      "strictThreeSourceConsensus": {
+        "eligible": 171,
+        "exact": 104,
+        "wrong": 1,
+        "unresolved": 66,
+        "exactMatchRate": 0.6081871345029239
+      }
+    },
+    "gateBStatus": "NOT_PASSED"
+  }
+}

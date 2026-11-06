@@ -161,3 +161,52 @@ test('artifact verifier parses BOM-prefixed Gate A and reconciliation JSON witho
   });
   assert.deepEqual(parseJsonUtf8(Buffer.from('{"status":"PASS"}', 'utf8')), { status: 'PASS' });
 });
+
+test('normalized PDF raster provenance is verified against source dimensions', async t => {
+  const f=await fixture(t);
+  const pageRaster=png(1818,2573);
+  const normalizedRaster=png(1818,1023);
+  const run=JSON.parse(await fs.readFile(f.runPath,'utf8'));
+  for (let i=0;i<19;i++) {
+    const row=run.results[i];
+    await fs.writeFile(path.join(f.artifactRoot,row.rasterPath),normalizedRaster);
+    row.pageRasterPath='page-'+(i+1)+'.png';
+    row.pageRasterBytes=pageRaster.length;
+    row.pageRasterSha256=sha(pageRaster);
+    row.pageRasterWidth=1818;
+    row.pageRasterHeight=2573;
+    row.rasterBytes=normalizedRaster.length;
+    row.rasterSha256=sha(normalizedRaster);
+    row.rasterWidth=1818;
+    row.rasterHeight=1023;
+    row.rasterNormalization={
+      method:'source-aspect-top-aligned-crop-v1',
+      sourceWidth:1920,sourceHeight:1080,
+      pageRasterWidth:1818,pageRasterHeight:2573,
+      cropRect:{left:0,top:0,width:1818,height:1023},
+      normalizedWidth:1818,normalizedHeight:1023
+    };
+  }
+  await fs.writeFile(f.runPath,JSON.stringify(run));
+  const report=await verifyArtifacts({...f,
+    preflightReport:f.preflightPath,freshPreflightReport:f.freshPreflightPath,
+    groundTruth:f.gtPath,runReport:f.runPath,workflowSourceText,apiKey:'not-a-real-secret',
+    renderPdf:async()=>pageRaster,
+    normalizeRaster:async(_page,dimensions)=>({
+      buffer:normalizedRaster,
+      similarity:{method:'original-source-resized-to-normalized-raster-v1',meanAbsoluteError:0,rootMeanSquareError:0},
+      normalization:{
+        method:'source-aspect-top-aligned-crop-v1',
+        sourceWidth:dimensions.sourceWidth,sourceHeight:dimensions.sourceHeight,
+        pageRasterWidth:1818,pageRasterHeight:2573,
+        cropRect:{left:0,top:0,width:1818,height:1023},
+        normalizedWidth:1818,normalizedHeight:1023
+      }
+    }),
+    readMetadata:async buffer=>buffer.toString('utf8').startsWith('source-image-bytes-')?{width:1920,height:1080}:buffer===pageRaster?{width:1818,height:2573}:{width:1818,height:1023},
+    toRawRgba:async buffer=>Buffer.from(buffer===pageRaster?'page':'normalized'),
+    readPdfText:async()=> 'searchable text'
+  });
+  assert.equal(report.checks.pdfDerivedRasterProvenance,'PASS');
+  assert.equal(report.status,'VERIFIED',JSON.stringify(report.checks));
+});
