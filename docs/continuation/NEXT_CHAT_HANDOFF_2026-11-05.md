@@ -5,7 +5,7 @@ This dated handoff body is historical context. The canonical living plan
 source of truth and its newest override controls any conflicting text below.
 
 - Canonical repository: `pbrau014/braultDwBotVis`, branch `main`.
-  Main HEAD before this handoff synchronization: `38ce43af2d2a1b928c335a97728c0d113964f78e`.
+  Main HEAD before this handoff synchronization: `17199b3b973be058631ae4c23a778f7694e8a589`.
 - Runtime rule: Node.js `22.16.0` is the accepted DWBOT baseline and is
   sufficient in place of older Node 24+ requirements. Node 24 is optional only
   for a specifically proven tool/dependency requirement. Keep OS-specific
@@ -31,12 +31,26 @@ source of truth and its newest override controls any conflicting text below.
   Do not claim durable preservation without verified files and checksums.
 - Current implementation/test/docs commits include source enablement/network
   policy `56f26a190ee5fcb5df2da10650d477a37423809a`, PDF contract test repair
-  `fceaf6e3bd28f3746c737e7306747f490088bbdf`, README `7d451dca07a832c44b0d6ee6c6622bdef59a46a2`,
-  and OCR.Space guide `b5c2a0d3c2b1adcd51ef644886da18cb1ca5818c`.
-- The latest exact main head and active queue must be re-read from the living
-  plan before any further operation. No live OCR.Space request or PDF has been
-  verified here; the local key is unavailable and Actions secret presence is
-  unverified. Production remains NO-GO.
+  `fceaf6e3bd28f3746c737e7306747f490088bbdf`, Unicode/overlay test correction
+  `5e8e181cec211042b1daf271c02f00459c3cec38`, PDF-first acceptance alignment
+  `18113f36bf3dc87c95407435a54e204e937734d5`, and current plan synchronization
+  `17199b3b973be058631ae4c23a778f7694e8a589`.
+- Exact-head run 393 on `18113f36bf3dc87c95407435a54e204e937734d5` completed:
+  Linux offline verification PASS; clean-package/PDF job PASS; Windows full
+  Node 22 suite PASS (303/0/2 skipped) and isolated persistence/recovery PASS.
+  The Windows job failed only at the protected-secret check because GitHub
+  reported `OCRSPACE_API_KEY configured: False`; the screenshot-acceptance
+  step was skipped. No live OCR.Space request or PDF is verified.
+- The repository Actions secret is confirmed missing/empty. The repository
+  owner must add `OCRSPACE_API_KEY` in Settings -> Secrets and variables ->
+  Actions -> New repository secret. Never paste the key into chat or logs.
+  After it is added, rerun exact-head verification and inspect the actual
+  Engine 2 PDF/raster artifacts and nine-field results. Run 394 is the current
+  plan-only workflow run on `17199b3b973be058631ae4c23a778f7694e8a589`; inspect
+  its final state before treating that exact head as verified.
+- No OCR acceptance, independent holdout pass, 64-image inventory pass,
+  production deployment or release readiness is established. Production
+  remains NO-GO.
 
 ---
 

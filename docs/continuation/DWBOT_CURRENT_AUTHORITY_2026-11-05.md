@@ -36,10 +36,14 @@ Nine mandatory fields remain exactly: result, player, map, mode, battleStart, cr
 ## Current source checkpoint
 
 - Canonical repository: `pbrau014/braultDwBotVis`, branch `main`.
-- Current main HEAD at this authority update: `23f92938ec02ebf9dd3bedd72f587183c47aa16d`.
+- Current main HEAD at this authority update: `17199b3b973be058631ae4c23a778f7694e8a589` (documentation-only plan synchronization atop source/test commit `18113f36bf3dc87c95407435a54e204e937734d5`).
 - Current living plan: `docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt`.
 - OCR.Space implementation guide: `docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md`.
-- The PDF-first source is implemented; the latest test correction and documentation sync are committed. No live provider request or provider PDF is verified in this chat. The local API key is unavailable here and the Actions secret's presence/value is unverified. Combined commit status returned no status entries; no exact-head CI pass is claimed.
+- Source/test commit `18113f36bf3dc87c95407435a54e204e937734d5` fixes the PDF-first regression contract and aligns the Windows acceptance launcher/workflow with the governing OCR.Space Engine 2 first-pass policy. The current main head `17199b3b973be058631ae4c23a778f7694e8a589` adds the corresponding living-plan evidence.
+- Exact-head run 393 tested source/test commit `18113f36bf3dc87c95407435a54e204e937734d5`. Linux offline verification passed; the PDF manual/clean-package job passed; Windows full Node 22 tests passed (303 passed, 0 failed, 2 skipped) and Windows process-level persistence/recovery passed. The Windows job nevertheless failed because GitHub reported `OCRSPACE_API_KEY configured: False`; the screenshot acceptance step was skipped.
+- The run-393 clean package passed `npm ci`, `npm test` (302 passed, 0 failed, 3 skipped) and prelive checks. Package SHA-256: `9eb2729967cbc77264dff0f8b10de2b75bf4c67c13d3b3175542bd2e4901fa67`. Workflow artifact ID `13471365068`; artifact SHA-256 `3cae3847b8600069756ab0d8efc9d63ed9adbb191cb8b4a3ccf10cd7211074bf`.
+- No live OCR.Space request, searchable PDF or image-acceptance result is verified. The repository Actions secret is confirmed missing/empty, not merely unverified. The repository owner must add `OCRSPACE_API_KEY` under Settings -> Secrets and variables -> Actions -> New repository secret; never paste the key into chat or logs. Re-run and inspect the exact-head workflow after the secret is configured.
+- Run 394 is the workflow triggered by the documentation-only plan synchronization commit `17199b3b973be058631ae4c23a778f7694e8a589`; re-read its final result before claiming verification for that exact head.
 - Windows acceptance sets a per-run `OCRSPACE_ARTIFACT_DIR`; the 64-image runner writes per-image PDF/raster artifacts. For other runs requiring durable evidence, configure `OCRSPACE_ARTIFACT_DIR` and verify the actual files/checksums.
 
 The canonical living plan controls the operational queue and supersedes older dated handoff/status text. Preserve the historical records below as provenance; do not promote their former Engine 3/crop-first/default-off instructions to current policy.
