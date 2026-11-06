@@ -234,6 +234,8 @@ test('billable imagesF extraction workflow supports fingerprint-bound no-duplica
     assert.match(workflow, /network provenance/);
     assert.match(runner, /onProviderRequestStarted/);
     assert.match(runner, /classifyResumeRow/);
+    assert.match(runner, /resume-local-only/);
+    assert.match(runner, /local-readers-rerun-from-hash-verified-pdf-derived-raster/);
     assert.match(runner, /Existing OCR.Space output found/);
     assert.match(resumeGuard, /skip-ambiguous/);
     assert.match(resumeGuard, /OCRSPACE_RESUME_FINGERPRINT_MISMATCH/);
