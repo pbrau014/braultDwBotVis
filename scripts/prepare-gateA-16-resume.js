@@ -276,7 +276,9 @@ async function prepare(options) {
         preservedOriginalJobLogPath: path.relative(sourceRoot, preservedOriginalJobLogPath),
         originalProviderStartCount: originalStartedFixtures.length,
         originalProviderStartedFixtureKeys: originalStartedFixtures.map(item => item.fixtureKey),
-        orchestrationOverlay: { candidateRunnerSha256, runnerOverlaySha256, helperOverlaySha256 },
+        orchestrationOverlay: { candidateRunnerSha256, runnerOverlaySha256, helperOverlaySha256,
+            rasterNormalizerSha256: sha256(await fs.readFile(path.join(path.resolve(__dirname, '..'), 'src', 'image-processor.js'))) },
+        rasterNormalization: normalized.normalization,
         sourceBuildSha256: null,
         createdAt: new Date().toISOString(),
     };
@@ -345,6 +347,7 @@ async function prepare(options) {
     recoveryReport.sourceBuildSha256 = sourceMetadata.sourceBuild.sha256;
     recoveryReport.resumeProgressPath = path.relative(sourceRoot, progressPath);
     recoveryReport.remainingProviderRequests = 15;
+    recoveryReport.continueProviderRun = true;
     recoveryReport.completedProviderRequestsReused = 1;
     recoveryReport.resumeProgressSha256 = sha256(await fs.readFile(progressPath));
     recoveryReport.originalNetworkLogStatus = 'MISSING_FROM_ORIGINAL_PARTIAL_ARTIFACT';
