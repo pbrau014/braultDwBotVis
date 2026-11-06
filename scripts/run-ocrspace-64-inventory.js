@@ -65,7 +65,9 @@ async function main() {
     for (const item of inventory.records) {
         const sourcePath = path.resolve(resolvedRoot, item.archivePath);
         if (!inside(resolvedRoot, sourcePath)) throw new Error(`Inventory path escapes source root: ${item.archivePath}`);
-        const source = await fs.readFile(sourcePath);
+        const resolvedSourcePath = await fs.realpath(sourcePath);
+        if (!inside(resolvedRoot, resolvedSourcePath)) throw new Error(`Inventory member resolves outside source root: ${item.archivePath}`);
+        const source = await fs.readFile(resolvedSourcePath);
         const actualHash = sha256(source);
         if (source.length !== Number(item.bytes) || actualHash !== String(item.sha256).toLowerCase()) {
             throw new Error(`Source archive member fingerprint mismatch: ${item.filename}; expected ${item.bytes}/${item.sha256}, got ${source.length}/${actualHash}`);

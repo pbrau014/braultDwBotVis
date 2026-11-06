@@ -4909,3 +4909,18 @@ remains not evaluable without independent nine-field ground truth.
 ================================================================================
 END DWBOT-UPD-2026-11-06-004
 ================================================================================
+
+
+================================================================================
+DWBOT-UPD-2026-11-06-005 — 64-IMAGE MEMBER PATH/SYMLINK PREFLIGHT
+================================================================================
+
+The all-member preflight now resolves every extracted member with fs.realpath
+and verifies the resolved target remains inside the canonical source root before
+reading or hashing it. A symlink or path that resolves outside the approved
+image root fails closed before the first OCR.Space request. Added a regression
+contract test for the realpath containment guard. No image was uploaded.
+
+================================================================================
+END DWBOT-UPD-2026-11-06-005
+================================================================================

@@ -54,3 +54,10 @@ test('all 64 source-member hashes are verified before the first OCR.Space reques
     assert.ok(preflight >= 0 && preflightComplete > preflight && providerCall > preflightComplete);
     assert.match(runner, /sourceMemberHashesVerified:\s*verifiedSources\.length/);
 });
+
+
+test('64-image member preflight rejects symlink targets outside the verified source root', () => {
+    const runner = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'run-ocrspace-64-inventory.js'), 'utf8');
+    assert.match(runner, /const resolvedSourcePath = await fs\.realpath\(sourcePath\)/);
+    assert.match(runner, /if \(!inside\(resolvedRoot, resolvedSourcePath\)\)/);
+});
