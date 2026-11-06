@@ -781,8 +781,6 @@ OCR.SPACE PDF-FIRST REVIEW / PRIVACY / CURRENT ACCEPTANCE
   and all remaining release gates pass.
 
 A. CANONICAL SOURCE AND TEST-FIX COMMITS
-
-A. CANONICAL SOURCE AND TEST-FIX COMMITS
 - Sole canonical repository: https://github.com/pbrau014/braultDwBotVis.git;
   active implementation/delivery branch is main only. Current main HEAD:
   5a12a9c218cebe61d277999318b7ceef5a8dc3b1.
@@ -856,8 +854,6 @@ C. OCR.SPACE AND NINE-FIELD RULES — CURRENT OVERRIDE
 - Nine mandatory fields: result, player, map, mode, battleStart, credits,
   freeXp, damage, xp. Zero wrong accepted values and zero unresolved required
   fields are required for exact-ground-truth Gate A/B corpora.
-
-D. READ-ONLY MISSING-FILE / HISTORICAL BRANCH SEARCH
 
 D. READ-ONLY MISSING-FILE / HISTORICAL BRANCH SEARCH
 - Current main contains the active living plan at
@@ -1975,8 +1971,6 @@ This section governs current work. The historical plan follows unchanged below.
   unresolved required fields.
 
 0.4 Execution and communication discipline
-
-0.4 Execution and communication discipline
 - Do not emit user-visible progress narration, interim status text or partial
   reports while operations are underway. Preserve findings in project artifacts
   and deliver one consolidated summary only after authorized operations and
@@ -2296,8 +2290,6 @@ Outstanding:
 Historical pre-PDF-first run 42088538702 and older Windows/native acceptance
 results remain fingerprint-bound historical evidence only. They do not verify
 the current OCR.Space PDF-first architecture.
-
-TASK 8 — INDEPENDENT HOLDOUT GATE B
 
 TASK 8 — INDEPENDENT HOLDOUT GATE B
 Status: NOT STARTED — prerequisite: Gate A pass and locked candidate fingerprint.
