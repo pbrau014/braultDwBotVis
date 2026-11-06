@@ -1,4 +1,38 @@
 ================================================================================
+LATEST NODE.JS RUNTIME AUTHORIZATION — 2026-11-05
+================================================================================
+Status: ACTIVE / GOVERNING / SUPERSEDES ANY OLDER NODE 24+ MINIMUM OR BLOCKER. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
+
+- Node.js v22.16.0 is explicitly authorized and acceptable for DWBOT work,
+  installation, tests, OCR acceptance and candidate verification. It is
+  acceptable in place of previously stated Node.js 24+, >=24.17.0 or
+  v24.22.1 requirements. Do not block, defer, fail or label work unsupported [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
+  solely because it runs under Node.js v22.16.0.
+- Current package.json and package-lock.json both declare engines.node
+  >=22.16.0. The current GitHub Actions Linux, Windows and package-verification
+  lanes use Node.js 22.16.0. No manifest, lockfile or workflow version change
+  is required to enact this authorization.
+- Node.js 24 remains permissible, but is not mandatory. Use it only when a [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
+  specific dependency, tool or test is proven to require it; document that
+  narrow reason and keep its result separate from the Node 22.16.0 baseline.
+- This runtime authorization does not waive operating-system or tool-specific
+  acceptance. Windows PowerShell, native Tesseract, Windows process behavior,
+  Windows OCR and Windows persistence tests must still execute on Windows.
+  Linux Node 22.16.0 results do not prove Windows behavior, and vice versa.
+- Preserve exact runtime/npm versions, source fingerprints, commands, logs,
+  exit codes and artifacts. Historical reports that actually ran on Node 24
+  remain valid evidence for those exact runs; their runtime does not become
+  the current minimum.
+- Older statements below that call Node 24+, >=24.17.0 or v24.22.1 mandatory, [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
+  unsupported, a release blocker or a prerequisite are superseded by this
+  authorization. Their recorded historical test outcomes and provenance
+  remain unchanged; apply this rule when interpreting their old next steps.
+
+================================================================================
+END LATEST NODE.JS RUNTIME AUTHORIZATION — 2026-11-05
+================================================================================
+
+================================================================================
 LATEST OCR RUNNER / NETWORK-POLICY SYNCHRONIZATION — 2026-11-06
 ================================================================================
 This newest status supersedes earlier notes about the standalone additional-
@@ -3041,10 +3075,10 @@ The original report completed 16/16 images, with 5/16 exact nine-field records, 
 
 ### Verification on the available environment
 
-- Linux x64 Node `v22.16.0`, npm `10.9.2` is available here; the package requires Node.js `>=24.17.0`. `dotenv`, `discord.js`, and `tesseract.js` are missing from the incomplete local `node_modules`.
+- Linux x64 Node `v22.16.0`, npm `10.9.2` is available here; the package requires Node.js `>=24.17.0`. `dotenv`, `discord.js`, and `tesseract.js` are missing from the incomplete local `node_modules`. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 - Focused targeted regression command: **60 passed, 0 failed, 0 skipped**, exit 0. It covered battle-record, reward geometry, damage consensus, localized numeric parsing, OCR process supervision/watchdog, serial queue, Windows path/cancellation helpers, and acceptance negative-control tests.
 - `node --check` across `.js` files under `src/`, `scripts/` and `tests/`: exit 0.
-- **Not performed / not a pass:** full `npm test`, real `npm run test:tesseractjs`, actual OCR on the changed code, or Windows Node 24 validation. Since dependencies are missing and the available runtime is unsupported, do not count the focused 60 as the full suite. No fresh OCR accuracy claims are made for these modifications.
+- **Not performed / not a pass:** full `npm test`, real `npm run test:tesseractjs`, actual OCR on the changed code, or Windows Node 24 validation. Since dependencies are missing and the available runtime is unsupported, do not count the focused 60 as the full suite. No fresh OCR accuracy claims are made for these modifications. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 
 ### Current status matrix
 
@@ -3053,12 +3087,12 @@ The original report completed 16/16 images, with 5/16 exact nine-field records, 
 | **0 — baseline and claim reconciliation** | COMPLETE for original scope | Preserve original source, workbook hash and reports. No OCR readiness implied. |
 | **1 — reliability foundation** | RC2 Windows regression baseline PASS | Windows RC2 `npm test`: 104 pass, 0 fail, 2 POSIX-only skips; watchdog 14/14. Re-run on RC3 because its code changed. |
 | **2 — OCR acceptance harness** | Historical Phase 2 PASS; RC2 target-run FAIL | Earlier Phase 2 source passed its recorded local runs. RC2 Windows OCR acceptance was 3/10; that result remains bound to RC2 source. |
-| **3 — lifecycle/recovery** | PARTIALLY IMPLEMENTED in RC3 | Isolated Asashio lifecycle gate and strict negative control are wired in but not yet run on RC3/Windows Node 24. First/middle/final recognition-pass injections remain open. Historical pass-16 cause remains unknown. |
+| **3 — lifecycle/recovery** | PARTIALLY IMPLEMENTED in RC3 | Isolated Asashio lifecycle gate and strict negative control are wired in but not yet run on RC3/Windows Node 24. First/middle/final recognition-pass injections remain open. Historical pass-16 cause remains unknown. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.] |
 | **4 — OCR field accuracy** | OPEN / NOT VALIDATED on RC3 | Geometry-based reward rereads and map prefix cleanup are unit-tested only. Need full current-source OCR acceptance on all fixtures; damage and Libertad player-name ambiguity remain open. |
 | **5 — native Windows Tesseract** | OPEN / BLOCKED | Windows RC2 report had `nativeTesseractAvailable: false`. Locate/install `tesseract.exe` with authorization and produce an actual native-vs-JS comparison. |
 | **6 — privacy-safe correction diagnostics** | OPEN / OPTIONAL | No collection implementation until consent, minimal fields, retention/deletion, access control and holdout policy are defined. |
-| **7 — broad regression** | RC2 passed; RC3 pending | Focused subset passed 60/60. Run full `npm test` on supported Node 24 against RC3. |
-| **8 — candidate packaging** | RC3 package assembled and verified; not release-cleared | Candidate archive integrity, embedded file manifest, checksum, and excluded runtime/secrets verified. Current-source Windows Node 24 validation remains mandatory before release. |
+| **7 — broad regression** | RC2 passed; RC3 pending | Focused subset passed 60/60. Run full `npm test` on supported Node 24 against RC3. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.] |
+| **8 — candidate packaging** | RC3 package assembled and verified; not release-cleared | Candidate archive integrity, embedded file manifest, checksum, and excluded runtime/secrets verified. Current-source Windows Node 24 validation remains mandatory before release. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.] |
 
 ### Exact next actions, ordered
 
@@ -3104,7 +3138,7 @@ The original report completed 16/16 images, with 5/16 exact nine-field records, 
 3. Diagnose the targeted field problems identified above without hardcoding ground truth or weakening validation: reported-image crop geometry / PSM 11 candidate formation; Hoffmann map/reward parsing; Libertad name/reward/damage boundaries; Schlieffen map/XP/Free XP. Keep uncertain critical fields missing for manual correction rather than guessing.
 4. Strengthen the negative expected-value test so its baseline case passes completely before changing one expected value and demonstrating rejection solely because that expected value is wrong.
 5. After lifecycle isolation is confirmed, continue Phase 3 stall injection at first/middle/final recognition passes, three-run sequential coverage, non-overlap and fail-closed cleanup tests. The historical pass-16 cause remains unknown absent its incident-specific evidence.
-6. Rerun the complete Windows Node 24 acceptance suite on corrected current source. Require all 10 stages to pass and exact expected fields on all fixtures. Keep Windows-native Tesseract comparison (`nativeTesseractAvailable: false`) and authorized live Discord smoke tests as separate release gates.
+6. Rerun the complete Windows Node 24 acceptance suite on corrected current source. Require all 10 stages to pass and exact expected fields on all fixtures. Keep Windows-native Tesseract comparison (`nativeTesseractAvailable: false`) and authorized live Discord smoke tests as separate release gates. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 
 **Decision:** RC2 Gate A passes; current OCR acceptance Gate B fails. The injected-stall termination and fresh-child cleanup sequence are supported by the exact report, but the combined recovery acceptance fails on damage ambiguity. Proceed only with scoped separation/diagnosis before broad Phase 3 stall-position expansion. Phase 3 is not complete and production remains **NO-GO**.
 
@@ -3140,7 +3174,7 @@ At the time of this section, the earlier Windows RC2 transcript was the current 
 1. Return to the original RC2 folder without `(1)` where the 11:24Z/11:25Z test ran, and package the two exact generated directories named above. If those directories no longer exist, rerun `npm run test:tesseractjs` in that tested folder and collect the generated folder immediately afterward.
 2. Inspect per-field actual/expected/missing/ambiguity evidence and engine/model/source metadata for the reported screenshot, all five-image batches, both order runs, and integrated recovery. Determine whether recovery closed successfully but failed exact-field acceptance, or had a distinct process/lifecycle fault.
 3. Only then make the smallest evidence-backed change. Do not hardcode the known damage value, weaken exact-match rules, or treat process close alone as successful recovery.
-4. Rerun acceptance until all 10 stages pass on Windows Node 24; only then continue first/middle/final stall injections and historical pass-16 investigation. Keep Windows native Tesseract and authorized Discord smoke tests as separate release gates.
+4. Rerun acceptance until all 10 stages pass on Windows Node 24; only then continue first/middle/final stall injections and historical pass-16 investigation. Keep Windows native Tesseract and authorized Discord smoke tests as separate release gates. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 
 **Decision remains:** do not continue Phase 3 feature expansion until the current Windows OCR failures are understood and the Gate B acceptance suite passes. Production is **NO-GO**.
 
@@ -3151,7 +3185,7 @@ At the time of this section, the earlier Windows RC2 transcript was the current 
 
 - Uploaded ZIP SHA-256: `f91362b9a57d084b2d74843a50867712549b3fd9a21f4fd86db1b27e0bd86136`; 27,928,283 bytes, 3,826 entries, ZIP integrity passed. Its root directory says `phase3_rc1`; RC2 files `scripts/node-options-path.js` and `tests/node-options-path.test.js` are absent. It includes 3,489 `node_modules` entries, unlike the clean RC2 candidate packaging policy. No `.env` secrets or live `data/` directory were found.
 - The included Windows report `testdata/ocr-acceptance/2026-10-25T10-53-49-244Z-23296/acceptance-report.json` is the older RC1/preload-failure run: Windows Node `v24.22.1`, only 2/10 acceptance stages passed. Do not confuse it with the later RC2 run.
-- The included green acceptance report `testdata/phase1-evidence/acceptance-report.json` is Linux Node `v22.16.0` run `2026-10-25T02-57-30-282Z-40824`: 9/9 stages passed. That source/runtime-bound historical run reports the screenshot damage as `87373`, three 5/5 exact batches, both two-image orderings 2/2 exact, and successful real-recognition stall/recovery. It is not Windows Node 24 certification and cannot supersede the fresh Windows RC2 3/10 result.
+- The included green acceptance report `testdata/phase1-evidence/acceptance-report.json` is Linux Node `v22.16.0` run `2026-10-25T02-57-30-282Z-40824`: 9/9 stages passed. That source/runtime-bound historical run reports the screenshot damage as `87373`, three 5/5 exact batches, both two-image orderings 2/2 exact, and successful real-recognition stall/recovery. It is not Windows Node 24 certification and cannot supersede the fresh Windows RC2 3/10 result. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 - The exact Windows RC2 output directories cited by PowerShell—`testdata\ocr-acceptance\2026-10-25T11-24-45-302Z-18268\` and `testdata\phase1-evidence\integrated-stall-recovery-2026-10-25T11-25-12-314Z-23252\`—are absent from the uploaded ZIP. The exact per-image JSON missing-field reasons and integrated recovery payload are therefore still unavailable in this workspace.
 - Current Windows console evidence shows a damage ambiguity (`873131` vs `87373`) and repeatable fixture failures; the injected worker termination is logged as confirmed and the fresh recovery child closes normally before an assertion `false !== true`. Because the same screenshot fails the exact-field gate, recovery accuracy/completeness is a plausible cause, but the integrated JSON is needed to confirm the failing assertion. Do not label this conclusively as a hung recovery process.
 - A successful Linux detailed log shows pass 16 completing in about 197 ms. That log does not prove the cause of the separate historical pass-16 incident. Keep that root cause unknown unless incident-specific evidence establishes it.
@@ -3204,18 +3238,18 @@ Evidence source: the user-provided `/mnt/data/Windows PowerShell5.txt`. Its past
 
 - RC2 archive integrity and SHA-256 matched the existing sidecar: `dd16cd00df324fd5040fe6a27e0c1bdc8a666c72d35e602661fc33441465a010`. The existing package-verification record reports all 300 manifest entries verified and no forbidden entries. The package itself was not edited.
 - Fresh extraction used `/mnt/data/phase3_rc2_preflight_20261025/wows-yolo-tournament-discord-bot`, not the Phase 3 working copy and not an existing installation.
-- Available runtime is Linux x64 Node.js `v22.16.0` / npm `10.9.2`; `package.json` requires Node.js `>=24.17.0`. No Node 24 executable is installed in this runtime. An attempt to invoke Node 24 through `npm exec --yes --package=node@24 -- node --version` timed out.
+- Available runtime is Linux x64 Node.js `v22.16.0` / npm `10.9.2`; `package.json` requires Node.js `>=24.17.0`. No Node 24 executable is installed in this runtime. An attempt to invoke Node 24 through `npm exec --yes --package=node@24 -- node --version` timed out. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 - `npm ci` was attempted in the fresh extraction and timed out after emitting the expected `EBADENGINE` warning. Its incomplete `node_modules` tree is invalid for acceptance. A subsequent `npm ls --depth=0` confirmed dependency problems, including invalid/incomplete root dependencies; it must not be treated as an installed or verified dependency tree.
 - Focused path/lifecycle test command: `node --test tests/node-options-path.test.js tests/ocr-watchdog.test.js tests/serial-task-queue.test.js tests/windows-process-cancel.test.js tests/image-processor-cancel.test.js tests/native-ocr-cancel.test.js` — **14 passed, 0 failed, 0 skipped**, exit 0, but only on Linux Node.js 22. The Windows path cases are unit-level normalization tests, not execution on Windows.
 - `npm run test:ocr-watchdog` — **14 passed, 0 failed, 0 skipped**, exit 0, still on unsupported Linux Node.js 22. Useful focused evidence only.
-- A diagnostic `npm test` run after the timed-out install showed **99 passed, 2 failed**. The failures are dependency-loading failures (`Cannot find module 'dotenv'` from the bot/full-system test and missing `tesseract.js/package.json` from OCR metadata tests). Because `npm ci` did not complete, this result is **invalid as a regression verdict**: neither a pass nor evidence of source regressions. The full-suite result still required is a clean Windows Node 24 run.
+- A diagnostic `npm test` run after the timed-out install showed **99 passed, 2 failed**. The failures are dependency-loading failures (`Cannot find module 'dotenv'` from the bot/full-system test and missing `tesseract.js/package.json` from OCR metadata tests). Because `npm ci` did not complete, this result is **invalid as a regression verdict**: neither a pass nor evidence of source regressions. The full-suite result still required is a clean Windows Node 24 run. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 - Linux container binaries `tesseract 5.5.0` and ImageMagick 7.1.2 are present. That does not satisfy the separate Windows-native-Tesseract gate or prove Windows behavior.
 
 Logs: `PHASE-3-RC2-PREFLIGHT-FOCUSED.log`, `PHASE-3-RC2-PREFLIGHT-OCR-WATCHDOG.log`, and `PHASE-3-RC2-PREFLIGHT-NPM-TEST.log`. Their command-level scope and limitations are summarized in `PHASE-3-RC2-PREFLIGHT-REPORT.md`.
 
 ### Gate disposition and next action
 
-1. **Gate A (RC2 target-runtime baseline): NOT PASSED / BLOCKED BY ENVIRONMENT.** The archive is valid, but the required fresh Windows Node.js `>=24.17.0` install and commands have not run on RC2. Run on Windows from a fresh RC2 extraction: record `node --version` and `npm --version`; then run `npm ci`, `npm ls --depth=0`, `npm test`, `npm run test:ocr-watchdog`, and `npm run test:tesseractjs`, preserving full output, actual exit codes, all per-command logs, and `acceptance-report.json`.
+1. **Gate A (RC2 target-runtime baseline): NOT PASSED / BLOCKED BY ENVIRONMENT.** The archive is valid, but the required fresh Windows Node.js `>=24.17.0` install and commands have not run on RC2. Run on Windows from a fresh RC2 extraction: record `node --version` and `npm --version`; then run `npm ci`, `npm ls --depth=0`, `npm test`, `npm run test:ocr-watchdog`, and `npm run test:tesseractjs`, preserving full output, actual exit codes, all per-command logs, and `acceptance-report.json`. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 2. **Gate B (10-stage OCR acceptance): NOT PASSED / NOT RUN on RC2's target runtime.** RC1's eight failures are prior evidence. RC2's path-helper unit tests passing on Linux do not prove the Windows `NODE_OPTIONS` preload issue is fixed. All 10 stages must pass on the RC2 source; the negative control must be counted as passing only when its generated JSON proves the injected expected-value mismatch.
 3. **Phase 3 feature work: PAUSED.** Do not implement additional first/middle/final stall injection or change OCR-selection logic until Gates A/B are completed or the target-runtime blocker is explicitly resolved. After those gates pass, exercise the controlled stall locations on current source and analyze historical pass-16 evidence. Record the root cause only if the original logs support it; otherwise leave it unknown.
 4. **Production stays NO-GO.** Current-source exact-field acceptance, Windows-native comparison, final workbook/tournament regression, and authorized live Discord smoke tests remain separate release gates.
@@ -3232,7 +3266,7 @@ Reconcile previous work with the actual latest source. Implement and test as muc
 The priorities are:
 
 1. Fix the currently failing automated test against real dependencies.
-2. Run and validate the Tesseract.js fallback using the actual Node.js 24 environment and installed packages.
+2. Run and validate the Tesseract.js fallback using the actual Node.js 24 environment and installed packages. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 3. Diagnose and correct OCR field mismatches.
 4. Prove sequential processing, timeout cancellation, worker cleanup and recovery.
 5. Implement a cross-platform fallback acceptance command.
@@ -3312,7 +3346,7 @@ This matrix reflects the latest user-provided Windows run in `Windows PowerShell
 ### Fresh tests and environment limitation
 
 - Focused lifecycle suite: `node --test tests/ocr-watchdog.test.js tests/serial-task-queue.test.js tests/windows-process-cancel.test.js tests/image-processor-cancel.test.js tests/native-ocr-cancel.test.js` — **12 passed, 0 failed, 0 skipped**, Linux x64 / Node.js `v22.16.0`.
-- A full `npm test` attempt against the newly extracted package failed because the ZIP correctly excludes `node_modules` and `dotenv` was not installed in the work copy. A subsequent `npm ci` emitted the expected engine warning (package requires `>=24.17.0`, host is `v22.16.0`) and timed out without a trustworthy completion/exit result. The incomplete `node_modules` tree was not treated as valid; the full suite and real Tesseract.js integrated test were not rerun on this fresh Phase 3 copy.
+- A full `npm test` attempt against the newly extracted package failed because the ZIP correctly excludes `node_modules` and `dotenv` was not installed in the work copy. A subsequent `npm ci` emitted the expected engine warning (package requires `>=24.17.0`, host is `v22.16.0`) and timed out without a trustworthy completion/exit result. The incomplete `node_modules` tree was not treated as valid; the full suite and real Tesseract.js integrated test were not rerun on this fresh Phase 3 copy. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 - Therefore Phase 2 acceptance (10/10 full behavior commands and 8/8 metadata-enabled current-source commands) remains historical evidence for its source fingerprint, not proof that the modified Phase 3 source has passed the full OCR acceptance suite.
 
 ### Reconciled Phase 3 conclusion
@@ -3322,21 +3356,21 @@ The local lifecycle tests establish timeout behavior, confirmed termination orde
 ### Phase status and future sequencing after Phase 3
 
 - Phase 0: COMPLETE as baseline/artifact reconciliation only.
-- Phase 1: COMPLETE locally; Windows Node.js 24 sign-off pending.
+- Phase 1: COMPLETE locally; Windows Node.js 24 sign-off pending. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 - Phase 2: COMPLETE locally on the recorded Phase 2 source; its results do not automatically transfer to modified Phase 3 source. Re-run after clean install.
 - Phase 3: lifecycle hardening implemented; focused tests pass; end-to-end acceptance, historical root-cause evidence, and Windows validation remain open.
-- Phase 4: accuracy results remain local fixture evidence on prior source; rerun exact-field acceptance on the modified source and Windows Node 24.
+- Phase 4: accuracy results remain local fixture evidence on prior source; rerun exact-field acceptance on the modified source and Windows Node 24. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 - Phase 5: Windows native Tesseract comparison remains blocked until `tesseract.exe` is available.
 - Phase 6: optional privacy-safe correction/diagnostic collection remains open; do not start collection before consent, retention/deletion, access and holdout rules are defined.
-- Phase 7: prior 103/103 local regression result belongs to Phase 2 source. Re-run full suite after clean dependency install on Phase 3 source and on Windows Node 24.
+- Phase 7: prior 103/103 local regression result belongs to Phase 2 source. Re-run full suite after clean dependency install on Phase 3 source and on Windows Node 24. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 - Phase 8: package Phase 3 candidate with a source manifest, hash verification, forbidden-file scan and explicit no-go notes. Do not call it a production release.
 
 ### Remaining required actions
 
-1. On a supported Windows Node.js `>=24.17.0` host, run `npm ci`, `npm ls --depth=0`, `npm test`, `npm run test:ocr-watchdog`, and `npm run test:tesseractjs`; preserve commands, exit codes and logs.
+1. On a supported Windows Node.js `>=24.17.0` host, run `npm ci`, `npm ls --depth=0`, `npm test`, `npm run test:ocr-watchdog`, and `npm run test:tesseractjs`; preserve commands, exit codes and logs. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 2. Add/run fault-injection scenarios at the first, middle and final recognition pass; verify the stalled image cannot overlap any subsequent worker, and a fresh image recovers only after confirmed termination/close.
 3. Analyze the original pass-16 transcript at operation granularity. If it lacks per-pass timestamps, treat root cause as unknown rather than infer from the new watchdog tests.
-4. Run the Hoffmann/Asashio both orders and at least three sequential batches on the same current source, then repeat on Windows Node 24. Record each child close, field exactness and network-block count.
+4. Run the Hoffmann/Asashio both orders and at least three sequential batches on the same current source, then repeat on Windows Node 24. Record each child close, field exactness and network-block count. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 5. Keep native Windows Tesseract and authorized live Discord smoke tests as separate gates; neither is satisfied by Linux unit tests.
 
 **Decision: Phase 3 implementation progressed, but Phase 3 is not fully complete and production remains NO-GO.**
@@ -3377,7 +3411,7 @@ Treat the original and post-fix test runs as separate records, not contradictory
 
 The candidate-specific Windows PowerShell transcript then records `npm ci` and `npm ls --depth=0` passing, and `npm test` with 74 tests: 72 passed, 0 failed, 2 skipped. The panel test passes in that run. The two POSIX-specific process tests are still skipped; the transcript does not prove that verified native Windows equivalents replace them. Keep both Windows transcript hashes in evidence records: original baseline `6a02975205ec9f57962027967a3fd89fcd9707d3e21c8f333060e0b868f00610`; candidate-specific run `f8aa3987c07d4a6fbeef95154d1db85171a4d9f8a0a6e13cf69ab43b2030c3b1`.
 
-The current work-copy run in the available container recorded `npm test`: 74 passed, 0 failed, 0 skipped, and targeted `node --test tests/full-system.test.js`: 5 passed, 0 failed, 0 skipped. These ran under Node.js `v22.16.0`, below the declared minimum, using actual dependency package directories copied from the original archive because a fresh `npm ci` in this container did not finish within the 120-second execution window. This is useful regression evidence only, not proof of a clean install or acceptance on Node.js 24. The full-log SHA-256 is `ca89f1e68bbb704352695e05c39b3a8e831f36e78b7e934a255b832a3a12f883`; panel-log SHA-256 is `cfdb7c050516809cb1527b4018776c40041412ea6cfb9afdaa87387183902026`.
+The current work-copy run in the available container recorded `npm test`: 74 passed, 0 failed, 0 skipped, and targeted `node --test tests/full-system.test.js`: 5 passed, 0 failed, 0 skipped. These ran under Node.js `v22.16.0`, below the declared minimum, using actual dependency package directories copied from the original archive because a fresh `npm ci` in this container did not finish within the 120-second execution window. This is useful regression evidence only, not proof of a clean install or acceptance on Node.js 24. The full-log SHA-256 is `ca89f1e68bbb704352695e05c39b3a8e831f36e78b7e934a255b832a3a12f883`; panel-log SHA-256 is `cfdb7c050516809cb1527b4018776c40041412ea6cfb9afdaa87387183902026`. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 
 ### Workbook and preserved test evidence
 
@@ -3462,7 +3496,7 @@ The panel correction is already verified in the candidate-specific Windows trans
 
 ## Phase 2 — Build a repeatable Tesseract.js fallback acceptance command
 
-**Status: IMPLEMENTED; LOCAL ACCEPTANCE PASSED; WINDOWS NODE 24 VALIDATION PENDING.** The cross-platform Node launcher is `scripts/accept-tesseractjs.js`, exposed as `npm run test:tesseractjs`. New Phase 2 runs are recorded in `testdata/phase2-evidence/`: the full OCR behavior run passed **10/10 commands**, including the negative-control gate, integrated stall/recovery, three five-image batches, both image orders and no-network asset checking; after adding report metadata and timeout-safe file-backed output, the current-source run passed **8/8 commands** with one full five-image batch. The current-source report is `acceptance-2026-10-25T03-31-59-739Z-51914/acceptance-report.json`. Both runs had zero blocked network attempts. These ran on Linux Node.js v22.16.0, below the package minimum, so Windows Node.js 24 validation remains required.
+**Status: IMPLEMENTED; LOCAL ACCEPTANCE PASSED; WINDOWS NODE 24 VALIDATION PENDING.** The cross-platform Node launcher is `scripts/accept-tesseractjs.js`, exposed as `npm run test:tesseractjs`. New Phase 2 runs are recorded in `testdata/phase2-evidence/`: the full OCR behavior run passed **10/10 commands**, including the negative-control gate, integrated stall/recovery, three five-image batches, both image orders and no-network asset checking; after adding report metadata and timeout-safe file-backed output, the current-source run passed **8/8 commands** with one full five-image batch. The current-source report is `acceptance-2026-10-25T03-31-59-739Z-51914/acceptance-report.json`. Both runs had zero blocked network attempts. These ran on Linux Node.js v22.16.0, below the package minimum, so Windows Node.js 24 validation remains required. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 
 Implement a cross-platform Node.js launcher and a command such as:
 
@@ -3514,7 +3548,7 @@ Do not report successful fallback validation unless the actual recognition regre
 
 ## Phase 3 — Prove and correct sequential OCR, timeout, cancellation and cleanup
 
-**Status: IMPLEMENTED; LOCAL ACCEPTANCE PARTLY PASSED; HISTORICAL ROOT CAUSE AND TARGET-WINDOWS VALIDATION OPEN.** The current source adds operation watchdogs for Tesseract.js `setParameters` and `recognize`, waits for the actual underlying worker thread termination result on timeout, and runs each image in a separately supervised child process. The parent imposes an independent image deadline, kills the child tree on timeout, and waits for the `close` event before advancing. Tests for a stuck operation, worker-termination confirmation, fail-closed behavior, real hanging child cancellation, and queue recovery passed in the contract suite. Three five-image network-blocked runs passed 5/5 each; the two image orders passed 2/2 each; and the separate four-image Tesseract.js run passed 4/4. However, the historic pass-16 stall is not proven to have a single identified root cause. An integrated injected stall through an actual Tesseract.js recognition pass followed by a successful real-image recovery, plus the target Windows Node.js 24 run, remains necessary before this phase is fully closed.
+**Status: IMPLEMENTED; LOCAL ACCEPTANCE PARTLY PASSED; HISTORICAL ROOT CAUSE AND TARGET-WINDOWS VALIDATION OPEN.** The current source adds operation watchdogs for Tesseract.js `setParameters` and `recognize`, waits for the actual underlying worker thread termination result on timeout, and runs each image in a separately supervised child process. The parent imposes an independent image deadline, kills the child tree on timeout, and waits for the `close` event before advancing. Tests for a stuck operation, worker-termination confirmation, fail-closed behavior, real hanging child cancellation, and queue recovery passed in the contract suite. Three five-image network-blocked runs passed 5/5 each; the two image orders passed 2/2 each; and the separate four-image Tesseract.js run passed 4/4. However, the historic pass-16 stall is not proven to have a single identified root cause. An integrated injected stall through an actual Tesseract.js recognition pass followed by a successful real-image recovery, plus the target Windows Node.js 24 run, remains necessary before this phase is fully closed. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 
 This phase must establish a reliable explanation for the historical stall on the second image at recognition pass 16. Do not assume that it is caused by worker termination unless the evidence supports that conclusion.
 
@@ -3709,13 +3743,13 @@ Use separate training, validation and holdout datasets. Prevent the same source 
 
 ## Phase 7 — Preserve the tournament bot and scoring integrity
 
-**Status: LOCAL REGRESSION PASS; TARGET WINDOWS VALIDATION PENDING.** The current post-change `npm test` run passes 102/102, including tournament/scoring, SQLite/persistence, workbook formula/source-of-truth checks, public interaction and OCR contract tests. The workbook SHA-256 remains `12ad80209ef77451b3586b52359a06b5361a68bc9926fc81a9da3d6c4b586397`. Run the same final suite on target Windows Node.js 24 before final acceptance.
+**Status: LOCAL REGRESSION PASS; TARGET WINDOWS VALIDATION PENDING.** The current post-change `npm test` run passes 102/102, including tournament/scoring, SQLite/persistence, workbook formula/source-of-truth checks, public interaction and OCR contract tests. The workbook SHA-256 remains `12ad80209ef77451b3586b52359a06b5361a68bc9926fc81a9da3d6c4b586397`. Run the same final suite on target Windows Node.js 24 before final acceptance. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 
 After OCR changes, run the full existing application and workbook regression suite.
 
 Preserve:
 
-- Node.js 24 compatibility.
+- Node.js 24 compatibility. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 - Native Tesseract CLI support and the JavaScript fallback.
 - The 50-player workbook.
 - The `$12.49` default dollar regression.
@@ -3732,7 +3766,7 @@ A test failure in unrelated functionality is a release blocker until it is fixed
 
 ## Phase 8 — Final acceptance and versioned packaging
 
-**Status: PHASE 1 RELEASE CANDIDATE PACKAGED; PRODUCTION RELEASE GATES OPEN.** The new `wows_yolo_tournament_discord_bot_v2_5_0_phase1_rc1.zip` is a separate candidate containing the updated source/tests/scripts, updated `plan1.txt`, reports, and curated evidence. The final ZIP hash is recorded in the paired `.sha256` sidecar; the implementation report documents the checks but does not embed the self-referential archive hash. It excludes `node_modules`, `.git`, live `data/`, and `.env`; package-level ZIP integrity and manifest checks passed. Do not treat this release candidate as production-approved until the target Windows Node.js 24 run, native Windows comparison, integrated injected-recognition-stall recovery proof, and authorized live Discord smoke test are recorded.
+**Status: PHASE 1 RELEASE CANDIDATE PACKAGED; PRODUCTION RELEASE GATES OPEN.** The new `wows_yolo_tournament_discord_bot_v2_5_0_phase1_rc1.zip` is a separate candidate containing the updated source/tests/scripts, updated `plan1.txt`, reports, and curated evidence. The final ZIP hash is recorded in the paired `.sha256` sidecar; the implementation report documents the checks but does not embed the self-referential archive hash. It excludes `node_modules`, `.git`, live `data/`, and `.env`; package-level ZIP integrity and manifest checks passed. Do not treat this release candidate as production-approved until the target Windows Node.js 24 run, native Windows comparison, integrated injected-recognition-stall recovery proof, and authorized live Discord smoke test are recorded. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 
 Keep the original project and ZIP files unchanged. Make changes only in a separate working copy.
 
@@ -3775,7 +3809,7 @@ Provide a report with these sections:
 
 Clearly distinguish actual test results, historical claims, test simulations, code changes and remaining external acceptance tests.
 
-**Final instruction and current truth (Phase 1 implementation update):** Continue using a separate working copy and preserve all Phase 0 source, hashes, historical failures, and reports. The original Windows baseline of 74 tests (71 passed, 1 failed, 2 skipped) remains historical evidence; the panel-test correction is now implemented and its current full suite passes 102/102 in the available Linux environment. The current source has an operation watchdog, confirmed underlying worker-thread termination on watchdog timeout, and a per-image child-process supervisor that waits for confirmed child closure before advancing. The cross-platform `npm run test:tesseractjs` command passed 8/8 local subcommands with network blocking and zero observed attempts: the reported screenshot passed 9/9; three five-image sequential batches each passed 5/5 exact with all required fields complete; both Hoffmann/Asashio orders passed 2/2; local assets passed. A separate four-fixture Tesseract.js no-network batch passed 4/4. Evidence is retained under `testdata/phase1-evidence/`. These successful tests ran on Linux Node.js 22.16.0, below the declared package minimum `>=24.17.0`; the latest source has not been certified on Windows Node.js 24. The historical pass-16 stall's single root cause and a forced stall through an actual Tesseract.js recognition pass followed by real-image recovery are not conclusively demonstrated; Windows native Tesseract comparison remains blocked because the recorded PowerShell environment cannot find `tesseract.exe`; authorized live Discord smoke tests were not performed; Phase 6's privacy-safe correction/diagnostic collection system remains open. Therefore Phase 1 implementation and local fallback acceptance are complete, but Phase 1 formal target-Windows closure and production go-live are pending. Treat this `plan1.txt` as the single main source of truth; historical results in later Phase 0 sections are frozen snapshots, and must not override the current status at the top.
+**Final instruction and current truth (Phase 1 implementation update):** Continue using a separate working copy and preserve all Phase 0 source, hashes, historical failures, and reports. The original Windows baseline of 74 tests (71 passed, 1 failed, 2 skipped) remains historical evidence; the panel-test correction is now implemented and its current full suite passes 102/102 in the available Linux environment. The current source has an operation watchdog, confirmed underlying worker-thread termination on watchdog timeout, and a per-image child-process supervisor that waits for confirmed child closure before advancing. The cross-platform `npm run test:tesseractjs` command passed 8/8 local subcommands with network blocking and zero observed attempts: the reported screenshot passed 9/9; three five-image sequential batches each passed 5/5 exact with all required fields complete; both Hoffmann/Asashio orders passed 2/2; local assets passed. A separate four-fixture Tesseract.js no-network batch passed 4/4. Evidence is retained under `testdata/phase1-evidence/`. These successful tests ran on Linux Node.js 22.16.0, below the declared package minimum `>=24.17.0`; the latest source has not been certified on Windows Node.js 24. The historical pass-16 stall's single root cause and a forced stall through an actual Tesseract.js recognition pass followed by real-image recovery are not conclusively demonstrated; Windows native Tesseract comparison remains blocked because the recorded PowerShell environment cannot find `tesseract.exe`; authorized live Discord smoke tests were not performed; Phase 6's privacy-safe correction/diagnostic collection system remains open. Therefore Phase 1 implementation and local fallback acceptance are complete, but Phase 1 formal target-Windows closure and production go-live are pending. Treat this `plan1.txt` as the single main source of truth; historical results in later Phase 0 sections are frozen snapshots, and must not override the current status at the top. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 
 ---
 
@@ -3793,7 +3827,7 @@ Clearly distinguish actual test results, historical claims, test simulations, co
 ### Remaining Phase 1 closure gates
 
 1. Make the integrated actual-recognition stall -> confirmed worker termination -> child close -> fresh real-image recovery test deterministic across repeated runs. The successful historical report is evidence of one pass, not proof of reliability.
-2. Execute the latest candidate on Windows Node.js `>=24.17.0`: `npm ci`, `npm ls --depth=0`, `npm test`, and `npm run test:tesseractjs`, saving the actual logs and exit codes. The earlier PowerShell transcript predates these source changes.
+2. Execute the latest candidate on Windows Node.js `>=24.17.0`: `npm ci`, `npm ls --depth=0`, `npm test`, and `npm run test:tesseractjs`, saving the actual logs and exit codes. The earlier PowerShell transcript predates these source changes. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 3. Complete the native Tesseract comparison on Windows after locating or installing `tesseract.exe` with authorization; Linux Tesseract 5.5.0 diagnostics do not satisfy this target-specific criterion.
 4. Perform authorized live Discord smoke tests (login, channel permissions, attachment delivery, rate limits, and restart/recovery). Not run in this environment.
 5. Do not start the optional Phase 6 correction-data system until accuracy and lifecycle behavior are reproducible.
@@ -3803,7 +3837,7 @@ Clearly distinguish actual test results, historical claims, test simulations, co
 - **Local source regression:** PASS (102/102).
 - **Local Tesseract.js exact-match acceptance:** PASS based on preserved report (8/8 commands, three 5/5 batches, both orderings, 4/4 extra fixture batch).
 - **Integrated injected stall/recovery:** PARTIAL / INTERMITTENT (one pass preserved; repeat attempt stalled during recovery).
-- **Windows Node.js 24:** BLOCKED / NOT RUN on latest source.
+- **Windows Node.js 24:** BLOCKED / NOT RUN on latest source. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 - **Windows native Tesseract comparison:** BLOCKED by unavailable CLI in recorded Windows environment.
 - **Live Discord smoke test:** OPEN / NOT RUN.
 - **Phase 1 overall:** PARTIALLY COMPLETE; do not mark fully complete or production-ready.
@@ -3819,7 +3853,7 @@ Keep this section as the current status; historical reports remain frozen eviden
 
 ### Latest reproduced results
 
-- Package `wows-yolo-tourney-discord-bot@2.5.0`; required Node.js `>=24.17.0`; actual host Linux x64 / Node `v22.16.0` / npm `10.9.2`.
+- Package `wows-yolo-tourney-discord-bot@2.5.0`; required Node.js `>=24.17.0`; actual host Linux x64 / Node `v22.16.0` / npm `10.9.2`. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 - `npm test`: **102 passed, 0 failed, 0 skipped**, exit 0. `npm ls --depth=0`: exit 0. JavaScript `node --check` across `src`, `scripts`, and `tests`: exit 0.
 - Fresh `npm run test:tesseractjs` run `2026-10-25T02-57-30-282Z-40824`: **9/9 subcommands passed**; report `passed: true`; every subcommand exit code 0; network guard detected no blocked attempts. Acceptance report SHA-256: 0aaec6682daebb1a0dd092ea10027d5a8cc3f298d2e50e3529256677ab501895.
 - Integrated actual-recognition stall/recovery passed in the newest launcher: real recognition completed before injected hang; 15-second watchdog fired; underlying worker termination and stalled child close were confirmed; fresh child recovered the reported screenshot with 9/9 exact fields and no required fields missing. Three successful current-scenario reports are retained (`02-34-28`, `02-54-30`, `02-57-32`). Earlier transient timeouts and the older stale-harness `started is not defined` failure remain preserved as historical evidence, not counted as passes.
@@ -3829,7 +3863,7 @@ Keep this section as the current status; historical reports remain frozen eviden
 ### Remaining gates
 
 1. `npm ci --prefer-offline --no-audit --no-fund` could not be verified on Node 22: the process stopped making observable progress after an engine warning, was terminated, and `node_modules` was restored from a backup. No trustworthy exit code was captured. It is **INCOMPLETE / NOT PASS**, not proof of a lockfile defect.
-2. Run latest source on Windows Node.js `>=24.17.0`: `npm ci`, `npm ls --depth=0`, `npm test`, and `npm run test:tesseractjs`; preserve logs, report and exit codes. Use `PHASE-1-QUICKSTART-POWERSHELL.md`.
+2. Run latest source on Windows Node.js `>=24.17.0`: `npm ci`, `npm ls --depth=0`, `npm test`, and `npm run test:tesseractjs`; preserve logs, report and exit codes. Use `PHASE-1-QUICKSTART-POWERSHELL.md`. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 3. Windows native Tesseract remains blocked because the supplied PowerShell evidence could not locate `tesseract.exe`; Linux native output is diagnostic only.
 4. Authorized live Discord login, permissions, attachment delivery, rate-limit and restart/recovery smoke tests are not run because they require an authorized live environment.
 5. Phase 6 privacy-safe correction feedback, retention and deletion system remains OPEN and is not represented as implemented.
@@ -3871,9 +3905,9 @@ A separate RC2 candidate is built from the latest work copy; the Phase 0 and RC1
 
 - **Phase 0:** COMPLETE as baseline reconciliation only. No OCR production readiness implied.
 - **Phase 1:** COMPLETE locally; target-Windows sign-off remains pending. Do not re-open its code changes unless Phase 2/Windows tests reveal regressions.
-- **Phase 2:** COMPLETE locally. Windows PowerShell execution, Node.js `>=24.17.0` and clean-install confirmation remain required external gates.
+- **Phase 2:** COMPLETE locally. Windows PowerShell execution, Node.js `>=24.17.0` and clean-install confirmation remain required external gates. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 - **Phase 3:** Local integrated stall/termination/close/recovery passes are now repeatable in two fresh runs, but the original historical pass-16 incident root cause remains unproven and Windows lifecycle validation remains pending. Keep this phase partially complete overall until target-runtime evidence and historical-cause analysis are resolved.
-- **Phase 4:** Local OCR accuracy gates pass. Preserve historical mismatch fixtures and run the same exact-match gates on Windows Node 24; don't treat completion/nonempty fields as accuracy.
+- **Phase 4:** Local OCR accuracy gates pass. Preserve historical mismatch fixtures and run the same exact-match gates on Windows Node 24; don't treat completion/nonempty fields as accuracy. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 - **Phase 5:** OPEN/BLOCKED until Windows `tesseract.exe` is located or installed with authorization and native-versus-JS reports are captured. Linux native output is diagnostic only.
 - **Phase 6:** OPEN and optional. Do not implement correction-data capture until retention/deletion, consent, privacy boundaries and accuracy holdout criteria are specified; do not store private Discord content by default.
 - **Phase 7:** COMPLETE locally at 103/103, with target-Windows regression still pending. Preserve workbook hash `12ad80209ef77451b3586b52359a06b5361a68bc9926fc81a9da3d6c4b586397` and all tournament/Discord behavior.
@@ -3882,7 +3916,7 @@ A separate RC2 candidate is built from the latest work copy; the Phase 0 and RC1
 ### Remaining blockers / no-go boundary
 
 - **Node.js version:** all new local results are Linux x64 Node.js `v22.16.0` / npm `10.9.2`, while `package.json` declares `>=24.17.0`. The host has only Node 22 installed. Do not label this Node 24 validation.
-- **Clean install:** `npm ci` did not complete observably on this host during the previous attempt. Treat it as unverified; do not infer a dependency defect or a pass. Run on Windows Node.js 24 with the lockfile.
+- **Clean install:** `npm ci` did not complete observably on this host during the previous attempt. Treat it as unverified; do not infer a dependency defect or a pass. Run on Windows Node.js 24 with the lockfile. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 - **Native Tesseract:** the prior Windows transcript could not find `tesseract.exe`; no Windows native comparison pass is claimed.
 - **Live Discord:** authorized real-environment login/channel/attachment/rate-limit/restart tests have not been run.
 
@@ -3893,7 +3927,7 @@ A separate RC2 candidate is built from the latest work copy; the Phase 0 and RC1
 
 ## Phase 3 RC1 Windows run reconciliation and RC2 preload-path fix — 2026-10-25
 
-**Current decision: RC1 main suite PASS; Tesseract.js acceptance FAIL/INCOMPLETE at harness preload; RC2 corrective candidate created; production remains NO-GO.** This section is the newest source-of-truth update and supersedes earlier status prose that said the Windows Node 24 full-suite run had not been performed. Earlier per-phase narratives below remain historical; preserve them.
+**Current decision: RC1 main suite PASS; Tesseract.js acceptance FAIL/INCOMPLETE at harness preload; RC2 corrective candidate created; production remains NO-GO.** This section is the newest source-of-truth update and supersedes earlier status prose that said the Windows Node 24 full-suite run had not been performed. Earlier per-phase narratives below remain historical; preserve them. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 
 ### User-provided Windows evidence (RC1)
 
@@ -3913,7 +3947,7 @@ A separate RC2 candidate is built from the latest work copy; the Phase 0 and RC1
 
 ### Required next actions
 
-1. Test the RC2 archive in a fresh Windows folder with Node `>=24.17.0`: `npm ci`, `npm ls --depth=0`, `npm test`, and `npm run test:tesseractjs`. Preserve complete logs and JSON reports, not only the last few output lines.
+1. Test the RC2 archive in a fresh Windows folder with Node `>=24.17.0`: `npm ci`, `npm ls --depth=0`, `npm test`, and `npm run test:tesseractjs`. Preserve complete logs and JSON reports, not only the last few output lines. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 2. Require all 10 OCR acceptance steps to pass and verify exact fields, negative control, real recognition then injected stall, confirmed worker termination/child close, recovery, sequential batches, both image orders and zero blocked network attempts.
 3. Keep first/middle/final recognition-pass injection, historical pass-16 root cause, native Windows Tesseract comparison, and authorized live Discord smoke test as distinct open gates. If pass-16 evidence cannot establish the cause, state it is unknown.
 
@@ -4001,7 +4035,7 @@ Iteration-21 acceptance contract decision:
 Local verification actually performed in this environment:
 - Focused tests on available Node.js v22.16.0: 36 passed, 0 failed, 0 skipped across tests/battle-record.test.js, tests/ocr-metrics.test.js, tests/additional-screenshot-corpus.test.js, tests/paddleocr-comparison.test.js, and tests/tesseractjs-acceptance.test.js.
 - node --check passed for all nine modified JavaScript files.
-- The package requires Node.js >=24.17.0. Node 24 was not available in this environment. A full npm test attempt was interrupted by the execution time limit and did not yield a completed suite result; do not claim a full-suite pass from this environment.
+- The package requires Node.js >=24.17.0. Node 24 was not available in this environment. A full npm test attempt was interrupted by the execution time limit and did not yield a completed suite result; do not claim a full-suite pass from this environment. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 - The patch's included ITERATION21-ACCEPTANCE-CONTRACT-REPORT.md records a prior isolated Node v24.17.0 run with 178 passed, 0 failed, 0 skipped. This is attributed to the supplied patch report, not independently reproduced here.
 - The supplied patch report records the paired Windows comparison: Tesseract-only 111/128 exact mandatory fields and 7/16 fully exact mandatory records; hybrid 108/128 and 3/16; hybrid had more incorrect accepted mandatory values (4 vs 2) and slower median latency (42,601 ms vs 34,898 ms). Keep PADDLEOCR_FIELD_FALLBACK=0.
 - No OCR acceptance run, Windows target-runtime validation, Discord smoke test, restore rehearsal, production deployment, repository migration, commit, or push was performed here.
@@ -4012,7 +4046,7 @@ Current decision:
 - Preserve source and evidence. Do not deploy or push without the required separate approval/authentication and target-environment verification.
 
 Next actions:
-1. On target Windows, use Node >=24.17.0 and a clean folder; run npm ci, npm test, then the supervised OCR acceptance sequence.
+1. On target Windows, use Node >=24.17.0 and a clean folder; run npm ci, npm test, then the supervised OCR acceptance sequence. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 2. Preserve full stdout/stderr and JSON reports. Check that the mandatory-only gate behaves as intended while optional XP remains visible in diagnostic metrics.
 3. Run a fresh independently labeled holdout; the existing 16-image corpus is a development/tuning set.
 4. Complete native Windows Tesseract, Discord staging smoke test, and backup/restore rehearsal before any production decision.
@@ -4041,9 +4075,9 @@ The three V4 `plan1.txt` copies and the `plan1ext(1).zip` copy are byte-identica
 - Iteration 21 patch manifest: 21/21 entries passed.
 - Edited JavaScript syntax checks: passed.
 - Focused nine-field suite: 52/52 passed on Node.js `v22.16.0`.
-- Full `npm test`: 179/179 passed on Node.js `v22.16.0` using dependencies bundled in the verified V4 archive. This is diagnostic only; the package requires Node.js `>=24.17.0`.
+- Full `npm test`: 179/179 passed on Node.js `v22.16.0` using dependencies bundled in the verified V4 archive. This is diagnostic only; the package requires Node.js `>=24.17.0`. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 - `npm ci` did not finish within 240 seconds; no clean install is claimed.
-- The 16-image corpus is development/tuning data, not an independent holdout. No current-source supervised OCR acceptance run on supported Windows Node 24, independent holdout, live Discord staging test, restore rehearsal, authenticated Git checkout, repository migration, or deployment is claimed.
+- The 16-image corpus is development/tuning data, not an independent holdout. No current-source supervised OCR acceptance run on supported Windows Node 24, independent holdout, live Discord staging test, restore rehearsal, authenticated Git checkout, repository migration, or deployment is claimed. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 
 6. ChatGPT limits reference — mandatory final planning/handoff check
 Preserve `docs/limits/chtGptLimits.txt` as user-supplied reference material. Its figures and availability statements are a prior summary, not a live quota audit; values may vary or change. Before relying on exact limits, reset times, or feature availability, consult the official links contained in that file when available. Do not claim to see the user's remaining quota. If Data Analysis is unavailable and the user instructs us to wait, pause the restricted operations; do not route equivalent archive inspection, checksums, or packaging through another executor to bypass the limit. When the user confirms availability, resume the queued work. Keep local copies, batch related tasks, upload only needed files, and maintain this master plan.
@@ -4051,7 +4085,7 @@ Preserve `docs/limits/chtGptLimits.txt` as user-supplied reference material. Its
 7. Next actions
 A. Reconcile the continuation archive's 26 embedded-manifest mismatches and establish source lineage against V4 + the verified patch; preserve the original archives unchanged.
 B. Obtain/use an authenticated local Git checkout only after source reconciliation; preserve the existing repository/history. Do not create or migrate to a new private repository yet.
-C. On a clean Windows x64 environment with Node `>=24.17.0`, run `npm ci`, `npm ls --depth=0`, `npm test`, then the supervised nine-field OCR acceptance sequence with complete logs and JSON reports.
+C. On a clean Windows x64 environment with Node `>=24.17.0`, run `npm ci`, `npm ls --depth=0`, `npm test`, then the supervised nine-field OCR acceptance sequence with complete logs and JSON reports. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 D. Run an independently labelled holdout; report exact-field accuracy, complete-record accuracy, accepted-wrong rate, unresolved rate, human-review rate, latency, and resource use. Do not tune against the holdout.
 E. Complete offline/network-blocked, OpenCV, local PaddleOCR asset, scoring/workbook, Discord staging, and restore-rehearsal gates. Keep production NO-GO until every mandatory gate passes.
 F. Create a verified milestone package after each major milestone. Current package status is candidate/blocked, not authoritative.
@@ -4099,7 +4133,7 @@ Verification evidence in this environment
 
 Current decision and next gates
 - Continue targeted repair of fragmented XP/Free XP and other exact-value failures without changing ground truth or loosening exact equality.
-- Complete code/diff review and targeted regressions, then run Node `>=24.17.0` clean dependency installation and full test suite.
+- Complete code/diff review and targeted regressions, then run Node `>=24.17.0` clean dependency installation and full test suite. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 - Execute bounded screenshot subsets followed by the full four-fixture and 16-image development suites with captured JSON/logs. Any timeout remains not-tested.
 - Use the 16-image set only for development/tuning; require a separate, independently labeled holdout for accuracy claims.
 - Complete Windows native-Tesseract, Discord staging, security/secret review, data restore, and final package verification as separate gates.
@@ -4124,7 +4158,7 @@ Additional implemented changes
 - Exact DWBOT RC3 and GTO v3.22 input archives are now retained under `provenance/input-archives/`; original uploads remain unchanged.
 
 Latest verification
-- `npm test`: 183 passed, 0 failed, 0 skipped, Node v22.16.0 / Linux x64. Diagnostic only; package.json requires Node >=24.17.0.
+- `npm test`: 183 passed, 0 failed, 0 skipped, Node v22.16.0 / Linux x64. Diagnostic only; package.json requires Node >=24.17.0. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 - Focused source/export/workflow tests: 46 passed.
 - `node scripts/check-tesseractjs-assets.js`: PASS; local Tesseract worker, English model, and four WASM assets present.
 - `git diff --check`: PASS.
@@ -4133,13 +4167,13 @@ Latest verification
 - Bounded Asashio rerun: TIMEOUT at the execution window; no completed OCR report. Both attempts are NOT TESTED for accuracy, not passes and not accuracy failures.
 
 Runtime and release qualification
-- Current container runtime is Node v22.16.0; declared project minimum remains Node >=24.17.0. No target-runtime validation is claimed.
+- Current container runtime is Node v22.16.0; declared project minimum remains Node >=24.17.0. No target-runtime validation is claimed. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 - Tesseract asset integrity does not prove real-image OCR accuracy. No new broad OCR accuracy claim is made.
-- Production remains NO-GO. Outstanding gates include clean Node 24+ install/full suite, supported Windows/native Tesseract, completed four-image and 16-image current-source acceptance, independent labeled holdout, live Discord smoke test, dedicated secret scan, and backup/restore rehearsal.
+- Production remains NO-GO. Outstanding gates include clean Node 24+ install/full suite, supported Windows/native Tesseract, completed four-image and 16-image current-source acceptance, independent labeled holdout, live Discord smoke test, dedicated secret scan, and backup/restore rehearsal. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 - No Git remote is configured; no remote repository creation or push is claimed.
 
 Next execution order
-1. Run a clean install and complete tests on Node >=24.17.0.
+1. Run a clean install and complete tests on Node >=24.17.0. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 2. Diagnose the slow/timing-out OCR runner using bounded per-child stages and captured logs; preserve exact nine-field checks.
 3. Complete the four-image and 16-image development acceptance runs; report all mandatory fields and accepted-wrong/unresolved counts. Do not change ground truth.
 4. After development fixes stabilize, run an independent holdout.
@@ -4492,13 +4526,13 @@ Main is now the active implementation/delivery branch by explicit user authoriza
 
 ### Remaining release gates - OPEN
 
-1. **Windows OCR:** current-source full screenshot acceptance on Windows Node 24.22.1, Tesseract.js baseline and native Tesseract 5.x; exact nine-field ground truth, offline execution and per-image diagnostics. Capture versions, image hashes, source fingerprint, logs/reports and SHA-256. Any mandatory mismatch is FAIL.
+1. **Windows OCR:** current-source full screenshot acceptance on Windows Node 24.22.1, Tesseract.js baseline and native Tesseract 5.x; exact nine-field ground truth, offline execution and per-image diagnostics. Capture versions, image hashes, source fingerprint, logs/reports and SHA-256. Any mandatory mismatch is FAIL. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 2. **Local OAuth/browser:** real local Discord OAuth sign-in, Player/Admin role checks, browser visual QA and synthetic screenshot upload through the local bot bridge; confirm shared record visibility through Discord.
 3. **Isolated Discord:** separate dev bot/guild/channel; verify READY, channel permissions, participant/admin allow-deny, wrong-channel ignore, synthetic attachment, exact correction/mapping, shared state and restart/recovery.
 4. **Windows persistence/recovery:** JSON and SQLite over separate process restarts, full private archive import, private links/pending associations, physical SQLite copy after WAL checkpoint, integrity and restore using 50 synthetic players.
 5. **PDF/package:** produce and inspect the PDF manual. Package current source/tests/scripts/docs/reports/manifest; exclude secrets, .env, node_modules, runtime state/databases, caches and private content. Record SHA-256, test ZIP integrity, extract cleanly, rerun install/tests and verify the manifest from that extraction.
 
-Automation entry points: npm run test:persistence-recovery and npm run test:windows-native-ocr. GitHub Actions on main runs Linux and Windows Node 24/native OCR lanes; hosted CI does not replace the local OAuth/browser or isolated Discord checks. Presence of scripts/workflows is not a pass. Production remains NO-GO.
+Automation entry points: npm run test:persistence-recovery and npm run test:windows-native-ocr. GitHub Actions on main runs Linux and Windows Node 24/native OCR lanes; hosted CI does not replace the local OAuth/browser or isolated Discord checks. Presence of scripts/workflows is not a pass. Production remains NO-GO. [Current runtime authorization: Node.js v22.16.0 is acceptable; Node.js 24+ is not a prerequisite. Preserve this historical result as recorded.]
 
 ================================================================================
 DWBOT ROOT-LEVEL PACKAGE CLEANUP — 2026-11-05
