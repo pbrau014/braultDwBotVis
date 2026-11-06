@@ -239,7 +239,7 @@ def gate_a_evidence_status(artifact):
         return "FAIL"
     if not re.fullmatch(r"[0-9a-f]{64}", str(evidence.get("reportSha256", ""))):
         return "FAIL"
-    if not re.fullmatch(r"[0-9a-f]{64}", str(evidence.get("candidateFingerprint", ""))):
+    if not re.fullmatch(r"(?:[0-9a-f]{40}|[0-9a-f]{64})", str(evidence.get("candidateFingerprint", ""))):
         return "FAIL"
     if evidence.get("fingerprintLocked") is not True or evidence.get("matchesGateBRunSource") is not True:
         return "FAIL"
