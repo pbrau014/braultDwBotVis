@@ -20,6 +20,24 @@ function sha256(buffer) {
     return crypto.createHash('sha256').update(buffer).digest('hex');
 }
 
+function canonicalJsonValue(value) {
+    if (typeof value === 'string') return value.normalize('NFC');
+    if (Array.isArray(value)) return value.map(canonicalJsonValue);
+    if (value && typeof value === 'object') {
+        const entries = Object.entries(value).map(([key, item]) => [key.normalize('NFC'), canonicalJsonValue(item)]);
+        const keys = entries.map(([key]) => key);
+        if (new Set(keys).size !== keys.length) throw new Error('JSON keys collide after Unicode NFC normalization.');
+        return Object.fromEntries(entries.sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0));
+    }
+    if (typeof value === 'number' && !Number.isFinite(value)) throw new Error('Non-finite JSON numbers are not canonical.');
+    return value;
+}
+
+function canonicalJsonSha256(input) {
+    const parsed = parseJsonUtf8(input);
+    return sha256(Buffer.from(JSON.stringify(canonicalJsonValue(parsed)), 'utf8'));
+}
+
 function pngDimensions(buffer) {
     if (!Buffer.isBuffer(buffer) || buffer.length < 24
         || buffer.subarray(0, 8).toString('hex') !== '89504e470d0a1a0a'
@@ -325,12 +343,14 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
     return {
         schemaVersion: 1, status, createdAt: new Date().toISOString(),
         inventorySelection: { id: INVENTORY, selectedImageCount: MIN_GATE_B_IMAGES, verifiedImageCount: verifiedCount, pdfRasterVerifiedImageCount: pdfRasterVerifiedCount, localReaderVerifiedImageCount: localReaderVerifiedCount, allPdfRasterPairsVerified: pdfRasterVerifiedCount === MIN_GATE_B_IMAGES, allSelectedImagesVerified: verifiedCount === MIN_GATE_B_IMAGES },
-        runReportSha256: sha256(runBytes), groundTruthSha256: sha256(gtBytes),
+        runReportSha256: canonicalJsonSha256(runBytes), groundTruthSha256: canonicalJsonSha256(gtBytes),
+        runReportRawSha256: sha256(runBytes), groundTruthRawSha256: sha256(gtBytes),
+        verifierWorkingTreeRawSha256: sha256(await fs.readFile(__filename)),
         sourceArchiveSha256: run.sourceArchiveSha256, gateA, checks, networkLogReconciliation: networkReconciliation, images,
         secretScan: { status: secret.status, scannedFiles: secret.scannedFiles },
         notes: [
             'This verifier performs no OCR.Space requests.',
-            'PDF-derived raster provenance is checked by rerendering the PDF and comparing the raster SHA-256.',
+            'PDF-derived raster provenance is checked by rerendering the PDF, reproducing the source-aspect crop, and comparing normalized pixels to the original screenshot.',
             'Gate A is a separate prerequisite; this report does not certify Gate A or the v6 workbook.'
         ]
     };
