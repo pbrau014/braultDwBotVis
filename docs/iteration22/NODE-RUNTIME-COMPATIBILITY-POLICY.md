@@ -1,39 +1,58 @@
 # Node.js runtime compatibility and test acceptance policy
 
-**Effective:** 2026-11-03  
+**Effective:** 2026-11-06  
 **Project:** DWBOT / WoWS YOLO Tournament Discord Bot  
-**Status:** Active runtime policy
+**Status:** Active — exact project runtime pin  
+**Supersedes:** The Node.js 22.16.0 baseline in the 2026-11-03 policy text. Historical test records remain unchanged.
 
-## Policy
+## 1. Single project-wide standard
 
-- The reproducible development baseline remains **Node.js 22.16.0**, recorded in `.nvmrc`.
-- Node.js 22.16.0 is explicitly acceptable in place of older Node 24+, >=24.17.0 and v24.22.1 requirements. Node 24 is optional only for a specifically proven tool/dependency need; it is not a general project gate.
-- The supported runtime minimum is **Node.js 22.16.0**. Later stable patch/minor releases in the Node.js 22 line and newer Node.js major releases are accepted, subject to the full project test suite and any relevant runtime-specific checks.
-- Test results produced on Node.js 22.16.0 or newer are eligible for acceptance. A pass on one runtime does not automatically prove platform-specific behavior on another operating system or runtime family.
-- Node.js versions before 22.16.0 are not accepted by the application runtime guard.
-- Historical Node 24-only instructions and test reports are retained as historical records; they are not current runtime gates unless a report explicitly describes a platform-specific test that has not yet been reproduced.
+The one standard runtime for development, CI, OCR acceptance, local tools, packaging, and release evidence is:
 
-## Technical minimum
+- **Node.js 26.13.0 (LTS, Lithium)**
+- .nvmrc: 26.13.0
+- package.json and root package-lock.json engines: exact 26.13.0
+- GitHub Actions setup-node: exact 26.13.0
+- Windows and Linux acceptance jobs must report v26.13.0; a different major, minor, or patch is not an accepted run for the current baseline.
 
-The project uses `node:sqlite` and constructs `DatabaseSync` with its `timeout` option. Node's official SQLite API history documents that `DatabaseSync` was added in Node 22.5.0 and that the `timeout` option was added in Node 22.16.0. This is why the project minimum is 22.16.0 rather than 22.0.0. The 22.16.0 baseline is retained for reproducible local development.
+This pin is chosen because it is the latest LTS release recorded for the project date and matches the previously recorded Windows environment. Node.js 24.22.2 is also LTS, but is not the project standard. Node.js 22.16.0 is no longer an accepted project runtime.
 
-References:
+## 2. Runtime update control
 
-- Node.js v22 SQLite API: https://nodejs.org/download/release/v22.23.3/docs/api/sqlite.html
-- Node.js v22.16.0 release notes: https://nodejs.org/en/blog/release/v22.16.0
+Do not silently float to 26.x, 24.x, 22.x, or lts/*. Any later Node update requires a deliberate version change across:
+- .nvmrc;
+- package engine declarations and lockfile root metadata;
+- every GitHub Actions workflow and runtime assertion;
+- Docker/container definitions, scripts, build/package metadata, setup documentation, and acceptance reports where applicable;
+- test evidence on each supported OS and relevant native OCR/PaddleOCR paths.
 
-## Verification requirements
+A version update is not accepted merely because npm ci succeeds. The full project suite and the Windows/native OCR, local PDF-reader, and persistence checks must be rerun on the new exact version. Preserve old test reports as historical records; never relabel them as Node 26.13.0 runs.
 
-For each accepted test run, record:
+## 3. Required evidence
 
-- `process.version`, `process.versions.node`, npm version, operating system, and architecture.
-- Exact command, exit code, start/end time, pass/fail/skip counts, and the report/log path.
-- Whether native Tesseract, ImageMagick, OpenCV, PaddleOCR, and local models were available.
-- Runtime-specific blockers and any tests not run.
+Every acceptance run records:
+- process.version, process.versions.node, npm version, OS, architecture;
+- exact commit and package-lock SHA-256;
+- exact command, exit code, start/end times, pass/fail/skip counts, and report/log paths;
+- native Tesseract, ImageMagick, Ghostscript, OpenCV, PaddleOCR, Python, and model availability/versions;
+- runtime-specific blockers and tests not run.
 
-A passing unit suite is not equivalent to passing the screenshot OCR acceptance, Windows/native-Tesseract, PaddleOCR comparative, or live Discord gates. Those remain independently tracked. Never erase or rewrite historical reports to make them appear to have run under a newer compatibility policy.
+A unit-suite pass does not substitute for Gate A/B screenshot OCR, Windows/native OCR, PDF provenance, restricted-egress, or persistence acceptance.
 
+## 4. Technical basis
 
-## Related OCR feature-gating decision
+The project previously used Node 22.16.0 because the application uses node:sqlite and the DatabaseSync timeout option. The Node 26 LTS line includes that capability; this is a runtime baseline update, not a change to SQLite behavior. Re-run the persistence and native Windows test suites before accepting the new baseline.
 
-OpenCV geometry proposals are disabled by default and require `OCR_CV_ASSIST=1` for controlled evaluation only. They can propose crop geometry but cannot directly emit accepted OCR values. Enablement for routine use requires same-input evidence of improved exact-field/complete-record accuracy, no increase in accepted-wrong values, and acceptable latency. PaddleOCR field fallback likewise remains disabled by default.
+## 5. Historical evidence
+
+Reports generated under Node 22.16.0, Node 24.x, or any other runtime retain their original version labels and remain useful historical diagnostics. They do not count as current-baseline acceptance evidence. Do not rewrite historical reports or source artifacts to make them appear to have run under Node 26.13.0.
+
+## 6. OCR feature gates
+
+OpenCV geometry proposals remain disabled by default and require OCR_CV_ASSIST=1 for controlled evaluation only. They may propose crop geometry but cannot directly emit accepted OCR values. Routine enablement requires same-input evidence of improved exact-field and complete-record accuracy, no increase in wrongly accepted values, and acceptable latency. PaddleOCR field fallback remains separately gated by its own evidence.
+
+## References
+
+- Node.js release schedule: https://github.com/nodejs/Release
+- Node.js v26.13.0 release: https://github.com/nodejs/node/releases/tag/v26.13.0
+- Node.js v24.22.2 release (LTS, not selected): https://github.com/nodejs/node/releases/tag/v24.22.2
