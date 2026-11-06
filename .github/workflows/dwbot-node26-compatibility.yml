@@ -42,6 +42,25 @@ jobs:
           node-version: 26.13.0
           cache: npm
           package-manager-cache: false
+      - name: Install local English Tesseract.js model (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes tesseract-ocr-eng
+          model_path="$(find /usr/share/tesseract-ocr -type f -name eng.traineddata -print -quit)"
+          test -n "$model_path"
+          echo "TESSERACT_LANG_PATH=$(dirname "$model_path")" >> "$GITHUB_ENV"
+      - name: Install local English Tesseract.js model (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          choco install tesseract --version=5.5.3.20260724 --yes --no-progress
+          Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+          refreshenv
+          $tesseract = Get-Command tesseract.exe -ErrorAction Stop
+          $tessdata = Join-Path (Split-Path $tesseract.Source -Parent) 'tessdata'
+          if (-not (Test-Path (Join-Path $tessdata 'eng.traineddata'))) { throw "English language model not found in $tessdata" }
+          "TESSERACT_LANG_PATH=$tessdata" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
       - name: Install locked dependencies
         run: |
           node --version
