@@ -352,3 +352,17 @@ The PaddleOCR child/recovery diagnostics are also now preserved in the report ra
 - 19-image no-provider artifact verification: [#42236474159](https://github.com/pbrau014/braultDwBotVis/actions/runs/42236474159)
 
 Gate A and Gate B remain NOT PASSED. Production remains NO-GO.
+
+
+## 12. Runtime floor correction
+
+A later user-authorized runtime decision recorded in the governing plan and
+`package.json` establishes Node.js **>=22.16.0** as acceptable; Node 24+ is
+permitted but not mandatory. The source extraction run's Node 22.16.0 runtime
+therefore meets the current project floor. Earlier statements in this report
+that it was below the accepted Node 24.17.0 minimum are superseded.
+
+The extraction remains exploratory and does not establish Gate A or Gate B:
+Gate A still has only one of 16 PDF/raster pairs and lacks its original
+network log; Gate B still has incomplete local-reader evidence, unresolved
+mandatory values and missing original network-log proof.
