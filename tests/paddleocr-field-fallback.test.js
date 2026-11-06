@@ -233,3 +233,21 @@ test('PaddleOCR fallback field request order preserves the canonical nine-field 
         'result', 'player', 'map', 'mode', 'battleStart', 'credits', 'freeXp', 'damage', 'xp',
     ]);
 });
+
+test('all PaddleOCR helper exit paths use one ASCII-safe JSON serializer', async () => {
+    const helperSource = await fs.readFile(path.join(__dirname, '..', 'scripts', 'paddleocr_field_crops.py'), 'utf8');
+    assert.match(helperSource, /def emit_json\(payload: dict\[str, Any\]\)/);
+    assert.match(helperSource, /json\.dumps\(payload, ensure_ascii=True, separators=\(',', ':'\)\)/);
+    assert.doesNotMatch(helperSource, /print\(json\.dumps\(/);
+    assert.ok((helperSource.match(/emit_json\(/g) || []).length >= 6);
+    const python = process.platform === 'win32' ? 'python' : 'python3';
+    const probe = spawnSync(python, ['-c', [
+        'import importlib.util',
+        "spec=importlib.util.spec_from_file_location('helper','scripts/paddleocr_field_crops.py')",
+        'module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module)',
+        "module.emit_json({'text':chr(0x2606)})"
+    ].join(';')], { cwd: path.resolve(__dirname, '..'), encoding: 'utf8', timeout: 10000 });
+    if (probe.error || probe.status !== 0) throw new Error(probe.stderr || probe.error?.message || String(probe.status));
+    assert.equal(probe.stdout.trim(), '{"text":"\\u2606"}');
+    assert.deepEqual(JSON.parse(probe.stdout), { text: '☆' });
+});
