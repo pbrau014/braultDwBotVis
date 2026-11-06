@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/dwbot-imagesF-21-artifact-verification.yml'
       - 'scripts/verify-ocrspace-imagesF-21-artifacts.js'
+      - 'scripts/recover-ocrspace-imagesF-21-local-readers.js'
       - 'scripts/evaluate-ocrspace-imagesF-63-ground-truth.py'
       - 'testdata/ground-truth/imagesF-63-working-ground-truth-v6.json'
   workflow_dispatch:
@@ -55,14 +56,14 @@ jobs:
           $magick = Get-Command magick.exe -ErrorAction SilentlyContinue
           if (-not $magick) {
             choco install imagemagick --yes --no-progress
-            Import-Module "$env:ChocolateyInstallhelperschocolateyProfile.psm1"
+            Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
             refreshenv
             $magick = Get-Command magick.exe -ErrorAction Stop
           }
           $ghostscript = Get-Command gswin64c.exe -ErrorAction SilentlyContinue
           if (-not $ghostscript) {
             choco install ghostscript --yes --no-progress
-            Import-Module "$env:ChocolateyInstallhelperschocolateyProfile.psm1"
+            Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
             refreshenv
             $ghostscript = Get-Command gswin64c.exe -ErrorAction Stop
           }
@@ -147,6 +148,27 @@ jobs:
           "DWBOT_FRESH_PREFLIGHT=$freshPreflight" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           "DWBOT_SOURCE_IMAGE_ROOT=$imageRoot" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
 
+      - name: Recover only timed-out local readers from verified PDF-derived rasters
+        id: local-reader-recovery
+        continue-on-error: true
+        shell: powershell
+        env:
+          OCRSPACE_ENABLED: '0'
+          OCRSPACE_NETWORK_ALLOWLIST: '0'
+          OCR_NON_OCR_NETWORK_RESTRICTED: '1'
+          OCR_IMAGE_TIMEOUT_MS: '180000'
+          OCR_SUPERVISED_TIMEOUT_MS: '185000'
+          OCR_NON_OCR_NETWORK_LOG: ${{ github.workspace }}/testdata/ocr-acceptance/local-reader-recovery-network.log
+        run: |
+          $recoveredRun = Join-Path $env:GITHUB_WORKSPACE 'testdata\ocrspace-imagesF-63-exploratory\recovered-run-report-21.json'
+          $recoveryReport = Join-Path $env:GITHUB_WORKSPACE 'testdata\ocrspace-imagesF-63-exploratory\local-reader-recovery-21.json'
+          New-Item -ItemType Directory -Force (Split-Path $recoveryReport -Parent) | Out-Null
+          node scripts/recover-ocrspace-imagesF-21-local-readers.js --run-report $env:DWBOT_RUN_REPORT --ground-truth $env:DWBOT_GROUND_TRUTH --artifact-root $env:DWBOT_ARTIFACT_ROOT --output-run-report $recoveredRun --recovery-report $recoveryReport --network-log $env:OCR_NON_OCR_NETWORK_LOG
+          if (Test-Path $recoveredRun) {
+            "DWBOT_RUN_REPORT=$recoveredRun" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          }
+          "DWBOT_LOCAL_READER_RECOVERY_REPORT=$recoveryReport" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+
       - name: Verify the 21 selected PDFs, text layers, rasters, provenance and security
         id: artifact-verification
         continue-on-error: true
@@ -180,10 +202,13 @@ jobs:
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: dwbot-imagesF-21-artifact-verification-${{ inputs.source_run_id }}
+          name: dwbot-imagesF-21-artifact-verification-${{ inputs.source_run_id || '42160979140' }}
           path: |
             testdata/ocrspace-imagesF-63-exploratory/artifact-verification-21.json
             testdata/ocrspace-imagesF-63-exploratory/posthoc-evaluation-21.json
+            testdata/ocrspace-imagesF-63-exploratory/recovered-run-report-21.json*
+            testdata/ocrspace-imagesF-63-exploratory/local-reader-recovery-21.json
+            testdata/ocr-acceptance/local-reader-recovery-network.log
             testdata/ocr-acceptance/fresh-imagesF-63-preflight.json*
           if-no-files-found: warn
           retention-days: 30
