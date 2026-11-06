@@ -153,6 +153,7 @@ jobs:
           OCRSPACE_56_ARCHIVE_PATH: ${{ runner.temp }}\\imgsHalf1-eligible-56.zip
           OCRSPACE_56_IMAGE_ROOT: ${{ runner.temp }}\\imgsHalf1-eligible-56
           OCRSPACE_56_PREFLIGHT_REPORT: ${{ github.workspace }}\\testdata\\ocr-acceptance\\ocrspace-56-preflight.json
+          OCRSPACE_56_PROVIDER_REQUESTS_AUTHORIZED: ${{ github.event_name == 'workflow_dispatch' && inputs.run_legacy_56_provider_acceptance == true }}
         run: |
           $python = Get-Command python.exe -ErrorAction Stop
           & $python.Source scripts/prepare-ocrspace-eligible-56.py
