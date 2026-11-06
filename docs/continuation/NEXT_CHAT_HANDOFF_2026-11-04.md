@@ -1,3 +1,35 @@
+# Superseding continuation override — 2026-11-06
+
+This dated handoff is historical. The canonical living plan
+`docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt` is the current
+operational source of truth and overrides conflicting active instructions
+below; preserve the old handoff body as provenance.
+
+- Stay in this ChatGPT conversation for all DWBOT work; do not hand off to
+  Work mode or another executor. Do not emit progress narration or interim
+  screen text while authorized operations are underway.
+- OCR.Space is the explicitly enabled, highest-priority first reader for each
+  eligible original screenshot. Require `OCRSPACE_ENABLED=1`,
+  `OCRSPACE_NETWORK_ALLOWLIST=1`, and a valid local `OCRSPACE_API_KEY`.
+  Use Engine 2 to create one searchable PDF per image, download/validate and
+  preserve that PDF, render it to a bounded raster, then run Tesseract.js,
+  native Tesseract and any enabled local readers only on that PDF-derived
+  raster. Never fall back to the original screenshot after PDF-first begins.
+- The network guard must permit HTTPS to `api.ocr.space` and `ocr.space`.
+  `OCR_NON_OCR_NETWORK_RESTRICTED=1` restricts unrelated destinations only;
+  it does not block OCR.Space. `OCRSPACE_ENABLED=0` is reserved for isolated
+  mocks or downstream local readers after the PDF has already been produced.
+- Keep the nine mandatory fields in exact order: result, player, map, mode,
+  battleStart, credits, freeXp, damage, xp. XP is mandatory and ninth.
+- Only the authorized 4-, 16- and 64-image inventories are in scope. No paid
+  usage, unrelated uploads, production screenshot transmission, live Discord
+  action or production deployment is authorized. Production remains NO-GO.
+- No live provider request or PDF is verified in this chat; the local API key
+  is unavailable and the Actions secret's presence is unverified. Re-read the
+  current main head and living-plan queue before further work.
+
+---
+
 # DWBOT — Next-chat continuation handoff
 
 **Snapshot date:** 2026-11-04  
