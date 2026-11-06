@@ -118,3 +118,16 @@ Nine mandatory fields remain exactly: result, player, map, mode, battleStart, cr
 - Windows acceptance sets a per-run `OCRSPACE_ARTIFACT_DIR`; the current 63-image exploratory runner writes per-image PDF/raster artifacts. Reuse the 21 selected records from those outputs for post-hoc evaluation; do not repeat provider submissions. For other runs requiring durable evidence, configure `OCRSPACE_ARTIFACT_DIR` and verify the actual files/checksums.
 
 The canonical living plan controls the operational queue and supersedes older dated handoff/status text. Preserve the historical records below as provenance; do not promote their former Engine 3/crop-first/default-off instructions to current policy.
+
+- The repository-side candidate manifest now includes the explicit
+  gateBSubset list (21 filenames, bytes and SHA-256 values) bound to the v6
+  reference. Its automated test confirms zero SHA-256 overlap with the 16-image
+  development corpus. The embedded ZIP manifest remains unchanged.
+- The 63-image workflow no longer has a push trigger; it is workflow_dispatch
+  only, with a second job-level event guard. A push-triggered run already
+  queued under the older workflow revision has no jobs and cannot submit.
+- The active 42160979140 run predates persistent network-log configuration.
+  The current workflow now initializes and uploads
+  imagesF-63-blocked-network-attempts.log. For the active run, inspect
+  localReaderFailures and completed job logs; if zero unauthorized attempts
+  cannot be established, Gate B remains blocked.

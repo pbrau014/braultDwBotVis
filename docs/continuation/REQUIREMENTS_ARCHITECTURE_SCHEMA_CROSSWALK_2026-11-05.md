@@ -1,4 +1,4 @@
-# DWBOT requirements, architecture and schema crosswalk — updated 2026-11-05
+# DWBOT requirements, architecture and schema crosswalk — updated 2026-11-06
 
 ## OCR.Space PDF-first governing sequence
 The current implementation sequence is eligible original screenshot → OCR.Space Engine 2 first → searchable PDF → validated/downloaded PDF → bounded local PDF-page raster → Tesseract.js/native Tesseract/optional PaddleOCR/OpenCV local readers → existing parser/consensus/validators. No downstream local image reader may process the original screenshot after PDF-first processing begins. A failed OCR.Space/PDF/raster stage fails closed. Eligible intake requires OCRSPACE_ENABLED=1, OCRSPACE_NETWORK_ALLOWLIST=1 and OCRSPACE_API_KEY. OCRSPACE_ENABLED=0 is only for isolated mocks or downstream local readers after the PDF-derived raster already exists.
@@ -51,9 +51,18 @@ This is an evidence-based supporting crosswalk for Plan 2 (requirements/architec
 ## Release gates and unresolved requirements
 
 - **Gate A:** approved 16-image Windows development corpus, all nine fields independently compared, zero wrong accepted mandatory values, zero unresolved mandatory values, exactly one authorized OCR.Space request per eligible image and zero unrelated outbound network attempts.
-- **Gate B:** independent holdout of at least 50 (100 preferred) screenshots with independently established nine-field truth; no tuning against it.
+- **Gate B:** exactly 21 screenshots: the first 21 corpus-order v6 records with complete, non-empty, independently established expected values for all nine fields. This replaces the former 50-image minimum / 100-image preferred target. Source hashes confirm zero overlap with the 16-image development corpus. Do not tune against these records. Gate B passes only after all 21 PDF/raster artifacts and searchable text layers are verified, both local readers are present, zero mandatory values are wrongly accepted, zero unauthorized network attempts occur, and the secret-leak scan passes.
 - **Gate C:** isolated Windows persistence/backup/restore/rollback only after A and B pass.
 - **Gate D:** final release decision with current source fingerprint, logs, benchmark, recovery evidence and rollback readiness.
 - Plan 1 is source/repository reconciliation; Plan 2 is requirements/architecture/schemas. Their exact original detailed acceptance specifications are not fully present in retrieved authoritative context; this crosswalk is an evidence-based derivative, not a claim that missing text was recovered.
 - The roadmap refers to 20 phases, but the accessible `plan1.txt` defines Phase 0–10 only. Phase 11–20 definitions must be recovered from an authoritative source.
 - The exact four `GrandYoloInstruct` deliverables are unresolved. See `GRANDYOLOINSTRUCT_DELIVERABLE_CROSSWALK.md`; do not guess.
+
+
+## Gate B 21-image amendment — 2026-11-06
+
+The exact source-bound list is recorded in
+testdata/imagesF-holdout-candidate-manifest.json under gateBSubset and is
+validated against the v6 ground-truth JSON by
+tests/test_ocrspace_imagesF_21_evaluator.py. The embedded manifest in the
+original 63-image ZIP remains unchanged and retains its original SHA-256.
