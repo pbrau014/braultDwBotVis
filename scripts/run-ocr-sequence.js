@@ -229,7 +229,7 @@ function getNetworkIsolation() {
                             engine: evidence.engine || null, sourceSha256: evidence.sourceSha256 || null,
                             uploadSha256: evidence.uploadSha256 || null, uploadBytes: evidence.uploadBytes || null,
                             pdfBytes: evidence.pdfBytes || null, pdfSha256: evidence.pdfSha256 || null,
-                            rasterBytes: evidence.rasterBytes || null, rasterWidth: evidence.rasterWidth || null,
+                            rasterBytes: evidence.rasterBytes || null, rasterSha256: evidence.rasterSha256 || null, rasterWidth: evidence.rasterWidth || null,
                             rasterHeight: evidence.rasterHeight || null, artifacts: evidence.artifacts || null,
                             reason: evidence.reason || null, requests: evidence.requests ?? null,
                         };
