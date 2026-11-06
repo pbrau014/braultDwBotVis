@@ -33,17 +33,17 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Set up accepted Node.js 22.16.0
+      - name: Set up accepted Node.js 26.13.0
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 22.16.0
+          node-version: 26.13.0
           cache: npm
           package-manager-cache: false
       - name: Assert accepted Node.js runtime
         shell: powershell
         run: |
           $node = (node --version).Trim()
-          if ([version]$node.TrimStart('v') -lt [version]'22.16.0') { throw "Node.js 22.16.0 or newer is required; found $node" }
+          if ([version]$node.TrimStart('v') -lt [version]'26.13.0') { throw "Node.js 26.13.0 or newer is required; found $node" }
       - name: Install local PDF raster and OCR readers
         shell: powershell
         run: |
