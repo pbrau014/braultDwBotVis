@@ -77,6 +77,21 @@ function selectedSpecs(args) {
 let activeProgress = null;
 let activeProgressPath = null;
 
+function getNetworkIsolation() {
+    const logPath = String(process.env.OCR_NON_OCR_NETWORK_LOG || '').trim();
+    let denied = false;
+    if (logPath) {
+        try { denied = fsSync.existsSync(logPath) && fsSync.statSync(logPath).size > 0; }
+        catch { denied = true; }
+    }
+    return {
+        ocrSpaceEnabled: process.env.OCRSPACE_ENABLED === '1',
+        ocrSpaceNetworkAllowed: process.env.OCRSPACE_NETWORK_ALLOWLIST === '1',
+        nonOcrNetworkRestricted: process.env.OCR_NON_OCR_NETWORK_RESTRICTED === '1',
+        nonOcrDeniedAttemptsDetected: denied,
+    };
+}
+
 (async () => {
     const results = [];
     const startedAll = Date.now();
@@ -108,7 +123,8 @@ let activeProgressPath = null;
         packageName: packageInfo.name,
         packageVersion: packageInfo.version,
         configuredEngine: String(process.env.OCR_ENGINE || 'auto').toLowerCase(),
-        networkBlocked: process.env.OCR_NETWORK_BLOCK_ENABLED === '1',
+        networkBlocked: process.env.OCR_NON_OCR_NETWORK_RESTRICTED === '1', // legacy field: unrelated egress only
+        networkIsolation: getNetworkIsolation(),
         sourceMetadata: createOcrReportMetadata(root),
     });
     activeProgress = progress;
@@ -287,7 +303,8 @@ let activeProgressPath = null;
         mandatoryExactMatches: results.filter(row => row.allRequiredFieldsPass).length,
         requiredFieldsComplete: results.filter(row => row.pipelineCompleted && row.requiredMissing.length === 0).length,
         durationMs: Date.now() - startedAll,
-        networkBlocked: process.env.OCR_NETWORK_BLOCK_ENABLED === '1',
+        networkBlocked: process.env.OCR_NON_OCR_NETWORK_RESTRICTED === '1', // legacy field: unrelated egress only
+        networkIsolation: getNetworkIsolation(),
         results,
     };
     await writeJsonAtomically(outputPath, report);
