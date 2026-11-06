@@ -174,3 +174,19 @@ test('OCR attachment download is inside the bounded queue and unsafe timeout rec
     assert.match(queueSource, /closed = true;\s*throw haltError/);
     assert.match(botSource, /SERIAL_TASK_UNSETTLED.*SERIAL_QUEUE_CLOSED/s);
 });
+
+test('Node.js 22.16.0 is the accepted runtime baseline; Node 24 is not mandatory', () => {
+    const root = path.join(__dirname, '..');
+    const packageJson = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
+    const packageLock = JSON.parse(fs.readFileSync(path.join(root, 'package-lock.json'), 'utf8'));
+    const workflow = fs.readFileSync(path.join(root, '.github', 'workflows', 'dwbot-verification.yml'), 'utf8');
+    const nvmrc = fs.readFileSync(path.join(root, '.nvmrc'), 'utf8').trim();
+    const windowsAcceptance = fs.readFileSync(path.join(root, 'scripts', 'run-windows-ocr-acceptance.ps1'), 'utf8');
+
+    assert.equal(nvmrc, '22.16.0');
+    assert.equal(packageJson.engines?.node, '>=22.16.0');
+    assert.equal(packageLock.packages?.['']?.engines?.node, '>=22.16.0');
+    assert.match(workflow, /node-version:\s*22\.16\.0/);
+    assert.doesNotMatch(workflow, /node-version:\s*24(?:\.|\s|$)/);
+    assert.match(windowsAcceptance, /MinimumNodeVersion\s*=\s*'22\.16\.0'/);
+});
