@@ -1,15 +1,15 @@
 ## OCR pipeline — current governing sequence
 
-OCR.Space is the explicitly enabled primary text-extraction stage for every eligible, authorized image. Set `OCRSPACE_ENABLED=1`, `OCRSPACE_NETWORK_ALLOWLIST=1`, and provide `OCRSPACE_API_KEY`. OCR.Space Engine 2 receives each original image first and creates a searchable PDF. The PDF is downloaded, validated and rasterized locally; Tesseract.js, native Tesseract, PaddleOCR (when enabled), and OpenCV geometry then operate only on the PDF-derived raster. No local reader falls back to the original screenshot after PDF-first processing begins. Acceptance runners set `OCRSPACE_ARTIFACT_DIR` and retain the PDF/raster artifacts. The network guard explicitly permits the OCR.Space HTTPS API/PDF hosts; any restriction applies only to unrelated outbound destinations. `OCRSPACE_ENABLED=0` is reserved for isolated mocks or local readers after a PDF has already been produced, never for eligible original-image intake. See docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md and docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt.
+OCR.Space Engine 2 is the primary text-extraction stage for specifically authorized test and acceptance images. The user authorized additional guarded provider requests on 2026-11-06; this supersedes the earlier blanket no-new-request restriction. Production-wide Engine 2 scope remains a separate open decision. Set `OCRSPACE_ENABLED=1`, `OCRSPACE_NETWORK_ALLOWLIST=1`, and provide `OCRSPACE_API_KEY`. OCR.Space Engine 2 receives each original image first and creates a searchable PDF. The PDF is downloaded, validated and rasterized locally; Tesseract.js, native Tesseract, PaddleOCR (when enabled), and OpenCV geometry then operate only on the PDF-derived raster. No local reader falls back to the original screenshot after PDF-first processing begins. Acceptance runners set `OCRSPACE_ARTIFACT_DIR` and retain the PDF/raster artifacts. The network guard explicitly permits the OCR.Space HTTPS API/PDF hosts; any restriction applies only to unrelated outbound destinations. `OCRSPACE_ENABLED=0` is reserved for isolated mocks or local readers after a PDF has already been produced, never for eligible original-image intake. See docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md and docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt.
 
 ## Node.js runtime baseline
 
-The accepted DWBOT runtime baseline is Node.js **22.16.0** (`>=22.16.0`). This
-version is acceptable for installation, project tests, OCR acceptance and
-candidate verification; Node.js 24+ is not a prerequisite. The repository pins
-22.16.0 in `.nvmrc`, package manifests and GitHub Actions. Use Node 24 only for
-a specific dependency/tool requirement that is independently demonstrated.
-Windows-specific checks still run on Windows, regardless of Node version.
+The accepted DWBOT runtime is exactly Node.js **26.13.0 LTS**. The repository pins
+26.13.0 in .nvmrc, package.json, package-lock.json and every active GitHub Actions
+workflow. Do not use Node 22 or Node 24 for current acceptance; historical reports
+retain their original runtime labels. Any future runtime change requires a
+project-wide update and exact-version CI plus Windows/native OCR verification.
+Windows-specific checks still run on Windows.
 
 ## Historical tested-source checkpoint — 2026-11-05 (superseded by 2026-11-06 OCR.Space authority)
 
@@ -96,7 +96,7 @@ License text is preserved at docs/legal/LICENSE after the authorized root-only c
 
 ## Commands
 
-Use Node >=22.16.0. From the project root run:
+Use Node.js 26.13.0 exactly. From the project root run:
 - npm ci
 - npm run test:discord-preflight
 - npm run preflight:desktop-test
