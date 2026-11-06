@@ -194,6 +194,7 @@ test('normalized PDF raster provenance is verified against source dimensions', a
     renderPdf:async()=>pageRaster,
     normalizeRaster:async(_page,dimensions)=>({
       buffer:normalizedRaster,
+      similarity:{method:'original-source-resized-to-normalized-raster-v1',meanAbsoluteError:0,rootMeanSquareError:0},
       normalization:{
         method:'source-aspect-top-aligned-crop-v1',
         sourceWidth:dimensions.sourceWidth,sourceHeight:dimensions.sourceHeight,
