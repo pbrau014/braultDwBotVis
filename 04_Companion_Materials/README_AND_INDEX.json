@@ -38,7 +38,8 @@
     "SOURCE_BUNDLE_STATUS_AND_ACQUISITION_RECORD.md",
     "Scoring_Workbook_and_Validation_Guide_v1.1_DRAFT.md",
     "Training_Room_Host_and_Referee_Guide_v1.1_DRAFT.md",
-    "Season_Logistics_and_Grand_YOLO_Finale_Blueprint_v0.1_PROPOSAL.md"
+    "Season_Logistics_and_Grand_YOLO_Finale_Blueprint_v0.1_PROPOSAL.md",
+    "Participant_Quick_Start_Evidence_and_Results_v1.2_WORKING_UPDATE.md"
   ],
   "human_approval_status": "No event-specific approver name, signature timestamp, effective time, or event-specific values were supplied. This does not block documentation package publication under the waiver and does not constitute approval of a particular event.",
   "source_conflict_dispositions": {
@@ -74,5 +75,17 @@
     "status": "PROPOSAL_ONLY_NOT_AN_EVENT_NOTICE_OR_APPROVAL",
     "scope": "Pilot lifecycle, candidate recurring season, playoff decision register, Grand YOLO finale, participant/staff logistics",
     "constraints": "No dates, prizes, eligibility thresholds, playoff format, or finale formula are approved by this planning document."
-  }
+  },
+  "working_updates": [
+    {
+      "file": "Participant_Quick_Start_Evidence_and_Results_v1.2_WORKING_UPDATE.md",
+      "status": "MARKDOWN_ONLY_NOT_RENDERED_OR_APPROVED",
+      "derived_from": "Participant_Quick_Start_Evidence_and_Results_v1.1_DRAFT.md",
+      "changes": [
+        "Adds the exact nine mandatory DWBOT fields and fail-unresolved guidance",
+        "Distinguishes Pilot, regular season, playoffs and Grand YOLO finale participant expectations"
+      ],
+      "publication_note": "The v1.1 DOCX/PDF remain the released publication until the v1.2 source is reviewed and rendered."
+    }
+  ]
 }
