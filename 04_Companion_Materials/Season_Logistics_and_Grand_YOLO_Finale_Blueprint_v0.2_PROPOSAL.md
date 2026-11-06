@@ -276,3 +276,15 @@ The supplied `yoloPaperWork(1).zip` archive was integrity-checked and safely ext
 
 The WoWs Tournaments listing shows **King of the Sea XIX** scheduled 9 October–15 November 2026, with separate Europe, North America, APAC and International sections. Wargaming's official event page lists the International Finals over the weekends of 7–8 and 14–15 November, and the associated in-game event rewards page remains active through 2 December. These are KOTS dates, not YOLO dates. The example illustrates why event settings need a region, phase, signup window, match schedule and versioned notice rather than one ambiguous calendar entry. See [WoWs Tournaments](https://wows-tournaments.com/) and [Wargaming's King of the Sea XIX page](https://worldofwarships.com/en/content/king-of-the-sea-xix-tournament/).
 
+
+
+### Coordinated public and staff publications
+
+The mock season now has separate companion documents for the distinct audiences:
+- Participant Quick Start and Evidence Submission Guide — check-in, eligibility questions, ship list, nine-field evidence and corrections.
+- Event Night Operations Manual — event settings, staff separation, room setup, attendance, restarts, scoring and appeals.
+- Scoring and Standings Explainer — Damage, Kills, Race C01, Grand Yolo, Tourney Totals and source boundaries.
+- Admiralty Chronicle — fictional season narrative and tactical case studies.
+- Admiralty × YOLO Mock Tournament Field Guide and HTML companion — the integrated overview and visual presentation.
+
+These publications share the same source reconciliation record and do not override event-specific signed settings.
