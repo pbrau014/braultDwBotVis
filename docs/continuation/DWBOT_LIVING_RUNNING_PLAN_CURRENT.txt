@@ -1,7 +1,46 @@
+CURRENT GATE B REQUIREMENT OVERRIDE — 2026-11-06
+Status: ACTIVE / GOVERNING / SUPERSEDES THE 21-IMAGE GATE B RULE BELOW.
+
+- Gate B now uses exactly 19 images: corpus-order records 1–19 from the v6
+  63-image reference, each with COMPLETE_9_FIELD_TRANSCRIPTION and all nine
+  expected fields eligible_for_exact_match=true and non-empty. The former
+  50-image minimum, 100-image preferred target, and interim 21-image Gate B
+  rule are superseded.
+- The 21-image complete-record subset remains the authorized PDF-first
+  pipeline-analysis inventory. Gate B is the first 19 records of that set;
+  records 20–21 remain analysis-only and must not be counted toward Gate B.
+  No new OCR.Space requests are needed: reuse the original 63-image run.
+- All nine fields remain mandatory and ordered: result, player, map, mode,
+  battleStart, credits, freeXp, damage, xp. The manual source is independent
+  of OCR outputs but has no documented blind second reviewer; do not call it
+  double-blind or certified ground truth.
+- Gate A remains FAIL/BLOCKED. Gate B cannot pass until Gate A passes on the
+  locked matching candidate fingerprint, all 19 selected PDFs/rasters and
+  local-reader outputs are verified, every selected record has resolved
+  nine-field outputs, no mandatory value is wrongly accepted, and network and
+  secret evidence pass. The missing original network log is reconciled as
+  limited evidence only; no zero-attempt claim is made from that absence.
+- The 63-image extraction #42160979140 completed and uploaded its artifact.
+  All 63 PDFs and 63 page rasters passed independent hash/size/format checks;
+  all PDFs contain searchable text. The 21-image post-hoc analysis reported
+  field-level exact matches of 65.08% for Tesseract.js and 61.38% for native
+  Tesseract, but only 2/21 and 0/21 exact nine-field records respectively.
+  These are preliminary measurements, not Gate B acceptance.
+- The first artifact-verification attempt exposed an undefined recovery-log
+  variable and did not produce an artifact-verification report. The verifier,
+  workflow, tests and Gate B selection are being corrected for a fresh
+  no-provider 19-image verification. Preserve the original run and reports.
+- Production remains NO-GO. The v6 workbook remains a partial working
+  transcription reference, not certified acceptance-grade ground truth.
+
+================================================================================
+END CURRENT GATE B REQUIREMENT OVERRIDE
+================================================================================
+
 ================================================================================
 CURRENT GATE B HOLDOUT REQUIREMENT — 2026-11-06
 ================================================================================
-Status: ACTIVE / GOVERNING / SUPERSEDES THE FORMER 50-IMAGE MINIMUM.
+Status: SUPERSEDED HISTORICAL REQUIREMENT; SEE CURRENT 19-IMAGE OVERRIDE ABOVE.
 
 - Gate B now uses exactly 21 screenshots: the first 21 corpus-order records in
   testdata/ground-truth/imagesF-63-working-ground-truth-v6.json whose
