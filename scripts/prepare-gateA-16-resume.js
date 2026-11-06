@@ -179,7 +179,7 @@ async function prepare(options) {
         OCR_NON_OCR_NETWORK_LOG: localNetworkLogPath,
         OCR_ENGINE: 'tesseractjs',
         OCR_SAVE_RAW_DIAGNOSTICS: '1',
-        PADDLEOCR_FIELD_FALLBACK: '0',
+        PADDLEOCR_FIELD_FALLBACK: '1',
         OCR_IMAGE_CHILD: '1',
     };
     const supervised = await runSupervisedProcess({

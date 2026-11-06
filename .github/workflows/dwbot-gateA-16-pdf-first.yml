@@ -26,7 +26,7 @@ env:
 
 jobs:
   gate-a:
-    if: github.run_attempt == 1 && github.event_name == 'push' && (github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME' || github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15')
+    if: github.run_attempt == 1 && github.event_name == 'push' && (github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME' || github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' || github.event.head_commit.message == 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY')
     runs-on: windows-latest
     timeout-minutes: 240
     permissions:
@@ -145,7 +145,7 @@ jobs:
           Write-Host 'Both guard sources verified; each OCR/local-reader Node step will preload them explicitly.'
 
       - name: Download and verify original partial Gate A artifact
-        if: github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15'
+        if: github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' || github.event.head_commit.message == 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'
         shell: powershell
         env:
           GH_TOKEN: ${{ github.token }}
@@ -197,6 +197,7 @@ jobs:
           if (-not (Test-Path $log) -or (Get-Item $log).Length -ne 0) { throw 'Could not initialize an empty Gate A restricted-egress log before provider calls.' }
 
       - name: Run the 16-image OCR.Space Engine 2 PDF-first Gate A acceptance
+        if: github.event.head_commit.message != 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'
         working-directory: source
         env:
           OCRSPACE_API_KEY: ${{ secrets.OCRSPACE_API_KEY }}
