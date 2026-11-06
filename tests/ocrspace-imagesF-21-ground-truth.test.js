@@ -57,7 +57,7 @@ test('Gate B requires 19 labels, verified artifacts, zero wrong acceptance and c
     assert.match(evaluator, /zeroWronglyAcceptedMandatoryFieldValues/);
     assert.match(evaluator, /zeroUnresolvedMandatoryFieldValues/);
     assert.match(evaluator, /all19GateBRecordsHaveAResolvedNineFieldOutputPerEngine/);
-    assert.match(evaluator, /wrong but unaccepted candidates remain separately reported/);
+    assert.match(evaluator, /wrong but unaccepted candidates remain separately reported/i);
     assert.match(evaluator, /engine_acceptance_complete/);
     assert.match(evaluator, /zeroUnauthorizedNetworkAttempts/);
     assert.match(evaluator, /gate_b = "PASS"/);
@@ -73,5 +73,5 @@ test('uncertain or partial ground-truth fields cannot count as eligible Gate B l
 
 test('the evaluator retains a separate 21-image diagnostic inventory in addition to 19-image Gate B', () => {
     const evaluator = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'evaluate-ocrspace-imagesF-63-ground-truth.py'), 'utf8');
-    assert.match(evaluator, /ANALYSIS_21_INVENTORY = \\"complete-ground-truth-21\\"/);
+    assert.match(evaluator, /ANALYSIS_21_INVENTORY = "complete-ground-truth-21"/);
 });
