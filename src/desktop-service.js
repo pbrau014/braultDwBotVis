@@ -107,15 +107,20 @@ function createDesktopService(options = {}) {
       role(principal,['admin','player']);
       const current=state(), rows=Tournament.standings(current);
       const total=rows.reduce((s,r)=>s+r.total,0);
-      const aggregate={doubloons:total,estimatedValue:total*0.54/100};
-      const base={aggregate,maxPlayers:Tournament.MAX_PLAYERS,events: Tournament.EVENTS,eventLabels:Tournament.EVENT_LABELS};
+      const base={maxPlayers:Tournament.MAX_PLAYERS,events: Tournament.EVENTS,eventLabels:Tournament.EVENT_LABELS};
       if(principal.role==='player') {
         const player=Tournament.findPlayer(current,principal.player.id);
         if(!player) throw Object.assign(new Error('Your linked roster entry no longer exists.'),{status:403,code:'PLAYER_UNLINKED'});
-        return {...base,role:'player',player,standing:rows.find(r=>r.id===player.id)||null,
-          publicStandings:rows.map((r,i)=>({rank:i+1,...r}))};
+        const publicRow = row => {
+          if (!row) return null;
+          const { estimatedValue, ...visible } = row;
+          return visible;
+        };
+        return {...base,role:'player',player,standing:publicRow(rows.find(r=>r.id===player.id)||null),
+          publicStandings:rows.map((r,i)=>({rank:i+1,...publicRow(r)}))};
       }
-      return {...base,role:'admin',roster:current.players,standings:rows.map((r,i)=>({rank:i+1,...r})),
+      const aggregate={doubloons:total,estimatedValue:total*0.54/100};
+      return {...base,aggregate,role:'admin',roster:current.players,standings:rows.map((r,i)=>({rank:i+1,...r})),
         settings:current.settings,
         playerAccountLinks:Object.entries(current.playerAccountLinks).map(([playerId,discordUserId])=>({playerId:Number(playerId),discordUserId})),
         pendingCount:current.battleRecords.filter(r=>r.status!=='mapped').length};
