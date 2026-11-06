@@ -362,3 +362,29 @@ the exact run report. No arbitrary minimum pixel threshold is introduced.
   its jobs/logs are inspected.
 - No change was made to the active OCR.Space extraction. No duplicate provider
   request was initiated.
+
+
+## Bounded-response and resume hardening — 2026-11-06
+
+- OCR.Space JSON responses and searchable-PDF downloads now require a readable
+  streaming body. The unbounded `arrayBuffer()`, `text()`, and `json()`
+  fallback paths were removed; a response without a stream fails closed.
+- Both readers check declared Content-Length before reading, enforce the byte
+  cap while streaming, cancel the reader when the cap is crossed, and only
+  parse/retain content after it is within bounds. This closes the previous
+  post-allocation size-check gap for the non-streaming fallbacks.
+- Regression coverage now includes oversized streamed PDF cancellation,
+  non-streaming response rejection, malformed streamed JSON, and the durable
+  provider-start checkpoint boundary.
+- The manual resume procedure for a future run is: use the same exact source
+  commit; wait until the previous run is completed and its always-upload
+  artifact is available; dispatch the workflow with that prior run ID in
+  `resume_run_id`. The workflow verifies the prior run name/commit, downloads
+  the named artifact, checks the old preflight report hash and exact 63 source
+  members against a fresh archive preflight, then restores progress and the
+  network log. Completed rows are hash-checked and skipped. Any potentially
+  submitted but incomplete row is marked ambiguous and never retried.
+- The currently active older run #42160979140 does not meet the same-commit
+  and per-request-checkpoint requirements. It is not eligible for this resume
+  workflow. Continue to let it finish and inspect its own artifact.
+
