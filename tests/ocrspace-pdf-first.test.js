@@ -157,7 +157,7 @@ test('durable provider-start checkpoint completes before the OCR.Space request',
 test('failed durable provider-start checkpoint prevents any OCR.Space request', async () => {
     let providerCalled = false;
     await assert.rejects(createOcrSpacePdfFirst({
-        imageBuffer: png, env: { OCRSPACE_API_KEY: 'test-key' }, quotaLedger: fakeLedger(),
+        imageBuffer: png, env: { OCRSPACE_API_KEY: 'test-key' }, quotaLedger: fakeLedger(), sourceDimensions,
         onProviderRequestStarted: async () => { throw new Error('checkpoint disk failure'); },
         client: async () => { providerCalled = true; return { searchablePdfUrl: 'https://api.ocr.space/result.pdf' }; },
     }), /checkpoint disk failure/);
