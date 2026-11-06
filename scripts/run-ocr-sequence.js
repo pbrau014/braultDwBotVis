@@ -200,6 +200,85 @@ function getNetworkIsolation() {
         for (let position = 0; position < entries.length; position += 1) {
             const spec = entries[position];
             const start = Date.now();
+            const buffer = await fs.readFile(spec.path);
+            const imageSha256 = crypto.createHash('sha256').update(buffer).digest('hex');
+            const priorRow = resumeState?.rows.get(spec.key) || null;
+            if (priorRow && priorRow.imageSha256 !== imageSha256) {
+                const error = new Error('Prior progress source-image hash differs from the current fixture: ' + spec.filename);
+                error.code = 'OCR_SEQUENCE_RESUME_ROW_MISMATCH';
+                throw error;
+            }
+            if (priorRow) {
+                const disposition = classifySequenceResumeRow(priorRow, null, spec.key);
+                if (disposition === 'verify-and-skip-complete') {
+                    const artifactCheck = await verifyCompletedSequenceArtifacts(priorRow, imageSha256);
+                    const resumedRow = artifactCheck.valid
+                        ? { ...priorRow, resumeDisposition: 'verified-complete-provider-skipped', resumeArtifactVerification: artifactCheck }
+                        : { ...priorRow, pipelineCompleted: false, allExpectedFieldsPass: false, allRequiredFieldsPass: false,
+                            resumeDisposition: 'artifact-integrity-failure-no-provider-retry',
+                            error: artifactCheck.reason, code: 'OCR_SEQUENCE_RESUME_ARTIFACT_INVALID' };
+                    results.push(resumedRow);
+                    recordJobResult(progress, resumedRow);
+                    await writeJsonAtomically(progressPath, progress);
+                    if (!artifactCheck.valid) process.exitCode = 1;
+                    console.log('[OCR-SEQUENCE] ' + (artifactCheck.valid ? 'SKIP-COMPLETE' : 'FAIL-ARTIFACT') + ' ' + spec.key + ' (provider not repeated)');
+                    continue;
+                }
+                const ambiguous = {
+                    ...priorRow, pipelineCompleted: false, allExpectedFieldsPass: false, allRequiredFieldsPass: false,
+                    resumeDisposition: 'ambiguous-prior-provider-submission-not-retried',
+                    error: priorRow.error || 'Prior image attempt did not record a fully verified completed PDF/raster and local-reader result; automatic provider retry is prohibited.',
+                    code: 'OCR_SEQUENCE_RESUME_AMBIGUOUS_SUBMISSION',
+                };
+                results.push(ambiguous);
+                recordJobResult(progress, ambiguous);
+                await writeJsonAtomically(progressPath, progress);
+                process.exitCode = 1;
+                console.log('[OCR-SEQUENCE] SKIP-AMBIGUOUS ' + spec.key + ' (provider not repeated)');
+                continue;
+            }
+            if (resumeState?.currentJob?.fixtureKey === spec.key) {
+                const ambiguous = {
+                    fixtureKey: spec.key, filename: spec.filename, imageSha256,
+                    pipelineCompleted: false, allExpectedFieldsPass: false, allRequiredFieldsPass: false,
+                    resumeDisposition: 'ambiguous-in-flight-provider-submission-not-retried',
+                    error: 'The prior process checkpointed this image as started but did not record a completed result; provider submission status is ambiguous.',
+                    code: 'OCR_SEQUENCE_RESUME_AMBIGUOUS_SUBMISSION',
+                };
+                results.push(ambiguous);
+                recordJobResult(progress, ambiguous);
+                await writeJsonAtomically(progressPath, progress);
+                process.exitCode = 1;
+                console.log('[OCR-SEQUENCE] SKIP-AMBIGUOUS ' + spec.key + ' (prior in-flight request not repeated)');
+                continue;
+            }
+            const artifactDir = String(process.env.OCRSPACE_ARTIFACT_DIR || '').trim()
+                ? path.resolve(process.env.OCRSPACE_ARTIFACT_DIR) : null;
+            if (artifactDir) {
+                const possibleArtifacts = [
+                    path.join(artifactDir, imageSha256 + '.ocrspace.pdf'),
+                    path.join(artifactDir, imageSha256 + '.ocrspace-page.png'),
+                ];
+                let artifactExists = false;
+                for (const candidate of possibleArtifacts) {
+                    try { await fs.access(candidate); artifactExists = true; } catch {}
+                }
+                if (artifactExists) {
+                    const ambiguous = {
+                        fixtureKey: spec.key, filename: spec.filename, imageSha256,
+                        pipelineCompleted: false, allExpectedFieldsPass: false, allRequiredFieldsPass: false,
+                        resumeDisposition: 'orphaned-provider-artifact-not-resubmitted',
+                        error: 'A PDF/raster artifact exists without a matching completed progress row; provider submission may already have occurred.',
+                        code: 'OCR_SEQUENCE_RESUME_AMBIGUOUS_SUBMISSION',
+                    };
+                    results.push(ambiguous);
+                    recordJobResult(progress, ambiguous);
+                    await writeJsonAtomically(progressPath, progress);
+                    process.exitCode = 1;
+                    console.log('[OCR-SEQUENCE] SKIP-AMBIGUOUS ' + spec.key + ' (orphan artifact; provider not repeated)');
+                    continue;
+                }
+            }
             console.log(`[OCR-SEQUENCE] ${position + 1}/${entries.length} START ${spec.key}`);
             markJobStarted(progress, { index: position + 1, fixtureKey: spec.key, filename: spec.filename, startedAt: new Date().toISOString() });
             await writeJsonAtomically(progressPath, progress);
@@ -207,8 +286,6 @@ function getNetworkIsolation() {
             let childTempDir = null;
             let resultRecorded = false;
             try {
-                const buffer = await fs.readFile(spec.path);
-                const imageSha256 = crypto.createHash('sha256').update(buffer).digest('hex');
                 // Run each OCR job in a separately supervised child. The outer
                 // process still owns one sequential batch, but the next image is
                 // never started until this child's close event confirms exit.
