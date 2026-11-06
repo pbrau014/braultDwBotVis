@@ -229,7 +229,7 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, artifa
         && /OCR_NON_OCR_NETWORK_LOG:/.test(workflowSourceText);
     const networkOk = networkAttempts === 0 && workflowRestrictionOk;
     const files = await listFiles(artifactRoot);
-    const secret = await secretScan([...files, runReport, groundTruth], apiKey);
+    const secret = await secretScan([...files, runReport, groundTruth, preflightReport], apiKey);
     const gateA = gateAReport ? {
         status: gateAReport.status || 'PENDING',
         reportSha256: gateAReport.reportSha256 || null,
@@ -257,7 +257,7 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, artifa
     };
     const verifiedCount = images.filter(image => image.status === 'VERIFIED').length;
     const requiredChecks = ['sourceImageHashes', 'pdfIntegrity', 'searchablePdfTextLayer',
-        'rasterIntegrity', 'pdfDerivedRasterProvenance', 'networkRestriction', 'secretLeakScan'];
+        'rasterIntegrity', 'pdfDerivedRasterProvenance', 'localReaders', 'networkRestriction', 'secretLeakScan'];
     const status = verifiedCount === 21 && requiredChecks.every(key => checks[key] === 'PASS')
         && checks.unauthorizedNetworkAttempts === 0 && checks.originalScreenshotFallback === false
         ? 'VERIFIED' : 'FAILED';
