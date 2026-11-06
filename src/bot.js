@@ -2733,8 +2733,8 @@ function tournamentHelp() {
         '`!yolo remove-player <name or ID>` — remove a player (admin)',
         '`!yolo result <player> | <event> | <game 1-7> | <DD|CA|BB> | <tier> | <metric>` — enter a result (admin)',
         '`!yolo settings` — view scoring settings (admin); `!yolo setting <event> <field> <number>` — change a setting (admin)',
-        '`!yolo standings [damage|kills|race|grand]` — leaderboard with all-player aggregate and estimated dollar value',
-        '`!yolo totals` — precise all-player doubloon and dollar totals (Excel H12 formula: 0.54 × doubloons / 100)',
+        '`!yolo standings [damage|kills|race|grand]` — leaderboard and doubloon totals',
+        '`!yolo totals` — precise all-player doubloon totals',
         '`!yolo snapshot` — attach a public-safe recovery snapshot to the same channel (admin; private account links and per-user pending associations are omitted)',
         '`!yolo status` — filled game slots per player and event',
         '`!yolo missing [event] [| player or ID]` — list unfilled slots',
@@ -2774,21 +2774,17 @@ function tournamentStatusText() {
 
 function tournamentStandingsText() {
     const rows = Tournament.standings(tournamentState);
-    if (!rows.length) return 'No players in the tournament yet. Use `!yolo add-player <name>` to start the roster. Current aggregate: **0.00 doubloons · $0.00**.';
-    const lines = ['**YOLO Tourney standings**', '`Rank | Player | Damage | Kills | Race | Grand Yolo | Total doubloons | Est. value`'];
-    rows.forEach((row, index) => lines.push(`**${index + 1}. ${row.name}** | ${row.events.damage.toFixed(2)} | ${row.events.kills.toFixed(2)} | ${row.events.race.toFixed(2)} | ${row.events.grand.toFixed(2)} | **${row.total.toFixed(2)}** | $${row.estimatedValue.toFixed(2)}`));
+    if (!rows.length) return 'No players in the tournament yet. Use `!yolo add-player <name>` to start the roster. Current aggregate: **0.00 doubloons**.';
+    const lines = ['**YOLO Tourney standings**', '`Rank | Player | Damage | Kills | Race | Grand Yolo | Total doubloons`'];
+    rows.forEach((row, index) => lines.push(`**${index + 1}. ${row.name}** | ${row.events.damage.toFixed(2)} | ${row.events.kills.toFixed(2)} | ${row.events.race.toFixed(2)} | ${row.events.grand.toFixed(2)} | **${row.total.toFixed(2)}**`));
     const totalDoubloons = rows.reduce((sum, row) => sum + row.total, 0);
-    // Match Excel Totals!H12 exactly: round once after summing all player rows.
-    const totalDollars = 0.54 * totalDoubloons / 100;
-    lines.push('', `**All-player aggregate (${rows.length}/${Tournament.MAX_PLAYERS} players): ${totalDoubloons.toFixed(2)} doubloons · $${totalDollars.toFixed(2)}**`);
-    lines.push('Dollar total uses the workbook formula `=0.54*G12/100` and sums unrounded player scores before currency formatting.');
+    lines.push('', `**All-player aggregate (${rows.length}/${Tournament.MAX_PLAYERS} players): ${totalDoubloons.toFixed(2)} doubloons**`);
     return lines.join('\n');
 }
 
 function tournamentTotalsText() {
     const rows = Tournament.standings(tournamentState);
     const totalDoubloons = rows.reduce((sum, row) => sum + row.total, 0);
-    const totalDollars = 0.54 * totalDoubloons / 100;
     const eventLines = Tournament.EVENTS.map(event => {
         const total = rows.reduce((sum, row) => sum + row.events[event], 0);
         return `**${Tournament.EVENT_LABELS[event]}:** ${total.toFixed(2)} doubloons`;
@@ -2798,8 +2794,7 @@ function tournamentTotalsText() {
         `Players: **${rows.length}/${Tournament.MAX_PLAYERS}**`,
         ...eventLines,
         `**Total doubloons (G12-equivalent): ${totalDoubloons.toFixed(2)}**`,
-        `**Estimated total value (H12-equivalent): $${totalDollars.toFixed(2)}**`,
-        'Formula: `=0.54*G12/100`. The bot sums every active player, then converts once to dollars; cents are rounded only for display.',
+        'Participant-facing totals are reported in doubloons only; the historical H12 dollar diagnostic is not a prize or public value.',
     ].join('\n');
 }
 
@@ -3561,11 +3556,10 @@ function tournamentPanelText(view = 'home', event = null) {
     }
     const rows = Tournament.standings(tournamentState);
     const totalDoubloons = rows.reduce((sum, row) => sum + row.total, 0);
-    const dollars = 0.54 * totalDoubloons / 100;
     return [
         '**YOLO Tournament Control Panel**',
         `Roster: **${tournamentState.players.length}/${Tournament.MAX_PLAYERS}** players`,
-        `All-player aggregate: **${totalDoubloons.toFixed(2)} doubloons · $${dollars.toFixed(2)}**`,
+        `All-player aggregate: **${totalDoubloons.toFixed(2)} doubloons**`,
         `Storage: **${tournamentStore.engine || 'JSON'}** · Recovery snapshots: same public channel`,
         '',
         'Use the buttons below to view totals, standings, and roster. Choose an event from the menu to view its leaderboard.',
@@ -3591,8 +3585,8 @@ const YOLO_SLASH_COMMAND = {
     options: [
         { type: 1, name: 'help', description: 'Show tournament command guidance' },
         { type: 1, name: 'panel', description: 'Open the interactive tournament panel' },
-        { type: 1, name: 'totals', description: 'Show accurate all-player doubloon and dollar totals' },
-        { type: 1, name: 'standings', description: 'Show leaderboard and total value', options: [{ type: 3, name: 'event', description: 'Optional event leaderboard', required: false, choices: Tournament.EVENTS.map(event => ({ name: Tournament.EVENT_LABELS[event], value: event })) }] },
+        { type: 1, name: 'totals', description: 'Show all-player doubloon totals' },
+        { type: 1, name: 'standings', description: 'Show leaderboard and doubloon totals', options: [{ type: 3, name: 'event', description: 'Optional event leaderboard', required: false, choices: Tournament.EVENTS.map(event => ({ name: Tournament.EVENT_LABELS[event], value: event })) }] },
         { type: 1, name: 'players', description: 'Show the active participant roster' },
         { type: 1, name: 'status', description: 'Show progress across all participants' },
     ],
