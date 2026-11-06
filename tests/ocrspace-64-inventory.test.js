@@ -61,3 +61,17 @@ test('64-image member preflight rejects symlink targets outside the verified sou
     assert.match(runner, /const resolvedSourcePath = await fs\.realpath\(sourcePath\)/);
     assert.match(runner, /if \(!inside\(resolvedRoot, resolvedSourcePath\)\)/);
 });
+
+test('Windows acceptance validates the 56 eligible and 8 excluded inventory partition', () => {
+    const runner = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'run-windows-ocr-acceptance.ps1'), 'utf8');
+    assert.match(runner, /\$Inventory64Data\.imageCount -eq 64/);
+    assert.match(runner, /\$Inventory64Data\.eligibleCount -eq 56/);
+    assert.match(runner, /\$Inventory64Data\.eligibleProcessed -eq 56/);
+    assert.match(runner, /\$Inventory64Data\.completedImages -eq 56/);
+    assert.match(runner, /\$Inventory64Data\.excludedCount -eq 8/);
+    assert.match(runner, /\$Inventory64Data\.excludedSkipped -eq 8/);
+    assert.match(runner, /\$Inventory64Data\.completedInventoryEntries -eq 64/);
+    assert.match(runner, /\$Inventory64Data\.sourceMemberHashesVerified -eq 64/);
+    assert.match(runner, /\$Inventory64Data\.allSourceMembersVerifiedBeforeProvider -eq \$true/);
+    assert.match(runner, /\$EligibleRows\.Count -eq 56 -and \$ExcludedRows\.Count -eq 8/);
+});
