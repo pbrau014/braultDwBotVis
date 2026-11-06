@@ -121,7 +121,7 @@ function selectGateB(gt) {
             && String(row.expected?.[field] ?? '').trim() !== ''));
 }
 
-async function verifyArtifacts({ runReport, groundTruth, artifactRoot, networkLogPath,
+async function verifyArtifacts({ runReport, groundTruth, preflightReport, artifactRoot, networkLogPath,
     workflowSourceText = '', apiKey = process.env.OCRSPACE_API_KEY || '',
     renderPdf = imageProcessor.renderSearchablePdfPage,
     readMetadata = imageProcessor.metadata,
@@ -129,11 +129,15 @@ async function verifyArtifacts({ runReport, groundTruth, artifactRoot, networkLo
     gateAReport = null }) {
     const runBytes = await fs.readFile(runReport);
     const gtBytes = await fs.readFile(groundTruth);
+    const preflightBytes = await fs.readFile(preflightReport);
     const run = JSON.parse(runBytes.toString('utf8'));
     const gt = JSON.parse(gtBytes.toString('utf8'));
+    const preflight = JSON.parse(preflightBytes.toString('utf8'));
     const selected = selectGateB(gt);
     if (selected.length !== 21) throw new Error('Gate B selection is not exactly 21 complete nine-field records.');
-    if (run.sourceArchiveSha256 !== gt.candidateArchive?.sha256) throw new Error('Run report archive fingerprint does not match the v6 ground truth.');
+    if (run.sourceArchiveSha256 !== gt.candidateArchive?.sha256 || preflight.archiveSha256 !== run.sourceArchiveSha256) throw new Error('Run/preflight archive fingerprint does not match the v6 ground truth.');
+    if (run.preflightReportSha256 !== sha256(preflightBytes) || preflight.verifiedMembers?.length !== 63 || preflight.allImageMemberHashesVerified !== true) throw new Error('Preflight report hash, inventory size, or member-hash verification does not match the run report.');
+    const preflightByName = new Map(preflight.verifiedMembers.map(member => [member.filename, member]));
     const rows = new Map((run.results || []).map(row => [row.filename, row]));
     if (rows.size !== (run.results || []).length) throw new Error('Run report contains duplicate filenames.');
     const images = [];
@@ -161,8 +165,11 @@ async function verifyArtifacts({ runReport, groundTruth, artifactRoot, networkLo
             images.push(image);
             continue;
         }
+        const preflightMember = preflightByName.get(expected.filename);
         const sourceOk = row.sourceSha256 === expected.sourceImage.sha256
-            && row.sourceBytes === expected.sourceImage.bytes;
+            && row.sourceBytes === expected.sourceImage.bytes
+            && preflightMember?.sha256 === expected.sourceImage.sha256
+            && preflightMember?.bytes === expected.sourceImage.bytes;
         image.checks.sourceImageHash = sourceOk ? 'PASS' : 'FAIL';
         if (!sourceOk) all.sourceImageHashes = false;
 
@@ -273,15 +280,16 @@ async function main() {
     const value = key => { const i = args.indexOf(key); return i >= 0 ? args[i + 1] : null; };
     const runReport = value('--run-report');
     const groundTruth = value('--ground-truth');
+    const preflightReport = value('--preflight-report');
     const artifactRoot = value('--artifact-root');
     const networkLogPath = value('--network-log');
     const workflowFile = value('--workflow-file');
     const output = value('--output');
-    if (![runReport, groundTruth, artifactRoot, networkLogPath, workflowFile, output].every(Boolean)) {
-        throw new Error('Usage: node scripts/verify-ocrspace-imagesF-21-artifacts.js --run-report FILE --ground-truth FILE --artifact-root DIR --network-log FILE --workflow-file FILE --output FILE');
+    if (![runReport, groundTruth, preflightReport, artifactRoot, networkLogPath, workflowFile, output].every(Boolean)) {
+        throw new Error('Usage: node scripts/verify-ocrspace-imagesF-21-artifacts.js --run-report FILE --ground-truth FILE --preflight-report FILE --artifact-root DIR --network-log FILE --workflow-file FILE --output FILE');
     }
     const workflowSourceText = await fs.readFile(workflowFile, 'utf8');
-    const report = await verifyArtifacts({ runReport, groundTruth, artifactRoot, networkLogPath, workflowSourceText });
+    const report = await verifyArtifacts({ runReport, groundTruth, preflightReport, artifactRoot, networkLogPath, workflowSourceText });
     await fs.writeFile(output, JSON.stringify(report, null, 2) + '\n');
     console.log('[DWBOT-ARTIFACT-VERIFY] ' + report.status + '; verified=' + report.inventorySelection.verifiedImageCount + '/21; Gate A=' + report.gateA.status + '; network=' + report.checks.networkRestriction + '; secret scan=' + report.checks.secretLeakScan);
     if (report.status !== 'VERIFIED') process.exitCode = 1;
