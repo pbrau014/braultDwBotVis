@@ -160,3 +160,28 @@ unresolved, never matches. Gate A's zero-unresolved criterion remains separate.
 
 Do not start another OCR.Space submission, retry the active run, or claim Gate A,
 Gate B or production acceptance from source review alone.
+
+
+## Existing run source-fingerprint comparison — 2026-11-06
+
+The active exploratory run 42160979140 was triggered at commit
+adaf4f8c3a9573f56d0348a4bba36686fc31c22e. GitHub blob SHA comparisons against
+main at b58175e07ee1e47cb1fdbbecee398fc3af9e9fc4 found identical content for
+src/bot.js, src/ocrspace-client.js, src/ocrspace-pdf-first.js,
+src/ocrspace-quota-ledger.js, scripts/run-ocrspace-imagesF-63-exploratory.js,
+scripts/block-network.js, scripts/prepare-ocrspace-imagesF-63.py,
+tests/ocrspace-pdf-first.test.js and package-lock.json. package.json differs
+only in scripts: the current branch adds the 21-image test/evaluator command
+and removes the retired 64-image package command; package name/version,
+Node engine, dependencies and allowScripts are identical. Thus the active run's
+OCR implementation and locked dependencies match the current main source for
+the compared files; the report still remains fingerprint-bound to its original
+triggering commit.
+
+At the latest check, run 42160979140 remained in_progress at the
+"Run OCR.Space Engine 2 PDF-first exploratory extraction" step and listed no
+artifacts. Exact-head verification run 42170621125 was pending with no jobs
+reported yet. Push-triggered 63-image workflow run 42170489690 was pending with
+no jobs reported; the current workflow's job-level workflow_dispatch guard
+prevents a push event from executing provider submissions. No duplicate
+OCR.Space submission is claimed or initiated.
