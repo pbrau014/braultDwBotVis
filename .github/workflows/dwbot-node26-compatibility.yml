@@ -1,0 +1,50 @@
+name: DWBOT Node.js 26.13.0 compatibility
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dwbot-node26-compat-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  offline-compatibility:
+    name: Node 26.13.0 / ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    env:
+      OCRSPACE_ENABLED: '0'
+      OCRSPACE_NETWORK_ALLOWLIST: '0'
+      OCR_NON_OCR_NETWORK_RESTRICTED: '1'
+    steps:
+      - name: Checkout exact PR commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js 26.13.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26.13.0
+          cache: npm
+          package-manager-cache: false
+      - name: Install locked dependencies
+        run: |
+          node --version
+          npm --version
+          npm ci --no-audit --no-fund
+      - name: OCR.Space offline contract tests
+        run: npm run test:ocrspace
+      - name: Full project regression suite
+        run: npm test
