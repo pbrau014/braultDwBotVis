@@ -31,7 +31,7 @@ function fail(message) {
     process.exitCode = 1;
 }
 
-async function auditArtifacts(report, selected, networkLogReconciliation) {
+async function auditArtifacts(report, selected, networkLogReconciliation, outputReportPath) {
     const rows = [];
     for (const key of selected) {
         const result = (report?.results || []).find(item => item.fixtureKey === key);
@@ -74,7 +74,7 @@ async function auditArtifacts(report, selected, networkLogReconciliation) {
         networkLogReconciliation,
         images: rows,
     };
-    const auditPath = reportPath + '.pdf-audit.json';
+    const auditPath = outputReportPath + '.pdf-audit.json';
     await fs.promises.writeFile(auditPath, JSON.stringify(audit, null, 2) + '\n');
     return { audit, auditPath, passed: rows.length === selected.length && rows.every(row => row.valid) };
 }
@@ -154,7 +154,7 @@ async function main() {
     let report;
     try { report = JSON.parse(await fs.promises.readFile(actualReportPath, 'utf8')); }
     catch (error) { throw new Error(`Sequence report was not written or is invalid: ${error.message}`); }
-    const auditResult = await auditArtifacts(report, selected, networkLogReconciliation);
+    const auditResult = await auditArtifacts(report, selected, networkLogReconciliation, actualReportPath);
     const network = report.networkIsolation || {};
     const rowsExact = (report.results || []).length === selected.length
         && report.results.every(row => row.pipelineCompleted === true
