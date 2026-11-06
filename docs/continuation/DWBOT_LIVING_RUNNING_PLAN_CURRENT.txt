@@ -58,8 +58,9 @@ SOURCE FINGERPRINT / RUN STATUS — 2026-11-06
   identical. This is a source-file comparison, not an artifact/accuracy pass.
 - Exact-head verification for the latest main commit remains pending. Existing
   extraction remains in progress at its provider step; no artifacts are listed.
-- Push-triggered provider workflow run 42170489690 is pending with no jobs;
-  the manual-dispatch-only job guard prevents push events from submitting.
+- The older push-triggered provider run 42171236931 is CANCELLED with no jobs.
+  The current exploratory workflow now has only a workflow_dispatch trigger
+  plus a job-level event guard; later pushes cannot create provider runs.
 - No duplicate OCR.Space requests were started. Continue with artifact
   verification only after the original run uploads evidence.
 

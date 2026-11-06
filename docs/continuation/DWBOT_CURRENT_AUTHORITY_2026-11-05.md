@@ -19,9 +19,10 @@ IMPLEMENTATION / VERIFICATION STATUS — 2026-11-06
   at the compared source checkpoint. package.json differs only in scripts;
   dependencies and Node engine declarations are identical. The run remains
   bound to its original trigger commit and report fingerprint.
-- Push-triggered imagesF-63 workflow run 42170489690 is pending; the active
-  workflow's job-level workflow_dispatch condition prevents push events from
-  submitting provider requests. No duplicate OCR.Space requests were initiated.
+- The older push-triggered imagesF-63 workflow run 42171236931 is cancelled
+  with no jobs. The current workflow now has only a workflow_dispatch trigger
+  plus a job-level guard, so pushes cannot create provider runs. No duplicate
+  OCR.Space requests were initiated.
 - Gate B is exactly the approved 21-image subset, replacing the former
   50-image minimum / 100 preferred target. Gate B remains NOT_PASSED pending
   verified PDFs/rasters, bound artifact report, post-hoc metrics, zero wrongly
