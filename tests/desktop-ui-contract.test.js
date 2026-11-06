@@ -77,6 +77,8 @@ test('desktop styles provide narrow-screen layouts without a third-party style d
   assert.match(css, /@media\(max-width:950px\)/);
   assert.match(css, /@media\(max-width:620px\)/);
   assert.match(css, /:root/);
+  assert.match(css, /:focus-visible/);
+  assert.match(css, /prefers-reduced-motion:\s*reduce/);
 });
 
 test('desktop binary screenshot upload sends the session CSRF token required by the bridge', () => {
