@@ -67,7 +67,8 @@ jobs:
           node --version
           npm --version
           npm ci --no-audit --no-fund
-          npm test
+          npm run test:ocrspace
+          node --test tests/workflow-contract.test.js
 
       - name: Validate source run and download its exact artifact
         id: source-artifact
