@@ -4,6 +4,8 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const root = path.resolve(__dirname, '..');
+const read = relative => fs.readFileSync(path.join(root, relative), 'utf8');
 const { REQUIRED_MANUAL_FIELDS, buildBattleRecord, getMissingRequiredFields, formatBattleRecord } = require('../src/battle-record');
 
 const botSource = fs.readFileSync(path.join(__dirname, '..', 'src', 'bot.js'), 'utf8');
@@ -249,7 +251,7 @@ test('billable imagesF extraction workflow supports fingerprint-bound no-duplica
 });
 
 
-test('21-image post-hoc artifact workflow is manual-only and never submits OCR.Space requests', () => {
+test('21-image post-hoc artifact workflow automatically verifies the completed run without provider requests', () => {
     const workflow = read('.github/workflows/dwbot-imagesF-21-artifact-verification.yml');
     assert.match(workflow, /^  workflow_dispatch:/m);
     assert.match(workflow, /^  push:/m);
