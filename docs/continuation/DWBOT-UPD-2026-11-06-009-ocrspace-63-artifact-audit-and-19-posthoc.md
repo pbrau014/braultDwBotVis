@@ -94,7 +94,7 @@ These additional combinations are included in the next 19/21 diagnostic workflow
 
 ## 6. Runtime and acceptance limitations
 
-The source extraction run used Node 22.16.0. The accepted Windows OCR baseline is Node >=24.17.0 (the established Windows environment is Node 26.13.0 / npm 11.20.0). Therefore, this 63-image provider run is exploratory, not a valid release acceptance run.
+The source extraction run used Node 22.16.0, which meets the current authorized Node >=22.16.0 baseline. It remains exploratory rather than a release acceptance run because its original restricted-egress diagnostic log is missing and the mandatory-field outputs remain unresolved.
 
 The 19-image report is also blocked by:
 - Gate A remains PENDING.
