@@ -37,7 +37,10 @@ try {
  $env:IMAGEMAGICK_BIN=$Magick.Source
  $env:PADDLEOCR_FIELD_FALLBACK='0'
  $env:OCR_CV_ASSIST='0'
- $env:OCRSPACE_ENABLED='0'
+ if(-not $env:OCRSPACE_API_KEY){throw 'OCRSPACE_API_KEY is not available. OCR.Space-first acceptance is blocked; no local-original-image substitute is permitted.'}
+ $env:OCRSPACE_ENABLED='1'
+ $env:OCRSPACE_NETWORK_ALLOWLIST='1'
+ $env:OCRSPACE_ARTIFACT_DIR=Join-Path $RunDir 'ocrspace-searchable-pdfs'
  $env:OCR_NETWORK_BLOCK_ENABLED='1'
  $Guard=(Join-Path $ProjectRoot 'scripts\block-network.js').Replace('\','/')
  $env:NODE_OPTIONS=(($env:NODE_OPTIONS+' --require="'+$Guard+'"').Trim())

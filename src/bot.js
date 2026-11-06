@@ -360,6 +360,23 @@ async function extractTextCore(imageBuffer) {
             throw error;
         }
         const { rasterBuffer, pdfBuffer, ...publicEvidence } = pdfFirst;
+        let artifactPaths = null;
+        if (String(process.env.OCRSPACE_ARTIFACT_DIR || '').trim()) {
+            const artifactDir = path.resolve(process.env.OCRSPACE_ARTIFACT_DIR);
+            await fs.mkdir(artifactDir, { recursive: true });
+            const stem = publicEvidence.sourceSha256;
+            const pdfPath = path.join(artifactDir, stem + '.ocrspace.pdf');
+            const rasterPath = path.join(artifactDir, stem + '.ocrspace-page.png');
+            await fs.writeFile(pdfPath, pdfBuffer, { flag: 'wx' }).catch(async error => {
+                if (error.code !== 'EEXIST') throw error;
+                await fs.writeFile(pdfPath, pdfBuffer);
+            });
+            await fs.writeFile(rasterPath, rasterBuffer, { flag: 'wx' }).catch(async error => {
+                if (error.code !== 'EEXIST') throw error;
+                await fs.writeFile(rasterPath, rasterBuffer);
+            });
+            artifactPaths = { pdf: pdfPath, raster: rasterPath };
+        }
         imageBuffer = rasterBuffer;
         metadata = await imageProcessor.metadata(imageBuffer);
         dimensions = imageProcessor.assertDimensions(metadata.width, metadata.height, {
@@ -367,7 +384,7 @@ async function extractTextCore(imageBuffer) {
         });
         sourceWidth = dimensions.width;
         sourceHeight = dimensions.height;
-        ocrSpacePdfFirstEvidence = { ...publicEvidence, pdfBytes: pdfBuffer.length };
+        ocrSpacePdfFirstEvidence = { ...publicEvidence, pdfBytes: pdfBuffer.length, artifacts: artifactPaths };
         ocrSpacePrepassEvidence = {
             status: 'complete', requests: 1,
             evidence: [{ field: 'fullScreenshot', source: 'ocrspace-searchable-pdf', status: 'success',
@@ -3879,6 +3896,10 @@ if (require.main === module) {
     // ============================================================
     // SECTION 8: VALIDATE CONFIGURATION AND START BOT
     // ============================================================
+    if (process.env.OCRSPACE_ENABLED !== '0' && !String(process.env.OCRSPACE_API_KEY || '').trim()) {
+        console.error('OCR.Space-first processing requires OCRSPACE_API_KEY. Set OCRSPACE_ENABLED=0 only for an explicitly local-only development/test run.');
+        process.exit(1);
+    }
     if (!BOT_TOKEN || BOT_TOKEN === 'PASTE_YOUR_BOT_TOKEN_HERE') {
         console.error('Missing Discord bot token. Add DISCORD_BOT_TOKEN to your .env file.');
         process.exit(1);
