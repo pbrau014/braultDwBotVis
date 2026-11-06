@@ -201,7 +201,7 @@ try {
    $ExcludedRows=@($Inventory64Data.excludedRecords)
    $InvalidEligibleRows=@($EligibleRows | Where-Object {
     $_.provider -ne 'ocr.space' -or $_.providerEngine -ne 2 -or
-    $_.sourceSha256 -notmatch '^[a-f0-9]{64} -or $_.pdfSha256 -notmatch '^[a-f0-9]{64}$' -or -or $_.pdfSha256 -notmatch '^[a-f0-9]{64}$' -or
+    $_.sourceSha256 -notmatch '^[a-f0-9]{64}$' -or $_.pdfSha256 -notmatch '^[a-f0-9]{64}$' -or
     [int]$_.pdfBytes -le 0 -or [int]$_.rasterBytes -le 0 -or
     -not $_.artifacts.pdf -or -not $_.artifacts.raster -or @($_.localReaders).Count -ne 2
    })
