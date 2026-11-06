@@ -52,949 +52,163 @@
     ],
     "pixelCheck": "Crop the archived full-page raster at source aspect ratio; resize the embedded PDF image to the crop dimensions with Pillow LANCZOS; compare RGB pixels. Limits MAE<=3 and RMSE<=8. This independently validates page placement/crop geometry, not byte-identical original-source pixels."
   },
-  "gateB63": {
+  "gateA16": {
+    "corpusImageCount": 16,
+    "existingPdfCount": 1,
+    "notSubmittedPdfCount": 15,
+    "providerRequestsInPreflight": 0,
+    "firstImage": {
+      "filename": "Screenshot_16.jpg",
+      "sourceBytes": 482662,
+      "sourceSha256": "4a58aad7cb1d21f9bb457e1ad728fee59ebff3873a1e47938cf401d41f784bbc",
+      "sourceWidth": 3840,
+      "sourceHeight": 2160,
+      "pdfPath": "source/testdata/gateA-16/artifacts/4a58aad7cb1d21f9bb457e1ad728fee59ebff3873a1e47938cf401d41f784bbc.ocrspace.pdf",
+      "pdfBytes": 535706,
+      "pdfSha256": "98532da5058778aeee8a46515a8a6a12a3c20cb865565f974271706777b7ec93",
+      "reportedPdfSha256": "98532da5058778aeee8a46515a8a6a12a3c20cb865565f974271706777b7ec93",
+      "pageRasterPath": "source/testdata/gateA-16/artifacts/4a58aad7cb1d21f9bb457e1ad728fee59ebff3873a1e47938cf401d41f784bbc.ocrspace-page.png",
+      "pageRasterBytes": 1033392,
+      "pageRasterSha256": "620fd7395a4736d6c95a3ab89a1cb2924cfb019e7547d534b1ffcde6458bda72",
+      "reportedPageRasterSha256": "620fd7395a4736d6c95a3ab89a1cb2924cfb019e7547d534b1ffcde6458bda72",
+      "pdfPagePoints": {
+        "width": 595.0,
+        "height": 842.0
+      },
+      "embeddedImage": {
+        "width": 3840,
+        "height": 2160,
+        "format": "jpeg"
+      },
+      "imagePlacementPoints": {
+        "x0": 0.0,
+        "y0": 0.0,
+        "width": 595.0,
+        "height": 334.6875
+      },
+      "normalizedCrop": {
+        "method": "source-aspect-top-aligned-crop-v1",
+        "left": 0,
+        "top": 0,
+        "width": 1818,
+        "height": 1023
+      },
+      "embeddedImageComparison": {
+        "meanAbsoluteError": 0.3113506691170909,
+        "rootMeanSquareError": 1.5470278162571778,
+        "limits": {
+          "meanAbsoluteError": 3,
+          "rootMeanSquareError": 8
+        }
+      },
+      "checks": {
+        "sourceHashMatchesPreflight": true,
+        "pdfShaMatchesResume": true,
+        "rasterShaMatchesResume": true,
+        "pageRasterDimensions": true,
+        "embeddedAspectMatchesSource": true,
+        "imageTopAlignedFullWidth": true,
+        "imageHeightMatchesSourceAspect": true,
+        "embeddedPixelComparisonWithinLimits": true
+      },
+      "previousGateAResumeStatus": "FIRST_IMAGE_NOT_EXACT",
+      "previousLocalTesseractMapCandidate": "Not detected",
+      "expectedMap": "Aegis",
+      "pdfTextLayerExtract": "PERSONAL SCORE\nTEAM SCORE\nDETAILED REPORT\nCREDITS AND XP\nESC ×\nVictory!\nOur team completed the primary task.\n[HO-FL]VeritechCEO | XARCHERFISH\nReceived for the Battle\n583 5270 6872 ★ 2856 ★\nBattle performance\n401 597\nDamage\nx37\nx11\nTarget hits\nTarget hits\nIncapacitations\nCombat Missions\nAegis - Operations\nBattle start time: 09.10.2025 16:20\nDestroyed\nx11\nCaused flooding\nx9\nSpotted\nx27\nTarget hits\nEarn 1 500 Base XP\nEarn 3 000 Base XP\nComplete mission\nGet ribbons\n9 MISSIONS IN TOTAL\nBACK TO PORT\nSearchable PDF created by OCR.space (Free Version)\n"
+    },
+    "gateAAcceptanceStatus": "FAIL",
+    "gateAReportedNodeVersion": "v22.16.0",
+    "gateAParallelReaderMatrixStatus": "MISSING",
+    "gateAVerifiedPdfCount": 0,
+    "gateANetworkEvidence": "FAIL_MISSING_ORIGINAL_EVIDENCE",
+    "originalNetworkLogStatus": "MISSING_FROM_ORIGINAL_PARTIAL_ARTIFACT"
+  },
+  "limitations": [
+    "The original 63 screenshot byte files are not present in the supplied PDF/raster artifact ZIP; source-image hashes and dimensions are taken from the v6 ground-truth/manifest and prior artifact verification. This audit compares the PDF crop to the image embedded in the PDF, not directly to the original screenshot bytes.",
+    "Only one of the 16 Gate A screenshots has an existing searchable PDF in the supplied recovery artifact. The other 15 were not submitted; no new OCR.Space submissions were made or authorized.",
+    "The Gate A first-image crop geometry passes, but its previous Tesseract-only record remains FIRST_IMAGE_NOT_EXACT because map was unresolved. The searchable PDF text layer contains “Aegis - Operations”; that is a separate provider-derived text candidate, not a local OCR result.",
+    "This audit does not execute the PR #13 JavaScript/ImageMagick implementation on the Windows target. It is an independent geometry/pixel audit using PyMuPDF and Pillow against archived PDF/page-raster artifacts. PR #13 offline CI passed, while the corrected Gate B Windows recovery workflow is still pending.",
+    "The historical Gate B artifact verification remains FAILED due to localReaders failure and missing original network diagnostic log. The 0-byte local-recovery network log only supports the local recovery run; it cannot reconstruct historical network attempts."
+  ],
+  "noProviderRequestsMade": true,
+  "gateB63Summary": {
     "pdfCount": 63,
     "passCount": 63,
     "failCount": 0,
     "maeMedian": 0.866654897714168,
     "maeMax": 1.7632310763291257,
     "rmseMedian": 2.3563789672865028,
-    "rmseMax": 5.763339192962916,
-    "records": [
+    "rmseMax": 5.763339192962916
+  },
+  "gateB63PassCount": 63,
+  "gateB63FailCount": 0,
+  "historicalGateB19Summary": {
+    "artifactVerificationStatus": "FAILED",
+    "artifactChecks": {
+      "sourceImageHashes": "PASS",
+      "pdfIntegrity": "PASS",
+      "searchablePdfTextLayer": "PASS",
+      "rasterIntegrity": "PASS",
+      "pdfDerivedRasterProvenance": "PASS",
+      "localReaders": "FAIL",
+      "networkRestriction": "NOT_VERIFIED_MISSING_ORIGINAL_LOG",
+      "originalNetworkLogStatus": "MISSING_FROM_SOURCE_ARTIFACT",
+      "networkLogReconciliationStatus": "RECONSTRUCTED_LIMITED_EVIDENCE",
+      "unauthorizedNetworkAttempts": null,
+      "localRecoveryNetworkRestriction": "PASS",
+      "localRecoveryBlockedNetworkAttempts": 0,
+      "localRecoveryNetworkLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "localRecoveryNetworkLogMatchesReport": true,
+      "secretLeakScan": "PASS",
+      "originalScreenshotFallback": false
+    },
+    "postHocEngineMetrics": [
       {
-        "corpusOrder": 1,
-        "filename": "PHX-1.jpg",
-        "sourceImage": {
-          "bytes": 121470,
-          "sha256": "2274fc1f5452a8ce0273764111dd8e781d195de42a846c51c730fd4db6eb126f",
-          "width": 1334,
-          "height": 627
-        },
-        "sourceHashMatchesRunReport": true,
-        "pdf": {
-          "path": "01-PHX-1.jpg.ocrspace.pdf",
-          "bytes": 140587,
-          "sha256": "0c547f70c2a61e37d31cf1cc069c349a80ab911ef036a775f965bfb886f7baaa",
-          "reportedSha256": "0c547f70c2a61e37d31cf1cc069c349a80ab911ef036a775f965bfb886f7baaa"
-        },
-        "pageRaster": {
-          "path": "01-PHX-1.jpg.pdf-page.png",
-          "bytes": 832748,
-          "sha256": "370df8e483525813caaf2ff03e18fb28574db3f4e06d3baa129293f1b8e2c4fa",
-          "reportedSha256": "370df8e483525813caaf2ff03e18fb28574db3f4e06d3baa129293f1b8e2c4fa",
-          "width": 1818,
-          "height": 2573
-        },
-        "pdfPagePoints": {
-          "width": 595.0,
-          "height": 842.0
-        },
-        "embeddedImageCount": 1,
-        "embeddedImage": {
-          "width": 1334,
-          "height": 627,
-          "format": "jpeg"
-        },
-        "imagePlacementPoints": {
-          "x0": 0.0,
-          "y0": -3.0517578125e-05,
-          "width": 595.0,
-          "height": 279.6589050292969
-        },
-        "normalizedCrop": {
-          "method": "source-aspect-top-aligned-crop-v1",
-          "left": 0,
-          "top": 0,
-          "width": 1818,
-          "height": 854
-        },
-        "embeddedImageComparison": {
-          "method": "embedded-PDF-image-resized-to-crop-LANCZOS",
-          "meanAbsoluteError": 1.6076989236784724,
-          "rootMeanSquareError": 5.763339192962916,
-          "limits": {
-            "meanAbsoluteError": 3,
-            "rootMeanSquareError": 8
-          }
-        },
-        "checks": {
-          "sourceHashMatchesRunReport": true,
-          "pdfSha256MatchesRunReport": true,
-          "pageRasterSha256MatchesRunReport": true,
-          "pageRasterDimensions": true,
-          "embeddedAspectMatchesGroundTruth": true,
-          "imageTopAlignedAndFullWidth": true,
-          "imageHeightMatchesSourceAspect": true,
-          "cropWithinPage": true,
-          "embeddedPixelComparisonWithinLimits": true
-        },
-        "status": "PASS"
+        "engine": "tesseractjs",
+        "eligibleExpectedValues": 171,
+        "exactMatches": 110,
+        "wrongCandidates": 2,
+        "unresolvedOutputs": 59,
+        "wronglyAcceptedMandatoryFieldValues": 0,
+        "completeRecordExactMatches": 2,
+        "completeRecordCount": 19,
+        "completeRecordUnresolved": 17
       },
       {
-        "corpusOrder": 2,
-        "filename": "Screen55shot_376.png",
-        "sourceImage": {
-          "bytes": 942673,
-          "sha256": "0fdbb49c43decfc895678dc8c0277fcb82f43eb1c36fe348fb46ccfc535c3e32",
-          "width": 1920,
-          "height": 1080
-        },
-        "sourceHashMatchesRunReport": true,
-        "pdf": {
-          "path": "02-Screen55shot_376.png.ocrspace.pdf",
-          "bytes": 808398,
-          "sha256": "05ea9028e9c91bd156e60fb0605535de3ac57efc2cf8f2e482bbbb10ce793ac5",
-          "reportedSha256": "05ea9028e9c91bd156e60fb0605535de3ac57efc2cf8f2e482bbbb10ce793ac5"
-        },
-        "pageRaster": {
-          "path": "02-Screen55shot_376.png.pdf-page.png",
-          "bytes": 973502,
-          "sha256": "bea3137f1a83d389e48bd5b594f0a70dc7a48024de5cfeecba8d404589118f7a",
-          "reportedSha256": "bea3137f1a83d389e48bd5b594f0a70dc7a48024de5cfeecba8d404589118f7a",
-          "width": 1818,
-          "height": 2573
-        },
-        "pdfPagePoints": {
-          "width": 595.0,
-          "height": 842.0
-        },
-        "embeddedImageCount": 1,
-        "embeddedImage": {
-          "width": 1920,
-          "height": 1080,
-          "format": "png"
-        },
-        "imagePlacementPoints": {
-          "x0": 0.0,
-          "y0": 0.0,
-          "width": 595.0,
-          "height": 334.6875
-        },
-        "normalizedCrop": {
-          "method": "source-aspect-top-aligned-crop-v1",
-          "left": 0,
-          "top": 0,
-          "width": 1818,
-          "height": 1023
-        },
-        "embeddedImageComparison": {
-          "method": "embedded-PDF-image-resized-to-crop-LANCZOS",
-          "meanAbsoluteError": 0.4331305890445675,
-          "rootMeanSquareError": 2.053726507543603,
-          "limits": {
-            "meanAbsoluteError": 3,
-            "rootMeanSquareError": 8
-          }
-        },
-        "checks": {
-          "sourceHashMatchesRunReport": true,
-          "pdfSha256MatchesRunReport": true,
-          "pageRasterSha256MatchesRunReport": true,
-          "pageRasterDimensions": true,
-          "embeddedAspectMatchesGroundTruth": true,
-          "imageTopAlignedAndFullWidth": true,
-          "imageHeightMatchesSourceAspect": true,
-          "cropWithinPage": true,
-          "embeddedPixelComparisonWithinLimits": true
-        },
-        "status": "PASS"
+        "engine": "native",
+        "eligibleExpectedValues": 171,
+        "exactMatches": 103,
+        "wrongCandidates": 2,
+        "unresolvedOutputs": 66,
+        "wronglyAcceptedMandatoryFieldValues": 0,
+        "completeRecordExactMatches": 0,
+        "completeRecordCount": 19,
+        "completeRecordUnresolved": 19
+      }
+    ],
+    "pdfTextLayerConsensus": {
+      "fourSourceConsensus": {
+        "eligible": 171,
+        "exact": 131,
+        "wrong": 1,
+        "unresolved": 39,
+        "exactMatchRate": 0.7660818713450293
       },
-      {
-        "corpusOrder": 3,
-        "filename": "Screens4hot_377.png",
-        "sourceImage": {
-          "bytes": 870187,
-          "sha256": "e0f6b14d2414f210c57da9e0884f5345e1beb4355bf4c38c5d1f960da1f4e3f3",
-          "width": 1920,
-          "height": 1080
-        },
-        "sourceHashMatchesRunReport": true,
-        "pdf": {
-          "path": "03-Screens4hot_377.png.ocrspace.pdf",
-          "bytes": 728434,
-          "sha256": "8b5fabd80dc985f7a302336cf08fccc1cd67a9d88a7f27b9ea596f11c48b85a2",
-          "reportedSha256": "8b5fabd80dc985f7a302336cf08fccc1cd67a9d88a7f27b9ea596f11c48b85a2"
-        },
-        "pageRaster": {
-          "path": "03-Screens4hot_377.png.pdf-page.png",
-          "bytes": 903779,
-          "sha256": "0ed998459e6e828051f53ac3f8f3e415cd3f469ac025825e59a283d96d3c90f1",
-          "reportedSha256": "0ed998459e6e828051f53ac3f8f3e415cd3f469ac025825e59a283d96d3c90f1",
-          "width": 1818,
-          "height": 2573
-        },
-        "pdfPagePoints": {
-          "width": 595.0,
-          "height": 842.0
-        },
-        "embeddedImageCount": 1,
-        "embeddedImage": {
-          "width": 1920,
-          "height": 1080,
-          "format": "png"
-        },
-        "imagePlacementPoints": {
-          "x0": 0.0,
-          "y0": 0.0,
-          "width": 595.0,
-          "height": 334.6875
-        },
-        "normalizedCrop": {
-          "method": "source-aspect-top-aligned-crop-v1",
-          "left": 0,
-          "top": 0,
-          "width": 1818,
-          "height": 1023
-        },
-        "embeddedImageComparison": {
-          "method": "embedded-PDF-image-resized-to-crop-LANCZOS",
-          "meanAbsoluteError": 0.3622776256120236,
-          "rootMeanSquareError": 1.886076219596756,
-          "limits": {
-            "meanAbsoluteError": 3,
-            "rootMeanSquareError": 8
-          }
-        },
-        "checks": {
-          "sourceHashMatchesRunReport": true,
-          "pdfSha256MatchesRunReport": true,
-          "pageRasterSha256MatchesRunReport": true,
-          "pageRasterDimensions": true,
-          "embeddedAspectMatchesGroundTruth": true,
-          "imageTopAlignedAndFullWidth": true,
-          "imageHeightMatchesSourceAspect": true,
-          "cropWithinPage": true,
-          "embeddedPixelComparisonWithinLimits": true
-        },
-        "status": "PASS"
+      "strictFourSourceConsensus": {
+        "eligible": 171,
+        "exact": 59,
+        "wrong": 0,
+        "unresolved": 112,
+        "exactMatchRate": 0.34502923976608185
       },
-      {
-        "corpusOrder": 4,
-        "filename": "Screens666hot_373.png",
-        "sourceImage": {
-          "bytes": 786478,
-          "sha256": "34ddede26d0ef5c4ee9a0aa3e755555af2b132c7a10e3b9b9a79efc68df29bfc",
-          "width": 1920,
-          "height": 1080
-        },
-        "sourceHashMatchesRunReport": true,
-        "pdf": {
-          "path": "04-Screens666hot_373.png.ocrspace.pdf",
-          "bytes": 686479,
-          "sha256": "182879ac5ccbec9a5e2808fda6d1b6ca36909806289af696b6013ea43b9f736c",
-          "reportedSha256": "182879ac5ccbec9a5e2808fda6d1b6ca36909806289af696b6013ea43b9f736c"
-        },
-        "pageRaster": {
-          "path": "04-Screens666hot_373.png.pdf-page.png",
-          "bytes": 830854,
-          "sha256": "85398a58f5d6bdee4d9d26a74487b26b1b222017b208ea514016bfd7dd480c92",
-          "reportedSha256": "85398a58f5d6bdee4d9d26a74487b26b1b222017b208ea514016bfd7dd480c92",
-          "width": 1818,
-          "height": 2573
-        },
-        "pdfPagePoints": {
-          "width": 595.0,
-          "height": 842.0
-        },
-        "embeddedImageCount": 1,
-        "embeddedImage": {
-          "width": 1920,
-          "height": 1080,
-          "format": "png"
-        },
-        "imagePlacementPoints": {
-          "x0": 0.0,
-          "y0": 0.0,
-          "width": 595.0,
-          "height": 334.6875
-        },
-        "normalizedCrop": {
-          "method": "source-aspect-top-aligned-crop-v1",
-          "left": 0,
-          "top": 0,
-          "width": 1818,
-          "height": 1023
-        },
-        "embeddedImageComparison": {
-          "method": "embedded-PDF-image-resized-to-crop-LANCZOS",
-          "meanAbsoluteError": 0.400231600220954,
-          "rootMeanSquareError": 2.048880340888697,
-          "limits": {
-            "meanAbsoluteError": 3,
-            "rootMeanSquareError": 8
-          }
-        },
-        "checks": {
-          "sourceHashMatchesRunReport": true,
-          "pdfSha256MatchesRunReport": true,
-          "pageRasterSha256MatchesRunReport": true,
-          "pageRasterDimensions": true,
-          "embeddedAspectMatchesGroundTruth": true,
-          "imageTopAlignedAndFullWidth": true,
-          "imageHeightMatchesSourceAspect": true,
-          "cropWithinPage": true,
-          "embeddedPixelComparisonWithinLimits": true
-        },
-        "status": "PASS"
-      },
-      {
-        "corpusOrder": 5,
-        "filename": "Screenshot_20 526-10-18_135815.png",
-        "sourceImage": {
-          "bytes": 2671073,
-          "sha256": "fce5527e68d39037d73ecb116dab001da13a88b0fd8f9cb73d50e7ba04cf542f",
-          "width": 2880,
-          "height": 1800
-        },
-        "sourceHashMatchesRunReport": true,
-        "pdf": {
-          "path": "05-Screenshot_20_526-10-18_135815.png.ocrspace.pdf",
-          "bytes": 290386,
-          "sha256": "54a8215a69c41917840a595c17702e062e1b5078220e206fd2d41efedcb6fb66",
-          "reportedSha256": "54a8215a69c41917840a595c17702e062e1b5078220e206fd2d41efedcb6fb66"
-        },
-        "pageRaster": {
-          "path": "05-Screenshot_20_526-10-18_135815.png.pdf-page.png",
-          "bytes": 1359460,
-          "sha256": "332fac1d3401d41fbe34c512e6dcc240ccc3aaf0b97c1bbb5497d95d351d5c93",
-          "reportedSha256": "332fac1d3401d41fbe34c512e6dcc240ccc3aaf0b97c1bbb5497d95d351d5c93",
-          "width": 1818,
-          "height": 2573
-        },
-        "pdfPagePoints": {
-          "width": 595.0,
-          "height": 842.0
-        },
-        "embeddedImageCount": 1,
-        "embeddedImage": {
-          "width": 2600,
-          "height": 1625,
-          "format": "jpeg"
-        },
-        "imagePlacementPoints": {
-          "x0": 0.0,
-          "y0": 0.0,
-          "width": 595.0,
-          "height": 371.875
-        },
-        "normalizedCrop": {
-          "method": "source-aspect-top-aligned-crop-v1",
-          "left": 0,
-          "top": 0,
-          "width": 1818,
-          "height": 1136
-        },
-        "embeddedImageComparison": {
-          "method": "embedded-PDF-image-resized-to-crop-LANCZOS",
-          "meanAbsoluteError": 0.3582184802987341,
-          "rootMeanSquareError": 1.613987583015131,
-          "limits": {
-            "meanAbsoluteError": 3,
-            "rootMeanSquareError": 8
-          }
-        },
-        "checks": {
-          "sourceHashMatchesRunReport": true,
-          "pdfSha256MatchesRunReport": true,
-          "pageRasterSha256MatchesRunReport": true,
-          "pageRasterDimensions": true,
-          "embeddedAspectMatchesGroundTruth": true,
-          "imageTopAlignedAndFullWidth": true,
-          "imageHeightMatchesSourceAspect": true,
-          "cropWithinPage": true,
-          "embeddedPixelComparisonWithinLimits": true
-        },
-        "status": "PASS"
-      },
-      {
-        "corpusOrder": 6,
-        "filename": "Screenshot_2026-08-05_094321.png",
-        "sourceImage": {
-          "bytes": 1442671,
-          "sha256": "7b6cbe589b448620092088a2e6f3894ee4c42d7fe41800ada7999a50019de9fa",
-          "width": 1920,
-          "height": 1200
-        },
-        "sourceHashMatchesRunReport": true,
-        "pdf": {
-          "path": "06-Screenshot_2026-08-05_094321.png.ocrspace.pdf",
-          "bytes": 218435,
-          "sha256": "9c2cad7153d34384879d36b03bd1346991d761657af74522809651410ef6fc77",
-          "reportedSha256": "9c2cad7153d34384879d36b03bd1346991d761657af74522809651410ef6fc77"
-        },
-        "pageRaster": {
-          "path": "06-Screenshot_2026-08-05_094321.png.pdf-page.png",
-          "bytes": 1370259,
-          "sha256": "204199aa4c992ab26a2992dab14ae0291f41991ac6bf5ebf8b354599a90b6df0",
-          "reportedSha256": "204199aa4c992ab26a2992dab14ae0291f41991ac6bf5ebf8b354599a90b6df0",
-          "width": 1818,
-          "height": 2573
-        },
-        "pdfPagePoints": {
-          "width": 595.0,
-          "height": 842.0
-        },
-        "embeddedImageCount": 1,
-        "embeddedImage": {
-          "width": 1920,
-          "height": 1200,
-          "format": "jpeg"
-        },
-        "imagePlacementPoints": {
-          "x0": 0.0,
-          "y0": 0.0,
-          "width": 595.0,
-          "height": 371.875
-        },
-        "normalizedCrop": {
-          "method": "source-aspect-top-aligned-crop-v1",
-          "left": 0,
-          "top": 0,
-          "width": 1818,
-          "height": 1136
-        },
-        "embeddedImageComparison": {
-          "method": "embedded-PDF-image-resized-to-crop-LANCZOS",
-          "meanAbsoluteError": 0.4447022020277145,
-          "rootMeanSquareError": 1.9599312736067058,
-          "limits": {
-            "meanAbsoluteError": 3,
-            "rootMeanSquareError": 8
-          }
-        },
-        "checks": {
-          "sourceHashMatchesRunReport": true,
-          "pdfSha256MatchesRunReport": true,
-          "pageRasterSha256MatchesRunReport": true,
-          "pageRasterDimensions": true,
-          "embeddedAspectMatchesGroundTruth": true,
-          "imageTopAlignedAndFullWidth": true,
-          "imageHeightMatchesSourceAspect": true,
-          "cropWithinPage": true,
-          "embeddedPixelComparisonWithinLimits": true
-        },
-        "status": "PASS"
-      },
-      {
-        "corpusOrder": 7,
-        "filename": "Screenshot_2026-08-05_175543.png",
-        "sourceImage": {
-          "bytes": 1112940,
-          "sha256": "69d155397c915da89a525ecf070293e89682abecb48fc6204fc36011672f7eb3",
-          "width": 2376,
-          "height": 1403
-        },
-        "sourceHashMatchesRunReport": true,
-        "pdf": {
-          "path": "07-Screenshot_2026-08-05_175543.png.ocrspace.pdf",
-          "bytes": 171281,
-          "sha256": "4da333e0f2e145c4176732f137ac98e8b58fb179b0fa087fff7661daf19903a8",
-          "reportedSha256": "4da333e0f2e145c4176732f137ac98e8b58fb179b0fa087fff7661daf19903a8"
-        },
-        "pageRaster": {
-          "path": "07-Screenshot_2026-08-05_175543.png.pdf-page.png",
-          "bytes": 840352,
-          "sha256": "3161775d188a2fdc09fa42ca7079b4601c9d4f574fb8aa6d6dd36ccb59295aaa",
-          "reportedSha256": "3161775d188a2fdc09fa42ca7079b4601c9d4f574fb8aa6d6dd36ccb59295aaa",
-          "width": 1818,
-          "height": 2573
-        },
-        "pdfPagePoints": {
-          "width": 595.0,
-          "height": 842.0
-        },
-        "embeddedImageCount": 1,
-        "embeddedImage": {
-          "width": 2376,
-          "height": 1403,
-          "format": "jpeg"
-        },
-        "imagePlacementPoints": {
-          "x0": 0.0,
-          "y0": 0.0,
-          "width": 595.0,
-          "height": 351.34051513671875
-        },
-        "normalizedCrop": {
-          "method": "source-aspect-top-aligned-crop-v1",
-          "left": 0,
-          "top": 0,
-          "width": 1818,
-          "height": 1074
-        },
-        "embeddedImageComparison": {
-          "method": "embedded-PDF-image-resized-to-crop-LANCZOS",
-          "meanAbsoluteError": 0.23992760852745734,
-          "rootMeanSquareError": 1.3514682841733845,
-          "limits": {
-            "meanAbsoluteError": 3,
-            "rootMeanSquareError": 8
-          }
-        },
-        "checks": {
-          "sourceHashMatchesRunReport": true,
-          "pdfSha256MatchesRunReport": true,
-          "pageRasterSha256MatchesRunReport": true,
-          "pageRasterDimensions": true,
-          "embeddedAspectMatchesGroundTruth": true,
-          "imageTopAlignedAndFullWidth": true,
-          "imageHeightMatchesSourceAspect": true,
-          "cropWithinPage": true,
-          "embeddedPixelComparisonWithinLimits": true
-        },
-        "status": "PASS"
-      },
-      {
-        "corpusOrder": 8,
-        "filename": "Screenshot_2026-09-02_182610.png",
-        "sourceImage": {
-          "bytes": 1048444,
-          "sha256": "8f0964b9f84b040587031eff0ed97b8ae07f85ff65a3a5af2ac9d643299009ca",
-          "width": 1837,
-          "height": 1348
-        },
-        "sourceHashMatchesRunReport": true,
-        "pdf": {
-          "path": "08-Screenshot_2026-09-02_182610.png.ocrspace.pdf",
-          "bytes": 970108,
-          "sha256": "3eac6b3205347ef688637360c070498aa1926532f3e31218f7c27f753273e44c",
-          "reportedSha256": "3eac6b3205347ef688637360c070498aa1926532f3e31218f7c27f753273e44c"
-        },
-        "pageRaster": {
-          "path": "08-Screenshot_2026-09-02_182610.png.pdf-page.png",
-          "bytes": 1116833,
-          "sha256": "a4bbb11416f578895c0b053aec084d60425ddad6cbe9b76dd20f08c5e4294601",
-          "reportedSha256": "a4bbb11416f578895c0b053aec084d60425ddad6cbe9b76dd20f08c5e4294601",
-          "width": 1818,
-          "height": 2573
-        },
-        "pdfPagePoints": {
-          "width": 595.0,
-          "height": 842.0
-        },
-        "embeddedImageCount": 1,
-        "embeddedImage": {
-          "width": 1837,
-          "height": 1348,
-          "format": "png"
-        },
-        "imagePlacementPoints": {
-          "x0": 0.0,
-          "y0": 0.0,
-          "width": 595.0,
-          "height": 436.614013671875
-        },
-        "normalizedCrop": {
-          "method": "source-aspect-top-aligned-crop-v1",
-          "left": 0,
-          "top": 0,
-          "width": 1818,
-          "height": 1334
-        },
-        "embeddedImageComparison": {
-          "method": "embedded-PDF-image-resized-to-crop-LANCZOS",
-          "meanAbsoluteError": 0.31378054097263797,
-          "rootMeanSquareError": 1.849173837398698,
-          "limits": {
-            "meanAbsoluteError": 3,
-            "rootMeanSquareError": 8
-          }
-        },
-        "checks": {
-          "sourceHashMatchesRunReport": true,
-          "pdfSha256MatchesRunReport": true,
-          "pageRasterSha256MatchesRunReport": true,
-          "pageRasterDimensions": true,
-          "embeddedAspectMatchesGroundTruth": true,
-          "imageTopAlignedAndFullWidth": true,
-          "imageHeightMatchesSourceAspect": true,
-          "cropWithinPage": true,
-          "embeddedPixelComparisonWithinLimits": true
-        },
-        "status": "PASS"
-      },
-      {
-        "corpusOrder": 9,
-        "filename": "Screenshot_2026-09-23_100658.png",
-        "sourceImage": {
-          "bytes": 2207161,
-          "sha256": "c2bea3c768a9b7a952faab467fde07ac0e0eadbfb79b9cebb0edeadbc4634d6b",
-          "width": 1919,
-          "height": 1079
-        },
-        "sourceHashMatchesRunReport": true,
-        "pdf": {
-          "path": "09-Screenshot_2026-09-23_100658.png.ocrspace.pdf",
-          "bytes": 328966,
-          "sha256": "62b25974fa783486a0432d6343735cb0dd5575a28c69310b19e08bc6849b00d5",
-          "reportedSha256": "62b25974fa783486a0432d6343735cb0dd5575a28c69310b19e08bc6849b00d5"
-        },
-        "pageRaster": {
-          "path": "09-Screenshot_2026-09-23_100658.png.pdf-page.png",
-          "bytes": 1808627,
-          "sha256": "1a2966cb510398395f219a7ceb717c873f3004c8b5cd59d558f1d8b488d0cace",
-          "reportedSha256": "1a2966cb510398395f219a7ceb717c873f3004c8b5cd59d558f1d8b488d0cace",
-          "width": 1818,
-          "height": 2573
-        },
-        "pdfPagePoints": {
-          "width": 595.0,
-          "height": 842.0
-        },
-        "embeddedImageCount": 1,
-        "embeddedImage": {
-          "width": 1919,
-          "height": 1079,
-          "format": "jpeg"
-        },
-        "imagePlacementPoints": {
-          "x0": 0.0,
-          "y0": 0.0,
-          "width": 595.0,
-          "height": 334.5517883300781
-        },
-        "normalizedCrop": {
-          "method": "source-aspect-top-aligned-crop-v1",
-          "left": 0,
-          "top": 0,
-          "width": 1818,
-          "height": 1022
-        },
-        "embeddedImageComparison": {
-          "method": "embedded-PDF-image-resized-to-crop-LANCZOS",
-          "meanAbsoluteError": 0.866654897714168,
-          "rootMeanSquareError": 2.2274990417075373,
-          "limits": {
-            "meanAbsoluteError": 3,
-            "rootMeanSquareError": 8
-          }
-        },
-        "checks": {
-          "sourceHashMatchesRunReport": true,
-          "pdfSha256MatchesRunReport": true,
-          "pageRasterSha256MatchesRunReport": true,
-          "pageRasterDimensions": true,
-          "embeddedAspectMatchesGroundTruth": true,
-          "imageTopAlignedAndFullWidth": true,
-          "imageHeightMatchesSourceAspect": true,
-          "cropWithinPage": true,
-          "embeddedPixelComparisonWithinLimits": true
-        },
-        "status": "PASS"
-      },
-      {
-        "corpusOrder": 10,
-        "filename": "Screenshot_2026-10-02_154846.png",
-        "sourceImage": {
-          "bytes": 2403223,
-          "sha256": "143159096dec529090fdda209a80ea56040e19928d974971f3ce2e7bc5fa82fd",
-          "width": 1919,
-          "height": 1079
-        },
-        "sourceHashMatchesRunReport": true,
-        "pdf": {
-          "path": "10-Screenshot_2026-10-02_154846.png.ocrspace.pdf",
-          "bytes": 329775,
-          "sha256": "67cd07b809110384f721d8e053c4d475ceacd712f6e4e634c5b176336ee599bc",
-          "reportedSha256": "67cd07b809110384f721d8e053c4d475ceacd712f6e4e634c5b176336ee599bc"
-        },
-        "pageRaster": {
-          "path": "10-Screenshot_2026-10-02_154846.png.pdf-page.png",
-          "bytes": 1970915,
-          "sha256": "25931a376c0318598613c78eff6d155fb16079be06075be94baff0688e84cd85",
-          "reportedSha256": "25931a376c0318598613c78eff6d155fb16079be06075be94baff0688e84cd85",
-          "width": 1818,
-          "height": 2573
-        },
-        "pdfPagePoints": {
-          "width": 595.0,
-          "height": 842.0
-        },
-        "embeddedImageCount": 1,
-        "embeddedImage": {
-          "width": 1919,
-          "height": 1079,
-          "format": "jpeg"
-        },
-        "imagePlacementPoints": {
-          "x0": 0.0,
-          "y0": 0.0,
-          "width": 595.0,
-          "height": 334.5517883300781
-        },
-        "normalizedCrop": {
-          "method": "source-aspect-top-aligned-crop-v1",
-          "left": 0,
-          "top": 0,
-          "width": 1818,
-          "height": 1022
-        },
-        "embeddedImageComparison": {
-          "method": "embedded-PDF-image-resized-to-crop-LANCZOS",
-          "meanAbsoluteError": 0.8458086023866574,
-          "rootMeanSquareError": 2.311500751104989,
-          "limits": {
-            "meanAbsoluteError": 3,
-            "rootMeanSquareError": 8
-          }
-        },
-        "checks": {
-          "sourceHashMatchesRunReport": true,
-          "pdfSha256MatchesRunReport": true,
-          "pageRasterSha256MatchesRunReport": true,
-          "pageRasterDimensions": true,
-          "embeddedAspectMatchesGroundTruth": true,
-          "imageTopAlignedAndFullWidth": true,
-          "imageHeightMatchesSourceAspect": true,
-          "cropWithinPage": true,
-          "embeddedPixelComparisonWithinLimits": true
-        },
-        "status": "PASS"
-      },
-      {
-        "corpusOrder": 11,
-        "filename": "Screenshot_2026-10-13_221318.png",
-        "sourceImage": {
-          "bytes": 409654,
-          "sha256": "b3787f464f6e833a809bfdc7b63dd022ed9ad1ee8d87bc7a0d0227121e9de8b3",
-          "width": 1919,
-          "height": 1079
-        },
-        "sourceHashMatchesRunReport": true,
-        "pdf": {
-          "path": "11-Screenshot_2026-10-13_221318.png.ocrspace.pdf",
-          "bytes": 459828,
-          "sha256": "db8eedee807df73770750df22a2df1bf55cea04cfdd982e4f7d6223ae17bea8d",
-          "reportedSha256": "db8eedee807df73770750df22a2df1bf55cea04cfdd982e4f7d6223ae17bea8d"
-        },
-        "pageRaster": {
-          "path": "11-Screenshot_2026-10-13_221318.png.pdf-page.png",
-          "bytes": 585717,
-          "sha256": "6eaf045dbb1eb9fac97c5c42b1a194580415c927de7ca787e611b727f7183c3a",
-          "reportedSha256": "6eaf045dbb1eb9fac97c5c42b1a194580415c927de7ca787e611b727f7183c3a",
-          "width": 1818,
-          "height": 2573
-        },
-        "pdfPagePoints": {
-          "width": 595.0,
-          "height": 842.0
-        },
-        "embeddedImageCount": 1,
-        "embeddedImage": {
-          "width": 1919,
-          "height": 1079,
-          "format": "png"
-        },
-        "imagePlacementPoints": {
-          "x0": 0.0,
-          "y0": 0.0,
-          "width": 595.0,
-          "height": 334.5517883300781
-        },
-        "normalizedCrop": {
-          "method": "source-aspect-top-aligned-crop-v1",
-          "left": 0,
-          "top": 0,
-          "width": 1818,
-          "height": 1022
-        },
-        "embeddedImageComparison": {
-          "method": "embedded-PDF-image-resized-to-crop-LANCZOS",
-          "meanAbsoluteError": 0.39886827886963516,
-          "rootMeanSquareError": 2.1679937450988374,
-          "limits": {
-            "meanAbsoluteError": 3,
-            "rootMeanSquareError": 8
-          }
-        },
-        "checks": {
-          "sourceHashMatchesRunReport": true,
-          "pdfSha256MatchesRunReport": true,
-          "pageRasterSha256MatchesRunReport": true,
-          "pageRasterDimensions": true,
-          "embeddedAspectMatchesGroundTruth": true,
-          "imageTopAlignedAndFullWidth": true,
-          "imageHeightMatchesSourceAspect": true,
-          "cropWithinPage": true,
-          "embeddedPixelComparisonWithinLimits": true
-        },
-        "status": "PASS"
-      },
-      {
-        "corpusOrder": 12,
-        "filename": "Screenshot_2026-10-16_224234.png",
-        "sourceImage": {
-          "bytes": 1140425,
-          "sha256": "655c7578158d999f4243ea262163df6fb3126a83f5c936d140acc1ef9d79ef42",
-          "width": 2403,
-          "height": 1318
-        },
-        "sourceHashMatchesRunReport": true,
-        "pdf": {
-          "path": "12-Screenshot_2026-10-16_224234.png.ocrspace.pdf",
-          "bytes": 166762,
-          "sha256": "888fe370b3f4af5a8f5d3542723dea3afbaba454d1e5556be444793115c41a36",
-          "reportedSha256": "888fe370b3f4af5a8f5d3542723dea3afbaba454d1e5556be444793115c41a36"
-        },
-        "pageRaster": {
-          "path": "12-Screenshot_2026-10-16_224234.png.pdf-page.png",
-          "bytes": 727891,
-          "sha256": "7843dc846f12ec11c5ebe3b56c6a3714040069215b07bfbb48eab56f6bb2a7a0",
-          "reportedSha256": "7843dc846f12ec11c5ebe3b56c6a3714040069215b07bfbb48eab56f6bb2a7a0",
-          "width": 1818,
-          "height": 2573
-        },
-        "pdfPagePoints": {
-          "width": 595.0,
-          "height": 842.0
-        },
-        "embeddedImageCount": 1,
-        "embeddedImage": {
-          "width": 2403,
-          "height": 1318,
-          "format": "jpeg"
-        },
-        "imagePlacementPoints": {
-          "x0": 0.0,
-          "y0": 0.0,
-          "width": 595.0,
-          "height": 326.34619140625
-        },
-        "normalizedCrop": {
-          "method": "source-aspect-top-aligned-crop-v1",
-          "left": 0,
-          "top": 0,
-          "width": 1818,
-          "height": 997
-        },
-        "embeddedImageComparison": {
-          "method": "embedded-PDF-image-resized-to-crop-LANCZOS",
-          "meanAbsoluteError": 0.2579634760533894,
-          "rootMeanSquareError": 1.4625134608205144,
-          "limits": {
-            "meanAbsoluteError": 3,
-            "rootMeanSquareError": 8
-          }
-        },
-        "checks": {
-          "sourceHashMatchesRunReport": true,
-          "pdfSha256MatchesRunReport": true,
-          "pageRasterSha256MatchesRunReport": true,
-          "pageRasterDimensions": true,
-          "embeddedAspectMatchesGroundTruth": true,
-          "imageTopAlignedAndFullWidth": true,
-          "imageHeightMatchesSourceAspect": true,
-          "cropWithinPage": true,
-          "embeddedPixelComparisonWithinLimits": true
-        },
-        "status": "PASS"
-      },
-      {
-        "corpusOrder": 13,
-        "filename": "Screenshot_2026-10-19_183512.png",
-        "sourceImage": {
-          "bytes": 887403,
-          "sha256": "7ab154463579411ded95af84d1439df42cae823b123f699030ba7260a99d87a8",
-          "width": 1692,
-          "height": 1174
-        },
-        "sourceHashMatchesRunReport": true,
-        "pdf": {
-          "path": "13-Screenshot_2026-10-19_183512.png.ocrspace.pdf",
-          "bytes": 873360,
-          "sha256": "d8f1b4645255a8ca4913c8ad7337313745ab3dfabd9bab8b8b526722643b48e6",
-          "reportedSha256": "d8f1b4645255a8ca4913c8ad7337313745ab3dfabd9bab8b8b526722643b48e6"
-        },
-        "pageRaster": {
-          "path": "13-Screenshot_2026-10-19_183512.png.pdf-page.png",
-          "bytes": 1128690,
-          "sha256": "bde6984d63119d8076f11845f42340bd8131c00521a359979ac345e034d70469",
-          "reportedSha256": "bde6984d63119d8076f11845f42340bd8131c00521a359979ac345e034d70469",
-          "width": 1818,
-          "height": 2573
-        },
-        "pdfPagePoints": {
-          "width": 595.0,
-          "height": 842.0
-        },
-        "embeddedImageCount": 1,
-        "embeddedImage": {
-          "width": 1692,
-          "height": 1174,
-          "format": "png"
-        },
-        "imagePlacementPoints": {
-          "x0": 0.0,
-          "y0": 0.0,
-          "width": 595.0,
-          "height": 412.8428039550781
-        },
-        "normalizedCrop": {
-          "method": "source-aspect-top-aligned-crop-v1",
-          "left": 0,
-          "top": 0,
-          "width": 1818,
-          "height": 1261
-        },
-        "embeddedImageComparison": {
-          "method": "embedded-PDF-image-resized-to-crop-LANCZOS",
-          "meanAbsoluteError": 0.3445001914941692,
-          "rootMeanSquareError": 1.7037637219804258,
-          "limits": {
-            "meanAbsoluteError": 3,
-            "rootMeanSquareError": 8
-          }
-        },
-        "checks": {
-          "sourceHashMatchesRunReport": true,
-          "pdfSha256MatchesRunReport": true,
-          "pageRasterSha256MatchesRunReport": true,
-          "pageRasterDimensions": true,
-          "embeddedAspectMatchesGroundTruth": true,
-          "imageTopAlignedAndFullWidth": true,
-          "imageHeightMatchesSourceAspect": true,
-          "cropWithinPage": true,
-          "embeddedPixelComparisonWithinLimits": true
-        },
-        "status": "PASS"
-      },
-      {
-        "corpusOrder": 14,
-        "filename": "Screenshot_2026-10-24_200118.png",
-        "sourceImage": {
-          "bytes": 825369,
-          "sha256": "119ee537c6c2a93528dded878a676a8f631fdc0610899e2581a3cec4d9336139",
-          "width": 1571,
-          "height": 1055
-        },
-        "sourceHashMatchesRunReport": true,
-        "pdf": {
-          "path": "14-Screenshot_2026-10-24_200118.png.ocrspace.pdf",
-          "bytes": 771297,
-          "sha256": "1ece7619cad6b6a83f746f58121181cca6c43efca95f6ded0c3f57d13cf48a0b",
-          "reportedSha256": "1ece7619cad6b6a83f746f58121181cca6c43efca95f6ded0c3f57d13cf48a0b"
-        },
-        "pageRaster": {
-          "path": "14-Screenshot_2026-10-24_200118.png.pdf-page.png",
-          "bytes": 1090993,
-          "sha256": "48b3df14342c14eba6adc03f143cdd297e5cbe1130862b8b6f65435595d08f36",
-          "reportedSha256": "48b3df14342c14eba6adc03f143cdd297e5cbe1130862b8b6f65435595d08f36",
-          "width": 1818,
-          "height": 2573
-        },
-        "pdfPagePoints": {
-          "width": 595.0,
-          "height": 842.0
-        },
-        "embeddedImageCount": 1,
-        "embeddedImage": {
-          "width": 1571,
-          "height": 1055,
-          "format": "png"
-        },
-        "imagePlacementPoints": {
-          "x0": 0.0,
-          "y0": 0.0,
-          "width": 595.0,
-          "height": 399.5703125
-        },
+      "strictThreeSourceConsensus": {
+        "eligible": 171,
+        "exact": 104,
+        "wrong": 1,
+        "unresolved": 66,
+        "exactMatchRate": 0.6081871345029239
+      }
+    },
+    "gateBStatus": "NOT_PASSED"
+  }
+}
