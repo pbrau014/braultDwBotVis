@@ -183,7 +183,7 @@ jobs:
           OCRSPACE_NETWORK_ALLOWLIST: '0'
           OCR_NON_OCR_NETWORK_RESTRICTED: '1'
           OCR_NON_OCR_NETWORK_LOG: ${{ github.workspace }}/testdata/gateA-16/local-recovery-network.log
-          NODE_OPTIONS: '--require="${{ github.workspace }}/source/scripts/block-network.js" --require="${{ github.workspace }}/scripts/block-network.js"'
+          NODE_OPTIONS: '--require=./source/scripts/block-network.js --require=./scripts/block-network.js'
         run: |
           node scripts/prepare-gateA-16-resume.js --source-root source --preflight testdata/gateA-16-preflight.json --partial-artifact-root "$env:GATEA_PARTIAL_ARTIFACT_DIR"
           if ($LASTEXITCODE -ne 0) { throw 'First-image local recovery or original artifact verification failed; no remaining provider requests may start.' }
@@ -205,7 +205,7 @@ jobs:
           OCRSPACE_ENABLED: '1'
           OCRSPACE_NETWORK_ALLOWLIST: '1'
           OCR_NON_OCR_NETWORK_RESTRICTED: '1'
-          NODE_OPTIONS: '--require="${{ github.workspace }}/source/scripts/block-network.js" --require="${{ github.workspace }}/scripts/block-network.js"'
+          NODE_OPTIONS: '--require=./scripts/block-network.js --require=../scripts/block-network.js'
           OCR_SEQUENCE_REPORT_PATH: testdata/gateA-16/report.json
           OCR_NON_OCR_NETWORK_LOG: testdata/gateA-16/non-ocr-network-attempts.log
           OCRSPACE_ARTIFACT_DIR: testdata/gateA-16/artifacts
