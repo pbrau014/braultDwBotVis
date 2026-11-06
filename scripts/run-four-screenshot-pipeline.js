@@ -35,8 +35,9 @@ async function auditArtifacts(report, selected) {
     const rows = [];
     for (const key of selected) {
         const result = (report?.results || []).find(item => item.fixtureKey === key);
+        const sourceBytes = await fs.promises.readFile(path.join(root, 'fixtures', 'four-screenshots', key));
         const sourceSha256 = String(result?.imageSha256 || '').toLowerCase();
-        const validSourceHash = /^[a-f0-9]{64}$/.test(sourceSha256);
+        const validSourceHash = /^[a-f0-9]{64}$/.test(sourceSha256) && sha256(sourceBytes) === sourceSha256;
         const pdfPath = validSourceHash ? path.join(artifactDir, sourceSha256 + '.ocrspace.pdf') : null;
         const rasterPath = validSourceHash ? path.join(artifactDir, sourceSha256 + '.ocrspace-page.png') : null;
         let pdf = null;
@@ -45,18 +46,21 @@ async function auditArtifacts(report, selected) {
         try { if (rasterPath) raster = await fs.promises.readFile(rasterPath); } catch {}
         const pdfHeaderValid = Boolean(pdf && pdf.subarray(0, 5).toString('ascii') === '%PDF-');
         const pdfEofValid = Boolean(pdf && pdf.subarray(Math.max(0, pdf.length - 1024)).includes(Buffer.from('%%EOF')));
+        const rasterSha256 = raster ? sha256(raster) : null;
+        const rasterPngValid = Boolean(raster && raster.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])));
         rows.push({
             fixtureKey: key,
             sourceSha256,
             pdf: pdf ? { file: path.basename(pdfPath), bytes: pdf.length, sha256: sha256(pdf), headerValid: pdfHeaderValid, eofMarkerValid: pdfEofValid } : null,
-            raster: raster ? { file: path.basename(rasterPath), bytes: raster.length, sha256: sha256(raster) } : null,
+            raster: raster ? { file: path.basename(rasterPath), bytes: raster.length, sha256: rasterSha256, pngSignatureValid: rasterPngValid } : null,
             providerEvidence: result?.ocrSpacePdfFirst || null,
             valid: validSourceHash && pdfHeaderValid && pdfEofValid && Boolean(raster?.length)
                 && result?.ocrSpacePdfFirst?.status === 'complete'
                 && result?.ocrSpacePdfFirst?.provider === 'ocr.space'
                 && result?.ocrSpacePdfFirst?.engine === 2
                 && result?.ocrSpacePdfFirst?.sourceSha256 === sourceSha256
-                && result?.ocrSpacePdfFirst?.pdfSha256 === (pdf ? sha256(pdf) : null),
+                && result?.ocrSpacePdfFirst?.pdfSha256 === (pdf ? sha256(pdf) : null)
+                && result?.ocrSpacePdfFirst?.rasterSha256 === rasterSha256 && rasterPngValid,
         });
     }
     const audit = {
@@ -83,10 +87,23 @@ async function main() {
     if (unique.size !== selected.length) throw new Error('Duplicate screenshot arguments are not allowed.');
     if (!selected.length) throw new Error('At least one screenshot fixture must be selected.');
     if (!String(process.env.OCRSPACE_API_KEY || '').trim()) throw new Error('OCRSPACE_API_KEY is required; four-image PDF-first acceptance is blocked.');
+    const resumeFromPath = String(process.env.FOUR_SCREENSHOT_RESUME_FROM || '').trim()
+        ? path.resolve(process.env.FOUR_SCREENSHOT_RESUME_FROM) : null;
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const actualReportPath = resumeFromPath ? reportPath + '.resume-' + timestamp + '.json' : reportPath;
+    const actualProgressPath = actualReportPath + '.progress.json';
+    const actualNetworkLogPath = resumeFromPath ? nonOcrLogPath + '.resume-' + timestamp + '.log' : nonOcrLogPath;
     await fs.promises.mkdir(path.dirname(reportPath), { recursive: true });
     await fs.promises.mkdir(artifactDir, { recursive: true });
-    await fs.promises.rm(reportPath, { force: true });
-    await fs.promises.rm(nonOcrLogPath, { force: true });
+    for (const existing of [actualReportPath, actualProgressPath, actualNetworkLogPath]) {
+        try { await fs.promises.access(existing); throw new Error('Existing OCR evidence found at ' + existing + '; refusing to overwrite or duplicate provider requests.'); }
+        catch (error) { if (error.code !== 'ENOENT') throw error; }
+    }
+    if (!resumeFromPath) {
+        const existingArtifacts = await fs.promises.readdir(artifactDir);
+        if (existingArtifacts.length) throw new Error('Existing OCR.Space artifacts are present without a resume token; refusing a duplicate provider batch.');
+    }
+    await fs.promises.writeFile(actualNetworkLogPath, '', { flag: 'wx' });
 
     const preload = quoteRequireOption(networkBlockPath);
     const env = {
@@ -96,12 +113,14 @@ async function main() {
         OCRSPACE_NETWORK_ALLOWLIST: '1',
         OCRSPACE_ARTIFACT_DIR: artifactDir,
         OCR_NON_OCR_NETWORK_RESTRICTED: '1',
-        OCR_NON_OCR_NETWORK_LOG: nonOcrLogPath,
-        OCR_SEQUENCE_REPORT_PATH: reportPath,
+        OCR_NON_OCR_NETWORK_LOG: actualNetworkLogPath,
+        OCR_SEQUENCE_REPORT_PATH: actualReportPath,
+        OCR_SEQUENCE_PROGRESS_PATH: actualProgressPath,
+        OCR_SEQUENCE_RESUME_FROM: resumeFromPath || '',
         NODE_OPTIONS: [process.env.NODE_OPTIONS, preload].filter(Boolean).join(' '),
     };
 
-    console.log(`[FOUR-IMAGE] Running ${selected.length} image(s) with OCR.Space Engine 2 PDF-first; unrelated egress restricted.`);
+    console.log(`[FOUR-IMAGE] Running ${selected.length} image(s) with OCR.Space Engine 2 PDF-first; unrelated egress restricted. ${resumeFromPath ? 'Resume from ' + resumeFromPath : 'Fresh batch'}.`);
     const child = spawn(process.execPath, [sequencePath, ...selected], {
         cwd: root, env, stdio: 'inherit', windowsHide: true, shell: false,
     });
@@ -111,7 +130,7 @@ async function main() {
     });
 
     let report;
-    try { report = JSON.parse(await fs.promises.readFile(reportPath, 'utf8')); }
+    try { report = JSON.parse(await fs.promises.readFile(actualReportPath, 'utf8')); }
     catch (error) { throw new Error(`Sequence report was not written or is invalid: ${error.message}`); }
     const auditResult = await auditArtifacts(report, selected);
     const network = report.networkIsolation || {};
@@ -136,13 +155,15 @@ async function main() {
         noDeniedUnrelatedEgress: network.nonOcrDeniedAttemptsDetected === false,
         pdfAndRasterArtifactsVerified: auditResult.passed,
         childExitedZero: exit.code === 0 && !exit.signal,
-        noDeniedLogEntries: !fs.existsSync(nonOcrLogPath) || (await fs.promises.stat(nonOcrLogPath)).size === 0,
+        networkDiagnosticLogPresent: fs.existsSync(actualNetworkLogPath),
+        noDeniedLogEntries: fs.existsSync(actualNetworkLogPath) && (await fs.promises.stat(actualNetworkLogPath)).size === 0,
     };
     for (const [name, passed] of Object.entries(checks)) {
         console.log(`[FOUR-IMAGE] ${passed ? 'PASS' : 'FAIL'} ${name}`);
         if (!passed) fail(`${name} did not meet acceptance criteria`);
     }
-    console.log(`[FOUR-IMAGE] Report: ${path.relative(root, reportPath)}`);
+    console.log(`[FOUR-IMAGE] Report: ${path.relative(root, actualReportPath)}`);
+    console.log(`[FOUR-IMAGE] Progress: ${path.relative(root, actualProgressPath)}`);
     console.log(`[FOUR-IMAGE] PDF audit: ${path.relative(root, auditResult.auditPath)}`);
     if (process.exitCode !== 1) console.log(`[FOUR-IMAGE] PASS ${selected.length}/${selected.length} PDF-first images with exact nine-field records.`);
 }
