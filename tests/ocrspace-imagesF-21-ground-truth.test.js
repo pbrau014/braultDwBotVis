@@ -52,6 +52,7 @@ test('Gate B requires 21 labels, verified artifacts, zero wrong acceptance and c
     assert.match(evaluator, /MIN_GATE_B_IMAGES = 21/);
     assert.match(evaluator, /PENDING_ARTIFACT_VERIFICATION/);
     assert.match(evaluator, /PENDING_GATE_A/);
+    assert.match(evaluator, /\"localReaders\"/);
     assert.match(evaluator, /gateAPassAndLockedCandidateFingerprintRequired/);
     assert.match(evaluator, /zeroWronglyAcceptedMandatoryFieldValues/);
     assert.match(evaluator, /zeroUnauthorizedNetworkAttempts/);
