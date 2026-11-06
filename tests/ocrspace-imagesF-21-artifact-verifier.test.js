@@ -20,15 +20,18 @@ async function fixture(t) {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dwbot-artifact-'));
   t.after(() => fs.rm(root, { recursive: true, force: true }));
   const artifactRoot = path.join(root, 'artifacts');
-  await fs.mkdir(artifactRoot);
+  const sourceImageRoot = path.join(root, 'source-images');
+  await fs.mkdir(artifactRoot); await fs.mkdir(sourceImageRoot);
   const sourceArchiveSha256 = 'a'.repeat(64);
   const records = [];
   const verifiedMembers = [];
   const results = [];
   for (let i=0;i<63;i++) {
     const filename = `image-${String(i+1).padStart(2,'0')}.png`;
-    const sourceBytes = 1000+i;
-    const sourceSha = sha(Buffer.from('source-'+i));
+    const sourceBuffer = Buffer.from('source-image-bytes-'+i);
+    const sourceBytes = sourceBuffer.length;
+    const sourceSha = sha(sourceBuffer);
+    await fs.writeFile(path.join(sourceImageRoot,filename),sourceBuffer);
     const complete = i < 21;
     const expected = Object.fromEntries(FIELDS.map(field=>[field, complete ? field+'-'+i : '']));
     const fieldStatus = Object.fromEntries(FIELDS.map(field=>[field,{eligible_for_exact_match:complete}]));
@@ -49,23 +52,24 @@ async function fixture(t) {
   const gt={schemaVersion:2,requiredFields:FIELDS,candidateArchive:{sha256:sourceArchiveSha256},records};
   const preflight={status:'verified-imagesF-63-exploratory',archiveSha256:sourceArchiveSha256,
     imageMemberCount:63,allImageMemberHashesVerified:true,verifiedMembers};
-  const gtPath=path.join(root,'ground-truth.json'), preflightPath=path.join(root,'preflight.json');
+  const gtPath=path.join(root,'ground-truth.json'), preflightPath=path.join(root,'preflight.json'), freshPreflightPath=path.join(root,'fresh-preflight.json');
   await fs.writeFile(gtPath,JSON.stringify(gt));
   await fs.writeFile(preflightPath,JSON.stringify(preflight));
+  await fs.writeFile(freshPreflightPath,JSON.stringify(preflight));
   const run={sourceArchiveSha256,preflightReportSha256:sha(await fs.readFile(preflightPath)),
     originalScreenshotFallback:false,results};
   const runPath=path.join(root,'run-report.json');
   await fs.writeFile(runPath,JSON.stringify(run));
   const networkLogPath=path.join(root,'blocked-network.log');
   await fs.writeFile(networkLogPath,'');
-  return {root,artifactRoot,gtPath,preflightPath,runPath,networkLogPath};
+  return {root,artifactRoot,sourceImageRoot,gtPath,preflightPath,freshPreflightPath,runPath,networkLogPath};
 }
 const workflowSourceText="OCR_NON_OCR_NETWORK_RESTRICTED: '1'\\nOCR_NON_OCR_NETWORK_LOG: logs/blocked.log";
 
 test('verifies all 21 PDF/raster pairs, searchable text, source fingerprints, local readers and security evidence', async t => {
   const f=await fixture(t);
   const raster=png(1600,900);
-  const report=await verifyArtifacts({...f,workflowSourceText,apiKey:'not-a-real-secret',
+  const report=await verifyArtifacts({...f,preflightReport:f.preflightPath,freshPreflightReport:f.freshPreflightPath,groundTruth:f.gtPath,runReport:f.runPath,workflowSourceText,apiKey:'not-a-real-secret',
     renderPdf:async()=>raster,readMetadata:async()=>({width:1600,height:900}),readPdfText:async()=> 'searchable text'});
   assert.equal(report.status,'VERIFIED');
   assert.equal(report.inventorySelection.verifiedImageCount,21);
@@ -79,7 +83,7 @@ test('verifies all 21 PDF/raster pairs, searchable text, source fingerprints, lo
 
 test('does not pass when the saved raster cannot be reproduced from its PDF', async t => {
   const f=await fixture(t);
-  const report=await verifyArtifacts({...f,workflowSourceText,apiKey:'not-a-real-secret',
+  const report=await verifyArtifacts({...f,preflightReport:f.preflightPath,freshPreflightReport:f.freshPreflightPath,groundTruth:f.gtPath,runReport:f.runPath,workflowSourceText,apiKey:'not-a-real-secret',
     renderPdf:async()=>png(1599,900),readMetadata:async()=>({width:1600,height:900}),readPdfText:async()=> 'searchable text'});
   assert.equal(report.status,'FAILED');
   assert.equal(report.checks.pdfDerivedRasterProvenance,'FAIL');
@@ -87,7 +91,7 @@ test('does not pass when the saved raster cannot be reproduced from its PDF', as
 
 test('missing network log or secret is not treated as a clean security result', async t => {
   const f=await fixture(t);
-  const report=await verifyArtifacts({...f,networkLogPath:path.join(f.root,'missing.log'),
+  const report=await verifyArtifacts({...f,preflightReport:f.preflightPath,freshPreflightReport:f.freshPreflightPath,groundTruth:f.gtPath,runReport:f.runPath,networkLogPath:path.join(f.root,'missing.log'),
     workflowSourceText,apiKey:'',renderPdf:async()=>png(1600,900),
     readMetadata:async()=>({width:1600,height:900}),readPdfText:async()=> 'searchable text'});
   assert.equal(report.status,'FAILED');
