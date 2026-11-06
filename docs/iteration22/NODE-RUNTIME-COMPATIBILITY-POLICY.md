@@ -7,6 +7,7 @@
 ## Policy
 
 - The reproducible development baseline remains **Node.js 22.16.0**, recorded in `.nvmrc`.
+- Node.js 22.16.0 is explicitly acceptable in place of older Node 24+, >=24.17.0 and v24.22.1 requirements. Node 24 is optional only for a specifically proven tool/dependency need; it is not a general project gate.
 - The supported runtime minimum is **Node.js 22.16.0**. Later stable patch/minor releases in the Node.js 22 line and newer Node.js major releases are accepted, subject to the full project test suite and any relevant runtime-specific checks.
 - Test results produced on Node.js 22.16.0 or newer are eligible for acceptance. A pass on one runtime does not automatically prove platform-specific behavior on another operating system or runtime family.
 - Node.js versions before 22.16.0 are not accepted by the application runtime guard.
