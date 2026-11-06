@@ -43,7 +43,7 @@ jobs:
         shell: powershell
         run: |
           $node = (node --version).Trim()
-          if ([version]$node.TrimStart('v') -lt [version]'26.13.0') { throw "Node.js 26.13.0 or newer is required; found $node" }
+          if ([version]$node.TrimStart('v') -ne [version]'26.13.0') { throw "Node.js 26.13.0 exactly is required; found $node" }
       - name: Install local PDF raster and OCR readers
         shell: powershell
         run: |
