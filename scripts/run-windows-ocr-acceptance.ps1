@@ -191,7 +191,7 @@ try {
  if($env:OCRSPACE_64_ARCHIVE_PATH -and $env:OCRSPACE_64_IMAGE_ROOT){
   $env:OCRSPACE_ENABLED='1'
   $env:OCRSPACE_NETWORK_ALLOWLIST='1'
-  $env:OCRSPACE_64_OUTPUT_DIR=Join-Path $env:TEMP ('dwbot-ocrspace-64-' + $PID)
+  $env:OCRSPACE_64_OUTPUT_DIR=Join-Path $RunDir 'ocrspace-64-inventory'
   $env:OCR_NON_OCR_NETWORK_LOG=Join-Path $RunDir 'ocrspace-64-network-attempts.log'
   Invoke-LoggedNpm -Label 'ocrspace-64-inventory-pdf-first' -Arguments @('run','test:ocrspace-64')
   $Inventory64Path=Join-Path $env:OCRSPACE_64_OUTPUT_DIR 'ocrspace-64-inventory-report.json'
