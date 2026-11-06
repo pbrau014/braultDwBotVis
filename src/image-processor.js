@@ -3,6 +3,7 @@
 // Portable image preprocessing adapter. Sharp is intentionally not required:
 // ImageMagick's CLI is used to decode, resize, normalize, sharpen and crop images.
 // This avoids native Node ABI / platform-specific sharp binary install failures.
+const crypto = require('node:crypto');
 const { spawn, spawnSync } = require('node:child_process');
 
 function assertDimensions(width, height, options = {}) {
