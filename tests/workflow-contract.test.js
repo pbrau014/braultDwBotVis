@@ -211,6 +211,8 @@ test('eligible screenshot acceptance uses OCR.Space PDF-first and retains the is
 
 test('63-image exploratory workflow persists restricted-egress attempts for artifact review', () => {
     const workflow = fs.readFileSync(path.join(__dirname, '..', '.github', 'workflows', 'dwbot-imagesF-63-exploratory.yml'), 'utf8');
+    assert.match(workflow, /^  workflow_dispatch:/m);
+    assert.doesNotMatch(workflow, /^  push:/m, 'billable exploratory extraction must not trigger from pushes');
     assert.match(workflow, /if: github\.event_name == 'workflow_dispatch'/);
     assert.match(workflow, /OCR_NON_OCR_NETWORK_RESTRICTED: '1'/);
     assert.match(workflow, /OCR_NON_OCR_NETWORK_LOG:/);
