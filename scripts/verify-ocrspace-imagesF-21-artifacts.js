@@ -345,11 +345,13 @@ async function main() {
     const networkReconciliationPath = value('--network-log-reconciliation');
     const workflowFile = value('--workflow-file');
     const output = value('--output');
+    const gateAReportPath = value('--gate-a-report');
     if (![runReport, groundTruth, preflightReport, freshPreflightReport, sourceImageRoot, artifactRoot, networkLogPath, recoveryNetworkLogPath, workflowFile, output].every(Boolean)) {
-        throw new Error('Usage: node scripts/verify-ocrspace-imagesF-21-artifacts.js --run-report FILE --ground-truth FILE --preflight-report FILE --fresh-preflight-report FILE --source-image-root DIR --artifact-root DIR --network-log FILE --recovery-network-log FILE --workflow-file FILE --output FILE');
+        throw new Error('Usage: node scripts/verify-ocrspace-imagesF-21-artifacts.js --run-report FILE --ground-truth FILE --preflight-report FILE --fresh-preflight-report FILE --source-image-root DIR --artifact-root DIR --network-log FILE --recovery-network-log FILE --workflow-file FILE --output FILE [--gate-a-report FILE]');
     }
     const workflowSourceText = await fs.readFile(workflowFile, 'utf8');
-    const report = await verifyArtifacts({ runReport, groundTruth, preflightReport, freshPreflightReport, sourceImageRoot, artifactRoot, networkLogPath, recoveryNetworkLogPath, networkReconciliationPath, workflowSourceText });
+    const gateAReport = gateAReportPath ? JSON.parse(await fs.readFile(gateAReportPath, 'utf8')) : null;
+    const report = await verifyArtifacts({ runReport, groundTruth, preflightReport, freshPreflightReport, sourceImageRoot, artifactRoot, networkLogPath, recoveryNetworkLogPath, networkReconciliationPath, workflowSourceText, gateAReport });
     await fs.writeFile(output, JSON.stringify(report, null, 2) + '\n');
     console.log('[DWBOT-ARTIFACT-VERIFY] ' + report.status + '; pdf/raster=' + report.inventorySelection.pdfRasterVerifiedImageCount + '/19; full=' + report.inventorySelection.verifiedImageCount + '/19; Gate A=' + report.gateA.status + '; network=' + report.checks.networkRestriction + '; secret scan=' + report.checks.secretLeakScan);
     if (report.status !== 'VERIFIED') process.exitCode = 1;
