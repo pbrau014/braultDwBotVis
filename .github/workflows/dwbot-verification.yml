@@ -23,8 +23,8 @@ permissions:
   contents: read
 
 jobs:
-  node22-linux:
-    name: Node.js 22.16.0 - Linux offline verification
+  node26-linux:
+    name: Node.js 26.13.0 - Linux offline verification
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -34,10 +34,10 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Set up Node.js 22.16.0
+      - name: Set up Node.js 26.13.0
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 22.16.0
+          node-version: 26.13.0
           cache: npm
           package-manager-cache: false
       - name: Provision local English Tesseract.js model
@@ -90,8 +90,8 @@ jobs:
       - name: Full project suite
         run: npm test
 
-  windows-node22-native-ocr:
-    name: Windows Node.js 22.16.0 - native Tesseract and persistence
+  windows-node26-native-ocr:
+    name: Windows Node.js 26.13.0 - native Tesseract and persistence
     runs-on: windows-latest
     timeout-minutes: 180
     permissions:
@@ -101,10 +101,10 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Set up Node.js 22.16.0
+      - name: Set up Node.js 26.13.0
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 22.16.0
+          node-version: 26.13.0
           cache: npm
           package-manager-cache: false
       - name: Install native OCR prerequisites
@@ -160,7 +160,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw '56-image archive reconstruction or integrity preflight failed; OCR.Space provider submissions are prohibited.' }
       - name: Windows process-level persistence and recovery
         run: npm run test:persistence-recovery
-      - name: Full Windows Node 22 test suite
+      - name: Full Windows Node 26 test suite
         run: npm test
       - name: Verify protected OCR.Space secret is configured (value withheld)
         shell: powershell
@@ -183,7 +183,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: dwbot-windows-node22-native-ocr-and-recovery
+          name: dwbot-windows-node26-native-ocr-and-recovery
           path: |
             testdata/ocr-acceptance/**
             testdata/persistence-recovery/**
@@ -202,7 +202,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 22.16.0
+          node-version: 26.13.0
           cache: npm
           package-manager-cache: false
       - name: Install native Tesseract language model for clean-package tests
