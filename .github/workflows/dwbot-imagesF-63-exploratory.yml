@@ -105,5 +105,8 @@ jobs:
             testdata/ocr-acceptance/imagesF-63-preflight.json*
             testdata/ocr-acceptance/DWBOT_IMAGESF_HOLDOUT_CANDIDATE_MANIFEST.json
             docs/continuation/DWBOT-UPD-2026-11-05-002-groundtruth-gap-register.md
+            docs/continuation/DWBOT-UPD-2026-11-06-004-imagesF-63-ground-truth.md
+            testdata/ground-truth/imagesF-63-working-ground-truth-v6.json*
+            scripts/evaluate-ocrspace-imagesF-63-ground-truth.py
           if-no-files-found: warn
           retention-days: 30
