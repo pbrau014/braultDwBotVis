@@ -1,6 +1,33 @@
 # Current DWBOT authority — updated 2026-11-06
 
 IMPLEMENTATION / VERIFICATION STATUS — 2026-11-06
+
+
+## Current main / Gate B status — 2026-11-06
+
+- Current canonical main HEAD: 46810b5cd76a9148507b2aaa5f4262850c7cbbe4.
+- Exact-head DWBOT verification run 42170841013 is pending; no test pass is
+  claimed until its jobs finish and their logs/artifacts are inspected.
+- Existing imagesF-63 OCR.Space run 42160979140 remains in progress at its
+  PDF-first extraction step. No artifacts are listed yet. Do not restart it.
+- The run's OCR implementation, PDF-first runner, quota ledger, network guard,
+  source preflight, PDF contract test and package-lock blobs match current main
+  at the compared source checkpoint. package.json differs only in scripts;
+  dependencies and Node engine declarations are identical. The run remains
+  bound to its original trigger commit and report fingerprint.
+- Push-triggered imagesF-63 workflow run 42170489690 is pending; the active
+  workflow's job-level workflow_dispatch condition prevents push events from
+  submitting provider requests. No duplicate OCR.Space requests were initiated.
+- Gate B is exactly the approved 21-image subset, replacing the former
+  50-image minimum / 100 preferred target. Gate B remains NOT_PASSED pending
+  verified PDFs/rasters, bound artifact report, post-hoc metrics, zero wrongly
+  accepted mandatory values, and clean network/secret evidence.
+- Reproducible checklist and report schema:
+  docs/continuation/DWBOT-UPD-2026-11-06-006-parallel-release-readiness-and-gateB-21.md.
+- The v6 reference remains a partial manual-transcription source for the
+  63-image corpus; this change does not certify the workbook or the 42 partial
+  records. Production remains NO-GO.
+
 - Requirement change committed on canonical main. Implementation commits:
   66daf0df84532afd0699954d88dd08f2c313fc95 (evaluator, deterministic
   21-record test, package command, living-plan/authority/guide update);
