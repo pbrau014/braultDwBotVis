@@ -1,4 +1,75 @@
 ================================================================================
+CURRENT CHAT IMPLEMENTATION / CI STATUS — 2026-11-05
+================================================================================
+
+Canonical main HEAD: 3f9d790395da4a52d44df7f71fa526d8ceb7d375.
+Current OCR source implementation commit: 8cabbd06bbcf579acab7134a4221914e6b91194b.
+Synchronized documentation commits:
+- d6f35200a4921e7a1789d06b3a18b0a384a4e580 — current OCR architecture override,
+  living plan priority block, OCR.Space implementation document, current
+  authority and requirements/architecture crosswalk.
+- 3f9d790395da4a52d44df7f71fa526d8ceb7d375 — README, operations manual,
+  PaddleOCR fallback/runtime docs synchronized to PDF-first downstream flow.
+
+Current exact-head workflow run: 42138048633 (created for commit
+3f9d790395da4a52d44df7f71fa526d8ceb7d375); latest observed status PENDING,
+no jobs started yet. It is queued behind older run 42133060580, whose Windows
+screenshot acceptance step remains IN_PROGRESS on an older source fingerprint
+9dd3fa87a497894b4f84962a2a6a4c9293e94b7c. That older run is not evidence for
+the new OCR.Space PDF-first architecture. Its job logs currently return
+BlobNotFound, so no progress or result may be inferred from missing logs.
+Do not claim the new PDF-first tests have passed until run 42138048633 executes
+and its exact-head jobs/artifacts are inspected.
+
+Code changes now committed:
+- OCR.Space Engine 2 receives the source image first and requests a searchable
+  PDF with a visible text layer.
+- Images larger than the 1 MiB Free API limit are normalized locally using a
+  bounded JPEG resize/quality profile; original source remains unchanged.
+- Searchable PDF URL is HTTPS-host-allowlisted; download rejects redirects,
+  oversized/non-PDF payloads and timeouts; PDF is rasterized locally.
+- Bot downstream local OCR operates on the PDF-derived raster. Configured
+  PDF-first failure is fail-closed; no silent local OCR of original image.
+- Normal bot startup requires OCRSPACE_API_KEY unless OCRSPACE_ENABLED=0 is
+  explicitly selected for local-only development/test.
+- Windows acceptance workflow injects the OCRSPACE_API_KEY repository secret,
+  allows only HTTPS OCR.Space API/PDF hosts through the network guard, and
+  retains searchable PDF and raster artifacts.
+- New mocked tests are registered in npm run test:ocrspace. They are not yet
+  verified by an executed CI run.
+
+Inventory status:
+- Four-image and sixteen-image fixtures/ground truth exist in canonical main.
+  The Windows acceptance wrapper now sets OCRSPACE_ENABLED=1 and uses the
+  PDF-first bot path for the existing four-/sixteen-image and reader runs.
+  Neither corpus has yet completed a live OCR.Space PDF-first acceptance run.
+- The 64-image reviewed inventory metadata exists, but the source archive
+  imgsHalf1.zip is absent from the repository tree and was not found in the
+  accessible File Library ZIP listing. The only additional small ZIP examined
+  was not the screenshot archive. Two inventory records disagree on archive
+  byte count/fingerprint. Do not run the 64 corpus until the exact source
+  archive is supplied and every member hash matches the reviewed manifest.
+- The 64 inventory is not ground truth. It has 56 user-verified visibility-
+  eligible records and 8 user-excluded records; exact accuracy cannot be
+  claimed without independent nine-field annotations.
+
+Credential status:
+- The workflow now references the repository Actions secret OCRSPACE_API_KEY.
+  Its presence/value cannot be read from this chat and has not been confirmed.
+  The Windows acceptance script will fail with a precise prerequisite error
+  if it is absent. Never print or commit the key.
+- No live OCR.Space request, searchable PDF, or provider accuracy result has
+  been verified in this chat yet.
+
+The older OCR.Space adapter report dated 2026-11-03 remains historical evidence
+only; it described a standalone diagnostic adapter and must not be counted as
+verification of the new integrated PDF-first pipeline.
+
+================================================================================
+END CURRENT CHAT IMPLEMENTATION / CI STATUS
+================================================================================
+
+================================================================================
 CURRENT OCR ARCHITECTURE OVERRIDE — OCR.SPACE SOURCE-IMAGE → SEARCHABLE PDF FIRST
 2026-11-05 / controlling user instruction
 ================================================================================

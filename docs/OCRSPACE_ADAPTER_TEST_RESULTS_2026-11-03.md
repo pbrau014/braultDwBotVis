@@ -1,3 +1,5 @@
+> **Supersession note — 2026-11-05:** This report records a historical standalone adapter test from 2026-11-03. It does not describe or verify the current integrated architecture. The governing sequence is now OCR.Space Engine 2 source-image processing → searchable PDF → local PDF-page raster → Tesseract.js/native Tesseract/PaddleOCR/OpenCV downstream. The current implementation is in src/ocrspace-pdf-first.js, src/image-processor.js and src/bot.js. Its mocked tests are registered under npm run test:ocrspace, but live provider and inventory acceptance remain unverified. See docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md and the top override in docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt.
+
 # OCR.space adapter test results — 2026-11-03
 
 - Runtime: Node.js v22.16.0
