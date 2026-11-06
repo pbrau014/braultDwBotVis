@@ -185,10 +185,11 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
         }
         const preflightMember = preflightByName.get(expected.filename);
         let sourceOk = false;
+        let sourceBuffer = null;
         try {
             const sourcePath = safeArtifactPath(sourceImageRoot, expected.filename);
             if (sourcePath) {
-                const sourceBuffer = await fs.readFile(sourcePath);
+                sourceBuffer = await fs.readFile(sourcePath);
                 const sourceMetadata = await readMetadata(sourceBuffer);
                 sourceOk = row.sourceSha256 === expected.sourceImage.sha256
                     && row.sourceBytes === expected.sourceImage.bytes
@@ -246,10 +247,12 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
                     const normalized = await normalizeRaster(renderedPage, {
                         sourceWidth: expected.sourceImage.width,
                         sourceHeight: expected.sourceImage.height,
+                        sourceImageBuffer: sourceBuffer,
                     });
                     expectedRaster = normalized?.buffer;
                     const actualNormalization = normalized?.normalization || {};
-                    normalizationOk = pageEvidenceOk
+                    normalizationOk = pageEvidenceOk && sourceOk && Buffer.isBuffer(sourceBuffer)
+                        && normalized?.similarity?.method === 'original-source-resized-to-normalized-raster-v1'
                         && Buffer.isBuffer(expectedRaster)
                         && actualNormalization.method === 'source-aspect-top-aligned-crop-v1'
                         && JSON.stringify(actualNormalization) === JSON.stringify(normalization)
