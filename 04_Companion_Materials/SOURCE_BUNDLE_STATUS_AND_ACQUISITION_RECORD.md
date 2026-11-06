@@ -42,3 +42,17 @@ This record is complete only when the exact RC3 source bundle and identity are a
 
 ## v3.21 governing match-outcome clarification
 The current working policy is that individual-performance metrics (including Damage and Kills) feed the approved scoring method that calculates the verified match outcome; that outcome governs bracket advancement, with published tie-breaks applied where needed. Participant-level outputs and awards remain separately traceable. The canonical workbook and authoritative Score Reporter HTML remain unavailable, so implementation of this policy is not certified.
+
+
+## Supplemental YOLO / Admiralty / CBStrat source intake — 2026-11-06
+
+A separate supplied Library archive `yoloPaperWork(1).zip` was integrity-checked and extracted for the Admiralty × YOLO narrative documentation work.
+
+- Archive: 22,976,255 bytes
+- SHA-256: `b7598ed96d9af8ff1bd564e7aed945621800e2299e2f262d86541c62f34cf7b2`
+- ZIP members: 19; ZIP integrity test reported no corrupt member.
+- Contents: Admiralty handbook DOCX/PDF, organization chart and two visual concept boards; CBStrat Tier X Clan Battles PDF and infographic; three Discord scoring/summary texts; YOLO rules/Pilot documents, description PDF, historical workbook and formula example image.
+- The three Discord texts are now preserved verbatim under `dwbotStuff/discordMsgs/`.
+- Detailed SHA-256 fingerprints, source authority and conflict dispositions are recorded in `Admiralty_YOLO_Source_Reconciliation_and_Visual_Provenance_v0.1.md`.
+
+The Admiralty source is fictional worldbuilding and an organizational/design reference. CBStrat is Tier X Clan Battles tactical guidance; only general principles are adapted to YOLO. The supplied `test27xlsm.xlsm` is an archival sample, not the canonical scoring workbook. None of these materials creates a live event approval, participant cap, staff appointment, prize commitment or signed settings record.
