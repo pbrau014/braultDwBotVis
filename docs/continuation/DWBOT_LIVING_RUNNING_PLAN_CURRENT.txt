@@ -1,4 +1,47 @@
 ================================================================================
+CURRENT OCRSPACE IMPLEMENTATION UPDATE — 2026-11-05
+================================================================================
+
+Canonical main HEAD before this update: 508ac2952ae877cdb9f049e1639c0196d1e39a22.
+Current source implementation includes commit 951cf23ac3fa7d1234674c1e2fb8a3a678e083d1:
+the searchable PDF text layer is hidden in the rendered page, while remaining
+searchable, so Tesseract/native/Paddle readers do not see duplicate overlay text.
+
+The 64-image runner is committed:
+- 194d16c992219e07b79645c2ff91476cdf39994b adds npm run test:ocrspace-64 and
+  scripts/run-ocrspace-64-inventory.js.
+- 508ac2952ae877cdb9f049e1639c0196d1e39a22 adds exact archive size/SHA
+  verification and corrects the inventory byte-count interpretation.
+- The runner requires OCRSPACE_64_ARCHIVE_PATH and OCRSPACE_64_IMAGE_ROOT. It
+  verifies imgsHalf1.zip is 57,665,767 bytes with SHA-256
+  e32e43991ab90d6e2ca3e060f264456d175d0e93390f273d7f3a3f5d93fa98a2, then checks
+  every one of the 64 member sizes and SHA-256 values before uploading any image.
+  It creates one Engine 2 searchable PDF per image, renders the PDF page, and
+  runs local Tesseract.js and native Tesseract on the PDF-derived raster.
+- The report explicitly marks accuracy NOT EVALUABLE because the 64-image
+  inventory has no independently transcribed nine-field ground truth.
+- The archive is still not available in the repository or accessible Library
+  ZIP listing, so the 64-image run has not started.
+
+Archive metric correction:
+The reviewed inventory's totalBytes 58,090,288 is the sum of the 64 uncompressed
+image member sizes. The provenance's sourceArchiveBytes 57,665,767 is the ZIP
+file size. These values are different measurements, not conflicting archive
+fingerprints. The expected ZIP SHA-256 is e32e43991ab90d6e2ca3e060f264456d175d0e93390f273d7f3a3f5d93fa98a2.
+The archive remains missing; retrieve it and verify the exact size/hash and all
+64 members before running.
+
+Current exact-head CI is still queued behind older workflow run 42133060580.
+The latest exact-head run before this update was pending and had no jobs yet.
+The older Windows run remains in progress on commit 9dd3fa87a497894b4f84962a2a6a4c9293e94b7c and is not evidence for the PDF-first architecture.
+No live OCR.Space key has been confirmed in the local container; the repository
+Actions secret is still unverified. No live request or PDF has been verified.
+
+================================================================================
+END OCRSPACE IMPLEMENTATION UPDATE
+================================================================================
+
+================================================================================
 CURRENT CHAT IMPLEMENTATION / CI STATUS — 2026-11-05
 ================================================================================
 
@@ -46,9 +89,11 @@ Inventory status:
 - The 64-image reviewed inventory metadata exists, but the source archive
   imgsHalf1.zip is absent from the repository tree and was not found in the
   accessible File Library ZIP listing. The only additional small ZIP examined
-  was not the screenshot archive. Two inventory records disagree on archive
-  byte count/fingerprint. Do not run the 64 corpus until the exact source
-  archive is supplied and every member hash matches the reviewed manifest.
+  was not the screenshot archive. The byte counts are different metrics, not a conflict: 58,090,288 is the sum
+  of the 64 uncompressed image files; 57,665,767 is the ZIP size. The expected
+  ZIP SHA-256 is e32e43991ab90d6e2ca3e060f264456d175d0e93390f273d7f3a3f5d93fa98a2.
+  Do not run the 64 corpus until the exact source archive is supplied and every
+  member hash matches the reviewed manifest.
 - The 64 inventory is not ground truth. It has 56 user-verified visibility-
   eligible records and 8 user-excluded records; exact accuracy cannot be
   claimed without independent nine-field annotations.
@@ -80,7 +125,7 @@ descriptions. Historical reports and prior designs remain unchanged as provenanc
 REQUIRED PIPELINE
 1. Receive the original World of Warships battle-result screenshot.
 2. OCR.Space Engine 2 processes that source image FIRST and creates a searchable
-   PDF with a visible text layer. The provider's current engine comparison marks
+   PDF with a searchable text layer hidden from the rendered page so local OCR readers do not see duplicate overlay text. The provider's current engine comparison marks
    searchable-PDF creation supported for Engine 2 and unsupported for Engine 3.
    Engine 2 is therefore the PDF-producing first pass.
 3. Immediately download the temporary PDF. Validate HTTPS host, redirect
