@@ -1,0 +1,170 @@
+name: DWBOT 21-image artifact verification and post-hoc evaluation
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: 'Completed 63-image OCR.Space exploratory run ID; this workflow never submits OCR requests.'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  verify:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - name: Check out current verification tools
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24.17.0
+          cache: npm
+          package-manager-cache: false
+
+      - name: Install bounded PDF and image verification tools
+        shell: powershell
+        run: |
+          $magick = Get-Command magick.exe -ErrorAction SilentlyContinue
+          if (-not $magick) {
+            choco install imagemagick --yes --no-progress
+            Import-Module "$env:ChocolateyInstallhelperschocolateyProfile.psm1"
+            refreshenv
+            $magick = Get-Command magick.exe -ErrorAction Stop
+          }
+          $ghostscript = Get-Command gswin64c.exe -ErrorAction SilentlyContinue
+          if (-not $ghostscript) {
+            choco install ghostscript --yes --no-progress
+            Import-Module "$env:ChocolateyInstallhelperschocolateyProfile.psm1"
+            refreshenv
+            $ghostscript = Get-Command gswin64c.exe -ErrorAction Stop
+          }
+          & $magick.Source -version
+          if ($LASTEXITCODE -ne 0) { throw 'ImageMagick is required for raster verification.' }
+          & $ghostscript.Source -version
+          if ($LASTEXITCODE -ne 0) { throw 'Ghostscript is required for searchable-PDF verification.' }
+          "IMAGEMAGICK_BIN=$($magick.Source)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "GHOSTSCRIPT_BIN=$($ghostscript.Source)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Install locked dependencies and run no-provider contract tests
+        run: |
+          node --version
+          npm --version
+          npm ci --no-audit --no-fund
+          npm run test:ocrspace
+
+      - name: Validate source run and download its exact artifact
+        id: source-artifact
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+        run: |
+          $sourceRunId = 0L
+          if (-not [long]::TryParse($env:SOURCE_RUN_ID, [ref]$sourceRunId)) { throw 'source_run_id must be a numeric GitHub Actions run ID.' }
+          $sourceJson = gh run view $sourceRunId --repo $env:GITHUB_REPOSITORY --json workflowName,headSha,status,conclusion
+          if ($LASTEXITCODE -ne 0) { throw 'Could not inspect the requested OCR.Space source run.' }
+          $sourceRun = $sourceJson | ConvertFrom-Json
+          if ($sourceRun.workflowName -ne 'DWBOT imagesF 63 exploratory OCR.Space') { throw 'Source run is not the authorized 63-image exploratory workflow.' }
+          if ($sourceRun.status -ne 'completed') { throw 'Source extraction must finish before artifact verification.' }
+          $sourceSha = $sourceRun.headSha
+          $downloadRoot = Join-Path $env:RUNNER_TEMP ('dwbot-artifact-verify-' + $sourceRunId)
+          New-Item -ItemType Directory -Force $downloadRoot | Out-Null
+          gh run download $sourceRunId --repo $env:GITHUB_REPOSITORY --name dwbot-imagesF-63-ocrspace-exploratory --dir $downloadRoot
+          if ($LASTEXITCODE -ne 0) { throw 'Could not download the source run artifact.' }
+          $runReports = @(Get-ChildItem -Path $downloadRoot -Filter 'ocrspace-imagesF-63-exploratory-report.json' -File -Recurse)
+          $progressFiles = @(Get-ChildItem -Path $downloadRoot -Filter 'progress.json' -File -Recurse)
+          $groundTruthFiles = @(Get-ChildItem -Path $downloadRoot -Filter 'imagesF-63-working-ground-truth-v6.json' -File -Recurse)
+          $preflightFiles = @(Get-ChildItem -Path $downloadRoot -Filter 'imagesF-63-preflight.json' -File -Recurse)
+          $networkLogs = @(Get-ChildItem -Path $downloadRoot -Filter 'imagesF-63-blocked-network-attempts.log' -File -Recurse)
+          if ($runReports.Count -gt 1 -or $progressFiles.Count -ne 1 -or $groundTruthFiles.Count -ne 1 -or $preflightFiles.Count -ne 1 -or $networkLogs.Count -gt 1) {
+            throw 'Source artifact has duplicate or ambiguous report, progress, ground-truth, preflight, or network-log files.'
+          }
+          if ($runReports.Count -eq 0 -and $progressFiles.Count -ne 1) { throw 'Source artifact has neither a final run report nor a single progress file.' }
+          $selectedRunReport = if ($runReports.Count -eq 1) { $runReports[0].FullName } else { $progressFiles[0].FullName }
+          $artifactRoot = $progressFiles[0].DirectoryName
+          $sourceWorkflowJson = gh api "repos/$env:GITHUB_REPOSITORY/contents/.github/workflows/dwbot-imagesF-63-exploratory.yml?ref=$sourceSha"
+          if ($LASTEXITCODE -ne 0) { throw 'Could not retrieve the workflow source at the extraction commit.' }
+          $sourceWorkflow = $sourceWorkflowJson | ConvertFrom-Json
+          $sourceWorkflowPath = Join-Path $env:RUNNER_TEMP 'source-imagesF-63-workflow.yml'
+          [System.IO.File]::WriteAllBytes($sourceWorkflowPath, [Convert]::FromBase64String($sourceWorkflow.content))
+          "DWBOT_SOURCE_RUN_ID=$sourceRunId" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "DWBOT_SOURCE_RUN_SHA=$sourceSha" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "DWBOT_DOWNLOAD_ROOT=$downloadRoot" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "DWBOT_ARTIFACT_ROOT=$artifactRoot" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "DWBOT_RUN_REPORT=$selectedRunReport" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "DWBOT_GROUND_TRUTH=$($groundTruthFiles[0].FullName)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "DWBOT_OLD_PREFLIGHT=$($preflightFiles[0].FullName)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          $networkLogPath = if ($networkLogs.Count -eq 1) { $networkLogs[0].FullName } else { Join-Path $downloadRoot 'missing-network-log.log' }
+          "DWBOT_NETWORK_LOG=$networkLogPath" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "DWBOT_SOURCE_WORKFLOW=$sourceWorkflowPath" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          Write-Host "Source run $sourceRunId at $sourceSha; artifact root $artifactRoot"
+
+      - name: Download and freshly verify the exact 63-image source archive
+        shell: powershell
+        run: |
+          $archive = Join-Path $env:RUNNER_TEMP 'DWBOT_IMAGESF_HOLDOUT_CANDIDATE_63.zip'
+          $url = 'https://github.com/user-attachments/files/34459783/DWBOT_IMAGESF_HOLDOUT_CANDIDATE_63.zip'
+          curl.exe --location --fail --silent --show-error --output $archive $url
+          if ($LASTEXITCODE -ne 0) { throw 'Could not download the exact reviewed source archive.' }
+          $imageRoot = Join-Path $env:GITHUB_WORKSPACE 'testdata\imagesF-63'
+          $freshPreflight = Join-Path $env:GITHUB_WORKSPACE 'testdata\ocr-acceptance\fresh-imagesF-63-preflight.json'
+          New-Item -ItemType Directory -Force (Split-Path $freshPreflight -Parent) | Out-Null
+          $env:OCRSPACE_63_ARCHIVE_PATH = $archive
+          $env:OCRSPACE_63_IMAGE_ROOT = $imageRoot
+          $env:OCRSPACE_63_PREFLIGHT_REPORT = $freshPreflight
+          python scripts/prepare-ocrspace-imagesF-63.py
+          if ($LASTEXITCODE -ne 0) { throw 'Fresh source archive/member hash verification failed.' }
+          "DWBOT_FRESH_PREFLIGHT=$freshPreflight" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "DWBOT_SOURCE_IMAGE_ROOT=$imageRoot" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Verify the 21 selected PDFs, text layers, rasters, provenance and security
+        id: artifact-verification
+        continue-on-error: true
+        shell: powershell
+        env:
+          OCRSPACE_API_KEY: ${{ secrets.OCRSPACE_API_KEY }}
+        run: |
+          $output = Join-Path $env:GITHUB_WORKSPACE 'testdata\ocrspace-imagesF-63-exploratory\artifact-verification-21.json'
+          New-Item -ItemType Directory -Force (Split-Path $output -Parent) | Out-Null
+          node scripts/verify-ocrspace-imagesF-21-artifacts.js --run-report $env:DWBOT_RUN_REPORT --ground-truth $env:DWBOT_GROUND_TRUTH --preflight-report $env:DWBOT_OLD_PREFLIGHT --fresh-preflight-report $env:DWBOT_FRESH_PREFLIGHT --source-image-root $env:DWBOT_SOURCE_IMAGE_ROOT --artifact-root $env:DWBOT_ARTIFACT_ROOT --network-log $env:DWBOT_NETWORK_LOG --workflow-file $env:DWBOT_SOURCE_WORKFLOW --output $output
+          "DWBOT_ARTIFACT_VERIFICATION_REPORT=$output" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Run 21-image post-hoc evaluation without provider requests
+        if: always()
+        shell: powershell
+        run: |
+          if (-not $env:DWBOT_RUN_REPORT -or -not $env:DWBOT_GROUND_TRUTH) {
+            Write-Host 'Post-hoc evaluation skipped because source run artifacts were not available.'
+            exit 0
+          }
+          $output = Join-Path $env:GITHUB_WORKSPACE 'testdata\ocrspace-imagesF-63-exploratory\posthoc-evaluation-21.json'
+          $args = @('--run-report', $env:DWBOT_RUN_REPORT, '--ground-truth', $env:DWBOT_GROUND_TRUTH, '--output', $output, '--inventory', 'complete-ground-truth-21')
+          if ($env:DWBOT_ARTIFACT_VERIFICATION_REPORT -and (Test-Path $env:DWBOT_ARTIFACT_VERIFICATION_REPORT)) {
+            $args += @('--artifact-verification-report', $env:DWBOT_ARTIFACT_VERIFICATION_REPORT)
+          }
+          python scripts/evaluate-ocrspace-imagesF-63-ground-truth.py @args
+          if ($LASTEXITCODE -ne 0) { throw 'Post-hoc evaluation did not complete; inspect its report and logs.' }
+          "DWBOT_POSTHOC_REPORT=$output" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Upload verification and post-hoc evaluation reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dwbot-imagesF-21-artifact-verification-${{ inputs.source_run_id }}
+          path: |
+            testdata/ocrspace-imagesF-63-exploratory/artifact-verification-21.json
+            testdata/ocrspace-imagesF-63-exploratory/posthoc-evaluation-21.json
+            testdata/ocr-acceptance/fresh-imagesF-63-preflight.json*
+          if-no-files-found: warn
+          retention-days: 30
