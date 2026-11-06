@@ -4,6 +4,7 @@ name: DWBOT Gate A 16-image OCR.Space PDF-first acceptance
 # Its PDF may be reused for local-only diagnosis, but it cannot count toward Gate A or authorize remaining provider requests.
 # A compliant Gate A result requires a fresh, fully guarded 16-image run with a new diagnostic log and locked source fingerprint.
 # The LOCAL-ONLY-RECOVERY and RESUME-15 paths remain fail-closed and must never repeat or extend the historical partial batch.
+# The local-only helper rebinds NODE_OPTIONS for its child process because its cwd is sourceRoot.
 
 on:
   push:
