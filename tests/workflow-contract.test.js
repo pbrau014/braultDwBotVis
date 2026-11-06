@@ -337,6 +337,11 @@ test('four-image PDF-first runner refuses duplicates and supports fingerprint-bo
 });
 
 
+test('Gate B local recovery receives the verified original source image root', () => {
+    const workflow = read('.github/workflows/dwbot-imagesF-21-artifact-verification.yml');
+    assert.match(workflow, /recover-ocrspace-imagesF-21-local-readers\.js[^\n]*--source-image-root \$env:DWBOT_SOURCE_IMAGE_ROOT/);
+});
+
 test('ordinary verification uses Node 22.16 and cannot submit the legacy 56-image provider batch', () => {
     const workflow = read('.github/workflows/dwbot-verification.yml');
     const pkg = JSON.parse(read('package.json'));
