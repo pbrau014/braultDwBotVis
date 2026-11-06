@@ -57,7 +57,7 @@ async function fixture(t) {
   await fs.writeFile(preflightPath,JSON.stringify(preflight));
   await fs.writeFile(freshPreflightPath,JSON.stringify(preflight));
   const run={sourceArchiveSha256,preflightReportSha256:sha(await fs.readFile(preflightPath)),
-    originalScreenshotFallback:false,results};
+    imageCount:63,requiredFields:FIELDS,originalScreenshotFallback:false,results};
   const runPath=path.join(root,'run-report.json');
   await fs.writeFile(runPath,JSON.stringify(run));
   const networkLogPath=path.join(root,'blocked-network.log');
