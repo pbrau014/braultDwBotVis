@@ -190,7 +190,7 @@ test('Node.js 26.13.0 is the exact project runtime baseline', () => {
     assert.equal(packageLock.packages?.['']?.engines?.node, '26.13.0');
     assert.match(workflow, /node-version:\s*26\.13\.0/);
     assert.doesNotMatch(workflow, /node-version:\s*(?:22|24)(?:\.|\s|$)/);
-    assert.match(windowsAcceptance, /MinimumNodeVersion\s*=\s*'22\.16\.0'/);
+    assert.match(windowsAcceptance, /MinimumNodeVersion\\s*=\\s*'26\\.13\\.0'/);
 });
 
 
