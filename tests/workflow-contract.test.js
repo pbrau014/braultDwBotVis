@@ -272,3 +272,15 @@ test('19-image Gate B artifact workflow verifies the completed run without provi
     assert.match(workflow, /\$recoveryNetworkLog =/);
     assert.doesNotMatch(workflow, /createOcrSpacePdfFirst|OCRSPACE_63_RESUME=1/);
 });
+
+
+test('Gate A acceptance uses the accepted runtime, fail-closed network guard and preserves interruption checkpoints', () => {
+    const workflow = read('.github/workflows/dwbot-gateA-16-pdf-first.yml');
+    assert.match(workflow, /node-version: 24\\.17\\.0/);
+    assert.match(workflow, /runtimePass/);
+    assert.match(workflow, /Configure fail-closed restricted-egress diagnostic preload/);
+    assert.match(workflow, /scripts\\/block-network\\.js/);
+    assert.match(workflow, /source\\/testdata\\/gateA-16\\/report\\.json\\.progress\\.json/);
+    assert.match(workflow, /cancel-in-progress: false/);
+    assert.match(workflow, /DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME/);
+});
