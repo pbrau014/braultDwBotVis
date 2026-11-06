@@ -22,7 +22,7 @@ test('21-image local reader recovery is offline, source-bound, and never calls O
     assert.match(script, /savedPixels\.equals\(renderedPixels\)/);
     assert.match(script, /priorFailureByEngine/);
     assert.match(script, /providerRequests: 0/);
-    assert.match(script, /await fs\\.access\\(networkLogPath\\)/);
+    assert.match(script, /await fs\.access\(networkLogPath\)/);
     assert.doesNotMatch(script, /writeFile\\(networkLogPath, '', \\{ flag: 'w' \\}\\)/);
     assert.doesNotMatch(script, /createOcrSpacePdfFirst|recognizeCrop|OCRSPACE_API_KEY\s*=\s*process/);
 });
