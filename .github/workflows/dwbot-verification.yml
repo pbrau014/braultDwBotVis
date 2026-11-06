@@ -100,6 +100,9 @@ jobs:
           refreshenv
           $tesseract = Get-Command tesseract.exe -ErrorAction Stop
           $magick = Get-Command magick.exe -ErrorAction Stop
+          $ghostscript = Get-Command gswin64c.exe -ErrorAction Stop
+          & $ghostscript.Source -version
+          if ($LASTEXITCODE -ne 0) { throw 'Ghostscript is required for ImageMagick PDF rasterization.' }
           $version = (& $tesseract.Source --version | Select-Object -First 1).Trim()
           Write-Host "Native Tesseract: $version"
           if ($version -notmatch '^tesseract\s+v?5\.') { throw "Expected native Tesseract 5.x: $version" }
@@ -130,6 +133,10 @@ jobs:
           npm ci --no-audit --no-fund
       - name: Reconstruct and verify eligible-only 56-image archive before provider access
         shell: powershell
+        env:
+          OCRSPACE_56_ARCHIVE_PATH: ${{ runner.temp }}\\imgsHalf1-eligible-56.zip
+          OCRSPACE_56_IMAGE_ROOT: ${{ runner.temp }}\\imgsHalf1-eligible-56
+          OCRSPACE_56_PREFLIGHT_REPORT: ${{ github.workspace }}\\testdata\\ocr-acceptance\\ocrspace-56-preflight.json
         run: |
           $python = Get-Command python.exe -ErrorAction Stop
           & $python.Source scripts/prepare-ocrspace-eligible-56.py
