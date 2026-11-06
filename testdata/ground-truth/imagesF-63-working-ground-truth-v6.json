@@ -47,7 +47,7 @@
     "Score nine-field full-record exact match only for the 21 records with all nine eligible expected values.",
     "Do not score missing, partial, illegible, or explicitly uncertain expected values.",
     "For console reward pairs, preserve both base and WITH PREMIUM values; use the explicitly labeled WITH PREMIUM/final-received value as the canonical scalar, retaining base values in notes.",
-    "Do not treat field-level partial coverage as a Gate B pass. Gate B remains NOT_PASSED until at least 50 images have complete, independent nine-field expected values and all acceptance conditions pass.",
+    "Gate B uses exactly the 21 records with complete, independent nine-field expected values in this approved subset; all 21 must be processed and all acceptance conditions must pass.",
     "The supplied manual transcription is independent of the OCR run outputs, but the archive does not document a separate blind second reviewer; do not describe it as independently double-annotated or certified."
   ],
   "records": [

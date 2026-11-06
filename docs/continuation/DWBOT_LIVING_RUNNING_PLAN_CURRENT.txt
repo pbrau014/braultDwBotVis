@@ -1,4 +1,73 @@
 ================================================================================
+CURRENT GATE B HOLDOUT REQUIREMENT — 2026-11-06
+================================================================================
+Status: ACTIVE / GOVERNING / SUPERSEDES THE FORMER 50-IMAGE MINIMUM.
+
+- Gate B now uses exactly 21 screenshots: the first 21 corpus-order records in
+  testdata/ground-truth/imagesF-63-working-ground-truth-v6.json whose
+  recordStatus is COMPLETE_9_FIELD_TRANSCRIPTION and whose nine required
+  fields are each eligible_for_exact_match=true with a non-empty expected
+  value. This is the approved Gate B holdout; the former 50-image minimum and
+  100-image preferred target are withdrawn.
+- The 21 images are the same deterministic source-bound subset already used
+  for the 21-image PDF-first inventory evaluation. Do not submit them again.
+  Reuse the original 63-image exploratory run's results and retained PDF/raster
+  artifacts. Keep the 4-image and 16-image Gate A/development requirements
+  separate; do not tune against these 21 Gate B images.
+- All nine fields remain mandatory and ordered: result, player, map, mode,
+  battleStart, credits, freeXp, damage, xp. No partial, uncertain, illegible,
+  absent or inferred expected field counts toward the 21 labels. Preserve the
+  supplied manual-reference provenance qualification: the transcription is
+  independent of OCR outputs, but the archive does not document a separate
+  blind second reviewer or double-blind certification.
+- Gate B pass requires all 21 selected source images to be represented exactly
+  once; source hashes must match; all 21 searchable PDFs and PDF-derived
+  rasters must be independently verified against the run report; searchable
+  text layer and PDF-to-raster provenance must be confirmed; both configured
+  local reader outputs must be present; there must be zero wrongly accepted
+  mandatory field values and zero unauthorized network attempts; the
+  secret-leak scan must pass. Report exact field/full-record accuracy,
+  unresolved values, wrong-but-unaccepted candidates, human-review rate,
+  latency, resource use and network diagnostics. Unresolved outputs remain
+  unresolved; they are not exact matches. The zero-wrong-acceptance and
+  network conditions are hard blockers.
+- The post-hoc evaluator's default 21-image inventory never submits OCR.Space
+  requests. It counts missing run rows and source-hash mismatches as unresolved
+  selected records rather than silently dropping them. It will not report Gate
+  B PASS without a separate artifact-verification report bound to the exact
+  run-report and v6 ground-truth hashes.
+- The v6 workbook/JSON remain a partial manual-transcription reference for the
+  63-image corpus; this threshold change does not certify the workbook or
+  upgrade the 42 partial records. Gate B remains NOT_PASSED until actual
+  extraction artifacts, evaluator metrics and network/security evidence pass.
+  Production remains NO-GO.
+
+================================================================================
+END CURRENT GATE B HOLDOUT REQUIREMENT
+================================================================================
+
+
+PARALLEL RELEASE-READINESS REVIEW — 2026-11-06
+- UI source review: upload size, PDF-first copy, keyboard picker/drop-zone
+  semantics, focus-visible and reduced-motion rules are present. Exact-head
+  CI is pending; browser visual/OAuth/accessibility acceptance remains open.
+- PDF-first source review: timeout, size cap, HTTPS host allowlist, redirect
+  rejection, PDF signature, quota reservation, no automatic retries and
+  fail-closed behavior are present. Cross-run resume/idempotency is absent;
+  do not blindly rerun an interrupted batch. Artifact upload is configured
+  with if: always(), but actual artifact contents must still be verified.
+- Evaluator audit: missing selected rows and source-hash mismatches are counted
+  as unresolved; partial/uncertain labels are excluded. Gate B requires the
+  separate hash-bound artifact verification report.
+- Reproducible checklist/report schema:
+  docs/continuation/DWBOT-UPD-2026-11-06-006-parallel-release-readiness-and-gateB-21.md.
+- Other independent work: exact-head UI CI, browser/OAuth/accessibility QA,
+  secret scan/credential rotation, 25 MiB ingestion/resource review,
+  workbook/scoring parity, isolated Discord staging and GrandYoloInstruct
+  deliverable reconciliation. Do not interfere with the active OCR run.
+
+
+================================================================================
 CURRENT OCR.SPACE INVENTORY REQUIREMENT — 2026-11-06
 ================================================================================
 Status: ACTIVE / GOVERNING / SUPERSEDES THE 64-IMAGE INVENTORY TEST REQUIREMENT.
@@ -20,8 +89,9 @@ Status: ACTIVE / GOVERNING / SUPERSEDES THE 64-IMAGE INVENTORY TEST REQUIREMENT.
   The post-hoc evaluator supports --inventory complete-ground-truth-21 and
   must report the selection, missing run rows and per-engine metrics.
 - The 21-image subset supplies an eligible complete-record evaluation scope
-  for the PDF-first pipeline. It is not a 50-image independent Gate B holdout,
-  does not certify the v6 workbook, and does not change Gate B: NOT_PASSED.
+  for the PDF-first pipeline and is also the newly authorized 21-image Gate B
+  holdout. It does not certify the v6 workbook; Gate B remains NOT_PASSED until
+  the exact run, artifacts, evaluator and network/security evidence pass.
   The 4- and 16-image inventory requirements remain active.
 - The legacy 64-image inventory manifest, runner and tests may remain in the
   repository as historical/legacy integrity material, but they are no longer
@@ -877,10 +947,11 @@ GATE STATUS / ACTIVE QUEUE
 4. Gate A: all 16 approved development images must yield exact complete
    nine-field records, zero wrong accepted mandatory values, zero unresolved
    mandatory fields, and no unauthorized network activity.
-5. Gate B: locate/verify the independent 50-image minimum / 100-image preferred
-   holdout with independent nine-field labels. The previously named
-   dwbot_56_image_ground_truth_review(3).xlsx has not been located by targeted
-   Library search; do not substitute development images or invent labels.
+5. Gate B: use the exact 21 complete nine-field records in the v6 ground-truth
+   reference, source-bound by filename/bytes/SHA-256. This is the approved
+   holdout; no 50-image minimum or 100-image preferred target remains. Do not
+   tune against these records. Verify all 21 PDF/raster artifacts, exact metrics,
+   zero wrongly accepted mandatory values and clean network/security evidence.
 6. Recheck OCR.Space Free-tier terms/privacy/retention and local key handling
    before any explicitly authorized synthetic non-identifying live smoke. No
    local key is configured in this chat; local-only work continues meanwhile.
@@ -978,13 +1049,10 @@ GATE STATUS AND NEXT ACTIONS
 3. Gate A requires all 16 approved development images to have exact complete
    nine-field records, zero wrong accepted values, zero unresolved mandatory
    fields and no unauthorized network activity. It is not yet passed.
-4. Gate B remains a separate, untouched 50-image minimum / 100-image preferred
-   independent holdout with independent ground truth for all nine fields and
-   no tuning. The canonical repository tree contains the 16-image development
-   set, four-image regression set and reported screenshot, but no independent
-   Gate B corpus. Targeted Library search did not surface the previously named
-   dwbot_56_image_ground_truth_review(3).xlsx file. Do not substitute the
-   development corpus or fabricate holdout labels.
+4. Gate B is the separate 21-image holdout defined by the first 21 complete,
+   eligible nine-field records in the v6 reference. The 21 records are outside
+   the 16-image development corpus. Do not tune against them or infer missing
+   labels. Gate B is not passed until all artifacts and metrics are verified.
 5. Gate C remains blocked until A and B pass; Gate D follows only after C.
    Production remains NO-GO.
 
@@ -2709,13 +2777,16 @@ Historical pre-PDF-first run 42088538702 and older Windows/native acceptance
 results remain fingerprint-bound historical evidence only. They do not verify
 the current OCR.Space PDF-first architecture.
 
-TASK 8 — INDEPENDENT HOLDOUT GATE B
+TASK 8 — 21-IMAGE INDEPENDENT HOLDOUT GATE B
 Status: NOT STARTED — prerequisite: Gate A pass and locked candidate fingerprint.
-Use 50 screenshots minimum, 100 preferred, with independently established
-nine-field ground truth. No tuning against this corpus. Report exact-field and
-complete-record accuracy, accepted-wrong rate, unresolved rate, human-review
-rate, latency, resource use, and network diagnostics. Any wrong mandatory
-acceptance or network restriction failure blocks pass.
+Use exactly the first 21 corpus-order images in the v6 reference with complete,
+independently established nine-field labels. This replaces the former 50-image
+minimum / 100-image preferred target. No tuning against this corpus. Reuse the
+existing 63-image extraction; do not resubmit. Verify all source/PDF/raster
+artifacts and report exact-field/full-record accuracy, accepted-wrong rate,
+unresolved rate, human-review rate, latency, resource use, and network/security
+diagnostics. Any wrong mandatory acceptance or network restriction failure
+blocks pass.
 
 TASK 9 — WINDOWS PERSISTENCE / BACKUP / RESTORE / ROLLBACK GATE C
 Status: NOT STARTED — prerequisite: OCR gates A and B pass.

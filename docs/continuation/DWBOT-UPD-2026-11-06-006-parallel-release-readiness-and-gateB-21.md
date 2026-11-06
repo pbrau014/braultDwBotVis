@@ -1,0 +1,162 @@
+# DWBOT parallel verification and Gate B artifact acceptance record
+
+Date: 2026-11-06
+Repository: pbrau014/braultDwBotVis
+Branch: main
+
+## Gate B authority and exact selection
+
+Gate B now uses exactly 21 images, replacing the former 50-image minimum and
+100-image preferred target. The 21 are the first 21 corpus-order records in
+the v6 ground-truth JSON with COMPLETE_9_FIELD_TRANSCRIPTION and all nine
+required fields eligible and non-empty. They are outside the 16-image
+development corpus and must not be used for tuning.
+
+Required fields: result, player, map, mode, battleStart, credits, freeXp,
+damage, xp.
+
+The supplied manual transcription is independent of OCR outputs, but the
+archive does not document a blind second reviewer. Preserve that provenance
+qualification. This amendment does not certify the workbook or the 42 partial
+records.
+
+## UI source and test review
+
+Inspected desktop/upload.html, desktop/upload.js, desktop/desktop.css and
+tests/desktop-ui-contract.test.js.
+
+- Upload validation enforces one image and 25 MiB using 25*1024*1024; UI copy
+  is now stated as 25 MiB.
+- The file picker is a keyboard-operable button. The drop target is a labelled
+  region with aria-describedby, not a second nested button.
+- Page guidance describes Engine 2, searchable PDF, PDF-derived local readers
+  and fail-closed behavior.
+- Global :focus-visible styling and prefers-reduced-motion handling are
+  present.
+- Contract tests cover same-origin upload, CSRF, local-only API use, credential
+  exclusion including OCRSPACE_API_KEY, one-file type/size validation,
+  progress, drop-zone semantics, focus visibility and reduced motion.
+- These are source/contract checks, not rendered-browser visual, keyboard
+  session, screen-reader or live OAuth acceptance. Exact-head CI must pass.
+
+## PDF-first workflow review
+
+Inspected src/ocrspace-client.js, src/ocrspace-pdf-first.js,
+scripts/run-ocrspace-imagesF-63-exploratory.js and the 63-image workflow.
+
+Verified: Engine 2 searchable PDF request; bounded API/download timeouts; 25 MiB
+PDF cap; HTTPS host allowlist; redirect rejection; PDF signature; quota
+reservation before request; no automatic retry; fail-closed original-image
+fallback prohibition; per-image PDF/raster hashes and metadata; artifact
+upload with if: always(); manual-dispatch-only workflow guard.
+
+Risks: the runner has no cross-run resume/idempotency, so a manual rerun of an
+interrupted batch could resubmit completed images. Do not rerun without
+reconciling previous progress and artifacts. Per-image write interruption can
+leave a provider submission without complete artifacts. The PDF response
+streaming path is bounded, but the arrayBuffer fallback checks size only after
+allocation. Source inspection found no intentional API-key logging, but
+actual run logs/artifacts still require exact-value scanning in a protected
+environment; never print the key. The active run is on its fixed earlier
+commit and is unaffected by later source changes.
+
+## Reproducible artifact verification checklist
+
+1. Fetch artifact list for the exact run ID; preserve artifact ID, size,
+   archive digest, expiration and download timestamp.
+2. Download once, hash the ZIP before extraction, preserve original ZIP.
+3. Extract to a clean isolated directory; reject path traversal, absolute
+   paths, duplicate names, symlinks and unexpected members.
+4. Verify final run report and .sha256 sidecar; retain progress.json as
+   intermediate evidence, not a replacement final report.
+5. Verify source archive SHA-256:
+   6294944fbad9df05feeeac57b68acaf12642f8c883697748cad3b1a88f8bcba3.
+6. For each selected filename, compare run source hash and byte size with v6.
+7. Require exactly one run row and providerSubmissionAttempted=true per image.
+8. Require pdf-first-complete; contained relative PDF/raster paths; both files.
+9. Verify PDF byte count, SHA-256 and %PDF- signature.
+10. Verify searchable PDF text layer with a PDF text extractor; record tool,
+    version, command, exit code and extracted-text hash.
+11. Verify raster byte count, SHA-256, PNG signature and dimensions.
+12. Verify PDF-to-raster provenance by rerendering the retained PDF with the
+    pinned rasterizer and comparing dimensions/pixels or deterministic hash.
+13. Confirm originalScreenshotFallback=false and inspect logs for fallback.
+14. Inspect both local-reader outputs, accepted flags, unresolved fields and
+    all nine expected/actual values.
+15. Verify allowlisted provider network, unrelated egress restriction and
+    zero unauthorized attempts; preserve blocked-network-attempts log.
+16. Scan logs, JSON, text and metadata for the exact protected key in its
+    protected environment; report only PASS/FAIL and paths, never key/content.
+17. Record runtime, engine/model, source commit, lockfile, workflow/job IDs,
+    timestamps and all artifact hashes.
+
+Any missing PDF/raster, source mismatch, unsearchable PDF, fallback, network
+failure, secret leak, duplicate or missing selected row blocks Gate B.
+
+## Artifact verification report schema
+
+Create artifact-verification-report.json beside the final run report only
+after completing the checklist. This is a template, not completed evidence:
+
+    {
+      "schemaVersion": 1,
+      "status": "VERIFIED",
+      "runReportSha256": "<exact final run report hash>",
+      "groundTruthSha256": "<exact v6 JSON hash>",
+      "inventorySelection": {
+        "id": "complete-ground-truth-21",
+        "selectedImageCount": 21,
+        "verifiedImageCount": 21,
+        "allSelectedImagesVerified": true
+      },
+      "checks": {
+        "sourceImageHashes": "PASS",
+        "pdfIntegrity": "PASS",
+        "searchablePdfTextLayer": "PASS",
+        "rasterIntegrity": "PASS",
+        "pdfDerivedRasterProvenance": "PASS",
+        "networkRestriction": "PASS",
+        "unauthorizedNetworkAttempts": 0,
+        "secretLeakScan": "PASS",
+        "originalScreenshotFallback": false
+      },
+      "images": [
+        {
+          "filename": "<exact selected filename>",
+          "status": "VERIFIED",
+          "sourceSha256": "<source image SHA-256>",
+          "pdfSha256": "<PDF SHA-256>",
+          "rasterSha256": "<PDF-derived PNG SHA-256>"
+        }
+      ]
+    }
+
+The evaluator binds this report to exact run-report and ground-truth hashes
+and reconciles each per-image source/PDF/raster hash.
+
+## Post-hoc evaluation and Gate B criteria
+
+After artifact verification, run:
+npm run evaluate:ocrspace-imagesF-21
+
+The evaluator counts missing run rows and source-hash mismatches as unresolved,
+excludes partial/uncertain reference fields, and reports per-field exact-match
+rate, wrong accepted/unaccepted values, unresolved outputs, nine-field
+exact-record rate and per-engine metrics. It never calls OCR.Space. Gate B
+PASS requires the bound verified artifact report, all 21 rows, both reader
+outputs, matching source/PDF/raster hashes, zero wrongly accepted mandatory
+values and zero unauthorized network attempts. Unresolved outputs remain
+unresolved, never matches. Gate A's zero-unresolved criterion remains separate.
+
+## Other authorized work independent of the active extraction
+
+- Exact-head UI/contract CI, then browser visual, keyboard and screen-reader QA.
+- Secret scan and rotate previously exposed credentials before reuse.
+- Review 25 MiB streamed ingestion, worker limits, cancellation and cleanup.
+- Workbook/scoring parity against authoritative workbook source.
+- Desktop OAuth and isolated Discord staging when staging prerequisites exist.
+- GrandYoloInstruct deliverable reconciliation against authoritative inputs.
+- PDF/clean-package and source-manifest verification.
+
+Do not start another OCR.Space submission, retry the active run, or claim Gate A,
+Gate B or production acceptance from source review alone.
