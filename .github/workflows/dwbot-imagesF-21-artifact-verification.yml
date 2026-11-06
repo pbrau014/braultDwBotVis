@@ -8,6 +8,8 @@ on:
       - 'scripts/verify-ocrspace-imagesF-21-artifacts.js'
       - 'scripts/recover-ocrspace-imagesF-21-local-readers.js'
       - 'scripts/evaluate-ocrspace-imagesF-63-ground-truth.py'
+      - 'scripts/evaluate-ocrspace-pdf-text-layer.js'
+      - 'tests/ocrspace-pdf-text-layer.test.js'
       - 'testdata/ground-truth/imagesF-63-working-ground-truth-v6.json'
   workflow_dispatch:
     inputs:
@@ -82,6 +84,7 @@ jobs:
           npm --version
           npm ci --no-audit --no-fund
           node --check scripts/recover-ocrspace-imagesF-21-local-readers.js
+          node --check scripts/evaluate-ocrspace-pdf-text-layer.js
           npm run test:ocrspace
           node --test tests/workflow-contract.test.js
 
@@ -234,6 +237,17 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Post-hoc evaluation did not complete; inspect its report and logs.' }
           "DWBOT_POSTHOC_REPORT=$output" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
 
+      - name: Run searchable-PDF text-layer and multi-reader fusion analysis
+        if: always()
+        shell: powershell
+        run: |
+          if (-not $env:DWBOT_RUN_REPORT -or -not $env:DWBOT_GROUND_TRUTH -or -not $env:DWBOT_ARTIFACT_ROOT) {
+            Write-Host 'PDF text-layer analysis skipped because verified source artifacts are unavailable.'
+            exit 0
+          }
+          $output = Join-Path $env:GITHUB_WORKSPACE 'testdata\ocrspace-imagesF-63-exploratory\pdf-text-layer-analysis-19.json'
+          node scripts/evaluate-ocrspace-pdf-text-layer.js --run-report $env:DWBOT_RUN_REPORT --ground-truth $env:DWBOT_GROUND_TRUTH --artifact-root $env:DWBOT_ARTIFACT_ROOT --inventory gate-b-complete-ground-truth-19 --output $output
+
       - name: Upload verification and post-hoc evaluation reports
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -242,6 +256,7 @@ jobs:
           path: |
             testdata/ocrspace-imagesF-63-exploratory/artifact-verification-19.json
             testdata/ocrspace-imagesF-63-exploratory/posthoc-evaluation-19.json
+            testdata/ocrspace-imagesF-63-exploratory/pdf-text-layer-analysis-19.json*
             testdata/ocrspace-imagesF-63-exploratory/recovered-run-report-21.json*
             testdata/ocrspace-imagesF-63-exploratory/local-reader-recovery-21.json
             testdata/ocr-acceptance/local-reader-recovery-network.log
