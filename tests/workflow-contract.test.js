@@ -265,6 +265,8 @@ test('19-image Gate B artifact workflow verifies the completed run without provi
     assert.match(workflow, /OCRSPACE_NETWORK_ALLOWLIST: '0'/);
     assert.match(workflow, /evaluate-ocrspace-imagesF-63-ground-truth\.py/);
     assert.match(workflow, /--network-log-reconciliation/);
+    assert.match(workflow, /evaluate-ocrspace-pdf-text-layer\.js/);
+    assert.match(workflow, /pdf-text-layer-analysis-19\.json/);
     assert.match(workflow, /RECONSTRUCTED_LIMITED_EVIDENCE/);
     assert.match(workflow, /originalBlockedAttemptCount = \$null/);
     assert.match(workflow, /\$recoveryNetworkLog =/);
