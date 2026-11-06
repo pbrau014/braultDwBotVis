@@ -23,6 +23,21 @@ test('Grand Yolo tier-weight default matches Excel d4!F10 and old tierPower impo
   assert.equal(T.normalizeState({ settings: { events: { grand: { tierPower: 1 } } } }).settings.events.grand.tierWeight, 1);
 });
 
+test('shared ship-class weights are DD=4, CA=3, BB=2 and unknown classes fail closed', () => {
+  assert.deepEqual(T.CLASSES, { DD: 4, CA: 3, BB: 2 });
+  assert.equal(T.classWeightFor('dd'), 4);
+  assert.equal(T.classWeightFor('CA'), 3);
+  assert.equal(T.classWeightFor('bb'), 2);
+  assert.equal(T.classWeightFor('CV'), 0);
+  assert.equal(T.classWeightFor('-'), 0);
+  const state = T.createState();
+  const player = T.addPlayer(state, 'Class Check');
+  assert.throws(() => T.recordResult(state, {
+    player: player.id, event: 'damage', gameNumber: 1, shipClass: 'CV', tier: 10, damage: 50000,
+  }), /Ship class must be DD, CA, or BB/);
+  assert.equal(T.eventScore(state, player, 'damage'), 0);
+});
+
 test('damage scoring follows workbook formula and recalculates against the whole roster', () => {
   const state = T.createState();
   const a = T.addPlayer(state, 'Alpha');
