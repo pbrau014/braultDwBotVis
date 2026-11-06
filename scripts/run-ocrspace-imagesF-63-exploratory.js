@@ -133,8 +133,8 @@ async function main() {
         if (decision === 'skip-complete') {
             const pdfPath = path.resolve(outputRoot, String(prior.pdfPath || ''));
             const rasterPath = path.resolve(outputRoot, String(prior.rasterPath || ''));
-            const safeArtifactPath = target => path.dirname(target) === outputRoot && !path.isAbsolute(target) && path.basename(target) === target.split(path.sep).pop();
-            let artifactsValid = safeArtifactPath(pdfPath) && safeArtifactPath(rasterPath);
+            const safeArtifactPath = (target, relative) => path.dirname(target) === outputRoot && !path.isAbsolute(relative) && path.basename(relative) === relative;
+            let artifactsValid = safeArtifactPath(pdfPath, prior.pdfPath) && safeArtifactPath(rasterPath, prior.rasterPath);
             if (artifactsValid) {
                 try {
                     artifactsValid = sha256(await fs.readFile(pdfPath)) === prior.pdfSha256
