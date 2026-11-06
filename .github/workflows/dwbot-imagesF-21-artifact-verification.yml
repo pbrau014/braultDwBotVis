@@ -54,6 +54,10 @@ permissions:
   contents: read
   actions: read
 
+env:
+  # Candidate code tested by the fresh Gate A run; 63-image PDFs retain their separate historical extraction fingerprint.
+  DWBOT_CANDIDATE_SHA: 7eda2759760651ffead3d64d3d3854295115a113
+
 jobs:
   verify:
     runs-on: windows-latest
@@ -248,7 +252,7 @@ jobs:
             $runsJson = gh api "repos/$env:GITHUB_REPOSITORY/actions/workflows/dwbot-gateA-16-pdf-first.yml/runs?per_page=100"
             if ($LASTEXITCODE -ne 0) { throw 'Could not list Gate A workflow runs.' }
             $matchingRuns = @(($runsJson | ConvertFrom-Json).workflow_runs | Where-Object {
-              $_.head_branch -eq 'main' -and $_.name -eq 'DWBOT Gate A 16-image OCR.Space PDF-first acceptance' -and $_.head_commit.message -in @('DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME','DWBOT-GATE-A-16-PDF-FIRST-RESUME-15')
+              $_.head_branch -in @('main','fix/pdf-raster-source-aspect-normalization') -and $_.name -eq 'DWBOT Gate A 16-image OCR.Space PDF-first acceptance' -and $_.head_commit.message -in @('DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME','DWBOT-GATE-A-16-PDF-FIRST-RESUME-15')
             } | Sort-Object run_number -Descending)
             $latest = $matchingRuns | Select-Object -First 1
             if ($null -eq $latest) {
@@ -285,8 +289,8 @@ jobs:
           $reports = @(Get-ChildItem -Path $gateADir -Filter 'gate-a-acceptance.json' -File -Recurse)
           if ($reports.Count -ne 1) { throw 'Gate A artifact must contain exactly one gate-a-acceptance.json report.' }
           $gateAReport = Get-Content -Raw $reports[0].FullName | ConvertFrom-Json
-          if ($gateAReport.candidateFingerprint -ne $env:DWBOT_SOURCE_RUN_SHA -or $gateAReport.gateBSourceRunId -ne $env:DWBOT_SOURCE_RUN_ID -or $gateAReport.gateBSourceCommitSha -ne $env:DWBOT_SOURCE_RUN_SHA) {
-            throw 'Gate A report is not locked to the exact 63-image source run/commit.'
+          if ($gateAReport.candidateFingerprint -ne $env:DWBOT_CANDIDATE_SHA -or $gateAReport.gateBSourceCommitSha -ne $env:DWBOT_CANDIDATE_SHA -or $gateAReport.fingerprintLocked -ne $true -or $gateAReport.matchesGateBRunSource -ne $true) {
+            throw 'Gate A report is not locked to the exact Node 26 candidate code fingerprint; the 63-PDF extraction fingerprint is recorded separately.'
           }
           $evidenceDir = Join-Path $env:GITHUB_WORKSPACE 'testdata/ocr-acceptance'
           New-Item -ItemType Directory -Force $evidenceDir | Out-Null
