@@ -13,7 +13,7 @@ Gate A is the PDF-first development acceptance gate, not the independent holdout
 Required evidence:
 
 1. Exact 16-image source archive, manifest and per-image SHA-256 values. The source archive fingerprint must be locked and recorded before processing.
-2. Windows runtime on the accepted Node baseline (Node >= 24.17.0; the established environment is Windows x64, Node 26.13.0 / npm 11.20.0).
+2. Windows runtime on the accepted Node baseline (Node >=22.16.0; Node 24.22.1 is also permitted but not required). The Gate A acceptance runner must be Windows x64; a Linux Node distribution does not satisfy this Windows-specific requirement.
 3. OCR.Space Engine 2 as the authorized primary extraction stage: original screenshot -> searchable PDF -> validated HTTPS PDF -> bounded local PDF-derived raster -> local OCR readers. No silent OCR fallback to the original screenshot.
 4. Verified PDF and PDF-derived raster for each of the 16 images, including source/PDF/raster hashes, PDF signature, page count, searchable text layer, raster dimensions and rerendered pixel provenance.
 5. Local readers and all field-specific reconciliation must operate only on the PDF-derived raster. Preserve engine/model versions, per-field candidates, disagreements, timeouts and unresolved fields.
@@ -128,7 +128,7 @@ as passed from reconstructed evidence.
 
 The current Gate A workflow definition (for any future explicitly triggered
 run) now:
-- uses Node 24.17.0 and checks the runtime before OCR execution;
+- uses Node 22.16.0 and checks the runtime before OCR execution;
 - loads the candidate network guard first and the current fail-closed
   diagnostic wrapper second, so the fail-closed logger wraps candidate network
   hooks and records denied attempts;
@@ -137,12 +137,13 @@ run) now:
 - remains one-time-message gated and does not run on ordinary pushes.
 
 These are future-workflow protections only. They do not repair or rewrite
-run #42202563673, do not reconstruct its missing original network log, and do
-not make its Node 22.16.0 runtime acceptable. The first image remains
-non-repeatable; the current 16-image runner has not yet gained an
-artifact-bound resume path. Do not re-trigger the full 16-image batch until
-such a path is implemented and the existing first-image artifacts are
-explicitly incorporated.
+run #42202563673 and do not reconstruct its missing original network log.
+The original first-image request was made without proven restricted-egress
+enforcement, so its PDF is historical evidence only and cannot count toward
+Gate A. The safe local-only recovery path must never resubmit that image. A
+new fully guarded Gate A run, if authorized, must bind all 16 images to a new
+source-bound report and fresh restricted-egress diagnostic log; this will
+repeat the first provider request because the earlier request is ineligible.
 
 
 ## 8. Runtime floor reconciliation — 2026-11-06
@@ -154,8 +155,8 @@ minimum statements in this document. The current accepted minimum is
 The current Gate A workflow uses Node 22.16.0 and its explicit runtime check
 uses the same floor.
 
-Accordingly, the earlier statements in sections 1, 5, 6 and 7 describing
-Node 22.16.0 as below the accepted runtime are historical and superseded.
+Accordingly, any older statements in this document describing Node 22.16.0
+as below the accepted runtime are historical and superseded.
 This correction does not change Gate A's status: the interrupted run still
 contains only 1/16 PDF/raster pairs and lacks its original restricted-egress
 diagnostic log. Gate A remains NOT PASSED.
