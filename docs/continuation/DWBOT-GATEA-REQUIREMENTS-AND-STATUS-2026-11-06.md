@@ -120,3 +120,24 @@ artifact-bound resume for the existing first PDF/raster, then process only
 the 15 unprocessed source hashes, preserving the first run's missing-log and
 runtime limitations in the final evidence. No Gate A PASS may be claimed from
 this mixed/interrupted evidence.
+
+
+## 7. Gate A workflow hardening after the interrupted run
+
+The current Gate A workflow definition (for any future explicitly triggered
+run) now:
+- uses Node 24.17.0 and checks the runtime before OCR execution;
+- loads the candidate network guard first and the current fail-closed
+  diagnostic wrapper second, so the fail-closed logger wraps candidate network
+  hooks and records denied attempts;
+- uploads the sequence `report.json.progress.json` checkpoint alongside
+  reports and PDF/raster artifacts;
+- remains one-time-message gated and does not run on ordinary pushes.
+
+These are future-workflow protections only. They do not repair or rewrite
+run #42202563673, do not reconstruct its missing original network log, and do
+not make its Node 22.16.0 runtime acceptable. The first image remains
+non-repeatable; the current 16-image runner has not yet gained an
+artifact-bound resume path. Do not re-trigger the full 16-image batch until
+such a path is implemented and the existing first-image artifacts are
+explicitly incorporated.
