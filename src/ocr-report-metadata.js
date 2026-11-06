@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { getOcrSpaceActivation } = require('./ocrspace-field-evidence');
+const { MAX_FREE_FILE_BYTES } = require('./ocrspace-client');
 
 function sha256File(filePath) {
     return crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex');
@@ -26,7 +27,7 @@ function describeOcrConfiguration(env = process.env) {
         imageTimeoutMs: positiveInteger(env.OCR_IMAGE_TIMEOUT_MS, 90_000),
         operationTimeoutMs: positiveInteger(env.OCR_OPERATION_TIMEOUT_MS, 15_000),
         ocrSequence: ocrSpaceEnabled
-            ? ['opencv-geometry', 'ocrspace-engine3', 'tesseractjs-local', 'ocrspace-diagnostic-reconciliation']
+            ? ['ocrspace-engine2-source-image', 'searchable-pdf-download', 'pdf-page-raster', 'local-ocr-readers', 'field-validation']
             : ['tesseractjs-local'],
         ocrSpace: {
             enabled: ocrSpaceEnabled,
@@ -35,22 +36,23 @@ function describeOcrConfiguration(env = process.env) {
             explicitlyDisabled: ocrSpaceActivation.explicitlyDisabled,
             activationReason: ocrSpaceActivation.reason,
             apiKeyConfigured: ocrSpaceKeyConfigured,
-            engine: 3,
+            engine: 2,
             requestProfile: {
                 detectOrientation: true,
                 scale: true,
-                tableMode: 'rewardBand-only',
+                tableMode: false,
                 searchablePdf: true,
-                searchablePdfHideTextLayer: false,
-                explicitTextOverlayResponse: false,
-                pdfFallbackEngine: 2,
+                searchablePdfHideTextLayer: true,
+                oneRequestPerImage: true,
+                sourceImageFirst: true,
+                localReadersUsePdfRaster: true,
             },
             limits: {
-                maxCrops: bounded(env.OCRSPACE_MAX_CROPS, 2, 7),
-                stageBudgetMs: Math.max(1000, Math.min(30_000, positiveInteger(env.OCRSPACE_STAGE_BUDGET_MS, 20_000))),
+                maxUploadBytes: MAX_FREE_FILE_BYTES,
+                maxPdfBytes: 25 * 1024 * 1024,
+                maxPdfPages: 3,
                 maxPerDay: bounded(env.OCRSPACE_MAX_PER_DAY, 450, 499),
                 maxPerMonth: bounded(env.OCRSPACE_MAX_PER_MONTH, 22_000, 24_999),
-                maxEngine3PerMonth: bounded(env.OCRSPACE_MAX_ENGINE3_PER_MONTH, 900, 999),
             },
         },
     };

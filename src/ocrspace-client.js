@@ -59,8 +59,8 @@ async function readJsonBounded(response, maxBytes = MAX_RESPONSE_BYTES) {
     }
     throw fail('OCR.space response body is unavailable.', 'OCRSPACE_INVALID_RESPONSE');
 }
-/** Returns OCR.space evidence only; callers must not use it to accept or rewrite DWBOT fields. */
-async function recognizeCrop({ apiKey, imageBuffer, filename = 'dwbot-field-crop.png', mimeType = 'image/png', engine = 3, overlayRequired = false, detectOrientation = true, isTable = false, scale = true, createSearchablePdf = true, searchablePdfHideTextLayer = false, timeoutMs = 15000, fetchImpl = globalThis.fetch }) {
+/** Returns OCR.Space evidence only; active PDF-first callers must pass Engine 2 and request a hidden-but-searchable PDF text layer. This generic client still supports Engine 3 for legacy non-PDF diagnostics. */
+async function recognizeCrop({ apiKey, imageBuffer, filename = 'dwbot-field-crop.png', mimeType = 'image/png', engine = 2, overlayRequired = false, detectOrientation = true, isTable = false, scale = true, createSearchablePdf = true, searchablePdfHideTextLayer = true, timeoutMs = 15000, fetchImpl = globalThis.fetch }) {
     const key = String(apiKey || '').trim();
     if (!key) throw fail('OCR.space API key is not configured.', 'OCRSPACE_KEY_MISSING');
     if (!Buffer.isBuffer(imageBuffer) || !imageBuffer.length) throw fail('OCR.space input crop is empty or invalid.', 'OCRSPACE_INVALID_IMAGE');

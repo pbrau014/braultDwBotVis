@@ -62,7 +62,7 @@ test('OCR configuration metadata makes optional engine and network feature flags
             explicitlyDisabled: false,
             activationReason: 'OCRSPACE_API_KEY is not configured',
             apiKeyConfigured: false,
-            engine: 3,
+            engine: 2,
             requestProfile: {
                 detectOrientation: true, scale: true, tableMode: 'rewardBand-only',
                 searchablePdf: true, searchablePdfHideTextLayer: false,
@@ -84,39 +84,38 @@ test('OCR.Space report metadata records the configured request profile without e
     assert.equal(defaults.ocrSpace.explicitlyDisabled, false);
     assert.equal(defaults.ocrSpace.activationReason, 'OCRSPACE_API_KEY is not configured');
     assert.equal(defaults.ocrSpace.apiKeyConfigured, false);
-    assert.equal(defaults.ocrSequence.includes('ocrspace-engine3'), false);
+    assert.equal(defaults.ocrSequence.includes('ocrspace-engine2-source-image'), false);
 
     const keyOnlyDefault = describeOcrConfiguration({ OCRSPACE_API_KEY: 'local-key' });
     assert.equal(keyOnlyDefault.ocrSpace.enabled, true);
     assert.equal(keyOnlyDefault.ocrSpace.defaultEnabled, true);
     assert.equal(keyOnlyDefault.ocrSpace.explicitlyEnabled, false);
-    assert.deepEqual(keyOnlyDefault.ocrSequence, ['opencv-geometry', 'ocrspace-engine3', 'tesseractjs-local', 'ocrspace-diagnostic-reconciliation']);
+    assert.deepEqual(keyOnlyDefault.ocrSequence, ['ocrspace-engine2-source-image', 'searchable-pdf-download', 'pdf-page-raster', 'local-ocr-readers', 'field-validation']);
     const explicitlyOff = describeOcrConfiguration({ OCRSPACE_ENABLED: '0', OCRSPACE_API_KEY: 'local-key' });
     assert.equal(explicitlyOff.ocrSpace.enabled, false);
     assert.equal(explicitlyOff.ocrSpace.explicitlyDisabled, true);
-    assert.equal(explicitlyOff.ocrSequence.includes('ocrspace-engine3'), false);
+    assert.equal(explicitlyOff.ocrSequence.includes('ocrspace-engine2-source-image'), false);
 
     const enabled = describeOcrConfiguration({
         OCRSPACE_ENABLED: '1',
         OCRSPACE_API_KEY: 'never-log-this-secret',
-        OCRSPACE_MAX_CROPS: '4',
-        OCRSPACE_STAGE_BUDGET_MS: '18000',
+        OCRSPACE_MAX_PER_DAY: '400',
+        OCRSPACE_MAX_PER_MONTH: '21000',
     });
     assert.equal(enabled.ocrSpace.enabled, true);
     assert.equal(enabled.ocrSpace.apiKeyConfigured, true);
-    assert.deepEqual(enabled.ocrSequence, ['opencv-geometry', 'ocrspace-engine3', 'tesseractjs-local', 'ocrspace-diagnostic-reconciliation']);
-    assert.equal(enabled.ocrSpace.engine, 3);
+    assert.deepEqual(enabled.ocrSequence, ['ocrspace-engine2-source-image', 'searchable-pdf-download', 'pdf-page-raster', 'local-ocr-readers', 'field-validation']);
+    assert.equal(enabled.ocrSpace.engine, 2);
     assert.deepEqual(enabled.ocrSpace.requestProfile, {
-        detectOrientation: true, scale: true, tableMode: 'rewardBand-only',
-        searchablePdf: true, searchablePdfHideTextLayer: false,
-        explicitTextOverlayResponse: false, pdfFallbackEngine: 2,
+        detectOrientation: true, scale: true, tableMode: false,
+        searchablePdf: true, searchablePdfHideTextLayer: true,
+        oneRequestPerImage: true, sourceImageFirst: true, localReadersUsePdfRaster: true,
     });
-    assert.equal(enabled.ocrSpace.limits.maxCrops, 4);
-    assert.equal(enabled.ocrSpace.limits.stageBudgetMs, 18000);
+    assert.equal(enabled.ocrSpace.limits.maxPerDay, 400);
+    assert.equal(enabled.ocrSpace.limits.maxPerMonth, 21000);
     assert.equal(JSON.stringify(enabled).includes('never-log-this-secret'), false);
     const bounded = describeOcrConfiguration({ OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'key',
-        OCRSPACE_MAX_CROPS: '999', OCRSPACE_STAGE_BUDGET_MS: '999999', OCRSPACE_MAX_PER_DAY: '9999',
-        OCRSPACE_MAX_PER_MONTH: '999999', OCRSPACE_MAX_ENGINE3_PER_MONTH: '9999' });
-    assert.deepEqual(bounded.ocrSpace.limits, { maxCrops: 7, stageBudgetMs: 30000,
-        maxPerDay: 499, maxPerMonth: 24999, maxEngine3PerMonth: 999 });
+        OCRSPACE_MAX_PER_DAY: '9999', OCRSPACE_MAX_PER_MONTH: '999999' });
+    assert.deepEqual(bounded.ocrSpace.limits, { maxUploadBytes: 1048576, maxPdfBytes: 25 * 1024 * 1024,
+        maxPdfPages: 3, maxPerDay: 499, maxPerMonth: 24999 });
 });

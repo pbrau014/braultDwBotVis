@@ -9,7 +9,7 @@ const { recognizeCrop, API_URL, MAX_FREE_FILE_BYTES, MAX_RESPONSE_BYTES } = requ
 const { OcrSpaceQuotaLedger, PROVIDER_LIMITS } = require('../src/ocrspace-quota-ledger');
 const { collectOcrSpaceFieldEvidence, parseCropCap, isEligibleCrop } = require('../src/ocrspace-field-evidence');
 
-function payload(text = '43110', engine = 3) {
+function payload(text = '43110', engine = 2) {
     return { OCRExitCode: 1, IsErroredOnProcessing: false, ProcessingTimeInMilliseconds: '143',
         SearchablePDFURL: 'https://api.ocr.space/download/mock.pdf',
         ParsedResults: [{ FileParseExitCode: 1, ParsedText: text, TextOverlay: engine === 2
@@ -21,7 +21,7 @@ function reply(data, status = 200, headers = {}) {
 }
 function args() { return { apiKey: 'not-a-real-key-value', imageBuffer: Buffer.from('png-data'), fetchImpl: async () => reply(payload()) }; }
 
-test('Engine 3 uses HTTPS multipart and required orientation, table, scaling and visible-PDF profile', async () => {
+test('Engine 2 is the default PDF-first profile with hidden searchable text layer', async () => {
     let request;
     const result = await recognizeCrop({ ...args(), fetchImpl: async (url, options) => { request = { url, options }; return reply(payload('43110', 3)); } });
     assert.equal(request.url, API_URL);
@@ -29,14 +29,14 @@ test('Engine 3 uses HTTPS multipart and required orientation, table, scaling and
     assert.equal(request.options.redirect, 'error');
     assert.equal(request.options.headers.apikey, 'not-a-real-key-value');
     assert.ok(request.options.body instanceof FormData);
-    assert.equal(request.options.body.get('OCREngine'), '3');
+    assert.equal(request.options.body.get('OCREngine'), '2');
     assert.equal(request.options.body.get('language'), 'auto');
     assert.equal(request.options.body.get('isOverlayRequired'), null);
     assert.equal(request.options.body.get('detectOrientation'), 'true');
     assert.equal(request.options.body.get('isTable'), 'false');
     assert.equal(request.options.body.get('scale'), 'true');
     assert.equal(request.options.body.get('isCreateSearchablePdf'), 'true');
-    assert.equal(request.options.body.get('isSearchablePdfHideTextLayer'), 'false');
+    assert.equal(request.options.body.get('isSearchablePdfHideTextLayer'), 'true');
     assert.equal(result.parsedText, '43110');
     assert.equal(result.providerConfidence, null);
     assert.deepEqual(result.overlay, []);
@@ -65,12 +65,12 @@ test('Engine 2 is used only as a searchable-PDF fallback when Engine 3 returns n
     assert.deepEqual(calls, ['reserve:3', 'client:3:true:false', 'reserve:2', 'client:2:true:false']);
 });
 
-test('Engine 3 searchable PDF does not request slower optional TextOverlay data', async () => {
+test('Legacy Engine 3 non-PDF OCR does not request optional TextOverlay data', async () => {
     let form;
-    const result = await recognizeCrop({ ...args(), engine: 3, fetchImpl: async (_url, options) => { form = options.body; return reply(payload('player text', 3)); } });
+    const result = await recognizeCrop({ ...args(), engine: 3, createSearchablePdf: false, searchablePdfHideTextLayer: false, fetchImpl: async (_url, options) => { form = options.body; return reply(payload('player text', 3)); } });
     assert.equal(form.get('OCREngine'), '3');
     assert.equal(form.get('isOverlayRequired'), null);
-    assert.equal(form.get('isCreateSearchablePdf'), 'true');
+    assert.equal(form.get('isCreateSearchablePdf'), 'false');
     assert.equal(form.get('isSearchablePdfHideTextLayer'), 'false');
     assert.equal(result.providerConfidence, null);
     assert.deepEqual(result.overlay, []);
