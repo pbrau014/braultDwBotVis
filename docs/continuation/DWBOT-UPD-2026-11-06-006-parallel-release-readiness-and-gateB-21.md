@@ -198,3 +198,13 @@ to its original workflow commit and cannot gain this log retroactively; for
 that run, inspect the run logs and every localReaderFailures entry for
 OCR_NETWORK_BLOCKED, and do not claim a clean zero-attempt result if the
 evidence is insufficient.
+
+
+## Candidate manifest alignment
+
+The repository-side 63-image candidate manifest now carries a derived
+gateBSubset block listing the exact 21 selected filenames, byte sizes and
+source SHA-256 values, bound to the current v6 JSON SHA-256. Its usePolicy now
+distinguishes the full 63-image exploratory archive from the approved 21-image
+Gate B subset. The embedded manifest inside the original candidate ZIP and its
+fixed preflight fingerprint remain unchanged for provenance and reproducibility.

@@ -40,6 +40,16 @@ class GateB21EvaluatorTests(unittest.TestCase):
         self.assertEqual(len(dev_hashes), 16)
         self.assertFalse(gate_b_hashes & dev_hashes)
 
+    def test_gate_b_selection_matches_source_bound_candidate_manifest(self):
+        manifest_path = ROOT / "testdata" / "imagesF-holdout-candidate-manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        subset = manifest["gateBSubset"]
+        self.assertEqual(subset["id"], "complete-ground-truth-21")
+        self.assertEqual(subset["imageCount"], 21)
+        self.assertEqual(subset["groundTruthSha256"], hashlib.sha256(GT_PATH.read_bytes()).hexdigest())
+        expected = [{"filename": row["filename"], "bytes": row["sourceImage"]["bytes"], "sha256": row["sourceImage"]["sha256"]} for row in self.selected]
+        self.assertEqual(subset["records"], expected)
+
     def test_partial_or_uncertain_rows_do_not_enter_gate_b(self):
         selected_names = {r["filename"] for r in self.selected}
         for row in self.gt["records"]:
