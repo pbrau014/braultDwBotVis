@@ -27,6 +27,10 @@ Gate B NOT_PASSED, and production NO-GO.
 
 ---
 
+# Historical record — superseded by the 19-image Gate B revision above
+
+The following section preserves the earlier 21-image Gate B decision as history only. It is not current policy; Gate B is exactly 19 images and records 20–21 are diagnostic-only.
+
 # DWBOT parallel verification and Gate B artifact acceptance record
 
 Date: 2026-11-06
