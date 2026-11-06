@@ -4680,3 +4680,118 @@ Verification disposition:
 ================================================================================
 END DWBOT-UPD-2026-11-06-001
 ================================================================================
+
+
+================================================================================
+DWBOT-UPD-2026-11-06-002 — EXACT-HEAD RUN 393 RESULTS / PROVIDER SECRET BLOCKER
+================================================================================
+
+Canonical source at verification: 18113f36bf3dc87c95407435a54e204e937734d5.
+Exact-head workflow run 393:
+https://github.com/pbrau014/braultDwBotVis/actions/runs/42147353938
+Expected and actual run SHA both equal 18113f36bf3dc87c95407435a54e204e937734d5.
+Run 393 completed with overall conclusion FAILURE. It is not a complete CI
+pass because the protected OCR.Space secret check failed in the Windows job.
+
+Run 393 job results:
+1. PDF manual and clean package verification — SUCCESS.
+   - PDF manual rendering passed.
+   - Clean extraction/package verification passed.
+   - The clean package completed npm ci, npm test and prelive checks.
+   - Clean-package npm test: 302 passed, 0 failed, 3 skipped.
+   - Prelive result: PASS.
+   - Package: DWBOT-18113f36bf3d.zip.
+   - Package SHA-256: 9eb2729967cbc77264dff0f8b10de2b75bf4c67c13d3b3175542bd2e4901fa67.
+   - Artifact: dwbot-pdf-manual-and-clean-package, ID 13471365068,
+     88,465,640 bytes, artifact SHA-256
+     3cae3847b8600069756ab0d8efc9d63ed9adbb191cb8b4a3ccf10cd7211074bf.
+2. Windows Node.js 22.16.0 — JOB FAILURE CAUSED BY MISSING SECRET.
+   - Setup, Node 22.16.0, native Tesseract prerequisites, isolated OpenCV
+     runtime, locked dependency install, process-level persistence/recovery,
+     and the full Windows test suite all passed.
+   - Native Tesseract: 5.5.3.20260724.
+   - Full Windows npm test: 303 passed, 0 failed, 2 skipped.
+   - The two new regression tests passed: OCR.Space Engine 2 PDF-first before
+     local readers with retained PDF/raster artifacts; and screenshot
+     acceptance policy requiring OCR.Space PDF-first while preserving the
+     isolated offline synthetic lifecycle test.
+   - Persistence/recovery report passed all 11 stages on win32 x64 / Node
+     v22.16.0. Synthetic 50-player JSON and SQLite seed, copy, restore and
+     verification completed; SQLite integrity reported "ok". This CI fixture
+     is not production data and does not by itself satisfy deferred release
+     Gate C.
+   - Protected secret step reported exactly:
+     OCRSPACE_API_KEY configured: False.
+     The workflow then failed with "Protected OCRSPACE_API_KEY secret is
+     missing or empty." The current-source screenshot acceptance step was
+     skipped. No OCR.Space request, searchable PDF, or live screenshot
+     acceptance is claimed from run 393.
+   - Artifact: dwbot-windows-node22-native-ocr-and-recovery, ID
+     13471275062, 46,095 bytes, artifact SHA-256
+     b982af3ab764df9ff08c1b30b4c34def3c67437f84a15ee05d6c11aaa5f2aec6.
+3. Linux Node.js 22.16.0 offline verification — SUCCESS.
+   - Local English model provision, locked install, syntax checks, mocked
+     OCR.Space contract, Discord offline preflight, desktop offline
+     configuration, desktop service/bridge tests, JSON/SQLite recovery, and
+     full project suite all passed.
+   - Full project suite: 303 passed, 0 failed, 2 skipped.
+
+Overall interpretation:
+- Source/test corrections and PDF-first acceptance-contract checks are now
+  verified on both Windows and Linux test environments.
+- Clean package/manual generation and isolated persistence/recovery tests
+  passed.
+- Run 393 is still an overall FAILURE because the required protected
+  OCRSPACE_API_KEY secret is missing. Do not call it a green workflow.
+- The secret cannot be supplied through chat or inferred from any local
+  configuration. The repository owner must add the secret in GitHub:
+  Settings -> Secrets and variables -> Actions -> New repository secret,
+  name OCRSPACE_API_KEY. Do not paste the key into chat or logs. After the
+  secret is added, rerun verification on the resulting exact main commit and
+  inspect the actual PDF and raster artifacts before assigning Gate A status.
+
+Historical screenshot artifact investigation:
+- Separate historical run 317:
+  https://github.com/pbrau014/braultDwBotVis/actions/runs/42127310691
+  completed FAILURE on source commit 593a692dfc7220d77804d63ba2daf322f1a0159a.
+  Its Windows artifact ID 13464839625 has artifact SHA-256
+  b04bddc624dcb61f65fbe37cd580725cb0d458d131062b359c569553134d2d77.
+- The run-317 Windows report identifies Node 22.16.0, native Tesseract
+  5.5.3.20260724, and source commit 593a692. Native baseline exact matches
+  were 2/4 on the four-image corpus and 3/16 on the additional corpus; the
+  OpenCV-assisted results had the same exact-match counts. The reported
+  screenshot was 1/1 exact. The 16-image run had only 3/16 complete exact
+  required records. These results are historical, not current source
+  acceptance.
+- Inspection of that artifact ZIP found no PDF or raster files and no
+  per-image ocrSpacePdfFirst evidence in the sequence reports. It therefore
+  does not establish the current OCR.Space Engine 2 PDF-first path and must
+  not be used as a substitute for the new acceptance run.
+- A separate preserved Library file native-16-image-report.json was
+  re-hashed in this session: SHA-256
+  f6f4dd7a3b6c8cc6c300c480c20dcd44f0638797e20f32036726478b51cd0f5a,
+  1,360,612 bytes. Its metadata identifies source-build fingerprint
+  ea881c66dca81970c19a20a7e1536681dbf815b0e36d81f9ae22f95235628dad
+  (99 files), Node v26.13.0, native Tesseract, network blocked, 16 completed,
+  5 exact matches and 6 complete required records. Preserve it as a distinct
+  historical report; do not conflate it with run 317 or current main.
+- Targeted Library search for imgsHalf1.zip, a 64-image archive, and an
+  independent 50+/100-image holdout did not surface those archive/corpus
+  files. This was a targeted search, not an exhaustive Library inventory.
+  The 64-image archive and independent holdout remain open prerequisites.
+
+Next authorized work:
+- Continue code, test, documentation and offline verification work that does
+  not require provider credentials.
+- Once the repository owner adds OCRSPACE_API_KEY, rerun exact-head workflow
+  verification and execute the approved 4-/16-image PDF-first acceptance.
+  Verify Engine 2, source/PDF/raster hash binding, all nine exact mandatory
+  fields, zero wrong accepted values, and unrelated-network denial.
+- Keep the 64-image inventory and independent holdout separate; do not tune
+  against or relabel the development corpus as holdout.
+- No production deployment, live Discord action, or release readiness claim.
+  Production remains NO-GO.
+
+================================================================================
+END DWBOT-UPD-2026-11-06-002
+================================================================================
