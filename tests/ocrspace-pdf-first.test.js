@@ -4,6 +4,13 @@ const assert = require('node:assert/strict');
 const { createOcrSpacePdfFirst, downloadSearchablePdf, readPdfBounded } = require('../src/ocrspace-pdf-first');
 
 const pdf = Buffer.from('%PDF-1.7\\nmock-pdf-bytes\\n%%EOF');
+function streamResponse(bytes, headers = {}) {
+    let sent = false;
+    return { headers: { get: name => headers[String(name).toLowerCase()] || null }, body: { getReader: () => ({
+        async read() { if (sent) return { done: true }; sent = true; return { done: false, value: bytes }; },
+        async cancel() {}, releaseLock() {}
+    }) } };
+}
 const png = Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a,1,2,3]);
 
 function fakeLedger() {
@@ -85,13 +92,14 @@ test('PDF download rejects unapproved URLs, redirects and non-PDF payloads', asy
         fetchImpl: async url => ({ ok: true, redirected: true, url: 'https://evil.example/a.pdf', arrayBuffer: async () => pdf }),
     }), { code: 'OCRSPACE_PDF_REDIRECT_BLOCKED' });
     await assert.rejects(downloadSearchablePdf('https://api.ocr.space/a.pdf', {
-        fetchImpl: async url => ({ ok: true, redirected: false, url, arrayBuffer: async () => Buffer.from('not-pdf') }),
+        fetchImpl: async url => ({ ok: true, redirected: false, url, ...streamResponse(Buffer.from('not-pdf')) }),
     }), { code: 'OCRSPACE_INVALID_PDF' });
 });
 
 test('bounded PDF reader enforces the byte cap', async () => {
     const bytes = Buffer.alloc(100, 1);
-    await assert.rejects(readPdfBounded({ headers: { get: () => '100' }, arrayBuffer: async () => bytes }, 50), { code: 'OCRSPACE_PDF_TOO_LARGE' });
+    await assert.rejects(readPdfBounded({ headers: { get: () => '100' }, body: { getReader: () => { throw new Error('must reject from declared size first'); } } }, 50), { code: 'OCRSPACE_PDF_TOO_LARGE' });
+    await assert.rejects(readPdfBounded({ headers: { get: () => null }, arrayBuffer: async () => bytes }, 50), { code: 'OCRSPACE_PDF_STREAM_UNAVAILABLE' });
 });
 
 
