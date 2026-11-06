@@ -62,6 +62,11 @@ async function main() {
         cvAnalysis: { status: cvAnalysis.status, opencvVersion: cvAnalysis.opencvVersion,
             regionNames: Object.keys(cvAnalysis.regions || {}), preprocessing: cvAnalysis.preprocessing || [] },
         modelVersions: fallback.modelVersions || null,
+        error: fallback.error || null,
+        reason: fallback.reason || null,
+        helperStatus: fallback.helperStatus || null,
+        requestedFields: fallback.requestedFields || [],
+        attemptedCrops: fallback.attemptedCrops || [],
         networkAttemptCount: Number(fallback.networkAttemptCount) || 0,
         cropResults: fallback.cropResults || [],
         acceptancePolicy: 'diagnostic candidates only; no standalone PaddleOCR candidate is accepted'
