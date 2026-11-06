@@ -160,7 +160,7 @@ function main() {
     const baseline = readJson(baselinePath); const candidate = readJson(candidatePath); const manifest = readJson(manifestPath);
     const baseSummary = summarizePipeline('tesseract-only-baseline', baseline, manifest);
     const candidateSummary = summarizePipeline('tesseract-plus-paddle-local-field-crop', candidate, manifest);
-    if (candidate.networkBlocked !== true) throw new Error('Candidate run does not state that the network block was enabled. Refusing an offline-safety comparison without this control.');
+    if (candidate.networkBlocked !== true || candidate.networkIsolation?.ocrSpaceNetworkAllowed !== true || candidate.networkIsolation?.nonOcrNetworkRestricted !== true) throw new Error('Candidate run must prove OCR.Space provider access was allowed while unrelated outbound traffic was restricted.');
     if (candidateSummary.fallback.networkAttemptCount !== 0) throw new Error('PaddleOCR fallback report recorded blocked network attempts.');
     const baseByField = new Map(baseSummary.byField.map(row => [row.field, row]));
     const deltas = candidateSummary.byField.map(next => ({ field: next.field, baselineCorrect: baseByField.get(next.field).correct,
