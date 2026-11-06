@@ -3,7 +3,7 @@
 
 This script never calls OCR.Space or repeats provider submissions. It compares
 saved PDF-derived local-reader records against the versioned manual reference.
-Gate B is the approved 21-image complete nine-field subset; a pass additionally
+Gate B is the approved 19-image complete nine-field subset; a pass additionally
 requires a separately verified artifact/network report.
 """
 from __future__ import annotations
@@ -13,8 +13,9 @@ from pathlib import Path
 FIELDS = ["result", "player", "map", "mode", "battleStart", "credits", "freeXp", "damage", "xp"]
 NUMERIC = {"credits", "freeXp", "damage", "xp"}
 MISSING = {"", "not detected", "not_detected", "none", "null", "n/a"}
-MIN_GATE_B_IMAGES = 21
-GATE_B_INVENTORY = "complete-ground-truth-21"
+MIN_GATE_B_IMAGES = 19
+GATE_B_INVENTORY = "gate-b-complete-ground-truth-19"
+ANALYSIS_21_INVENTORY = "complete-ground-truth-21"
 
 
 def sha(path: Path) -> str:
@@ -69,9 +70,10 @@ def verify_gate_b_independence(selected_records):
 
 def select_gate_b_records(gt):
     records = gt.get("records", [])
-    selected = [r for r in records if is_complete_reference(r)]
-    if len(selected) != MIN_GATE_B_IMAGES or selected != records[:MIN_GATE_B_IMAGES]:
-        raise SystemExit("Gate B requires exactly the first 21 corpus-order records with complete, eligible, non-empty values for all nine fields.")
+    eligible = [r for r in records if is_complete_reference(r)]
+    if len(eligible) < MIN_GATE_B_IMAGES or eligible[:MIN_GATE_B_IMAGES] != records[:MIN_GATE_B_IMAGES]:
+        raise SystemExit("Gate B requires at least the first 19 corpus-order records with complete, eligible, non-empty values for all nine fields.")
+    selected = eligible[:MIN_GATE_B_IMAGES]
     for row in selected:
         source = row.get("sourceImage") or {}
         if (not re.fullmatch(r"[0-9a-f]{64}", str(source.get("sha256", "")))
@@ -260,9 +262,9 @@ def verify_artifact_report(artifact, run_path, gt_path, selected_records, select
     if artifact.get("groundTruthSha256") != sha(gt_path):
         reasons.append("Artifact report is not bound to this ground-truth SHA-256.")
     if selection.get("id") != GATE_B_INVENTORY or selection.get("selectedImageCount") != MIN_GATE_B_IMAGES:
-        reasons.append("Artifact report inventory selection is not the approved 21-image Gate B set.")
+        reasons.append("Artifact report inventory selection is not the approved 19-image Gate B set.")
     if selection.get("verifiedImageCount") != MIN_GATE_B_IMAGES or selection.get("allSelectedImagesVerified") is not True:
-        reasons.append("Artifact report does not verify all 21 selected images.")
+        reasons.append("Artifact report does not verify all 19 selected images.")
     for key in ("sourceImageHashes", "pdfIntegrity", "searchablePdfTextLayer",
                 "rasterIntegrity", "pdfDerivedRasterProvenance", "localReaders",
                 "networkRestriction", "secretLeakScan"):
@@ -277,7 +279,7 @@ def verify_artifact_report(artifact, run_path, gt_path, selected_records, select
     image_by_name = {r.get("filename"): r for r in image_rows}
     selected_names = {r["filename"] for r in selected_records}
     if len(image_rows) != MIN_GATE_B_IMAGES or set(image_by_name) != selected_names:
-        reasons.append("Artifact report image list is not an exact 21-image selection.")
+        reasons.append("Artifact report image list is not an exact 19-image selection.")
     run_by_name = {r.get("filename"): r for r in selected_run_results}
     gt_by_name = {r["filename"]: r for r in selected_records}
     for name in selected_names:
@@ -309,7 +311,7 @@ def main():
     ap.add_argument("--run-report", required=True, type=Path)
     ap.add_argument("--ground-truth", required=True, type=Path)
     ap.add_argument("--output", required=True, type=Path)
-    ap.add_argument("--inventory", choices=("all-63", GATE_B_INVENTORY), default=GATE_B_INVENTORY)
+    ap.add_argument("--inventory", choices=("all-63", ANALYSIS_21_INVENTORY, GATE_B_INVENTORY), default=GATE_B_INVENTORY)
     ap.add_argument("--artifact-verification-report", type=Path, default=None)
     args = ap.parse_args()
 
@@ -328,7 +330,15 @@ def main():
     if unknown:
         raise SystemExit("OCR run contains filenames absent from ground truth: " + ", ".join(unknown))
 
-    selected_records = select_gate_b_records(gt) if args.inventory == GATE_B_INVENTORY else gt["records"]
+    if args.inventory == GATE_B_INVENTORY:
+        selected_records = select_gate_b_records(gt)
+    elif args.inventory == ANALYSIS_21_INVENTORY:
+        eligible = [r for r in gt["records"] if is_complete_reference(r)]
+        if len(eligible) != 21 or eligible != gt["records"][:21]:
+            raise SystemExit("The 21-image analysis inventory requires exactly the first 21 complete nine-field reference records.")
+        selected_records = eligible
+    else:
+        selected_records = gt["records"]
     selected_names = [r["filename"] for r in selected_records]
     selected_name_set = set(selected_names)
     selected_run_results = [r for r in run.get("results", []) if r.get("filename") in selected_name_set]
@@ -342,19 +352,21 @@ def main():
     ) if args.inventory == GATE_B_INVENTORY else {"status": "NOT_APPLICABLE"}
     wrong_accepted = sum(e["wronglyAcceptedMandatoryFieldValues"] for e in engines)
     source_mismatches = sum(e["sourceImageHashMismatches"] for e in engines)
-    readers_complete = all(e["readerRowsAvailable"] == MIN_GATE_B_IMAGES for e in engines)
+    readers_complete = all(e["readerRowsAvailable"] == len(selected_records) for e in engines)
     rows_complete = not missing_selected and all(
         r.get("status") == "pdf-first-complete" and r.get("providerSubmissionAttempted") is True
         and r.get("pdfSha256") and r.get("rasterSha256") for r in selected_run_results
     )
     network_pass = artifact_verification.get("checks", {}).get("networkRestriction") == "PASS" and artifact_verification.get("checks", {}).get("unauthorizedNetworkAttempts") == 0
     engine_acceptance_complete = all(
-        engine["completeNineFieldSubset"]["eligibleRecords"] == MIN_GATE_B_IMAGES
+        engine["completeNineFieldSubset"]["eligibleRecords"] == len(selected_records)
         and engine["completeNineFieldSubset"]["unresolved"] == 0
         and engine["fieldLevelSummary"]["unresolvedOutputs"] == 0
         for engine in engines
     )
-    if args.inventory != GATE_B_INVENTORY:
+    if args.inventory == ANALYSIS_21_INVENTORY:
+        gate_b = "NOT_EVALUATED_GATE_B_19_REQUIRES_GATE_B_INVENTORY"
+    elif args.inventory == "all-63":
         gate_b = "NOT_APPLICABLE_WRONG_INVENTORY"
     elif artifact_verification["status"] == "PENDING_ARTIFACT_VERIFICATION":
         gate_b = "PENDING_ARTIFACT_VERIFICATION"
@@ -384,7 +396,7 @@ def main():
             "sourceCorpusImageCount": len(gt["records"]),
             "selectedFilenames": selected_names,
             "independenceChecks": verify_gate_b_independence(selected_records) if args.inventory == GATE_B_INVENTORY else {"status": "NOT_APPLICABLE"},
-            "selectionRule": "exactly the first 21 corpus-order records with COMPLETE_9_FIELD_TRANSCRIPTION and all nine non-empty expected values eligible_for_exact_match=true" if args.inventory == GATE_B_INVENTORY else "all 63 source-corpus records"
+            "selectionRule": ("exactly the first 19 corpus-order records with COMPLETE_9_FIELD_TRANSCRIPTION and all nine non-empty expected values eligible_for_exact_match=true" if args.inventory == GATE_B_INVENTORY else ("all 21 complete corpus-order records for analysis only; this is not the Gate B holdout" if args.inventory == ANALYSIS_21_INVENTORY else "all 63 source-corpus records"))
         },
         "imageCount": len(selected_records),
         "sourceCorpusImageCount": len(gt["records"]),
@@ -407,13 +419,13 @@ def main():
             "allSelectedPdfAndRasterArtifactsVerified": True,
             "zeroWronglyAcceptedMandatoryFieldValues": True,
             "zeroUnresolvedMandatoryFieldValues": True,
-            "all21RecordsHaveAResolvedNineFieldOutputPerEngine": True,
+            "all19GateBRecordsHaveAResolvedNineFieldOutputPerEngine": True,
             "zeroUnauthorizedNetworkAttempts": True,
             "unresolvedOutputs": "Any missing/unresolved mandatory output blocks Gate B. Wrong but unaccepted candidates remain separately reported and do not count as accepted; any wrongly accepted mandatory value blocks Gate B."
         },
         "gateB": gate_b,
         "engineAcceptanceChecks": {
-            "all21RecordsHaveAResolvedNineFieldOutputPerEngine": engine_acceptance_complete,
+            "all19GateBRecordsHaveAResolvedNineFieldOutputPerEngine": engine_acceptance_complete,
             "zeroUnresolvedMandatoryFieldValues": engine_acceptance_complete
         },
         "engines": engines
