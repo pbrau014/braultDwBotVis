@@ -17,8 +17,8 @@ $Comparator = Join-Path $ProjectRoot 'scripts\compare-paddleocr-integrated-accep
 $Manifest = Join-Path $ProjectRoot 'testdata\additional-screenshot-ground-truth.json'
 $AcceptanceDir = Join-Path $ProjectRoot 'testdata\ocr-acceptance'
 
-$BaselineNetworkLog = Join-Path $AcceptanceDir 'baseline-blocked-network-attempts.log'
-$CandidateNetworkLog = Join-Path $AcceptanceDir 'candidate-blocked-network-attempts.log'
+$BaselineNetworkLog = Join-Path $AcceptanceDir 'baseline-non-ocr-network-attempts.log'
+$CandidateNetworkLog = Join-Path $AcceptanceDir 'candidate-non-ocr-network-attempts.log'
 
 foreach ($file in @((Join-Path $ProjectRoot 'package.json'), $Manifest, $RegressionScript, $Comparator)) {
     if (-not (Test-Path -LiteralPath $file -PathType Leaf)) { throw "Expected project file not found: $file" }
@@ -26,6 +26,7 @@ foreach ($file in @((Join-Path $ProjectRoot 'package.json'), $Manifest, $Regress
 foreach ($required in @($Python, $DetModel, $RecModel)) {
     if (-not (Test-Path -LiteralPath $required)) { throw "Local PaddleOCR prerequisite not found: $required" }
 }
+if (-not $env:OCRSPACE_API_KEY) { throw 'OCRSPACE_API_KEY is required; original images must use OCR.Space PDF-first processing.' }
 $NodeVersionText = (& node.exe -p 'process.versions.node').Trim()
 if ($LASTEXITCODE -ne 0) { throw 'Could not determine the active Node.js runtime.' }
 try {
@@ -49,7 +50,10 @@ $env:PADDLEOCR_REC_MODEL_DIR = $RecModel
 $env:PADDLEOCR_FIELD_FALLBACK_MAX_CROPS = [string][Math]::Max(1, [Math]::Min(7, $MaxCropsPerImage))
 $env:PADDLEOCR_FIELD_FALLBACK_TIMEOUT_MS = [string][Math]::Max(1000, [Math]::Min(15000, $FallbackTimeoutMs))
 $env:OCR_IMAGE_TIMEOUT_MS = [string][Math]::Max(30000, $ImageTimeoutMs)
-$env:OCR_NETWORK_BLOCK_ENABLED = '1'
+$env:OCRSPACE_ENABLED = '1'
+$env:OCRSPACE_NETWORK_ALLOWLIST = '1'
+$env:OCR_NON_OCR_NETWORK_RESTRICTED = '1'
+$env:OCRSPACE_ARTIFACT_DIR = Join-Path $AcceptanceDir 'paddleocr-pdf-first-baseline'
 $env:OCR_SAVE_RAW_DIAGNOSTICS = '1'
 
 # Capture the control and candidate on the same Windows host, Node runtime, engine,
@@ -57,14 +61,14 @@ $env:OCR_SAVE_RAW_DIAGNOSTICS = '1'
 # available but are not used as the paired runtime control for this comparison.
 $env:PADDLEOCR_FIELD_FALLBACK = '0'
 $env:OCR_SEQUENCE_REPORT_PATH = $Baseline
-$env:OCR_NETWORK_BLOCK_LOG = $BaselineNetworkLog
+$env:OCR_NON_OCR_NETWORK_LOG = $BaselineNetworkLog
 Write-Host "Running the 16-image Windows Node $NodeVersionText Tesseract-only control..." -ForegroundColor Cyan
 & node.exe $RegressionScript
 $BaselineExit = $LASTEXITCODE
 if (-not (Test-Path -LiteralPath $Baseline -PathType Leaf)) { throw "Tesseract-only control did not produce a report: $Baseline" }
 $BaselineObject = Get-Content -LiteralPath $Baseline -Raw | ConvertFrom-Json
-if ($BaselineObject.imageCount -ne 16 -or $BaselineObject.completedImages -ne 16 -or $BaselineObject.networkBlocked -ne $true) {
-    throw 'Tesseract-only control is incomplete or does not prove that the Node network guard was enabled.'
+if ($BaselineObject.imageCount -ne 16 -or $BaselineObject.completedImages -ne 16 -or $BaselineObject.networkBlocked -ne $true -or $BaselineObject.networkIsolation.ocrSpaceNetworkAllowed -ne $true -or $BaselineObject.networkIsolation.nonOcrNetworkRestricted -ne $true) {
+    throw 'Tesseract-only control is incomplete or does not prove OCR.Space was allowed while unrelated egress was restricted.'
 }
 if ((Test-Path -LiteralPath $BaselineNetworkLog) -and (Get-Item -LiteralPath $BaselineNetworkLog).Length -gt 0) {
     throw "Network attempts were blocked during the Tesseract-only control; inspect $BaselineNetworkLog before continuing."
@@ -75,15 +79,16 @@ if ($BaselineExit -ne 0) {
 
 $env:PADDLEOCR_FIELD_FALLBACK = '1'
 $env:OCR_SEQUENCE_REPORT_PATH = $Candidate
-$env:OCR_NETWORK_BLOCK_LOG = $CandidateNetworkLog
+$env:OCRSPACE_ARTIFACT_DIR = Join-Path $AcceptanceDir 'paddleocr-pdf-first-candidate'
+$env:OCR_NON_OCR_NETWORK_LOG = $CandidateNetworkLog
 Write-Host "Running the 16-image local PaddleOCR field-crop candidate..." -ForegroundColor Cyan
-Write-Host 'PaddleOCR is enabled for this test process only. Python sockets and the Node worker network path are blocked.' -ForegroundColor Cyan
+Write-Host 'PaddleOCR is enabled for this test process only. OCR.Space HTTPS is allowlisted for PDF-first input; unrelated Node egress is restricted and the local PaddleOCR Python helper has no network access.' -ForegroundColor Cyan
 & node.exe $RegressionScript
 $CandidateExit = $LASTEXITCODE
 if (-not (Test-Path -LiteralPath $Candidate -PathType Leaf)) { throw "Hybrid acceptance did not produce a report: $Candidate" }
 $CandidateObject = Get-Content -LiteralPath $Candidate -Raw | ConvertFrom-Json
-if ($CandidateObject.imageCount -ne 16 -or $CandidateObject.completedImages -ne 16 -or $CandidateObject.networkBlocked -ne $true) {
-    throw 'Hybrid acceptance is incomplete or does not prove that the Node network guard was enabled.'
+if ($CandidateObject.imageCount -ne 16 -or $CandidateObject.completedImages -ne 16 -or $CandidateObject.networkBlocked -ne $true -or $CandidateObject.networkIsolation.ocrSpaceNetworkAllowed -ne $true -or $CandidateObject.networkIsolation.nonOcrNetworkRestricted -ne $true) {
+    throw 'Hybrid acceptance is incomplete or does not prove OCR.Space was allowed while unrelated egress was restricted.'
 }
 if ((Test-Path -LiteralPath $CandidateNetworkLog) -and (Get-Item -LiteralPath $CandidateNetworkLog).Length -gt 0) {
     throw "Network attempts were blocked during the PaddleOCR candidate run; inspect $CandidateNetworkLog. The candidate comparison is not accepted."
