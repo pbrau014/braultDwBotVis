@@ -160,3 +160,112 @@ an explicit runtime check. These changes cannot repair the interrupted run.
 Gate A remains NOT PASSED. Any continuation must verify and reuse the existing
 PDF/raster for image 1, process only the 15 remaining source hashes, and retain
 the original missing-log/runtime limitations in the report.
+
+
+## 10. Latest completed no-provider 19/21 verification — run #42202349114
+
+The corrected artifact-verification workflow completed and uploaded artifact
+`dwbot-imagesF-19-gateB-artifact-verification-42160979140`:
+- Run: [#42202349114](https://github.com/pbrau014/braultDwBotVis/actions/runs/42202349114)
+- Artifact ID: `13496000656`
+- Size: 233,466 bytes
+- GitHub digest and downloaded ZIP SHA-256:
+  `282f728280b2bfcae9d58d28e48e469a3dfa6108a31feebcdb9e0fc1ccd06f96`
+- The workflow made zero OCR.Space provider requests.
+
+### 19-image artifact checks
+
+All 19 selected source-image hashes, PDFs, searchable text layers, PDF-derived
+rasters, PDF-to-raster provenance comparisons, local-reader availability and
+secret-leak checks passed. The verifier also confirmed
+`originalScreenshotFallback=false`.
+
+The overall artifact report remains `FAILED` for release gating because:
+- Gate A evidence is still pending/not passed.
+- The original 63-image run's restricted-egress diagnostic log is absent.
+- The historical unauthorized-attempt count is `null`/UNKNOWN, not zero.
+
+The reconciliation report is `RECONSTRUCTED_LIMITED_EVIDENCE`. The source
+workflow had the restricted-egress guard and OCR.Space allowlist enabled, but
+did not configure the log path. Source job logs show zero blocked markers and
+per-image records show zero network-block failure rows; those observations
+cannot reconstruct the missing log. No zero-attempt claim is made.
+
+The later local-only recovery is separately verified:
+- Status: `COMPLETED_LOCAL_ONLY_RECOVERY`
+- Provider requests: 0
+- Network blocked attempts: 0
+- All network destinations blocked
+- Empty diagnostic log SHA-256:
+  `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`
+
+### Final 19-image field evaluation after recovery
+
+| Field | Tesseract.js exact | Native Tesseract exact |
+|---|---:|---:|
+| result | 19/19 | 19/19 |
+| player | 8/19 | 8/19 |
+| map | 5/19 | 4/19 |
+| mode | 10/19 | 7/19 |
+| battleStart | 14/19 | 13/19 |
+| credits | 19/19 | 19/19 |
+| freeXp | 11/19 (1 wrong, unaccepted) | 11/19 (2 wrong, unaccepted) |
+| damage | 8/19 | 7/19 |
+| xp | 16/19 (1 wrong, unaccepted) | 15/19 |
+
+Aggregate:
+- Tesseract.js: 110/171 exact fields (64.33%), 2 wrong unaccepted
+  candidates, 59 unresolved; 2/19 fully exact nine-field records and 17/19
+  unresolved records.
+- Native Tesseract: 103/171 exact fields (60.23%), 2 wrong unaccepted
+  candidates, 66 unresolved; 0/19 fully exact nine-field records and 19/19
+  unresolved records.
+- Wrongly accepted mandatory values: zero for both engines.
+- Source hash mismatches: zero; missing run rows: zero; reader rows: 19/19
+  for each engine.
+
+These are field-candidate exact-match measurements, not accepted-record
+accuracy and not Gate B PASS. The unresolved fields are the decisive blocker.
+
+### Separate 21-image diagnostic
+
+The same completed run also produced a 21-image diagnostic, not a Gate B
+holdout:
+- Tesseract.js: 123/189 exact fields (65.08%), 2 wrong unaccepted candidates,
+  64 unresolved; 2/21 fully exact records.
+- Native Tesseract: 116/189 exact fields (61.38%), 2 wrong unaccepted
+  candidates, 71 unresolved; 0/21 fully exact records.
+- Gate B status for this diagnostic inventory:
+  `NOT_EVALUATED_GATE_B_19_REQUIRES_GATE_B_INVENTORY`.
+
+### PDF text layer and multi-source arrangements
+
+The final 19-image analysis tested these procedures, all without provider
+requests:
+
+| Arrangement | Exact / eligible | Wrong | Unresolved | Exact-match rate |
+|---|---:|---:|---:|---:|
+| PDF text layer alone (player excluded by identity policy) | 73/152 | 2 | 77 | 48.03% |
+| OCR.Space parsed text alone (player excluded) | 79/152 | 17 | 56 | 51.97% |
+| PDF text + Tesseract.js for player | 81/171 | 2 | 88 | 47.37% |
+| PDF text + native Tesseract for player | 81/171 | 2 | 88 | 47.37% |
+| Provider parsed text + Tesseract.js for player | 87/171 | 17 | 67 | 50.88% |
+| Provider parsed text + native Tesseract for player | 87/171 | 17 | 67 | 50.88% |
+| PDF/provider consensus | 80/171 | 0 | 91 | 46.78% |
+| Strict three-source consensus | 104/171 | 1 | 66 | 60.82% |
+| Four-source unique-majority consensus | 131/171 | 1 | 39 | 76.61% |
+| Strict four-source consensus | 59/171 | 0 | 112 | 34.50% |
+
+The four-source unique-majority method has the highest measured field coverage,
+but it still has one wrong candidate and 39 unresolved values. Strict
+four-source consensus eliminates wrong candidates in this sample but leaves
+112 unresolved values. Neither is safe for automatic acceptance. Keep
+conflicting/tied candidates unresolved; preserve source-specific evidence and
+do not promote a candidate merely because a majority method raises coverage.
+
+### Current gate decision
+
+Gate B remains `NOT_PASSED`. The 19-image artifact-integrity and reader
+checks are complete, but Gate A, original network evidence, and fully resolved
+nine-field outputs remain blockers. The 21-image output remains diagnostic
+only. No additional OCR.Space submissions were made during this verification.
