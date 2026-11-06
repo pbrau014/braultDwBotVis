@@ -230,6 +230,8 @@ test('billable imagesF extraction workflow supports fingerprint-bound no-duplica
     assert.match(workflow, /headSha -ne \$env:CURRENT_SHA/);
     assert.match(workflow, /progress\.json/);
     assert.match(workflow, /OCRSPACE_63_RESUME=1/);
+    assert.match(workflow, /oldNetworkLogs\.Count -ne 1/);
+    assert.match(workflow, /network provenance/);
     assert.match(runner, /onProviderRequestStarted/);
     assert.match(runner, /classifyResumeRow/);
     assert.match(runner, /Existing OCR.Space output found/);
