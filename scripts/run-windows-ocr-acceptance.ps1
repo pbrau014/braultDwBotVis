@@ -187,7 +187,7 @@ try {
   $CvNativeReports += [pscustomobject]@{name=$Name;exists=$true;expectedImages=$Count;completedImages=$Done;exact=[bool]$Exact}
  }
  $Inventory64ExtractionComplete=$false
- $Inventory64=[ordered]@{status='BLOCKED';completedImages=0;exactAccuracy='NOT_EVALUABLE_NO_INDEPENDENT_GROUND_TRUTH'}
+ $Inventory64=[ordered]@{status='BLOCKED';imageCount=64;eligibleCount=56;eligibleProcessed=0;completedImages=0;excludedCount=8;excludedSkipped=0;completedInventoryEntries=0;sourceMemberHashesVerified=0;allSourceMembersVerifiedBeforeProvider=$false;resultCount=0;excludedRecordCount=0;exactAccuracy='NOT_EVALUABLE_NO_INDEPENDENT_GROUND_TRUTH'}
  if($env:OCRSPACE_64_ARCHIVE_PATH -and $env:OCRSPACE_64_IMAGE_ROOT){
   $env:OCRSPACE_ENABLED='1'
   $env:OCRSPACE_NETWORK_ALLOWLIST='1'
@@ -197,10 +197,157 @@ try {
   $Inventory64Path=Join-Path $env:OCRSPACE_64_OUTPUT_DIR 'ocrspace-64-inventory-report.json'
   if(Test-Path -LiteralPath $Inventory64Path -PathType Leaf){
    $Inventory64Data=Get-Content -LiteralPath $Inventory64Path -Raw | ConvertFrom-Json
-   $Inventory64ExtractionComplete=($Inventory64Data.status -eq 'completed-extraction-not-accuracy-accepted') -and ($Inventory64Data.completedImages -eq 64) -and (@($Inventory64Data.results).Count -eq 64)
-   $Inventory64=[ordered]@{status=$Inventory64Data.status;completedImages=[int]$Inventory64Data.completedImages;resultCount=@($Inventory64Data.results).Count;sourceArchiveSha256=$Inventory64Data.sourceArchiveSha256;report=$Inventory64Path;exactAccuracy='NOT_EVALUABLE_NO_INDEPENDENT_GROUND_TRUTH'}
+   $EligibleRows=@($Inventory64Data.results)
+   $ExcludedRows=@($Inventory64Data.excludedRecords)
+   $InvalidEligibleRows=@($EligibleRows | Where-Object {
+    $_.provider -ne 'ocr.space' -or $_.providerEngine -ne 2 -or
+    $_.sourceSha256 -notmatch '^[a-f0-9]{64}
+ $CvPythonVersion='not-available'
+ if($env:OPENCV_PYTHON_BIN -and (Test-Path -LiteralPath $env:OPENCV_PYTHON_BIN -PathType Leaf)){
+  $CvPythonVersion=(& $env:OPENCV_PYTHON_BIN -c 'import cv2; print(cv2.__version__)' 2>&1 | Out-String).Trim()
+  if($LASTEXITCODE -ne 0){$CvPythonVersion='unavailable'}
+ }
+ $NoUnauthorizedNetwork=($BaselineJsReport -and $BaselineJsReport.networkIsolation.nonOcrDeniedAttemptsDetected -eq $false) -and ($CvJsReport -and $CvJsReport.networkIsolation.nonOcrDeniedAttemptsDetected -eq $false)
+ foreach($Name in @('reported-native-network-attempts.log','four-image-native-network-attempts.log','additional-sixteen-native-network-attempts.log','reported-native-cv-network-attempts.log','four-image-native-cv-network-attempts.log','additional-sixteen-native-cv-network-attempts.log','ocrspace-64-network-attempts.log')){
+  $Path=Join-Path $RunDir $Name
+  if((Test-Path -LiteralPath $Path) -and (Get-Item -LiteralPath $Path).Length -gt 0){$NoUnauthorizedNetwork=$false}
+ }
+ if(-not $BaselineJsReport -or -not $CvJsReport -or $CvPythonVersion -eq 'not-available' -or $CvPythonVersion -eq 'unavailable'){$NoUnauthorizedNetwork=$false}
+ foreach($Name in @('reported-native-network-attempts.log','four-image-native-network-attempts.log','additional-sixteen-native-network-attempts.log')){
+  $Path=Join-Path $RunDir $Name
+  if((Test-Path -LiteralPath $Path) -and (Get-Item -LiteralPath $Path).Length -gt 0){$NoUnauthorizedNetwork=$false}
+ }
+ $Commit='not-available'
+ try{$Commit=(& git -C $ProjectRoot rev-parse HEAD 2>$null).Trim()}catch{}
+ $Version=(& node.exe -p "require('./package.json').version").Trim()
+ $Report=[ordered]@{
+  schemaVersion=2;createdAt=(Get-Date).ToUniversalTime().ToString('o')
+  runtime=[ordered]@{node=$NodeText;npm=$NpmVersion;platform=[System.Runtime.InteropServices.RuntimeInformation]::OSDescription;architecture=[System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString()}
+  engines=[ordered]@{tesseract=$TessVersion;imageMagick=$MagickVersion;languages=$Languages}
+  source=[ordered]@{gitCommit=$Commit;packageVersion=$Version}
+  commands=$script:Results;baselineNativeReports=$NativeReports;inventory64=$Inventory64;cvCandidate=[ordered]@{opencvVersion=$CvPythonVersion;tesseractJsExact=$CvJsExact;nativeReports=$CvNativeReports};noNetworkAttempts=$NoUnauthorizedNetwork
+  passed=(($CvJsExact) -and (@($script:Results|Where-Object{$_.label -like 'cv-assisted-*' -and -not $_.passed}).Count -eq 0) -and ($CvNativeReports.Count -eq 3) -and (@($CvNativeReports|Where-Object{-not $_.exists -or -not $_.exact}).Count -eq 0) -and $Inventory64ExtractionComplete -and $NoUnauthorizedNetwork)
+ }
+ $ReportPath=Join-Path $RunDir 'windows-native-ocr-acceptance-report.json'
+ $Report | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $ReportPath -Encoding utf8
+ $Hash=(Get-FileHash -LiteralPath $ReportPath -Algorithm SHA256).Hash.ToLowerInvariant()
+ "$Hash  windows-native-ocr-acceptance-report.json" | Set-Content -LiteralPath (Join-Path $RunDir 'windows-native-ocr-acceptance-report.sha256') -Encoding ascii
+ Write-Host "[WINDOWS-OCR] Report: $ReportPath"
+ Write-Host "[WINDOWS-OCR] SHA-256: $Hash"
+ if(-not $Report.passed){Write-Error 'Windows OCR acceptance failed or remains incomplete. Diagnostics are retained; do not weaken exact-value validation.';exit 1}
+ Write-Host '[WINDOWS-OCR] PASS: OpenCV-assisted Tesseract.js and native Tesseract exact screenshot gates passed.'
+}
+finally{Pop-Location}
+ -or $_.pdfSha256 -notmatch '^[a-f0-9]{64}
+ $CvPythonVersion='not-available'
+ if($env:OPENCV_PYTHON_BIN -and (Test-Path -LiteralPath $env:OPENCV_PYTHON_BIN -PathType Leaf)){
+  $CvPythonVersion=(& $env:OPENCV_PYTHON_BIN -c 'import cv2; print(cv2.__version__)' 2>&1 | Out-String).Trim()
+  if($LASTEXITCODE -ne 0){$CvPythonVersion='unavailable'}
+ }
+ $NoUnauthorizedNetwork=($BaselineJsReport -and $BaselineJsReport.networkIsolation.nonOcrDeniedAttemptsDetected -eq $false) -and ($CvJsReport -and $CvJsReport.networkIsolation.nonOcrDeniedAttemptsDetected -eq $false)
+ foreach($Name in @('reported-native-network-attempts.log','four-image-native-network-attempts.log','additional-sixteen-native-network-attempts.log','reported-native-cv-network-attempts.log','four-image-native-cv-network-attempts.log','additional-sixteen-native-cv-network-attempts.log','ocrspace-64-network-attempts.log')){
+  $Path=Join-Path $RunDir $Name
+  if((Test-Path -LiteralPath $Path) -and (Get-Item -LiteralPath $Path).Length -gt 0){$NoUnauthorizedNetwork=$false}
+ }
+ if(-not $BaselineJsReport -or -not $CvJsReport -or $CvPythonVersion -eq 'not-available' -or $CvPythonVersion -eq 'unavailable'){$NoUnauthorizedNetwork=$false}
+ foreach($Name in @('reported-native-network-attempts.log','four-image-native-network-attempts.log','additional-sixteen-native-network-attempts.log')){
+  $Path=Join-Path $RunDir $Name
+  if((Test-Path -LiteralPath $Path) -and (Get-Item -LiteralPath $Path).Length -gt 0){$NoUnauthorizedNetwork=$false}
+ }
+ $Commit='not-available'
+ try{$Commit=(& git -C $ProjectRoot rev-parse HEAD 2>$null).Trim()}catch{}
+ $Version=(& node.exe -p "require('./package.json').version").Trim()
+ $Report=[ordered]@{
+  schemaVersion=2;createdAt=(Get-Date).ToUniversalTime().ToString('o')
+  runtime=[ordered]@{node=$NodeText;npm=$NpmVersion;platform=[System.Runtime.InteropServices.RuntimeInformation]::OSDescription;architecture=[System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString()}
+  engines=[ordered]@{tesseract=$TessVersion;imageMagick=$MagickVersion;languages=$Languages}
+  source=[ordered]@{gitCommit=$Commit;packageVersion=$Version}
+  commands=$script:Results;baselineNativeReports=$NativeReports;inventory64=$Inventory64;cvCandidate=[ordered]@{opencvVersion=$CvPythonVersion;tesseractJsExact=$CvJsExact;nativeReports=$CvNativeReports};noNetworkAttempts=$NoUnauthorizedNetwork
+  passed=(($CvJsExact) -and (@($script:Results|Where-Object{$_.label -like 'cv-assisted-*' -and -not $_.passed}).Count -eq 0) -and ($CvNativeReports.Count -eq 3) -and (@($CvNativeReports|Where-Object{-not $_.exists -or -not $_.exact}).Count -eq 0) -and $Inventory64ExtractionComplete -and $NoUnauthorizedNetwork)
+ }
+ $ReportPath=Join-Path $RunDir 'windows-native-ocr-acceptance-report.json'
+ $Report | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $ReportPath -Encoding utf8
+ $Hash=(Get-FileHash -LiteralPath $ReportPath -Algorithm SHA256).Hash.ToLowerInvariant()
+ "$Hash  windows-native-ocr-acceptance-report.json" | Set-Content -LiteralPath (Join-Path $RunDir 'windows-native-ocr-acceptance-report.sha256') -Encoding ascii
+ Write-Host "[WINDOWS-OCR] Report: $ReportPath"
+ Write-Host "[WINDOWS-OCR] SHA-256: $Hash"
+ if(-not $Report.passed){Write-Error 'Windows OCR acceptance failed or remains incomplete. Diagnostics are retained; do not weaken exact-value validation.';exit 1}
+ Write-Host '[WINDOWS-OCR] PASS: OpenCV-assisted Tesseract.js and native Tesseract exact screenshot gates passed.'
+}
+finally{Pop-Location}
+ -or
+    [int]$_.pdfBytes -le 0 -or [int]$_.rasterBytes -le 0 -or
+    -not $_.artifacts.pdf -or -not $_.artifacts.raster -or @($_.localReaders).Count -ne 2
+   })
+   $InvalidExcludedRows=@($ExcludedRows | Where-Object {
+    $_.providerSubmission -ne $false -or $_.status -ne 'skipped-user-excluded' -or
+    $_.sourceSha256 -notmatch '^[a-f0-9]{64}
+ $CvPythonVersion='not-available'
+ if($env:OPENCV_PYTHON_BIN -and (Test-Path -LiteralPath $env:OPENCV_PYTHON_BIN -PathType Leaf)){
+  $CvPythonVersion=(& $env:OPENCV_PYTHON_BIN -c 'import cv2; print(cv2.__version__)' 2>&1 | Out-String).Trim()
+  if($LASTEXITCODE -ne 0){$CvPythonVersion='unavailable'}
+ }
+ $NoUnauthorizedNetwork=($BaselineJsReport -and $BaselineJsReport.networkIsolation.nonOcrDeniedAttemptsDetected -eq $false) -and ($CvJsReport -and $CvJsReport.networkIsolation.nonOcrDeniedAttemptsDetected -eq $false)
+ foreach($Name in @('reported-native-network-attempts.log','four-image-native-network-attempts.log','additional-sixteen-native-network-attempts.log','reported-native-cv-network-attempts.log','four-image-native-cv-network-attempts.log','additional-sixteen-native-cv-network-attempts.log','ocrspace-64-network-attempts.log')){
+  $Path=Join-Path $RunDir $Name
+  if((Test-Path -LiteralPath $Path) -and (Get-Item -LiteralPath $Path).Length -gt 0){$NoUnauthorizedNetwork=$false}
+ }
+ if(-not $BaselineJsReport -or -not $CvJsReport -or $CvPythonVersion -eq 'not-available' -or $CvPythonVersion -eq 'unavailable'){$NoUnauthorizedNetwork=$false}
+ foreach($Name in @('reported-native-network-attempts.log','four-image-native-network-attempts.log','additional-sixteen-native-network-attempts.log')){
+  $Path=Join-Path $RunDir $Name
+  if((Test-Path -LiteralPath $Path) -and (Get-Item -LiteralPath $Path).Length -gt 0){$NoUnauthorizedNetwork=$false}
+ }
+ $Commit='not-available'
+ try{$Commit=(& git -C $ProjectRoot rev-parse HEAD 2>$null).Trim()}catch{}
+ $Version=(& node.exe -p "require('./package.json').version").Trim()
+ $Report=[ordered]@{
+  schemaVersion=2;createdAt=(Get-Date).ToUniversalTime().ToString('o')
+  runtime=[ordered]@{node=$NodeText;npm=$NpmVersion;platform=[System.Runtime.InteropServices.RuntimeInformation]::OSDescription;architecture=[System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString()}
+  engines=[ordered]@{tesseract=$TessVersion;imageMagick=$MagickVersion;languages=$Languages}
+  source=[ordered]@{gitCommit=$Commit;packageVersion=$Version}
+  commands=$script:Results;baselineNativeReports=$NativeReports;inventory64=$Inventory64;cvCandidate=[ordered]@{opencvVersion=$CvPythonVersion;tesseractJsExact=$CvJsExact;nativeReports=$CvNativeReports};noNetworkAttempts=$NoUnauthorizedNetwork
+  passed=(($CvJsExact) -and (@($script:Results|Where-Object{$_.label -like 'cv-assisted-*' -and -not $_.passed}).Count -eq 0) -and ($CvNativeReports.Count -eq 3) -and (@($CvNativeReports|Where-Object{-not $_.exists -or -not $_.exact}).Count -eq 0) -and $Inventory64ExtractionComplete -and $NoUnauthorizedNetwork)
+ }
+ $ReportPath=Join-Path $RunDir 'windows-native-ocr-acceptance-report.json'
+ $Report | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $ReportPath -Encoding utf8
+ $Hash=(Get-FileHash -LiteralPath $ReportPath -Algorithm SHA256).Hash.ToLowerInvariant()
+ "$Hash  windows-native-ocr-acceptance-report.json" | Set-Content -LiteralPath (Join-Path $RunDir 'windows-native-ocr-acceptance-report.sha256') -Encoding ascii
+ Write-Host "[WINDOWS-OCR] Report: $ReportPath"
+ Write-Host "[WINDOWS-OCR] SHA-256: $Hash"
+ if(-not $Report.passed){Write-Error 'Windows OCR acceptance failed or remains incomplete. Diagnostics are retained; do not weaken exact-value validation.';exit 1}
+ Write-Host '[WINDOWS-OCR] PASS: OpenCV-assisted Tesseract.js and native Tesseract exact screenshot gates passed.'
+}
+finally{Pop-Location}
+
+   })
+   $Inventory64ExtractionComplete=(
+    $Inventory64Data.status -eq 'completed-extraction-not-accuracy-accepted' -and
+    [int]$Inventory64Data.imageCount -eq 64 -and
+    [int]$Inventory64Data.eligibleCount -eq 56 -and
+    [int]$Inventory64Data.eligibleProcessed -eq 56 -and
+    [int]$Inventory64Data.completedImages -eq 56 -and
+    [int]$Inventory64Data.excludedCount -eq 8 -and
+    [int]$Inventory64Data.excludedSkipped -eq 8 -and
+    [int]$Inventory64Data.completedInventoryEntries -eq 64 -and
+    [int]$Inventory64Data.sourceMemberHashesVerified -eq 64 -and
+    $Inventory64Data.allSourceMembersVerifiedBeforeProvider -eq $true -and
+    $EligibleRows.Count -eq 56 -and $ExcludedRows.Count -eq 8 -and
+    $InvalidEligibleRows.Count -eq 0 -and $InvalidExcludedRows.Count -eq 0
+   )
+   $Inventory64=[ordered]@{
+    status=$Inventory64Data.status;imageCount=[int]$Inventory64Data.imageCount
+    eligibleCount=[int]$Inventory64Data.eligibleCount;eligibleProcessed=[int]$Inventory64Data.eligibleProcessed
+    completedImages=[int]$Inventory64Data.completedImages;excludedCount=[int]$Inventory64Data.excludedCount
+    excludedSkipped=[int]$Inventory64Data.excludedSkipped;completedInventoryEntries=[int]$Inventory64Data.completedInventoryEntries
+    sourceMemberHashesVerified=[int]$Inventory64Data.sourceMemberHashesVerified
+    allSourceMembersVerifiedBeforeProvider=($Inventory64Data.allSourceMembersVerifiedBeforeProvider -eq $true)
+    resultCount=$EligibleRows.Count;excludedRecordCount=$ExcludedRows.Count
+    invalidEligibleRecordCount=$InvalidEligibleRows.Count;invalidExcludedRecordCount=$InvalidExcludedRows.Count
+    sourceArchiveSha256=$Inventory64Data.sourceArchiveSha256;report=$Inventory64Path
+    exactAccuracy='NOT_EVALUABLE_NO_INDEPENDENT_GROUND_TRUTH'
+   }
   }else{
-   $Inventory64=[ordered]@{status='FAILED_OR_BLOCKED';completedImages=0;report=$Inventory64Path;exactAccuracy='NOT_EVALUABLE_NO_INDEPENDENT_GROUND_TRUTH'}
+   $Inventory64=[ordered]@{status='FAILED_OR_BLOCKED';imageCount=64;eligibleCount=56;completedImages=0;excludedCount=8;completedInventoryEntries=0;report=$Inventory64Path;exactAccuracy='NOT_EVALUABLE_NO_INDEPENDENT_GROUND_TRUTH'}
   }
  }else{
   $script:Results += [pscustomobject]@{label='ocrspace-64-inventory-pdf-first';arguments=@('run','test:ocrspace-64');exitCode=2;log=$null;passed=$false;blocked=$true}
