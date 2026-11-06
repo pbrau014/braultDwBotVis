@@ -2,11 +2,13 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
+const fs = require('node:fs');
+const os = require('node:os');
 const { spawnSync } = require('node:child_process');
 
 const guardPath = path.join(__dirname, '..', 'scripts', 'block-network.js');
 
-function runGuard(restrictNonOcrNetwork) {
+function runGuard(restrictNonOcrNetwork, logPath = '') {
     const script = `
         const calls = [];
         globalThis.fetch = async input => {
@@ -32,6 +34,7 @@ function runGuard(restrictNonOcrNetwork) {
             ...process.env,
             OCRSPACE_NETWORK_ALLOWLIST: '1',
             OCR_NON_OCR_NETWORK_RESTRICTED: restrictNonOcrNetwork ? '1' : '0',
+            OCR_NON_OCR_NETWORK_LOG: logPath,
         },
         timeout: 10000,
     });
@@ -40,12 +43,18 @@ function runGuard(restrictNonOcrNetwork) {
 }
 
 test('OCR.Space HTTPS API and searchable-PDF hosts remain reachable while unrelated egress is restricted', () => {
-    const result = runGuard(true);
+    const logPath = path.join(os.tmpdir(), `dwbot-network-policy-${process.pid}.log`);
+    fs.rmSync(logPath, { force: true });
+    const result = runGuard(true, logPath);
     assert.equal(result.api, true);
     assert.equal(result.pdf, true);
     assert.deepEqual(result.calls, ['https://api.ocr.space/parse/image', 'https://ocr.space/temp/result.pdf']);
     assert.equal(result.unrelatedDenied, true);
     assert.equal(result.httpDenied, true);
+    const log = fs.readFileSync(logPath, 'utf8');
+    assert.match(log, /denied fetch https:\/\/example\\.invalid/);
+    assert.match(log, /denied fetch http:\/\/api\\.ocr\\.space/);
+    fs.rmSync(logPath, { force: true });
 });
 
 test('the guard does not impose blanket network blocking when unrelated-egress restriction is disabled', () => {
@@ -60,4 +69,16 @@ test('the guard does not impose blanket network blocking when unrelated-egress r
     ]);
     assert.equal(result.unrelatedDenied, false);
     assert.equal(result.httpDenied, false);
+});
+
+
+test('restricted mode refuses to start without a writable diagnostic log', () => {
+    const child = spawnSync(process.execPath, ['-e', `require(${JSON.stringify(guardPath)})`], {
+        encoding: 'utf8',
+        env: { ...process.env, OCRSPACE_NETWORK_ALLOWLIST: '1',
+            OCR_NON_OCR_NETWORK_RESTRICTED: '1', OCR_NON_OCR_NETWORK_LOG: '' },
+        timeout: 10000,
+    });
+    assert.notEqual(child.status, 0);
+    assert.match(child.stderr, /OCR_NON_OCR_NETWORK_LOG is required/);
 });
