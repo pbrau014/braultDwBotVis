@@ -1,5 +1,35 @@
 ================================================================================
-CURRENT USER AUTHORITY ADDENDUM — 2026-11-05
+CURRENT OCR.SPACE PDF-FIRST OVERRIDE — 2026-11-05
+================================================================================
+This addendum supersedes older active OCR.Space statements in this historical
+Phase 0–10 roadmap. The canonical living plan on main remains controlling.
+
+- OCR.Space Engine 2 processes the original World of Warships screenshot first
+  and creates a searchable PDF with a hidden-but-searchable text layer.
+- Download and validate that PDF, render its page locally to a bounded raster,
+  then run Tesseract.js/native Tesseract/PaddleOCR/OpenCV on that PDF-derived
+  raster. No local reader processes the original screenshot after successful
+  PDF creation. One OCR.Space request/PDF per source image; no crop refinement.
+- Engine 2 is the PDF-producing first pass because the current provider matrix
+  marks Engine 3 searchable-PDF generation unsupported. The older Engine 3-first
+  / Engine 2 PDF-only fallback design below is superseded.
+- The user explicitly authorized OCR.Space uploads for the 4-, 16- and
+  64-image World of Warships inventories, including visible player names, only.
+  No unrelated images, credentials, Discord IDs or private account data.
+- Production requires OCRSPACE_API_KEY; OCRSPACE_ENABLED=0 is local-only.
+  Failure to produce/download/rasterize the PDF fails closed.
+- Exact nine fields remain mandatory; zero wrong accepted mandatory values.
+  The 64-image inventory has no independent ground truth and is extraction-only.
+- Current implementation: src/ocrspace-pdf-first.js, src/image-processor.js,
+  src/bot.js. The old crop-only helper files are legacy, not active bot path.
+  See docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md and the canonical living plan.
+
+================================================================================
+END CURRENT OCR.SPACE PDF-FIRST OVERRIDE
+================================================================================
+
+================================================================================
+SUPERSEDED USER AUTHORITY ADDENDUM — 2026-11-05
 ================================================================================
 - OCR.Space remote use is default-on when a local Free API key is configured.
   An unset/blank OCRSPACE_ENABLED value or 1 enables; explicit 0 is a deliberate
@@ -21,7 +51,7 @@ CURRENT USER AUTHORITY ADDENDUM — 2026-11-05
   superseded prospectively by this addendum.
 ================================================================================
 
-# CURRENT AUTHORITY NOTE — 2026-11-05
+# SUPERSEDED AUTHORITY NOTE — 2026-11-05
 
 This historical append-only roadmap is subordinate to the canonical DWBOT Living Running Plan at docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt. All work stays in this ChatGPT conversation; no Work-mode handoff. Do not emit interim progress narration; report once after operations. Every development step references the living plan, and every plan update/download comprehensively reconciles the entire accessible context and active/historical narratives. Carry these rules into the next chat. The current governing plan is docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt; the File Library's dated/updated copies are historical until synchronized with its exact content. All DWBOT work uses only canonical repository pbrau014/braultDwBotVis, branch main. Older RC2/RC3 work copies, other repository names and branch names below are historical provenance only, not active sources or destinations. Node.js 22.16.0 is authorized; older Node 24+ requirements below are historical unless a specific tool gate proves otherwise. Last verified main before this plan/status refresh: fc59a52591673250ef289ef5cea68f1c25ea648c; exact-head run 42095870483 is pending and the refresh triggers a newer run.
 
