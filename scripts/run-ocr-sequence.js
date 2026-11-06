@@ -222,6 +222,18 @@ function getNetworkIsolation() {
                     damageCandidates: output.fields.damageCandidates || [],
                     fullScreenDamageCandidates: output.fields.fullScreenDamageCandidates || [],
                     damageOcrText: output.fields.damageOcrText || '',
+                    ocrSpacePdfFirst: (() => {
+                        const evidence = output.fields.ocrSpacePdfFirst || {};
+                        return {
+                            status: evidence.status || 'not-reported', provider: evidence.provider || null,
+                            engine: evidence.engine || null, sourceSha256: evidence.sourceSha256 || null,
+                            uploadSha256: evidence.uploadSha256 || null, uploadBytes: evidence.uploadBytes || null,
+                            pdfBytes: evidence.pdfBytes || null, pdfSha256: evidence.pdfSha256 || null,
+                            rasterBytes: evidence.rasterBytes || null, rasterWidth: evidence.rasterWidth || null,
+                            rasterHeight: evidence.rasterHeight || null, artifacts: evidence.artifacts || null,
+                            reason: evidence.reason || null, requests: evidence.requests ?? null,
+                        };
+                    })(),
                     ...(saveRaw ? {
                         rawCandidateText: output.attempts.map(attempt => ({ psm: attempt.pageSegmentationMode, confidence: attempt.confidence, text: attempt.text })),
                         fullScreenDamageOcrText: output.fields.fullScreenDamageOcrText || [],
