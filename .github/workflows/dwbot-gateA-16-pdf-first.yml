@@ -221,7 +221,7 @@ jobs:
           OCRSPACE_NETWORK_ALLOWLIST: '0'
           OCR_NON_OCR_NETWORK_RESTRICTED: '1'
           OCR_NON_OCR_NETWORK_LOG: ${{ github.workspace }}/testdata/gateA-16/parallel-reader-network.log
-          NODE_OPTIONS: '--require="${{ github.workspace }}/scripts/block-network.js"'
+          NODE_OPTIONS: '--require=./scripts/block-network.js'
           PADDLEOCR_FIELD_FALLBACK: '1'
         run: |
           $sourceRoot = Join-Path $env:GITHUB_WORKSPACE 'source'
