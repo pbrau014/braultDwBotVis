@@ -814,7 +814,7 @@ test('50-player randomized tournament: roster cap, all-player aggregates, dollar
   const totals = await send('!yolo totals');
   assert.match(totals.text, /Players: \*\*50\/50\*\*/);
   assert.ok(totals.text.includes(`**Total doubloons (G12-equivalent): ${totalDoubloons.toFixed(2)}**`));
-  assert.doesNotMatch(totals.text, /H12-equivalent|Estimated total value|\\$/);
+  assert.doesNotMatch(totals.text, /H12-equivalent|Estimated total value|\$/);
   assert.ok(Math.abs(rows.reduce((sum,row) => sum + row.estimatedValue, 0) - expectedDollars) < 1e-7);
   const standings = await send('!yolo standings');
   const allStandingsMessages = standings.text + '\n' + standings.sends.map(x => x.content || '').join('\n');
