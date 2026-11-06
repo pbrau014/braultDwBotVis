@@ -348,13 +348,23 @@ def main():
         and r.get("pdfSha256") and r.get("rasterSha256") for r in selected_run_results
     )
     network_pass = artifact_verification.get("checks", {}).get("networkRestriction") == "PASS" and artifact_verification.get("checks", {}).get("unauthorizedNetworkAttempts") == 0
+    engine_acceptance_complete = all(
+        engine["completeNineFieldSubset"]["eligibleRecords"] == MIN_GATE_B_IMAGES
+        and engine["completeNineFieldSubset"]["exactMatches"] == MIN_GATE_B_IMAGES
+        and engine["completeNineFieldSubset"]["mismatches"] == 0
+        and engine["completeNineFieldSubset"]["unresolved"] == 0
+        and engine["fieldLevelSummary"]["unresolvedOutputs"] == 0
+        and engine["fieldLevelSummary"]["wrongValues"] == 0
+        for engine in engines
+    )
     if args.inventory != GATE_B_INVENTORY:
         gate_b = "NOT_APPLICABLE_WRONG_INVENTORY"
     elif artifact_verification["status"] == "PENDING_ARTIFACT_VERIFICATION":
         gate_b = "PENDING_ARTIFACT_VERIFICATION"
     elif artifact_verification["status"] == "PENDING_GATE_A":
         gate_b = "PENDING_GATE_A"
-    elif artifact_verification["status"] != "PASS" or not rows_complete or not readers_complete or source_mismatches or wrong_accepted or not network_pass:
+    elif (artifact_verification["status"] != "PASS" or not rows_complete or not readers_complete
+          or not engine_acceptance_complete or source_mismatches or wrong_accepted or not network_pass):
         gate_b = "NOT_PASSED"
     else:
         gate_b = "PASS"
@@ -399,10 +409,18 @@ def main():
             "zeroSourceHashOverlapWithSixteenImageDevelopmentAndFourImageRegressionCorpora": True,
             "allSelectedPdfAndRasterArtifactsVerified": True,
             "zeroWronglyAcceptedMandatoryFieldValues": True,
+            "zeroUnresolvedMandatoryFieldValues": True,
+            "all21CompleteNineFieldRecordsExactPerEngine": True,
+            "zeroWrongUnacceptedCandidatesForGateBPass": True,
             "zeroUnauthorizedNetworkAttempts": True,
-            "unresolvedOutputs": "Reported as accuracy/review metrics; do not convert unresolved values into matches."
+            "unresolvedOutputs": "Reported as accuracy/review metrics; unresolved outputs and wrong unaccepted candidates both block Gate B; do not convert either into matches."
         },
         "gateB": gate_b,
+        "engineAcceptanceChecks": {
+            "all21CompleteNineFieldRecordsExactPerEngine": engine_acceptance_complete,
+            "zeroUnresolvedMandatoryFieldValues": engine_acceptance_complete,
+            "zeroWrongUnacceptedCandidatesForGateBPass": engine_acceptance_complete
+        },
         "engines": engines
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
