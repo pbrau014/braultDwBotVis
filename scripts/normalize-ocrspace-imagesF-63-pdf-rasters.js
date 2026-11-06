@@ -58,6 +58,7 @@ async function normalizeInventory({
         schemaVersion: 1,
         status: 'RUNNING',
         method: 'source-aspect-top-aligned-crop-v1',
+        sourceSimilarityLimits: SOURCE_SIMILARITY_LIMITS,
         sourceRunSha: run?.sourceCommitSha || run?.sourceBuild?.sha256 || null,
         sourceResultCount: results.length,
         expectedGroundTruthCount: records.length,
