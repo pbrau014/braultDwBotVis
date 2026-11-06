@@ -160,10 +160,11 @@ async function prepare(options) {
     const helperOverlaySha256 = sha256(helperOverlay);
 
     const localResultPath = path.join(sourceRoot, 'testdata', 'gateA-16', 'resume-first-local-reader.json');
+    const localPayloadPath = path.join(sourceRoot, 'testdata', 'gateA-16', 'resume-first-local-reader-child-output.json');
     const localNetworkLogPath = path.join(sourceRoot, 'testdata', 'gateA-16', 'resume-local-network.log');
     const progressPath = path.join(sourceRoot, 'testdata', 'gateA-16', 'resume-from-progress.json');
     const reportPath = path.join(sourceRoot, 'testdata', 'gateA-16', 'report.json');
-    for (const target of [localResultPath, localNetworkLogPath, progressPath, reportPath, reportPath + '.progress.json']) {
+    for (const target of [localResultPath, localPayloadPath, localNetworkLogPath, progressPath, reportPath, reportPath + '.progress.json']) {
         try { await fs.access(target); throw new Error('Gate A resume evidence destination already exists; refusing to overwrite: ' + target); }
         catch (error) { if (error.code !== 'ENOENT') throw error; }
     }
@@ -183,7 +184,7 @@ async function prepare(options) {
     };
     const supervised = await runSupervisedProcess({
         command: process.execPath,
-        args: [path.join(sourceRoot, 'scripts', 'ocr-image-child.js'), localResultPath],
+        args: [path.join(sourceRoot, 'scripts', 'ocr-image-child.js'), localPayloadPath],
         cwd: sourceRoot,
         env: childEnv,
         inputBuffer: raster,
@@ -193,7 +194,7 @@ async function prepare(options) {
     if (supervised.closeConfirmed !== true || supervised.code !== 0 || supervised.signal) {
         throw new Error('Local-only OCR recovery child did not close successfully; provider calls are not authorized to proceed.');
     }
-    const localPayload = JSON.parse(await fs.readFile(localResultPath, 'utf8'));
+    const localPayload = parseJsonUtf8(await fs.readFile(localPayloadPath));
     if (localPayload.ok !== true || !localPayload.output || !Array.isArray(localPayload.output.attempts) || !localPayload.output.attempts.length) {
         throw new Error('Local-only OCR recovery produced no usable candidate output; provider calls are not authorized to proceed.');
     }
@@ -250,6 +251,8 @@ async function prepare(options) {
         allRequiredFieldsPass: requiredFieldsPass, requiredMissing,
         originalNetworkLogStatus: 'MISSING_FROM_ORIGINAL_PARTIAL_ARTIFACT',
         originalNetworkAttemptCount: null,
+        localReaderOutputPath: path.relative(sourceRoot, localPayloadPath),
+        localReaderOutputSha256: sha256(await fs.readFile(localPayloadPath)),
         originalJobLogSha256: sha256(Buffer.from(originalJobLog, 'utf8')),
         preservedOriginalJobLogPath: path.relative(sourceRoot, preservedOriginalJobLogPath),
         originalProviderStartCount: originalStartedFixtures.length,
