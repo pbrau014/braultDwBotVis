@@ -71,10 +71,16 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
     fetchImpl = globalThis.fetch, client = recognizeCrop, quotaLedger = null,
     prepareUpload = imageProcessor.prepareOcrSpaceUpload,
     downloadPdf = downloadSearchablePdf, renderPdf = imageProcessor.renderSearchablePdfPage,
-    readRasterMetadata = imageProcessor.metadata, onProviderRequestStarted = null, now = () => new Date() } = {}) {
+    readRasterMetadata = imageProcessor.metadata, normalizeRaster = imageProcessor.normalizeSearchablePdfPageRaster,
+    sourceDimensions = null, onProviderRequestStarted = null, now = () => new Date() } = {}) {
     const apiKey = String(env.OCRSPACE_API_KEY || '').trim();
     if (!apiKey) return { status: 'blocked', reason: 'OCRSPACE_API_KEY is not configured', requests: 0 };
     if (!Buffer.isBuffer(imageBuffer) || !imageBuffer.length) throw fail('Source screenshot is empty.', 'OCRSPACE_INVALID_IMAGE');
+    const sourceMetadata = sourceDimensions || await readRasterMetadata(imageBuffer);
+    if (!Number.isSafeInteger(Number(sourceMetadata?.width)) || !Number.isSafeInteger(Number(sourceMetadata?.height))
+        || Number(sourceMetadata.width) < 1 || Number(sourceMetadata.height) < 1) {
+        throw fail('Source screenshot dimensions are unavailable for safe PDF-raster normalization.', 'OCRSPACE_SOURCE_DIMENSIONS_INVALID');
+    }
     const png = imageBuffer.length >= 8 && imageBuffer[0] === 0x89 && imageBuffer.subarray(1, 4).toString('ascii') === 'PNG';
     const jpeg = imageBuffer.length >= 3 && imageBuffer[0] === 0xff && imageBuffer[1] === 0xd8 && imageBuffer[2] === 0xff;
     const bmp = imageBuffer.length >= 2 && imageBuffer.subarray(0, 2).toString('ascii') === 'BM';
@@ -112,7 +118,16 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
     const pdfUrl = safeSearchablePdfUrl(response.searchablePdfUrl);
     if (!pdfUrl) throw fail('OCR.Space Engine 2 did not return SearchablePDFURL; local OCR from the original screenshot is not substituted.', 'OCRSPACE_SEARCHABLE_PDF_MISSING');
     const pdfBuffer = await downloadPdf(pdfUrl, { fetchImpl });
-    const rasterBuffer = await renderPdf(pdfBuffer);
+    const pageRasterBuffer = await renderPdf(pdfBuffer);
+    const pageRasterMetadata = await readRasterMetadata(pageRasterBuffer);
+    const normalized = await normalizeRaster(pageRasterBuffer, {
+        sourceWidth: Number(sourceMetadata.width), sourceHeight: Number(sourceMetadata.height),
+    });
+    if (!Buffer.isBuffer(normalized?.buffer) || !normalized.buffer.length
+        || normalized.normalization?.method !== 'source-aspect-top-aligned-crop-v1') {
+        throw fail('Searchable-PDF raster normalization did not return verified source-aspect metadata.', 'OCRSPACE_PDF_RASTER_NORMALIZATION_FAILED');
+    }
+    const rasterBuffer = normalized.buffer;
     const rasterMetadata = await readRasterMetadata(rasterBuffer);
     return {
         status: 'complete', provider: 'ocr.space', engine: 2,
@@ -120,9 +135,13 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
         uploadSha256: crypto.createHash('sha256').update(upload.buffer).digest('hex'),
         uploadBytes: upload.buffer.length, uploadWidth: upload.width || null, uploadHeight: upload.height || null,
         uploadResized: upload.resized === true, uploadQuality: upload.quality || null,
+        sourceWidth: Number(sourceMetadata.width), sourceHeight: Number(sourceMetadata.height),
         pdfBytes: pdfBuffer.length, pdfSha256: crypto.createHash('sha256').update(pdfBuffer).digest('hex'),
+        pageRasterBytes: pageRasterBuffer.length, pageRasterSha256: crypto.createHash('sha256').update(pageRasterBuffer).digest('hex'),
+        pageRasterWidth: pageRasterMetadata.width, pageRasterHeight: pageRasterMetadata.height,
         rasterBytes: rasterBuffer.length, rasterSha256: crypto.createHash('sha256').update(rasterBuffer).digest('hex'),
         rasterWidth: rasterMetadata.width, rasterHeight: rasterMetadata.height,
+        rasterNormalization: normalized.normalization,
         searchablePdfUrlHost: new URL(pdfUrl).hostname,
         processingTimeMs: Number(response.processingTimeMs) || null,
         providerExitCode: response.exitCode, partial: response.partial === true,
