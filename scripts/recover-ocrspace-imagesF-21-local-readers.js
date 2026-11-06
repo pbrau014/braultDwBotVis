@@ -231,7 +231,8 @@ async function main() {
         reportSha256: null,
         sourceRunReportSha256: recovery.sourceRunReportSha256,
         providerRequests: 0,
-        networkBlockedAttempts: recovery.networkBlockedAttempts
+        networkBlockedAttempts: recovery.networkBlockedAttempts,
+        networkLogSha256: recovery.networkLogSha256
     };
     run.derivedFromRunReportSha256 = recovery.sourceRunReportSha256;
     run.updatedAt = new Date().toISOString();
