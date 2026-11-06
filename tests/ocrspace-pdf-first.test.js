@@ -17,6 +17,7 @@ const png = Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a,1,2,3]);
 const sourceDimensions = { width: 1920, height: 1080 };
 const normalizeRaster = async (buffer, dimensions) => ({
     buffer,
+    similarity: { method: 'original-source-resized-to-normalized-raster-v1', meanAbsoluteError: 0, rootMeanSquareError: 0 },
     normalization: {
         method: 'source-aspect-top-aligned-crop-v1',
         sourceWidth: dimensions.sourceWidth,
