@@ -16,7 +16,7 @@ permissions:
 
 concurrency:
   group: dwbot-gateA-16-pdf-first-adaf4f8c
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 env:
   GATEB_SOURCE_SHA: adaf4f8c3a9573f56d0348a4bba36686fc31c22e
