@@ -255,7 +255,8 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
         && /OCR_NON_OCR_NETWORK_LOG:/.test(workflowSourceText);
     const networkOk = networkAttempts === 0 && workflowRestrictionOk;
     const files = await listFiles(artifactRoot);
-    const secret = await secretScan([...files, runReport, groundTruth, preflightReport, freshPreflightReport, Buffer.from(workflowSourceText, 'utf8')], apiKey);
+    const secretInputs = [...files, runReport, groundTruth, preflightReport, freshPreflightReport, ...(networkLog === null ? [] : [networkLogPath]), Buffer.from(workflowSourceText, 'utf8')];
+    const secret = await secretScan(secretInputs, apiKey);
     const gateA = gateAReport ? {
         status: gateAReport.status || 'PENDING',
         reportSha256: gateAReport.reportSha256 || null,
