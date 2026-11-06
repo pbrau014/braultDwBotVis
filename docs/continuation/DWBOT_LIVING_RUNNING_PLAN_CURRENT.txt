@@ -976,9 +976,12 @@ F. OPEN GATES / NEXT STEPS
    by independent Gate B on 50 minimum / 100 preferred holdout images with
    independent nine-field ground truth and no holdout tuning. Zero wrong
    mandatory acceptances required.
-3. Before first live OCR.Space request, recheck current Free-tier/terms/privacy/
-   retention, configure a local Free key without sharing it, and run only a
-   synthetic non-identifying smoke. No production screenshots or identity data.
+3. Before live runs, recheck current Free-tier/terms/privacy/retention and
+   confirm OCRSPACE_API_KEY in the protected local/Actions secret store. The
+   user explicitly authorized full screenshots, including visible player names,
+   from the named 4-, 16- and 64-image World of Warships inventories only. Run
+   those inventories through Engine 2 PDF-first; do not send unrelated images,
+   credentials, Discord IDs or private account data.
 4. Complete browser/OAuth/desktop visual and upload QA, isolated Discord
    staging, security review, backup/restore/rollback and final release decision.
    Production remains NO-GO until every applicable gate is accepted.
@@ -1319,14 +1322,15 @@ A. CURRENT MAIN AND OCR.SPACE DEFAULT-ON IMPLEMENTATION
   screenshot transmission has occurred. Mock tests do not prove live provider
   accuracy or live terms/privacy compliance.
 
-B. ENGINE 3 SEARCHABLE-PDF COMPARISON RULE
-- DWBOT's Engine capability comparison now marks Engine 3 searchable PDF as
-  SUPPORTED, based on the Engine 3 feature-description text.
-- The provider's own comparison matrix still marks it unsupported. Preserve
-  this documentation conflict; do not claim the provider matrix changed.
-  Runtime must check SearchablePDFURL. If Engine 3 returns no safe URL, retain
-  the quota-reserved Engine 2 PDF-only fallback and discard Engine 2 OCR text.
-  No paid tier or usage is authorized.
+B. ENGINE 2 SEARCHABLE-PDF FIRST-PASS RULE — CURRENT OVERRIDE
+- The provider's current comparison matrix marks searchable-PDF creation
+  supported for Engine 2 and unsupported for Engine 3. Use Engine 2 directly
+  for the first source-image request; do not use Engine 3 first or as a PDF
+  fallback.
+- Request one searchable PDF per original source screenshot, with a hidden but
+  searchable text layer. Validate and download the PDF, then render the page
+  locally. All local OCR readers process the PDF-derived raster.
+- This replaces the earlier Engine 3-first / Engine 2 fallback description.
 
 C. WINDOWS ACCEPTANCE ARTIFACT — RUN 42088538702
 - The run is now complete. Windows process-level persistence/recovery and the
@@ -1430,9 +1434,10 @@ END CURRENT EXECUTION RECONCILIATION — 2026-11-05
 ================================================================================
 
 ================================================================================
-CURRENT USER AUTHORITY ADDENDUM — 2026-11-05 14:56 AMERICA/CHICAGO
-This addendum is the newest active rule and supersedes conflicting default-off
-statements in older active sections. Historical evidence and records remain.
+SUPERSEDED USER AUTHORITY ADDENDUM — 2026-11-05 14:56 AMERICA/CHICAGO
+This earlier addendum is historical. Its OCR sequence/privacy restrictions are
+superseded by the current PDF-first override and 0.5 binding rule at the top.
+Preserve the remaining non-OCR review notes as historical context.
 ================================================================================
 
 1. REMOTE OCR.SPACE DEFAULT — USER-AUTHORIZED CHANGE
