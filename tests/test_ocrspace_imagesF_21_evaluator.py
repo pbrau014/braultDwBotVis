@@ -101,6 +101,10 @@ class GateB19EvaluatorTests(unittest.TestCase):
             "networkRestriction": "PASS"
         }}
         self.assertEqual(EVALUATOR.gate_a_evidence_status(good), "PASS")
+        # Gate A currently binds candidateFingerprint to the 40-character Git commit SHA.
+        good["gateA"]["candidateFingerprint"] = "c" * 40
+        self.assertEqual(EVALUATOR.gate_a_evidence_status(good), "PASS")
+        good["gateA"]["candidateFingerprint"] = "b" * 64
         good["gateA"]["matchesGateBRunSource"] = False
         self.assertEqual(EVALUATOR.gate_a_evidence_status(good), "FAIL")
         good["gateA"]["matchesGateBRunSource"] = True
