@@ -125,7 +125,7 @@ test('missing local-recovery network log fails closed even when original log is 
 test('preserves BOM-prefixed reconstructed network evidence without upgrading it to a zero-attempt claim', async t => {
   const f=await fixture(t);
   const networkReconciliationPath=path.join(f.root,'network-log-reconciliation.json');
-  await fs.writeFile(networkReconciliationPath,'\\uFEFF'+JSON.stringify({
+  await fs.writeFile(networkReconciliationPath,String.fromCharCode(0xFEFF)+JSON.stringify({
     status:'RECONSTRUCTED_LIMITED_EVIDENCE', originalBlockedAttemptCount:null, zeroAttemptsClaimed:false
   }));
   const report=await verifyArtifacts({...f,networkReconciliationPath,
