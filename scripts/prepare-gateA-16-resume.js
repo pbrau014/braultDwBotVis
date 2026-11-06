@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('node:fs/promises');
+const fsConstants = require('node:fs').constants;
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { execFileSync } = require('node:child_process');
@@ -33,10 +34,7 @@ function pngInfo(bytes) {
         || bytes.subarray(12,16).toString('ascii') !== 'IHDR') return null;
     return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
 }
-function numericValueOrNull(value) {
-    const { numericValueOrNull: convert } = require(path.join(global.__DWBOT_GATEA_SOURCE_ROOT, 'src', 'battle-record'));
-    return convert(value);
-}
+
 async function writeJson(filePath, value) {
     await fs.mkdir(path.dirname(filePath), { recursive: true });
     await fs.writeFile(filePath, JSON.stringify(value, null, 2) + '\n', { flag: 'wx' });
@@ -116,7 +114,7 @@ async function prepare(options) {
         try { await fs.access(target); throw new Error('Gate A resume destination already exists; refusing to overwrite: ' + target); }
         catch (error) { if (error.code !== 'ENOENT') throw error; }
     }
-    await fs.copyFile(partialPdfPath, pdfPath, fs.constants.COPYFILE_EXCL);
+    await fs.copyFile(partialPdfPath, pdfPath, fsConstants.COPYFILE_EXCL);
     await fs.copyFile(partialRasterPath, rasterPath, fs.constants.COPYFILE_EXCL);
 
     // The candidate OCR engine remains at the exact Gate B source commit.
