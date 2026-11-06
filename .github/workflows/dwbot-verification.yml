@@ -63,6 +63,10 @@ jobs:
           node --check scripts/run-persistence-recovery.js
       - name: OCR.space mocked contract
         run: npm run test:ocrspace
+      - name: Post-hoc Gate B evaluator schema and missing-row tests
+        run: |
+          python -m py_compile scripts/evaluate-ocrspace-imagesF-63-ground-truth.py
+          python -m unittest discover -s tests -p test_ocrspace_imagesF_21_evaluator.py
       - name: Discord offline preflight and policy
         run: npm run test:discord-preflight
       - name: Desktop offline configuration preflight
