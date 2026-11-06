@@ -73,13 +73,36 @@
       try{await D.api('/api/admin/results',{method:'POST',body});form.reset();await load();}
       catch(error){status(error.message,'error');}finally{button.disabled=false;}
     });
+    const settingHelp={
+      pool:{
+        damage:'Doubloon pool factor for the Damage round. It scales the round formula; totals are not normalized to spend exactly the pool.',
+        kills:'Doubloon pool factor for the Kills round. It scales the round formula; totals are not normalized to spend exactly the pool.',
+        race:'Doubloon pool factor for the Race round. It scales the round formula; totals are not normalized to spend exactly the pool.',
+        grand:'Reference-only setting. The Grand Yolo formula does not use the Doubloon pool.'
+      },
+      multiplier:'Overall event multiplier applied after the event formula. Default 1 leaves the calculated score unchanged; 2 doubles it; 0 disables the round score.',
+      tierPower:'Exponent applied to the tier divisor in Damage, Kills or Race. Default 1 divides by tier; larger values penalize higher tiers more strongly.',
+      tierWeight:'Grand Yolo only: scales the base 100 ÷ tier contribution. DWBOT default is 0.9; changing it does not alter Damage, Kills or Time terms.',
+      damageWeight:'Grand Yolo only: scales the Damage ÷ tier ÷ 1,000 contribution. Default 1.',
+      killsWeight:'Grand Yolo only: scales the Kills × 10 ÷ tier contribution. Default 1.',
+      timeWeight:'Grand Yolo only: scales the 5 ÷ time × 1,000 contribution. Lower times produce a larger base time contribution. Default 1.'
+    };
+    function updateSettingHelp(){
+      const event=D.$('setting-event').value,field=D.$('setting-field').value;
+      const description=field==='pool'?(settingHelp.pool[event]||'Event pool factor.'):(settingHelp[field]||'Scoring setting for the selected event.');
+      D.$('setting-help').textContent=description;
+      D.$('setting-field').title=description;
+      D.$('setting-value').title=description;
+    }
     function updateSettingFields(){
       const event=D.$('setting-event').value;
       const values=Object.keys(overview.settings.events[event]||{});
       const field=D.$('setting-field');field.replaceChildren();
       for(const v of values){const opt=document.createElement('option');opt.value=v;opt.textContent=v;field.append(opt);}
+      updateSettingHelp();
     }
     D.$('setting-event').addEventListener('change',updateSettingFields);
+    D.$('setting-field').addEventListener('change',updateSettingHelp);
     D.$('settings-form').addEventListener('submit',async e=>{
       e.preventDefault();const form=e.currentTarget,button=form.querySelector('button');button.disabled=true;
       try{await D.api('/api/admin/settings',{method:'POST',body:{event:form.elements.event.value,field:form.elements.field.value,value:Number(form.elements.value.value)}});form.reset();await load();}
