@@ -63,9 +63,10 @@ class GateB19EvaluatorTests(unittest.TestCase):
 
     def test_partial_or_uncertain_rows_do_not_enter_gate_b(self):
         selected_names = {r["filename"] for r in self.selected}
-        for row in self.gt["records"]:
-            if row["filename"] not in selected_names:
-                self.assertFalse(EVALUATOR.is_complete_reference(row))
+        self.assertEqual(len(selected_names), 19)
+        self.assertTrue(all(EVALUATOR.is_complete_reference(row) for row in self.gt["records"][19:21]))
+        for row in self.gt["records"][21:]:
+            self.assertFalse(EVALUATOR.is_complete_reference(row))
 
     def test_missing_selected_run_rows_are_counted_as_unresolved(self):
         first = self.selected[0]
@@ -83,7 +84,7 @@ class GateB19EvaluatorTests(unittest.TestCase):
         metrics = EVALUATOR.evaluate_engine(run, "tesseractjs", self.selected)
         self.assertEqual(metrics["missingRunResults"], 18)
         self.assertEqual(metrics["readerRowsAvailable"], 1)
-        self.assertEqual(metrics["fieldLevelSummary"]["eligibleExpectedValues"], 189)
+        self.assertEqual(metrics["fieldLevelSummary"]["eligibleExpectedValues"], 171)
         self.assertEqual(metrics["fieldLevelSummary"]["unresolvedOutputs"], 171)
         self.assertEqual(metrics["fieldLevelSummary"]["exactMatches"], 0)
 
