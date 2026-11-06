@@ -19,6 +19,10 @@ Branch: `main`
 - The two console-style reward screens preserve both base and WITH PREMIUM values. The canonical scalar reward uses the explicitly labeled WITH PREMIUM/final-received value; base values remain in the workbook notes.
 - No missing player, map, mode, or battle-start value was inferred. The source images do not make all such values readable.
 
+## Reviewer provenance qualification
+
+The manual transcription is independent of the OCR run outputs, and selected disputed values were checked against the original screenshots. The supplied archive does not record the transcriber identity/date or document a separate blind second reviewer. Treat this as a working manual reference, not certified double-blind ground truth.
+
 ## Coverage and accuracy status
 
 - 63 candidate images total.
