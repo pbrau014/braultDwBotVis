@@ -961,6 +961,22 @@ test('Discord score views label event scores as doubloons and separate bracket w
     const player = H.playerDetailText('Race Fast');
     assert.match(player, /60s/);
     assert.match(player, /raw scoring inputs/);
+    const command = await send('!yolo scoring');
+    assert.match(command.text, /YOLO scoring guide/);
+    const componentRows = H.buildTournamentPanelComponents();
+    assert.ok(componentRows[0].components.some(button => button.data.custom_id === 'yolo:scoring'));
+    let updated;
+    const scoringButton = {
+      channelId: H.getTargetChannelId(),
+      customId: 'yolo:scoring',
+      isChatInputCommand: () => false,
+      isButton: () => true,
+      isStringSelectMenu: () => false,
+      async update(payload) { updated = payload; },
+    };
+    assert.equal(await H.handleInteraction(scoringButton), true);
+    assert.match(updated.content, /YOLO scoring guide/);
+
   } finally {
     await H.setTournamentState(previous);
   }
