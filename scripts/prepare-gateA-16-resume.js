@@ -28,6 +28,10 @@ function samePreflight(a, b) {
     });
     return stable(a) === stable(b);
 }
+function extractStartedFixtures(logText) {
+    return [...String(logText || '').matchAll(/\\[OCR-SEQUENCE\\]\\s+(\\d+)\\/16 START ([^\\r\\n]+)/g)]
+        .map(match => ({ index: Number(match[1]), fixtureKey: match[2].trim() }));
+}
 function pngInfo(bytes) {
     const signature = Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a]);
     if (bytes.length < 24 || !bytes.subarray(0,8).equals(signature)
@@ -61,6 +65,13 @@ async function prepare(options) {
     const priorManifestBytes = await fs.readFile(priorManifestPath);
     const priorGateAPath = path.join(partialRoot, 'source', 'testdata', 'gateA-16', 'gate-a-acceptance.json');
     const priorGateA = JSON.parse(await fs.readFile(priorGateAPath, 'utf8'));
+    const originalJobLogPath = path.join(partialRoot, 'original-run.log');
+    const originalJobLog = await fs.readFile(originalJobLogPath, 'utf8');
+    const originalStartedFixtures = extractStartedFixtures(originalJobLog);
+    if (originalStartedFixtures.length !== 1 || originalStartedFixtures[0].index !== 1
+        || originalStartedFixtures[0].fixtureKey !== 'Screenshot_16.jpg') {
+        throw new Error('Original job log does not prove exactly one start for Screenshot_16.jpg; refusing to resume any provider work.');
+    }
     if (manifest.imageCount !== 16 || manifest.records?.length !== 16 || preflight.imageCount !== 16
         || !samePreflight(priorPreflight, preflight) || manifestSha256 !== preflight.manifestSha256
         || sha256(priorManifestBytes) !== manifestSha256
@@ -225,6 +236,9 @@ async function prepare(options) {
         allRequiredFieldsPass: requiredFieldsPass, requiredMissing,
         originalNetworkLogStatus: 'MISSING_FROM_ORIGINAL_PARTIAL_ARTIFACT',
         originalNetworkAttemptCount: null,
+        originalJobLogSha256: sha256(Buffer.from(originalJobLog, 'utf8')),
+        originalProviderStartCount: originalStartedFixtures.length,
+        originalProviderStartedFixtureKeys: originalStartedFixtures.map(item => item.fixtureKey),
         orchestrationOverlay: { candidateRunnerSha256, runnerOverlaySha256, helperOverlaySha256 },
         sourceBuildSha256: null,
         createdAt: new Date().toISOString(),
@@ -299,4 +313,4 @@ if (require.main === module) {
         process.exitCode = 1;
     });
 }
-module.exports = { prepare, samePreflight, pngInfo };
+module.exports = { prepare, samePreflight, pngInfo, extractStartedFixtures };
