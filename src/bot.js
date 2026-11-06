@@ -2847,7 +2847,9 @@ function eventStandingsText(event) {
     if (!Tournament.EVENTS.includes(event)) throw new Error(`Event must be one of: ${Tournament.EVENTS.join(', ')}.`);
     const rows = Tournament.standings(tournamentState).sort((a, b) => b.events[event] - a.events[event] || a.name.localeCompare(b.name));
     if (!rows.length) return 'No players in the tournament yet.';
-    return [`**${Tournament.EVENT_LABELS[event]} leaderboard**`, ...rows.map((row, index) => `**${index + 1}. ${row.name}** — ${row.events[event].toFixed(2)} doubloons`)].join('\n');
+    const heading = [`**${Tournament.EVENT_LABELS[event]} leaderboard**`];
+    if (event === 'race') heading.push('`Race C01 inverse-time: lower elapsed seconds earn a larger performance share.`');
+    return [...heading, ...rows.map((row, index) => `**${index + 1}. ${row.name}** — ${row.events[event].toFixed(2)} doubloons`)].join('\\n');
 }
 
 function missingSlotsText(args) {
