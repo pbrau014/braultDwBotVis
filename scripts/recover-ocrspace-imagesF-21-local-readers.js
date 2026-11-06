@@ -188,6 +188,7 @@ async function main() {
             try {
                 pdfBuffer = await fs.readFile(pdfPath);
                 const normalization = row.rasterNormalization || row.ocrSpacePdfFirst?.rasterNormalization || null;
+                if (normalization) row.rasterNormalization = normalization;
                 const pageRasterPath = safePath(artifactRoot, row.pageRasterPath || (!normalization ? row.rasterPath : null));
                 const pageRasterBuffer = pageRasterPath ? await fs.readFile(pageRasterPath) : null;
                 const pageRasterBytes = row.pageRasterBytes || row.ocrSpacePdfFirst?.pageRasterBytes || (!normalization ? row.rasterBytes : null);
@@ -225,8 +226,9 @@ async function main() {
                     const [savedNormalizedPixels, expectedNormalizedPixels] = await Promise.all([
                         toPixels(rasterBuffer), toPixels(normalized.buffer),
                     ]);
-                    if (!savedNormalizedPixels.equals(expectedNormalizedPixels)) {
-                        throw new Error('Saved normalized raster is not pixel-identical to the source-bound PDF crop.');
+                    if (!savedNormalizedPixels.equals(expectedNormalizedPixels)
+                        || JSON.stringify(normalized.normalization) !== JSON.stringify(normalization)) {
+                        throw new Error('Saved normalized raster or its metadata is not identical to the source-bound PDF crop.');
                     }
                 } else {
                     const priorRasterMetadata = await imageProcessor.metadata(pageRasterBuffer);
