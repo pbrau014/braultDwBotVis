@@ -2,10 +2,11 @@
 
 const HASH = /^[0-9a-f]{64}$/;
 
-function validateResumeState(run, { sourceArchiveSha256, preflightReportSha256, verifiedMembers, requiredFields }) {
+function validateResumeState(run, { sourceArchiveSha256, preflightReportSha256, verifiedMembers, requiredFields, runtime }) {
     if (!run || run.schemaVersion !== 1 || run.sourceArchiveSha256 !== sourceArchiveSha256
         || run.preflightReportSha256 !== preflightReportSha256 || run.imageCount !== verifiedMembers.length
         || run.imageCount !== 63 || JSON.stringify(run.requiredFields) !== JSON.stringify(requiredFields)
+        || JSON.stringify(run.runtime) !== JSON.stringify(runtime)
         || !Array.isArray(run.results)) {
         const error = new Error('Existing OCR.Space progress does not match this exact archive, preflight, inventory, or required-field contract.');
         error.code = 'OCRSPACE_RESUME_FINGERPRINT_MISMATCH';
