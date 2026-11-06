@@ -30,92 +30,69 @@ test('OCR reports include reproducible build, engine, language-model and local a
 });
 
 
-test('OCR configuration metadata makes optional engine and network feature flags explicit', () => {
+test('OCR configuration metadata reports explicit primary activation and provider network access', () => {
     const defaults = describeOcrConfiguration({});
     assert.equal(defaults.engine, 'auto');
     assert.equal(defaults.opencvAssistEnabled, false);
     assert.equal(defaults.paddleOcrFieldFallbackEnabled, false);
-    assert.equal(defaults.networkBlockingEnabled, false);
-    assert.equal(defaults.imageTimeoutMs, 90000);
-    assert.equal(defaults.operationTimeoutMs, 15000);
+    assert.equal(defaults.ocrSpaceNetworkEnabled, false);
+    assert.equal(defaults.nonOcrNetworkRestricted, false);
+    assert.equal(defaults.ocrSpace.enabled, false);
+    assert.equal(defaults.ocrSpace.defaultEnabled, false);
+    assert.equal(defaults.ocrSpace.explicitlyEnabled, false);
+    assert.equal(defaults.ocrSpace.activationReason, 'OCRSPACE_ENABLED must be explicitly set to 1');
+    assert.deepEqual(defaults.ocrSequence, ['ocrspace-required-but-blocked-until-explicit-enable-and-key']);
 
     const enabled = describeOcrConfiguration({
         OCR_ENGINE: 'TESSERACTJS',
         OCR_CV_ASSIST: '1',
         PADDLEOCR_FIELD_FALLBACK: '1',
-        OCR_NETWORK_BLOCK_ENABLED: '1',
+        OCRSPACE_ENABLED: '1',
+        OCRSPACE_API_KEY: 'never-log-this-secret',
+        OCRSPACE_NETWORK_ALLOWLIST: '1',
+        OCR_NON_OCR_NETWORK_RESTRICTED: '1',
         OCR_IMAGE_TIMEOUT_MS: '120000',
         OCR_OPERATION_TIMEOUT_MS: '9000',
     });
-    assert.deepEqual(enabled, {
-        engine: 'tesseractjs',
-        opencvAssistEnabled: true,
-        paddleOcrFieldFallbackEnabled: true,
-        networkBlockingEnabled: true,
-        imageTimeoutMs: 120000,
-        operationTimeoutMs: 9000,
-        ocrSequence: ['tesseractjs-local'],
-        ocrSpace: {
-            enabled: false,
-            defaultEnabled: true,
-            explicitlyEnabled: false,
-            explicitlyDisabled: false,
-            activationReason: 'OCRSPACE_API_KEY is not configured',
-            apiKeyConfigured: false,
-            engine: 2,
-            requestProfile: {
-                detectOrientation: true, scale: true, tableMode: false,
-                searchablePdf: true, searchablePdfHideTextLayer: true,
-                oneRequestPerImage: true, sourceImageFirst: true, localReadersUsePdfRaster: true,
-            },
-            limits: { maxUploadBytes: 1048576, maxPdfBytes: 25 * 1024 * 1024, maxPdfPages: 3, maxPerDay: 450, maxPerMonth: 22000 },
-        },
-    });
-    assert.equal(describeOcrConfiguration({ OCR_CV_ASSIST: 'true', PADDLEOCR_FIELD_FALLBACK: 'yes' }).opencvAssistEnabled, false);
-    assert.equal(describeOcrConfiguration({ OCR_CV_ASSIST: 'true', PADDLEOCR_FIELD_FALLBACK: 'yes' }).paddleOcrFieldFallbackEnabled, false);
+    assert.equal(enabled.engine, 'tesseractjs');
+    assert.equal(enabled.ocrSpace.enabled, true);
+    assert.equal(enabled.ocrSpace.explicitlyEnabled, true);
+    assert.equal(enabled.ocrSpace.networkEnabled, true);
+    assert.equal(enabled.ocrSpace.unrelatedEgressRestricted, true);
+    assert.equal(enabled.ocrSpaceNetworkEnabled, true);
+    assert.equal(enabled.nonOcrNetworkRestricted, true);
+    assert.deepEqual(enabled.ocrSequence, ['ocrspace-engine2-source-image', 'searchable-pdf-download', 'pdf-page-raster', 'local-ocr-readers', 'field-validation']);
+    assert.deepEqual(enabled.ocrSpace.allowedHttpsHosts, ['api.ocr.space', 'ocr.space']);
+    assert.equal(enabled.imageTimeoutMs, 120000);
+    assert.equal(enabled.operationTimeoutMs, 9000);
+    assert.equal(JSON.stringify(enabled).includes('never-log-this-secret'), false);
+
+    const zero = describeOcrConfiguration({ OCRSPACE_ENABLED: '0', OCRSPACE_API_KEY: 'local-key' });
+    assert.equal(zero.ocrSpace.enabled, false);
+    assert.equal(zero.ocrSpace.explicitlyDisabled, false);
+    assert.equal(zero.ocrSpace.activationReason, 'OCRSPACE_ENABLED must be explicitly set to 1');
+    assert.deepEqual(zero.ocrSequence, ['ocrspace-required-but-blocked-until-explicit-enable-and-key']);
 });
 
-
-test('OCR.Space report metadata records the configured request profile without exposing the key', () => {
-    const defaults = describeOcrConfiguration({});
-    assert.equal(defaults.ocrSpace.enabled, false);
-    assert.equal(defaults.ocrSpace.defaultEnabled, true);
-    assert.equal(defaults.ocrSpace.explicitlyEnabled, false);
-    assert.equal(defaults.ocrSpace.explicitlyDisabled, false);
-    assert.equal(defaults.ocrSpace.activationReason, 'OCRSPACE_API_KEY is not configured');
-    assert.equal(defaults.ocrSpace.apiKeyConfigured, false);
-    assert.equal(defaults.ocrSequence.includes('ocrspace-engine2-source-image'), false);
-
-    const keyOnlyDefault = describeOcrConfiguration({ OCRSPACE_API_KEY: 'local-key' });
-    assert.equal(keyOnlyDefault.ocrSpace.enabled, true);
-    assert.equal(keyOnlyDefault.ocrSpace.defaultEnabled, true);
-    assert.equal(keyOnlyDefault.ocrSpace.explicitlyEnabled, false);
-    assert.deepEqual(keyOnlyDefault.ocrSequence, ['ocrspace-engine2-source-image', 'searchable-pdf-download', 'pdf-page-raster', 'local-ocr-readers', 'field-validation']);
-    const explicitlyOff = describeOcrConfiguration({ OCRSPACE_ENABLED: '0', OCRSPACE_API_KEY: 'local-key' });
-    assert.equal(explicitlyOff.ocrSpace.enabled, false);
-    assert.equal(explicitlyOff.ocrSpace.explicitlyDisabled, true);
-    assert.equal(explicitlyOff.ocrSequence.includes('ocrspace-engine2-source-image'), false);
-
+test('OCR.Space report metadata keeps the required PDF-first request profile', () => {
     const enabled = describeOcrConfiguration({
         OCRSPACE_ENABLED: '1',
-        OCRSPACE_API_KEY: 'never-log-this-secret',
+        OCRSPACE_API_KEY: 'key',
+        OCRSPACE_NETWORK_ALLOWLIST: '1',
+        OCR_NON_OCR_NETWORK_RESTRICTED: '1',
         OCRSPACE_MAX_PER_DAY: '400',
         OCRSPACE_MAX_PER_MONTH: '21000',
     });
-    assert.equal(enabled.ocrSpace.enabled, true);
-    assert.equal(enabled.ocrSpace.apiKeyConfigured, true);
-    assert.deepEqual(enabled.ocrSequence, ['ocrspace-engine2-source-image', 'searchable-pdf-download', 'pdf-page-raster', 'local-ocr-readers', 'field-validation']);
-    assert.equal(enabled.ocrSpace.engine, 2);
     assert.deepEqual(enabled.ocrSpace.requestProfile, {
         detectOrientation: true, scale: true, tableMode: false,
         searchablePdf: true, searchablePdfHideTextLayer: true,
         oneRequestPerImage: true, sourceImageFirst: true, localReadersUsePdfRaster: true,
     });
+    assert.equal(enabled.ocrSpace.engine, 2);
     assert.equal(enabled.ocrSpace.limits.maxPerDay, 400);
     assert.equal(enabled.ocrSpace.limits.maxPerMonth, 21000);
-    assert.equal(JSON.stringify(enabled).includes('never-log-this-secret'), false);
     const bounded = describeOcrConfiguration({ OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'key',
-        OCRSPACE_MAX_PER_DAY: '9999', OCRSPACE_MAX_PER_MONTH: '999999' });
+        OCRSPACE_NETWORK_ALLOWLIST: '1', OCRSPACE_MAX_PER_DAY: '9999', OCRSPACE_MAX_PER_MONTH: '999999' });
     assert.deepEqual(bounded.ocrSpace.limits, { maxUploadBytes: 1048576, maxPdfBytes: 25 * 1024 * 1024,
         maxPdfPages: 3, maxPerDay: 499, maxPerMonth: 24999 });
 });

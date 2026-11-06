@@ -3841,8 +3841,12 @@ if (require.main === module) {
     // ============================================================
     // SECTION 8: VALIDATE CONFIGURATION AND START BOT
     // ============================================================
-    if (process.env.OCRSPACE_ENABLED !== '0' && !String(process.env.OCRSPACE_API_KEY || '').trim()) {
-        console.error('OCR.Space-first processing requires OCRSPACE_API_KEY. Set OCRSPACE_ENABLED=0 only for an explicitly local-only development/test run.');
+    if (String(process.env.OCRSPACE_ENABLED || '').trim() !== '1') {
+        console.error('OCR.Space is the required primary text-extraction stage. Set OCRSPACE_ENABLED=1.');
+        process.exit(1);
+    }
+    if (!String(process.env.OCRSPACE_API_KEY || '').trim()) {
+        console.error('OCR.Space-first processing requires OCRSPACE_API_KEY in the local environment or protected Actions secrets.');
         process.exit(1);
     }
     if (!BOT_TOKEN || BOT_TOKEN === 'PASTE_YOUR_BOT_TOKEN_HERE') {

@@ -187,30 +187,31 @@ test('corrupt quota ledger fails closed', async () => {
     } finally { await fs.rm(dir, { recursive: true, force: true }); }
 });
 
-test('OCR.Space defaults on with a local key; explicit opt-out and missing/invalid keys fail closed', async () => {
+test('OCR.Space requires explicit enablement and a local key; unset, 0 and invalid settings fail closed', async () => {
     let builds = 0, network = 0;
     const cropPlan = [{ field: 'xp', source: 'localized-reward-column', engine: 3, identityBoundaryVerified: true, rect: { left: 1, top: 2, width: 10, height: 8 } }];
     const buildCrop = async () => { builds++; return Buffer.from('crop'); };
     const quotaLedger = { reserve: async () => ({ reserved: true }) };
     const client = async () => { network++; return { engine: 3, parsedText: '451', overlay: [], partial: false,
         searchablePdfUrl: 'https://api.ocr.space/download/mock.pdf', processingTimeMs: 5 }; };
-    const defaultOn = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_API_KEY: 'key' }, cropPlan, buildCrop, quotaLedger, client });
-    const explicitlyOff = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '0', OCRSPACE_API_KEY: 'key' }, cropPlan, buildCrop, quotaLedger, client });
-    const noKey = await collectOcrSpaceFieldEvidence({ env: {}, cropPlan, buildCrop, quotaLedger, client });
+    const unset = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_API_KEY: 'key' }, cropPlan, buildCrop, quotaLedger, client });
+    const zero = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '0', OCRSPACE_API_KEY: 'key' }, cropPlan, buildCrop, quotaLedger, client });
+    const noKey = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '1' }, cropPlan, buildCrop, quotaLedger, client });
     const invalidSetting = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: 'true', OCRSPACE_API_KEY: 'key' }, cropPlan, buildCrop, quotaLedger, client });
     const explicitOn = await collectOcrSpaceFieldEvidence({ env: { OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'key' }, cropPlan, buildCrop, quotaLedger, client });
-    assert.equal(defaultOn.status, 'complete');
-    assert.equal(defaultOn.activation.defaultEnabled, true);
-    assert.equal(defaultOn.activation.explicitlyEnabled, false);
-    assert.equal(explicitlyOff.status, 'disabled');
+    assert.equal(unset.status, 'disabled');
+    assert.equal(unset.activation.defaultEnabled, false);
+    assert.equal(unset.activation.explicitlyEnabled, false);
+    assert.equal(zero.status, 'disabled');
+    assert.equal(zero.activation.reason, 'OCRSPACE_ENABLED must be explicitly set to 1');
     assert.equal(noKey.status, 'disabled');
     assert.equal(invalidSetting.status, 'disabled');
     assert.equal(explicitOn.status, 'complete');
-    assert.equal(defaultOn.requests, 1);
+    assert.equal(unset.requests, 0);
     assert.equal(explicitOn.requests, 1);
-    assert.equal(defaultOn.evidence[0].text, '451');
-    assert.equal(builds, 2);
-    assert.equal(network, 2);
+    assert.equal(explicitOn.evidence[0].text, '451');
+    assert.equal(builds, 1);
+    assert.equal(network, 1);
 });
 
 test('field evidence rejects identity/unknown crops and submits allowlisted crops sequentially', async () => {

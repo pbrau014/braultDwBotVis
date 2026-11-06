@@ -19,23 +19,32 @@ function describeOcrConfiguration(env = process.env) {
     const ocrSpaceActivation = getOcrSpaceActivation(env);
     const ocrSpaceKeyConfigured = ocrSpaceActivation.apiKeyConfigured;
     const ocrSpaceEnabled = ocrSpaceActivation.enabled;
+    const ocrSpaceNetworkEnabled = String(env.OCRSPACE_NETWORK_ALLOWLIST || '').trim() === '1';
+    const nonOcrNetworkRestricted = String(env.OCR_NON_OCR_NETWORK_RESTRICTED || '').trim() === '1';
     return {
         engine: String(env.OCR_ENGINE || 'auto').trim().toLowerCase(),
         opencvAssistEnabled: String(env.OCR_CV_ASSIST || '').trim() === '1',
         paddleOcrFieldFallbackEnabled: String(env.PADDLEOCR_FIELD_FALLBACK || '').trim() === '1',
-        networkBlockingEnabled: String(env.OCR_NETWORK_BLOCK_ENABLED || '').trim() === '1',
+        ocrSpaceNetworkEnabled,
+        nonOcrNetworkRestricted,
+        networkPolicy: ocrSpaceNetworkEnabled
+            ? 'OCR.Space HTTPS API/PDF access allowed; unrelated outbound destinations restricted'
+            : 'OCR.Space network allowlist is not enabled',
         imageTimeoutMs: positiveInteger(env.OCR_IMAGE_TIMEOUT_MS, 90_000),
         operationTimeoutMs: positiveInteger(env.OCR_OPERATION_TIMEOUT_MS, 15_000),
         ocrSequence: ocrSpaceEnabled
             ? ['ocrspace-engine2-source-image', 'searchable-pdf-download', 'pdf-page-raster', 'local-ocr-readers', 'field-validation']
-            : ['tesseractjs-local'],
+            : ['ocrspace-required-but-blocked-until-explicit-enable-and-key'],
         ocrSpace: {
             enabled: ocrSpaceEnabled,
             defaultEnabled: ocrSpaceActivation.defaultEnabled,
             explicitlyEnabled: ocrSpaceActivation.explicitlyEnabled,
-            explicitlyDisabled: ocrSpaceActivation.explicitlyDisabled,
+            explicitlyDisabled: false,
             activationReason: ocrSpaceActivation.reason,
             apiKeyConfigured: ocrSpaceKeyConfigured,
+            networkEnabled: ocrSpaceNetworkEnabled,
+            unrelatedEgressRestricted: nonOcrNetworkRestricted,
+            allowedHttpsHosts: ocrSpaceNetworkEnabled ? ['api.ocr.space', 'ocr.space'] : [],
             engine: 2,
             requestProfile: {
                 detectOrientation: true,

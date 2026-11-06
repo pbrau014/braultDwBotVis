@@ -13,14 +13,13 @@ const ALLOWED_REMOTE_SOURCES = new Set(['localized-reward-column', 'localized-da
 function getOcrSpaceActivation(env = {}) {
     const setting = String(env.OCRSPACE_ENABLED ?? '').trim();
     const apiKeyConfigured = Boolean(String(env.OCRSPACE_API_KEY || '').trim());
-    const validSetting = setting === '' || setting === '1' || setting === '0';
-    const enabled = validSetting && setting !== '0' && apiKeyConfigured;
-    const reason = !validSetting ? 'OCRSPACE_ENABLED must be 0 or 1 when explicitly set'
-        : setting === '0' ? 'OCRSPACE_ENABLED is explicitly disabled'
-            : !apiKeyConfigured ? 'OCRSPACE_API_KEY is not configured' : null;
+    const explicitlyEnabled = setting === '1';
+    const enabled = explicitlyEnabled && apiKeyConfigured;
+    const reason = !explicitlyEnabled ? 'OCRSPACE_ENABLED must be explicitly set to 1'
+        : !apiKeyConfigured ? 'OCRSPACE_API_KEY is not configured' : null;
     return {
-        enabled, defaultEnabled: true, setting: setting || 'default-on',
-        explicitlyEnabled: setting === '1', explicitlyDisabled: setting === '0',
+        enabled, defaultEnabled: false, setting: setting || 'missing',
+        explicitlyEnabled, explicitlyDisabled: false,
         apiKeyConfigured, reason,
     };
 }

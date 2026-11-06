@@ -14,7 +14,7 @@ const runDir = process.env.OCR_ACCEPTANCE_RUN_DIR
     : path.join(root, 'testdata', 'ocr-acceptance', `${stamp}-${process.pid}`);
 fs.mkdirSync(runDir, { recursive: true });
 const blockNetworkPath = path.join(__dirname, 'block-network.js');
-const blockLogPath = path.join(runDir, 'blocked-network-attempts.log');
+const nonOcrNetworkLogPath = path.join(runDir, 'non-ocr-network-attempts.log');
 const packageInfo = require('../package.json');
 const { nativeTesseractAvailable } = require('../src/ocr-worker');
 const { validateNegativeExpectedControl } = require('../src/acceptance-checks');
@@ -23,7 +23,7 @@ const { version: tesseractJsVersion } = require('tesseract.js/package.json');
 const { version: tesseractCoreVersion } = require('tesseract.js-core/package.json');
 const results = [];
 
-function run(label, args, envOverrides = {}, networkBlocked = false) {
+function run(label, args, envOverrides = {}, nonOcrNetworkRestricted = false) {
     const logfile = path.join(runDir, `${label.replace(/[^a-z0-9_-]/gi, '-')}.log`);
     const env = {
         ...process.env,
@@ -34,9 +34,9 @@ function run(label, args, envOverrides = {}, networkBlocked = false) {
         OCR_OPERATION_TIMEOUT_MS: process.env.OCR_OPERATION_TIMEOUT_MS || '15000',
         ...envOverrides,
     };
-    if (networkBlocked) {
-        env.OCR_NETWORK_BLOCK_LOG = blockLogPath;
-        env.OCR_NETWORK_BLOCK_ENABLED = '1';
+    if (nonOcrNetworkRestricted) {
+        env.OCR_NON_OCR_NETWORK_LOG = nonOcrNetworkLogPath;
+        env.OCR_NON_OCR_NETWORK_RESTRICTED = '1';
         // NODE_OPTIONS propagates the network guard into the per-image supervised
         // child process too; preloading only the sequence parent would not prove
         // that the OCR worker path itself is offline-safe.
@@ -59,7 +59,7 @@ function run(label, args, envOverrides = {}, networkBlocked = false) {
     try {
         child = spawnSync(process.execPath, argv, {
             cwd: root, env, encoding: 'utf8', maxBuffer: 30 * 1024 * 1024,
-            timeout: Number(process.env.OCR_ACCEPTANCE_CHILD_TIMEOUT_MS) || (label === 'additional-sixteen-images-sequential-no-network' ? 1_200_000 : 480_000),
+            timeout: Number(process.env.OCR_ACCEPTANCE_CHILD_TIMEOUT_MS) || (label === 'additional-sixteen-images-sequential-ocrspace-allowlisted' ? 1_200_000 : 480_000),
             detached: process.platform !== 'win32',
             stdio: ['ignore', stdoutFd, stderrFd],
         });
@@ -84,7 +84,7 @@ function run(label, args, envOverrides = {}, networkBlocked = false) {
         spawnError: child.error?.message || null,
         elapsedMs: Date.now() - started,
         logfile: path.relative(root, logfile),
-        networkBlocked,
+        nonOcrNetworkRestricted,
         passed: child.status === 0 && !child.error,
     };
     results.push(row);
@@ -115,7 +115,7 @@ function sourceFingerprint() {
 }
 
 function report() {
-    const blockedLogPresent = fs.existsSync(blockLogPath) && fs.statSync(blockLogPath).size > 0;
+    const deniedNonOcrLogPresent = fs.existsSync(nonOcrNetworkLogPath) && fs.statSync(nonOcrNetworkLogPath).size > 0;
     const output = {
         schemaVersion: 1,
         runId: path.basename(runDir),
@@ -128,9 +128,14 @@ function report() {
         configuredEngine: 'tesseractjs',
         expectedEngineVersions: { tesseractJs: tesseractJsVersion, tesseractCore: tesseractCoreVersion },
         nativeTesseractAvailable: nativeTesseractAvailable(),
-        networkIsolation: { networkBlocked: true, blockedAttemptLog: path.relative(root, blockLogPath), blockedAttemptsDetected: blockedLogPresent },
+        networkIsolation: {
+            ocrSpaceNetworkEnabled: process.env.OCRSPACE_NETWORK_ALLOWLIST === '1',
+            nonOcrNetworkRestricted: results.some(result => result.nonOcrNetworkRestricted),
+            nonOcrDeniedAttemptLog: path.relative(root, nonOcrNetworkLogPath),
+            nonOcrDeniedAttemptsDetected: deniedNonOcrLogPresent,
+        },
         results,
-        passed: results.every(result => result.passed) && !blockedLogPresent,
+        passed: results.every(result => result.passed) && !deniedNonOcrLogPresent,
     };
     const jsonPath = path.join(runDir, 'acceptance-report.json');
     fs.writeFileSync(jsonPath, `${JSON.stringify(output, null, 2)}\n`);
@@ -138,7 +143,7 @@ function report() {
     fs.writeFileSync(path.join(runDir, 'acceptance-report.sha256'), `${digest}  acceptance-report.json\n`);
     console.log(`\n[ACCEPTANCE] Report: ${path.relative(root, jsonPath)}`);
     console.log(`[ACCEPTANCE] Report SHA-256: ${digest}`);
-    console.log(`[ACCEPTANCE] Summary ${results.filter(r => r.passed).length}/${results.length} commands passed; blocked network attempts=${blockedLogPresent ? 'yes' : 'no'}`);
+    console.log(`[ACCEPTANCE] Summary ${results.filter(r => r.passed).length}/${results.length} commands passed; denied non-OCR.Space egress attempts=${deniedNonOcrLogPresent ? 'yes' : 'no'}`);
     if (!output.passed) process.exitCode = 1;
 }
 
@@ -171,8 +176,8 @@ function report() {
         const negativeBaselinePath = path.join(runDir, 'negative-control-image-baseline.json');
         const negativeBaseline = run('negative-control-image-known-good-baseline', ['scripts/run-ocr-sequence.js', 'image.png'], {
             OCR_SEQUENCE_REPORT_PATH: negativeBaselinePath,
-            OCR_NETWORK_BLOCK_LOG: blockLogPath,
-            OCR_NETWORK_BLOCK_ENABLED: '1',
+            OCR_NON_OCR_NETWORK_LOG: nonOcrNetworkLogPath,
+            OCR_NON_OCR_NETWORK_RESTRICTED: '1',
         }, true);
         let negativeBaselineValid = false;
         let baselineRow = null;
@@ -198,8 +203,8 @@ function report() {
             OCR_ACCEPTANCE_TEST_MODE: '1',
             OCR_ACCEPTANCE_TEST_EXPECTED_OVERRIDE: 'image.png.damage=255360',
             OCR_SEQUENCE_REPORT_PATH: negativeReportPath,
-            OCR_NETWORK_BLOCK_LOG: blockLogPath,
-            OCR_NETWORK_BLOCK_ENABLED: '1',
+            OCR_NON_OCR_NETWORK_LOG: nonOcrNetworkLogPath,
+            OCR_NON_OCR_NETWORK_RESTRICTED: '1',
         }, true);
         let negativeReportValid = false;
         try {
@@ -227,10 +232,10 @@ function report() {
         run('integrated-reported-screenshot-recovery-exactness', ['scripts/integrated-ocr-stall-recovery.js'], {
             OCR_OPERATION_TIMEOUT_MS: process.env.OCR_INJECTED_STALL_OPERATION_TIMEOUT_MS || '15000',
         }, true);
-        run('reported-screenshot-no-network', ['scripts/run-reported-screenshot-regression.js'], {
+        run('reported-screenshot-ocrspace-allowlisted', ['scripts/run-reported-screenshot-regression.js'], {
             REPORTED_SCREENSHOT_REPORT_PATH: path.join(runDir, 'reported-screenshot.json'),
-            OCR_NETWORK_BLOCK_LOG: blockLogPath,
-            OCR_NETWORK_BLOCK_ENABLED: '1',
+            OCR_NON_OCR_NETWORK_LOG: nonOcrNetworkLogPath,
+            OCR_NON_OCR_NETWORK_RESTRICTED: '1',
         }, true);
         // Repeat the complete five-image acceptance batch three times by default.
         // This is intentionally measured end-to-end; isolated fixture passes are
@@ -238,29 +243,29 @@ function report() {
         // override OCR_ACCEPTANCE_BATCH_REPEATS without shell-specific syntax.
         const batchRepeats = Math.max(1, Math.min(3, Number(process.env.OCR_ACCEPTANCE_BATCH_REPEATS) || 3));
         for (let batch = 1; batch <= batchRepeats; batch += 1) {
-            run(`five-image-sequential-no-network-${batch}`, ['scripts/run-ocr-sequence.js'], {
+            run(`five-image-sequential-ocrspace-allowlisted-${batch}`, ['scripts/run-ocr-sequence.js'], {
                 OCR_SEQUENCE_REPORT_PATH: path.join(runDir, `five-image-sequence-${batch}.json`),
-                OCR_NETWORK_BLOCK_LOG: blockLogPath,
-                OCR_NETWORK_BLOCK_ENABLED: '1',
+                OCR_NON_OCR_NETWORK_LOG: nonOcrNetworkLogPath,
+                OCR_NON_OCR_NETWORK_RESTRICTED: '1',
             }, true);
         }
-        run('hoffmann-then-asashio-no-network', ['scripts/run-ocr-sequence.js', 'hoffmann-victory.png', 'asashio-defeat.jpg'], {
+        run('hoffmann-then-asashio-ocrspace-allowlisted', ['scripts/run-ocr-sequence.js', 'hoffmann-victory.png', 'asashio-defeat.jpg'], {
             OCR_SEQUENCE_REPORT_PATH: path.join(runDir, 'hoffmann-asashio.json'),
-            OCR_NETWORK_BLOCK_LOG: blockLogPath,
-            OCR_NETWORK_BLOCK_ENABLED: '1',
+            OCR_NON_OCR_NETWORK_LOG: nonOcrNetworkLogPath,
+            OCR_NON_OCR_NETWORK_RESTRICTED: '1',
         }, true);
-        run('asashio-then-hoffmann-no-network', ['scripts/run-ocr-sequence.js', 'asashio-defeat.jpg', 'hoffmann-victory.png'], {
+        run('asashio-then-hoffmann-ocrspace-allowlisted', ['scripts/run-ocr-sequence.js', 'asashio-defeat.jpg', 'hoffmann-victory.png'], {
             OCR_SEQUENCE_REPORT_PATH: path.join(runDir, 'asashio-hoffmann.json'),
-            OCR_NETWORK_BLOCK_LOG: blockLogPath,
-            OCR_NETWORK_BLOCK_ENABLED: '1',
+            OCR_NON_OCR_NETWORK_LOG: nonOcrNetworkLogPath,
+            OCR_NON_OCR_NETWORK_RESTRICTED: '1',
         }, true);
         // Add the 16 user-supplied screenshots as a separate, exact-match
         // acceptance stage. This keeps the established five-image repeat tests
         // comparable while ensuring the expanded corpus is exercised each run.
-        run('additional-sixteen-images-sequential-no-network', ['scripts/run-additional-screenshot-regression.js'], {
+        run('additional-sixteen-images-sequential-ocrspace-allowlisted', ['scripts/run-additional-screenshot-regression.js'], {
             OCR_SEQUENCE_REPORT_PATH: path.join(runDir, 'additional-screenshot-sequence.json'),
-            OCR_NETWORK_BLOCK_LOG: blockLogPath,
-            OCR_NETWORK_BLOCK_ENABLED: '1',
+            OCR_NON_OCR_NETWORK_LOG: nonOcrNetworkLogPath,
+            OCR_NON_OCR_NETWORK_RESTRICTED: '1',
         }, true);
     } finally {
         report();

@@ -35,7 +35,12 @@ function validateDiscordTestConfig(env = process.env, options = {}) {
         const safe = configured ? isWithinDirectory(testDataRoot, path.resolve(projectRoot, configured)) : false;
         check(`isolated-${variable.toLowerCase()}`, safe, `${variable} must remain inside ./testdata/live-discord-state/.`);
     }
-    for (const variable of ['ENABLE_SLASH_COMMANDS', 'OCRSPACE_ENABLED', 'PADDLEOCR_FIELD_FALLBACK', 'OCR_CV_ASSIST']) {
+    check('ocrspace-explicitly-enabled', String(env.OCRSPACE_ENABLED || '').trim() === '1',
+        'OCRSPACE_ENABLED must be explicitly set to 1 for the primary OCR path.');
+    const ocrSpaceKey = String(env.OCRSPACE_API_KEY || '').trim();
+    check('ocrspace-api-key-present', Boolean(ocrSpaceKey) && !/^(paste_|your_|<|replace)/i.test(ocrSpaceKey),
+        'OCRSPACE_API_KEY must be configured locally; the value is never returned by this preflight.');
+    for (const variable of ['ENABLE_SLASH_COMMANDS', 'PADDLEOCR_FIELD_FALLBACK', 'OCR_CV_ASSIST']) {
         const value = String(env[variable] ?? '0').trim().toLowerCase();
         check(`disabled-${variable.toLowerCase()}`, DISABLED_VALUES.has(value), `${variable} must be disabled for the first isolated Discord smoke test.`);
     }
