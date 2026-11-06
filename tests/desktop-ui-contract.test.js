@@ -50,6 +50,7 @@ test('desktop browser scripts use only same-origin local APIs and do not contain
 test('upload page supports one image preview, drag and drop, type/size validation and progress', () => {
   const html = read('desktop/upload.html');
   const script = read('desktop/upload.js');
+  const css = read('desktop/desktop.css');
   assert.match(html, /type="file"/);
   assert.doesNotMatch(html, /multiple/i);
   assert.match(script, /dragover/);
