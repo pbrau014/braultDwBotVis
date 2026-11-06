@@ -1773,7 +1773,7 @@ C. OCR.SPACE REQUEST PROFILE — REQUIRED WHEN THE PROVIDER IS USED
 D. IMPLEMENTATION MAP AND CURRENT VERIFICATION STATE
 
 - `src/ocrspace-client.js`: Engine 3, orientation detection, table flag,
-  scaling, searchable PDF flags, visible text layer, bounded request/response,
+  scaling, searchable PDF flags, hidden searchable text layer, bounded request/response,
   safe URL extraction, HTTPS/header/redirect safeguards. For PDF requests it
   omits explicit TextOverlay response flag because provider enables its own
   internal overlay for PDF generation.
@@ -2032,7 +2032,7 @@ This section governs current work. The historical plan follows unchanged below.
   and low-DPI crops (`scale=false` only for verified 200–300 DPI input);
   `isTable=true` only for the genuinely tabular reward/stat crop and false for
   non-tabular result-title/metadata crops; `isCreateSearchablePdf=true` and
-  `isSearchablePdfHideTextLayer=false` for a visible text layer. OCR.Space's
+  `isSearchablePdfHideTextLayer=true` for a hidden-but-searchable text layer so PDF raster OCR does not see duplicate overlay text. OCR.Space's
   `isCreateSearchablePdf` automatically enables internal PDF overlay; do not
   separately request optional TextOverlay JSON unless a measured need exists,
   because Engine 3 overlay response can be 2–3x slower.

@@ -164,13 +164,31 @@ try {
   }
   $CvNativeReports += [pscustomobject]@{name=$Name;exists=$true;expectedImages=$Count;completedImages=$Done;exact=[bool]$Exact}
  }
+ $Inventory64ExtractionComplete=$false
+ $Inventory64=[ordered]@{status='BLOCKED';completedImages=0;exactAccuracy='NOT_EVALUABLE_NO_INDEPENDENT_GROUND_TRUTH'}
+ if($env:OCRSPACE_64_ARCHIVE_PATH -and $env:OCRSPACE_64_IMAGE_ROOT){
+  $env:OCRSPACE_64_OUTPUT_DIR=Join-Path $RunDir 'ocrspace-64-pdf-first'
+  $env:OCR_NETWORK_BLOCK_LOG=Join-Path $RunDir 'ocrspace-64-network-attempts.log'
+  Invoke-LoggedNpm -Label 'ocrspace-64-inventory-pdf-first' -Arguments @('run','test:ocrspace-64')
+  $Inventory64Path=Join-Path $env:OCRSPACE_64_OUTPUT_DIR 'ocrspace-64-inventory-report.json'
+  if(Test-Path -LiteralPath $Inventory64Path -PathType Leaf){
+   $Inventory64Data=Get-Content -LiteralPath $Inventory64Path -Raw | ConvertFrom-Json
+   $Inventory64ExtractionComplete=($Inventory64Data.status -eq 'completed-extraction-not-accuracy-accepted') -and ($Inventory64Data.completedImages -eq 64) -and (@($Inventory64Data.results).Count -eq 64)
+   $Inventory64=[ordered]@{status=$Inventory64Data.status;completedImages=[int]$Inventory64Data.completedImages;resultCount=@($Inventory64Data.results).Count;sourceArchiveSha256=$Inventory64Data.sourceArchiveSha256;report=$Inventory64Path;exactAccuracy='NOT_EVALUABLE_NO_INDEPENDENT_GROUND_TRUTH'}
+  }else{
+   $Inventory64=[ordered]@{status='FAILED_OR_BLOCKED';completedImages=0;report=$Inventory64Path;exactAccuracy='NOT_EVALUABLE_NO_INDEPENDENT_GROUND_TRUTH'}
+  }
+ }else{
+  $script:Results += [pscustomobject]@{label='ocrspace-64-inventory-pdf-first';arguments=@('run','test:ocrspace-64');exitCode=2;log=$null;passed=$false;blocked=$true}
+  Write-Host '[WINDOWS-OCR] BLOCKED 64-image inventory: set OCRSPACE_64_ARCHIVE_PATH and OCRSPACE_64_IMAGE_ROOT after verifying imgsHalf1.zip.'
+ }
  $CvPythonVersion='not-available'
  if($env:OPENCV_PYTHON_BIN -and (Test-Path -LiteralPath $env:OPENCV_PYTHON_BIN -PathType Leaf)){
   $CvPythonVersion=(& $env:OPENCV_PYTHON_BIN -c 'import cv2; print(cv2.__version__)' 2>&1 | Out-String).Trim()
   if($LASTEXITCODE -ne 0){$CvPythonVersion='unavailable'}
  }
  $NoNetwork=($BaselineJsReport -and $BaselineJsReport.networkIsolation.blockedAttemptsDetected -eq $false) -and ($CvJsReport -and $CvJsReport.networkIsolation.blockedAttemptsDetected -eq $false)
- foreach($Name in @('reported-native-network-attempts.log','four-image-native-network-attempts.log','additional-sixteen-native-network-attempts.log','reported-native-cv-network-attempts.log','four-image-native-cv-network-attempts.log','additional-sixteen-native-cv-network-attempts.log')){
+ foreach($Name in @('reported-native-network-attempts.log','four-image-native-network-attempts.log','additional-sixteen-native-network-attempts.log','reported-native-cv-network-attempts.log','four-image-native-cv-network-attempts.log','additional-sixteen-native-cv-network-attempts.log','ocrspace-64-network-attempts.log')){
   $Path=Join-Path $RunDir $Name
   if((Test-Path -LiteralPath $Path) -and (Get-Item -LiteralPath $Path).Length -gt 0){$NoNetwork=$false}
  }
@@ -187,8 +205,8 @@ try {
   runtime=[ordered]@{node=$NodeText;npm=$NpmVersion;platform=[System.Runtime.InteropServices.RuntimeInformation]::OSDescription;architecture=[System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString()}
   engines=[ordered]@{tesseract=$TessVersion;imageMagick=$MagickVersion;languages=$Languages}
   source=[ordered]@{gitCommit=$Commit;packageVersion=$Version}
-  commands=$script:Results;baselineNativeReports=$NativeReports;cvCandidate=[ordered]@{opencvVersion=$CvPythonVersion;tesseractJsExact=$CvJsExact;nativeReports=$CvNativeReports};noNetworkAttempts=$NoNetwork
-  passed=(($CvJsExact) -and (@($script:Results|Where-Object{$_.label -like 'cv-assisted-*' -and -not $_.passed}).Count -eq 0) -and ($CvNativeReports.Count -eq 3) -and (@($CvNativeReports|Where-Object{-not $_.exists -or -not $_.exact}).Count -eq 0) -and $NoNetwork)
+  commands=$script:Results;baselineNativeReports=$NativeReports;inventory64=$Inventory64;cvCandidate=[ordered]@{opencvVersion=$CvPythonVersion;tesseractJsExact=$CvJsExact;nativeReports=$CvNativeReports};noNetworkAttempts=$NoNetwork
+  passed=(($CvJsExact) -and (@($script:Results|Where-Object{$_.label -like 'cv-assisted-*' -and -not $_.passed}).Count -eq 0) -and ($CvNativeReports.Count -eq 3) -and (@($CvNativeReports|Where-Object{-not $_.exists -or -not $_.exact}).Count -eq 0) -and $Inventory64ExtractionComplete -and $NoNetwork)
  }
  $ReportPath=Join-Path $RunDir 'windows-native-ocr-acceptance-report.json'
  $Report | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $ReportPath -Encoding utf8
