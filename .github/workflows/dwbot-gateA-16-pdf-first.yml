@@ -176,7 +176,7 @@ jobs:
       # Original gate-a-acceptance.json contains a UTF-8 BOM; the recovery helper parses BOM-safe JSON.
       # Child OCR output and the enriched resume report use separate files; missing original egress evidence blocks all remaining paid requests.
       - name: Prepare no-duplicate Gate A resume checkpoint from existing PDF
-        if: github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15'
+        if: github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' || github.event.head_commit.message == 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'
         shell: powershell
         env:
           OCRSPACE_ENABLED: '0'
@@ -189,6 +189,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'First-image local recovery or original artifact verification failed; no remaining provider requests may start.' }
 
       - name: Initialize Gate A restricted-egress diagnostic log
+        if: github.event.head_commit.message != 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'
         shell: powershell
         run: |
           $log = Join-Path $env:GITHUB_WORKSPACE 'source/testdata/gateA-16/non-ocr-network-attempts.log'
@@ -259,7 +260,8 @@ jobs:
           $network = $report.networkIsolation
           $resumeManifestPath = Join-Path $sourceRoot 'testdata/gateA-16/resume-manifest.json'
           $resumeManifest = if (Test-Path $resumeManifestPath) { Get-Content -Raw $resumeManifestPath | ConvertFrom-Json } else { $null }
-          $originalNetworkEvidencePass = $null -eq $resumeManifest -or ($resumeManifest.originalNetworkLogStatus -eq 'PRESENT' -and $resumeManifest.originalNetworkAttemptCount -eq 0)
+          $isResume = -not [string]::IsNullOrWhiteSpace($env:GATEA_PARTIAL_ARTIFACT_ID)
+          $originalNetworkEvidencePass = if (-not $isResume) { $true } else { $null -ne $resumeManifest -and $resumeManifest.originalNetworkLogStatus -eq 'PRESENT' -and $resumeManifest.originalNetworkAttemptCount -eq 0 }
           $matrixPath = Join-Path $env:GITHUB_WORKSPACE 'testdata/gateA-16/parallel-reader-matrix.json'
           $matrix = if (Test-Path $matrixPath) { Get-Content -Raw $matrixPath | ConvertFrom-Json } else { $null }
           $matrixPass = $null -ne $matrix -and $matrix.status -eq 'COMPLETED_DIAGNOSTIC_MATRIX' -and $matrix.inventory.imageCount -eq 16 -and $matrix.network.blockedAttempts -eq 0
@@ -283,7 +285,7 @@ jobs:
           }
           $reportSha = if (Test-Path $reportPath) { (Get-FileHash -Algorithm SHA256 $reportPath).Hash.ToLowerInvariant() } else { $null }
           $gateAStatus = if ($reportPass -and $auditPass -and $networkPass -and $fingerprintPass -and $runtimePass -and $matrixPass) { 'PASS' } else { 'FAIL' }
-          $networkRestriction = if ($networkPass) { 'PASS' } elseif ($null -ne $resumeManifest -and -not $originalNetworkEvidencePass) { 'RECONSTRUCTED_LIMITED_EVIDENCE' } else { 'FAIL' }
+          $networkRestriction = if ($networkPass) { 'PASS' } elseif ($isResume -and -not $originalNetworkEvidencePass) { 'FAIL_MISSING_ORIGINAL_EVIDENCE' } else { 'FAIL' }
           $summary = [ordered]@{
             schemaVersion = 1
             gate = 'A'
@@ -317,8 +319,8 @@ jobs:
             networkPass = $networkPass
             networkLogBytes = $networkBytes
             networkIsolation = $network
-            originalNetworkLogStatus = if ($resumeManifest) { $resumeManifest.originalNetworkLogStatus } else { 'NOT_APPLICABLE_FRESH_RUN' }
-            originalNetworkAttemptCount = if ($resumeManifest) { $resumeManifest.originalNetworkAttemptCount } else { 0 }
+            originalNetworkLogStatus = if (-not $isResume) { 'NOT_APPLICABLE_FRESH_RUN' } elseif ($resumeManifest) { $resumeManifest.originalNetworkLogStatus } else { 'MISSING_ORIGINAL_NETWORK_LOG' }
+            originalNetworkAttemptCount = if (-not $isResume) { 0 } elseif ($resumeManifest) { $resumeManifest.originalNetworkAttemptCount } else { $null }
             resumeManifestSha256 = if (Test-Path $resumeManifestPath) { (Get-FileHash -Algorithm SHA256 $resumeManifestPath).Hash.ToLowerInvariant() } else { $null }
             resumeManifest = $resumeManifest
             sourceBuildSha256 = if ($report -and $report.reportMetadata) { $report.reportMetadata.sourceBuild.sha256 } else { $null }
