@@ -39,6 +39,11 @@ function pngInfo(bytes) {
     return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
 }
 
+function parseJsonUtf8(input) {
+    const text = Buffer.isBuffer(input) ? input.toString('utf8') : String(input);
+    return JSON.parse(text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text);
+}
+
 async function writeJson(filePath, value) {
     await fs.mkdir(path.dirname(filePath), { recursive: true });
     await fs.writeFile(filePath, JSON.stringify(value, null, 2) + '\n', { flag: 'wx' });
@@ -56,15 +61,15 @@ async function prepare(options) {
     if (sourceCommit !== expectedCandidateSha) throw new Error('Gate A source checkout does not match the locked Gate B candidate commit.');
     const manifestPath = path.join(sourceRoot, 'testdata', 'additional-screenshot-ground-truth.json');
     const manifestBytes = await fs.readFile(manifestPath);
-    const manifest = JSON.parse(manifestBytes.toString('utf8'));
+    const manifest = parseJsonUtf8(manifestBytes);
     const manifestSha256 = sha256(manifestBytes);
-    const preflight = JSON.parse(await fs.readFile(preflightPath, 'utf8'));
+    const preflight = parseJsonUtf8(await fs.readFile(preflightPath));
     const priorPreflightPath = path.join(partialRoot, 'testdata', 'gateA-16-preflight.json');
-    const priorPreflight = JSON.parse(await fs.readFile(priorPreflightPath, 'utf8'));
+    const priorPreflight = parseJsonUtf8(await fs.readFile(priorPreflightPath));
     const priorManifestPath = path.join(partialRoot, 'source', 'testdata', 'additional-screenshot-ground-truth.json');
     const priorManifestBytes = await fs.readFile(priorManifestPath);
     const priorGateAPath = path.join(partialRoot, 'source', 'testdata', 'gateA-16', 'gate-a-acceptance.json');
-    const priorGateA = JSON.parse(await fs.readFile(priorGateAPath, 'utf8'));
+    const priorGateA = parseJsonUtf8(await fs.readFile(priorGateAPath));
     const originalJobLogPath = path.join(partialRoot, 'original-run.log');
     const originalJobLog = await fs.readFile(originalJobLogPath, 'utf8');
     const originalStartedFixtures = extractStartedFixtures(originalJobLog);
@@ -317,4 +322,4 @@ if (require.main === module) {
         process.exitCode = 1;
     });
 }
-module.exports = { prepare, samePreflight, pngInfo, extractStartedFixtures };
+module.exports = { prepare, samePreflight, pngInfo, extractStartedFixtures, parseJsonUtf8 };
