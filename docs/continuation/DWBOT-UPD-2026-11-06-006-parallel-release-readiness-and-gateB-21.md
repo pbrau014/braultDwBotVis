@@ -106,7 +106,12 @@ after completing the checklist. This is a template, not completed evidence:
         "reportSha256": "<Gate A report SHA-256>",
         "candidateFingerprint": "<locked candidate SHA-256>",
         "fingerprintLocked": true,
-        "matchesGateBRunSource": true
+        "matchesGateBRunSource": true,
+        "completeImages": 16,
+        "exactCompleteRecords": 16,
+        "wronglyAcceptedMandatoryFieldValues": 0,
+        "unresolvedMandatoryFieldValues": 0,
+        "unauthorizedNetworkAttempts": 0
       },
       "runReportSha256": "<exact final run report hash>",
       "groundTruthSha256": "<exact v6 JSON hash>",
@@ -256,7 +261,9 @@ download, desktop bridge, queue, supervisor and Windows cancellation tests.
 The living plan keeps Gate A (16-image development acceptance) as a
 prerequisite to Gate B. The evaluator now requires a Gate A PASS attestation
 bound to a hashed report and a locked candidate fingerprint that is confirmed
-to match the Gate B run source. Without it, the evaluator returns
+to match the Gate B run source. The attestation must document all 16 complete
+records, all 16 exact nine-field matches, zero wrongly accepted mandatory
+values, zero unresolved mandatory values, and zero unauthorized network attempts. Without it, the evaluator returns
 PENDING_GATE_A; an invalid/mismatched fingerprint blocks Gate B.
 
 The governing Gate B criteria do not specify a numerical minimum exact-match

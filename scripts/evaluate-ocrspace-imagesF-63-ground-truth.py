@@ -209,6 +209,14 @@ def gate_a_evidence_status(artifact):
         return "FAIL"
     if evidence.get("fingerprintLocked") is not True or evidence.get("matchesGateBRunSource") is not True:
         return "FAIL"
+    if evidence.get("completeImages") != 16 or evidence.get("exactCompleteRecords") != 16:
+        return "FAIL"
+    if evidence.get("wronglyAcceptedMandatoryFieldValues") != 0:
+        return "FAIL"
+    if evidence.get("unresolvedMandatoryFieldValues") != 0:
+        return "FAIL"
+    if evidence.get("unauthorizedNetworkAttempts") != 0:
+        return "FAIL"
     return "PASS"
 
 
