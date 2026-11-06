@@ -56,29 +56,35 @@ A statement's status must be attached to the statement, not inferred from the do
 
 ### 3.1 Tournament documentation source
 
-The uploaded source archive is:
+The latest tournament-documentation authority located in the active DWBOT repository is the **v3.22 Production Documentation Release**. Its source archive identity is recorded as:
 
-`Grand_Tournament_Instruction_Set_v3.17_Reorganized_Release_Package.zip`
+- Archive: `Grand_Tournament_Instruction_Set_v3.22.zip`
+- SHA-256: `12a69ee2cf880d7d0ebdf97b4e5fa2eff5290c5808f4aed84bf8256204e48b7e`
+- Repository-preserved source material: `docs/source-baselines/grand-tournament-v3.22/`
+- Release disposition: GO for publication of the documentation package and reusable templates only, under a prior user-directed documentation-release waiver. It does not certify scoring, OCR, Discord, credentials, an event instance, or production deployment.
 
-- ZIP size: 4,636,603 bytes.
-- SHA-256: `f8efba7f76260665992cbfd57652f2c47ed3f01ee2d0be2fa478f5997c17fa17`.
+The newly uploaded v3.17 reorganized package is a verified historical source baseline embedded in the v3.22 history, not the newest governing package:
+
+- ZIP: `Grand_Tournament_Instruction_Set_v3.17_Reorganized_Release_Package.zip`
+- Size: 4,636,603 bytes; SHA-256: `f8efba7f76260665992cbfd57652f2c47ed3f01ee2d0be2fa478f5997c17fa17`.
 - 66 archive entries; 66 files; no nested ZIP archive.
 - The embedded `MANIFEST.sha256` lists 65 payload files; all 65 listed hashes matched.
 - Text extraction covered 56 text-bearing Markdown, JSON, DOCX, and PDF files with no extraction errors.
 - Nine embedded JPG contact sheets represent the three publication PDFs. The package's visual-inspection report states that 67 PDF pages across the three manuals were contact-sheet inspected. Contact-sheet layout review is not substantive, accessibility, legal, scoring, or event approval.
+- Saved unchanged to the ChatGPT Library at `/DWBOT/Source Archives/Grand_Tournament_Instruction_Set_v3.17_Reorganized_Release_Package.zip`.
 
-The archive was saved unchanged to the ChatGPT Library at:
+**Precedence:** use v3.22 as the latest tournament-documentation release baseline; retain v3.17 and v3.15 as historical sources for line-by-line change traceability. The v3.22 package waiver only authorizes documentation publication; the current DWBOT Gate A/B and production NO-GO rules remain controlling for software acceptance and operations.
 
-`/DWBOT/Source Archives/Grand_Tournament_Instruction_Set_v3.17_Reorganized_Release_Package.zip`
+### 3.2 Hierarchy across v3.22, v3.17 and v3.15
 
-### 3.2 Hierarchy inside the v3.17 archive
+1. **v3.22 Production Documentation Release** — latest tournament documentation package recorded in the repository. Its README, RELEASE_INDEX, v3.22 waiver record, and source archive hash establish the package version and a documentation-only release GO under prior user direction. It explicitly says the canonical Score Reporter HTML and designated workbook were unavailable, technical checks remain NOT TESTED, and no event-specific approval or live implementation certification is implied.
+2. **v3.19 role-based publications inside v3.22** — Participant Guide, Event Operations Manual, and Technical Reference. Their filenames are v3.19 for reference stability; the enclosing package/release index is v3.22. They are the active publication set under the v3.22 documentation waiver.
+3. **v3.17 reorganized package** — historical source ZIP retained unchanged and embedded/referenced by the v3.22 baseline. It reorganizes the v3.15 policy-resolved source into participant, operations and technical manuals. Its embedded manifest verifies 65/65 payload hashes.
+4. **v3.15 Policy-Resolved Source Baseline** — retained historical policy source and traceability base for the v3.17 reorganization and later revisions.
+5. **v1.1 companion materials and v0.x proposals** — reusable worksheets, focused procedures, and proposals. Their draft/proposal status must be retained unless the v3.22 release index explicitly supersedes the label for documentation publication. They do not establish an event-specific approval or implementation pass.
+6. **QA reports/manifests** — evidence of package integrity, navigation, rendering and the stated limits of checks. The v3.22 documentation waiver does not close DWBOT technical gates or approve a live event.
 
-1. **v3.15 Policy-Resolved Source Baseline** — retained in `05_QA`; it is the traceability source for the reorganized v3.17 publications and records selected C01–C06 working policies and D01–D52 decision-register content.
-2. **v3.17 Participant Guide, Event Operations Manual, Technical Reference** — role-based reorganizations of the v3.15 baseline. The package README says they preserve substantive source sections and do not invent event settings, approvals, signatures, or test results. They remain working drafts and are not approved for event publication, score certification, or live bot deployment.
-3. **Eight v1.1 companion materials** — focused draft workflows and records. They are retained as drafts unless individually marked otherwise. They do not supersede the three manuals or establish approval.
-4. **QA reports and manifests** — evidence about package integrity, internal navigation, visual layout, and the stated scope/limitations of prior checks. These reports do not certify operational systems or event approval.
-
-The v3.17 package is a new source input and must not be silently conflated with the previously referenced v3.22 archive. Reconcile version differences explicitly before selecting any later authoritative release.
+The v3.22 documentation waiver and the current DWBOT software-release gates are separate authorities. Documentation GO is not bot GO, scoring GO, event GO, or production GO.
 
 ### 3.3 Key tournament policy baseline
 
@@ -122,7 +128,7 @@ These are bounded documentation QA claims, not operational acceptance.
 - Live `package.json` at this fingerprint declares Node `>=22.16.0`.
 - The current verification workflow uses Node 22.16.0 on Windows and Linux.
 
-**Runtime authority conflict:** the v3.15 maintainer/release material specifies Windows Node 24 for target acceptance, while the current repository manifest and workflow specify Node 22.16.0. Earlier local user-supplied acceptance evidence records Windows Node 26.13.0. Do not silently reconcile these. Before release, define and test the intended minimum/target runtime, align package engines, workflows, manuals, and acceptance reports, and retain compatibility evidence.
+**Runtime authority:** current controlling DWBOT authority and `docs/iteration22/NODE-RUNTIME-COMPATIBILITY-POLICY.md` explicitly authorize Node.js 22.16.0 as the supported minimum and reproducible baseline. It replaces older Node 24+, >=24.17.0 and v24.22.1 minimum/prerequisite statements. Node 24 is optional only for a specifically proven dependency/tool requirement. Windows-specific acceptance must still run on Windows; historical Node 24/26 reports remain bound to their original environment and are not rewritten.
 
 ### 4.2 PR #12 — Windows PaddleOCR JSON serialization
 
@@ -157,8 +163,9 @@ A draft PR was opened:
 ### 4.4 OCR architecture constraints
 
 - Keep local Tesseract.js, OpenCV and PaddleOCR as the local reader architecture; do not replace an engine without frozen-fixture evidence.
-- OCR.Space Engine 2 PDF-first processing is a distinct, explicitly scoped stage. It is not automatically authorized for production use.
-- If the PDF-first stage is enabled for an authorized test, the original screenshot is submitted once; a valid searchable PDF is required; the PDF is preserved; downstream local readers consume only the PDF-derived raster.
+- Current DWBOT authority specifies OCR.Space Engine 2 as the highest-priority text-extraction stage for eligible original images in explicitly authorized DWBOT screenshot inventories. This describes the authorized test architecture, not blanket production transmission permission.
+- Production screenshot transmission, live Discord actions, paid provider usage outside the named test inventory, and deployment remain unauthorized. The user’s current outstanding-decision register leaves the production scope of full-image PDF-first processing unresolved. Until that scope is separately decided, keep Engine 2 use confined to explicitly authorized test inventories; do not change public participant disclosure to imply production use.
+- If PDF-first is enabled for an authorized test, the original screenshot is submitted once; a valid searchable PDF is required; the PDF is preserved; downstream local readers consume only the PDF-derived raster.
 - A missing/ambiguous provider response or timeout is `UNKNOWN`, not permission to resubmit. Preserve request intent, provider boundary, provider response, PDF download, PDF fingerprint, page-raster fingerprint, normalized-raster fingerprint, and resume state.
 - No silent original-image fallback.
 - The no-duplicate restriction remains in force. No new OCR.Space request may be dispatched under this document.
@@ -213,11 +220,11 @@ These are diagnostic strategy counts from the 21-record analysis, not Gate B pas
 |---|---|---|---|
 | AD-01 | Continue engineering and documentation; Gate A/B status; production restrictions | Authorized work continues; both gates NOT PASSED; production NO-GO | Maintain this control document and gate-bound reports |
 | AD-02 | New guarded OCR.Space request for previously submitted first image | **NOT AUTHORIZED**; no-duplicate restriction remains | A separate explicit, scoped authorization naming image, purpose, request count, cost/quota limit, and safeguards is required |
-| AD-03 | Engine 2 production scope | **UNRESOLVED**; test-only scope remains until decided | Explicit product/operations decision; update participant/public disclosure only after approval |
+| AD-03 | Engine 2 production scope | **UNRESOLVED for production**; authorized test inventories use the Engine 2 PDF-first architecture, but production screenshot transmission is not authorized | Explicit product/operations decision; update participant/public disclosure only after approval |
 | AD-04 | Canonical scoring workbook and Score Reporter HTML | **UNVERIFIED / BLOCKING** | Identify exact authoritative files, version/hash, owner, source history; run formula, numeric normalization, browser and workbook parity tests |
 | AD-05 | Event-instance approval | **NOT APPROVED** | Dated Pilot or Recurring settings, time zone, roster, ship allowlist, schedule, awards, contacts, retention, named owner/approver/reviewer, actual signatures/effective time |
 | AD-06 | Evidence retention and access control | **UNRESOLVED** | Approve retention periods and least-privilege access for originals, PDFs/rasters, OCR outputs, corrections, logs, and results; include legal/privacy deletion/hold process |
-| AD-07 | Runtime minimum | **CONFLICTING SOURCES** | Resolve Node 22.16 vs Node 24 target requirement vs recorded Node 26 local environment; align CI, package engines and manuals |
+| AD-07 | Runtime minimum | **RESOLVED** — Node.js 22.16.0 minimum/reproducible baseline; Windows-specific proof remains required | Keep package engines, .nvmrc, CI and manuals aligned; preserve historical runtime reports |
 | AD-08 | PR #12 PaddleOCR Windows JSON path | Draft PR; latest CI run success | Complete diff/review and acceptance before merge |
 | AD-09 | PR #13 PDF raster normalization | Draft PR; targeted workflow queued | Wait for checks; fix failures; verify existing PDFs and Gate A partial artifact locally without provider calls |
 | AD-10 | 63-image original network log | Missing from recovered artifact set | Preserve limitation; do not reconstruct as original evidence |
