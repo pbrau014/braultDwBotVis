@@ -166,6 +166,63 @@ async function cropResize(inputBuffer, rect, outputWidth, options = {}) {
     return runImageMagick(args, inputBuffer);
 }
 
+function sourceAspectCropRect(pageWidth, pageHeight, sourceWidth, sourceHeight) {
+    const values = [pageWidth, pageHeight, sourceWidth, sourceHeight].map(Number);
+    if (!values.every(Number.isSafeInteger) || values.some(value => value < 1)) {
+        const error = new Error('PDF raster normalization requires positive integer page and source dimensions.');
+        error.code = 'OCRSPACE_PDF_SOURCE_DIMENSIONS_INVALID';
+        throw error;
+    }
+    const [pageW, pageH, sourceW, sourceH] = values;
+    const pageAspect = pageW / pageH;
+    const sourceAspect = sourceW / sourceH;
+    // DWBOT result screenshots are landscape and OCR.Space places the source
+    // image top-aligned at full PDF-page width. Portrait/letterboxed layouts are
+    // not guessed: they must use a separately verified layout strategy.
+    if (sourceAspect <= pageAspect) {
+        const error = new Error('Source screenshot aspect ratio is not compatible with the verified top-aligned landscape PDF layout.');
+        error.code = 'OCRSPACE_PDF_SOURCE_ASPECT_UNSUPPORTED';
+        throw error;
+    }
+    const cropHeight = Math.round(pageW * sourceH / sourceW);
+    if (cropHeight < 240 || cropHeight >= pageH) {
+        const error = new Error('Source screenshot aspect ratio produced an unsafe or empty PDF content crop.');
+        error.code = 'OCRSPACE_PDF_SOURCE_ASPECT_UNSUPPORTED';
+        throw error;
+    }
+    return { left: 0, top: 0, width: pageW, height: cropHeight };
+}
+
+async function normalizeSearchablePdfPageRaster(pageRasterBuffer, { sourceWidth, sourceHeight } = {}) {
+    if (!Buffer.isBuffer(pageRasterBuffer) || !pageRasterBuffer.length) {
+        const error = new Error('Searchable-PDF page raster is empty.');
+        error.code = 'OCRSPACE_PDF_RASTER_INVALID';
+        throw error;
+    }
+    const page = await metadata(pageRasterBuffer);
+    const cropRect = sourceAspectCropRect(page.width, page.height, sourceWidth, sourceHeight);
+    const buffer = await cropResize(pageRasterBuffer, cropRect, page.width);
+    const normalized = await metadata(buffer);
+    if (normalized.width !== cropRect.width || normalized.height !== cropRect.height) {
+        const error = new Error('Normalized PDF raster dimensions do not match the source-aspect crop.');
+        error.code = 'OCRSPACE_PDF_RASTER_NORMALIZATION_MISMATCH';
+        throw error;
+    }
+    return {
+        buffer,
+        normalization: {
+            method: 'source-aspect-top-aligned-crop-v1',
+            sourceWidth: Number(sourceWidth),
+            sourceHeight: Number(sourceHeight),
+            pageRasterWidth: page.width,
+            pageRasterHeight: page.height,
+            cropRect,
+            normalizedWidth: normalized.width,
+            normalizedHeight: normalized.height,
+        },
+    };
+}
+
 async function prepareOcrSpaceUpload(inputBuffer, maxBytes = 1024 * 1024) {
     if (!Buffer.isBuffer(inputBuffer) || !inputBuffer.length) throw new Error('OCR.Space source image is empty.');
     const attempts = [
