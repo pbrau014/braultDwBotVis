@@ -167,16 +167,24 @@ function rngFactory(seed = 0x4f435231) {
 }
 function randomInt(rng, min, max) { return Math.floor(rng() * (max - min + 1)) + min; }
 const CLASS_CODES = ['DD', 'CA', 'BB'];
-function referenceWorkbookScore(state, player, event) {
-  // Independent implementation of the formula in the supplied workbook HTML.
+function referenceCurrentScore(state, player, event) {
+  // Independent implementation of current DWBOT policy. Race uses C01 inverse-time;
+  // the archived workbook deliberately remains an unchanged raw-time source record.
   const settings = state.settings.events[event];
   const classWeight = code => ({ DD: 4, CA: 3, BB: 2 }[code] || 0);
-  const totalMetric = (p, key) => p.events[key].reduce((sum, game) => sum + Number(key === 'grand' ? game.damage : game.metric || 0), 0);
+  const totalMetric = (p, key) => p.events[key].reduce((sum, game) => {
+    if (key === 'grand') return sum + Number(game.damage || 0);
+    if (key === 'race') return sum + (Number(game.metric) > 0 ? 1 / Number(game.metric) : 0);
+    return sum + Number(game.metric || 0);
+  }, 0);
   if (event !== 'grand') {
     const rosterTotal = state.players.reduce((sum, p) => sum + totalMetric(p, event), 0);
     if (!rosterTotal || player.events[event].some(g => Number(g.tier) <= 0)) return 0;
     let raw = 0;
-    for (const g of player.events[event]) raw += classWeight(g.class) * (Number(g.metric || 0) / rosterTotal) / Math.pow(Number(g.tier), Number(settings.tierPower));
+    for (const g of player.events[event]) {
+      const metric = event === 'race' ? (Number(g.metric) > 0 ? 1 / Number(g.metric) : 0) : Number(g.metric || 0);
+      raw += classWeight(g.class) * (metric / rosterTotal) / Math.pow(Number(g.tier), Number(settings.tierPower));
+    }
     return 2 * Number(settings.multiplier) * Number(settings.pool) * raw;
   }
   const totalDamage = state.players.reduce((sum, p) => sum + totalMetric(p, 'grand'), 0);
@@ -214,7 +222,7 @@ function extractFunctionDeclaration(source, name) {
 function assertScoresMatchWorkbook(state, context) {
   for (const player of state.players) for (const event of Tournament.EVENTS) {
     const actual = Tournament.eventScore(state, player, event);
-    const expected = referenceWorkbookScore(state, player, event);
+    const expected = referenceCurrentScore(state, player, event);
     assert.ok(nearlyEqual(actual, expected), `${context}: ${player.name}/${event}: bot=${actual}, workbook-reference=${expected}`);
   }
 }
@@ -241,10 +249,10 @@ test('Excel Totals!H12 source-of-truth audit matches the clean browser seed and 
   assert.equal(cleanState.players.length, 9);
   assert.equal(cleanState.settings.events.grand.tierWeight, workbookTruth.grand_yolo_default_tier_weight);
 
-  const totalDoubloons = Tournament.standings(cleanState).reduce((sum, row) => sum + row.total, 0);
-  const calculatedH12 = 0.54 * totalDoubloons / 100;
-  assert.ok(Math.abs(totalDoubloons - workbookTruth.source_G12_cached_value) < 1e-8,
-    `default G12 mismatch: calculated ${totalDoubloons}, Excel cached ${workbookTruth.source_G12_cached_value}`);
+  // This block audits the preserved historical workbook only. Current DWBOT Race
+  // C01 intentionally differs from the archived workbook's raw-time Race formula.
+  const historicalWorkbookTotalDoubloons = workbookTruth.source_G12_cached_value;
+  const calculatedH12 = 0.54 * historicalWorkbookTotalDoubloons / 100;
   assert.ok(Math.abs(calculatedH12 - workbookTruth.source_H12_cached_value) < 1e-8,
     `default H12 mismatch: calculated ${calculatedH12}, Excel cached ${workbookTruth.source_H12_cached_value}`);
   assert.equal(`$${calculatedH12.toFixed(2)}`, workbookTruth.source_H12_display_value);
@@ -275,8 +283,8 @@ test('Excel Totals!H12 source-of-truth audit matches the clean browser seed and 
   ].join('\n');
   const htmlFormulaContext = {};
   vm.runInNewContext(htmlFormulaCode, htmlFormulaContext);
-  assert.ok(Math.abs(htmlFormulaContext.htmlFormulaAudit.total - workbookTruth.source_G12_cached_value) < 1e-8,
-    'actual HTML scoring functions do not reproduce Excel G12');
+  assert.ok(Math.abs(htmlFormulaContext.htmlFormulaAudit.total - historicalWorkbookTotalDoubloons) < 1e-8,
+    'archival HTML scoring functions do not reproduce the preserved Excel G12');
   assert.ok(Math.abs(htmlFormulaContext.htmlFormulaAudit.h12 - workbookTruth.source_H12_cached_value) < 1e-8,
     'actual HTML dollars function does not reproduce Excel H12');
   assert.equal(htmlFormulaContext.htmlFormulaAudit.grandTierWeight, 0.9);
@@ -853,7 +861,7 @@ test('public interactive panel renders controls, responds to totals/event select
   // Inspect the serialized Discord API payload rather than private builder state.
   // discord.js keeps select-menu options on the builder and includes them in toJSON().
   const buttons = panel.replies[0].components[0].components.map(item => item.toJSON().custom_id);
-  assert.deepEqual(buttons, ['yolo:home', 'yolo:totals', 'yolo:standings', 'yolo:players']);
+  assert.deepEqual(buttons, ['yolo:home', 'yolo:totals', 'yolo:standings', 'yolo:players', 'yolo:scoring']);
   const menu = panel.replies[0].components[1].components[0].toJSON();
   assert.equal(menu.custom_id, 'yolo:event');
   assert.deepEqual(menu.options.map(option => option.value), Tournament.EVENTS);
