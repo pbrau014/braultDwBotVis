@@ -3,8 +3,8 @@
   "prepared": "2026-10-29",
   "release_status": "GO — PRODUCTION DOCUMENTATION RELEASE UNDER USER-DIRECTED GATE WAIVER; IMPLEMENTATION TESTS NOT TESTED",
   "selected_policies": {
-    "C01": "Round 3 uses positive finite elapsed seconds and metric 1 / seconds; lower time scores better. Specification resolved; DWBOT core and standalone HTML updated on 2026-11-06; exact-head CI/browser verification pending.",
-    "C02": "Shared mapping DD=4, CA=3, BB=2; unknown classes block scoring. Specification resolved; implementation/parity tests open.",
+    "C01": "Round 3 uses positive finite elapsed seconds and metric 1 / seconds; lower time scores better. Specification resolved; DWBOT core, standalone HTML calculator and Discord leaderboard explanation updated on 2026-11-06. Formula-parity/integration tests committed; exact-head CI and browser verification pending.",
+    "C02": "Shared mapping DD=4, CA=3, BB=2; unknown classes are rejected before scoring. Core mapping test and HTML/core formula-parity test committed; exact-head CI pending.",
     "C03": "Retire/hide S10:S12 from participant controls, preserve historical cells; verify zero effect in canonical implementation.",
     "C04": "Retire/hide Round 4 F8 control, preserve historical cell; Rounds 1–3 pool use stays unchanged.",
     "C05": "No public-facing H12/dollar estimate by default. H12 remains internal historical QA; future display requires verified basis and separate approval.",
@@ -131,5 +131,7 @@
       "chronicle": "Admiralty_Chronicle_The_First_YOLO_Season_v0.1_PROPOSAL.md"
     }
   },
-  "source_reconciliation": "Admiralty_YOLO_Source_Reconciliation_and_Visual_Provenance_v0.1.md"
+  "source_reconciliation": "Admiralty_YOLO_Source_Reconciliation_and_Visual_Provenance_v0.1.md",
+  "implementation_verification": "Implementation changes are committed; latest exact-head GitHub verification is pending. Browser/visual verification and live Discord OAuth smoke tests remain open. Do not describe uncompleted checks as passed.",
+  "scoring_source_boundary": "The supplied workbook remains an archival historical source. Current DWBOT Race C01 uses inverse elapsed seconds; tests compare current core/HTML formulas separately from archival workbook formulas. Historical H12 remains internal QA and is not a public award calculation."
 }
