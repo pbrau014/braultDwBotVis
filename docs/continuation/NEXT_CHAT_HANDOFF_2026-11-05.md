@@ -6,6 +6,10 @@ source of truth and its newest override controls any conflicting text below.
 
 - Canonical repository: `pbrau014/braultDwBotVis`, branch `main`.
   Main HEAD before this handoff synchronization: `38ce43af2d2a1b928c335a97728c0d113964f78e`.
+- Runtime rule: Node.js `22.16.0` is the accepted DWBOT baseline and is
+  sufficient in place of older Node 24+ requirements. Node 24 is optional only
+  for a specifically proven tool/dependency requirement. Keep OS-specific
+  Windows tests on Windows and preserve historical runtime evidence unchanged.
 - Stay in this ChatGPT conversation for all DWBOT work. Do not hand off to
   Work mode or another executor. Do not emit progress narration or interim
   screen text while authorized operations are underway; report once operations
