@@ -1,52 +1,78 @@
-CURRENT GOVERNING OCR GATE / INVENTORY OVERRIDE — 2026-11-06 15:55 UTC
+CURRENT GOVERNING OCR GATE / INVENTORY OVERRIDE — 2026-11-06 16:15 UTC
 This block is authoritative over older historical plan sections below.
 
 - Gate A remains NOT PASSED. The 16-image preflight passed against the 16
-  repository fixtures and the original nine-field manifest. The original
-  imgs2add.zip archive bytes remain unavailable, but all 16 individual source
-  hashes were verified. The interrupted Gate A run #42202563673 produced one
-  searchable PDF/raster pair for Screenshot_16.jpg and was cancelled after
-  its single START marker. That first provider submission must never be
-  repeated.
-- Gate A continuation #42246737451 is running on the exact original partial
-  artifact. It has completed preflight, candidate checkout, runtime and OCR/PDF
-  setup and is provisioning the pinned PaddleOCR runtime. Its next critical
-  steps are original artifact/log verification and local-only recovery of the
-  first image. Only if that first record is exact may the remaining 15 new
-  provider submissions proceed. The original restricted-egress log is absent;
-  its historical attempt count remains UNKNOWN, not zero.
+  repository fixtures and the approved nine-field manifest. The original
+  imgs2add.zip container remains unavailable, but every individual fixture
+  hash was verified. The original run #42202563673 submitted only
+  Screenshot_16.jpg and produced one searchable PDF/raster pair; its original
+  network diagnostic log is absent and its historical blocked-attempt count
+  is UNKNOWN.
+- Gate A continuation #42246737451 stopped on BOM-prefixed JSON parsing before
+  any provider request. Continuation #42247731956 stopped on an EEXIST path
+  collision after the local OCR child wrote its output; again, zero new
+  provider requests. Both defects are fixed. The child output and enriched
+  wrapper report now use separate paths; JSON parsing strips UTF-8 BOMs.
+- Gate A continuation #42249978731 is running from the exact partial artifact.
+  It has passed preflight, candidate checkout, runtime, and source artifact
+  verification; local OCR/PDF setup is in progress. The updated helper now
+  refuses any remaining paid provider request unless the original network
+  log is present and proves exactly zero blocked attempts. Since that original
+  log is absent, this run must stop after local recovery with
+  BLOCKED_MISSING_ORIGINAL_NETWORK_LOG. No first-image resubmission and no
+  remaining provider requests are permitted.
 - The original 63-image OCR.Space run #42160979140 completed with 63 searchable
-  PDFs and 63 PDF-derived rasters. The downloaded 81,886,966-byte artifact
-  independently matches GitHub SHA-256
-  ac4ae071ee4737c2fe044b64456a8dab1cddf7073a02f8f427ec7b35af28629a. All 63
-  PDFs are valid one-page files with non-empty searchable text; all 63 rasters
-  are valid PNGs. This source run's original restricted-egress log is absent.
-  Available job logs show the allowlist/restriction flags but no configured
+  PDFs and 63 PDF-derived PNG rasters. Its 81,886,966-byte artifact matches
+  GitHub SHA-256
+  ac4ae071ee4737c2fe044b64456a8dab1cddf7073a02f8f427ec7b35af28629a.
+  Independent local inspection verified 63/63 one-page PDFs with non-empty
+  searchable text and 63/63 valid PNGs. The original restricted-egress log is
+  absent. Job logs show restriction/allowlist flags but no configured
   OCR_NON_OCR_NETWORK_LOG path; the historical blocked-attempt count is UNKNOWN.
-  Never create an empty file and present it as original evidence.
+  Never fabricate an empty historical log or claim zero attempts.
 - Gate B is exactly the first 19 corpus-order records with complete, eligible,
-  non-empty expected values for all nine fields. The remaining two complete
-  records (Screenshot_55374.png and lllfrfgfgff.png) are diagnostic-only in
-  the separate 21-image PDF-first analysis inventory. The v6 JSON, checksum
-  sidecar and candidate manifest now agree on this 19-image Gate B policy.
-  Gate B remains NOT PASSED until Gate A passes, all 19 records are artifact-
-  verified, all mandatory outputs are resolved with zero wrong acceptance,
-  and original network/security evidence meets the gate.
-- No provider requests were made while verifying the 63-image source artifact.
-  The current 19-image artifact-verification run #42239832115 is still in its
-  local-only reader-recovery step; it has made zero provider requests. Its
-  final report/artifact is not yet available. The updated 19-policy run
-  #42247080407 is pending behind it.
-- Latest main at this update: 0d983f542b4b987faa3754429c3cf74ba23392d8.
-  Exact-head DWBOT verification #42247080424 is pending. Gate A run
-  #42246737451 is independent and running. Node.js >=22.16.0 is the accepted
+  non-empty expected values for all nine fields. Records 20–21 are
+  diagnostic-only in the 21-image PDF-first analysis inventory. The v6 JSON,
+  SHA-256 sidecar and candidate manifest agree on the 19-image holdout. The
+  current v6 SHA-256 is
+  62ea492c9d4a4a05b33d16c67bb4ec31ebdc07b67cbf47d3e4a3062ff8d1dfb3.
+- Gate B run #42239832115 completed with failure at the artifact-verifier
+  JSON parse step. Its artifact contains 19-image post-hoc metrics and 21-image
+  diagnostics. Local recovery produced Tesseract.js 21/21 and native
+  Tesseract 21/21; PaddleOCR failed 21/21 at the 15-second field-crop timeout.
+  The recovery made 0 provider requests and recorded 0 blocked attempts in its
+  own local-only log. That log does not replace the missing original run log.
+- Run #42239832115 diagnostic results over 171 eligible fields:
+  PDF text alone 73 exact / 2 wrong / 77 unresolved; provider text alone
+  79 / 17 / 56; PDF+provider consensus 80 / 0 / 91; four-source consensus
+  131 / 1 / 39; strict four-source consensus 59 / 0 / 112. These are
+  field-level exploratory metrics, not a Gate B accuracy percentage or pass.
+  PDF text is useful as a reader but is not sufficient alone. Multi-reader
+  consensus improves coverage but must remain fail-closed; one wrong accepted
+  value blocks Gate B, while unresolved mandatory values remain unresolved.
+- The artifact-verifier BOM defect is fixed. The local recovery planner now
+  preserves valid completed readers and retries only missing, failed, duplicate
+  or ambiguous reader rows; PDF text is re-extracted from the verified PDF.
+  PaddleOCR's bounded field-crop timeout is 60 seconds (under the 185-second
+  supervised process deadline). The new Gate B run #42249191471 is pending
+  with these changes; intermediate run #42248203429 remains in local recovery
+  using the earlier 15-second configuration.
+- Original network evidence remains limited: the original 63-image artifact
+  lacks its restricted-egress diagnostic log. Available logs show the
+  restriction/allowlist flags and no blocked-request markers, but the old
+  guard did not persist a diagnostic log. Reconciliation status is
+  RECONSTRUCTED_LIMITED_EVIDENCE, originalBlockedAttemptCount=null, and
+  zeroAttemptsClaimed=false. This cannot satisfy Gate A or Gate B network proof.
+- Latest main at this update:
+  7b8f53e669e0e3ed94f772a399a2f4e465c38286. Exact-head verification is pending
+  after the recent parser/recovery fixes. Node.js >=22.16.0 is the accepted
   runtime baseline; older >=24.17.0 wording below is superseded.
 - Production remains NO-GO. No production Discord deployment or production
   data operation is authorized by these test runs.
 
 ================================================================================
 END CURRENT GOVERNING OCR GATE / INVENTORY OVERRIDE
-================================================================================
+================================================================================================================================================================
 
 CURRENT PARALLEL IMPLEMENTATION UPDATE — 2026-11-06
 Status: changes committed; exact-head verification pending.
