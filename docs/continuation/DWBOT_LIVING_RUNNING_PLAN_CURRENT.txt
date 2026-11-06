@@ -1,4 +1,188 @@
 ================================================================================
+CURRENT GOVERNING OVERRIDE — 2026-11-06 (OCR.SPACE EXPLICIT ENABLE + PDF FIRST)
+================================================================================
+Status: ACTIVE / CANONICAL / SUPERSEDES CONFLICTING ACTIVE OCR INSTRUCTIONS BELOW.
+The dated source records and historical test reports below remain unchanged as
+provenance. Do not treat historical settings/results as current policy.
+
+A. CANONICAL SOURCE AND EXACT CURRENT BASE
+- Repository: https://github.com/pbrau014/braultDwBotVis.git
+- Sole active branch: main.
+- Verified main HEAD immediately before this plan update:
+  b5c2a0d3c2b1adcd51ef644886da18cb1ca5818c.
+- Relevant current commits:
+  * 56f26a190ee5fcb5df2da10650d477a37423809a — explicitly require OCR.Space
+    activation and permit the approved provider network path.
+  * fceaf6e3bd28f3746c737e7306747f490088bbdf — corrected the PDF-first
+    contract test to require the hidden-but-searchable PDF text layer and
+    assert that the returned PDF bytes are retained.
+  * 7d451dca07a832c44b0d6ee6c6622bdef59a46a2 — synchronized the README's
+    active OCR architecture and activation instructions.
+  * b5c2a0d3c2b1adcd51ef644886da18cb1ca5818c — synchronized the OCR.Space
+    implementation guide's explicit-enable and provider-network policy.
+- The PDF-first implementation is present in canonical main. These source and
+  documentation commits are implementation evidence, not live-provider,
+  exact-corpus, Windows-acceptance, or release acceptance.
+- The current GitHub code-search connector returned no indexed results for
+  targeted OCRSPACE_ENABLED / network / PDF-first searches despite known files
+  being present. Relevant source, test, workflow, environment examples, README,
+  implementation guide and living plan were fetched directly. Do not claim an
+  exhaustive scan of every tracked blob from that search response.
+
+B. BINDING OCR.SPACE PRIORITY AND EXPLICIT ACTIVATION
+- OCR.Space is the highest-priority and first text-extraction stage for every
+  eligible original image within the explicitly authorized DWBOT screenshot
+  inventories. Do not describe it as optional, secondary, last-resort,
+  diagnostic-only, or disabled in the active implementation.
+- Every eligible original image must enter the PDF-first path with
+  OCRSPACE_ENABLED=1, OCRSPACE_NETWORK_ALLOWLIST=1 and a valid local
+  OCRSPACE_API_KEY. Production startup and the Windows OCR acceptance wrapper
+  require explicit enablement and the key. A missing key or disabled provider
+  blocks that image; it does not authorize local OCR of the original image.
+- OCRSPACE_ENABLED=0 is permitted only for isolated offline/mock tests that do
+  not transmit an original image, or for downstream local-reader invocations
+  after the successful PDF-first stage has already produced the raster. In the
+  latter case it prevents a duplicate provider request; the input is already
+  derived from the OCR.Space PDF. It is never a local-original-image fallback
+  for an eligible source screenshot.
+- Keep the Free API only. Keep the key local or in protected Actions secrets;
+  never place it in chat, source, logs, reports, artifacts, or packages. Paid
+  tiers/engines/usage remain unauthorized. Reserve quota before requests,
+  fail closed on quota-ledger errors, and do not automatically retry.
+
+C. REQUIRED SOURCE IMAGE → SEARCHABLE PDF → LOCAL READER SEQUENCE
+1. Submit each eligible original World of Warships screenshot to OCR.Space
+   Engine 2 first. Engine 2 is the active PDF-producing engine because the
+   provider's current comparison matrix marks searchable-PDF creation
+   supported for Engine 2 and unsupported for Engine 3.
+2. Make one OCR.Space request and obtain one searchable PDF per source image.
+   The searchable text layer is hidden from the rendered page to avoid
+   duplicating/obscuring the page image while remaining searchable.
+3. Download the returned PDF immediately from an approved HTTPS OCR.Space host.
+   Reject redirects, unapproved hosts, invalid/non-PDF payloads, oversized
+   responses and timeouts. Preserve source, normalized-upload, PDF and raster
+   SHA-256 values, byte sizes, dimensions, engine, provider status and timings.
+4. Preserve the PDF and its PDF-derived raster as per-image acceptance artifacts.
+   The Windows acceptance wrapper sets OCRSPACE_ARTIFACT_DIR to a per-run
+   directory; the 64-image inventory runner writes each PDF/raster into its
+   output directory. Every acceptance run must retain and hash the artifacts.
+   In the normal bot path, durable artifact writing is conditional on
+   OCRSPACE_ARTIFACT_DIR being configured; set it for any run requiring
+   persistent evidence. Do not claim durable PDF preservation if no file and
+   checksum were produced. No local API key or live provider PDF is verified
+   in this chat.
+5. Render the downloaded PDF page locally to a bounded PNG raster. Tesseract.js,
+   native Tesseract, optional PaddleOCR, OpenCV geometry and every downstream
+   local OCR/text-extraction reader operate only on this PDF-derived raster.
+   They must never return to the original source image after the PDF-first
+   stage begins. This is the supported reader input contract; the OCR engines
+   consume the PDF page rendering because they are image readers.
+6. Keep OCR.Space response text and the PDF's searchable text layer separate
+   from local OCR candidates. They are provenance/diagnostic evidence and may
+   not independently accept, merge, rewrite, normalize, fuzzy-correct or
+   override a mandatory field. Existing parsers, geometry, independent-read
+   consensus and exact validation remain authoritative.
+7. If OCR.Space processing, PDF creation/download, PDF validation, artifact
+   preservation required by the run, or rasterization fails, fail that image
+   closed. Never fall back to OCR of the original screenshot.
+
+D. NETWORK POLICY — PROVIDER ACCESS ENABLED
+- OCRSPACE_NETWORK_ALLOWLIST=1 explicitly permits HTTPS access to
+  api.ocr.space for the API request and the approved OCR.Space PDF host
+  api.ocr.space / ocr.space for the temporary PDF download.
+- The network guard must never block these approved OCR.Space requests. No
+  blanket offline/network-blocking setting may be applied to the provider path.
+- OCR_NON_OCR_NETWORK_RESTRICTED=1, when set, restricts and logs only unrelated
+  outbound destinations. It does not block OCR.Space. Keep this least-privilege
+  restriction rather than opening arbitrary outbound access. "Network blocking
+  disabled" in the active OCR rule means OCR.Space's required network path is
+  enabled, not that all unrelated network destinations become unrestricted.
+- Acceptance diagnostics must distinguish provider requests from unrelated
+  denied egress and must record both accurately. A zero blocked-attempt count
+  does not prove that a provider request occurred.
+
+E. PRIVACY, SCOPE, AND NINE-FIELD ACCEPTANCE
+- The user-authorized full-image scope remains limited to the named 4-image,
+  16-image and 64-image World of Warships inventories, including visible
+  player names in those inventories. Do not transmit unrelated images, private
+  account data, Discord IDs, credentials or unrelated UI. No production
+  screenshot transmission, live Discord action, paid usage or deployment is
+  authorized by this instruction. Production remains NO-GO.
+- Normalize images above the Free API 1 MiB limit locally without modifying
+  the original; preserve original/upload hashes and dimensions.
+- The exact mandatory order remains result, player, map, mode, battleStart,
+  credits, freeXp, damage, xp. XP is ninth and mandatory. Zero wrongly
+  accepted mandatory values is required; Gate A additionally requires zero
+  unresolved mandatory fields. Do not tune against Gate B or alter ground truth.
+- Preserve provider terms/privacy/retention review, HTTPS/redirect restrictions,
+  response bounds, timeout, quota, no-retry, key secrecy, artifact provenance,
+  and fail-closed behavior.
+
+F. CURRENT IMPLEMENTATION / VERIFICATION STATUS
+- Direct source inspection confirmed src/ocrspace-pdf-first.js requests Engine 2
+  on the original image, requests a searchable PDF, validates and downloads the
+  PDF, rasterizes it, and returns the PDF/raster bytes and hashes.
+- src/bot.js calls the PDF-first stage before OpenCV/Tesseract and replaces its
+  downstream image buffer with the PDF-derived raster. It writes PDF/raster
+  artifacts when OCRSPACE_ARTIFACT_DIR is configured.
+- scripts/run-windows-ocr-acceptance.ps1 explicitly sets OCRSPACE_ENABLED=1,
+  OCRSPACE_NETWORK_ALLOWLIST=1 and OCR_NON_OCR_NETWORK_RESTRICTED=1; it sets a
+  per-run OCRSPACE_ARTIFACT_DIR. The workflow injects the protected
+  OCRSPACE_API_KEY secret. The 64-image runner performs one PDF-first call per
+  image and invokes local Tesseract.js/native readers on the resulting raster.
+- scripts/block-network.js explicitly permits HTTPS OCR.Space API/PDF hosts;
+  its optional restriction applies to unrelated egress only.
+- tests/ocrspace-pdf-first.test.js had a stale assertion expecting a visible
+  text layer although the implementation requests a hidden-but-searchable layer.
+  Commit fceaf6e corrected that assertion and added an assertion that the
+  returned PDF buffer is retained. This correction is committed but not yet
+  executed/verified by CI in this record.
+- README and docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md now describe explicit
+  enablement, PDF-first processing, PDF-derived local readers and the provider
+  network allowlist. Environment examples and the Windows workflow already set
+  OCRSPACE_ENABLED=1 and OCRSPACE_NETWORK_ALLOWLIST=1.
+- No status checks were returned by the GitHub combined-status query at the
+  preceding source checkpoint. No current exact-head CI pass, live OCR.Space
+  request, provider PDF, Gate A/B pass, or production acceptance is claimed.
+- The local OCRSPACE_API_KEY is not available in this chat. The Actions secret's
+  presence/value remains unverified. The 64-image archive imgsHalf1.zip remains
+  absent from the accessible Library/repository; its expected size is
+  57,665,767 bytes and SHA-256 is
+  e32e43991ab90d6e2ca3e060f264456d175d0e93390f273d7f3a3f5d93fa98a2.
+  Its inventory has no independent nine-field ground truth, so accuracy would
+  remain NOT EVALUABLE even after extraction.
+
+G. ACTIVE QUEUE — CONTINUE AUTOMATICALLY IN THIS CHAT
+1. Verify the exact-head GitHub Actions run triggered by the latest plan/code
+   changes. Inspect Linux OCR.Space mocked contracts, full suite, Windows
+   persistence and full suite, live PDF-first screenshot acceptance, artifacts,
+   logs, checksums and all nine-field per-image results. Do not infer success
+   from a commit, queued run, empty status response or mock test.
+2. If CI exposes a demonstrated defect, fix the root cause, add regression
+   coverage, re-fetch main before the write, and re-run on the new exact head.
+3. Confirm the protected OCRSPACE_API_KEY secret exists without revealing it.
+   Then run the authorized 4-image and 16-image corpora through Engine 2 →
+   searchable PDF → retained PDF/raster → local readers. Inspect every field,
+   wrong accepted value, unresolved field, network attempt and fingerprint.
+   If the key is absent, mark only live runs BLOCKED and continue independent
+   source/documentation work.
+4. Locate and verify imgsHalf1.zip by exact size/hash and all 64 member hashes
+   before the 64-image extraction-only run. Do not substitute or synthesize the
+   archive or independent ground truth.
+5. Locate the independent Gate B holdout and its nine-field labels. Gate A must
+   pass before Gate B; Gate C recovery follows A/B; Gate D release follows all
+   mandatory gates. Production remains NO-GO.
+6. Keep all DWBOT work in this ChatGPT conversation. Do not hand off to Work
+   mode or another executor. Do not emit progress narration or interim screen
+   text while authorized operations are underway. After operations complete,
+   provide one concise consolidated recommendation and prioritized next steps,
+   and offer to implement the next authorized steps.
+
+================================================================================
+END CURRENT GOVERNING OVERRIDE — 2026-11-06
+================================================================================
+
+================================================================================
 CURRENT OCR.SPACE IMPLEMENTATION STATUS — 2026-11-06
 ================================================================================
 
