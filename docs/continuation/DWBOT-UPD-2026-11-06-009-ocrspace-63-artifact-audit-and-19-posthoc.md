@@ -269,3 +269,86 @@ Gate B remains `NOT_PASSED`. The 19-image artifact-integrity and reader
 checks are complete, but Gate A, original network evidence, and fully resolved
 nine-field outputs remain blockers. The 21-image output remains diagnostic
 only. No additional OCR.Space submissions were made during this verification.
+
+
+## 11. Latest downloaded artifact and 19-image analysis — run #42210718226
+
+The original 63-image extraction is now confirmed complete:
+- Source run: [#42160979140](https://github.com/pbrau014/braultDwBotVis/actions/runs/42160979140), completed successfully.
+- Artifact ID: `13482219732`, 81,886,966 bytes.
+- GitHub digest and independently downloaded ZIP SHA-256:
+  `ac4ae071ee4737c2fe044b64456a8dab1cddf7073a02f8f427ec7b35af28629a`.
+- 63 searchable PDFs and 63 PDF-derived rasters were present. The run report records 63 successful PDF extractions, zero failed images, Engine 2 and no original-screenshot fallback.
+
+The latest 19-image no-provider verification attempt is [run #42210718226](https://github.com/pbrau014/braultDwBotVis/actions/runs/42210718226):
+- Artifact ID: `13502190474`, 267,125 bytes.
+- GitHub digest and independently downloaded ZIP SHA-256:
+  `a0254e8ec900b8cb695a3bde92640c47e472435cb347d2b5aa928923a8c1f902`.
+- Source-image hashes: PASS for 19/19.
+- PDF integrity: PASS for 19/19.
+- Searchable PDF text layer: PASS for 19/19.
+- Raster integrity and PDF-derived raster provenance: PASS for 19/19.
+- Secret-leak scan: PASS.
+- Local readers: FAIL for 19/19 as an acceptance component because PaddleOCR returned `failed-open` for every image; Tesseract.js and native Tesseract did return rows.
+- Original extraction network restriction: `NOT_VERIFIED_MISSING_ORIGINAL_LOG`; the reconciliation status is `RECONSTRUCTED_LIMITED_EVIDENCE`, not a historical zero-attempt result.
+- Local-only recovery network restriction: PASS, zero blocked attempts, zero provider requests, empty-log SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+- Overall artifact report: FAILED, 0/19 fully verified because the local-reader and original-network evidence conditions remain open. The 19 PDF/raster pairs themselves passed all file/provenance checks.
+
+### 19-image per-engine post-hoc results
+
+| Reader | Exact eligible fields | Wrong unaccepted candidates | Unresolved fields | Field exact-match rate | Fully exact nine-field records |
+|---|---:|---:|---:|---:|---:|
+| Tesseract.js | 110 / 171 | 2 | 59 | 64.33% | 2 / 19 (10.53%) |
+| Native Tesseract | 103 / 171 | 2 | 66 | 60.23% | 0 / 19 (0%) |
+
+Wrong candidate values were not accepted as mandatory fields. The full-record counts remain inadequate: 17/19 and 19/19 records respectively have unresolved required outputs.
+
+### 19-image fusion comparison
+
+| Arrangement | Exact | Wrong | Unresolved | Exact-match rate |
+|---|---:|---:|---:|---:|
+| PDF text layer alone (8 non-identity fields) | 73 / 152 | 2 | 77 | 48.03% |
+| OCR.Space provider parsed text alone (8 non-identity fields) | 79 / 152 | 17 | 56 | 51.97% |
+| PDF text + provider + Tesseract.js + native unique majority | 131 / 171 | 1 | 39 | 76.61% |
+| Strict three-source consensus (PDF + Tesseract.js + native) | 104 / 171 | 1 | 66 | 60.82% |
+| Strict four-source consensus (3 of 4) | 59 / 171 | 0 | 112 | 34.50% |
+
+Four-source majority gives the best field-level exact count but has one wrong candidate and 39 unresolved fields. On complete-record grouping it yields 1 fully exact record, 1 record with a wrong candidate, and 17 unresolved records. Strict four-source consensus removes the wrong candidate in this sample but leaves all 19 records unresolved. Neither arrangement is safe for automatic acceptance.
+
+### 21-image diagnostic-only matrix
+
+The 21-image report includes the first 19 Gate B records plus two additional complete-reference records. It is diagnostic only; it does not change the Gate B inventory.
+
+- PDF text layer: 80/168 exact (47.62%), 3 wrong, 85 unresolved.
+- OCR.Space parsed text: 91/168 exact (54.17%), 19 wrong, 58 unresolved.
+- Four-source majority: 147/189 exact (77.78%), 1 wrong, 41 unresolved; 2 fully exact nine-field records, 1 with a wrong candidate, 18 unresolved.
+- Strict four-source consensus: 68/189 exact (35.98%), zero wrong, 121 unresolved; no complete nine-field record.
+- Three-local-reader consensus (PaddleOCR unavailable): 112/189 exact (59.26%), 1 wrong, 76 unresolved.
+
+The PDF text layer alone is not sufficient for the nine fields. In these PDFs the text layer reliably exposes result/map/mode/battle time, but the reward line frequently merges or misreads adjacent numeric values; player identity is excluded by policy. Multi-source fusion improves field-level coverage, but even the best majority still produces one wrong candidate and unresolved fields. All candidates remain diagnostic and unaccepted.
+
+### PaddleOCR recovery diagnosis
+
+The local runtime install manifest reports PaddleOCR 3.7.0 / PaddlePaddle 3.3.1, complete PP-OCRv6 medium model files, and a successful offline smoke test with zero network attempts. However, the 21-image recovery report records PaddleOCR `failed-open` on all 21 images. The previous child output discarded the underlying helper error, so the precise runtime cause was not retained. The current code now preserves the fallback error, helper status, requested fields and attempted crops in the child result and recovery report. A new no-provider run is required to diagnose the underlying failure; no provider request is needed.
+
+### Network log reconciliation
+
+The original extraction artifact did not contain `imagesF-63-blocked-network-attempts.log`. The later verifier inspected the source workflow and available completed job logs:
+- source workflow had restricted-egress enabled and OCR.Space allowlisting enabled;
+- source workflow did not configure `OCR_NON_OCR_NETWORK_LOG`;
+- the guard writes events only when a log path is configured;
+- available source job logs contained zero blocked-attempt markers;
+- per-image run rows contained zero network-block failure rows;
+- historical blocked-attempt count remains UNKNOWN and zero attempts are NOT claimed.
+
+A new synthetic empty file cannot reconstruct the historical log. The separately generated reconciliation JSON/text are the correct workaround: they preserve the absence, corroborating observations, and limitation without impersonating original evidence.
+
+### Exact-head verification failure and correction
+
+Exact-head run [#42210718244](https://github.com/pbrau014/braultDwBotVis/actions/runs/42210718244) failed in Linux, Windows and clean-package full-suite steps on one stale assertion in `tests/full-system.test.js`: it expected the old `Total doubloons (G12-equivalent)` wording in `!yolo standings`, while the public command correctly emits `All-player aggregate (50/50 players): ... doubloons`. The `!yolo totals` command retains the former label. The test now asserts the actual public standings contract. The earlier verification steps, including desktop service/bridge and UI tests, passed; the full suite remains unverified until the next exact-head run completes.
+
+The PaddleOCR child/recovery diagnostics are also now preserved in the report rather than collapsed to a generic `failed-open`. New exact-head DWBOT verification and no-provider Gate B runs are queued against commit `a290730c057cd26d3abc7d5e24e8bf17593a99ba`:
+- DWBOT verification: [#42236474184](https://github.com/pbrau014/braultDwBotVis/actions/runs/42236474184)
+- 19-image no-provider artifact verification: [#42236474159](https://github.com/pbrau014/braultDwBotVis/actions/runs/42236474159)
+
+Gate A and Gate B remain NOT PASSED. Production remains NO-GO.
