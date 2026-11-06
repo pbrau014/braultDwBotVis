@@ -38,6 +38,9 @@ test('strict fusion requires two matching candidates and keeps conflicts unresol
     assert.equal(consensus(['Victory', 'Defeat', 'Defeat'], 'result'), 'Defeat');
     assert.equal(consensus(['Victory', 'Defeat', null], 'result'), null);
     assert.equal(consensus(['123456', '123456', '123465'], 'credits'), '123456');
+    assert.equal(consensus(['123456', '123456', '123465', '123465'], 'credits'), null, 'a tied 2–2 vote must remain unresolved');
+    assert.equal(consensus(['123456', '123456', '123456', '123465'], 'credits', 3), '123456');
+    assert.equal(consensus(['123456', '123465', '123465', '123466'], 'credits', 3), null);
 });
 
 test('fusion evaluation counts missing values as unresolved and never changes the input record', () => {
