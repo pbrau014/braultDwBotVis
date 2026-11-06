@@ -26,7 +26,7 @@
     "test:discord-command-policy": "node --test tests/tournament-command-policy.test.js",
     "test:discord-preflight": "node --test tests/discord-gateway-diagnostics.test.js tests/tournament-command-policy.test.js tests/discord-test-preflight.test.js",
     "preflight:discord-test": "node scripts/preflight-discord-test.js",
-    "test:ocrspace": "node --test tests/ocrspace.test.js tests/ocrspace-prepass.test.js tests/ocrspace-pdf-first.test.js tests/ocrspace-exploratory-resume.test.js tests/ocrspace-reconciliation.test.js tests/ocr-report-metadata.test.js tests/ocrspace-64-inventory.test.js tests/ocrspace-imagesF-21-ground-truth.test.js tests/ocrspace-imagesF-21-artifact-verifier.test.js",
+    "test:ocrspace": "node --test tests/ocrspace.test.js tests/ocrspace-prepass.test.js tests/ocrspace-pdf-first.test.js tests/ocrspace-exploratory-resume.test.js tests/ocrspace-reconciliation.test.js tests/ocr-report-metadata.test.js tests/ocrspace-64-inventory.test.js tests/ocrspace-imagesF-21-ground-truth.test.js tests/ocrspace-imagesF-21-local-recovery.test.js tests/ocrspace-imagesF-21-artifact-verifier.test.js",
     "test:ocr": "npm run test:ocrspace && npm run test:ocr-sequence-checkpoint && npm run test:ocr-watchdog && npm run test:paddleocr-fallback",
     "test:ocr-sequence-checkpoint": "node --test tests/ocr-sequence-checkpoint.test.js",
     "test:desktop": "node --test tests/desktop-service.test.js tests/desktop-bridge.test.js tests/desktop-account-links.test.js tests/desktop-test-preflight.test.js tests/desktop-ui-contract.test.js",
