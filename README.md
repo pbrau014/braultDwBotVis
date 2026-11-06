@@ -2,6 +2,15 @@
 
 OCR.Space is the explicitly enabled primary text-extraction stage for every eligible, authorized image. Set `OCRSPACE_ENABLED=1`, `OCRSPACE_NETWORK_ALLOWLIST=1`, and provide `OCRSPACE_API_KEY`. OCR.Space Engine 2 receives each original image first and creates a searchable PDF. The PDF is downloaded, validated and rasterized locally; Tesseract.js, native Tesseract, PaddleOCR (when enabled), and OpenCV geometry then operate only on the PDF-derived raster. No local reader falls back to the original screenshot after PDF-first processing begins. Acceptance runners set `OCRSPACE_ARTIFACT_DIR` and retain the PDF/raster artifacts. The network guard explicitly permits the OCR.Space HTTPS API/PDF hosts; any restriction applies only to unrelated outbound destinations. `OCRSPACE_ENABLED=0` is reserved for isolated mocks or local readers after a PDF has already been produced, never for eligible original-image intake. See docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md and docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt.
 
+## Node.js runtime baseline
+
+The accepted DWBOT runtime baseline is Node.js **22.16.0** (`>=22.16.0`). This
+version is acceptable for installation, project tests, OCR acceptance and
+candidate verification; Node.js 24+ is not a prerequisite. The repository pins
+22.16.0 in `.nvmrc`, package manifests and GitHub Actions. Use Node 24 only for
+a specific dependency/tool requirement that is independently demonstrated.
+Windows-specific checks still run on Windows, regardless of Node version.
+
 ## Historical tested-source checkpoint — 2026-11-05 (superseded by 2026-11-06 OCR.Space authority)
 
 - Last source-code checkpoint: 5a12a9c218cebe61d277999318b7ceef5a8dc3b1 (run 42111470540).
