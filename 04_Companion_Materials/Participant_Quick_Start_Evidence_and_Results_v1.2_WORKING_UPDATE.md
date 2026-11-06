@@ -74,4 +74,4 @@ The latest official event notice controls. A reusable ruleset or planning propos
 
 Before committing to an event, confirm the exact event stage, time zone, registration/arrival cutoff, eligibility, team/roster rules, map/mode and ship limits, prize details, official evidence route, referee/help contact, dispute deadline, and settings/rules version. If any required item is blank or contradictory, ask the organizer before play.
 
-The internal planning proposal `Season_Logistics_and_Grand_YOLO_Finale_Blueprint_v0.1_PROPOSAL.md` is not participant authority and does not create a date, eligibility rule, playoff bracket, prize, or finale format.
+The internal planning proposal `Season_Logistics_and_Grand_YOLO_Finale_Blueprint_v0.2_PROPOSAL.md` contains proposed defaults for review only. It is not participant authority and does not create an event date, eligibility rule, playoff bracket, prize, or finale format.
