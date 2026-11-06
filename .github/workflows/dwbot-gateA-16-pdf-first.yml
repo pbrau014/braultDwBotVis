@@ -108,9 +108,13 @@ jobs:
       - name: Configure fail-closed restricted-egress diagnostic preload
         shell: powershell
         run: |
-          $guard = Join-Path $env:GITHUB_WORKSPACE 'scripts/block-network.js'
-          if (-not (Test-Path $guard)) { throw 'Current fail-closed network guard is missing.' }
-          "NODE_OPTIONS=--require `"$guard`"" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          $candidateGuard = Join-Path $env:GITHUB_WORKSPACE 'source/scripts/block-network.js'
+          $failClosedGuard = Join-Path $env:GITHUB_WORKSPACE 'scripts/block-network.js'
+          if (-not (Test-Path $candidateGuard)) { throw 'Candidate restricted-egress guard is missing.' }
+          if (-not (Test-Path $failClosedGuard)) { throw 'Current fail-closed network guard is missing.' }
+          # Load candidate first and fail-closed wrapper second; the runner appends
+          # the candidate preload again, which Node's module cache safely ignores.
+          "NODE_OPTIONS=--require `"$candidateGuard`" --require `"$failClosedGuard`"" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
 
       - name: Run the 16-image OCR.Space Engine 2 PDF-first Gate A acceptance
         working-directory: source
