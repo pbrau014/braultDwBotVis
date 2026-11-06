@@ -5,7 +5,7 @@ The v1.1 companion materials are published as documentation and reusable templat
 
 | Companion | Primary audience / use | Main publication relationship | Status note |
 |---|---|---|---|
-| Participant Quick Start, Evidence and Results | Participants submitting evidence and understanding results | Participant Guide | Released guide; the event-specific submission route must be stated in the event settings before a particular event. |
+| Participant Quick Start, Evidence and Results v1.1 | Participants submitting evidence and understanding results | Participant Guide | Released guide; the event-specific submission route must be stated in the event settings before a particular event. |\n| Participant Quick Start v1.2 working update | Participants reviewing Pilot/season/playoff/finale distinctions and nine-field evidence | Participant Guide | Markdown working update only; DOCX/PDF derivatives are not rendered or approved. Do not substitute it for the released v1.1 publication until reviewed and rendered. |
 | Pilot Event Ruleset | Pilot participants and staff | Participant Guide + Operations Manual | Released reusable template; fill and confirm placeholders before issuing a specific event notice. |
 | Recurring Tournament Ruleset | Recurring participants and staff | Participant Guide + Operations Manual | Released reusable template; format-specific rules remain distinct from Pilot rules. |
 | Training Room Host and Referee Guide | Hosts and referees | Operations Manual | Released procedure guide; installed-client clicks remain unverified and event-specific room settings still apply. |
