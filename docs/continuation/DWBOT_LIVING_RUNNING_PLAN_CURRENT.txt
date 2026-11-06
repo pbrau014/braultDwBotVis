@@ -5005,3 +5005,64 @@ Current blockers and next actions:
 ================================================================================
 END DWBOT-UPD-2026-11-06-006
 ================================================================================
+
+
+================================================================================
+DWBOT-UPD-2026-11-06-007 — EXACT-HEAD RUN 399 / FOCUSED OCR CONTRACT VERIFIED
+================================================================================
+
+Exact-head run 399:
+https://github.com/pbrau014/braultDwBotVis/actions/runs/42149272914
+Expected and actual SHA: 0547237613e3ee331244a591b959642b789b151c.
+Run 399 completed with overall FAILURE solely because the Windows job's
+protected OCRSPACE_API_KEY check failed. This is not a fully green workflow.
+
+Run 399 job results:
+- Linux Node 22.16.0 offline verification: SUCCESS. Focused OCR.Space
+  contract suite: 51 passed, 0 failed, 0 skipped. Full project suite:
+  309 passed, 0 failed, 2 skipped. All six 64-inventory safety tests ran in
+  the full suite.
+- Windows Node 22.16.0 job: full project suite SUCCESS, 309 passed,
+  0 failed, 2 skipped. The native OCR prerequisite and isolated OpenCV
+  runtime setup succeeded. The protected secret check then reported
+  OCRSPACE_API_KEY configured: False and failed with
+  "Protected OCRSPACE_API_KEY secret is missing or empty." The current-source
+  screenshot-acceptance step was skipped. No OCR.Space request or PDF was
+  produced.
+- PDF manual and clean-package verification: SUCCESS. Manual PDF rendering
+  passed; clean extraction/package verification passed. Clean-package npm
+  test: 308 passed, 0 failed, 3 skipped. Prelive: 21 passed, 0 failed,
+  0 skipped. Focused OCR.Space contract: 51 passed, 0 failed, 0 skipped.
+  Additional contract groups: 31, 4, 23 and 16 tests passed with zero failures.
+  Package manifest verified with 550 entries; prelive PASS.
+- Clean package ZIP SHA-256:
+  faeaa16b4d6b4a98582623a070c7778283543266d5138bc1b4e7848629d2d3d5.
+  Artifact ID 13471702699, size 88,474,901 bytes, SHA-256
+  37bd1b652c2bafd31301ce1ba4351be32e9d65b62a017c076fdc3e4cc256215c.
+- Windows recovery artifact ID 13471801309, size 46,091 bytes, SHA-256
+  ba5ec7e34acbb8623851027cbe1909936d397673b16f2108d9afd904bcbaa16d.
+  The Windows recovery report is separate from screenshot OCR acceptance.
+
+Interpretation:
+- The package script now includes tests/ocrspace-64-inventory.test.js in
+  npm run test:ocrspace; the focused 51-test suite passes on Linux and in the
+  clean package. The full 309-test suite passes on Linux and Windows.
+- The 64-image runner's user-exclusion, all-member preflight and symlink
+  containment contracts are verified by automated tests. No 64-image run
+  occurred because the source archive/image root are absent and the provider
+  secret is missing.
+- Run 399 is not an OCR acceptance pass. No eligible 4-/16-image screenshot
+  entered the current Engine 2 PDF-first workflow because the protected key
+  was missing. No OCR accuracy or release readiness claim is made.
+- The repository owner must add OCRSPACE_API_KEY in GitHub Settings ->
+  Secrets and variables -> Actions -> New repository secret. Never paste the
+  key into chat or logs. After it is added, rerun the exact-head workflow.
+- The 64-image source archive imgsHalf1.zip and extracted root remain missing;
+  only the 64-record manifest exists (56 eligible, 8 excluded). Independent
+  holdout with 50 minimum / 100 preferred screenshots and independently
+  reviewed nine-field ground truth remains unavailable.
+- Production remains NO-GO.
+
+================================================================================
+END DWBOT-UPD-2026-11-06-007
+================================================================================

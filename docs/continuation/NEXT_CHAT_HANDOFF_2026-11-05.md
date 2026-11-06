@@ -5,7 +5,7 @@ This dated handoff body is historical context. The canonical living plan
 source of truth and its newest override controls any conflicting text below.
 
 - Canonical repository: `pbrau014/braultDwBotVis`, branch `main`.
-  Code checkpoint verified in run 398: `2362320ab0daaa001303012a212296bd27bd350a`; this handoff synchronization is documentation/package-script-only atop it.
+  Exact-head run 399 verified main commit `0547237613e3ee331244a591b959642b789b151c`; this handoff synchronization is documentation-only atop it.
 - Runtime rule: Node.js `22.16.0` is the accepted DWBOT baseline and is
   sufficient in place of older Node 24+ requirements. Node 24 is optional only
   for a specifically proven tool/dependency requirement. Keep OS-specific
@@ -37,9 +37,9 @@ source of truth and its newest override controls any conflicting text below.
   `e47acda2adb49623fcd1f5f305327aa7e166ebdf`, and complete member preflight /
   path-containment fixes `1398d65da25894db2a873de808963b2ccf0bb48e` and
   `2362320ab0daaa001303012a212296bd27bd350a`.
-- Exact-head run 398 on `2362320ab0daaa001303012a212296bd27bd350a` completed:
-  Linux suite PASS (309/0/2 skipped), Windows suite PASS (309/0/2 skipped),
-  Windows persistence/recovery PASS, and clean-package/PDF job PASS. The
+- Exact-head run 399 on `0547237613e3ee331244a591b959642b789b151c` completed:
+  Linux focused OCR.Space suite PASS (51/0/0), Linux full suite PASS (309/0/2),
+  Windows full suite PASS (309/0/2), and clean-package/PDF job PASS. The
   Windows job itself failed at the protected-secret check:
   `OCRSPACE_API_KEY configured: False`; screenshot acceptance was skipped.
 - Six 64-inventory regression tests passed on Linux and Windows. The runner
@@ -47,19 +47,17 @@ source of truth and its newest override controls any conflicting text below.
   provider request, skips the 8 user-excluded images without provider or local
   OCR, and permits only the 56 eligible images to proceed. The exact source
   archive and extracted root remain missing.
-- Clean package npm test: 308/0/3 skipped; prelive: 21/0. Package manifest
-  verified (550 entries); ZIP SHA-256
-  `0676b9c44a98b0d70c2a44b83435379de510f892840de93d287448f8f2a33c24`.
-  Artifact ID `13471786598`, digest
-  `141aaeed7d12dde675f3b2c6b83923069acea24e6f9c8553b9ab4679d8de6893`.
+- Clean package npm test: 308/0/3 skipped; prelive: 21/0; focused OCR.Space:
+  51/0/0. Package manifest verified (550 entries); ZIP SHA-256
+  `faeaa16b4d6b4a98582623a070c7778283543266d5138bc1b4e7848629d2d3d5`.
+  Artifact ID `13471702699`, digest
+  `37bd1b652c2bafd31301ce1ba4351be32e9d65b62a017c076fdc3e4cc256215c`.
 - The repository Actions secret is confirmed missing/empty. The repository
   owner must add `OCRSPACE_API_KEY` in Settings -> Secrets and variables ->
   Actions -> New repository secret. Never paste the key into chat or logs.
   No live OCR.Space request, searchable PDF, screenshot acceptance or release
   readiness is established. Production remains NO-GO.
-- No OCR acceptance, independent holdout pass, 64-image inventory pass,
-  production deployment or release readiness is established. Production
-  remains NO-GO.
+
 
 ---
 
