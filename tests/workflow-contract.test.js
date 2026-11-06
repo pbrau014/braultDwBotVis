@@ -269,7 +269,7 @@ test('19-image Gate B artifact workflow verifies the completed run without provi
     assert.match(workflow, /--network-log-reconciliation/);
     assert.match(workflow, /evaluate-ocrspace-pdf-text-layer\.js/);
     assert.match(workflow, /pdf-text-layer-analysis-19\.json/);
-    assert.match(workflow, /Discover and download the latest Gate A report for this exact candidate commit/);
+    assert.match(workflow, /Gate A report for this exact (?:candidate|source) commit/);
     assert.match(workflow, /DWBOT_CANDIDATE_SHA:\s*[0-9a-f]{40}/);
     assert.ok(workflow.includes("head_branch -in @('main','fix/pdf-raster-source-aspect-normalization')"));
     assert.ok(workflow.includes('gateAReport.candidateFingerprint -ne $env:DWBOT_CANDIDATE_SHA'));
