@@ -31,7 +31,7 @@ The official API currently documents a 1 MiB Free API upload limit, 500 requests
 - scripts/block-network.js: OCR.Space-only HTTPS allowlist for acceptance.
 - scripts/run-windows-ocr-acceptance.ps1: requires OCRSPACE_API_KEY, runs PDF-first acceptance, retains PDF/raster artifacts.
 - `OCRSPACE_ARTIFACT_DIR` is set to a per-run directory by the Windows acceptance wrapper; the PDF and PDF-derived raster are retained there. The 64-image runner verifies all 64 member hashes, submits only the 56 eligible images, and records the 8 user-excluded images as skipped without OCR.Space requests. The normal bot only writes durable artifacts when `OCRSPACE_ARTIFACT_DIR` is configured; set it before any run that requires persistent evidence. No artifact is claimed until the file and checksum are inspected.
-- tests/ocrspace-pdf-first.test.js: mocked first-pass, upload-size normalization, PDF URL/redirect/signature/size and fail-closed tests.
+- tests/ocrspace-pdf-first.test.js and tests/ocrspace-64-inventory.test.js: mocked PDF-first contracts plus 64-inventory eligibility, exclusion, preflight and path-containment regressions.
 - npm run test:ocrspace includes PDF-first contract tests.
 
 ## Inventory gates

@@ -4924,3 +4924,84 @@ contract test for the realpath containment guard. No image was uploaded.
 ================================================================================
 END DWBOT-UPD-2026-11-06-005
 ================================================================================
+
+
+================================================================================
+DWBOT-UPD-2026-11-06-006 — EXACT-HEAD RUN 398 / 64-INVENTORY FIX VERIFIED
+================================================================================
+
+Exact code checkpoint: 2362320ab0daaa001303012a212296bd27bd350a.
+Exact-head workflow run 398:
+https://github.com/pbrau014/braultDwBotVis/actions/runs/42148705952
+The actual run SHA matches 2362320ab0daaa001303012a212296bd27bd350a.
+Run 398 completed with overall conclusion FAILURE solely because the Windows
+job's protected OCRSPACE_API_KEY check failed. Do not call this a green workflow.
+
+Run 398 results:
+- Linux Node 22.16.0 offline job: SUCCESS. Full project suite 309 passed,
+  0 failed, 2 skipped. OCR.Space focused contract, Discord offline policy,
+  desktop preflight/service/bridge, JSON/SQLite recovery and full project suite
+  all passed.
+- Windows Node 22.16.0 job: full suite SUCCESS, 309 passed, 0 failed,
+  2 skipped. Native OCR prerequisites and isolated OpenCV geometry runtime
+  installed; Windows process-level persistence/recovery step passed.
+- The six 64-inventory regression tests passed in both Linux and Windows full
+  suites: 56/8 manifest partition, unknown disposition fail-closed,
+  exclusion-list consistency, user-excluded skip before provider call,
+  all 64 source-member hashes verified before first provider request, and
+  realpath rejection for symlink targets outside the verified image root.
+- The Windows persistence/recovery artifact report passed all 11 stages with
+  a synthetic 50-player seed. JSON and SQLite seed/verify/restore checks passed;
+  SQLite integrity was "ok". Artifact ID 13471321848, 46,087 bytes,
+  SHA-256 681a53ba3daccb09075331cde36f05d5dfe56e9a22134f8daa1c41afa362533d.
+  This isolated CI fixture is not production data and does not by itself close
+  the deferred release recovery gate.
+- PDF manual and clean-package job: SUCCESS. PDF manual rendered; clean
+  extraction and package verification passed. npm test in the extracted
+  package: 308 passed, 0 failed, 3 skipped. npm run test:prelive: 21 passed,
+  0 failed, 0 skipped. Package manifest verified with 550 entries.
+  Package ZIP SHA-256:
+  0676b9c44a98b0d70c2a44b83435379de510f892840de93d287448f8f2a33c24.
+  Artifact ID 13471786598, 88,472,955 bytes, SHA-256
+  141aaeed7d12dde675f3b2c6b83923069acea24e6f9c8553b9ab4679d8de6893.
+- Windows protected-secret step again reported OCRSPACE_API_KEY configured:
+  False and failed with "Protected OCRSPACE_API_KEY secret is missing or
+  empty." Current-source screenshot acceptance was skipped. No OCR.Space
+  request, searchable PDF or live image acceptance was produced.
+
+64-image runner safety:
+- The current 64-image manifest has 64 unique decode-verified records, 56
+  eligible_user_verified_visible_fields and 8 exclude_user_verified. All
+  records still lack independent ground truth.
+- The runner correction on this exact code checkpoint is verified by the
+  six regression tests. It hash-verifies the exact archive and all 64 extracted
+  members before any provider call, resolves every member path and rejects
+  symlinks escaping the source root, then skips the eight excluded images
+  without provider or local OCR. Only the 56 eligible images may proceed to
+  Engine 2 PDF-first and PDF-raster local readers.
+- The source archive imgsHalf1.zip and extracted image root remain missing.
+  No 64-image processing was attempted. The inventory is not an accuracy
+  holdout; exact accuracy remains not evaluable without independent labels.
+- package.json now includes tests/ocrspace-64-inventory.test.js in the focused
+  npm run test:ocrspace command, so the focused OCR.Space contract suite
+  covers these regressions as well as the full project suite.
+
+Current blockers and next actions:
+- Repository Actions secret OCRSPACE_API_KEY is confirmed missing. The
+  repository owner must add it via Settings -> Secrets and variables ->
+  Actions -> New repository secret. Never paste the key into chat or logs.
+- The exact imgsHalf1.zip (57,665,767 bytes, SHA-256
+  e32e43991ab90d6e2ca3e060f264456d175d0e93390f273d7f3a3f5d93fa98a2) and its
+  extracted image root are required for the 64 inventory. No candidate may be
+  substituted or reconstructed.
+- Independent holdout with at least 50, preferably 100, images and separately
+  reviewed nine-field ground truth remains unavailable. Do not repurpose the
+  64 development inventory.
+- After secret configuration, rerun the exact-head workflow, verify the
+  protected secret check, then inspect 4-/16-image Engine 2 PDF/raster hashes
+  and nine-field acceptance outcomes. Only then advance the applicable gates.
+- Production remains NO-GO.
+
+================================================================================
+END DWBOT-UPD-2026-11-06-006
+================================================================================
