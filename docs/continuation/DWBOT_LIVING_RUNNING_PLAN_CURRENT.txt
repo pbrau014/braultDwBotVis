@@ -4795,3 +4795,88 @@ Next authorized work:
 ================================================================================
 END DWBOT-UPD-2026-11-06-002
 ================================================================================
+
+
+================================================================================
+DWBOT-UPD-2026-11-06-003 — 64-IMAGE USER-EXCLUSION SAFETY CORRECTION
+================================================================================
+
+Current main before this update: a9fc2fa07b330090b7b73839a53b0929fe5ec5c4.
+Repository inventory file: dwbotStuff/DWBOT_64_IMAGE_INVENTORY_REVIEWED.json.
+
+Verified manifest facts:
+- The reviewed inventory contains exactly 64 records, 64 unique image SHA-256
+  values, and 64 decode-verified images.
+- The user review marks 56 images eligible_user_verified_visible_fields and
+  8 images exclude_user_verified. The eight excluded filenames are explicitly
+  listed in the manifest's userReview.excludedFilenames.
+- The manifest says all nine mandatory fields are visible in the 56 eligible
+  images, but every record's groundTruthStatus remains
+  not_transcribed_or_independently_reviewed. This is an integrity/eligibility
+  inventory, not OCR ground truth and not an accuracy holdout.
+- The manifest's total uncompressed image bytes are 58,090,288. The expected
+  source archive is imgsHalf1.zip, 57,665,767 bytes, SHA-256
+  e32e43991ab90d6e2ca3e060f264456d175d0e93390f273d7f3a3f5d93fa98a2.
+
+Availability reconciliation:
+- Current GitHub main contains the reviewed inventory JSON but none of its 64
+  individual image files (0/64 filename matches in the recursive repository
+  tree), and it does not contain imgsHalf1.zip.
+- Targeted Dropbox searches for imgsHalf1.zip, DWBOT 64 screenshot archive,
+  WoWS screenshot corpus, and independent holdout terms returned no matches.
+- Targeted Library search surfaced the inventory/older OCR reports but not the
+  source archive or an independent holdout. This was not an exhaustive Library
+  inventory. The archive bytes and all image members remain unavailable here.
+- A reviewed archive fingerprint in a manifest or plan is not the archive
+  itself. Do not claim the archive was recovered, extracted or reverified.
+
+Critical runner defect discovered:
+- scripts/run-ocrspace-64-inventory.js previously iterated all 64 manifest
+  records and called createOcrSpacePdfFirst for every image without checking
+  corpusDisposition. That would have transmitted the eight images the user
+  explicitly excluded. This is a user-scope/privacy violation and the 64-image
+  runner must not be executed in that state.
+- The correction adds src/ocrspace-inventory.js to validate the complete
+  reviewed manifest, exact nine-field list, unique hashes, decode verification,
+  exclusion list and eligibility counts.
+- The runner now hash-verifies every source member, records the eight excluded
+  images as skipped-user-excluded with providerSubmission=false, and continues
+  without any OCR.Space request for them. Only the 56 eligible records proceed
+  to Engine 2 PDF-first and local readers on the PDF raster.
+- Reports distinguish 64 total inventory entries, 56 eligible processed, and
+  8 excluded skipped. Accuracy remains
+  NOT_EVALUABLE_NO_INDEPENDENT_GROUND_TRUTH.
+- Added regression tests for the 56/8 partition, unknown dispositions,
+  exclusion-list mismatch, and ensuring the runner continues past excluded
+  records before the OCR.Space provider call.
+- No 64-image provider request was made during this correction.
+
+Historical OCR evidence retained separately:
+- The preserved native-16-image-report.json SHA-256 is
+  f6f4dd7a3b6c8cc6c300c480c20dcd44f0638797e20f32036726478b51cd0f5a.
+  Its Node v26.13.0/native-Tesseract/network-blocked run completed 16/16,
+  achieved 5/16 exact records and 6/16 complete required records. It belongs
+  to source-build fingerprint
+  ea881c66dca81970c19a20a7e1536681dbf815b0e36d81f9ae22f95235628dad.
+  Preserve as historical, not current PDF-first evidence.
+- Run 317 on source commit 593a692dfc7220d77804d63ba2daf322f1a0159a is a
+  different Windows Node 22.16.0 run: native exact matches 2/4 and 3/16;
+  OpenCV-assisted exact counts were unchanged. Its artifact had no PDF/raster
+  files or per-image PDF-first evidence. Do not merge its results with the
+  preserved native-16 report or current main.
+
+Verification and execution constraints:
+- Run the new inventory unit tests and exact-head Actions workflow before
+  considering the runner correction verified.
+- The OCRSPACE_API_KEY repository Actions secret was confirmed missing by run
+  393. No provider call may be attempted until the repository owner adds it.
+- The expected imgsHalf1.zip bytes and image-root directory are still required;
+  the runner must verify archive size/hash and every member hash before any
+  eligible image is transmitted.
+- The 64-image inventory cannot satisfy Gate A/B accuracy because there is no
+  independent nine-field ground truth. Do not promote it to holdout.
+- Production remains NO-GO.
+
+================================================================================
+END DWBOT-UPD-2026-11-06-003
+================================================================================

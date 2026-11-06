@@ -9,6 +9,7 @@ process.env.OCRSPACE_NETWORK_ALLOWLIST = '1';
 require('./block-network');
 
 const inventory = require('../dwbotStuff/DWBOT_64_IMAGE_INVENTORY_REVIEWED.json');
+const { ELIGIBLE_DISPOSITION, EXCLUDED_DISPOSITION, partitionReviewedInventory } = require('../src/ocrspace-inventory');
 const { createOcrSpacePdfFirst } = require('../src/ocrspace-pdf-first');
 const bot = require('../src/bot');
 
@@ -28,18 +29,6 @@ function inside(parent, candidate) {
     const relative = path.relative(parent, candidate);
     return relative !== '' && !relative.startsWith('..') && !path.isAbsolute(relative);
 }
-function validateInventory() {
-    if (inventory.imageCount !== 64 || !Array.isArray(inventory.records) || inventory.records.length !== 64) {
-        throw new Error('Reviewed 64-image inventory must contain exactly 64 records.');
-    }
-    const hashes = inventory.records.map(item => String(item.sha256 || '').toLowerCase());
-    if (hashes.some(value => !/^[a-f0-9]{64}$/.test(value)) || new Set(hashes).size !== 64) {
-        throw new Error('Reviewed 64-image inventory has missing or duplicate SHA-256 values.');
-    }
-    if (inventory.records.some(item => item.decodeVerified !== true)) {
-        throw new Error('Reviewed inventory includes an image that was not decode-verified.');
-    }
-}
 async function extractWithEngine(rasterBuffer, engine) {
     process.env.OCRSPACE_ENABLED = '0';
     process.env.OCR_ENGINE = engine;
@@ -57,7 +46,7 @@ async function extractWithEngine(rasterBuffer, engine) {
 }
 
 async function main() {
-    validateInventory();
+    const { eligibleRecords, excludedRecords } = partitionReviewedInventory(inventory);
     if (!String(process.env.OCRSPACE_API_KEY || '').trim()) {
         throw new Error('OCRSPACE_API_KEY is required for the 64-image OCR.Space-first inventory run.');
     }
@@ -79,9 +68,9 @@ async function main() {
         totalUncompressedImageBytes: summedImageBytes,
         inventorySha256: sha256(Buffer.from(JSON.stringify(inventory))),
         imageCount: 64, groundTruthStatus: 'not_transcribed_or_independently_reviewed',
-        eligibleCount: inventory.records.filter(x => x.corpusDisposition === 'eligible_user_verified_visible_fields').length,
-        excludedCount: inventory.records.filter(x => x.corpusDisposition === 'exclude_user_verified').length,
-        engines: requiredEngines, results: [],
+        eligibleCount: eligibleRecords.length, excludedCount: excludedRecords.length,
+        eligibleProcessed: 0, excludedSkipped: 0, completedInventoryEntries: 0,
+        engines: requiredEngines, results: [], excludedRecords: [],
     };
     for (let index = 0; index < inventory.records.length; index++) {
         const item = inventory.records[index];
@@ -91,6 +80,26 @@ async function main() {
         const actualHash = sha256(source);
         if (source.length !== Number(item.bytes) || actualHash !== String(item.sha256).toLowerCase()) {
             throw new Error(`Source archive member fingerprint mismatch: ${item.filename}; expected ${item.bytes}/${item.sha256}, got ${source.length}/${actualHash}`);
+        }
+        if (item.corpusDisposition === EXCLUDED_DISPOSITION) {
+            run.excludedSkipped++;
+            run.excludedRecords.push({
+                index: index + 1, filename: item.filename, archivePath: item.archivePath,
+                corpusDisposition: item.corpusDisposition, groundTruthStatus: item.groundTruthStatus,
+                sourceBytes: source.length, sourceSha256: actualHash,
+                providerSubmission: false, status: 'skipped-user-excluded',
+            });
+            run.completedInventoryEntries = index + 1;
+            run.completedImages = run.eligibleProcessed;
+            run.updatedAt = new Date().toISOString();
+            if ((index + 1) % 4 === 0) {
+                await fs.writeFile(path.join(outputRoot, 'progress.json'), JSON.stringify(run, null, 2));
+            }
+            console.log(`[OCRSPACE-64] ${index + 1}/64 SKIP ${item.filename} (user-excluded; no provider request)`);
+            continue;
+        }
+        if (item.corpusDisposition !== ELIGIBLE_DISPOSITION) {
+            throw new Error(`Unreviewed corpus disposition for ${item.filename}; refusing provider submission.`);
         }
         const pdfFirst = await createOcrSpacePdfFirst({
             imageBuffer: source, filename: item.filename, env: process.env,
@@ -105,6 +114,7 @@ async function main() {
         for (const engine of requiredEngines) {
             localResults.push(await extractWithEngine(pdfFirst.rasterBuffer, engine));
         }
+        run.eligibleProcessed++;
         run.results.push({
             index: index + 1, filename: item.filename, archivePath: item.archivePath,
             corpusDisposition: item.corpusDisposition, groundTruthStatus: item.groundTruthStatus,
@@ -120,22 +130,26 @@ async function main() {
             localReaders: localResults,
             exactAccuracy: 'NOT_EVALUABLE_NO_INDEPENDENT_GROUND_TRUTH',
         });
+        run.completedInventoryEntries = index + 1;
+        run.completedImages = run.eligibleProcessed;
+        run.updatedAt = new Date().toISOString();
         if ((index + 1) % 4 === 0) {
-            run.completedImages = index + 1;
-            run.updatedAt = new Date().toISOString();
             await fs.writeFile(path.join(outputRoot, 'progress.json'), JSON.stringify(run, null, 2));
         }
         console.log(`[OCRSPACE-64] ${index + 1}/64 ${item.filename} Engine2 PDF ${pdfFirst.pdfSha256}`);
     }
     run.status = 'completed-extraction-not-accuracy-accepted';
-    run.completedImages = 64;
+    run.completedInventoryEntries = 64;
+    run.completedImages = run.eligibleProcessed;
+    run.eligibleProcessed = run.results.length;
+    run.excludedSkipped = run.excludedRecords.length;
     run.updatedAt = new Date().toISOString();
     const reportPath = path.join(outputRoot, 'ocrspace-64-inventory-report.json');
     await fs.writeFile(reportPath, JSON.stringify(run, null, 2));
     const reportSha256 = sha256(await fs.readFile(reportPath));
     await fs.writeFile(reportPath + '.sha256', reportSha256 + '  ' + path.basename(reportPath) + '\\n');
     await bot.terminateOcrWorker().catch(() => {});
-    console.log(`[OCRSPACE-64] COMPLETE: 64 PDFs generated and processed by local readers; exact accuracy NOT EVALUABLE without independent ground truth. Report: ${reportPath}`);
+    console.log(`[OCRSPACE-64] COMPLETE: ${run.eligibleProcessed} eligible PDFs generated; ${run.excludedSkipped} user-excluded images skipped; exact accuracy NOT EVALUABLE without independent ground truth. Report: ${reportPath}`);
 }
 main().catch(async error => {
     await bot.terminateOcrWorker().catch(() => {});

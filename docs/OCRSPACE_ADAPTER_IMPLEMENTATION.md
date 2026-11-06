@@ -30,7 +30,7 @@ The official API currently documents a 1 MiB Free API upload limit, 500 requests
 - src/bot.js: performs PDF-first processing before OpenCV/Tesseract; subsequent readers receive only the PDF raster. Production entrypoint refuses normal startup without OCRSPACE_API_KEY; OCRSPACE_ENABLED=0 is local-only.
 - scripts/block-network.js: OCR.Space-only HTTPS allowlist for acceptance.
 - scripts/run-windows-ocr-acceptance.ps1: requires OCRSPACE_API_KEY, runs PDF-first acceptance, retains PDF/raster artifacts.
-- `OCRSPACE_ARTIFACT_DIR` is set to a per-run directory by the Windows acceptance wrapper; the PDF and PDF-derived raster are retained there. The 64-image runner also writes each PDF/raster and hashes them. The normal bot only writes durable artifacts when `OCRSPACE_ARTIFACT_DIR` is configured; set it before any run that requires persistent evidence. No artifact is claimed until the file and checksum are inspected.
+- `OCRSPACE_ARTIFACT_DIR` is set to a per-run directory by the Windows acceptance wrapper; the PDF and PDF-derived raster are retained there. The 64-image runner verifies all 64 member hashes, submits only the 56 eligible images, and records the 8 user-excluded images as skipped without OCR.Space requests. The normal bot only writes durable artifacts when `OCRSPACE_ARTIFACT_DIR` is configured; set it before any run that requires persistent evidence. No artifact is claimed until the file and checksum are inspected.
 - tests/ocrspace-pdf-first.test.js: mocked first-pass, upload-size normalization, PDF URL/redirect/signature/size and fail-closed tests.
 - npm run test:ocrspace includes PDF-first contract tests.
 
@@ -39,7 +39,7 @@ The official API currently documents a 1 MiB Free API upload limit, 500 requests
 |---|---|---|---|
 | 4 images | fixtures/four-screenshots/ | Existing exact expected values | OCR.Space PDF first, then local readers, compare all nine fields |
 | 16 images | fixtures/additional-screenshots/ | testdata/additional-screenshot-ground-truth.json | OCR.Space PDF first, then local readers, compare all nine fields |
-| 64 images | imgsHalf1.zip / dwbotStuff/DWBOT_64_IMAGE_INVENTORY_REVIEWED.json | No independent nine-field ground truth | Process all 64 when archive is restored and SHA-verified; report extraction only, not accuracy. Preserve 56 eligible / 8 excluded classification |
+| 64 images | imgsHalf1.zip / dwbotStuff/DWBOT_64_IMAGE_INVENTORY_REVIEWED.json | No independent nine-field ground truth | Verify all 64; submit only 56 user-verified eligible images, skip the 8 user-excluded images without provider requests; report extraction only, not accuracy |
 
 The 64-image archive is not in the current repository tree. The reviewed provenance specifies imgsHalf1.zip as 57,665,767 bytes with SHA-256 e32e43991ab90d6e2ca3e060f264456d175d0e93390f273d7f3a3f5d93fa98a2. The 58,090,288-byte inventory total is the sum of the 64 uncompressed image files, not a competing ZIP size. Retrieve the exact archive, verify its size/hash, then verify all 64 member hashes before processing; never reconstruct or select a candidate by guess.
 

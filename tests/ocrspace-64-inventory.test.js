@@ -1,0 +1,46 @@
+'use strict';
+
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const inventory = require('../dwbotStuff/DWBOT_64_IMAGE_INVENTORY_REVIEWED.json');
+const {
+    ELIGIBLE_DISPOSITION,
+    EXCLUDED_DISPOSITION,
+    partitionReviewedInventory,
+} = require('../src/ocrspace-inventory');
+
+test('reviewed 64-image inventory partitions 56 eligible and 8 user-excluded images', () => {
+    const { eligibleRecords, excludedRecords } = partitionReviewedInventory(inventory);
+    assert.equal(eligibleRecords.length, 56);
+    assert.equal(excludedRecords.length, 8);
+    assert.ok(eligibleRecords.every(item => item.corpusDisposition === ELIGIBLE_DISPOSITION));
+    assert.ok(excludedRecords.every(item => item.corpusDisposition === EXCLUDED_DISPOSITION));
+    assert.deepEqual(
+        new Set(excludedRecords.map(item => item.filename)),
+        new Set(inventory.userReview.excludedFilenames),
+    );
+});
+
+test('unknown or unreviewed image dispositions fail closed before any provider run', () => {
+    const changed = structuredClone(inventory);
+    changed.records[0].corpusDisposition = 'unreviewed';
+    assert.throws(() => partitionReviewedInventory(changed), /unknown corpus disposition/);
+});
+
+test('per-image exclusions and user-reviewed exclusion list must agree exactly', () => {
+    const changed = structuredClone(inventory);
+    changed.userReview.excludedFilenames.pop();
+    assert.throws(() => partitionReviewedInventory(changed), /do not match/);
+});
+
+test('64-image runner skips user-excluded records before the OCR.Space provider call', () => {
+    const runner = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'run-ocrspace-64-inventory.js'), 'utf8');
+    const exclusionGuard = runner.indexOf('if (item.corpusDisposition === EXCLUDED_DISPOSITION)');
+    const skip = runner.indexOf('continue;', exclusionGuard);
+    const providerCall = runner.indexOf('await createOcrSpacePdfFirst', exclusionGuard);
+    assert.ok(exclusionGuard >= 0);
+    assert.ok(skip > exclusionGuard && providerCall > skip);
+    assert.match(runner, /providerSubmission:\s*false/);
+});
