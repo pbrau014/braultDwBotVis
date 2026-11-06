@@ -840,9 +840,6 @@ OCR.SPACE PDF-FIRST REVIEW / PRIVACY / CURRENT ACCEPTANCE
   accessible Library or canonical repo. Production remains NO-GO.
 
 A. CANONICAL SOURCE AND TEST-FIX COMMITS
-
-
-A. CANONICAL SOURCE AND TEST-FIX COMMITS
 - Sole canonical repository: https://github.com/pbrau014/braultDwBotVis.git;
   active implementation/delivery branch is main only. Current main HEAD:
   5a12a9c218cebe61d277999318b7ceef5a8dc3b1.
@@ -921,9 +918,6 @@ C. OCR.SPACE AND NINE-FIELD RULES — CURRENT OVERRIDE
   ambiguous, conflicting or incorrect mandatory values prevent acceptance.
   Zero wrong accepted values and zero unresolved required fields are required
   for exact-ground-truth Gate A/B corpora.
-
-D. READ-ONLY MISSING-FILE / HISTORICAL BRANCH SEARCH
-
 
 D. READ-ONLY MISSING-FILE / HISTORICAL BRANCH SEARCH
 - Current main contains the active living plan at
@@ -1796,47 +1790,34 @@ C. OCR.SPACE REQUEST PROFILE — CURRENT PDF-FIRST REQUIREMENTS
 
 D. IMPLEMENTATION MAP AND CURRENT VERIFICATION STATE
 
+Current active implementation:
+- src/ocrspace-pdf-first.js: Engine 2 source-image request, searchable PDF
+  creation, safe PDF download, PDF signature/size checks, and local raster handoff.
+- src/image-processor.js: <=1 MiB upload normalization and bounded PDF-page render.
+- src/bot.js: PDF-first request before any local reader; local readers process
+  only the PDF-derived raster; fail-closed on configured PDF-first errors; no
+  second OCR.Space crop refinement.
+- src/ocrspace-client.js: defaults to Engine 2 and hidden searchable text layer.
+  Engine 3 remains available only for legacy non-PDF diagnostics.
+- src/ocrspace-field-evidence.js and src/ocrspace-prepass.js: legacy crop-only
+  helpers/tests, not called by the active bot.
+- src/ocrspace-reconciliation.js: provider text remains separate diagnostic
+  evidence; it cannot overwrite local candidates or accepted fields.
+- src/ocrspace-quota-ledger.js: fail-closed per-day/per-month request reservation.
+- src/ocr-report-metadata.js: reports Engine 2 source-image PDF-first sequence,
+  upload/PDF limits and local-reader handoff without exposing the API key.
+- scripts/block-network.js: HTTPS allowlist for api.ocr.space and ocr.space only.
+- scripts/run-windows-ocr-acceptance.ps1: OCR.Space enabled for 4/16 corpora,
+  requires the API key, and conditionally invokes the 64-image runner.
+- scripts/run-ocrspace-64-inventory.js: verifies the exact ZIP and every member
+  before one PDF per image; local Tesseract.js/native readers consume the raster.
+- tests/ocrspace-pdf-first.test.js and tests/ocr-report-metadata.test.js verify
+  the new contract. The live provider/Windows/inventory run remains unverified.
 
-D. IMPLEMENTATION MAP AND CURRENT VERIFICATION STATE
+Historical CI and test reports below remain bound to their recorded source
+fingerprints. They are not current PDF-first acceptance evidence.
 
-- `src/ocrspace-client.js`: Engine 3, orientation detection, table flag,
-  scaling, searchable PDF flags, hidden searchable text layer, bounded request/response,
-  safe URL extraction, HTTPS/header/redirect safeguards. For PDF requests it
-  omits explicit TextOverlay response flag because provider enables its own
-  internal overlay for PDF generation.
-- `src/ocrspace-field-evidence.js`: Engine 3 evidence and quota reservation;
-  Engine 2 PDF-only fallback when Engine 3 provides no PDF URL; Engine 2 text
-  is discarded. Evidence stores request profile and PDF status.
-- `src/ocrspace-prepass.js`: OpenCV-derived safe crop proposals and geometric
-  exclusion of player identity ROI; reward band is the only crop marked table.
-- `src/ocrspace-reconciliation.js`: independent parse and exact diagnostic
-  comparison of OCR.Space evidence against the local nine-field record; no
-  mutation or remote-only acceptance.
-- `src/ocr-report-metadata.js`: records effective OCR.Space activation, key
-  presence as a boolean only, Engine 3 request profile, enabled sequence and
-  bounded quota values; no API key value is recorded. Discord logs summarize
-  only diagnostic status counts and explicitly exclude player identity.
-- `src/opencv-field-isolation.js`: geometry-only OpenCV analysis can be forced
-  for the explicitly enabled OCR.Space prepass; it never recognizes/accepts text.
-- `src/bot.js`: OCR.Space prepass runs before Tesseract.js only when explicitly
-  enabled; then existing local Tesseract, local crop processing, validation and
-  optional Paddle paths run. If prepass succeeded, duplicate later OCR.Space
-  requests are suppressed; if not, bounded local-geometry refinement can run.
-- `tests/ocrspace.test.js`, `tests/ocrspace-prepass.test.js`,
-  `tests/ocrspace-reconciliation.test.js` and `tests/ocr-report-metadata.test.js`:
-  mocked API request profile, PDF fallback, privacy, quotas, failure handling,
-  crop bounds, identity exclusion, OCR order, key redaction and diagnostic
-  reconciliation regression tests.
-- `src/ocr-report-metadata.js`: records effective OCR.Space enablement, API-key
-  presence (boolean only), Engine 3 request profile, processing sequence and
-  bounded quotas without exposing the key. Discord emits only cross-check status
-  counts; raw OCR text is not included in that summary.
-- `.env.desktop.example`, `README.md`,
-  `docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md`,
-  `docs/continuation/PROJECT_AUTHORITY_AND_IMPLEMENTATION_RULES.md`,
-  `docs/continuation/NEXT_CHAT_HANDOFF_2026-11-05.md` and `plan1.txt` carry
-  the current configuration, architecture and continuation rules.
-- Exact-head CI run `42088032492` on code commit
+Exact-head CI run `42088032492` on code commit
   `e1993bf91f54a2f366d5b5739b4aafa0c318be1a`: Linux offline job PASS. OCR.Space
   focused/prepass tests 24/24, other focused groups 21/21 and 29/29, full
   project suite 269 total / 267 passed / 0 failed / 2 skipped. The two skips
