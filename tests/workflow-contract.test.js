@@ -344,9 +344,9 @@ test('ordinary verification uses Node 22.16 and cannot submit the legacy 56-imag
     assert.ok(workflow.includes('node-version: 22.16.0'));
     assert.ok(workflow.includes('run_legacy_56_provider_acceptance'));
     assert.ok(workflow.includes("if: github.event_name == 'workflow_dispatch' && inputs.run_legacy_56_provider_acceptance == true"));
-    assert.match(workflow, /OCRSPACE_56_PROVIDER_REQUESTS_AUTHORIZED: \\$\\{\\{ github\\.event_name == 'workflow_dispatch' && inputs\\.run_legacy_56_provider_acceptance == true \\}\\}/);
+    assert.ok(workflow.includes("OCRSPACE_56_PROVIDER_REQUESTS_AUTHORIZED: ${{ github.event_name == 'workflow_dispatch' && inputs.run_legacy_56_provider_acceptance == true }}"));
     const preflight = read('scripts/prepare-ocrspace-eligible-56.py');
-    assert.match(preflight, /provider_requests_authorized = os\\.environ\\.get/);
+    assert.ok(preflight.includes('provider_requests_authorized = os.environ.get'));
     assert.match(preflight, /"providerRequestsPermitted": provider_requests_authorized/);
     assert.match(preflight, /"providerRequestsMade": False/);
     assert.doesNotMatch(preflight, /"providerRequestsPermitted": True/);
