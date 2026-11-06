@@ -114,3 +114,16 @@ test('admin scoring settings provide contextual visible, hover and assistive hel
   assert.match(script, /DWBOT default is 0\.9/);
   assert.match(script, /Grand Yolo formula does not use the Doubloon pool/);
 });
+
+
+test('participant desktop scoreboards suppress H12 dollar diagnostics', () => {
+  const html = read('desktop/player.html');
+  const script = read('desktop/player.js');
+  const service = read('src/desktop-service.js');
+  assert.doesNotMatch(html, /ESTIMATED VALUE|player-value|<th>Value<\\/th>/);
+  assert.doesNotMatch(script, /estimatedValue|D\\.money/);
+  assert.match(script, /D\\.number\\(row\\.total\\)/);
+  assert.match(service, /const publicRow = row =>/);
+  assert.match(service, /const \\{ estimatedValue, \.\.\.visible \\} = row/);
+  assert.match(service, /role:'admin'.*aggregate/);
+});
