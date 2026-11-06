@@ -23,7 +23,7 @@ const SINGLE_READ_CONFIDENCE_CEILING = 84;
 // missing/unusable recognition metadata; it is never an acceptance threshold.
 const MIN_CANDIDATE_CONFIDENCE = 50;
 const DEFAULT_MAX_CROPS = 7;
-const DEFAULT_TIMEOUT_MS = 15_000;
+const DEFAULT_TIMEOUT_MS = 60_000;
 const MAX_OUTPUT_BYTES = 2_000_000;
 const MAX_STDERR_BYTES = 24_000;
 
@@ -488,5 +488,5 @@ async function applyFieldFallback({ imageBuffer, rawText, fields, sourceWidth, s
 module.exports = {
     applyFieldFallback, enabled, determineNeededFields, buildCropRequests, parseCropCandidate,
     addCandidatesToFields, playersConfusable, summarizeCropLatency,
-    __test: { HELPER_PATH, FIELDS, MAX_GROUPS, SINGLE_READ_CONFIDENCE_CEILING, MIN_CANDIDATE_CONFIDENCE, fieldCandidateValues, hasConflictingCandidates, clampRect, scaledPreparedRect, rewardRect, damageRect, runHelper },
+    __test: { HELPER_PATH, FIELDS, MAX_GROUPS, SINGLE_READ_CONFIDENCE_CEILING, MIN_CANDIDATE_CONFIDENCE, DEFAULT_TIMEOUT_MS, fieldCandidateValues, hasConflictingCandidates, clampRect, scaledPreparedRect, rewardRect, damageRect, runHelper },
 };
