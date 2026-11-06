@@ -95,6 +95,7 @@ jobs:
         shell: powershell
         run: |
           choco install tesseract --version=5.5.3.20260724 --yes --no-progress
+          choco install ghostscript --yes --no-progress
           Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
           refreshenv
           $tesseract = Get-Command tesseract.exe -ErrorAction Stop
@@ -127,6 +128,12 @@ jobs:
           node --version
           npm --version
           npm ci --no-audit --no-fund
+      - name: Reconstruct and verify eligible-only 56-image archive before provider access
+        shell: powershell
+        run: |
+          $python = Get-Command python.exe -ErrorAction Stop
+          & $python.Source scripts/prepare-ocrspace-eligible-56.py
+          if ($LASTEXITCODE -ne 0) { throw '56-image archive reconstruction or integrity preflight failed; OCR.Space provider submissions are prohibited.' }
       - name: Windows process-level persistence and recovery
         run: npm run test:persistence-recovery
       - name: Full Windows Node 22 test suite
