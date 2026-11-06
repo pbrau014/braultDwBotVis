@@ -37,9 +37,7 @@ async function readPdfBounded(response, maxBytes = MAX_SEARCHABLE_PDF_BYTES) {
         } finally { try { reader.releaseLock(); } catch {} }
         return Buffer.concat(chunks, total);
     }
-    const bytes = Buffer.from(await response.arrayBuffer());
-    if (bytes.length > maxBytes) throw fail('OCR.Space PDF exceeds the download size limit.', 'OCRSPACE_PDF_TOO_LARGE');
-    return bytes;
+    throw fail('OCR.Space PDF response does not support bounded streaming; refusing an unbounded body read.', 'OCRSPACE_PDF_STREAM_UNAVAILABLE');
 }
 
 async function downloadSearchablePdf(url, { fetchImpl = globalThis.fetch, timeoutMs = 45000 } = {}) {
