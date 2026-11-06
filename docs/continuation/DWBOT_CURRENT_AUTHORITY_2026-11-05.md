@@ -1,23 +1,32 @@
-# Current DWBOT authority — updated 2026-11-05
+# Current DWBOT authority — updated 2026-11-06
 
-## Controlling OCR architecture override
-OCR.Space Engine 2 must process the original World of Warships screenshot first and produce a searchable PDF. The PDF is downloaded and rendered locally; Tesseract.js, native Tesseract, PaddleOCR (when enabled), OpenCV geometry and all subsequent local image readers process only the PDF-derived raster. A successful OCR.Space stage must never be followed by local OCR of the original screenshot. Failure to produce/download/rasterize the PDF fails that image closed; no silent original-image fallback.
+## Controlling OCR.Space architecture and activation
 
-The current provider comparison marks Engine 2 searchable-PDF generation supported and Engine 3 unsupported. Engine 2 is therefore the first-pass engine. The user's explicit authorization in this chat covers OCR.Space processing of the 4-, 16-, and 64-image World of Warships screenshot inventories, including visible player names, and no unrelated images or private credentials/data.
+OCR.Space is the explicitly enabled, highest-priority text-extraction stage for every eligible original image in the authorized DWBOT screenshot inventories. Set `OCRSPACE_ENABLED=1`, `OCRSPACE_NETWORK_ALLOWLIST=1`, and provide a valid local `OCRSPACE_API_KEY`. Do not describe the active path as default-off, secondary, last-resort, or diagnostic-only.
 
-Production requires OCRSPACE_API_KEY. OCRSPACE_ENABLED=0 is an explicit local-only development/test mode. Live OCR.Space and exact-inventory acceptance remain unverified until the current Windows run and provider reports are inspected.
+OCR.Space Engine 2 must process each eligible original World of Warships screenshot first and create one searchable PDF. The searchable text layer is hidden from the rendered page but remains searchable. Download and validate the PDF over the approved HTTPS OCR.Space hosts, preserve its hash and bytes in the configured acceptance artifact directory, and render the PDF page locally to a bounded raster. Tesseract.js, native Tesseract, PaddleOCR (when enabled), OpenCV geometry and all subsequent local readers operate only on that PDF-derived raster. No local reader may fall back to the original screenshot after PDF-first processing begins. A missing/invalid PDF, failed download, failed required artifact preservation or rasterization error fails that image closed.
+
+The current provider comparison marks Engine 2 searchable-PDF generation supported and Engine 3 unsupported; Engine 2 is the PDF-producing first pass. One OCR.Space request/PDF per eligible source image. Provider response text and the PDF text layer remain separate diagnostic/provenance evidence and cannot independently accept, merge, rewrite or override mandatory fields.
+
+## Provider network policy
+
+`OCRSPACE_NETWORK_ALLOWLIST=1` explicitly permits HTTPS access to `api.ocr.space` and `ocr.space` for the provider request and temporary PDF download. The network guard must not block these provider hosts. `OCR_NON_OCR_NETWORK_RESTRICTED=1` restricts only unrelated outbound destinations; it is not a provider network block. Keep unrelated egress restricted rather than enabling arbitrary destinations.
+
+`OCRSPACE_ENABLED=0` is permitted only for isolated mocks/offline tests that do not submit an original image, or for downstream local-reader invocations after the successful PDF-first stage has already produced the raster. It must never be used to process an eligible original image as a local-only fallback.
+
+## Scope, privacy and acceptance
+
+The user's explicit upload authorization is limited to the named 4-, 16- and 64-image World of Warships inventories, including visible player names in those images. Do not transmit unrelated images, credentials, Discord IDs, private account data or unrelated UI. No paid tier/usage, production screenshot transmission, live Discord action or production deployment is authorized. Keep API keys out of source, chat, logs, reports and artifacts; retain quota reservations, no automatic retries, bounded requests, fail-closed behavior and current provider terms/privacy review.
+
+Nine mandatory fields remain exactly: result, player, map, mode, battleStart, credits, freeXp, damage, xp. XP is mandatory and ninth. Zero wrongly accepted mandatory values is required; Gate A also requires zero unresolved mandatory fields. Production remains NO-GO until all gates pass.
 
 ## Current source checkpoint
 
-Canonical main HEAD at this plan synchronization: 2f34557a200341e818349ac0e072980961415ec2. The current bot has one OCR.Space Engine 2 source-image request per screenshot; crop-only OCR.Space refinement is removed from the active bot. The 64-image PDF-first runner is registered but awaits the verified source archive and extraction root.
+- Canonical repository: `pbrau014/braultDwBotVis`, branch `main`.
+- Current main HEAD at this authority update: `23f92938ec02ebf9dd3bedd72f587183c47aa16d`.
+- Current living plan: `docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt`.
+- OCR.Space implementation guide: `docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md`.
+- The PDF-first source is implemented; the latest test correction and documentation sync are committed. No live provider request or provider PDF is verified in this chat. The local API key is unavailable here and the Actions secret's presence/value is unverified. Combined commit status returned no status entries; no exact-head CI pass is claimed.
+- Windows acceptance sets a per-run `OCRSPACE_ARTIFACT_DIR`; the 64-image runner writes per-image PDF/raster artifacts. For other runs requiring durable evidence, configure `OCRSPACE_ARTIFACT_DIR` and verify the actual files/checksums.
 
-## Canonical source
-- Repository: pbrau014/braultDwBotVis
-- Active branch: main only
-- Living plan: docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt
-- OCR.Space architecture: docs/OCRSPACE_ADAPTER_IMPLEMENTATION.md
-- Nine mandatory fields: result, player, map, mode, battleStart, credits, freeXp, damage, xp. XP is ninth and mandatory.
-- No wrong accepted mandatory values; no unresolved required values at Gate A/B.
-- Production remains NO-GO until every mandatory gate has current verified evidence.
-
-Older source/head statements below are historical and superseded by the dated living-plan override. Preserve provenance; do not treat historical run results as current-head acceptance.
+The canonical living plan controls the operational queue and supersedes older dated handoff/status text. Preserve the historical records below as provenance; do not promote their former Engine 3/crop-first/default-off instructions to current policy.
