@@ -6,7 +6,7 @@ const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
 const crypto = require('node:crypto');
-const { normalizeInventory, safeResolve } = require('../scripts/normalize-ocrspace-imagesF-63-pdf-rasters');
+const { normalizeInventory, safeResolve, compareRgbaPixels, SOURCE_SIMILARITY_LIMITS } = require('../scripts/normalize-ocrspace-imagesF-63-pdf-rasters');
 
 const sha = value => crypto.createHash('sha256').update(value).digest('hex');
 
@@ -38,6 +38,7 @@ test('all-image PDF raster normalizer is source-bound, fail-closed, and provider
       ? { width: 1920, height: 1080 }
       : buffer.equals(page) ? { width: 1818, height: 2573 } : { width: 1818, height: 1023 },
     renderPdf: async () => page,
+    resizeSource: async () => normalized,
     normalizeRaster: async (_buffer, dimensions) => ({
       buffer: normalized,
       normalization: {
@@ -56,6 +57,9 @@ test('all-image PDF raster normalizer is source-bound, fail-closed, and provider
   assert.equal(report.networkAccessRequired, false);
   assert.equal(report.images[0].checks.pdfPageProvenance, 'PASS');
   assert.equal(report.images[0].checks.sourceAspectNormalization, 'PASS');
+  assert.equal(report.images[0].checks.sourceSimilarity, 'PASS');
+  assert.equal(report.images[0].sourceSimilarity.meanAbsoluteError, 0);
+  assert.equal(report.images[0].sourceSimilarity.rootMeanSquareError, 0);
   assert.equal(report.images[0].normalizedRaster.width, 1818);
   assert.equal(report.images[0].normalizedRaster.height, 1023);
 });
@@ -64,4 +68,13 @@ test('all-image normalizer rejects unsafe artifact paths', () => {
   assert.equal(safeResolve('/tmp/artifacts', '../outside.pdf'), null);
   assert.equal(safeResolve('/tmp/artifacts', '/outside.pdf'), null);
   assert.equal(safeResolve('/tmp/artifacts', 'nested/file.pdf'), path.resolve('/tmp/artifacts/nested/file.pdf'));
+});
+
+test('source similarity metrics reject mismatched pixel buffers and expose bounded thresholds', () => {
+  assert.deepEqual(SOURCE_SIMILARITY_LIMITS, { meanAbsoluteError: 3, rootMeanSquareError: 8 });
+  assert.deepEqual(compareRgbaPixels(Buffer.from([0, 10, 20, 255]), Buffer.from([0, 12, 22, 255])), {
+    pixelCount: 1, channelCount: 4, meanAbsoluteError: 1, rootMeanSquareError: Math.SQRT2,
+  });
+  assert.throws(() => compareRgbaPixels(Buffer.from([0, 1, 2]), Buffer.from([0, 1, 2])), /equal, non-empty RGBA/);
+  assert.throws(() => compareRgbaPixels(Buffer.from([0, 1, 2, 3]), Buffer.from([0, 1, 2, 3, 4, 5, 6, 7])), /equal, non-empty RGBA/);
 });
