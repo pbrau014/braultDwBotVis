@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
+const { isReusableLocalReader, planReaderRecovery } = require('../src/ocrspace-local-reader-recovery');
 
 test('21-image local reader matrix is offline, source-bound, and never calls OCR.Space', () => {
     const script = read('scripts/recover-ocrspace-imagesF-21-local-readers.js');
@@ -33,7 +34,9 @@ test('parallel local readers preserve prior outputs and record every engine', ()
     assert.ok(script.includes('runSupervisedProcess'));
     assert.ok(script.includes('extractPdfText'));
     assert.ok(script.includes('parallelReaderMatrix'));
-    assert.ok(script.includes("enginesRequested: [...ENGINES, 'pdf-text-layer']"));
+    assert.ok(script.includes("enginesRequested: [...recoveryPlan.pending, 'pdf-text-layer']"));
+    assert.ok(script.includes('enginesPreserved: preservedReaders.map(item => item.engine)'));
+    assert.ok(script.includes('row.priorLocalReaderFailures'));
     assert.ok(script.includes('row.priorLocalReaders = row.priorLocalReaders || priorReaders'));
     assert.ok(script.includes('row.localReaderFailures = failures'));
     assert.ok(script.includes('sourcePdfSha256: row.pdfSha256'));
@@ -51,4 +54,30 @@ test('PaddleOCR local recovery preserves the underlying helper failure diagnosti
     assert.ok(child.includes('helperStatus: fallback.helperStatus || null'));
     assert.ok(recovery.includes('payload.output?.error || payload.output?.reason'));
     assert.ok(recovery.includes('PaddleOCR unavailable or incomplete:'));
+});
+
+
+test('local recovery preserves completed/partial readers and retries only missing or failed engines', () => {
+    const prior = [
+        { engine: 'tesseractjs', status: 'complete', record: { result: 'Victory' } },
+        { engine: 'native', status: 'failed-open', record: {} },
+        { engine: 'paddleocr', status: 'partial', record: { damage: '100000' } }
+    ];
+    const plan = planReaderRecovery(prior, ['tesseractjs', 'native', 'paddleocr']);
+    assert.deepEqual(plan.preserved.map(x => x.engine), ['tesseractjs', 'paddleocr']);
+    assert.deepEqual(plan.pending, ['native']);
+    assert.equal(isReusableLocalReader(prior[0], 'tesseractjs'), true);
+    assert.equal(isReusableLocalReader(prior[1], 'native'), false);
+});
+
+test('local recovery treats duplicate or malformed prior engine rows as ambiguous and reruns only that engine', () => {
+    const prior = [
+        { engine: 'tesseractjs', status: 'complete', record: { result: 'Victory' } },
+        { engine: 'native', status: 'complete' },
+        { engine: 'paddleocr', status: 'complete', record: { damage: '100000' } },
+        { engine: 'paddleocr', status: 'partial', record: { damage: '100000' } }
+    ];
+    const plan = planReaderRecovery(prior, ['tesseractjs', 'native', 'paddleocr']);
+    assert.deepEqual(plan.preserved.map(x => x.engine), ['tesseractjs']);
+    assert.deepEqual(plan.pending, ['native', 'paddleocr']);
 });
