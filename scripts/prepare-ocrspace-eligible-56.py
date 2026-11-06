@@ -93,6 +93,7 @@ def main() -> None:
     if len(verified) != 56: raise RuntimeError("Not all 56 eligible source images were verified.")
     if any((IMAGE_ROOT / r["filename"]).exists() for r in excluded):
         raise RuntimeError("A user-excluded image unexpectedly exists in the extraction root.")
+    provider_requests_authorized = os.environ.get("OCRSPACE_56_PROVIDER_REQUESTS_AUTHORIZED", "false").strip().lower() in {"1", "true", "yes"}
     report = {
         "schemaVersion": 1, "status": "verified-eligible-only-56",
         "sourceType": "repository-split-zip-parts-concatenated",
@@ -101,7 +102,10 @@ def main() -> None:
         "inventorySha256": hashlib.sha256(MANIFEST.read_bytes()).hexdigest(),
         "inventoryEntries": 64, "archiveMembers": 56, "eligibleMembersVerified": 56,
         "excludedRecords": 8, "excludedRecordsAbsent": True, "verifiedMembers": verified,
-        "providerRequestsPermitted": True,
+        "providerPreflightPassed": True,
+        "providerRequestsAuthorized": provider_requests_authorized,
+        "providerRequestsPermitted": provider_requests_authorized,
+        "providerRequestsMade": False,
     }
     REPORT.parent.mkdir(parents=True, exist_ok=True)
     REPORT.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
@@ -114,7 +118,7 @@ def main() -> None:
             f.write(f"OCRSPACE_64_IMAGE_ROOT={IMAGE_ROOT}\n")
             f.write(f"OCRSPACE_56_ARCHIVE_SHA256={archive_sha}\n")
             f.write(f"OCRSPACE_56_PREFLIGHT_REPORT={REPORT}\n")
-    print(json.dumps({k: report[k] for k in ("status", "archiveBytes", "archiveSha256", "archiveMembers", "eligibleMembersVerified", "excludedRecordsAbsent", "providerRequestsPermitted")}, indent=2))
+    print(json.dumps({k: report[k] for k in ("status", "archiveBytes", "archiveSha256", "archiveMembers", "eligibleMembersVerified", "excludedRecordsAbsent", "providerPreflightPassed", "providerRequestsAuthorized", "providerRequestsPermitted", "providerRequestsMade")}, indent=2))
 
 if __name__ == "__main__":
     try: main()
