@@ -3,7 +3,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
-const { samePreflight, pngInfo, extractStartedFixtures, parseJsonUtf8 } = require('../scripts/prepare-gateA-16-resume');
+const { samePreflight, pngInfo, extractStartedFixtures, parseJsonUtf8, originalNetworkEvidenceAllowsProvider } = require('../scripts/prepare-gateA-16-resume');
 
 test('Gate A resume compares substantive preflight identity, fixture order and hashes', () => {
     const a = { status:'PREFLIGHT_PASS_NO_PROVIDER_REQUESTS', candidateFingerprint:'a'.repeat(40),
@@ -55,4 +55,20 @@ test('Gate A resume parses BOM-prefixed JSON from the original uploaded artifact
         { schemaVersion: 1, status: 'FAIL' });
     assert.deepEqual(parseJsonUtf8(Buffer.from('{"schemaVersion":1}', 'utf8')),
         { schemaVersion: 1 });
+});
+
+
+test('Gate A never resumes paid OCR.Space requests without original zero-attempt network evidence', () => {
+    assert.equal(originalNetworkEvidenceAllowsProvider({
+        originalNetworkLogStatus: 'PRESENT', originalNetworkAttemptCount: 0
+    }), true);
+    assert.equal(originalNetworkEvidenceAllowsProvider({
+        originalNetworkLogStatus: 'MISSING_FROM_ORIGINAL_PARTIAL_ARTIFACT', originalNetworkAttemptCount: null
+    }), false);
+    assert.equal(originalNetworkEvidenceAllowsProvider({
+        originalNetworkLogStatus: 'RECONSTRUCTED_LIMITED_EVIDENCE', originalNetworkAttemptCount: null
+    }), false);
+    assert.equal(originalNetworkEvidenceAllowsProvider({
+        originalNetworkLogStatus: 'PRESENT', originalNetworkAttemptCount: 1
+    }), false);
 });
