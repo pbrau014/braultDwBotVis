@@ -85,6 +85,7 @@ test('verifies all 19 Gate B PDF/raster pairs, searchable text, source fingerpri
   assert.equal(report.checks.networkRestriction,'PASS');
   assert.equal(report.checks.localRecoveryNetworkRestriction,'PASS');
   assert.equal(report.checks.secretLeakScan,'PASS');
+  assert.equal(report.checks.originalScreenshotFallback,false);
   assert.equal(report.gateA.status,'PENDING');
 });
 
@@ -118,4 +119,21 @@ test('missing local-recovery network log fails closed even when original log is 
   assert.equal(report.status,'FAILED');
   assert.equal(report.checks.localRecoveryNetworkRestriction,'FAIL');
   assert.equal(report.checks.localRecoveryNetworkLogMatchesReport,false);
+});
+
+
+test('preserves BOM-prefixed reconstructed network evidence without upgrading it to a zero-attempt claim', async t => {
+  const f=await fixture(t);
+  const networkReconciliationPath=path.join(f.root,'network-log-reconciliation.json');
+  await fs.writeFile(networkReconciliationPath,'\\uFEFF'+JSON.stringify({
+    status:'RECONSTRUCTED_LIMITED_EVIDENCE', originalBlockedAttemptCount:null, zeroAttemptsClaimed:false
+  }));
+  const report=await verifyArtifacts({...f,networkReconciliationPath,
+    preflightReport:f.preflightPath,freshPreflightReport:f.freshPreflightPath,
+    groundTruth:f.gtPath,runReport:f.runPath,workflowSourceText,apiKey:'not-a-real-secret',
+    renderPdf:async()=>png(1600,900),readMetadata:metadataFor,
+    toRawRgba:async()=>Buffer.from('same-pixels'),readPdfText:async()=> 'searchable text'});
+  assert.equal(report.checks.networkLogReconciliationStatus,'RECONSTRUCTED_LIMITED_EVIDENCE');
+  assert.equal(report.networkLogReconciliation.zeroAttemptsClaimed,false);
+  assert.equal(report.checks.originalScreenshotFallback,false);
 });
