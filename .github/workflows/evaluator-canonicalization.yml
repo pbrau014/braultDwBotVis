@@ -1,0 +1,48 @@
+name: Gate B evaluator canonicalization regression
+
+on:
+  push:
+    branches:
+      - fix/gateB-evaluator-canonical-hashes-and-numeric-normalization
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'scripts/evaluate-ocrspace-imagesF-63-ground-truth.py'
+      - 'scripts/verify-ocrspace-imagesF-21-artifacts.js'
+      - 'tests/evaluator-canonicalization.test.js'
+      - 'tests/ocrspace-imagesF-21-artifact-verifier.test.js'
+      - '.github/workflows/evaluator-canonicalization.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  evaluator-regression:
+    name: ${{ matrix.os }} evaluator regression
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact candidate
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.16.0
+          cache: npm
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Python syntax check
+        run: python -m py_compile scripts/evaluate-ocrspace-imagesF-63-ground-truth.py
+      - name: Strict numeric and canonical JSON tests
+        run: node --test tests/evaluator-canonicalization.test.js
+      - name: Artifact verifier provenance and canonical hash tests
+        run: node --test tests/ocrspace-imagesF-21-artifact-verifier.test.js
