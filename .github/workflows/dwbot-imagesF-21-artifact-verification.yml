@@ -1,6 +1,19 @@
 name: DWBOT 19-image Gate B artifact verification and post-hoc evaluation
 
 on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/dwbot-imagesF-21-artifact-verification.yml'
+      - 'scripts/verify-ocrspace-imagesF-21-artifacts.js'
+      - 'scripts/recover-ocrspace-imagesF-21-local-readers.js'
+      - 'src/image-processor.js'
+      - 'src/ocrspace-pdf-first.js'
+      - 'tests/ocrspace-imagesF-21-artifact-verifier.test.js'
+      - 'tests/ocrspace-imagesF-21-local-recovery.test.js'
+      - 'tests/image-processor.test.js'
+      - 'tests/ocrspace-pdf-first.test.js'
+      - 'package.json'
   push:
     branches: [main]
     paths:
