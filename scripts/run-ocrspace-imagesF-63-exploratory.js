@@ -105,10 +105,6 @@ async function main() {
             const rasterName = stem + '.pdf-page.png';
             const pdfPath = path.join(outputRoot, pdfName);
             const rasterPath = path.join(outputRoot, rasterName);
-            await fs.writeFile(pdfPath, pdfFirst.pdfBuffer, { flag: 'wx' });
-            await fs.writeFile(rasterPath, pdfFirst.rasterBuffer, { flag: 'wx' });
-            const localReaders = [];
-            for (const engine of engines) localReaders.push(await extractWithEngine(pdfFirst.rasterBuffer, engine));
             row.status = 'pdf-first-complete';
             row.uploadBytes = pdfFirst.uploadBytes;
             row.uploadSha256 = pdfFirst.uploadSha256;
@@ -130,11 +126,21 @@ async function main() {
                 searchablePdfUrlHost: pdfFirst.searchablePdfUrlHost,
                 parsedText: pdfFirst.providerText
             };
-            row.localReaders = localReaders;
+            await fs.writeFile(pdfPath, pdfFirst.pdfBuffer, { flag: 'wx' });
+            await fs.writeFile(rasterPath, pdfFirst.rasterBuffer, { flag: 'wx' });
+            row.localReaders = [];
+            row.localReaderFailures = [];
+            for (const engine of engines) {
+                try { row.localReaders.push(await extractWithEngine(pdfFirst.rasterBuffer, engine)); }
+                catch (readerError) {
+                    row.localReaderFailures.push({ engine, code: readerError.code || null, message: String(readerError.message || readerError).slice(0, 400) });
+                }
+            }
         } catch (error) {
             row.status = 'failed';
             row.failure = { code: error.code || null, message: String(error.message || error).slice(0, 500) };
         }
+        if (row.status === 'failed' && row.pdfSha256) row.status = 'pdf-first-complete-local-artifact-error';
         run.results.push(row);
         run.completedImages = run.results.length;
         run.updatedAt = new Date().toISOString();
