@@ -47,6 +47,26 @@ def is_complete_reference(row):
                and norm(field, expected.get(field)) is not None for field in FIELDS)
 
 
+def verify_gate_b_independence(selected_records):
+    root = Path(__file__).resolve().parents[1]
+    dev_path = root / "testdata" / "additional-screenshot-ground-truth.json"
+    dev = json.loads(dev_path.read_text(encoding="utf-8"))
+    dev_hashes = {row["sha256"] for row in dev.get("records", [])}
+    regression_dir = root / "fixtures" / "four-screenshots"
+    regression_files = [p for p in regression_dir.iterdir() if p.suffix.lower() in {".png", ".jpg", ".jpeg"}]
+    if len(dev_hashes) != 16 or len(regression_files) != 4:
+        raise SystemExit("Gate B independence inputs are incomplete; expected 16 development and 4 regression images.")
+    dev_overlap = sorted({r["sourceImage"]["sha256"] for r in selected_records} & dev_hashes)
+    regression_hashes = {sha(p) for p in regression_files}
+    regression_overlap = sorted({r["sourceImage"]["sha256"] for r in selected_records} & regression_hashes)
+    if dev_overlap or regression_overlap:
+        raise SystemExit("Gate B holdout overlaps a development/regression corpus by source SHA-256.")
+    return {
+        "sixteenImageDevelopmentCorpus": {"status": "PASS", "imageCount": len(dev_hashes), "overlapCount": 0},
+        "fourImageRegressionCorpus": {"status": "PASS", "imageCount": len(regression_files), "overlapCount": 0}
+    }
+
+
 def select_gate_b_records(gt):
     records = gt.get("records", [])
     selected = [r for r in records if is_complete_reference(r)]
@@ -56,6 +76,7 @@ def select_gate_b_records(gt):
         source = row.get("sourceImage") or {}
         if not re.fullmatch(r"[0-9a-f]{64}", str(source.get("sha256", ""))) or int(source.get("bytes") or 0) <= 0:
             raise SystemExit("Gate B source-image fingerprint is incomplete: " + str(row.get("filename")))
+    verify_gate_b_independence(selected)
     return selected
 
 
@@ -348,6 +369,7 @@ def main():
             "missingSelectedImages": missing_selected,
             "sourceCorpusImageCount": len(gt["records"]),
             "selectedFilenames": selected_names,
+            "independenceChecks": verify_gate_b_independence(selected_records) if args.inventory == GATE_B_INVENTORY else {"status": "NOT_APPLICABLE"},
             "selectionRule": "exactly the first 21 corpus-order records with COMPLETE_9_FIELD_TRANSCRIPTION and all nine non-empty expected values eligible_for_exact_match=true" if args.inventory == GATE_B_INVENTORY else "all 63 source-corpus records"
         },
         "imageCount": len(selected_records),
@@ -367,6 +389,7 @@ def main():
             "minimumExactMatchRate": None,
             "accuracyThresholdPolicy": "No numeric exact-match floor is defined in the governing plan; report measured rates. Zero wrongly accepted mandatory values remains a hard blocker.",
             "completeNineFieldLabelsRequired": True,
+            "zeroSourceHashOverlapWithSixteenImageDevelopmentAndFourImageRegressionCorpora": True,
             "allSelectedPdfAndRasterArtifactsVerified": True,
             "zeroWronglyAcceptedMandatoryFieldValues": True,
             "zeroUnauthorizedNetworkAttempts": True,
