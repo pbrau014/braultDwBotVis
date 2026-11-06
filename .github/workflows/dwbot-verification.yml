@@ -142,9 +142,9 @@ jobs:
       - name: Current-source Tesseract.js and native Tesseract screenshot acceptance
         shell: powershell
         env:
-          OCRSPACE_ENABLED: '0'
+          OCRSPACE_ENABLED: '1'
           OCRSPACE_API_KEY: ${{ secrets.OCRSPACE_API_KEY }}
-          OCRSPACE_NETWORK_ALLOWLIST: '0'
+          OCRSPACE_NETWORK_ALLOWLIST: '1'
           OCR_NON_OCR_NETWORK_RESTRICTED: '1'
         run: npm run test:windows-native-ocr
       - name: Upload Windows acceptance evidence even on failure

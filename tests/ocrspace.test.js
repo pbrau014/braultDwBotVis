@@ -279,32 +279,19 @@ test('crop cap parser is bounded to seven', () => {
     assert.equal(parseCropCap('99'), 7);
 });
 
-test('bot runs the geometry-only OCR.Space prepass before Tesseract and excludes identity crops', async () => {
+test('bot runs OCR.Space Engine 2 PDF-first before local readers and retains PDF-derived artifacts', async () => {
     const bot = await fs.readFile(path.join(__dirname, '..', 'src', 'bot.js'), 'utf8');
-    const prepass = bot.indexOf('OCR.Space-first prepass');
+    const pdfFirst = bot.indexOf('const pdfFirst = await createOcrSpacePdfFirst');
+    const rasterHandoff = bot.indexOf('imageBuffer = rasterBuffer', pdfFirst);
     const worker = bot.indexOf('const worker = await getOcrWorker()');
-    assert.ok(prepass >= 0 && prepass < worker);
-    assert.ok(prepass < bot.indexOf('await paddleOcrFieldFallback.applyFieldFallback'));
-    assert.ok(bot.includes('force: ocrSpaceConfigured'));
-    assert.ok(bot.includes('filterSafeOcrSpaceCropPlan'));
-    assert.ok(bot.includes('cropPlan: safeCropPlan'));
-    assert.ok(bot.includes('localized-column-unavailable-fail-closed'));
-    assert.ok(bot.includes('stableConflictsWithSupportedCandidate'));
-    assert.ok(bot.includes('anchorHasIndependentConflict'));
-    assert.ok(bot.includes('explicitGeometryResolution'));
-    assert.ok(bot.includes('legacyRewardCandidates.some(candidate =>'));
-    assert.ok(bot.includes('rewardConflictCandidates'));
-    assert.ok(bot.includes('localizedRewardEvidence.attempted && !localizedTupleComplete'));
-    assert.ok(bot.includes('getOcrSpaceActivation(process.env)'));
+    assert.ok(pdfFirst >= 0 && rasterHandoff > pdfFirst && rasterHandoff < worker);
     assert.ok(bot.includes('const ocrSpaceConfigured = ocrSpaceActivation.enabled'));
-    assert.equal(bot.includes("addCrop('player'"), false);
-    assert.equal(bot.includes("'localized-player-identity'"), false);
-    assert.ok(bot.includes('reconcileOcrSpaceEvidence(extractedFields.ocrSpaceEvidence, record)'));
-    assert.ok(bot.includes('ocrSpaceReconciliation,'));
-    assert.ok(bot.includes('OCR.Space diagnostic cross-check (no acceptance authority)'));
-    assert.ok(bot.includes("player: 'excluded_by_privacy_policy'"));
+    assert.ok(bot.includes("source: 'ocrspace-searchable-pdf'"));
+    assert.ok(bot.includes('OCR.Space is the required primary text-extraction stage.'));
+    assert.ok(bot.includes('OCRSPACE_ENABLED=1'));
+    assert.ok(bot.includes("const pdfPath = path.join(artifactDir, stem + '.ocrspace.pdf')"));
+    assert.ok(bot.includes("const rasterPath = path.join(artifactDir, stem + '.ocrspace-page.png')"));
 });
-
 
 test('quota ledger serializes independent Windows/Node processes and atomically replaces the existing state', async () => {
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'ocrspace-cross-process-'));

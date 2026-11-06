@@ -190,3 +190,20 @@ test('Node.js 22.16.0 is the accepted runtime baseline; Node 24 is not mandatory
     assert.doesNotMatch(workflow, /node-version:\s*24(?:\.|\s|$)/);
     assert.match(windowsAcceptance, /MinimumNodeVersion\s*=\s*'22\.16\.0'/);
 });
+
+
+test('eligible screenshot acceptance uses OCR.Space PDF-first and retains the isolated offline lifecycle test', () => {
+    const root = path.join(__dirname, '..');
+    const acceptance = fs.readFileSync(path.join(root, 'scripts', 'accept-tesseractjs.js'), 'utf8');
+    const windowsAcceptance = fs.readFileSync(path.join(root, 'scripts', 'run-windows-ocr-acceptance.ps1'), 'utf8');
+    const workflow = fs.readFileSync(path.join(root, '.github', 'workflows', 'dwbot-verification.yml'), 'utf8');
+
+    assert.match(acceptance, /OCRSPACE_ENABLED:\s*'1'/);
+    assert.match(acceptance, /OCRSPACE_NETWORK_ALLOWLIST:\s*'1'/);
+    assert.match(acceptance, /OCRSPACE_ARTIFACT_DIR:\s*path\.join\(runDir/);
+    assert.match(acceptance, /isolated-asashio-stall-recovery-lifecycle[\s\S]*?OCRSPACE_ENABLED:\s*'0'[\s\S]*?OCRSPACE_NETWORK_ALLOWLIST:\s*'0'/);
+    assert.match(windowsAcceptance, /OCRSPACE_ENABLED='1'/);
+    assert.match(windowsAcceptance, /OCRSPACE_NETWORK_ALLOWLIST='1'/);
+    assert.match(workflow, /OCRSPACE_ENABLED:\s*'1'/);
+    assert.match(workflow, /OCRSPACE_NETWORK_ALLOWLIST:\s*'1'/);
+});

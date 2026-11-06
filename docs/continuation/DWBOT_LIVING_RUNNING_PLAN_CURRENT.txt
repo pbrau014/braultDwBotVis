@@ -4589,3 +4589,94 @@ COMBINED-PLAN SOURCE INTEGRATION NOTE — 2026-11-05
 ================================================================================
 END COMBINED-PLAN SOURCE INTEGRATION NOTE
 ================================================================================
+
+
+================================================================================
+DWBOT-UPD-2026-11-06-001 — EXACT-HEAD CI FAILURE DIAGNOSIS / PDF-FIRST ACCEPTANCE ALIGNMENT
+================================================================================
+
+Canonical repository: pbrau014/braultDwBotVis, branch main.
+Source parent inspected before this update: 5e8e181cec211042b1daf271c02f00459c3cec38.
+Historical exact-head verification run 391:
+https://github.com/pbrau014/braultDwBotVis/actions/runs/42146189637
+Run 391 tested b05f4dc668c963add8ca261f34f3f012b36eb5e3, not this subsequent correction.
+
+Run 391 evidence:
+- Linux Node 22.16.0 job FAILED in npm run test:ocrspace.
+- The test loader exposed an invalid over-escaped Unicode property regex in
+  src/battle-record.js: preferredMapSpelling attempted to compile \\p{L}.
+  This caused SyntaxError and cascading failures in battle-record, OCR.Space
+  reconciliation, desktop service, full-system, PaddleOCR, Tesseract acceptance
+  and workflow-contract test files.
+- tests/ocrspace.test.js also expected isOverlayRequired to be absent (null),
+  while src/ocrspace-client.js correctly sends the explicit string 'false'
+  for a legacy non-PDF request. The test expectation was stale.
+- A third OCR.Space test still asserted the retired geometry-only field prepass.
+  Current bot source instead performs OCR.Space Engine 2 PDF-first, replaces
+  imageBuffer with the PDF-derived raster, and only then initializes local
+  Tesseract. The test was updated to assert this active architecture and
+  retained PDF/raster artifacts.
+- Windows Node 22 full suite failed for the same regex and stale OCR.Space
+  assertions. Windows process-level persistence/recovery itself passed.
+- The protected OCR.Space secret-check and screenshot acceptance steps were
+  skipped because the preceding full Windows suite failed. No live OCR.Space
+  request is claimed from run 391.
+- PDF manual rendering passed. Clean-package verification failed because
+  npm test in the extracted package reproduced the same source/test failures.
+- Run 391 uploaded:
+  * dwbot-windows-node22-native-ocr-and-recovery
+    artifact ID 13469574695, SHA-256
+    14f1297ca91a308e9f6285c0ab4c8beb209e09c070be4dce9c5bb9ffadbe3a04.
+  * dwbot-pdf-manual-and-clean-package
+    artifact ID 13470567139, SHA-256
+    4cffe58eaa9450f6311e0ea9c218150ba859b434811ad41b14b7d2777d1f1951.
+  These are historical evidence for run 391's exact SHA, not evidence for later
+  source commits.
+
+Correction already committed:
+- 5e8e181cec211042b1daf271c02f00459c3cec38 corrected the two Unicode property
+  regex literals in src/battle-record.js and corrected the explicit-false
+  overlay assertion in tests/ocrspace.test.js.
+- This did not yet address the stale geometry-prepass test or acceptance
+  runner's local-original-image paths; those are addressed in this update.
+
+Acceptance alignment:
+- The active OCR.Space rule requires every eligible original screenshot in
+  approved inventories to enter OCR.Space Engine 2 PDF-first with
+  OCRSPACE_ENABLED=1, OCRSPACE_NETWORK_ALLOWLIST=1 and a protected key.
+  Tesseract.js/native Tesseract and OpenCV operate only on the resulting PDF
+  raster. Retain searchable PDFs and raster artifacts per acceptance stage.
+- The Tesseract.js acceptance launcher now enables/allowlists OCR.Space for
+  eligible screenshot checks and assigns a distinct PDF/raster artifact folder
+  per stage. The isolated synthetic Asashio stall-lifecycle test explicitly
+  remains offline/mock with OCRSPACE_ENABLED=0 and network allowlist 0; it is
+  not an eligible screenshot acceptance run.
+- Windows screenshot acceptance now keeps OCR.Space enabled/allowlisted for
+  the Tesseract.js and native Tesseract screenshot checks, including the
+  OpenCV-assisted comparisons. The workflow step passes the same explicit
+  provider settings. The OCR.Space secret remains protected and its value is
+  never logged.
+- Tests now assert the current PDF-first implementation and guard the
+  acceptance runner/workflow against accidentally disabling OCR.Space for
+  eligible screenshot acceptance.
+- The 4-/16-image exact-match acceptance remains fail-closed on all nine
+  required fields. No XP relaxation, fuzzy repair, ground-truth changes or
+  automatic provider retry is introduced.
+- The 64-image archive and independent 50-minimum/100-preferred holdout remain
+  separate open gates; no substitute corpus is promoted.
+
+Verification disposition:
+- Run 391 is FAILED and remains historical; do not rewrite or relabel it.
+- Commit 5e8e181 is a targeted source/test correction, not a verified pass.
+- This update must be verified by its own exact-head Actions run. Review every
+  job/step and artifact, then inspect the Windows PDF/audit/sequence reports
+  before assigning OCR accuracy status.
+- Provider secret availability, live provider request, exact 4-/16-image
+  outcomes, 64-image inventory, independent holdout, desktop OAuth/browser,
+  isolated live Discord, security, restore and final package acceptance remain
+  unverified/open unless a later exact artifact proves them.
+- Production remains NO-GO.
+
+================================================================================
+END DWBOT-UPD-2026-11-06-001
+================================================================================

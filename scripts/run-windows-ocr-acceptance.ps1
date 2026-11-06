@@ -39,9 +39,9 @@ try {
  $env:OCR_CV_ASSIST='0'
  if(-not $env:OCRSPACE_API_KEY){throw 'OCRSPACE_API_KEY is not available. OCR.Space-first acceptance is blocked; no local-original-image substitute is permitted.'}
  Write-Host 'OCRSPACE_API_KEY configured: yes (value withheld).'
- # Default to local-only. Explicitly enable OCR.Space only for the approved 4/16-image corpora.
- $env:OCRSPACE_ENABLED='0'
- $env:OCRSPACE_NETWORK_ALLOWLIST='0'
+ # Every eligible source screenshot uses OCR.Space Engine 2 PDF-first; local engines read only the retained PDF raster.
+ $env:OCRSPACE_ENABLED='1'
+ $env:OCRSPACE_NETWORK_ALLOWLIST='1'
  $env:OCRSPACE_ARTIFACT_DIR=Join-Path $RunDir 'ocrspace-searchable-pdfs'
  $env:OCR_NON_OCR_NETWORK_RESTRICTED='1'
  $Guard=(Join-Path $ProjectRoot 'scripts\block-network.js').Replace('\','/')
@@ -85,16 +85,16 @@ try {
   $script:Results += [pscustomobject]@{label=$Label;arguments=$Arguments;exitCode=$Code;log=[System.IO.Path]::GetFileName($Log);passed=($Code -eq 0)}
   Write-Host "[WINDOWS-OCR] $Outcome $Label exit=$Code"
  }
- $env:OCRSPACE_ENABLED='0'
- $env:OCRSPACE_NETWORK_ALLOWLIST='0'
+ $env:OCRSPACE_ENABLED='1'
+ $env:OCRSPACE_NETWORK_ALLOWLIST='1'
  $env:OCR_ENGINE='tesseractjs'
  $env:OCR_ACCEPTANCE_RUN_DIR=Join-Path $RunDir 'tesseractjs-baseline'
  Invoke-LoggedNpm -Label 'tesseractjs-full-current-source-acceptance' -Arguments @('run','test:tesseractjs')
  $BaselineJsReportPath=Join-Path $env:OCR_ACCEPTANCE_RUN_DIR 'acceptance-report.json'
  $BaselineJsReport=$null
  if(Test-Path -LiteralPath $BaselineJsReportPath -PathType Leaf){$BaselineJsReport=Get-Content -LiteralPath $BaselineJsReportPath -Raw | ConvertFrom-Json}
- $env:OCRSPACE_ENABLED='0'
- $env:OCRSPACE_NETWORK_ALLOWLIST='0'
+ $env:OCRSPACE_ENABLED='1'
+ $env:OCRSPACE_NETWORK_ALLOWLIST='1'
  $env:OCR_ENGINE='native'
  $env:REPORTED_SCREENSHOT_REPORT_PATH=Join-Path $RunDir 'reported-native.json'
  $env:OCR_NON_OCR_NETWORK_LOG=Join-Path $RunDir 'reported-native-network-attempts.log'
@@ -137,8 +137,8 @@ try {
  $env:OCR_CV_ASSIST='1'
  $env:OCR_CV_DEBUG='1'
  $env:OCR_ACCEPTANCE_BATCH_REPEATS='1'
- $env:OCRSPACE_ENABLED='0'
- $env:OCRSPACE_NETWORK_ALLOWLIST='0'
+ $env:OCRSPACE_ENABLED='1'
+ $env:OCRSPACE_NETWORK_ALLOWLIST='1'
  $env:OCR_ACCEPTANCE_RUN_DIR=Join-Path $RunDir 'tesseractjs-cv-assisted'
  $env:OCR_ENGINE='tesseractjs'
  Invoke-LoggedNpm -Label 'cv-assisted-tesseractjs-full-acceptance' -Arguments @('run','test:tesseractjs')
@@ -149,8 +149,8 @@ try {
   $CvJsReport=Get-Content -LiteralPath $CvJsReportPath -Raw | ConvertFrom-Json
   $CvJsExact=($CvJsReport.passed -eq $true) -and ($CvJsReport.networkIsolation.nonOcrDeniedAttemptsDetected -eq $false)
  }
- $env:OCRSPACE_ENABLED='0'
- $env:OCRSPACE_NETWORK_ALLOWLIST='0'
+ $env:OCRSPACE_ENABLED='1'
+ $env:OCRSPACE_NETWORK_ALLOWLIST='1'
  $env:OCR_ENGINE='native'
  $env:REPORTED_SCREENSHOT_REPORT_PATH=Join-Path $RunDir 'reported-native-cv.json'
  $env:OCR_NON_OCR_NETWORK_LOG=Join-Path $RunDir 'reported-native-cv-network-attempts.log'

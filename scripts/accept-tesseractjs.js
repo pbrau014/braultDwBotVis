@@ -32,9 +32,11 @@ function run(label, args, envOverrides = {}, nonOcrNetworkRestricted = false) {
         OCR_DEBUG_TIMINGS: '1',
         OCR_RECYCLE_WORKER_PER_IMAGE: '1',
         OCR_OPERATION_TIMEOUT_MS: process.env.OCR_OPERATION_TIMEOUT_MS || '15000',
-        // Default all other fixture checks to local-only; only the explicitly approved 16-image corpus opts into OCR.Space.
-        OCRSPACE_ENABLED: '0',
-        OCRSPACE_NETWORK_ALLOWLIST: '0',
+        // Eligible source screenshots use OCR.Space Engine 2 PDF-first; local readers consume the retained PDF raster.
+        // Only the isolated synthetic stall-recovery lifecycle below explicitly opts into offline mode.
+        OCRSPACE_ENABLED: '1',
+        OCRSPACE_NETWORK_ALLOWLIST: '1',
+        OCRSPACE_ARTIFACT_DIR: path.join(runDir, `${label.replace(/[^a-z0-9_-]/gi, '-')}-ocrspace-pdfs`),
         ...envOverrides,
     };
     if (nonOcrNetworkRestricted) {
@@ -62,7 +64,7 @@ function run(label, args, envOverrides = {}, nonOcrNetworkRestricted = false) {
     try {
         child = spawnSync(process.execPath, argv, {
             cwd: root, env, encoding: 'utf8', maxBuffer: 30 * 1024 * 1024,
-            timeout: Number(process.env.OCR_ACCEPTANCE_CHILD_TIMEOUT_MS) || (label === 'additional-sixteen-images-sequential-ocrspace-allowlisted' ? 1_200_000 : 480_000),
+            timeout: Number(process.env.OCR_ACCEPTANCE_CHILD_TIMEOUT_MS) || (label === 'additional-sixteen-images-sequential-ocrspace-pdf-first' ? 1_200_000 : 480_000),
             detached: process.platform !== 'win32',
             stdio: ['ignore', stdoutFd, stderrFd],
         });
@@ -226,6 +228,8 @@ function report() {
         run('isolated-asashio-stall-recovery-lifecycle', [
             'scripts/integrated-ocr-stall-recovery.js', '--fixture=asashio-defeat.jpg', '--lifecycle-only',
         ], {
+            OCRSPACE_ENABLED: '0',
+            OCRSPACE_NETWORK_ALLOWLIST: '0',
             OCR_OPERATION_TIMEOUT_MS: process.env.OCR_INJECTED_STALL_OPERATION_TIMEOUT_MS || '15000',
         }, true);
 
@@ -235,7 +239,7 @@ function report() {
         run('integrated-reported-screenshot-recovery-exactness', ['scripts/integrated-ocr-stall-recovery.js'], {
             OCR_OPERATION_TIMEOUT_MS: process.env.OCR_INJECTED_STALL_OPERATION_TIMEOUT_MS || '15000',
         }, true);
-        run('reported-screenshot-local-only', ['scripts/run-reported-screenshot-regression.js'], {
+        run('reported-screenshot-pdf-first', ['scripts/run-reported-screenshot-regression.js'], {
             REPORTED_SCREENSHOT_REPORT_PATH: path.join(runDir, 'reported-screenshot.json'),
             OCR_NON_OCR_NETWORK_LOG: nonOcrNetworkLogPath,
             OCR_NON_OCR_NETWORK_RESTRICTED: '1',
@@ -246,18 +250,18 @@ function report() {
         // override OCR_ACCEPTANCE_BATCH_REPEATS without shell-specific syntax.
         const batchRepeats = Math.max(1, Math.min(3, Number(process.env.OCR_ACCEPTANCE_BATCH_REPEATS) || 3));
         for (let batch = 1; batch <= batchRepeats; batch += 1) {
-            run(`five-image-sequential-local-only-${batch}`, ['scripts/run-ocr-sequence.js'], {
+            run(`five-image-sequential-ocrspace-pdf-first-${batch}`, ['scripts/run-ocr-sequence.js'], {
                 OCR_SEQUENCE_REPORT_PATH: path.join(runDir, `five-image-sequence-${batch}.json`),
                 OCR_NON_OCR_NETWORK_LOG: nonOcrNetworkLogPath,
                 OCR_NON_OCR_NETWORK_RESTRICTED: '1',
             }, true);
         }
-        run('hoffmann-then-asashio-local-only', ['scripts/run-ocr-sequence.js', 'hoffmann-victory.png', 'asashio-defeat.jpg'], {
+        run('hoffmann-then-asashio-pdf-first', ['scripts/run-ocr-sequence.js', 'hoffmann-victory.png', 'asashio-defeat.jpg'], {
             OCR_SEQUENCE_REPORT_PATH: path.join(runDir, 'hoffmann-asashio.json'),
             OCR_NON_OCR_NETWORK_LOG: nonOcrNetworkLogPath,
             OCR_NON_OCR_NETWORK_RESTRICTED: '1',
         }, true);
-        run('asashio-then-hoffmann-local-only', ['scripts/run-ocr-sequence.js', 'asashio-defeat.jpg', 'hoffmann-victory.png'], {
+        run('asashio-then-hoffmann-pdf-first', ['scripts/run-ocr-sequence.js', 'asashio-defeat.jpg', 'hoffmann-victory.png'], {
             OCR_SEQUENCE_REPORT_PATH: path.join(runDir, 'asashio-hoffmann.json'),
             OCR_NON_OCR_NETWORK_LOG: nonOcrNetworkLogPath,
             OCR_NON_OCR_NETWORK_RESTRICTED: '1',
