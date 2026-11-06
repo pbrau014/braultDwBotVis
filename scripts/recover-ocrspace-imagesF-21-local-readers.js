@@ -57,6 +57,24 @@ function selectedRecords(gt) {
     return selected;
 }
 
+function isReusableLocalReader(reader, engine) {
+    return Boolean(reader && reader.engine === engine
+        && ['complete', 'partial'].includes(reader.status)
+        && reader.record && typeof reader.record === 'object' && !Array.isArray(reader.record));
+}
+
+function planReaderRecovery(priorReaders) {
+    const rows = Array.isArray(priorReaders) ? priorReaders : [];
+    const preserved = [];
+    const pending = [];
+    for (const engine of ENGINES) {
+        const matching = rows.filter(reader => reader?.engine === engine);
+        if (matching.length === 1 && isReusableLocalReader(matching[0], engine)) preserved.push(matching[0]);
+        else pending.push(engine);
+    }
+    return { preserved, pending };
+}
+
 async function extractLocalReader(rasterBuffer, engine, networkLogPath) {
     const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'dwbot-parallel-reader-'));
     const outputPath = path.join(tempDir, 'reader-output.json');
@@ -206,9 +224,14 @@ async function main() {
 
             const priorReaders = Array.isArray(row.localReaders) ? row.localReaders : [];
             row.priorLocalReaders = row.priorLocalReaders || priorReaders.map(item => ({ ...item }));
+            row.priorLocalReaderFailures = row.priorLocalReaderFailures
+                || (Array.isArray(row.localReaderFailures) ? row.localReaderFailures.map(item => ({ ...item })) : []);
+            const recoveryPlan = planReaderRecovery(priorReaders);
+            const preservedReaders = recoveryPlan.preserved.map(item => ({ ...item }));
+            image.preservedEngines.push(...preservedReaders.map(item => item.engine));
             const startedAt = new Date().toISOString();
             const tasks = [
-                ...ENGINES.map(engine => ({ engine, run: () => extractLocalReader(rasterBuffer, engine, networkLogPath) })),
+                ...recoveryPlan.pending.map(engine => ({ engine, run: () => extractLocalReader(rasterBuffer, engine, networkLogPath) })),
                 { engine: 'pdf-text-layer', run: async () => {
                     const text = await extractPdfText(pdfPath);
                     if (!text.trim()) { const error = new Error('Searchable PDF text layer is empty.'); error.code = 'PDF_TEXT_LAYER_EMPTY'; throw error; }
@@ -217,7 +240,7 @@ async function main() {
                 } }
             ];
             const settled = await Promise.allSettled(tasks.map(task => task.run()));
-            const localReaders = [];
+            const localReaders = [...preservedReaders];
             const failures = [];
             let pdfTextLayer = null;
             for (let index = 0; index < tasks.length; index += 1) {
@@ -234,6 +257,7 @@ async function main() {
                     image.failures.push(failure);
                 }
             }
+            localReaders.sort((a, b) => ENGINES.indexOf(a.engine) - ENGINES.indexOf(b.engine));
             if (!pdfTextLayer) pdfTextLayer = { engine: 'pdf-text-layer', status: 'failed', record: {}, textCharacters: 0, textSha256: null };
             row.localReaders = localReaders;
             row.localReaderFailures = failures;
@@ -245,7 +269,8 @@ async function main() {
                 sourceRasterSha256: row.rasterSha256,
                 startedAt,
                 completedAt: new Date().toISOString(),
-                enginesRequested: [...ENGINES, 'pdf-text-layer'],
+                enginesRequested: [...recoveryPlan.pending, 'pdf-text-layer'],
+                enginesPreserved: preservedReaders.map(item => item.engine),
                 enginesCompleted: localReaders.map(item => item.engine),
                 pdfTextLayer, localReaders, failures,
                 providerRequests: 0, originalScreenshotFallback: false
@@ -255,6 +280,8 @@ async function main() {
                 startedAt, completedAt: row.parallelReaderMatrix.completedAt,
                 timeoutMs: Number(process.env.OCR_SUPERVISED_TIMEOUT_MS),
                 providerRequests: 0, networkLogPath: path.basename(networkLogPath),
+                enginesRequested: [...recoveryPlan.pending, 'pdf-text-layer'],
+                enginesPreserved: preservedReaders.map(item => item.engine),
                 status: failures.length ? 'PARTIAL' : 'COMPLETE'
             };
             image.parallelEngines = row.parallelReaderMatrix.enginesCompleted;
@@ -305,4 +332,4 @@ if (require.main === module) {
         process.exitCode = 1;
     });
 }
-module.exports = { extractLocalReader, sha256, safePath };
+module.exports = { extractLocalReader, sha256, safePath, isReusableLocalReader, planReaderRecovery };
