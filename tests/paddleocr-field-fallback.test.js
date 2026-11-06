@@ -212,17 +212,17 @@ test('PaddleOCR field fallback uses a bounded 60-second CPU inference budget', (
 test('PaddleOCR helper emits ASCII-safe JSON for non-ASCII OCR text on Windows code pages', async (t) => {
     const helperPath = path.join(__dirname, '..', 'scripts', 'paddleocr_field_crops.py');
     const helperSource = await fs.readFile(helperPath, 'utf8');
-    const serializers = [...helperSource.matchAll(/json\\.dumps\\(payload,\\s*ensure_ascii=(True|False)/g)];
+    const serializers = [...helperSource.matchAll(/json\.dumps\(payload,\s*ensure_ascii=(True|False)/g)];
     assert.equal(serializers.length, 2, 'success and error payloads must both use the explicit serializer');
     assert.ok(serializers.every(match => match[1] === 'True'), 'stdout JSON must escape non-ASCII text');
 
     const python = process.platform === 'win32' ? 'python' : 'python3';
     const probe = spawnSync(python, ['--version'], { encoding: 'utf8', timeout: 10000 });
     if (probe.error || probe.status !== 0) { t.skip('Python interpreter not installed for helper protocol test'); return; }
-    const encoded = spawnSync(python, ['-c', "import json; print(json.dumps({'text':'☆'}, ensure_ascii=True, separators=(',', ':')))"], {
+    const encoded = spawnSync(python, ['-c', "import json; print(json.dumps({'text':chr(0x2606)}, ensure_ascii=True, separators=(',', ':')))"], {
         encoding: 'utf8', timeout: 10000,
     });
     assert.equal(encoded.status, 0, encoded.stderr);
-    assert.equal(encoded.stdout.trim(), '{"text":"\\\\u2606"}');
+    assert.ok([...Buffer.from(encoded.stdout, 'utf8')].every(byte => byte < 0x80), 'serialized JSON must be ASCII-only');
     assert.equal(JSON.parse(encoded.stdout).text, '☆');
 });
