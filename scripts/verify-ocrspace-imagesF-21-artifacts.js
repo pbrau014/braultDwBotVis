@@ -267,7 +267,8 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
         && /OCR_NON_OCR_NETWORK_RESTRICTED:\s*['"]?1/.test(workflowSourceText);
     const networkOk = networkAttempts === 0 && workflowRestrictionOk;
     const networkReconciliation = networkReconciliationPath
-        ? await fs.readFile(networkReconciliationPath, 'utf8').then(JSON.parse).catch(() => null) : null;
+        ? await fs.readFile(networkReconciliationPath, 'utf8')
+            .then(text => JSON.parse(text.replace(/^\\uFEFF/, ''))).catch(() => null) : null;
     const files = await listFiles(artifactRoot);
     const secretInputs = [...files, runReport, groundTruth, preflightReport, freshPreflightReport,
         ...(networkLog === null ? [] : [networkLogPath]),
@@ -304,7 +305,7 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
         localRecoveryNetworkLogSha256: recoveryNetworkLogSha256,
         localRecoveryNetworkLogMatchesReport: recoveryNetworkLogSha256 !== null && recoveryNetworkLogSha256 === recoveryExpectedSha256,
         secretLeakScan: secret.status,
-        originalScreenshotFallback: run.originalScreenshotFallback === false
+        originalScreenshotFallback: run.originalScreenshotFallback !== false
     };
     const verifiedCount = images.filter(image => image.status === 'VERIFIED').length;
     const requiredChecks = ['sourceImageHashes', 'pdfIntegrity', 'searchablePdfTextLayer',
