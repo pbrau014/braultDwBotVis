@@ -1,3 +1,43 @@
+## Current governing update — 2026-11-06 (19-image Gate B)
+
+- Gate B is now exactly the first 19 corpus-order records in the v6 ground
+  truth with complete, non-empty, eligible values for all nine required
+  fields. This supersedes both the former 50/100 target and the interim
+  21-image Gate B requirement.
+- The 21 complete records remain a separate pipeline-analysis inventory; the
+  last two complete records are not Gate B labels. The 4-image and 16-image
+  pipeline/Gate A requirements remain separate and unchanged.
+- Original OCR.Space run #42160979140 completed successfully. Its 81,886,966
+  byte artifact was downloaded and independently SHA-256 verified. It contains
+  63 searchable PDFs and 63 PDF-page rasters; all 126 matched the report's
+  byte counts and hashes, and all 63 PDFs contain searchable text.
+- Existing 21-image post-hoc analysis: Tesseract.js 123/189 eligible field
+  matches (65.08%), 2/21 exact nine-field records; native Tesseract 116/189
+  (61.38%), 0/21 exact nine-field records. Both engines have unresolved
+  mandatory outputs; each has two wrong candidates and zero wrongly accepted
+  values in that report. These are exploratory metrics, not Gate B pass data.
+- The original source artifact omitted imagesF-63-blocked-network-attempts.log.
+  The triggering workflow enabled the non-OCR egress guard but did not set
+  OCR_NON_OCR_NETWORK_LOG, so the guard had no persistent log destination.
+  The verifier workflow now creates a provenance-preserving reconciliation
+  report; it explicitly leaves the original attempt count unknown and does
+  not claim zero attempts. A new verification cannot pass the original-log
+  network gate on reconstructed evidence alone.
+- The first 21-image verification workflow completed green but its verifier
+  step actually failed on undefined recoveryNetworkOk/recoveryNetworkLogPath
+  references. Its uploaded post-hoc report remained
+  PENDING_ARTIFACT_VERIFICATION. Do not treat that workflow conclusion as a
+  verifier pass. The verifier and workflow are being corrected for a fresh
+  no-provider 19-image check.
+- Gate A remains FAIL/BLOCKED; Gate B remains NOT_PASSED; production remains
+  NO-GO. The v6 workbook is a partial working transcription reference, not
+  certified acceptance-grade ground truth.
+
+The earlier status snapshot and implementation notes below are retained as
+historical provenance; this current update governs.
+
+---
+
 # Current DWBOT authority — updated 2026-11-06
 
 IMPLEMENTATION / VERIFICATION STATUS — 2026-11-06
