@@ -95,9 +95,9 @@ test('desktop binary screenshot upload sends the session CSRF token required by 
   const uploadScript = read('desktop/upload.js');
   const bridge = read('src/desktop-bridge.js');
   assert.ok(desktopScript.includes("csrfToken:()=>session?.csrfToken||''"));
-  assert.ok(uploadScript.includes('const csrfToken=D.csrfToken();'));
-  assert.ok(uploadScript.includes("xhr.setRequestHeader('X-CSRF-Token',csrfToken)"));
-  assert.ok(uploadScript.indexOf("xhr.setRequestHeader('X-CSRF-Token',csrfToken)") < uploadScript.indexOf('xhr.send(file)'));
+  assert.match(uploadScript, /const\s+csrfToken\s*=\s*D\.csrfToken\(\);/);
+  assert.match(uploadScript, /xhr\.setRequestHeader\('X-CSRF-Token',\s*csrfToken\)/);
+  assert.ok(uploadScript.indexOf("xhr.setRequestHeader('X-CSRF-Token', csrfToken)") < uploadScript.indexOf('xhr.send(file)'));
   assert.match(bridge, /if\(req\.method==='POST'&&p==='\/api\/upload'\)\{\s*csrf\(req,session\)/);
 });
 
