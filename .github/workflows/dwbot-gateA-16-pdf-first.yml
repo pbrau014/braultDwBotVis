@@ -22,8 +22,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  GATEB_SOURCE_SHA: adaf4f8c3a9573f56d0348a4bba36686fc31c22e
-  GATEB_SOURCE_RUN_ID: '42160979140'
+  GATEB_SOURCE_SHA: 7eda2759760651ffead3d64d3d3854295115a113
 
 jobs:
   gate-a:
