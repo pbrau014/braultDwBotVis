@@ -73,13 +73,16 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
     fetchImpl = globalThis.fetch, client = recognizeCrop, quotaLedger = null,
     prepareUpload = imageProcessor.prepareOcrSpaceUpload,
     downloadPdf = downloadSearchablePdf, renderPdf = imageProcessor.renderSearchablePdfPage,
-    now = () => new Date() } = {}) {
+    readRasterMetadata = imageProcessor.metadata, now = () => new Date() } = {}) {
     const apiKey = String(env.OCRSPACE_API_KEY || '').trim();
     if (!apiKey) return { status: 'blocked', reason: 'OCRSPACE_API_KEY is not configured', requests: 0 };
     if (!Buffer.isBuffer(imageBuffer) || !imageBuffer.length) throw fail('Source screenshot is empty.', 'OCRSPACE_INVALID_IMAGE');
     const png = imageBuffer.length >= 8 && imageBuffer[0] === 0x89 && imageBuffer.subarray(1, 4).toString('ascii') === 'PNG';
-    const upload = imageBuffer.length <= MAX_FREE_FILE_BYTES
-        ? { buffer: imageBuffer, filename, mimeType: png ? 'image/png' : 'image/jpeg',
+    const jpeg = imageBuffer.length >= 3 && imageBuffer[0] === 0xff && imageBuffer[1] === 0xd8 && imageBuffer[2] === 0xff;
+    const bmp = imageBuffer.length >= 2 && imageBuffer.subarray(0, 2).toString('ascii') === 'BM';
+    const supported = png || jpeg || bmp;
+    const upload = imageBuffer.length <= MAX_FREE_FILE_BYTES && supported
+        ? { buffer: imageBuffer, filename, mimeType: png ? 'image/png' : jpeg ? 'image/jpeg' : 'image/bmp',
             bytes: imageBuffer.length, resized: false }
         : await prepareUpload(imageBuffer, MAX_FREE_FILE_BYTES);
     if (!Buffer.isBuffer(upload.buffer) || !upload.buffer.length || upload.buffer.length > MAX_FREE_FILE_BYTES) {
@@ -103,7 +106,7 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
     if (!pdfUrl) throw fail('OCR.Space Engine 2 did not return SearchablePDFURL; local OCR from the original screenshot is not substituted.', 'OCRSPACE_SEARCHABLE_PDF_MISSING');
     const pdfBuffer = await downloadPdf(pdfUrl, { fetchImpl });
     const rasterBuffer = await renderPdf(pdfBuffer);
-    const rasterMetadata = await imageProcessor.metadata(rasterBuffer);
+    const rasterMetadata = await readRasterMetadata(rasterBuffer);
     return {
         status: 'complete', provider: 'ocr.space', engine: 2,
         sourceSha256: crypto.createHash('sha256').update(imageBuffer).digest('hex'),
