@@ -6,10 +6,15 @@ source of truth and its newest override controls any conflicting text below.
 
 - Canonical repository: `pbrau014/braultDwBotVis`, branch `main`.
   Exact-head run 399 verified main commit `0547237613e3ee331244a591b959642b789b151c`; this handoff synchronization is documentation-only atop it.
-- Runtime rule: Node.js `22.16.0` is the accepted DWBOT baseline and is
-  sufficient in place of older Node 24+ requirements. Node 24 is optional only
-  for a specifically proven tool/dependency requirement. Keep OS-specific
-  Windows tests on Windows and preserve historical runtime evidence unchanged.
+- Runtime rule: Node.js `22.16.0` remains the authorized minimum/baseline. The
+  user-supplied Node.js `26.13.0` LTS Linux x64 archive has been hash-verified
+  and installed in an isolated tool directory (Node v26.13.0 / npm 11.20.0).
+  Node 26.13.0 is being added as a supplemental offline CI target on Linux and
+  Windows; it does not replace `.nvmrc`, the `>=22.16.0` package engine floor,
+  or existing Node 22 acceptance. See
+  `docs/toolchain/NODE_26_13_0_RUNTIME_ADOPTION_RECORD.md`. The Node 26 CI
+  result is pending; keep OS-specific Windows tests on Windows and preserve
+  historical runtime evidence unchanged.
 - Stay in this ChatGPT conversation for all DWBOT work. Do not hand off to
   Work mode or another executor. Do not emit progress narration or interim
   screen text while authorized operations are underway; report once operations
