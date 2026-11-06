@@ -124,7 +124,7 @@ jobs:
           "PADDLEOCR_REC_MODEL_DIR=$rec" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           "PADDLEOCR_MODEL_MANIFEST=$modelManifest" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           "PADDLE_PDX_ENABLE_MKLDNN_BYDEFAULT=False" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
-          "PADDLEOCR_FIELD_FALLBACK_TIMEOUT_MS=15000" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "PADDLEOCR_FIELD_FALLBACK_TIMEOUT_MS=60000" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           "PADDLEOCR_FIELD_FALLBACK_MAX_CROPS=7" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
 
       - name: Install exact candidate dependencies
