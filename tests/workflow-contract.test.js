@@ -219,3 +219,20 @@ test('63-image exploratory workflow persists restricted-egress attempts for arti
     assert.match(workflow, /imagesF-63-blocked-network-attempts\.log/);
     assert.match(workflow, /if: always\(\)/);
 });
+
+
+test('billable imagesF extraction workflow supports fingerprint-bound no-duplicate resume', () => {
+    const workflow = read('.github/workflows/dwbot-imagesF-63-exploratory.yml');
+    const runner = read('scripts/run-ocrspace-imagesF-63-exploratory.js');
+    const resumeGuard = read('src/ocrspace-exploratory-resume.js');
+    assert.match(workflow, /resume_run_id/);
+    assert.match(workflow, /gh run view/);
+    assert.match(workflow, /headSha -ne \$env:CURRENT_SHA/);
+    assert.match(workflow, /progress\.json/);
+    assert.match(workflow, /OCRSPACE_63_RESUME=1/);
+    assert.match(runner, /onProviderRequestStarted/);
+    assert.match(runner, /classifyResumeRow/);
+    assert.match(runner, /Existing OCR.Space output found/);
+    assert.match(resumeGuard, /skip-ambiguous/);
+    assert.match(resumeGuard, /OCRSPACE_RESUME_FINGERPRINT_MISMATCH/);
+});
