@@ -456,6 +456,8 @@ function getNetworkIsolation() {
     const report = {
         reportMetadata: createOcrReportMetadata(root),
         progressCheckpointPath: progressPath,
+        resumedFrom: progress.resumedFrom || null,
+        networkDiagnosticLogPath: progress.networkDiagnosticLogPath || null,
         buildVersion: packageInfo.version,
         packageName: packageInfo.name,
         packageEngines: packageInfo.engines,
