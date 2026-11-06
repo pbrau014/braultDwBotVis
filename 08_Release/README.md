@@ -21,7 +21,7 @@ Match outcome is calculated from individual performance across applicable publis
 
 ## Release-gate disposition
 
-**Release gate: GO FOR DOCUMENTATION PACKAGE — PRIOR GATES WAIVED AT THE USER'S DIRECTION.** The following items are acknowledged as not tested or not supplied and are no longer prerequisites for publishing this documentation package: canonical workbook presence/parity, Score Reporter HTML, Excel/VBA/Office 2010 execution, full scoring/browser regression, exact RC3 source and Windows Node 24/OCR acceptance, native Tesseract comparison, live Discord behavior, credential rotation evidence, current game-client walkthrough, event-specific settings, and formal event sign-off.
+**Release gate: GO FOR DOCUMENTATION PACKAGE — PRIOR GATES WAIVED AT THE USER'S DIRECTION.** The following items are acknowledged as not tested or not supplied and are no longer prerequisites for publishing this documentation package: canonical workbook presence/parity, Score Reporter HTML, Excel/VBA/Office 2010 execution, full scoring/browser regression, exact RC3 source and Windows Node 24/OCR acceptance (Node 22.16.0 is the accepted runtime; Node 24 is not mandatory), native Tesseract comparison, live Discord behavior, credential rotation evidence, current game-client walkthrough, event-specific settings, and formal event sign-off.
 
 This waiver is limited to the documentation package and reusable template publication. It **does not** assert those checks passed. A completed event record, actual signature, live scoring certification, credential rotation, and technical deployment approval are not created or implied. Do not use the historic workbook or archived bot tests as if they were the missing canonical builds.
 
