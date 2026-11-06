@@ -6,6 +6,27 @@ const crypto = require('node:crypto');
 const imageProcessor = require('../src/image-processor');
 
 const sha256 = buffer => crypto.createHash('sha256').update(buffer).digest('hex');
+const SOURCE_SIMILARITY_LIMITS = Object.freeze({ meanAbsoluteError: 3, rootMeanSquareError: 8 });
+
+function compareRgbaPixels(left, right) {
+    if (!Buffer.isBuffer(left) || !Buffer.isBuffer(right) || left.length !== right.length || left.length === 0 || left.length % 4 !== 0) {
+        throw new Error('Source-to-normalized raster comparison requires equal, non-empty RGBA pixel buffers.');
+    }
+    let absoluteSum = 0;
+    let squaredSum = 0;
+    for (let index = 0; index < left.length; index += 1) {
+        const difference = Math.abs(left[index] - right[index]);
+        absoluteSum += difference;
+        squaredSum += difference * difference;
+    }
+    const channelCount = left.length;
+    return {
+        pixelCount: channelCount / 4,
+        channelCount,
+        meanAbsoluteError: absoluteSum / channelCount,
+        rootMeanSquareError: Math.sqrt(squaredSum / channelCount),
+    };
+}
 
 function safeResolve(root, relative) {
     if (typeof relative !== 'string' || !relative.trim() || path.isAbsolute(relative)) return null;
@@ -21,6 +42,7 @@ async function normalizeInventory({
     renderPdf = imageProcessor.renderSearchablePdfPage,
     readMetadata = imageProcessor.metadata,
     normalizeRaster = imageProcessor.normalizeSearchablePdfPageRaster,
+    resizeSource = (buffer, width, height) => imageProcessor.cropResize(buffer, { left: 0, top: 0, width, height }, width),
     requiredImageCount = 63,
     toRawRgba = buffer => imageProcessor.__test.runImageMagick(
         ['png:-', '-depth', '8', 'rgba:-'], buffer,
@@ -117,6 +139,24 @@ async function normalizeInventory({
                 || normalizedMetadata.height !== normalized.normalization.normalizedHeight) {
                 throw new Error('Normalized raster dimensions do not match the recorded normalization transform.');
             }
+            const resizedSource = await resizeSource(sourceBuffer, sourceWidth, sourceHeight, normalizedMetadata.width);
+            const resizedSourceMetadata = await readMetadata(resizedSource);
+            if (resizedSourceMetadata.width !== normalizedMetadata.width
+                || resizedSourceMetadata.height !== normalizedMetadata.height) {
+                throw new Error('Resized original screenshot dimensions do not match the normalized PDF crop.');
+            }
+            const [normalizedPixels, sourcePixels] = await Promise.all([
+                toRawRgba(normalized.buffer), toRawRgba(resizedSource),
+            ]);
+            const sourceSimilarity = compareRgbaPixels(normalizedPixels, sourcePixels);
+            sourceSimilarity.limits = SOURCE_SIMILARITY_LIMITS;
+            sourceSimilarity.sourceResizedSha256 = sha256(resizedSource);
+            sourceSimilarity.sourceResizedWidth = resizedSourceMetadata.width;
+            sourceSimilarity.sourceResizedHeight = resizedSourceMetadata.height;
+            if (sourceSimilarity.meanAbsoluteError > SOURCE_SIMILARITY_LIMITS.meanAbsoluteError
+                || sourceSimilarity.rootMeanSquareError > SOURCE_SIMILARITY_LIMITS.rootMeanSquareError) {
+                throw new Error(`Normalized PDF crop does not sufficiently match the original screenshot (MAE=${sourceSimilarity.meanAbsoluteError.toFixed(3)}, RMSE=${sourceSimilarity.rootMeanSquareError.toFixed(3)}; limits MAE<=${SOURCE_SIMILARITY_LIMITS.meanAbsoluteError}, RMSE<=${SOURCE_SIMILARITY_LIMITS.rootMeanSquareError}).`);
+            }
             const outputName = String(index + 1).padStart(2, '0') + '-'
                 + path.basename(row.filename).replace(/[^a-z0-9_.-]/gi, '_') + '.pdf-content.png';
             const destination = path.join(normalizedRoot, outputName);
@@ -130,6 +170,8 @@ async function normalizeInventory({
                 }
             }
             image.checks.sourceAspectNormalization = 'PASS';
+            image.checks.sourceSimilarity = 'PASS';
+            image.sourceSimilarity = sourceSimilarity;
             image.status = 'PASS';
             image.source = {
                 bytes: sourceBuffer.length, sha256: sourceHash, width: sourceWidth, height: sourceHeight,
@@ -201,4 +243,4 @@ if (require.main === module) {
     })().catch(error => { console.error(error.stack || error); process.exitCode = 1; });
 }
 
-module.exports = { normalizeInventory, safeResolve };
+module.exports = { normalizeInventory, safeResolve, compareRgbaPixels, SOURCE_SIMILARITY_LIMITS };
