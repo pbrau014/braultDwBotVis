@@ -127,3 +127,18 @@ test('participant desktop scoreboards suppress H12 dollar diagnostics', () => {
   assert.match(service, /const \{ estimatedValue, \.\.\.visible \} = row/);
   assert.match(service, /return \{\.\.\.base,aggregate,role:'admin'/);
 });
+
+
+test('player and admin score tables label event scores as doubloons and explain Race C01', () => {
+  const playerHtml = read('desktop/player.html');
+  const playerJs = read('desktop/player.js');
+  const adminHtml = read('desktop/admin.html');
+  const adminJs = read('desktop/admin.js');
+  assert.match(playerHtml, /Each event value is a calculated doubloon score/);
+  assert.match(playerJs, /Damage event doubloons/);
+  assert.match(playerJs, /Race C01 doubloons/);
+  assert.match(adminHtml, /Damage dubs/);
+  assert.match(adminHtml, /Grand Yolo dubs/);
+  assert.match(adminJs, /C01 uses inverse elapsed seconds/);
+  assert.match(adminJs, /historical workbook raw-time formula is not the active policy/);
+});
