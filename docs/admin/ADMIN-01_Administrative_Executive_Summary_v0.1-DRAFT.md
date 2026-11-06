@@ -227,6 +227,25 @@ The one wrong value in four-source or three-local-reader consensus disqualifies 
 - **Gate B:** exact approved 19-image selection and ground truth; all nine fields; verifiable PDF/raster provenance; no source/hash mismatch; zero wrong accepted mandatory values; unresolved fields and exact denominators reported; complete-record exactness; network restriction evidence. Missing historical network logs remain a limitation and cannot be replaced by a newly generated local log.
 - Neither gate passes if a mandatory value is wrong, if the required full-record criterion is unmet, if the relevant network restriction failed, or if material provenance is unverified.
 
+### 5.3 Scoring authority and source assets
+
+**Canonical tournament scoring assets remain unidentified.** The v3.22 release record and `07_Score_Reporter_Assets/ASSET_INTAKE_REQUIRED.md` explicitly state that the designated workbook `test27xlsm_detailed_audit_polished_regression.xlsm` and authoritative Score Reporter HTML were not present in the active package. The source record specifically prohibits substituting a similarly named or historic file.
+
+The active DWBOT repository contains related files, but none is currently proven to be the canonical tournament scoring source:
+
+- `assets/YOLO-Tournament-Workbook.xlsm` — DWBOT's bundled workbook. The v3.22 ↔ DWBOT alignment record says it is verified against the bot project's own source-truth fixture, not byte-identical or mathematically equivalent to the unavailable v3.22 canonical workbook.
+- `dwbotStuff/test27xlsm.xlsm` and `dwbotStuff/backupWorkbook.xlsm` — same Git blob object ID; historical/backup assets, not the designated canonical workbook.
+- `dwbotStuff/scoreReport_dark_clipboard (1).html` and `dwbotStuff/yolo_tournament_scoreCalculator.html` — legacy score/report candidates; no source authority record designates either as the authoritative Score Reporter.
+- `dwbotStuff/backupWkbkBrowser.html` and `dwbotStuff/yolo_tourney_workbook_merged (4).html` — same Git blob object ID; workbook-browser/merged artifacts, not certified scoring authority.
+- `testdata/yolo_tourney_workbook_reference.html` — test fixture, not the production Score Reporter.
+- `desktop/*.html` — DWBOT desktop application pages, not identified as the tournament's canonical Score Reporter.
+
+The source tree's presence of these assets is evidence of candidates and historical derivatives, not authority. Formula and browser parity certification against the official tournament policy is blocked until the exact canonical workbook and authoritative Score Reporter HTML are identified by their owner, version, full-file SHA-256, source lineage, and intended runtime. Do not silently promote one of the candidates.
+
+The current v3.22 policy baseline states that verified match outcome is calculated from applicable individual-performance metrics, including Damage and Kills, under the approved scoring method; that verified outcome governs bracket advancement subject to published tie-breaks. The workbook's exact formula, aggregation, rounding, weights and tie-break implementation remain unverified against the missing canonical asset. The v3.17 C01–C06 policy text is historical traceability input and must be reconciled to the v3.22 source before operational use.
+
+Once the canonical assets are supplied and confirmed, required acceptance is: file/lineage/hash inventory; secret and unsafe browser-posting scan; formula-by-formula workbook oracle tests; numeric normalization and rounding edge cases; Excel/VBA compatibility at the declared supported version; HTML/browser calculations; reset, import/export and persistence behavior; and row-by-row parity for all shared fixtures. A passing DWBOT-internal workbook test does not replace these checks.
+
 ## 6. Outstanding decisions and blockers
 
 | ID | Decision / blocker | Current disposition | Required evidence / authority |
