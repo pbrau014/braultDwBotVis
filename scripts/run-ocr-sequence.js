@@ -141,6 +141,38 @@ function getNetworkIsolation() {
     }
     const outputPath = path.resolve(process.env.OCR_SEQUENCE_REPORT_PATH || path.join(root, 'testdata', 'ocr-acceptance', `sequence-${new Date().toISOString().replace(/[:.]/g, '-')}-${process.pid}.json`));
     const progressPath = path.resolve(process.env.OCR_SEQUENCE_PROGRESS_PATH || (outputPath + '.progress.json'));
+    const sourceMetadata = createOcrReportMetadata(root);
+    const resumeFromPath = String(process.env.OCR_SEQUENCE_RESUME_FROM || '').trim()
+        ? path.resolve(process.env.OCR_SEQUENCE_RESUME_FROM) : null;
+    let resumeState = null;
+    if (resumeFromPath) {
+        if (resumeFromPath === progressPath) throw new Error('Resume source and new progress destination must be different files.');
+        for (const existing of [outputPath, progressPath]) {
+            try { await fs.access(existing); throw new Error('Resume destination already exists; refusing to overwrite evidence: ' + existing); }
+            catch (error) { if (error.code !== 'ENOENT') throw error; }
+        }
+        const priorBytes = await fs.readFile(resumeFromPath);
+        const prior = JSON.parse(priorBytes.toString('utf8'));
+        if (prior.reportPath) {
+            try { await fs.access(prior.reportPath); throw new Error('Prior final report already exists; evaluate it instead of resuming.'); }
+            catch (error) { if (error.code !== 'ENOENT') throw error; }
+        }
+        const validated = validateSequenceResume(prior, {
+            entries, packageName: packageInfo.name, packageVersion: packageInfo.version, sourceMetadata,
+        });
+        resumeState = {
+            rows: validated.rows,
+            currentJob: validated.currentJob,
+            runId: prior.runId,
+            progressPath: resumeFromPath,
+            progressSha256: crypto.createHash('sha256').update(priorBytes).digest('hex'),
+        };
+    } else {
+        for (const existing of [outputPath, progressPath]) {
+            try { await fs.access(existing); throw new Error('Existing OCR sequence evidence found at ' + existing + '; use OCR_SEQUENCE_RESUME_FROM with the exact prior progress file instead of starting a duplicate batch.'); }
+            catch (error) { if (error.code !== 'ENOENT') throw error; }
+        }
+    }
     const progress = createProgressRecord({
         runId: new Date().toISOString().replace(/[:.]/g, '-') + '-' + process.pid,
         reportPath: outputPath,
@@ -150,8 +182,16 @@ function getNetworkIsolation() {
         configuredEngine: String(process.env.OCR_ENGINE || 'auto').toLowerCase(),
         networkBlocked: process.env.OCR_NON_OCR_NETWORK_RESTRICTED === '1', // legacy field: unrelated egress only
         networkIsolation: getNetworkIsolation(),
-        sourceMetadata: createOcrReportMetadata(root),
+        sourceMetadata,
     });
+    if (resumeState) {
+        progress.resumedFrom = {
+            runId: resumeState.runId,
+            progressPath: resumeState.progressPath,
+            progressSha256: resumeState.progressSha256,
+            startedAt: new Date().toISOString(),
+        };
+    }
     activeProgress = progress;
     activeProgressPath = progressPath;
     await writeJsonAtomically(progressPath, progress);
