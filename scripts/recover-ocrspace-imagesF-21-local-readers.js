@@ -125,10 +125,11 @@ async function main() {
     const runPath = arg('--run-report');
     const gtPath = arg('--ground-truth');
     const artifactRoot = arg('--artifact-root');
+    const sourceImageRoot = arg('--source-image-root');
     const outputRunPath = arg('--output-run-report');
     const outputRecoveryPath = arg('--recovery-report');
     const networkLogPath = arg('--network-log');
-    if (![runPath, gtPath, artifactRoot, outputRunPath, outputRecoveryPath, networkLogPath].every(Boolean)) {
+    if (![runPath, gtPath, artifactRoot, sourceImageRoot, outputRunPath, outputRecoveryPath, networkLogPath].every(Boolean)) {
         throw new Error('Missing required local recovery arguments.');
     }
 
@@ -184,8 +185,17 @@ async function main() {
                 continue;
             }
 
-            let pdfBuffer, rasterBuffer;
+            let pdfBuffer, rasterBuffer, sourceBuffer;
             try {
+                const sourcePath = safePath(sourceImageRoot, expected.filename);
+                if (!sourcePath) throw new Error('Original source screenshot path is missing or unsafe.');
+                sourceBuffer = await fs.readFile(sourcePath);
+                const sourceMetadata = await imageProcessor.metadata(sourceBuffer);
+                if (sourceBuffer.length !== expected.sourceImage.bytes || sha256(sourceBuffer) !== expected.sourceImage.sha256
+                    || sourceMetadata.width !== expected.sourceImage.width || sourceMetadata.height !== expected.sourceImage.height) {
+                    throw new Error('Original source screenshot does not match the approved nine-field ground-truth fingerprint.');
+                }
+                image.sourceImage = { bytes: sourceBuffer.length, sha256: sha256(sourceBuffer), width: sourceMetadata.width, height: sourceMetadata.height };
                 pdfBuffer = await fs.readFile(pdfPath);
                 const normalization = row.rasterNormalization || row.ocrSpacePdfFirst?.rasterNormalization || null;
                 if (normalization) row.rasterNormalization = normalization;
@@ -214,8 +224,12 @@ async function main() {
                     }
                 }
                 const normalized = await imageProcessor.normalizeSearchablePdfPageRaster(rendered, {
-                    sourceWidth: expected.sourceImage.width, sourceHeight: expected.sourceImage.height,
+                    sourceWidth: expected.sourceImage.width, sourceHeight: expected.sourceImage.height, sourceImageBuffer: sourceBuffer,
                 });
+                if (normalized.similarity?.method !== 'original-source-resized-to-normalized-raster-v1') {
+                    throw new Error('Normalized PDF raster is not pixel-verified against the original source screenshot.');
+                }
+                image.sourceSimilarity = normalized.similarity;
                 const normalizedPath = safePath(artifactRoot, row.rasterPath);
                 if (!normalizedPath) throw new Error('Normalized raster path is missing or unsafe.');
                 if (normalization) {
