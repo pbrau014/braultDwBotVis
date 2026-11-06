@@ -279,7 +279,9 @@ test('Gate A acceptance uses the accepted runtime, fail-closed network guard and
     assert.match(workflow, /node-version: 24\\.17\\.0/);
     assert.match(workflow, /runtimePass/);
     assert.match(workflow, /Configure fail-closed restricted-egress diagnostic preload/);
+    assert.match(workflow, /source\\/scripts\\/block-network\\.js/);
     assert.match(workflow, /scripts\\/block-network\\.js/);
+    assert.ok(workflow.indexOf('source/scripts/block-network.js') < workflow.indexOf("'scripts/block-network.js'"), 'fail-closed logger must wrap the candidate guard');
     assert.match(workflow, /source\\/testdata\\/gateA-16\\/report\\.json\\.progress\\.json/);
     assert.match(workflow, /cancel-in-progress: false/);
     assert.match(workflow, /DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME/);
