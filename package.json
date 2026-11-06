@@ -43,7 +43,7 @@
     "evaluate:ocrspace-pdf-text-layer-19": "node scripts/evaluate-ocrspace-pdf-text-layer.js --run-report testdata/ocrspace-imagesF-63-exploratory/recovered-run-report-21.json --ground-truth testdata/ground-truth/imagesF-63-working-ground-truth-v6.json --artifact-root testdata/ocrspace-imagesF-63-exploratory --inventory gate-b-complete-ground-truth-19 --output testdata/ocrspace-imagesF-63-exploratory/pdf-text-layer-analysis-19.json"
   },
   "engines": {
-    "node": ">=22.16.0"
+    "node": ">=24.17.0"
   },
   "dependencies": {
     "discord.js": "^14.27.0",
