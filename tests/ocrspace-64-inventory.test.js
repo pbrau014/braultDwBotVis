@@ -86,8 +86,10 @@ test('runner archive preflight reconstructs split parts and verifies exact eligi
     const preflight = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'prepare-ocrspace-eligible-56.py'), 'utf8');
     assert.match(preflight, /imgsHalf1-eligible-56\.zip\.\{n:03d\}/);
     assert.match(preflight, /archiveSha256/);
-    assert.match(preflight, /len\(names\) != 56/);
-    assert.match(preflight, /set\(names\) != set\(expected\)/);
+    assert.match(preflight, /len\(file_infos\) != 56 or len\(infos\) != 57/);
+    assert.match(preflight, /directory_infos\[0\]\.filename != "imgsHalf1\/"/);
+    assert.match(preflight, /set\(normalized\) != set\(expected\)/);
+    assert.match(preflight, /member_name\.startswith\(prefix\)/);
     assert.match(preflight, /record\["sha256"\]/);
     assert.match(preflight, /record\["bytes"\]/);
     assert.match(preflight, /excludedRecordsAbsent/);
