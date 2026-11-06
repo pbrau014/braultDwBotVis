@@ -93,7 +93,8 @@ async function extractLocalReader(rasterBuffer, engine, networkLogPath) {
                 throw error;
             }
             if (!payload.output?.available) {
-                const error = new Error('PaddleOCR unavailable or incomplete: ' + String(payload.output?.status || 'unknown'));
+                const detail = payload.output?.error || payload.output?.reason || payload.output?.helperStatus || 'no underlying diagnostic was returned';
+                const error = new Error('PaddleOCR unavailable or incomplete: ' + String(payload.output?.status || 'unknown') + '; ' + String(detail).slice(0, 700));
                 error.code = 'PADDLEOCR_READER_UNAVAILABLE';
                 throw error;
             }
