@@ -24,7 +24,7 @@
         <h2>Drop a screenshot here</h2>
         <p>or choose one from your computer</p>
         <button id="browse-button" type="button" class="button secondary">Choose image</button>
-        <small>PNG, JPG, WEBP, BMP or TIFF · maximum 10 MB · one image per submission</small>
+        <small>PNG, JPG, WEBP, BMP or TIFF · maximum 25 MB · one image per submission</small>
       </div>
       <div id="preview-panel" class="preview-panel hidden">
         <div class="panel-heading"><div><p class="eyebrow">SELECTED FILE</p><h2 id="file-name">—</h2><p id="file-meta" class="muted"></p></div><button id="remove-file" class="button quiet small" type="button">Remove</button></div>
@@ -40,8 +40,8 @@
     </section>
     <section class="notice info">
       <h2>What happens next?</h2>
-      <p>The screenshot is checked against the nine mandatory fields: result, player, map, mode, battle start, credits, Free XP, damage and XP. No fuzzy value repair is applied. Missing or conflicting values require an exact correction before mapping.</p>
-      <p>Desktop uploads use the same OCR pipeline as Discord attachments. Tesseract.js remains the local baseline and acceptance authority. If a valid Free OCR.Space API key is configured locally, its restricted safe-crop prepass is default-on; set OCRSPACE_ENABLED=0 for a local-only run. Full screenshots and player identity are never sent, and remote text is diagnostic only.</p>
+      <p>The screenshot is checked against all nine mandatory fields: result, player, map, mode, battle start, credits, Free XP, damage and XP. No fuzzy value repair is applied. Missing or conflicting values remain unresolved and require exact correction before mapping.</p>
+      <p>Desktop uploads use the same PDF-first OCR pipeline as Discord attachments. The original screenshot is submitted to OCR.Space Engine 2 to create a searchable PDF. The PDF is validated and downloaded, then rendered locally; Tesseract.js, native Tesseract and other enabled local readers operate only on that PDF-derived raster. If PDF creation, download, validation or rasterization fails, processing stops for that image rather than falling back to OCR on the original screenshot. OCR.Space must be explicitly enabled with OCRSPACE_ENABLED=1 and OCRSPACE_NETWORK_ALLOWLIST=1, with the API key kept in the local bot environment. Provider text is retained as separate evidence and cannot independently accept or overwrite a required field; exact local validation and review remain in force.</p>
     </section>
     <p id="page-status" class="status-line" role="status" aria-live="polite"></p>
   </main>
