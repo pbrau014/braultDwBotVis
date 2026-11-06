@@ -5787,3 +5787,11 @@ CURRENT CONNECTION-RESUME / GATE EVIDENCE RECONCILIATION — 2026-11-06 16:37 UT
 - The Gate A workflow is corrected for future runs: explicit provider allowlist/restriction flags and per-step Node preloads; local-only steps use the fail-closed guard with provider access disabled. This is a future-run correction, not retroactive evidence.
 - Exact-head verification after the parser export, Gate A regex test and runtime checklist fixes remains pending. No new OCR.Space provider requests were made. Production remains NO-GO.
 
+
+
+FOLLOW-UP CORRECTION — 2026-11-06
+
+- Corrected the 21-image diagnostic aggregate in the detailed report: Tesseract.js 123/189 (2 wrong candidates, 64 unresolved); native Tesseract 116/189 (2 wrong, 71 unresolved); PDF text layer 80/168 (3 wrong, 85 unresolved); provider parsed text 91/168 (19 wrong, 58 unresolved); four-source consensus 147/189 (1 wrong, 41 unresolved); strict four-source 68/189 (0 wrong, 121 unresolved); strict three-source 117/189 (1 wrong, 71 unresolved). These are diagnostic metrics only.
+- First local-only Gate A attempt #42254762859 skipped the prepare step due an incomplete step condition; it did not run local OCR or call OCR.Space. Its report also misclassified missing original history as a fresh run. Commit 91afe22 corrected the condition and report logic. New local-only Gate A attempt #42255893851 is in progress; the provider step is explicitly skipped. Do not use the earlier attempt's report as Gate A evidence.
+- Current exact-head verification #42255894247 and 19-image artifact verification #42255893968 are pending. No pass is claimed.
+

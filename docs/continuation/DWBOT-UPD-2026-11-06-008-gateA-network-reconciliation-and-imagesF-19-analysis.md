@@ -72,12 +72,13 @@ The searchable PDF text layer is useful, but it is not sufficient as the sole ni
 The first 21 complete nine-field records remain a diagnostic analysis inventory. Gate B is exactly the first 19; records 20–21 are not counted toward Gate B.
 
 For the 21-image/189-field diagnostic analysis:
-- PDF text layer: 80/168 exact, 3 wrong, 85 unresolved.
-- Provider parsed text: 91/168 exact, 19 wrong, 58 unresolved.
-- Four-source consensus: 147/189 exact, 1 wrong, 41 unresolved.
-- Strict four-source consensus: 68/189 exact, 0 wrong, 121 unresolved.
-- Strict three-source consensus: 117/189 exact, 1 wrong, 71 unresolved.
-- Three local-reader consensus: 112/189 exact, 1 wrong, 76 unresolved.
+- Tesseract.js: 123/189 exact, 2 wrong candidates (unaccepted), 64 unresolved (65.08%).
+- Native Tesseract: 116/189 exact, 2 wrong candidates (unaccepted), 71 unresolved (61.38%).
+- PDF text layer: 80/168 exact, 3 wrong, 85 unresolved (47.62%).
+- Provider parsed text: 91/168 exact, 19 wrong, 58 unresolved (54.17%).
+- Four-source consensus: 147/189 exact, 1 wrong, 41 unresolved (77.78%).
+- Strict four-source consensus: 68/189 exact, 0 wrong, 121 unresolved (35.98%).
+- Strict three-source consensus: 117/189 exact, 1 wrong, 71 unresolved (61.90%).
 
 ## 7. Future Gate A network enforcement correction
 
@@ -98,3 +99,12 @@ Local-only recovery and reader-matrix steps use the fail-closed guard with provi
 - 21-image analysis: **diagnostic only**.
 - Production: **NO-GO**.
 - No duplicate OCR.Space submissions were made during this review.
+
+
+## 9. Gate A local-only retry control
+
+- Local-only run #42254762859 did not execute the intended first-image recovery: the download step included the local-only trigger, but the prepare step condition still accepted only the paid-resume trigger. The run performed preflight/model setup and skipped the provider step; no OCR.Space request was made. Its generated report lacked a resume manifest and incorrectly described the original log as not applicable to a fresh run. Do not use that report as Gate A evidence.
+- Commit `91afe22cfad056ac27ae13f5e02bf370f6c831d8` corrected the prepare-step condition, made the acceptance summary treat any partial-artifact continuation as a resume even if the manifest is absent, and labels missing history as `FAIL_MISSING_ORIGINAL_EVIDENCE`. It also keeps the provider step explicitly skipped for local-only mode.
+- New local-only run #42255893851 is in progress at the time of this update. It will reuse the original PDF-derived raster, run the candidate's Tesseract.js plus optional PaddleOCR field fallback, and stop before any OCR.Space provider step. Its purpose is diagnostic only; even a successful local read cannot repair the historical missing-egress enforcement.
+- Exact-head DWBOT verification #42255894247 and 19-image artifact verification #42255893968 are pending on the same source commit. No pass is claimed.
+
