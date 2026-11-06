@@ -134,6 +134,7 @@ function selectGateB(gt) {
 async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshPreflightReport, sourceImageRoot, artifactRoot, networkLogPath, recoveryNetworkLogPath,
     workflowSourceText = '', apiKey = process.env.OCRSPACE_API_KEY || '', networkReconciliationPath = null,
     renderPdf = imageProcessor.renderSearchablePdfPage,
+    normalizeRaster = imageProcessor.normalizeSearchablePdfPageRaster,
     readMetadata = imageProcessor.metadata,
     toRawRgba = buffer => imageProcessor.__test.runImageMagick(['png:-', '-depth', '8', 'rgba:-'], buffer, { timeoutMs: 60000, maxOutputBytes: 80_000_000 }),
     readPdfText = extractPdfText,
@@ -223,12 +224,44 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
             image.checks.rasterIntegrity = rasterOk ? 'PASS' : 'FAIL';
             if (!rasterOk) all.rasterIntegrity = false;
             if (pdfOk && rasterOk) {
-                const rendered = await renderPdf(pdfBuffer);
-                const renderedDims = pngDimensions(rendered);
-                const renderedMetadata = renderedDims ? await readMetadata(rendered) : null;
+                const renderedPage = await renderPdf(pdfBuffer);
+                const pageDims = pngDimensions(renderedPage);
+                const pageMetadata = pageDims ? await readMetadata(renderedPage) : null;
+                const normalization = row.rasterNormalization || row.ocrSpacePdfFirst?.rasterNormalization || null;
+                let expectedRaster = renderedPage;
+                let normalizationOk = true;
+                if (normalization) {
+                    const pageSha = sha256(renderedPage);
+                    const pageBytes = renderedPage.length;
+                    const pageWidth = pageMetadata?.width || null;
+                    const pageHeight = pageMetadata?.height || null;
+                    const expectedPageSha = row.pageRasterSha256 || row.ocrSpacePdfFirst?.pageRasterSha256 || null;
+                    const expectedPageBytes = row.pageRasterBytes || row.ocrSpacePdfFirst?.pageRasterBytes || null;
+                    const expectedPageWidth = row.pageRasterWidth || row.ocrSpacePdfFirst?.pageRasterWidth || null;
+                    const expectedPageHeight = row.pageRasterHeight || row.ocrSpacePdfFirst?.pageRasterHeight || null;
+                    const pageEvidenceOk = (!expectedPageSha || expectedPageSha === pageSha)
+                        && (!expectedPageBytes || expectedPageBytes === pageBytes)
+                        && (!expectedPageWidth || expectedPageWidth === pageWidth)
+                        && (!expectedPageHeight || expectedPageHeight === pageHeight);
+                    const normalized = await normalizeRaster(renderedPage, {
+                        sourceWidth: expected.sourceImage.width,
+                        sourceHeight: expected.sourceImage.height,
+                    });
+                    expectedRaster = normalized?.buffer;
+                    const actualNormalization = normalized?.normalization || {};
+                    normalizationOk = pageEvidenceOk
+                        && Buffer.isBuffer(expectedRaster)
+                        && actualNormalization.method === 'source-aspect-top-aligned-crop-v1'
+                        && JSON.stringify(actualNormalization.cropRect) === JSON.stringify(normalization.cropRect)
+                        && actualNormalization.sourceWidth === expected.sourceImage.width
+                        && actualNormalization.sourceHeight === expected.sourceImage.height;
+                }
+                const renderedDims = pngDimensions(expectedRaster);
+                const renderedMetadata = renderedDims ? await readMetadata(expectedRaster) : null;
                 const savedPixels = await toRawRgba(rasterBuffer);
-                const renderedPixels = await toRawRgba(rendered);
-                const derivedOk = Buffer.isBuffer(rendered) && Boolean(renderedDims && renderedMetadata)
+                const renderedPixels = Buffer.isBuffer(expectedRaster) ? await toRawRgba(expectedRaster) : null;
+                const derivedOk = Buffer.isBuffer(expectedRaster) && Boolean(renderedDims && renderedMetadata)
+                    && normalizationOk
                     && renderedDims.width === dims.width && renderedDims.height === dims.height
                     && renderedMetadata.width === dims.width && renderedMetadata.height === dims.height
                     && Buffer.isBuffer(savedPixels) && Buffer.isBuffer(renderedPixels) && savedPixels.equals(renderedPixels);
