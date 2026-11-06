@@ -87,12 +87,20 @@ jobs:
           $python = Get-Command python.exe -ErrorAction Stop
           & $python.Source scripts/prepare-ocrspace-imagesF-63.py
           if ($LASTEXITCODE -ne 0) { throw '63-image archive preflight failed; OCR.Space submissions are prohibited.' }
+      - name: Initialize restricted-egress diagnostic log
+        shell: powershell
+        run: |
+          $dir = Join-Path $env:GITHUB_WORKSPACE 'testdata\ocr-acceptance'
+          New-Item -ItemType Directory -Force $dir | Out-Null
+          $log = Join-Path $dir 'imagesF-63-blocked-network-attempts.log'
+          [System.IO.File]::WriteAllText($log, '')
       - name: Run OCR.Space Engine 2 PDF-first exploratory extraction
         shell: powershell
         env:
           OCRSPACE_API_KEY: ${{ secrets.OCRSPACE_API_KEY }}
           OCRSPACE_NETWORK_ALLOWLIST: '1'
           OCR_NON_OCR_NETWORK_RESTRICTED: '1'
+          OCR_NON_OCR_NETWORK_LOG: ${{ github.workspace }}\\testdata\\ocr-acceptance\\imagesF-63-blocked-network-attempts.log
           OCRSPACE_63_OUTPUT_DIR: ${{ github.workspace }}\testdata\ocrspace-imagesF-63-exploratory
         run: |
           if ([string]::IsNullOrWhiteSpace($env:OCRSPACE_API_KEY)) { throw 'Protected OCRSPACE_API_KEY secret is missing.' }
@@ -109,6 +117,7 @@ jobs:
           path: |
             testdata/ocrspace-imagesF-63-exploratory/**
             testdata/ocr-acceptance/imagesF-63-preflight.json*
+            testdata/ocr-acceptance/imagesF-63-blocked-network-attempts.log
             testdata/ocr-acceptance/DWBOT_IMAGESF_HOLDOUT_CANDIDATE_MANIFEST.json
             docs/continuation/DWBOT-UPD-2026-11-05-002-groundtruth-gap-register.md
             docs/continuation/DWBOT-UPD-2026-11-06-004-imagesF-63-ground-truth.md

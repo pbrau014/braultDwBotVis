@@ -53,9 +53,9 @@ upload with if: always(); manual-dispatch-only workflow guard.
 Risks: the runner has no cross-run resume/idempotency, so a manual rerun of an
 interrupted batch could resubmit completed images. Do not rerun without
 reconciling previous progress and artifacts. Per-image write interruption can
-leave a provider submission without complete artifacts. The PDF response
-streaming path is bounded, but the arrayBuffer fallback checks size only after
-allocation. Source inspection found no intentional API-key logging, but
+leave a provider submission without complete artifacts. The PDF response streaming path is bounded, but the arrayBuffer fallback checks
+size only after allocation. The OCR JSON response has a similar non-streaming
+response.json fallback whose size check occurs after parsing. Source inspection found no intentional API-key logging, but
 actual run logs/artifacts still require exact-value scanning in a protected
 environment; never print the key. The active run is on its fixed earlier
 commit and is unaffected by later source changes.
@@ -185,3 +185,16 @@ reported yet. Push-triggered 63-image workflow run 42170489690 was pending with
 no jobs reported; the current workflow's job-level workflow_dispatch guard
 prevents a push event from executing provider submissions. No duplicate
 OCR.Space submission is claimed or initiated.
+
+
+## Restricted-egress log persistence
+
+Source review found that block-network.js records denied non-OCR.Space
+destinations only when OCR_NON_OCR_NETWORK_LOG is set. The workflow enabled
+restriction but did not set this log path. The workflow now initializes an
+empty log before extraction, passes the path to the runner, and includes it in
+the always-upload artifact list. The already-running 42160979140 job is pinned
+to its original workflow commit and cannot gain this log retroactively; for
+that run, inspect the run logs and every localReaderFailures entry for
+OCR_NETWORK_BLOCKED, and do not claim a clean zero-attempt result if the
+evidence is insufficient.

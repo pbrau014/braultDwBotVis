@@ -5224,3 +5224,13 @@ Interpretation:
 ================================================================================
 END DWBOT-UPD-2026-11-06-007
 ================================================================================
+
+- Network diagnostics hardening: the current workflow now initializes and
+  uploads imagesF-63-blocked-network-attempts.log via OCR_NON_OCR_NETWORK_LOG.
+  This change cannot affect the already-running pinned workflow. Its network
+  evidence must be reconstructed from job logs and localReaderFailures; if
+  zero unauthorized attempts cannot be established, Gate B stays blocked.
+- Bounded-read review also identified a post-allocation size check in the
+  non-streaming OCR JSON response.json fallback, in addition to the PDF
+  arrayBuffer fallback. Track both as hardening opportunities; streaming
+  runtime paths are bounded.
