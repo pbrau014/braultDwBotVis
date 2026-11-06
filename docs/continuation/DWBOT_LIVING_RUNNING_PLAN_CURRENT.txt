@@ -5263,3 +5263,9 @@ END DWBOT-UPD-2026-11-06-007
   Retain and manually inspect that report, verify its hash, and compare its
   locked candidate fingerprint with the Gate B run source. Without the actual
   source report, Gate A evidence remains pending; do not self-attest PASS.
+
+- Scoring parity correction: standalone HTML calculator Grand Yolo tierWeight
+  now defaults and resets to 0.9, matching src/tournament.js and admin UI;
+  legacy 0.9 values are preserved instead of silently converted to 1.
+  Regression assertion added in tests/tournament.test.js. Exact-head CI and
+  browser validation remain pending.
