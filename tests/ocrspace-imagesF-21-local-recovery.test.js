@@ -42,3 +42,13 @@ test('parallel local readers preserve prior outputs and record every engine', ()
     assert.ok(script.includes('derivedFromRunReportSha256'));
     assert.ok(script.includes('COMPLETED_LOCAL_ONLY_RECOVERY'));
 });
+
+
+test('PaddleOCR local recovery preserves the underlying helper failure diagnostic', () => {
+    const child = read('scripts/paddleocr-image-child.js');
+    const recovery = read('scripts/recover-ocrspace-imagesF-21-local-readers.js');
+    assert.ok(child.includes('error: fallback.error || null'));
+    assert.ok(child.includes('helperStatus: fallback.helperStatus || null'));
+    assert.ok(recovery.includes('payload.output?.error || payload.output?.reason'));
+    assert.ok(recovery.includes('PaddleOCR unavailable or incomplete:'));
+});
