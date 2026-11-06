@@ -227,6 +227,8 @@ test('63-image exploratory workflow persists restricted-egress attempts for arti
 
 test('billable imagesF extraction workflow supports fingerprint-bound no-duplicate resume', () => {
     const workflow = read('.github/workflows/dwbot-imagesF-63-exploratory.yml');
+    assert.ok(workflow.includes('node-version: 24.17.0'));
+    assert.ok(workflow.includes('Assert accepted Node.js runtime'));
     const runner = read('scripts/run-ocrspace-imagesF-63-exploratory.js');
     const resumeGuard = read('src/ocrspace-exploratory-resume.js');
     assert.match(workflow, /resume_run_id/);
