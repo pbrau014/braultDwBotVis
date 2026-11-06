@@ -66,6 +66,26 @@ function findRewardBaseX(sources, context) {
 }
 
 
+/**
+ * When OCR cannot locate the reward headings, use the lower portion of the
+ * OpenCV reward-band proposal as a geometry-only row window. The proposal is
+ * never a value source; independent OCR crops and field validation remain the
+ * only acceptance path. The lower band excludes the player/heading rows while
+ * retaining the numeric reward line across the supported screenshot layouts.
+ */
+function buildRewardRowBoundsFromCvRegion(rect, imageHeight) {
+    const top = Number(rect?.top);
+    const height = Number(rect?.height);
+    const screenHeight = Number(imageHeight);
+    const bottom = top + height;
+    if (![top, height, screenHeight, bottom].every(Number.isFinite) ||
+        top < 0 || height <= 0 || screenHeight <= 0 || bottom > screenHeight) return null;
+    const rowTop = Math.round(top + height * 0.65);
+    const rowBottom = Math.round(bottom - screenHeight * 0.015);
+    if (rowBottom <= rowTop || rowBottom - rowTop < screenHeight * 0.01) return null;
+    return { top: rowTop, bottom: rowBottom };
+}
+
 function fieldAllowsAnchorExtension(spec) {
     // Credits is the leftmost field and is especially vulnerable to grouping the
     // following XP token when an icon is mistaken for punctuation. Keep its
@@ -478,6 +498,7 @@ function rewardGeometryQuorumCanResolveXpTrailingAdornment(field, anchorValue, c
 
 module.exports = {
     FIELD_SPECS,
+    buildRewardRowBoundsFromCvRegion,
     findRewardBaseX,
     findRewardGeometryAnchor,
     buildRewardGeometryRects,

@@ -144,7 +144,7 @@ def analyze(image):
         'result': (0.025, 0.12, 0.48, 0.255),
         'identity': (0.02, 0.205, 0.58, 0.315),
         'metadata': (0.54, 0.115, 0.99, 0.275),
-        'rewardBand': (0.055, 0.255, 0.57, 0.405),
+        'rewardBand': (0.055, 0.255, 0.57, 0.445),
         'damage': (0.025, 0.365, 0.275, 0.505),
     }
     regions = {}
@@ -180,7 +180,7 @@ def analyze(image):
                                  'score': round(min(1.0, sum(g['components'] for g in chosen) / 18), 3),
                                  'componentCount': sum(g['components'] for g in chosen), 'method': 'opencv-connected-component-lines'}
         elif name == 'rewardBand':
-            choices = [g for g in groups if 0.275 <= g['center_y'] <= 0.40 and 0.05 <= g['center_x'] <= 0.57 and g['width_fraction'] >= 0.02]
+            choices = [g for g in groups if 0.275 <= g['center_y'] <= 0.42 and 0.05 <= g['center_x'] <= 0.57 and g['width_fraction'] >= 0.02]
             # This crop is an anchor/evidence source only, never a direct accepted tuple.
             chosen = sorted(choices, key=lambda g: (abs(g['center_y'] - 0.345), -g['components']))[:5]
             box = union_box([g['box'] for g in chosen]) if chosen else None

@@ -64,7 +64,7 @@ const { createDesktopService } = require('./desktop-service');
 const { createDesktopBridge } = require('./desktop-bridge');
 const { createSerialTaskQueue } = require('./serial-task-queue');
 const { selectDamageCandidates, hasUniqueDamageConsensus, extractFullScreenDamageCandidates } = require('./damage-consensus');
-const { FIELD_SPECS, findRewardBaseX, findRewardGeometryAnchor, buildRewardGeometryRects, rewardGeometryValueIsValid, rewardGeometryAnchorDigitsAreUsable, rewardValueMatchesAnchor, rewardGeometryQuorumCanResolveXpTrailingAdornment } = require('./reward-geometry');
+const { FIELD_SPECS, buildRewardRowBoundsFromCvRegion, findRewardBaseX, findRewardGeometryAnchor, buildRewardGeometryRects, rewardGeometryValueIsValid, rewardGeometryAnchorDigitsAreUsable, rewardValueMatchesAnchor, rewardGeometryQuorumCanResolveXpTrailingAdornment } = require('./reward-geometry');
 // Sharp is not a runtime dependency. ./image-processor uses ImageMagick CLI.
 
 const BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
@@ -1014,6 +1014,7 @@ async function extractTextCore(imageBuffer) {
     // ask local OpenCV for a text-line geometry proposal. This is anchor-only: its
     // raw OCR result can place later crops but cannot become an accepted reward tuple.
     let cvRewardAttempt = null;
+    let cvRewardAttemptPsm7 = null;
     const initialRewardTuples = rewardFieldOcrCandidates.map(attempt => extractFocusedRewards(attempt.text))
         .filter(tuple => tuple && /^\d{5,9}$/.test(String(tuple.credits || '')) &&
             /^\d{1,7}$/.test(String(tuple.xp || '')) && /^\d{1,7}$/.test(String(tuple.freeXp || '')))
@@ -1022,11 +1023,19 @@ async function extractTextCore(imageBuffer) {
         new Set(initialRewardTuples).size !== 1 || initialRewardTuples.length < 2;
     const cvRewardRegion = cvRegion('rewardBand', 0.16);
     if (cvRewardNeedsRescue && cvRewardRegion) {
-        cvRewardAttempt = await runSourceCrop({ ...cvRewardRegion.rect }, 2700, 7, {
+        // The OpenCV proposal can span the Received heading and the numeric row.
+        // PSM 6 reads this multi-line block; PSM 7 is retained as a second,
+        // single-line geometry source. Neither OCR result is accepted as a value.
+        cvRewardAttempt = await runSourceCrop({ ...cvRewardRegion.rect }, 2700, 6, {
             grayscale: true, contrastStretch: '0.5%x0.5%', sharpen: '0x1+1+0.03',
         });
         cvRewardAttempt.cvAssisted = true;
         cvRewardAttempt.cvRegion = cvRewardRegion;
+        cvRewardAttemptPsm7 = await runSourceCrop({ ...cvRewardRegion.rect }, 2700, 7, {
+            grayscale: true, contrastStretch: '0.5%x0.5%', sharpen: '0x1+1+0.03',
+        });
+        cvRewardAttemptPsm7.cvAssisted = true;
+        cvRewardAttemptPsm7.cvRegion = cvRewardRegion;
     }
 
     // When OCR's bounding box for the second Credits chunk includes the nearby
@@ -1764,6 +1773,7 @@ async function extractTextCore(imageBuffer) {
     const rewardGeometryAnchorSources = [
         ...(localizedWordGeometrySource ? [localizedWordGeometrySource] : []),
         ...(cvRewardAttempt ? [{ name: 'opencv-reward-band-anchor-only', attempt: cvRewardAttempt }] : []),
+        ...(cvRewardAttemptPsm7 ? [{ name: 'opencv-reward-band-anchor-psm7', attempt: cvRewardAttemptPsm7 }] : []),
         ...rewardFieldOcrCandidates.map((attempt, index) => ({ name: `reward-row-${index}`, attempt })),
         { name: 'reward-row-selected', attempt: rewardFieldOcr },
     ];
@@ -1781,9 +1791,12 @@ async function extractTextCore(imageBuffer) {
         { name: 'panel-source', attempt: panelSourceOcr },
     ];
     const rewardBounds = localizedRewardEvidence.bounds || {};
+    const cvRewardRowBounds = !Number.isFinite(Number(rewardBounds.top)) || !Number.isFinite(Number(rewardBounds.bottom))
+        ? buildRewardRowBoundsFromCvRegion(cvRewardRegion?.rect, imageHeight)
+        : null;
     const anchorContext = {
-        rowTop: Number(rewardBounds.top),
-        rowBottom: Number(rewardBounds.bottom),
+        rowTop: Number.isFinite(Number(rewardBounds.top)) ? Number(rewardBounds.top) : Number(cvRewardRowBounds?.top),
+        rowBottom: Number.isFinite(Number(rewardBounds.bottom)) ? Number(rewardBounds.bottom) : Number(cvRewardRowBounds?.bottom),
         imageWidth,
         imageHeight,
     };
@@ -2477,6 +2490,8 @@ async function extractTextCore(imageBuffer) {
                 identity: cvIdentityAttempt ? { text: cvIdentityAttempt.text, confidence: cvIdentityAttempt.confidence, psm: cvIdentityAttempt.pageSegmentationMode, crop: cvIdentityAttempt.sourceCrop, proposal: cvIdentityAttempt.cvRegion } : null,
                 metadata: cvMetadataAttempt ? { text: cvMetadataAttempt.text, confidence: cvMetadataAttempt.confidence, psm: cvMetadataAttempt.pageSegmentationMode, crop: cvMetadataAttempt.sourceCrop, proposal: cvMetadataAttempt.cvRegion } : null,
                 rewardBandAnchorOnly: cvRewardAttempt ? { text: cvRewardAttempt.text, confidence: cvRewardAttempt.confidence, psm: cvRewardAttempt.pageSegmentationMode, crop: cvRewardAttempt.sourceCrop, proposal: cvRewardAttempt.cvRegion } : null,
+                rewardBandAnchorPsm7: cvRewardAttemptPsm7 ? { text: cvRewardAttemptPsm7.text, confidence: cvRewardAttemptPsm7.confidence, psm: cvRewardAttemptPsm7.pageSegmentationMode, crop: cvRewardAttemptPsm7.sourceCrop, proposal: cvRewardAttemptPsm7.cvRegion } : null,
+                rewardRowBoundsSource: cvRewardRowBounds ? 'opencv-lower-reward-band' : (localizedRewardEvidence.bounds ? 'ocr-heading-anchors' : 'unavailable'),
             },
         },
         damage: focusedDamage,

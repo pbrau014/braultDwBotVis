@@ -3,6 +3,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
+  buildRewardRowBoundsFromCvRegion,
   findRewardBaseX,
   findRewardGeometryAnchor,
   buildRewardGeometryRects,
@@ -444,4 +445,30 @@ test('split Credits geometry can group a short numeric fragment with an adjacent
   }], { imageWidth: 1874, imageHeight: 967, baseX: 225, rowTop: 490, rowBottom: 560 });
   assert.equal(anchor?.groupedDigits, '261202');
   assert.deepEqual(anchor?.groupedWords, ['261', '202©&']);
+});
+
+
+test('OpenCV reward-band fallback bounds isolate the numeric row when OCR headings are missing', () => {
+  const bounds = buildRewardRowBoundsFromCvRegion(
+    { left: 140, top: 385, width: 1318, height: 197 }, 1439,
+  );
+  assert.deepEqual(bounds, { top: 513, bottom: 560 });
+  const sources = [attempt('opencv-reward-band-psm6', [
+    ['gtrain25465', 300, 520, 430, 460],
+    ['Received', 340, 550, 460, 500],
+    ['1092', 470, 560, 550, 590],
+    ['292@', 570, 650, 550, 590],
+    ['8425', 700, 780, 550, 590],
+    ['1904', 850, 930, 550, 590],
+  ], 6)];
+  assert.equal(findRewardBaseX(sources, {
+    rowTop: bounds.top, rowBottom: bounds.bottom, imageWidth: 2558, imageHeight: 1439,
+  }), 470);
+});
+
+test('OpenCV reward-band fallback bounds reject invalid or degenerate proposals', () => {
+  assert.equal(buildRewardRowBoundsFromCvRegion(null, 1439), null);
+  assert.equal(buildRewardRowBoundsFromCvRegion({ top: -1, height: 100 }, 1439), null);
+  assert.equal(buildRewardRowBoundsFromCvRegion({ top: 1400, height: 100 }, 1439), null);
+  assert.equal(buildRewardRowBoundsFromCvRegion({ top: 300, height: 5 }, 1439), null);
 });
