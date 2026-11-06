@@ -51,7 +51,7 @@ test('Gate A resume accepts only the single original first-image start marker', 
 
 
 test('Gate A resume parses BOM-prefixed JSON from the original uploaded artifact', () => {
-    assert.deepEqual(parseJsonUtf8(Buffer.from('\\uFEFF{"schemaVersion":1,"status":"FAIL"}', 'utf8')),
+    assert.deepEqual(parseJsonUtf8(Buffer.from('\uFEFF{"schemaVersion":1,"status":"FAIL"}', 'utf8')),
         { schemaVersion: 1, status: 'FAIL' });
     assert.deepEqual(parseJsonUtf8(Buffer.from('{"schemaVersion":1}', 'utf8')),
         { schemaVersion: 1 });
