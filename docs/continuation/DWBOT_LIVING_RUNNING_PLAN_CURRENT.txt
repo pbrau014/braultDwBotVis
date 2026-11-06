@@ -42,10 +42,10 @@ END OCRSPACE IMPLEMENTATION UPDATE
 ================================================================================
 
 ================================================================================
-CURRENT CHAT IMPLEMENTATION / CI STATUS — 2026-11-05
+SUPERSEDED CHAT IMPLEMENTATION / CI STATUS SNAPSHOT — 2026-11-05
 ================================================================================
 
-Canonical main HEAD: 3f9d790395da4a52d44df7f71fa526d8ceb7d375.
+This earlier snapshot is superseded by the CURRENT OCRSPACE IMPLEMENTATION UPDATE at the top of this plan. Do not use its source/head or workflow status as current.
 Current OCR source implementation commit: 8cabbd06bbcf579acab7134a4221914e6b91194b.
 Synchronized documentation commits:
 - d6f35200a4921e7a1789d06b3a18b0a384a4e580 — current OCR architecture override,
@@ -119,8 +119,7 @@ CURRENT OCR ARCHITECTURE OVERRIDE — OCR.SPACE SOURCE-IMAGE → SEARCHABLE PDF 
 2026-11-05 / controlling user instruction
 ================================================================================
 
-The user's latest instruction in this chat supersedes older active OCR pipeline
-descriptions. Historical reports and prior designs remain unchanged as provenance.
+The user's latest instruction in this chat supersedes older active OCR pipeline descriptions. Historical reports and prior designs remain unchanged as provenance.
 
 REQUIRED PIPELINE
 1. Receive the original World of Warships battle-result screenshot.

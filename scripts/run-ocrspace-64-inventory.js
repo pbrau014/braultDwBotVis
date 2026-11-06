@@ -130,12 +130,10 @@ async function main() {
     run.status = 'completed-extraction-not-accuracy-accepted';
     run.completedImages = 64;
     run.updatedAt = new Date().toISOString();
-    run.reportSha256 = null;
     const reportPath = path.join(outputRoot, 'ocrspace-64-inventory-report.json');
     await fs.writeFile(reportPath, JSON.stringify(run, null, 2));
-    run.reportSha256 = sha256(await fs.readFile(reportPath));
-    await fs.writeFile(reportPath, JSON.stringify(run, null, 2));
-    await fs.writeFile(reportPath + '.sha256', run.reportSha256 + '  ' + path.basename(reportPath) + '\n');
+    const reportSha256 = sha256(await fs.readFile(reportPath));
+    await fs.writeFile(reportPath + '.sha256', reportSha256 + '  ' + path.basename(reportPath) + '\\n');
     await bot.terminateOcrWorker().catch(() => {});
     console.log(`[OCRSPACE-64] COMPLETE: 64 PDFs generated and processed by local readers; exact accuracy NOT EVALUABLE without independent ground truth. Report: ${reportPath}`);
 }
