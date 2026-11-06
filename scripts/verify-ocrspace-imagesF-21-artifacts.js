@@ -125,6 +125,7 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
     workflowSourceText = '', apiKey = process.env.OCRSPACE_API_KEY || '',
     renderPdf = imageProcessor.renderSearchablePdfPage,
     readMetadata = imageProcessor.metadata,
+    toRawRgba = buffer => imageProcessor.__test.runImageMagick(['png:-', '-depth', '8', 'rgba:-'], buffer, { timeoutMs: 60000, maxOutputBytes: 80_000_000 }),
     readPdfText = extractPdfText,
     gateAReport = null }) {
     const runBytes = await fs.readFile(runReport);
@@ -213,7 +214,14 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
             if (!rasterOk) all.rasterIntegrity = false;
             if (pdfOk && rasterOk) {
                 const rendered = await renderPdf(pdfBuffer);
-                const derivedOk = Buffer.isBuffer(rendered) && sha256(rendered) === row.rasterSha256;
+                const renderedDims = pngDimensions(rendered);
+                const renderedMetadata = renderedDims ? await readMetadata(rendered) : null;
+                const savedPixels = await toRawRgba(rasterBuffer);
+                const renderedPixels = await toRawRgba(rendered);
+                const derivedOk = Buffer.isBuffer(rendered) && Boolean(renderedDims && renderedMetadata)
+                    && renderedDims.width === dims.width && renderedDims.height === dims.height
+                    && renderedMetadata.width === dims.width && renderedMetadata.height === dims.height
+                    && Buffer.isBuffer(savedPixels) && Buffer.isBuffer(renderedPixels) && savedPixels.equals(renderedPixels);
                 image.checks.pdfDerivedRasterProvenance = derivedOk ? 'PASS' : 'FAIL';
                 if (!derivedOk) all.pdfDerivedRasterProvenance = false;
             } else {
