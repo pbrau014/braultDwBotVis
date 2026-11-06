@@ -104,7 +104,7 @@ test('429 is classified with Retry-After and is never retried by this client', a
 test('HTTP, authentication, malformed JSON, provider errors and parse failures are classified', async () => {
     await assert.rejects(recognizeCrop({ ...args(), fetchImpl: async () => reply({}, 401) }), { code: 'OCRSPACE_AUTH_ERROR' });
     await assert.rejects(recognizeCrop({ ...args(), fetchImpl: async () => reply({}, 503) }), { code: 'OCRSPACE_HTTP_ERROR' });
-    await assert.rejects(recognizeCrop({ ...args(), fetchImpl: async () => ({ ok: true, status: 200, json: async () => { throw new Error('bad json'); } }) }), { code: 'OCRSPACE_INVALID_RESPONSE' });
+    await assert.rejects(recognizeCrop({ ...args(), fetchImpl: async () => ({ ok: true, status: 200, headers: { get: () => null }, body: { getReader: () => { let sent = false; return { async read() { if (sent) return { done: true }; sent = true; return { done: false, value: Buffer.from('{bad json') }; }, async cancel() {}, releaseLock() {} }; } } }) }), { code: 'OCRSPACE_INVALID_RESPONSE' });
     await assert.rejects(recognizeCrop({ ...args(), fetchImpl: async () => reply({ IsErroredOnProcessing: true, ErrorMessage: 'provider error', ParsedResults: [] }) }), { code: 'OCRSPACE_PROCESSING_ERROR' });
     await assert.rejects(recognizeCrop({ ...args(), fetchImpl: async () => reply({ OCRExitCode: 3, ParsedResults: [] }) }), { code: 'OCRSPACE_PARSE_FAILED' });
 });
