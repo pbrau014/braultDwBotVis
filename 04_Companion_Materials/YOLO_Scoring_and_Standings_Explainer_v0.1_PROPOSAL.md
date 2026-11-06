@@ -60,7 +60,7 @@ That game contributes 40 Doubloons. If the player records the same contribution 
 
 ### What the formula rewards
 
-The player's share of event-wide damage/kills determines the contribution. Class weight and tier power adjust it. A high raw damage number alone is not enough to know the reward: the event-wide total, ship class, tier, pool and multiplier all matter.
+The player's share of event-wide damage/kills determines the contribution. The shared ship-class mapping is DD=4, CA=3, BB=2; unknown classes are rejected rather than assigned a fallback weight. Class weight and tier power adjust the contribution. A high raw damage number alone is not enough to know the reward: the event-wide total, ship class, tier, pool and multiplier all matter. The DWBOT core and HTML calculator use the same mapping; an explicit core validation test and formula-parity tests are committed, with exact-head CI still pending.
 
 ## 4. Race — current DWBOT C01 policy
 
@@ -70,7 +70,7 @@ DWBOT policy C01 uses inverse elapsed seconds:
 
 `RaceShare_i = (1 / seconds_i) / Σ(1 / seconds_j)`
 
-The current DWBOT core and standalone HTML calculator have been changed to use this inverse-time share. The archival workbook and Discord texts remain unchanged as historical evidence. Exact-head CI/browser verification is required before declaring implementation parity passed.
+The current DWBOT core and standalone HTML calculator have been changed to use this inverse-time share. The Discord Race leaderboard now displays a C01 note explaining that lower elapsed seconds earn a larger performance share. The archival workbook and Discord source texts remain unchanged as historical evidence. Formula-parity/integration tests are committed; exact-head CI and browser/visual verification are still required before declaring implementation parity passed.
 
 ### Worked Race example
 
