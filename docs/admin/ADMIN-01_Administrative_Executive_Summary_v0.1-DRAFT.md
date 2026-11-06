@@ -164,10 +164,15 @@ The proposed correction is a deterministic crop derived from the source screensh
 A draft PR was opened:
 - PR #13: `https://github.com/pbrau014/braultDwBotVis/pull/13`
 - Branch: `fix/pdf-raster-source-aspect-normalization`
-- Latest head when this summary was prepared: `a8a5b0d243510ad33c26bd428409f18b980491f2`
-- Windows offline regression workflow run: `42287080242`, queued at last check.
+- Latest head when this summary was prepared: `cdc2d06adbe05cc785f802b46c191c400dc9c0c0`
+- Draft PR: [#13](https://github.com/pbrau014/braultDwBotVis/pull/13).
+- The first targeted Windows run found and corrected three fixture/contract issues; its source-aspect normalizer/provenance test group passed, while the wider offline OCR suite then failed because the workflow had not installed the local Tesseract English language model. The workflow was updated to install the pinned Tesseract package/model.
+- Latest targeted Windows regression run: `42289167703`, pending at last check.
+- Latest local-only Gate B artifact recovery run: `42289167849`, pending at last check.
+- A new no-provider audit now covers all 63 existing PDFs and emits separately fingerprinted normalized rasters; it is wired into the local-only Gate B workflow.
+- A Gate A local-only recovery run `42288788959` is in progress against the previously submitted first-image artifact. The commit message explicitly selects the LOCAL-ONLY-RECOVERY path; the paid 16-image provider step is skipped.
 
-**Status:** implementation is in a draft PR; not yet tested by the new workflow. Do not call the engineering fix complete or verified until that workflow passes, the affected scripts are reviewed, and the existing PDF-derived artifacts have been reprocessed/re-evaluated without provider submissions.
+**Status:** implementation is in a draft PR and remains unverified end-to-end. The deterministic normalization/provenance test group passed on the prior iteration, but the complete offline suite has not yet passed. Do not call the engineering fix complete until the latest Windows regression, all-63 raster audit, Gate A first-image local recovery, and Gate B 19-image artifact/evaluation runs finish and their reports are reviewed. No OCR.Space request was made by these recovery paths.
 
 ### 4.4 OCR architecture constraints
 
