@@ -1,6 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const vm = require('node:vm');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
@@ -194,4 +195,56 @@ test('standalone HTML Grand Yolo formula matches the live DWBOT scoring engine',
   assert.ok(coreFormula, 'DWBOT Grand Yolo formula must be present');
   assert.equal(htmlFormula, coreFormula);
   assert.equal(T.DEFAULT_SETTINGS.events.grand.tierWeight, 0.9);
+});
+
+
+test('HTML calculator and live DWBOT engine match all four event formulas', async () => {
+  const html = await fs.readFile(path.join(__dirname, '..', 'dwbotStuff', 'yolo_tournament_scoreCalculator.html'), 'utf8');
+  const start = html.indexOf('function eventRawScore(p,key){');
+  const end = html.indexOf('function eventScore(p,key)', start);
+  assert.ok(start >= 0 && end > start, 'HTML eventRawScore function must exist');
+  const functionSource = html.slice(start, end).trim();
+  const state = T.createState();
+  let seed = 271828;
+  const random = () => { seed = (seed * 48271) % 2147483647; return seed / 2147483647; };
+  for (let i = 0; i < 12; i++) {
+    const player = T.addPlayer(state, 'Formula parity ' + i);
+    for (const event of T.EVENTS) {
+      player.events[event] = Array.from({ length: 7 }, () => {
+        const shipClass = ['DD', 'CA', 'BB'][Math.floor(random() * 3)];
+        const tier = 1 + Math.floor(random() * 10);
+        if (event === 'grand') return {
+          class: shipClass, classWeight: ({ DD: 4, CA: 3, BB: 2 })[shipClass], tier,
+          damage: 10000 + Math.floor(random() * 90000),
+          kills: Math.floor(random() * 8),
+          time: 30 + Math.floor(random() * 240),
+        };
+        return {
+          class: shipClass, classWeight: ({ DD: 4, CA: 3, BB: 2 })[shipClass], tier,
+          metric: event === 'race' ? 30 + Math.floor(random() * 240) : 1000 + Math.floor(random() * 100000),
+        };
+      });
+    }
+  }
+  const sandbox = {
+    state,
+    num: value => { const n = Number(value); return Number.isFinite(n) ? n : 0; },
+    cfg: key => state.settings.events[key],
+    classWeightFor: code => ({ DD: 4, CA: 3, BB: 2 })[String(code || '-').toUpperCase()] || 0,
+    eventTotal: (player, key) => player.events[key].reduce((sum, game) => sum + Number(key === 'grand' ? game.damage : game.metric), 0),
+  };
+  const htmlEventRawScore = vm.runInNewContext(functionSource + '\\neventRawScore;', sandbox);
+  for (const player of state.players) {
+    for (const event of T.EVENTS) {
+      const live = T.eventScore(state, player, event);
+      const browser = htmlEventRawScore(player, event);
+      assert.ok(Math.abs(live - browser) < 1e-10, player.name + ' / ' + event + ': ' + live + ' vs ' + browser);
+    }
+  }
+});
+
+test('HTML calculator participant tables do not expose H12 dollar estimates', async () => {
+  const html = await fs.readFile(path.join(__dirname, '..', 'dwbotStuff', 'yolo_tournament_scoreCalculator.html'), 'utf8');
+  assert.doesNotMatch(html, /Estimated value|Season dollars|H12-equivalent|function dollars\\(|function money\\(|totalDollars/);
+  assert.match(html, /Total doubloons/);
 });
