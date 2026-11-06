@@ -8,6 +8,10 @@ below; preserve the old handoff body as provenance.
 - Stay in this ChatGPT conversation for all DWBOT work; do not hand off to
   Work mode or another executor. Do not emit progress narration or interim
   screen text while authorized operations are underway.
+- Runtime rule: Node.js 22.16.0 is explicitly accepted for DWBOT and replaces
+  older Node 24+ minimum/prerequisite statements. Node 24 is optional only for
+  a specific, proven tool/dependency requirement. Windows-specific checks still
+  require Windows execution; preserve all historical runtime reports unchanged.
 - OCR.Space is the explicitly enabled, highest-priority first reader for each
   eligible original screenshot. Require `OCRSPACE_ENABLED=1`,
   `OCRSPACE_NETWORK_ALLOWLIST=1`, and a valid local `OCRSPACE_API_KEY`.
