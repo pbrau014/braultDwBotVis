@@ -15,6 +15,8 @@ test('21-image local reader matrix is offline, source-bound, and never calls OCR
     assert.ok(script.includes('OCR_SUPERVISED_TIMEOUT_MS'));
     assert.ok(script.includes('complete-ground-truth-21'));
     assert.ok(script.includes('row.sourceSha256 !== expected.sourceImage.sha256'));
+    assert.ok(script.includes('run.pipeline !== EXPECTED_PIPELINE'));
+    assert.ok(script.includes('sourcePipeline: run.pipeline'));
     assert.ok(script.includes('sha256(pdfBuffer) !== row.pdfSha256'));
     assert.ok(script.includes('sha256(rasterBuffer) !== row.rasterSha256'));
     assert.ok(script.includes('renderSearchablePdfPage'));
