@@ -56,10 +56,11 @@
         <div class="panel-heading"><div><p class="eyebrow">SCORING CONFIGURATION</p><h2>Event settings</h2><p class="muted">Grand Yolo defaults to tierWeight 0.9. The workbook’s Totals!H12 formula remains =0.54*G12/100.</p></div></div>
         <form id="settings-form" class="form-grid compact-form">
           <label>Event<select name="event" id="setting-event"><option value="damage">Damage</option><option value="kills">Kills</option><option value="race">Race</option><option value="grand">Grand Yolo</option></select></label>
-          <label>Setting<select name="field" id="setting-field"></select></label>
-          <label>Value<input name="value" type="number" min="0" step="any" required></label>
+          <label>Setting<select name="field" id="setting-field" aria-describedby="setting-help"></select></label>
+          <label>Value<input id="setting-value" name="value" type="number" min="0" step="any" required aria-describedby="setting-help"></label>
           <button type="submit" class="button secondary">Update setting</button>
         </form>
+        <p id="setting-help" class="muted" role="note">Choose an event and setting to see its scoring effect and default behavior.</p>
       </section>
       <section class="panel">
         <div class="panel-heading"><div><p class="eyebrow">SCREENSHOT QUEUE</p><h2>OCR submissions and approvals</h2><p class="muted">Admin can review all records. Participants cannot view another account’s submissions.</p></div><a class="button secondary small" href="/upload.html">Upload on behalf of player</a></div>
