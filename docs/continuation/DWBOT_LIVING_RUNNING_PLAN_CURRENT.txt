@@ -1,3 +1,51 @@
+CURRENT PARALLEL IMPLEMENTATION UPDATE — 2026-11-06
+Status: changes committed; exact-head verification pending.
+
+- Runtime baseline is now Node.js >=24.17.0 in package.json/package-lock.
+  Current DWBOT verification, Gate A workflow and future 63-image workflow use
+  Node 24.17.0. Historical runs under Node 22.16.0 remain historical evidence,
+  not accepted-runtime passes.
+- The legacy 56-image OCR.Space provider step in ordinary DWBOT verification
+  is now gated behind workflow_dispatch input
+  run_legacy_56_provider_acceptance (default false). Push verification does
+  not submit this legacy provider batch. No such batch was started.
+- The generic four-image PDF-first runner now refuses fresh runs that would
+  overwrite reports/progress/artifacts; supports explicit resume from a prior
+  progress file; binds resume to exact fixture order, source build, runtime,
+  package and OCR configuration; verifies completed PDF/raster hashes; skips
+  completed submissions; and never retries ambiguous in-flight or orphaned
+  artifact rows. The original network log must be present and bound to claim
+  zero denied attempts.
+- The 63-image exploratory runner now records and verifies runtime in its
+  resume fingerprint. Future 63-image runs use Node 24.17.0. The old 63-image
+  run remains a historical Node 22.16.0 run and is not eligible for a
+  cross-runtime resume.
+- Added reproducible procedure:
+  docs/continuation/DWBOT-OCRSPACE-ARTIFACT-VERIFICATION-CHECKLIST-v1.md.
+  It covers exact run/artifact identity, source/PDF/raster hashes, searchable
+  text, PDF-to-raster provenance, network-log recovery/reconciliation, secret
+  scans, evaluator denominators and gate decisions.
+- Scoring implementation now has explicit tests for shared DD=4, CA=3, BB=2
+  weights and rejection of unknown classes. C01 inverse-time scoring is
+  aligned between DWBOT core, HTML calculator and Discord leaderboard text.
+  Exact-head CI is still pending.
+- Tournament participant guide, event-night operations manual, scoring
+  explainer, pilot/recurring draft rules and v0.2 season/playoff/Grand YOLO
+  finale blueprint are present in 04_Companion_Materials. Unapproved event
+  details remain marked DRAFT/PROPOSAL; no dates, prizes, eligibility cutoffs
+  or finale formula are represented as approved.
+- Desktop UI source/contract tests cover upload limit text, PDF-first
+  instructions, accessible drop-zone semantics, keyboard-visible focus,
+  reduced motion and contextual mouseover/assistive help. Exact-head CI is
+  pending; browser/visual checks and live Discord OAuth smoke checks remain
+  open.
+- No production deployment and no new OCR.Space provider requests were made
+  for these parallel changes.
+
+================================================================================
+END CURRENT PARALLEL IMPLEMENTATION UPDATE
+================================================================================
+
 CURRENT OCR / GATE EVIDENCE UPDATE — 2026-11-06
 Status: 19-image artifact review complete; Gate A and Gate B remain NOT PASSED.
 
