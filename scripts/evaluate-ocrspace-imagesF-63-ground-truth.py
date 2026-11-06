@@ -27,9 +27,9 @@ def norm(field: str, value):
     if text.casefold() in MISSING:
         return None
     if field in NUMERIC:
-        digits = re.sub(r"\\D", "", text)
+        digits = re.sub(r"\D", "", text)
         return digits or None
-    text = re.sub(r"\\s+", " ", text).strip()
+    text = re.sub(r"\s+", " ", text).strip()
     text = text.replace("—", "-").replace("–", "-")
     return text.casefold()
 
@@ -167,11 +167,11 @@ def main():
         "engines":engines
     }
     args.output.parent.mkdir(parents=True,exist_ok=True)
-    payload=json.dumps(report,ensure_ascii=False,indent=2)+"\\n"
+    payload=json.dumps(report,ensure_ascii=False,indent=2)+"\n"
     args.output.write_text(payload,encoding="utf-8")
     digest=sha(args.output)
     args.output.with_suffix(args.output.suffix+".sha256").write_text(
-        f"{digest}  {args.output.name}\\n",encoding="ascii")
+        f"{digest}  {args.output.name}\n",encoding="ascii")
     print(json.dumps({
         "output":str(args.output),"sha256":digest,
         "runStatus":run.get("status"),
