@@ -366,3 +366,62 @@ The extraction remains exploratory and does not establish Gate A or Gate B:
 Gate A still has only one of 16 PDF/raster pairs and lacks its original
 network log; Gate B still has incomplete local-reader evidence, unresolved
 mandatory values and missing original network-log proof.
+
+
+## Run #42239832115 — completed artifact and local-recovery findings
+
+- The 63-image source artifact was downloaded and its ZIP SHA-256 verified
+  against GitHub: `ac4ae071ee4737c2fe044b64456a8dab1cddf7073a02f8f427ec7b35af28629a`.
+  It contains 63 searchable one-page PDFs and 63 PDF-derived PNG rasters.
+  Independent local inspection found valid PDF signatures/EOF markers,
+  exactly one page and non-empty text for all 63 PDFs, and valid PNGs for all
+  63 rasters. The 21 selected complete-record pairs also passed the recovery
+  workflow's PDF/raster provenance checks.
+- The no-provider local recovery completed for all 21 analysis records:
+  Tesseract.js recovered 21/21 and native Tesseract recovered 21/21. PaddleOCR
+  failed 21/21 because the field-crop helper exceeded its 15,000 ms deadline.
+  The recovery report records 0 provider requests and 0 blocked network
+  attempts in the *new local-only recovery*. Its empty network log is not the
+  missing historical OCR.Space-run log.
+- The 19-image post-hoc report was produced, but its artifact-verification
+  report was absent. The artifact-verification step failed while parsing the
+  BOM-prefixed `gate-a-acceptance-source.json`; the verifier had BOM handling
+  for the network reconciliation file but not the Gate A report. This is a
+  parser defect, not evidence of a PDF/raster mismatch. The verifier now strips
+  a UTF-8 BOM consistently from run, ground-truth, preflight, reconciliation
+  and Gate A JSON, with a regression test using an actual BOM byte sequence.
+- The diagnostic field results across 171 eligible field values were:
+  - PDF text layer alone: 73 exact, 2 wrong, 77 unresolved (48.03% field exact).
+  - OCR.Space parsed text alone: 79 exact, 17 wrong, 56 unresolved (51.97%).
+  - PDF + provider consensus: 80 exact, 0 wrong, 91 unresolved (46.78%).
+  - Four-source consensus: 131 exact, 1 wrong, 39 unresolved (76.61%).
+  - Strict four-source consensus: 59 exact, 0 wrong, 112 unresolved (34.50%).
+  These are exploratory field-level measurements, not a Gate B accuracy pass.
+  The one wrong four-source acceptance is a hard blocker; the strict
+  zero-wrong variant leaves too many mandatory fields unresolved.
+- The results support a PDF-text-first *reader*, not PDF-text-only acceptance.
+  Keep PDF text, OCR.Space parsed text, Tesseract.js, native Tesseract and
+  PaddleOCR as separate provenance-labelled candidates. Apply field-specific
+  validation and strict consensus; never let one reader or confidence alone
+  authorize a mandatory value. Unresolved values remain blank for review.
+- Recovery/idempotency was improved after this run: successful local readers
+  are now preserved only when their engine/status/record are unambiguous;
+  only missing, failed or duplicate/ambiguous engine rows are retried. PDF
+  text is re-extracted from the hash-verified PDF. The source pipeline string
+  is checked before recovery. The bounded PaddleOCR crop deadline was raised
+  from 15 to 60 seconds (still below the 185-second supervised process limit).
+- The v6 ground-truth JSON, SHA-256 sidecar and candidate manifest now agree on
+  the 19-image Gate B holdout (first 19 corpus-order complete records).
+  Records 20–21 remain diagnostic-only. The updated ground-truth SHA-256 is
+  `62ea492c9d4a4a05b33d16c67bb4ec31ebdc07b67cbf47d3e4a3062ff8d1dfb3`.
+- The original 63-image artifact has no original restricted-egress diagnostic
+  log. The source job logs show the restriction/allowlist flags but no
+  configured log path and no blocked-request marker. The historical attempt
+  count remains UNKNOWN. The network reconciliation explicitly records
+  `RECONSTRUCTED_LIMITED_EVIDENCE`, `originalBlockedAttemptCount: null` and
+  `zeroAttemptsClaimed: false`. Do not fabricate an empty historical log.
+- Run #42239832115 failed only at the artifact-verifier JSON parse step and
+  therefore produced no formal `artifact-verification-19.json`. The new
+  BOM-safe, 60-second, idempotent recovery workflow is queued as #42249191471;
+  it makes no OCR.Space requests.
+
