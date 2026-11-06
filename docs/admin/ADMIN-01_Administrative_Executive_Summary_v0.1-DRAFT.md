@@ -176,37 +176,50 @@ A draft PR was opened:
 
 Latest recorded run reviewed: [42270137648](https://github.com/pbrau014/braultDwBotVis/actions/runs/42270137648), job 128072257063.
 
-Observed summary from the job log:
-- `DWBOT GATE A: FAIL`
-- exact result count was incomplete (`exact=/16`);
+Observed current-run summary from the job log:
+- `DWBOT GATE A: FAIL`;
+- exact count was incomplete (`exact=/16`);
 - PDF evidence was `0/16`;
 - source fingerprint check was true;
 - runtime was Node v22.16.0 and the runtime check reported true;
 - the local parallel-reader matrix was skipped because no completed source report/PDF audit existed;
-- no new provider request was made by the recovery path.
+- no new provider request was made by the local recovery path.
 
-The run uploaded a diagnostic artifact, but it does not constitute Gate A acceptance. The first-image recovery must verify the existing original PDF and full-page raster, then produce the source-aspect normalized raster and local-reader evidence. The preserved PDF and raster must be hash-checked and pixel-compared before reuse. Gate A cannot pass on a single recovered image; the 16-image criteria remain unchanged.
+The historical partial first-image run #42202563673 produced one PDF/raster pair for `Screenshot_16.jpg`; the other 15 images were not submitted. The original run lacked the required restricted-egress guard/allowlist, so its empty/missing network log cannot be reconstructed as proof. Later local-only attempts reused the partial artifact and did not make provider calls. This partial artifact is diagnostic only and cannot satisfy Gate A or authorize a continuation batch.
+
+The new geometry fix must verify the saved PDF and page raster by hash and pixel identity, then create the deterministic source-aspect normalized raster and local-reader evidence. Gate A cannot pass on a single recovered image; all 16 approved development images and the original network-control criteria remain unchanged.
 
 ### 5.2 Gate B — 19-image holdout
 
 Latest recorded run reviewed: [42268159303](https://github.com/pbrau014/braultDwBotVis/actions/runs/42268159303), job 128066284095.
 
-Observed summary:
-- artifact verification: `FAILED`;
-- PDF/raster integrity summary: `19/19`;
-- complete/full-record summary: `0/19`;
-- Gate A evidence: FAIL;
-- original network evidence: `NOT_VERIFIED_MISSING_ORIGINAL_LOG`;
-- local reader recovery: `COMPLETED_WITH_LOCAL_RECOVERY_FAILURES`;
-- provider requests during local recovery: 0;
-- blocked attempts observed in the new local recovery log: 0, but this does not reconstruct the missing contemporaneous original network log.
+The original exploratory source run #42160979140 completed and produced 63 searchable PDFs and 63 PDF-page rasters. Its 81,886,966-byte artifact ZIP was independently matched to the GitHub digest. The 126 PDF/raster files matched their recorded sizes and hashes; all 63 PDFs had non-empty searchable text. This establishes artifact availability and integrity for the original extraction, not OCR accuracy or historical network proof.
 
-The 21-record diagnostic reader comparison covered 189 eligible fields:
-- three-local-reader consensus: 112 exact, 1 wrong, 76 unresolved;
-- five-source consensus: 68 exact, 0 wrong, 121 unresolved;
-- strict five-source consensus: 45 exact, 0 wrong, 144 unresolved.
+Observed 19-image verification:
+- selected exactly 19 complete, eligible nine-field records in corpus order; zero overlap with the 16-image development corpus and four-image regression corpus;
+- source-image hashes: PASS; PDF integrity: PASS; searchable text: PASS; raster integrity: PASS; PDF-derived raster provenance: PASS;
+- local readers: FAIL; Gate A evidence: FAIL;
+- original network evidence: `NOT_VERIFIED_MISSING_ORIGINAL_LOG`; original denied-attempt count remains UNKNOWN;
+- local recovery provider requests: 0; blocked attempts in the new local recovery log: 0; this new log is not historical evidence;
+- overall artifact report: FAIL; `verifiedImageCount=19`; `gateB=NOT_PASSED`.
 
-These are diagnostic strategy counts from the 21-record analysis, not Gate B pass metrics for the selected 19 records. The one wrong value in three-reader consensus disqualifies that strategy under the zero-wrong rule. The zero-wrong strict strategy leaves most eligible fields unresolved and does not meet complete-record exactness. A zero-wrong but unresolved strategy is not a pass.
+The 19-image post-hoc diagnostic denominator is 171 eligible values (19 × 9), except PDF/provider text alone which exclude player and therefore have 152 eligible values:
+
+| Reader / method | Exact | Wrong candidates | Unresolved | Exact-match rate |
+|---|---:|---:|---:|---:|
+| Tesseract.js | 110/171 | 2 | 59 | 64.33% |
+| Native Tesseract | 103/171 | 2 | 66 | 60.23% |
+| PDF text layer | 73/152 | 2 | 77 | 48.03% |
+| OCR.Space parsed text | 79/152 | 17 | 56 | 51.97% |
+| PDF + provider consensus | 80/171 | 0 | 91 | 46.78% |
+| Four-source consensus | 131/171 | 1 | 39 | 76.61% |
+| Strict four-source consensus | 59/171 | 0 | 112 | 34.50% |
+| Strict three-source consensus | 104/171 | 1 | 66 | 60.82% |
+| Three local-reader consensus | 99/171 | 1 | 71 | 57.89% |
+
+Full nine-field records: Tesseract.js 2/19 exact (17 unresolved); native Tesseract 0/19 exact (19 unresolved). No wrong mandatory values were marked accepted by either individual local reader, but wrong candidates remain diagnostic errors. Four-source and local consensus strategies each produced a wrong candidate; strict strategies eliminated wrong candidates only by leaving most fields unresolved. None satisfies complete-record acceptance.
+
+The one wrong value in four-source or three-local-reader consensus disqualifies that strategy under the zero-wrong rule. The zero-wrong PDF+provider and strict consensus strategies leave 91/171 or 112/171 values unresolved, respectively. A zero-wrong but unresolved strategy is not a pass.
 
 ### 5.3 Gate acceptance conditions
 
