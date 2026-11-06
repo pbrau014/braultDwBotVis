@@ -23,7 +23,7 @@ and its exact-head jobs/artifacts are inspected.
 
 Code changes now committed:
 - OCR.Space Engine 2 receives the source image first and requests a searchable
-  PDF with a visible text layer.
+  PDF with a searchable text layer hidden from the rendered page so local OCR readers do not see duplicate overlay text.
 - Images larger than the 1 MiB Free API limit are normalized locally using a
   bounded JPEG resize/quality profile; original source remains unchanged.
 - Searchable PDF URL is HTTPS-host-allowlisted; download rejects redirects,

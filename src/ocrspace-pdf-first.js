@@ -98,7 +98,7 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
         apiKey, imageBuffer: upload.buffer, filename: upload.filename || filename,
         mimeType: upload.mimeType || 'image/jpeg', engine: 2, overlayRequired: false,
         detectOrientation: true, isTable: false, scale: true,
-        createSearchablePdf: true, searchablePdfHideTextLayer: false,
+        createSearchablePdf: true, searchablePdfHideTextLayer: true,
         timeoutMs: Math.max(1000, Math.min(60000, Number(env.OCRSPACE_PDF_FIRST_TIMEOUT_MS) || 45000)),
         fetchImpl,
     });

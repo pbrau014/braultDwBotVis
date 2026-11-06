@@ -5,7 +5,7 @@
 
 ## Required sequence
 1. Receive the original World of Warships screenshot.
-2. OCR.Space Engine 2 processes the complete source image first and creates a searchable PDF with a visible text layer. The current provider comparison lists searchable-PDF creation as supported for Engine 2 and unsupported for Engine 3.
+2. OCR.Space Engine 2 processes the complete source image first and creates a searchable PDF with a searchable text layer hidden from the rendered page so the local OCR readers do not see duplicate overlay text. The current provider comparison lists searchable-PDF creation as supported for Engine 2 and unsupported for Engine 3.
 3. Download the temporary PDF immediately from an approved HTTPS OCR.Space host. Reject redirects, invalid URLs, non-PDF payloads, oversized responses and timeouts.
 4. Render the PDF page locally to a bounded PNG raster.
 5. Run Tesseract.js, native Tesseract, PaddleOCR (when enabled), OpenCV geometry and all other local image readers on that PDF-derived raster. After successful PDF creation, no local reader may return to the original screenshot.
