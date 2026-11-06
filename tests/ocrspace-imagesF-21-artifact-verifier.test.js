@@ -202,7 +202,7 @@ test('normalized PDF raster provenance is verified against source dimensions', a
         normalizedWidth:1818,normalizedHeight:1023
       }
     }),
-    readMetadata:async buffer=>buffer===pageRaster?{width:1818,height:2573}:{width:1818,height:1023},
+    readMetadata:async buffer=>buffer.toString('utf8').startsWith('source-image-bytes-')?{width:1920,height:1080}:buffer===pageRaster?{width:1818,height:2573}:{width:1818,height:1023},
     toRawRgba:async buffer=>Buffer.from(buffer===pageRaster?'page':'normalized'),
     readPdfText:async()=> 'searchable text'
   });
