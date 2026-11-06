@@ -42,7 +42,7 @@ async function main() {
         imageBuffer, rawText: '', fields,
         sourceWidth: dimensions.width, sourceHeight: dimensions.height,
         preparedWidth: dimensions.width, preparedHeight: dimensions.height,
-        timeoutMs: Number(process.env.PADDLEOCR_FIELD_FALLBACK_TIMEOUT_MS) || 15000,
+        timeoutMs: Number(process.env.PADDLEOCR_FIELD_FALLBACK_TIMEOUT_MS) || 60000,
         env: process.env
     });
     const fallback = fields.paddleOcrFallback || { status: 'missing-result' };
