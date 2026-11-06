@@ -208,7 +208,6 @@ jobs:
 
       - name: Verify the 19 selected PDFs, text layers, rasters, provenance and security
         id: artifact-verification
-        continue-on-error: true
         shell: powershell
         env:
           OCRSPACE_API_KEY: ${{ secrets.OCRSPACE_API_KEY }}
