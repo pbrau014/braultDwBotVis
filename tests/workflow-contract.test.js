@@ -269,7 +269,10 @@ test('19-image Gate B artifact workflow verifies the completed run without provi
     assert.match(workflow, /--network-log-reconciliation/);
     assert.match(workflow, /evaluate-ocrspace-pdf-text-layer\.js/);
     assert.match(workflow, /pdf-text-layer-analysis-19\.json/);
-    assert.match(workflow, /Discover and download the latest Gate A report for this exact source commit/);
+    assert.match(workflow, /Discover and download the latest Gate A report for this exact candidate commit/);
+    assert.ok(workflow.includes('DWBOT_CANDIDATE_SHA: 7eda2759760651ffead3d64d3d3854295115a113'));
+    assert.ok(workflow.includes("head_branch -in @('main','fix/pdf-raster-source-aspect-normalization')"));
+    assert.ok(workflow.includes('gateAReport.candidateFingerprint -ne $env:DWBOT_CANDIDATE_SHA'));
     assert.match(workflow, /DWBOT_GATE_A_REPORT/);
     assert.match(workflow, /--gate-a-report/);
     assert.match(workflow, /RECONSTRUCTED_LIMITED_EVIDENCE/);
@@ -297,6 +300,10 @@ test('Gate A acceptance uses the accepted runtime, fail-closed network guard and
     assert.ok(workflow.includes('source/testdata/gateA-16/report.json.progress.json'));
     assert.ok(workflow.includes('cancel-in-progress: false'));
     assert.ok(workflow.includes('DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME'));
+    assert.ok(workflow.includes('GATEB_SOURCE_SHA: 7eda2759760651ffead3d64d3d3854295115a113'));
+    assert.ok(workflow.includes('actions/runs?head_sha=$env:GATEB_SOURCE_SHA'));
+    assert.ok(workflow.includes('No successful exact-SHA Windows Node 26.13.0 candidate verification exists'));
+    assert.ok(workflow.includes('ref: 7eda2759760651ffead3d64d3d3854295115a113'));
     assert.ok(workflow.includes('DWBOT-GATE-A-16-PDF-FIRST-RESUME-15'));
     assert.ok(workflow.includes('DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'));
     assert.match(workflow, /Prepare no-duplicate Gate A resume checkpoint from existing PDF\n        if: github\.event\.head_commit\.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' \|\| github\.event\.head_commit\.message == 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'/);
