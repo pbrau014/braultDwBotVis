@@ -3,7 +3,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
-const { samePreflight, pngInfo, extractStartedFixtures } = require('../scripts/prepare-gateA-16-resume');
+const { samePreflight, pngInfo, extractStartedFixtures, parseJsonUtf8 } = require('../scripts/prepare-gateA-16-resume');
 
 test('Gate A resume compares substantive preflight identity, fixture order and hashes', () => {
     const a = { status:'PREFLIGHT_PASS_NO_PROVIDER_REQUESTS', candidateFingerprint:'a'.repeat(40),
@@ -47,4 +47,12 @@ test('Gate A resume accepts only the single original first-image start marker', 
     ].join('\n');
     assert.deepEqual(extractStartedFixtures(log),[{index:1,fixtureKey:'Screenshot_16.jpg'}]);
     assert.equal(extractStartedFixtures(log + '\n[OCR-SEQUENCE] 2/16 START WTF.jpg').length,2);
+});
+
+
+test('Gate A resume parses BOM-prefixed JSON from the original uploaded artifact', () => {
+    assert.deepEqual(parseJsonUtf8(Buffer.from('\\uFEFF{"schemaVersion":1,"status":"FAIL"}', 'utf8')),
+        { schemaVersion: 1, status: 'FAIL' });
+    assert.deepEqual(parseJsonUtf8(Buffer.from('{"schemaVersion":1}', 'utf8')),
+        { schemaVersion: 1 });
 });
