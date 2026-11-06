@@ -252,7 +252,7 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
                     normalizationOk = pageEvidenceOk
                         && Buffer.isBuffer(expectedRaster)
                         && actualNormalization.method === 'source-aspect-top-aligned-crop-v1'
-                        && JSON.stringify(actualNormalization.cropRect) === JSON.stringify(normalization.cropRect)
+                        && JSON.stringify(actualNormalization) === JSON.stringify(normalization)
                         && actualNormalization.sourceWidth === expected.sourceImage.width
                         && actualNormalization.sourceHeight === expected.sourceImage.height;
                 }
