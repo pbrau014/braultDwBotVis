@@ -5402,3 +5402,32 @@ Proposal boundary: mock narrative and playoff defaults are not event approval; t
   docs/continuation/DWBOT-GATEA-REQUIREMENTS-AND-STATUS-2026-11-06.md
   docs/continuation/DWBOT-UPD-2026-11-06-009-ocrspace-63-artifact-audit-and-19-posthoc.md
 ================================================================================
+
+================================================================================
+2026-11-06 — ADMIRALTY / YOLO PUBLICATION SET EXPANDED
+================================================================================
+Created:
+- 04_Companion_Materials/YOLO_Participant_Quick_Start_and_Evidence_Submission_Guide_v0.1_PROPOSAL.md
+- 04_Companion_Materials/YOLO_Event_Night_Operations_Manual_v0.1_PROPOSAL.md
+- 04_Companion_Materials/YOLO_Scoring_and_Standings_Explainer_v0.1_PROPOSAL.md
+- 04_Companion_Materials/Admiralty_Chronicle_The_First_YOLO_Season_v0.1_PROPOSAL.md
+- Existing Admiralty × YOLO Field Guide and HTML companion extended with the current public KOTS XIX logistics example and links to the audience-specific publications.
+- Season Logistics and Grand YOLO Blueprint v0.2 linked to all publications.
+- README_AND_INDEX.json and Companion_Material_Crosswalk_v3.19 updated.
+
+Narrative/content boundaries:
+- The Chronicle uses fictional Admiralty characters, dialogue, sample matchups and scores; it dramatizes but does not rewrite the source rules.
+- Pilot, recurring weekly, Race, bracket advancement, damage awards, Grand Yolo Round 4 and the season-ending Grand YOLO finale are distinguished.
+- CBStrat Tier X tactics are translated as principles (vision, focus fire, crossfire, objective control, push/hold and disengagement), not copied as a YOLO ship lineup.
+- The participant guide explains the nine required fields, original evidence, unresolved-value handling and event-specific ship lists.
+- The staff manual covers settings records, role separation, room setup, attendance, restart/forfeit rules, OCR evidence, appeals, streaming and closeout.
+- The scoring explainer documents Damage, Kills, Race C01, Grand Yolo and Tourney Totals formulas with examples and archival/current-policy distinctions.
+- The current KOTS XIX listing (9 Oct–15 Nov 2026, regional sections) and Wargaming International Finals dates (7–8 and 14–15 Nov 2026) are clearly labeled as KOTS examples, not YOLO event dates.
+- Relative links/images across the six public/staff publications were checked: 63 references, zero broken local paths after fixing the YOLO instruction PDF link.
+- All publications explicitly warn that tournament configurations frequently change; event-specific signed settings control.
+
+Gate A status:
+- See docs/continuation/DWBOT-GATEA-REQUIREMENTS-AND-STATUS-2026-11-06.md.
+- 16-image ground truth exists, but original imgs2add.zip is not accessible. imgsHalf1.zip is a different 56-image archive with zero exact image-hash matches to the 16-image report. Do not substitute.
+- Existing native-16 report is historical local OCR only (5/16 exact records, 6/16 all-required-fields complete), not PDF-first Gate A evidence.
+================================================================================
