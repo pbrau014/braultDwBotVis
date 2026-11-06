@@ -14,6 +14,21 @@ function streamResponse(bytes, headers = {}) {
 }
 const png = Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a,1,2,3]);
 
+const sourceDimensions = { width: 1920, height: 1080 };
+const normalizeRaster = async (buffer, dimensions) => ({
+    buffer,
+    normalization: {
+        method: 'source-aspect-top-aligned-crop-v1',
+        sourceWidth: dimensions.sourceWidth,
+        sourceHeight: dimensions.sourceHeight,
+        pageRasterWidth: 1920,
+        pageRasterHeight: 2573,
+        cropRect: { left: 0, top: 0, width: 1920, height: 1080 },
+        normalizedWidth: 1920,
+        normalizedHeight: 1080,
+    },
+});
+
 function fakeLedger() {
     const reservations = [];
     return { reservations, async reserve(value) { reservations.push(value); return { reserved: true }; } };
@@ -30,7 +45,7 @@ test('OCR.Space Engine 2 processes the source image first and local readers rece
         client: async options => { request = options; return { searchablePdfUrl: 'https://api.ocr.space/parse/image/temporary.pdf', parsedText: 'Victory\\nShards', exitCode: 1, processingTimeMs: 123 }; },
         downloadPdf: async url => { downloaded = url; return pdf; },
         renderPdf: async bytes => { rendered = bytes; return png; },
-        readRasterMetadata: async () => ({ width: 1920, height: 1080 }),
+        readRasterMetadata: async () => ({ width: 1920, height: 1080 }), sourceDimensions, normalizeRaster, sourceDimensions, normalizeRaster,
     });
     assert.equal(request.engine, 2);
     assert.equal(request.createSearchablePdf, true);
@@ -63,7 +78,7 @@ test('source images above the Free API cap are re-encoded before upload', async 
         client: async options => { request = options; return { searchablePdfUrl: 'https://ocr.space/result.pdf', exitCode: 1 }; },
         downloadPdf: async () => pdf,
         renderPdf: async () => png,
-        readRasterMetadata: async () => ({ width: 1600, height: 900 }),
+        readRasterMetadata: async () => ({ width: 1600, height: 900 }), sourceDimensions: { width: 1600, height: 900 }, normalizeRaster,
     });
     assert.equal(prepared, true);
     assert.equal(request.filename, 'normalized.jpg');
