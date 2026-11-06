@@ -7,3 +7,6 @@
 /* Keyboard visibility and motion sensitivity. */
 :where(a,button,input,select,textarea,[tabindex]):focus-visible{outline:3px solid var(--accent2);outline-offset:3px;box-shadow:0 0 0 2px var(--bg)}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* Keep the drop target visibly grouped while its keyboard-accessible picker has focus. */
+.drop-zone:focus-within{border-color:var(--accent2);background:rgba(35,79,93,.24)}
