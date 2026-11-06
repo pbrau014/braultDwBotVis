@@ -5327,3 +5327,24 @@ END DWBOT-UPD-2026-11-06-007
   or official playoff/finale policy were invented.
 - Exact-head verification pending; do not mark these changes tested/passed
   until the latest DWBOT verification run completes.
+
+
+================================================================================
+2026-11-06 — USER DIRECTIVE PRESERVED VERBATIM / ADMIRALTY × YOLO NARRATIVE
+================================================================================
+USER DIRECTIVE — 2026-11-06 (VERBATIM; PRESERVED IN PROJECT PLAN)
+
+continue where you left off. add this to the dwbot project plans and the living running plan, include all this message. build manuals instructions player participant and or all public facing documents using all the following in conjunction coordination reliance in communication with each other and using the internet and your imagination to fill in holes close gaps and complete lessons to form a coherent story or stories. use the texts here [https://chatgpt.com/library/share/libfile_d373d454feb0819188155993f9043f71?account_id=personal](https://chatgpt.com/library/share/libfile_d373d454feb0819188155993f9043f71?account_id=personal) admiralty, cbstrat, discordmsgs, and yolo folders together to build a narrative around the yolo tournament, focus particularly on the admiralty and make or create build a mock tournament in light of its fashion design layout and organization, use specific exact imagery and the admiralty and cb strat texts and yolo texts together to be a basis for this mock tournament and use cb strat texts to explain strategy and tactics during the mock tournament, primary focus is the texts in yolo tourny being combined reconciled advanced developed alongside the admiralty cb strat txts to explain the rules of the real tournament by way of presenting this information in a mock narrative tournament. use your imagination and the content narrative sub narratives context sub context characters stories events happenings dealings interactions dialogue communication messages overview underlying connections beyond the surface story making connections and building on them, use the internet for ideas and content to build buff grow add depth insight continuity characters stories connections lessons instruction direction suggestion recommendation about how the admiralty and the cbstrat can be used together in conjunction with the yolo rules and discordmsgs to build a larger grand narrative explaining and exemplifying this tournament and how it works, all its nightly events, scoring scenarios, how the scoring equation works, and what happens during the pilot event, the regular season, the playoff, and the grand yolo, specifically use [https://wiki.worldofwarships.com/World_of_Warships](https://wiki.worldofwarships.com/World_of_Warships) to introduce familiar terminology specific to world of warships, use this for tournament logistics and terminology [https://wows-tournaments.com/](https://wows-tournaments.com/) , use this for additional supporting content [https://na.wows-numbers.com/](https://na.wows-numbers.com/) , use this for general information about the game [https://wargaming.net/en/games/wows](https://wargaming.net/en/games/wows) , use this for filling in holes gaps or general purpose [https://www.devstrike.net/](https://www.devstrike.net/) , use these two as general information and terminology on tournaments and bracket systems https://turnio.net/esports-tournament-guide/ https://scoreleader.com/how-tournament-brackets-work/, lasty inform the reader that tournament configurations often frequently change.
+
+
+Work recorded in:
+- docs/continuation/DWBOT-UPD-2026-11-06-008-admiralty-yolo-narrative-and-race-c01.md
+- 04_Companion_Materials/Admiralty_YOLO_Mock_Tournament_Field_Guide_v0.1_PROPOSAL.md
+- 04_Companion_Materials/Admiralty_YOLO_Mock_Tournament_v0.1.html
+- 04_Companion_Materials/Admiralty_YOLO_Source_Reconciliation_and_Visual_Provenance_v0.1.md
+- 04_Companion_Materials/Season_Logistics_and_Grand_YOLO_Finale_Blueprint_v0.2_PROPOSAL.md
+
+Source archive fingerprint: yoloPaperWork(1).zip, SHA-256 b7598ed96d9af8ff1bd564e7aed945621800e2299e2f262d86541c62f34cf7b2; 19 members; integrity check passed. The three Discord text sources are preserved verbatim in dwbotStuff/discordMsgs/.
+Scoring C01: core, HTML and regression changes committed; exact-head CI/browser verification pending. Historical source workbook remains archival, not canonical.
+Proposal boundary: mock narrative and playoff defaults are not event approval; tournament configurations frequently change and must be rechecked against current official/event-specific settings.
+================================================================================
