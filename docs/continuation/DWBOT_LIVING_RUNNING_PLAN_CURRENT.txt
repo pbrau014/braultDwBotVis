@@ -1149,32 +1149,24 @@ active-status wording below. Historical outcomes remain preserved.
   present, clean extraction succeeded, and npm ci, npm test and prelive passed.
   The PDF was rendered, but page-by-page visual inspection remains open.
 
-2. OCR.Space runtime policy and privacy correction
-- Current user policy is default-on when a local Free API key is configured:
-  unset/blank OCRSPACE_ENABLED or value 1 enables; value 0 explicitly disables;
-  invalid values fail closed; the key is mandatory. This supersedes older
-  default-off / explicit-1-required statements below. Keep the key local and
-  secret. No key is configured in this chat and no provider request has been
-  made.
-- The approved sequence remains OpenCV geometry/safe-crop planning, OCR.Space
-  Engine 3 remote evidence first, then independent Tesseract.js/local
-  recognition and exact local acceptance. Remote text remains separate,
-  diagnostic-only and unable to accept or overwrite a field. Engine 2 remains
-  PDF-only fallback if Engine 3 returns no safe PDF URL; its OCR text is
-  discarded.
-- A privacy-boundary defect was found in src/ocrspace-prepass.js: if OpenCV
-  did not return an identity ROI, the code substituted a nominal rectangle;
-  it also did not enforce the local geometry selector's minimum score. This
-  was not sufficient proof that identity pixels were excluded.
-- Corrected in this update: require an explicit in-bounds identity proposal
-  with score >= 0.12, matching the existing cvRegion() minimum. Missing,
-  weak, malformed, undersized or out-of-bounds identity geometry now returns
-  an empty crop plan and skips remote OCR for that image. No fallback box is
-  substituted. Tests cover missing/weak/out-of-bounds/undersized identity
-  geometry; adapter documentation records the same rule.
-- No user/player identity, Discord ID, full screenshot or production image was
-  transmitted. No live OCR.Space call or paid usage occurred.
-
+2. OCR.Space runtime policy and privacy correction — CURRENT OVERRIDE
+- OCR.Space Engine 2 processes the original screenshot first and creates a
+  searchable PDF with a hidden-but-searchable text layer. The PDF is validated,
+  downloaded and rendered locally; Tesseract.js/native Tesseract/PaddleOCR/
+  OpenCV process only the PDF-derived raster.
+- One OCR.Space request/PDF per source image. The active bot no longer calls
+  the legacy crop-only OCR.Space helpers. Provider text remains separate
+  diagnostic evidence and cannot accept or overwrite local fields.
+- If API/PDF creation/download/rasterization fails, fail closed; no fallback to
+  OCR on the original screenshot. Production requires OCRSPACE_API_KEY;
+  OCRSPACE_ENABLED=0 is explicit local-only development/test mode.
+- The user explicitly authorized full screenshots, including visible player
+  names, for the named 4-, 16- and 64-image World of Warships inventories only.
+  Unrelated images, credentials, Discord IDs and private account data remain
+  excluded. Free API only, <=1 MiB normalized upload, strict HTTPS allowlist,
+  quota reservation and no automatic retries.
+- No live provider request has yet been verified; the local key is absent and
+  the Actions secret remains unverified.
 3. Source-tree cleanup reconciliation
 - Rechecked the exact 332-name local archive root-cleanup list against the
   current main tree at e3169b6a671b8e663e42b3f66f90fae3253eefc5. Current main has 42 root entries;
@@ -1253,14 +1245,11 @@ A. CURRENT MAIN AND OCR.SPACE DEFAULT-ON IMPLEMENTATION
   screenshot transmission has occurred. Mock tests do not prove live provider
   accuracy or live terms/privacy compliance.
 
-B. ENGINE 3 SEARCHABLE-PDF COMPARISON RULE
-- DWBOT's Engine capability comparison now marks Engine 3 searchable PDF as
-  SUPPORTED, based on the Engine 3 feature-description text.
-- The provider's own comparison matrix still marks it unsupported. Preserve
-  this documentation conflict; do not claim the provider matrix changed.
-  Runtime must check SearchablePDFURL. If Engine 3 returns no safe URL, retain
-  the quota-reserved Engine 2 PDF-only fallback and discard Engine 2 OCR text.
-  No paid tier or usage is authorized.
+B. HISTORICAL ENGINE 3 SEARCHABLE-PDF COMPARISON NOTE — SUPERSEDED
+- Earlier documentation interpreted Engine 3 feature prose as searchable-PDF
+  support despite the provider matrix marking it unsupported. The old Engine
+  3-first / Engine 2 PDF-fallback design is retained as historical provenance.
+  The current active pipeline uses Engine 2 directly for every source image.
 
 C. WINDOWS ACCEPTANCE ARTIFACT — RUN 42088538702
 - The run is now complete. Windows process-level persistence/recovery and the
@@ -1392,17 +1381,14 @@ review notes as historical context.
   remote-only, remote-conflict and missing-candidate states; it never mutates
   the local record or promotes remote-only candidates into acceptance.
 
-2. ENGINE 3 SEARCHABLE-PDF CAPABILITY RULE
-- DWBOT's Engine comparison table marks Engine 3 searchable PDF as SUPPORTED,
-  following the Engine 3 feature-description text.
-- The OCR.Space provider documentation remains internally inconsistent: its
-  Engine 3 feature description says searchable PDF is supported with the same
-  parameters as Engine 1/2, while its comparison matrix still marks it
-  unsupported. Do not claim that the provider's matrix itself has changed.
-- DWBOT requests the visible searchable PDF with Engine 3 and checks the actual
-  SearchablePDFURL. If no safe URL is returned, it retains the separately
-  quota-reserved Engine 2 PDF-only fallback and discards Engine 2 OCR text.
-  No paid service or paid usage is authorized.
+2. ENGINE 2 SEARCHABLE-PDF FIRST-PASS RULE — CURRENT OVERRIDE
+- The provider comparison matrix marks searchable-PDF creation supported for
+  Engine 2 and unsupported for Engine 3. Use Engine 2 directly for the first
+  source-image request; do not use Engine 3 first or as a PDF fallback.
+- Request one searchable PDF per original screenshot with a hidden but
+  searchable text layer. Validate and download it, then render the page locally.
+  All local OCR readers process the PDF-derived raster.
+- This replaces the earlier Engine 3-first / Engine 2 fallback description.
 
 3. ENTERPRISEOCRPIPELINE.PY — ROOT-FILE REVIEW
 - The root file is a standalone Python/FastAPI/SQLAlchemy document-OCR service
