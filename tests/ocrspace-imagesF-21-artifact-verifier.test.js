@@ -5,7 +5,7 @@ const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
 const crypto = require('node:crypto');
-const { verifyArtifacts } = require('../scripts/verify-ocrspace-imagesF-21-artifacts');
+const { verifyArtifacts, parseJsonUtf8 } = require('../scripts/verify-ocrspace-imagesF-21-artifacts');
 
 const FIELDS = ['result', 'player', 'map', 'mode', 'battleStart', 'credits', 'freeXp', 'damage', 'xp'];
 const sha = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
@@ -151,4 +151,13 @@ test('preserves BOM-prefixed reconstructed network evidence without upgrading it
   assert.equal(report.checks.networkLogReconciliationStatus,'RECONSTRUCTED_LIMITED_EVIDENCE');
   assert.equal(report.networkLogReconciliation.zeroAttemptsClaimed,false);
   assert.equal(report.checks.originalScreenshotFallback,false);
+});
+
+
+test('artifact verifier parses BOM-prefixed Gate A and reconciliation JSON without changing provenance', () => {
+  const bytes = Buffer.from('\\uFEFF{"status":"FAIL","originalBlockedAttemptCount":null,"zeroAttemptsClaimed":false}', 'utf8');
+  assert.deepEqual(parseJsonUtf8(bytes), {
+    status: 'FAIL', originalBlockedAttemptCount: null, zeroAttemptsClaimed: false
+  });
+  assert.deepEqual(parseJsonUtf8(Buffer.from('{"status":"PASS"}', 'utf8')), { status: 'PASS' });
 });
