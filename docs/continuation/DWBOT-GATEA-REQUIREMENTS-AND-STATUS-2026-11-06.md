@@ -187,3 +187,27 @@ diagnostic log. Gate A remains NOT PASSED.
   reconstruct the prior run. Do not claim Gate A network proof from that
   synthetic/current log.
 - At this update the run was still in progress and no Gate A pass was claimed.
+
+
+## 8. Second artifact-bound local recovery — run #42247731956
+
+- The exact prior partial artifact and all 16 source hashes passed preflight.
+  The run installed the pinned PaddleOCR runtime and downloaded the existing
+  partial artifact. It did not submit any OCR.Space requests.
+- The local OCR child wrote its output to
+  `resume-first-local-reader.json`; the parent then attempted to write the
+  enriched wrapper report to the same path with exclusive-create semantics.
+  This caused `EEXIST` before the first record comparison was saved. The
+  provider step was skipped, and the original first image was not resubmitted.
+- The child-output and wrapper-report paths are now separated. The helper also
+  refuses any future paid continuation unless the original network log is
+  present and proves exactly zero blocked attempts. The current original
+  artifact still lacks that log, so the next run must stop after local
+  diagnostic recovery and record `BLOCKED_MISSING_ORIGINAL_NETWORK_LOG`;
+  it must not submit the remaining 15 requests.
+- Run #42249978731 is the new exact-trigger local-only recovery attempt. Its
+  purpose is to verify the first image from the existing PDF/raster and
+  produce a source-bound block report. No new provider submission is
+  authorized by this run.
+- Gate A remains NOT PASSED. The historical original blocked-attempt count is
+  UNKNOWN and cannot be converted to zero by creating a new empty log.
