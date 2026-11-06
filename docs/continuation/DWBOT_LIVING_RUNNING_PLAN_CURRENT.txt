@@ -1,4 +1,45 @@
 ================================================================================
+LATEST AUTHORITY / CROSSWALK SYNCHRONIZATION — 2026-11-06
+================================================================================
+This newest synchronization supersedes older active OCR statements in the
+authority and crosswalk documents below. Their historical source material is
+preserved; the living plan remains the controlling operational queue.
+
+- Canonical main HEAD immediately before this plan sync:
+  3ce23f36f2c47ffc5b9397b4320883afee65227b.
+- Additional active-document corrections after the preceding sync:
+  * e0f80b8b002093bd617bb9b83577dcd09b274308 — corrected
+    PROJECT_AUTHORITY_AND_IMPLEMENTATION_RULES.md: OCR.Space is first and
+    highest priority; explicit enablement, Engine 2 PDF-first and provider
+    network allowlist now govern.
+  * 2d5a1b98f517b2d3789b4e1a6928f856bebfa13e — corrected the active
+    requirements/architecture crosswalk, including Gate A network criteria
+    and original-image upload scope.
+  * 3ce23f36f2c47ffc5b9397b4320883afee65227b — added a superseding
+    OCR.Space/chat-only override to the 2026-11-04 historical handoff.
+- The 2026-11-05 handoff, 2026-11-05 current-authority note, plan1.txt top
+  override, README, OCR.Space implementation guide, current requirements
+  crosswalk and both dated handoffs now point to the same active rules.
+- PaddleOCR remains an optional local field-crop fallback requiring explicit
+  local Python/detection/recognition model directories. The standard Windows
+  acceptance wrapper currently sets PADDLEOCR_FIELD_FALLBACK=0; do not claim
+  PaddleOCR was run. The requested primary local readers currently run are
+  Tesseract.js and native Tesseract on the PDF-derived raster. Enable/benchmark
+  PaddleOCR only after its local model prerequisites and PDF-derived input
+  provenance are verified; its helper's own no-network rule remains valid.
+- The PaddleOCR fallback's separate historical integrated-acceptance script
+  uses a local-only network-blocked baseline/candidate and must not be treated
+  as OCR.Space PDF-first acceptance until it is adapted to consume the PDF
+  raster. It is not part of the current standard Windows acceptance path.
+- No exact-head CI status or workflow run was available through the connected
+  GitHub endpoints at the preceding check. No tests are claimed as executed
+  from these documentation/source inspections.
+
+================================================================================
+END LATEST AUTHORITY / CROSSWALK SYNCHRONIZATION — 2026-11-06
+================================================================================
+
+================================================================================
 LATEST CROSS-DOCUMENT SYNCHRONIZATION — 2026-11-06
 ================================================================================
 This block is the newest synchronization record. The governing OCR.Space and
