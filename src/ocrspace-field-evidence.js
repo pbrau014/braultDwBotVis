@@ -1,4 +1,10 @@
 'use strict';
+/**
+ * LEGACY crop-only OCR.Space evidence helper. It is retained for historical
+ * tests/provenance only and is not used by the active bot pipeline. The current
+ * path is OCR.Space Engine 2 source image -> searchable PDF -> local PDF raster.
+ */
+'use strict';
 const path = require('node:path');
 const { recognizeCrop, MAX_FREE_FILE_BYTES } = require('./ocrspace-client');
 const { OcrSpaceQuotaLedger } = require('./ocrspace-quota-ledger');

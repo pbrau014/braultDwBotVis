@@ -1,4 +1,10 @@
 'use strict';
+/**
+ * LEGACY geometry-only crop planner retained for historical tests/provenance.
+ * The active OCR pipeline no longer sends field crops: OCR.Space receives the
+ * source image first and all local readers process the returned PDF raster.
+ */
+'use strict';
 
 const MIN_IDENTITY_REGION_SCORE = 0.12;
 

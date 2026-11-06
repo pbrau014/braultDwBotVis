@@ -21,9 +21,9 @@ const { createWorker } = require('./ocr-worker');
 const { downloadImage } = require('./attachment-download');
 const { inspectTargetChannelPermissions } = require('./discord-gateway-diagnostics');
 const { isAdminOnlyCommand } = require('./tournament-command-policy');
-const { collectOcrSpaceFieldEvidence, getOcrSpaceActivation } = require('./ocrspace-field-evidence');
+const { getOcrSpaceActivation } = require('./ocrspace-field-evidence');
 const { createOcrSpacePdfFirst } = require('./ocrspace-pdf-first');
-const { buildSafeOcrSpacePrepassCropPlan, filterSafeOcrSpaceCropPlan } = require('./ocrspace-prepass');
+
 const { reconcileOcrSpaceEvidence } = require('./ocrspace-reconciliation');
 const path = require('node:path');
 const { createHash } = require('node:crypto');
@@ -346,7 +346,7 @@ async function extractTextCore(imageBuffer) {
     const ocrSpaceActivation = getOcrSpaceActivation(process.env);
     const ocrSpaceConfigured = ocrSpaceActivation.enabled;
     let ocrSpacePdfFirstEvidence = { status: 'disabled', reason: ocrSpaceActivation.reason, requests: 0 };
-    let ocrSpacePrepassEvidence = { status: 'disabled', reason: ocrSpaceActivation.reason, requests: 0, evidence: [] };
+    let ocrSpaceSourceEvidence = { status: 'disabled', reason: ocrSpaceActivation.reason, requests: 0, evidence: [] };
     if (ocrSpaceConfigured) {
         // The complete source screenshot is transmitted only under the user's
         // explicit OCR.Space-first authorization. The API key never enters logs.
@@ -385,7 +385,7 @@ async function extractTextCore(imageBuffer) {
         sourceWidth = dimensions.width;
         sourceHeight = dimensions.height;
         ocrSpacePdfFirstEvidence = { ...publicEvidence, pdfBytes: pdfBuffer.length, artifacts: artifactPaths };
-        ocrSpacePrepassEvidence = {
+        ocrSpaceSourceEvidence = {
             status: 'complete', requests: 1,
             evidence: [{ field: 'fullScreenshot', source: 'ocrspace-searchable-pdf', status: 'success',
                 text: String(pdfFirst.providerText || '') }],
@@ -2501,7 +2501,7 @@ async function extractTextCore(imageBuffer) {
         text: String(attempt.text || ''), confidence: Number(attempt.confidence) || 0,
     }));
     const extractedFields = {
-        ocrSpaceEvidence: ocrSpacePrepassEvidence,
+        ocrSpaceEvidence: ocrSpaceSourceEvidence,
         ocrSpacePdfFirst: ocrSpacePdfFirstEvidence,
         rewards: focusedRewards,
         rewardCandidates,
@@ -2599,9 +2599,7 @@ async function extractTextCore(imageBuffer) {
     // the remaining per-image budget and fails open to the Tesseract result.
     const prePaddleRecord = buildBattleRecord(combined.text, extractedFields);
     const hasUnresolvedBeforePaddle = getMissingRequiredFields(prePaddleRecord).length > 0;
-    const ocrSpaceReserveMs = ocrSpaceConfigured && hasUnresolvedBeforePaddle && ocrSpacePrepassEvidence.status !== 'complete'
-        ? Math.max(1000, Math.min(20000, Number(process.env.OCRSPACE_STAGE_BUDGET_MS) || 20000)) : 0;
-    const fallbackRemainingMs = Math.max(0, OCR_IMAGE_TIMEOUT_MS - (Date.now() - imageStartedAt) - 1500 - ocrSpaceReserveMs);
+    const fallbackRemainingMs = Math.max(0, OCR_IMAGE_TIMEOUT_MS - (Date.now() - imageStartedAt) - 1500);
     await paddleOcrFieldFallback.applyFieldFallback({
         imageBuffer,
         rawText: combined.text,
@@ -2612,68 +2610,15 @@ async function extractTextCore(imageBuffer) {
         preparedHeight: imageHeight,
         timeoutMs: fallbackRemainingMs,
     });
-    // After the geometry-first OCR.Space pass, use the more precise local crop
-    // geometry for one bounded refinement only if that first pass produced no
-    // remote evidence. This preserves OCR.Space-first ordering without duplicate
-    // provider calls when the prepass already succeeded.
-    const ocrSpaceApiKeyPresent = Boolean(String(process.env.OCRSPACE_API_KEY || '').trim());
-    if (ocrSpaceConfigured && ocrSpaceApiKeyPresent && ocrSpacePrepassEvidence.status !== 'complete') {
-        try {
-            const previewRecord = buildBattleRecord(combined.text, extractedFields);
-            const missingLabels = new Set(getMissingRequiredFields(previewRecord).map((item) => String(item.label)));
-            const cropPlan = [];
-            const addCrop = (field, engine, rect, source, imageSource, outputWidth) => {
-                if (rect && Number(rect.width) >= 8 && Number(rect.height) >= 6) {
-                    const coordinateWidth = imageSource === 'prepared' ? imageWidth : sourceWidth;
-                    const coordinateHeight = imageSource === 'prepared' ? imageHeight : sourceHeight;
-                    cropPlan.push({ field, engine: 3, rect: { ...rect }, source, imageSource, outputWidth,
-                        coordinateWidth, coordinateHeight, isTable: source === 'localized-reward-column' });
-                }
-            };
-            for (const field of ['xp', 'freeXp', 'credits']) {
-                const label = field === 'freeXp' ? 'Free XP' : field === 'xp' ? 'XP' : 'Credits';
-                if (!missingLabels.has(label)) continue;
-                const rect = localizedRewardEvidence.rects[field + '-psm7'] || localizedRewardEvidence.rects[field + '-psm8'];
-                if (rect) addCrop(field, 3, rect, 'localized-reward-column', 'prepared', Math.max(420, Math.min(1400, Math.round(rect.width * 3.5))));
-            }
-            if (missingLabels.has('Damage')) addCrop('damage', 3, damageProviderRect, 'localized-damage-column', 'prepared', 1400);
-            if (missingLabels.has('Battle Result')) addCrop('result', 3, resultTitleRect, 'localized-result-title', 'original', 1700);
-            if (missingLabels.has('Map') || missingLabels.has('Battle Mode') || missingLabels.has('Battle Start Time')) {
-                addCrop('battleMetadata', 3, sourceMetadataTightRect, 'localized-battle-metadata', 'original', 1700);
-            }
-            const remainingBudget = OCR_IMAGE_TIMEOUT_MS - (Date.now() - imageStartedAt) - 1500;
-            if (remainingBudget >= 1500) {
-                const safeCropPlan = filterSafeOcrSpaceCropPlan({
-                    cropPlan,
-                    regions: cvAnalysis?.regions || {},
-                    width: sourceWidth,
-                    height: sourceHeight,
-                    analysisWidth: cvAnalysis?.width,
-                    analysisHeight: cvAnalysis?.height,
-                });
-                extractedFields.ocrSpaceRefinementEvidence = await collectOcrSpaceFieldEvidence({
-                    env: { ...process.env, OCRSPACE_STAGE_BUDGET_MS: String(Math.min(20000, remainingBudget)) },
-                    cropPlan: safeCropPlan,
-                    buildCrop: async (spec) => imageProcessor.cropResize(
-                        spec.imageSource === 'prepared' ? preparedBuffer : imageBuffer,
-                        spec.rect,
-                        spec.outputWidth,
-                        { grayscale: true, contrastStretch: '0.5%x0.5%', sharpen: '0x1+1+0.02' },
-                    ),
-                });
-            } else {
-                extractedFields.ocrSpaceRefinementEvidence = { status: 'skipped', reason: 'insufficient remaining per-image time budget', requests: 0, evidence: [] };
-            }
-        } catch (error) {
-            console.warn('[OCR.space] Optional evidence stage failed; local OCR remains authoritative:', String(error && error.message || error).slice(0, 240));
-            extractedFields.ocrSpaceRefinementEvidence = { status: 'failed', reason: String(error && error.code || 'OCRSPACE_STAGE_ERROR'), requests: 0, evidence: [] };
-        }
-    } else if (ocrSpaceConfigured && ocrSpacePrepassEvidence.status === 'complete') {
-        extractedFields.ocrSpaceRefinementEvidence = { status: 'skipped', reason: 'geometry-first prepass already produced remote evidence; duplicate requests suppressed', requests: 0, evidence: [] };
-    } else {
-        extractedFields.ocrSpaceRefinementEvidence = { status: 'skipped',
-            reason: ocrSpaceActivation.reason || 'No eligible OCR.Space refinement crops remained', requests: 0, evidence: [] };
-    }
+    // The source-image PDF-first call is the sole OCR.Space request for this
+    // image. All local readers have already received the PDF-derived raster;
+    // do not issue a second crop-based remote request.
+    extractedFields.ocrSpaceRefinementEvidence = {
+        status: 'not-run',
+        reason: 'PDF-first source-image request is the only OCR.Space call; local readers process the PDF-derived raster',
+        requests: 0,
+        evidence: [],
+    };
 
     // Only full-screen OCR attempts and the combined full-screen-derived text
     // can be selected as the page record. Field-crop results enter through the
