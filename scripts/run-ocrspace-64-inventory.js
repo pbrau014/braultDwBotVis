@@ -58,6 +58,9 @@ async function main() {
     const archiveBytes = await fs.readFile(archivePath);
     const archiveSha256 = sha256(archiveBytes);
     const preflight = JSON.parse(await fs.readFile(preflightPath, 'utf8'));
+    const inventoryBytes = await fs.readFile(path.join(root, 'dwbotStuff', 'DWBOT_64_IMAGE_INVENTORY_REVIEWED.json'));
+    const inventorySha256 = sha256(inventoryBytes);
+    if (preflight.inventorySha256 !== inventorySha256) throw new Error('Preflight report was generated against a different reviewed inventory manifest.');
     if (preflight.status !== 'verified-eligible-only-56' || preflight.providerRequestsPermitted !== true
         || preflight.archiveSha256 !== expectedArchiveSha256 || archiveSha256 !== expectedArchiveSha256
         || Number(preflight.archiveMembers) !== 56 || Number(preflight.eligibleMembersVerified) !== 56
@@ -92,7 +95,7 @@ async function main() {
         sourceArchive: 'imgsHalf1-eligible-56.zip', sourceType: 'eligible-only-56', sourceArchiveBytes: archiveBytes.length, sourceArchiveSha256: archiveSha256,
         archiveMembersVerified: 56, eligibleSourceHashesVerified: verifiedSources.size, excludedRecordsAbsent: true,
         totalUncompressedImageBytes: summedImageBytes,
-        inventorySha256: sha256(Buffer.from(JSON.stringify(inventory))),
+        inventorySha256,
         imageCount: 64, groundTruthStatus: 'not_transcribed_or_independently_reviewed',
         eligibleCount: eligibleRecords.length, excludedCount: excludedRecords.length,
         eligibleProcessed: 0, excludedSkipped: 0, completedInventoryEntries: 0,
