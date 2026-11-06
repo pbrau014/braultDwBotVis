@@ -1,7 +1,7 @@
 # DWBOT requirements, architecture and schema crosswalk — updated 2026-11-05
 
 ## OCR.Space PDF-first governing sequence
-The current implementation sequence is original screenshot → OCR.Space Engine 2 → searchable PDF → bounded local PDF-page raster → Tesseract.js/native Tesseract/PaddleOCR/OpenCV local readers → existing parser/consensus/validators. No downstream local image reader may process the original screenshot after a successful PDF-first stage. A failed OCR.Space/PDF/raster stage fails closed. Production requires OCRSPACE_API_KEY; OCRSPACE_ENABLED=0 is only for local-only development/tests.
+The current implementation sequence is eligible original screenshot → OCR.Space Engine 2 first → searchable PDF → validated/downloaded PDF → bounded local PDF-page raster → Tesseract.js/native Tesseract/optional PaddleOCR/OpenCV local readers → existing parser/consensus/validators. No downstream local image reader may process the original screenshot after PDF-first processing begins. A failed OCR.Space/PDF/raster stage fails closed. Eligible intake requires OCRSPACE_ENABLED=1, OCRSPACE_NETWORK_ALLOWLIST=1 and OCRSPACE_API_KEY. OCRSPACE_ENABLED=0 is only for isolated mocks or downstream local readers after the PDF-derived raster already exists.
 
 | Requirement | Implementation | Verification |
 |---|---|---|
@@ -34,7 +34,7 @@ This is an evidence-based supporting crosswalk for Plan 2 (requirements/architec
 
 1. **Discord entry and orchestration:** `src/bot.js` receives messages/attachments, restricts work to the configured channel, applies command policy, reserves a bounded OCR queue slot before attachment download, and routes to OCR/correction/mapping.
 2. **Attachment intake:** `src/attachment-download.js` reads the HTTP response body incrementally, cancels once the configured maximum is exceeded, and returns a bounded buffer. The default hard maximum is 25 MiB; `MAX_IMAGE_MB` may lower but not raise it. The desktop bridge similarly caps requests at 25 MiB, bounds concurrent uploads, and sets request/header timeouts.
-3. **OCR and record acceptance:** Tesseract.js remains the local baseline. ImageMagick/OpenCV support image processing and geometry isolation. OCR.Space Engine 3 can provide a remote safe-crop evidence pass when a valid local Free key exists; it is default-on unless `OCRSPACE_ENABLED=0`. Remote output is separate diagnostic evidence only. PaddleOCR remains optional and must not be silently promoted to primary.
+3. **OCR and record acceptance:** OCR.Space Engine 2 is the explicitly enabled first text-extraction stage and creates the searchable PDF. Tesseract.js/native Tesseract and optional PaddleOCR operate only on the PDF-derived raster; OpenCV supports image processing and geometry isolation. The provider HTTPS allowlist permits OCR.Space; unrelated egress remains restricted. PaddleOCR remains optional until local model assets are available and independently benchmarked; it is not silently promoted to primary.
 4. **Battle record:** `src/battle-record.js` parses and validates the nine mandatory fields. Incomplete/conflicting values remain unresolved for exact correction; no fuzzy expected-value repair is permitted.
 5. **Tournament state/scoring:** `src/tournament.js` owns the roster (maximum 50), four events, seven game slots per event, scoring rules, JSON/SQLite persistence, and full/public archive projections. Grand Yolo's current default `tierWeight` is 0.9.
 6. **Browser workspace:** `src/desktop-service.js` enforces Player ownership and Admin authority; `src/desktop-bridge.js` provides loopback-only HTTP, Discord OAuth, CSRF/origin checks and bounded uploads; `desktop/` contains the Player/Admin/Upload pages.
@@ -46,11 +46,11 @@ This is an evidence-based supporting crosswalk for Plan 2 (requirements/architec
 - **Battle record:** the nine ordered fields above; XP is mandatory and ninth. A record cannot map to a tournament slot while any mandatory field is missing, invalid or disputed.
 - **Tournament state:** players and Discord account links; per-player event/game slots; event scoring settings; battle/OCR records; pending submissions and correction workflows; storage metadata/revision. Private account links and resumable user associations are retained in full private backups but omitted from public snapshots.
 - **Image intake:** one screenshot per upload, accepted image signatures PNG/JPEG/WEBP/BMP/TIFF, bounded by 25 MiB maximum, finite request timeout and bounded concurrent desktop upload count.
-- **OCR.Space request:** HTTPS, local Free key in header, allowlisted safe non-identifying crop only, bounded size/quota/timeout, no automatic retries; remote-only/conflicting evidence never accepted.
+- **OCR.Space request:** HTTPS to allowlisted OCR.Space API/PDF hosts, local Free key in header, one authorized original screenshot per eligible inventory image, bounded upload/download/quota/timeout, no automatic retries; unrelated images and private credentials/account data are excluded; provider-only text never accepts a mandatory field.
 
 ## Release gates and unresolved requirements
 
-- **Gate A:** approved 16-image Windows development corpus, all nine fields independently compared, zero wrong accepted mandatory values, zero unresolved mandatory values and zero unauthorized network requests.
+- **Gate A:** approved 16-image Windows development corpus, all nine fields independently compared, zero wrong accepted mandatory values, zero unresolved mandatory values, exactly one authorized OCR.Space request per eligible image and zero unrelated outbound network attempts.
 - **Gate B:** independent holdout of at least 50 (100 preferred) screenshots with independently established nine-field truth; no tuning against it.
 - **Gate C:** isolated Windows persistence/backup/restore/rollback only after A and B pass.
 - **Gate D:** final release decision with current source fingerprint, logs, benchmark, recovery evidence and rollback readiness.
