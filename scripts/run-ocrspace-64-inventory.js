@@ -18,8 +18,9 @@ const sourceRoot = process.env.OCRSPACE_64_IMAGE_ROOT
     ? path.resolve(process.env.OCRSPACE_64_IMAGE_ROOT) : null;
 const archivePath = process.env.OCRSPACE_64_ARCHIVE_PATH
     ? path.resolve(process.env.OCRSPACE_64_ARCHIVE_PATH) : null;
-const EXPECTED_ARCHIVE_BYTES = 57665767;
-const EXPECTED_ARCHIVE_SHA256 = 'e32e43991ab90d6e2ca3e060f264456d175d0e93390f273d7f3a3f5d93fa98a2';
+const expectedArchiveSha256 = String(process.env.OCRSPACE_56_ARCHIVE_SHA256 || '').toLowerCase();
+const preflightPath = process.env.OCRSPACE_56_PREFLIGHT_REPORT
+    ? path.resolve(process.env.OCRSPACE_56_PREFLIGHT_REPORT) : null;
 const outputRoot = path.resolve(process.env.OCRSPACE_64_OUTPUT_DIR
     || path.join(root, 'testdata', 'ocrspace-64-image-acceptance'));
 const requiredEngines = ['tesseractjs', 'native'];
@@ -53,54 +54,59 @@ async function main() {
     if (!sourceRoot || !archivePath) {
         throw new Error('OCRSPACE_64_ARCHIVE_PATH and OCRSPACE_64_IMAGE_ROOT are required for verified imgsHalf1.zip processing.');
     }
+    if (!preflightPath || !expectedArchiveSha256) throw new Error('Verified OCRSPACE-56 preflight report and archive SHA-256 are required; provider submission is blocked.');
     const archiveBytes = await fs.readFile(archivePath);
     const archiveSha256 = sha256(archiveBytes);
-    if (archiveBytes.length !== EXPECTED_ARCHIVE_BYTES || archiveSha256 !== EXPECTED_ARCHIVE_SHA256) {
-        throw new Error('imgsHalf1.zip fingerprint mismatch: expected ' + EXPECTED_ARCHIVE_BYTES + '/' + EXPECTED_ARCHIVE_SHA256 + ', got ' + archiveBytes.length + '/' + archiveSha256);
+    const preflight = JSON.parse(await fs.readFile(preflightPath, 'utf8'));
+    if (preflight.status !== 'verified-eligible-only-56' || preflight.providerRequestsPermitted !== true
+        || preflight.archiveSha256 !== expectedArchiveSha256 || archiveSha256 !== expectedArchiveSha256
+        || Number(preflight.archiveMembers) !== 56 || Number(preflight.eligibleMembersVerified) !== 56
+        || preflight.excludedRecordsAbsent !== true) {
+        throw new Error('Eligible-only 56 archive preflight verification is absent, incomplete, or mismatched; no OCR.Space requests permitted.');
     }
     const summedImageBytes = inventory.records.reduce((sum, item) => sum + Number(item.bytes || 0), 0);
     if (summedImageBytes !== Number(inventory.totalBytes)) throw new Error('Reviewed inventory totalBytes does not equal the sum of member image bytes.');
     const resolvedRoot = await fs.realpath(sourceRoot);
-    const verifiedSources = [];
-    for (const item of inventory.records) {
-        const sourcePath = path.resolve(resolvedRoot, item.archivePath);
-        if (!inside(resolvedRoot, sourcePath)) throw new Error(`Inventory path escapes source root: ${item.archivePath}`);
+    const verifiedSources = new Map();
+    for (const item of eligibleRecords) {
+        const sourcePath = path.resolve(resolvedRoot, item.filename);
+        if (!inside(resolvedRoot, sourcePath)) throw new Error(`Inventory path escapes source root: ${item.filename}`);
         const resolvedSourcePath = await fs.realpath(sourcePath);
-        if (!inside(resolvedRoot, resolvedSourcePath)) throw new Error(`Inventory member resolves outside source root: ${item.archivePath}`);
+        if (!inside(resolvedRoot, resolvedSourcePath)) throw new Error(`Inventory member resolves outside source root: ${item.filename}`);
         const source = await fs.readFile(resolvedSourcePath);
         const actualHash = sha256(source);
         if (source.length !== Number(item.bytes) || actualHash !== String(item.sha256).toLowerCase()) {
-            throw new Error(`Source archive member fingerprint mismatch: ${item.filename}; expected ${item.bytes}/${item.sha256}, got ${source.length}/${actualHash}`);
+            throw new Error(`Eligible source member fingerprint mismatch: ${item.filename}; expected ${item.bytes}/${item.sha256}, got ${source.length}/${actualHash}`);
         }
-        verifiedSources.push({ source, actualHash });
+        verifiedSources.set(item.filename, { source, actualHash });
     }
-    console.log('[OCRSPACE-64] Verified all 64 source members before any provider request.');
+    for (const item of excludedRecords) {
+        try { await fs.access(path.resolve(resolvedRoot, item.filename)); throw new Error(`Excluded source unexpectedly present: ${item.filename}`); }
+        catch (error) { if (error.message.startsWith('Excluded source unexpectedly present:')) throw error; if (error.code !== 'ENOENT') throw error; }
+    }
+    if (verifiedSources.size !== 56) throw new Error('Exactly 56 eligible source members must be verified before provider submission.');
+    console.log('[OCRSPACE-64] Verified the reconstructed archive SHA-256 and all 56 eligible member hashes; all 8 excluded records are absent. Provider submissions may now begin.');
     await fs.mkdir(outputRoot, { recursive: true });
     const run = {
         schemaVersion: 1, status: 'running', createdAt: new Date().toISOString(),
-        sourceArchive: inventory.sourceArchive, sourceArchiveBytes: archiveBytes.length, sourceArchiveSha256: archiveSha256,
+        sourceArchive: 'imgsHalf1-eligible-56.zip', sourceType: 'eligible-only-56', sourceArchiveBytes: archiveBytes.length, sourceArchiveSha256: archiveSha256,\n        archiveMembersVerified: 56, eligibleSourceHashesVerified: verifiedSources.size, excludedRecordsAbsent: true,
         totalUncompressedImageBytes: summedImageBytes,
         inventorySha256: sha256(Buffer.from(JSON.stringify(inventory))),
         imageCount: 64, groundTruthStatus: 'not_transcribed_or_independently_reviewed',
         eligibleCount: eligibleRecords.length, excludedCount: excludedRecords.length,
         eligibleProcessed: 0, excludedSkipped: 0, completedInventoryEntries: 0,
         engines: requiredEngines, results: [], excludedRecords: [],
-        sourceMemberHashesVerified: verifiedSources.length,
+        sourceMemberHashesVerified: verifiedSources.size,
         allSourceMembersVerifiedBeforeProvider: true,
     };
     for (let index = 0; index < inventory.records.length; index++) {
         const item = inventory.records[index];
-        const { source, actualHash } = verifiedSources[index];
-        if (source.length !== Number(item.bytes) || actualHash !== String(item.sha256).toLowerCase()) {
-            throw new Error(`Source archive member fingerprint mismatch: ${item.filename}; expected ${item.bytes}/${item.sha256}, got ${source.length}/${actualHash}`);
-        }
         if (item.corpusDisposition === EXCLUDED_DISPOSITION) {
             run.excludedSkipped++;
             run.excludedRecords.push({
                 index: index + 1, filename: item.filename, archivePath: item.archivePath,
                 corpusDisposition: item.corpusDisposition, groundTruthStatus: item.groundTruthStatus,
-                sourceBytes: source.length, sourceSha256: actualHash,
-                providerSubmission: false, status: 'skipped-user-excluded',
+                sourcePresent: false, providerSubmission: false, status: 'skipped-user-excluded',
             });
             run.completedInventoryEntries = index + 1;
             run.completedImages = run.eligibleProcessed;
@@ -114,6 +120,9 @@ async function main() {
         if (item.corpusDisposition !== ELIGIBLE_DISPOSITION) {
             throw new Error(`Unreviewed corpus disposition for ${item.filename}; refusing provider submission.`);
         }
+        const verifiedSource = verifiedSources.get(item.filename);
+        if (!verifiedSource) throw new Error(`Eligible source was not preflight-verified: ${item.filename}`);
+        const { source, actualHash } = verifiedSource;
         const pdfFirst = await createOcrSpacePdfFirst({
             imageBuffer: source, filename: item.filename, env: process.env,
         });
