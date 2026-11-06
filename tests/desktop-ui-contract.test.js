@@ -53,6 +53,11 @@ test('upload page supports one image preview, drag and drop, type/size validatio
   assert.match(html, /type="file"/);
   assert.doesNotMatch(html, /multiple/i);
   assert.match(script, /dragover/);
+  assert.match(html, /id="drop-zone"[^>]*role="region"/);
+  assert.match(html, /aria-describedby="upload-constraints"/);
+  assert.match(html, /id="browse-button"[^>]*type="button"/);
+  assert.doesNotMatch(html, /role="button"[^>]*>[\s\S]*?<button/i);
+  assert.doesNotMatch(script, /zone\.addEventListener\('keydown'/);
   assert.match(script, /URL\.createObjectURL/);
   assert.match(script, /25\s*\*\s*1024\s*\*\s*1024/);
   assert.match(script, /image\/png/);
