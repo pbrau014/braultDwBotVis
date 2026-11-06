@@ -201,4 +201,7 @@ async function main() {
     await fs.writeFile(outputPath + '.sha256', sha256(await fs.readFile(outputPath)) + '  ' + path.basename(outputPath) + '\n');
     console.log(JSON.stringify({ output: outputPath, status: report.status, inventory: inventory, aggregate }, null, 2));
 }
-main().catch(error => { console.error('[DWBOT-PDF-TEXT-LAYER] FAILED:', String(error.message || error).slice(0, 1000)); process.exitCode = 1; });
+if (require.main === module) {
+    main().catch(error => { console.error('[DWBOT-PDF-TEXT-LAYER] FAILED:', String(error.message || error).slice(0, 1000)); process.exitCode = 1; });
+}
+module.exports = { parseTextLayer, parseProviderText, score, consensus, selectRecords, GATE_B_19, ANALYSIS_21 };
