@@ -1,4 +1,52 @@
 ================================================================================
+LATEST CROSS-DOCUMENT SYNCHRONIZATION — 2026-11-06
+================================================================================
+This block is the newest synchronization record. The governing OCR.Space and
+chat rules are in the CURRENT GOVERNING OVERRIDE immediately below. Historical
+status snapshots remain unchanged and cannot override the active rules.
+
+- Canonical repository: pbrau014/braultDwBotVis, branch main.
+- Main HEAD immediately before this plan synchronization:
+  0234c6bf0a0d75cdd9e6a32bfce8787149e51792.
+- Cross-document commits after the first OCR.Space authority update:
+  * 38ce43af2d2a1b928c335a97728c0d113964f78e — refreshed the dated current
+    DWBOT authority document with explicit OCR.Space enablement and network
+    policy.
+  * 19a8076a1ab393412a97fd27951c989b6f3cbdb1 — added a current continuation
+    override to the dated handoff; its older body is retained as history.
+  * 0234c6bf0a0d75cdd9e6a32bfce8787149e51792 — aligned the top PDF-first
+    override in plan1.txt; its older Phase 0–10 records remain historical.
+  * 7d451dca07a832c44b0d6ee6c6622bdef59a46a2 — aligned the README active
+    architecture description.
+  * b5c2a0d3c2b1adcd51ef644886da18cb1ca5818c — clarified the implementation
+    guide's explicit-enable and OCR.Space network-allowlist semantics.
+  * fceaf6e3bd28f3746c737e7306747f490088bbdf — corrected the hidden searchable
+    PDF contract test and asserted that the PDF bytes are returned.
+  * 8a6933ac2d858b2a2b2a664d73a8b1667a99d13f and
+    23f92938ec02ebf9dd3bedd72f587183c47aa16d — added the living-plan
+    OCR.Space authority and corrected the active Gate A Task 5 instructions.
+- The README, implementation guide, current authority, handoff, plan1 top
+  override, workflow, environment examples, active source and PDF contract test
+  were inspected/updated as relevant. Historical default-off, Engine 3-first,
+  local-original-image, and offline-run statements remain only as dated
+  provenance where they record earlier states; the active override supersedes
+  them. The GitHub code-search connector did not return indexed code results,
+  so no claim is made that every tracked blob was exhaustively searched.
+- The combined-status query for the prior source checkpoint returned no status
+  entries, and the PR-filtered workflow-run query returned no runs. The
+  workflow-run page could not be retrieved through the available browser source.
+  No exact-head CI result is therefore verified. The final synchronization
+  commit will trigger the repository's configured push workflow; inspect its
+  exact-head jobs and artifacts before claiming test success.
+- No local OCRSPACE_API_KEY is available in this chat, and the Actions secret
+  cannot be read through the available connector. No live OCR.Space request,
+  real provider PDF, or image-acceptance result is claimed.
+
+================================================================================
+END LATEST CROSS-DOCUMENT SYNCHRONIZATION — 2026-11-06
+================================================================================
+
+================================================================================
 CURRENT GOVERNING OVERRIDE — 2026-11-06 (OCR.SPACE EXPLICIT ENABLE + PDF FIRST)
 ================================================================================
 Status: ACTIVE / CANONICAL / SUPERSEDES CONFLICTING ACTIVE OCR INSTRUCTIONS BELOW.
