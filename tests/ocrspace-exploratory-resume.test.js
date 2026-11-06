@@ -24,11 +24,15 @@ test('resume validation binds progress to exact archive, preflight, inventory, a
     requiredFields: fields }), { code: 'OCRSPACE_RESUME_FINGERPRINT_MISMATCH' });
 });
 
-test('completed image rows are skipped only with PDF and raster hashes', () => {
+test('completed image rows are skipped only when artifacts and both local readers are recorded', () => {
   const item = { filename: 'one.png', index: 1, sha256: 'a'.repeat(64) };
+  const complete = { ...item, status: 'pdf-first-complete', providerSubmissionAttempted: true,
+    pdfSha256: 'e'.repeat(64), rasterSha256: 'f'.repeat(64), pdfPath: 'one.pdf', rasterPath: 'one.png',
+    localReaders: [{ engine: 'tesseractjs' }, { engine: 'native' }], localReaderFailures: [] };
   assert.equal(classifyResumeRow(null, item), 'submit');
-  assert.equal(classifyResumeRow({ ...item, status: 'pdf-first-complete', pdfSha256: 'e'.repeat(64), rasterSha256: 'f'.repeat(64) }, item), 'skip-complete');
-  assert.equal(classifyResumeRow({ ...item, status: 'pdf-first-complete', pdfSha256: 'e'.repeat(64) }, item), 'skip-ambiguous');
+  assert.equal(classifyResumeRow(complete, item), 'skip-complete');
+  assert.equal(classifyResumeRow({ ...complete, localReaders: [{ engine: 'tesseractjs' }], localReaderFailures: [{ engine: 'native' }] }, item), 'resume-local-only');
+  assert.equal(classifyResumeRow({ ...complete, rasterSha256: undefined }, item), 'skip-ambiguous');
 });
 
 test('uncertain provider submissions are never automatically repeated', () => {
