@@ -5636,7 +5636,7 @@ LATEST ARTIFACT AUDIT / GATE B DIAGNOSTICS — 2026-11-06
   extractions, zero failed images, Engine 2, no original-image fallback.
 - Latest 19-image no-provider verification #42210718226 uploaded artifact
   13502190474, 267,125 bytes, ZIP SHA-256
-  a0254e8ec900b8cb695a3a1e? (see detailed audit report for full exact hash).
+  a0254e8ec900b8cb695a3bde92640c47e472435cb347d2b5aa928923a8c1f902.
   All 19 source hashes, PDF signatures/hashes, searchable text layers, raster
   hashes and PDF-derived raster provenance passed. Secret scan passed.
   Overall failed because local readers were incomplete (PaddleOCR failed-open
