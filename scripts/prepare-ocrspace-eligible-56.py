@@ -55,11 +55,16 @@ def main() -> None:
             if unix_mode and (unix_mode & 0o170000) == 0o120000:
                 raise RuntimeError(f"Symlink ZIP entry rejected: {name}")
             record = expected[name]
+            if info.file_size != int(record["bytes"]):
+                raise RuntimeError(f"ZIP metadata size mismatch for {name}: expected {record['bytes']}, got {info.file_size}")
             target = IMAGE_ROOT / name
             h = hashlib.sha256(); size = 0
             with z.open(info, "r") as src, target.open("xb") as dst:
                 for block in iter(lambda: src.read(1024 * 1024), b""):
-                    size += len(block); h.update(block); dst.write(block)
+                    size += len(block)
+                    if size > int(record["bytes"]):
+                        raise RuntimeError(f"ZIP member exceeds reviewed size limit: {name}")
+                    h.update(block); dst.write(block)
             actual = h.hexdigest()
             if size != int(record["bytes"]) or actual != str(record["sha256"]).lower():
                 raise RuntimeError(f"Image fingerprint mismatch for {name}: {size}/{actual}")
