@@ -8,16 +8,17 @@ const members = [
   { filename: 'two.png', bytes: 20, sha256: 'b'.repeat(64) },
 ];
 const fields = ['result', 'player', 'map', 'mode', 'battleStart', 'credits', 'freeXp', 'damage', 'xp'];
+const runtime = { node: 'v24.17.0', platform: 'win32', arch: 'x64' };
 function state(results = []) {
   return { schemaVersion: 1, sourceArchiveSha256: 'c'.repeat(64),
-    preflightReportSha256: 'd'.repeat(64), imageCount: 63, requiredFields: fields, results };
+    preflightReportSha256: 'd'.repeat(64), imageCount: 63, requiredFields: fields, runtime, results };
 }
 
 test('resume validation binds progress to exact archive, preflight, inventory, and field contract', () => {
   const valid = { ...state(), results: [{ index: 1, filename: 'one.png', sourceSha256: members[0].sha256, providerSubmissionAttempted: false }] };
   const rows = validateResumeState(valid, { sourceArchiveSha256: 'c'.repeat(64),
     preflightReportSha256: 'd'.repeat(64), verifiedMembers: Array.from({length:63},(_,i)=>i===0?members[0]:{filename:`image-${i+1}.png`,bytes:1,sha256:String(i).padStart(64,'0')}),
-    requiredFields: fields });
+    requiredFields: fields, runtime });
   assert.equal(rows.size, 1);
   assert.throws(() => validateResumeState(valid, { sourceArchiveSha256: 'e'.repeat(64),
     preflightReportSha256: 'd'.repeat(64), verifiedMembers: Array.from({length:63},(_,i)=>i===0?members[0]:{filename:`image-${i+1}.png`,bytes:1,sha256:String(i).padStart(64,'0')}),
@@ -45,4 +46,14 @@ test('uncertain provider submissions are never automatically repeated', () => {
 test('resume rejects changed or reordered source rows', () => {
   const item = { filename: 'one.png', index: 1, sha256: 'a'.repeat(64) };
   assert.throws(() => classifyResumeRow({ ...item, sourceSha256: 'b'.repeat(64) }, item), { code: 'OCRSPACE_RESUME_ROW_MISMATCH' });
+});
+
+
+test('63-image resume rejects a different Node runtime', () => {
+  const verifiedMembers = Array.from({length:63},(_,i)=>({filename:`image-${i+1}.png`,bytes:1,sha256:String(i+1).padStart(64,'0')}));
+  assert.throws(() => validateResumeState(state(), {
+    sourceArchiveSha256: 'c'.repeat(64), preflightReportSha256: 'd'.repeat(64),
+    verifiedMembers, requiredFields: fields,
+    runtime: { node: 'v22.16.0', platform: 'win32', arch: 'x64' },
+  }), { code: 'OCRSPACE_RESUME_FINGERPRINT_MISMATCH' });
 });
