@@ -44,7 +44,7 @@ test('Gate A resume accepts only the single original first-image start marker', 
     const log = [
         '2026-11-06T10:27:19Z [OCR-SEQUENCE] 1/16 START Screenshot_16.jpg',
         '2026-11-06T10:28:04Z cancellation requested'
-    ].join('\\n');
+    ].join('\n');
     assert.deepEqual(extractStartedFixtures(log),[{index:1,fixtureKey:'Screenshot_16.jpg'}]);
-    assert.equal(extractStartedFixtures(log + '\\n[OCR-SEQUENCE] 2/16 START WTF.jpg').length,2);
+    assert.equal(extractStartedFixtures(log + '\n[OCR-SEQUENCE] 2/16 START WTF.jpg').length,2);
 });
