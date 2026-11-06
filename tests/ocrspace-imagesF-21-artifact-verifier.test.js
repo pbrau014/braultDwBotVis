@@ -68,7 +68,7 @@ async function fixture(t) {
   await fs.writeFile(runPath,JSON.stringify(run));
   return {root,artifactRoot,sourceImageRoot,gtPath,preflightPath,freshPreflightPath,runPath,networkLogPath,recoveryNetworkLogPath};
 }
-const workflowSourceText="OCRSPACE_ENABLED: '0'\\nOCRSPACE_NETWORK_ALLOWLIST: '0'\\nOCR_NON_OCR_NETWORK_RESTRICTED: '1'\\nOCR_NON_OCR_NETWORK_LOG: logs/blocked.log";
+const workflowSourceText="OCRSPACE_ENABLED: '0'\\nOCRSPACE_NETWORK_ALLOWLIST: '1'\\nOCR_NON_OCR_NETWORK_RESTRICTED: '1'\\nOCR_NON_OCR_NETWORK_LOG: logs/blocked.log";
 const metadataFor = async buffer => buffer.toString('utf8').startsWith('source-image-bytes-')
   ? {width:1920,height:1080} : {width:1600,height:900};
 
@@ -102,7 +102,8 @@ test('missing network log or secret is not treated as a clean security result', 
     workflowSourceText,apiKey:'',renderPdf:async()=>png(1600,900),
     readMetadata:metadataFor,toRawRgba:async()=>Buffer.from('same-pixels'),readPdfText:async()=> 'searchable text'});
   assert.equal(report.status,'FAILED');
-  assert.equal(report.checks.networkRestriction,'FAIL');
+  assert.equal(report.checks.networkRestriction,'NOT_VERIFIED_MISSING_ORIGINAL_LOG');
+  assert.equal(report.checks.originalNetworkLogStatus,'MISSING_FROM_SOURCE_ARTIFACT');
   assert.equal(report.checks.secretLeakScan,'NOT_VERIFIED');
   assert.equal(report.checks.unauthorizedNetworkAttempts,null);
 });
