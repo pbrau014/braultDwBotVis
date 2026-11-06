@@ -82,3 +82,21 @@ Round 4 historical shape: Score = OverallMultiplier ÷ 3 × Σgames[ClassWeight 
 
 <div style="background-color:#DFF2FF; border:1.5px solid #0070C0; padding:6px 8px; margin:4px 0;"><strong>⚓ Quick hint:</strong> Use the designated source of truth; compare identical inputs and formulas, and do not certify untested parity.</div>
 > **Scoring gate passes when**: The exact designated workbook is fingerprinted; all formula and invalid-input tests, C01–C06 behavior, resets, H12 suppression, and post-start change/audit-trail tests pass; workbook and calculator match on the full suite; target Excel/VBA runtime succeeds; independent reviewer signs the evidence; and the approved event settings record names the accepted version.
+
+
+## C01 implementation update — 2026-11-06
+
+The supplied archival `test27xlsm.xlsm` and Discord scoring messages use elapsed seconds directly on the Race sheet. That historical behavior rewards a larger/slower time. The selected C01 policy remains:
+
+`RaceShare = (1 / elapsedSeconds) / SUM(1 / eligibleElapsedSeconds)`
+
+This makes lower elapsed time produce a larger performance share while retaining the same class and tier weighting framework.
+
+The current DWBOT scoring engine and standalone HTML calculator have been changed to use inverse elapsed seconds:
+- Core scoring commit: `2c1c1faf22ed0c519d2a11e901bd83720e755d2c`
+- HTML calculator commit: `561d792388f101eb5fa8ff61b6b63c65c3e3bad1`
+- Regression/parity test commit: `38da9fb1c3db28cb5c254e2023ba198785f4a39e`
+
+The test asserts that a 60-second time earns a larger Race score than a 120-second time under equal class/tier conditions, and that the HTML and DWBOT engines use the same Race formula. **Exact-head CI and browser verification are pending.** Do not report formula parity as passed until the final exact-commit workflow and relevant test logs succeed.
+
+The archival workbook and Discord source texts are preserved unchanged. The historical direct-time formula remains provenance; it is not silently rewritten or treated as the current C01 policy. The supplied workbook is still an archival sample, not the designated canonical workbook, and cannot certify a live event's score or award settings.
