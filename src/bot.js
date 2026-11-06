@@ -2849,7 +2849,7 @@ function eventStandingsText(event) {
     if (!rows.length) return 'No players in the tournament yet.';
     const heading = [`**${Tournament.EVENT_LABELS[event]} leaderboard**`];
     if (event === 'race') heading.push('`Race C01 inverse-time: lower elapsed seconds earn a larger performance share.`');
-    return [...heading, ...rows.map((row, index) => `**${index + 1}. ${row.name}** — ${row.events[event].toFixed(2)} doubloons`)].join('\\n');
+    return [...heading, ...rows.map((row, index) => `**${index + 1}. ${row.name}** — ${row.events[event].toFixed(2)} doubloons`)].join('\n');
 }
 
 function missingSlotsText(args) {
