@@ -137,7 +137,7 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
     const preflight = JSON.parse(preflightBytes.toString('utf8'));
     const freshPreflight = JSON.parse(freshPreflightBytes.toString('utf8'));
     const selected = selectGateB(gt);
-    if (selected.length !== 21) throw new Error('Gate B selection is not exactly 21 complete nine-field records.');
+    if (selected.length !== 21 || selected.some((record, index) => record !== gt.records[index])) throw new Error('Gate B selection is not exactly the first 21 complete nine-field records in corpus order.');
     if (run.sourceArchiveSha256 !== gt.candidateArchive?.sha256 || preflight.archiveSha256 !== run.sourceArchiveSha256) throw new Error('Run/preflight archive fingerprint does not match the v6 ground truth.');
     const sameMemberList = JSON.stringify(preflight.verifiedMembers || []) === JSON.stringify(freshPreflight.verifiedMembers || []);
     if (run.preflightReportSha256 !== sha256(preflightBytes) || preflight.verifiedMembers?.length !== 63 || preflight.allImageMemberHashesVerified !== true
@@ -255,7 +255,7 @@ async function verifyArtifacts({ runReport, groundTruth, preflightReport, freshP
         && /OCR_NON_OCR_NETWORK_LOG:/.test(workflowSourceText);
     const networkOk = networkAttempts === 0 && workflowRestrictionOk;
     const files = await listFiles(artifactRoot);
-    const secret = await secretScan([...files, runReport, groundTruth, preflightReport], apiKey);
+    const secret = await secretScan([...files, runReport, groundTruth, preflightReport, freshPreflightReport, Buffer.from(workflowSourceText, 'utf8')], apiKey);
     const gateA = gateAReport ? {
         status: gateAReport.status || 'PENDING',
         reportSha256: gateAReport.reportSha256 || null,
