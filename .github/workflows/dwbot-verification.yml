@@ -64,7 +64,10 @@ jobs:
           node --check src/attachment-download.js
           node --check src/discord-test-preflight.js
           node --check src/ocr-sequence-checkpoint.js
+          node --check src/ocr-sequence-resume.js
           node --check scripts/run-ocr-sequence.js
+          node --check scripts/run-four-screenshot-pipeline.js
+          node --check scripts/run-ocrspace-imagesF-63-exploratory.js
           node --check scripts/run-additional-screenshot-regression.js
           node --check scripts/run-persistence-recovery.js
       - name: OCR.space mocked contract
