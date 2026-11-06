@@ -121,7 +121,7 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
     const pageRasterBuffer = await renderPdf(pdfBuffer);
     const pageRasterMetadata = await readRasterMetadata(pageRasterBuffer);
     const normalized = await normalizeRaster(pageRasterBuffer, {
-        sourceWidth: Number(sourceMetadata.width), sourceHeight: Number(sourceMetadata.height),
+        sourceWidth: Number(sourceMetadata.width), sourceHeight: Number(sourceMetadata.height), sourceImageBuffer: imageBuffer,
     });
     if (!Buffer.isBuffer(normalized?.buffer) || !normalized.buffer.length
         || normalized.normalization?.method !== 'source-aspect-top-aligned-crop-v1') {
@@ -141,7 +141,7 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
         pageRasterWidth: pageRasterMetadata.width, pageRasterHeight: pageRasterMetadata.height,
         rasterBytes: rasterBuffer.length, rasterSha256: crypto.createHash('sha256').update(rasterBuffer).digest('hex'),
         rasterWidth: rasterMetadata.width, rasterHeight: rasterMetadata.height,
-        rasterNormalization: normalized.normalization,
+        rasterNormalization: normalized.normalization, rasterSourceSimilarity: normalized.similarity,
         searchablePdfUrlHost: new URL(pdfUrl).hostname,
         processingTimeMs: Number(response.processingTimeMs) || null,
         providerExitCode: response.exitCode, partial: response.partial === true,
