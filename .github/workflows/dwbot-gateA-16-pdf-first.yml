@@ -261,7 +261,7 @@ jobs:
                 $actualValue = $row.actual.$field
                 $expectedValue = $row.expected.$field
                 if ($null -eq $actualValue -or [string]::IsNullOrWhiteSpace([string]$actualValue)) { $unresolved++ }
-                elseif ([string]$actualValue -ne [string]$expectedValue) { $wronglyAccepted++ }
+                elseif ([string]$actualValue -cne [string]$expectedValue) { $wronglyAccepted++ }
               }
             }
           }
