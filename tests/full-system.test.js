@@ -820,7 +820,7 @@ test('50-player randomized tournament: roster cap, all-player aggregates, dollar
   const allStandingsMessages = standings.text + '\n' + standings.sends.map(x => x.content || '').join('\n');
   assert.match(allStandingsMessages, /All-player aggregate \(50\/50 players\)/);
   assert.ok(allStandingsMessages.includes(`Total doubloons (G12-equivalent): ${totalDoubloons.toFixed(2)}`));
-  assert.doesNotMatch(allStandingsMessages, /H12-equivalent|Estimated total value|\\$/);
+  assert.doesNotMatch(allStandingsMessages, /H12-equivalent|Estimated total value|\$/);
   const before = archiveSends.length;
   const snapshot = await send('!yolo snapshot');
   assert.match(snapshot.text, /snapshot attached/i);
