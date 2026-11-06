@@ -22,6 +22,7 @@ const { downloadImage } = require('./attachment-download');
 const { inspectTargetChannelPermissions } = require('./discord-gateway-diagnostics');
 const { isAdminOnlyCommand } = require('./tournament-command-policy');
 const { collectOcrSpaceFieldEvidence, getOcrSpaceActivation } = require('./ocrspace-field-evidence');
+const { createOcrSpacePdfFirst } = require('./ocrspace-pdf-first');
 const { buildSafeOcrSpacePrepassCropPlan, filterSafeOcrSpaceCropPlan } = require('./ocrspace-prepass');
 const { reconcileOcrSpaceEvidence } = require('./ocrspace-reconciliation');
 const path = require('node:path');
@@ -335,41 +336,48 @@ async function extractTextCore(imageBuffer) {
         }
     };
     ensureImageBudget();
-    const metadata = await imageProcessor.metadata(imageBuffer);
+    let metadata = await imageProcessor.metadata(imageBuffer);
     ensureImageBudget();
-    const { width: sourceWidth, height: sourceHeight } = imageProcessor.assertDimensions(metadata.width, metadata.height, {
+    let dimensions = imageProcessor.assertDimensions(metadata.width, metadata.height, {
         maxDimension: MAX_IMAGE_DIMENSION, maxPixels: MAX_IMAGE_PIXELS,
     });
-    // OpenCV is a local geometry assistant only. It never emits accepted values;
-    // the established Tesseract passes, parsers and ambiguity checks remain the
-    // authority. Missing Python/OpenCV fails back to the existing OCR pipeline.
+    let sourceWidth = dimensions.width;
+    let sourceHeight = dimensions.height;
     const ocrSpaceActivation = getOcrSpaceActivation(process.env);
     const ocrSpaceConfigured = ocrSpaceActivation.enabled;
-    // OCR.Space-first prepass: OpenCV supplies geometry only. Identity geometry is
-    // used as an exclusion boundary and is never uploaded. If a safe crop cannot
-    // be proven, the remote prepass skips it and local OCR continues unchanged.
-    const cvAnalysis = await opencvFieldIsolation.analyze(imageBuffer, { force: ocrSpaceConfigured });
-    let ocrSpacePrepassEvidence = { status: ocrSpaceConfigured ? 'pending' : 'disabled', reason: ocrSpaceActivation.reason, requests: 0, evidence: [] };
+    let ocrSpacePdfFirstEvidence = { status: 'disabled', reason: ocrSpaceActivation.reason, requests: 0 };
+    let ocrSpacePrepassEvidence = { status: 'disabled', reason: ocrSpaceActivation.reason, requests: 0, evidence: [] };
     if (ocrSpaceConfigured) {
-        try {
-            const cropPlan = buildSafeOcrSpacePrepassCropPlan({ regions: cvAnalysis?.regions || {}, width: sourceWidth, height: sourceHeight });
-            const remaining = Math.max(1000, OCR_IMAGE_TIMEOUT_MS - (Date.now() - imageStartedAt) - 45000);
-            if (cropPlan.length && remaining >= 1000) {
-                ocrSpacePrepassEvidence = await collectOcrSpaceFieldEvidence({
-                    env: { ...process.env, OCRSPACE_MAX_CROPS: process.env.OCRSPACE_MAX_CROPS || '4',
-                        OCRSPACE_STAGE_BUDGET_MS: String(Math.min(20000, remaining)) },
-                    cropPlan,
-                    buildCrop: async spec => imageProcessor.cropResize(imageBuffer, spec.rect,
-                        Math.max(600, Math.min(1800, Math.round(spec.rect.width * 2.5))),
-                        { grayscale: true, contrastStretch: '0.5%x0.5%', sharpen: '0x1+1+0.02' }),
-                });
-            } else {
-                ocrSpacePrepassEvidence = { status: 'skipped', reason: 'no geometrically safe non-identifying crops or insufficient time budget', requests: 0, evidence: [] };
-            }
-        } catch (error) {
-            ocrSpacePrepassEvidence = { status: 'failed', reason: String(error && error.code || 'OCRSPACE_PREPASS_ERROR'), requests: 0, evidence: [] };
+        // The complete source screenshot is transmitted only under the user's
+        // explicit OCR.Space-first authorization. The API key never enters logs.
+        // All downstream OCR readers receive the returned PDF page raster.
+        const pdfFirst = await createOcrSpacePdfFirst({
+            imageBuffer, filename: 'wows-battle-source.png', env: process.env,
+        });
+        if (pdfFirst.status !== 'complete') {
+            const error = new Error(pdfFirst.reason || 'OCR.Space searchable-PDF first pass did not complete.');
+            error.code = 'OCRSPACE_PDF_FIRST_BLOCKED';
+            throw error;
         }
+        const { rasterBuffer, pdfBuffer, ...publicEvidence } = pdfFirst;
+        imageBuffer = rasterBuffer;
+        metadata = await imageProcessor.metadata(imageBuffer);
+        dimensions = imageProcessor.assertDimensions(metadata.width, metadata.height, {
+            maxDimension: MAX_IMAGE_DIMENSION, maxPixels: MAX_IMAGE_PIXELS,
+        });
+        sourceWidth = dimensions.width;
+        sourceHeight = dimensions.height;
+        ocrSpacePdfFirstEvidence = { ...publicEvidence, pdfBytes: pdfBuffer.length };
+        ocrSpacePrepassEvidence = {
+            status: 'complete', requests: 1,
+            evidence: [{ field: 'fullScreenshot', source: 'ocrspace-searchable-pdf', status: 'success',
+                text: String(pdfFirst.providerText || '') }],
+        };
     }
+    // OpenCV remains geometry-only, now operating on the OCR.Space PDF page
+    // raster. Tesseract.js, PaddleOCR and native Tesseract all receive this raster,
+    // not the original source image.
+    const cvAnalysis = await opencvFieldIsolation.analyze(imageBuffer, { force: false });
     ensureImageBudget();
     const worker = await getOcrWorker();
     // Enlarge smaller screenshots and boost contrast before OCR, with a bounded
@@ -2477,6 +2485,7 @@ async function extractTextCore(imageBuffer) {
     }));
     const extractedFields = {
         ocrSpaceEvidence: ocrSpacePrepassEvidence,
+        ocrSpacePdfFirst: ocrSpacePdfFirstEvidence,
         rewards: focusedRewards,
         rewardCandidates,
         legacyRewardCandidates,

@@ -47,7 +47,7 @@ function runImageMagick(args, inputBuffer, testOptions = null) {
 
     return new Promise((resolve, reject) => {
         const timeoutMs = Math.max(testOptions ? 100 : 1000, Number(testOptions?.timeoutMs ?? process.env.IMAGEMAGICK_TIMEOUT_MS) || 15000);
-        const maxOutputBytes = Math.max(1_000_000, Number(process.env.MAX_IMAGEMAGICK_OUTPUT_BYTES) || 100_000_000);
+        const maxOutputBytes = Math.max(1_000_000, Number(testOptions?.maxOutputBytes ?? process.env.MAX_IMAGEMAGICK_OUTPUT_BYTES) || 100_000_000);
         const usePosixTimeout = testOptions?.usePosixTimeout ?? !testOptions?.command;
         const command = usePosixTimeout && posixTimeout ? posixTimeout : selectedImageMagick;
         const baseArgs = [...(testOptions?.argsPrefix || []), ...args];
@@ -166,4 +166,47 @@ async function cropResize(inputBuffer, rect, outputWidth, options = {}) {
     return runImageMagick(args, inputBuffer);
 }
 
-module.exports = { metadata, prepare, cropResize, imageMagick, assertDimensions, __test: { runImageMagick } };
+async function prepareOcrSpaceUpload(inputBuffer, maxBytes = 1024 * 1024) {
+    if (!Buffer.isBuffer(inputBuffer) || !inputBuffer.length) throw new Error('OCR.Space source image is empty.');
+    const attempts = [
+        { width: 2600, quality: 86 }, { width: 2200, quality: 82 },
+        { width: 1900, quality: 78 }, { width: 1600, quality: 74 },
+        { width: 1400, quality: 70 }, { width: 1200, quality: 66 },
+    ];
+    let last = null;
+    for (const attempt of attempts) {
+        const output = await runImageMagick([
+            '-', '-auto-orient', '-strip', '-colorspace', 'sRGB',
+            '-resize', `${attempt.width}x${attempt.width}>`,
+            '-sampling-factor', '4:2:0', '-interlace', 'Plane',
+            '-quality', String(attempt.quality), 'jpg:-',
+        ], inputBuffer);
+        if (output.length <= maxBytes) {
+            const info = await metadata(output);
+            return { buffer: output, filename: 'dwbot-source.jpg', mimeType: 'image/jpeg',
+                bytes: output.length, width: info.width, height: info.height,
+                resized: true, quality: attempt.quality };
+        }
+        last = { ...attempt, bytes: output.length };
+    }
+    const error = new Error(`OCR.Space Free API image remains above ${maxBytes} bytes after bounded re-encoding (last attempt ${last?.width}px/q${last?.quality}: ${last?.bytes} bytes).`);
+    error.code = 'OCRSPACE_FILE_TOO_LARGE';
+    throw error;
+}
+
+async function renderSearchablePdfPage(pdfBuffer, { density = 220, maxDimension = 3200 } = {}) {
+    if (!Buffer.isBuffer(pdfBuffer) || pdfBuffer.length < 8 || pdfBuffer.subarray(0, 5).toString('ascii') !== '%PDF-') {
+        const error = new Error('OCR.Space returned a file that is not a valid PDF.');
+        error.code = 'OCRSPACE_INVALID_PDF';
+        throw error;
+    }
+    const dimension = Math.max(800, Math.min(5000, Number(maxDimension) || 3200));
+    return runImageMagick([
+        '-density', String(Math.max(72, Math.min(400, Number(density) || 220))),
+        'pdf:-[0]', '-background', 'white', '-alpha', 'remove', '-alpha', 'off',
+        '-resize', `${dimension}x${dimension}>`, '-strip', 'png:-',
+    ], pdfBuffer, { timeoutMs: 60000, maxOutputBytes: 80_000_000 });
+}
+
+module.exports = { metadata, prepare, cropResize, prepareOcrSpaceUpload, renderSearchablePdfPage,
+    imageMagick, assertDimensions, __test: { runImageMagick } };
