@@ -3,11 +3,32 @@
 // allowlist. When unrelated-egress restriction is enabled, only non-provider
 // destinations are denied and recorded; OCR.Space is never blocked by this guard.
 const fs = require('node:fs');
+const path = require('node:path');
 const logPath = process.env.OCR_NON_OCR_NETWORK_LOG;
 const restrictNonOcrNetwork = process.env.OCR_NON_OCR_NETWORK_RESTRICTED === '1';
+if (restrictNonOcrNetwork) {
+  if (!logPath) throw new Error('OCR_NON_OCR_NETWORK_LOG is required when unrelated-egress restriction is enabled.');
+  try {
+    fs.mkdirSync(path.dirname(path.resolve(logPath)), { recursive: true });
+    fs.appendFileSync(logPath, '');
+  } catch (error) {
+    const failure = new Error('The restricted-egress diagnostic log is not writable; refusing to start.');
+    failure.code = 'OCR_NETWORK_LOG_UNAVAILABLE';
+    failure.cause = error;
+    throw failure;
+  }
+}
 function blocked(kind, destination) {
-  const message = `[NON-OCR-SPACE-EGRESS-RESTRICTED] denied ${kind} ${String(destination || '').slice(0, 300)}\\n`;
-  if (logPath) { try { fs.appendFileSync(logPath, message); } catch {} }
+  const message = `[NON-OCR-SPACE-EGRESS-RESTRICTED] denied ${kind} ${String(destination || '').slice(0, 300)}\n`;
+  if (restrictNonOcrNetwork) {
+    try { fs.appendFileSync(logPath, message); }
+    catch (cause) {
+      const failure = new Error('The restricted-egress diagnostic log write failed; request remains blocked.');
+      failure.code = 'OCR_NETWORK_LOG_WRITE_FAILED';
+      failure.cause = cause;
+      throw failure;
+    }
+  }
   const error = new Error(`Non-OCR.Space network destination is outside the configured allowlist (${kind}).`);
   error.code = 'OCR_NETWORK_BLOCKED';
   throw error;
