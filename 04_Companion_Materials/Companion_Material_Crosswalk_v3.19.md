@@ -17,3 +17,7 @@ The v1.1 companion materials are published as documentation and reusable templat
 
 ## Scope and authority
 The v3.15 policy-resolved source baseline is retained under `05_QA` for audit traceability. Main publication filenames retain v3.19 lineage for reference stability; the enclosing package is v3.22. The v3.22 waiver permits documentation publication only; it does not approve a specific event, certify scoring, or authorize a runtime deployment.
+
+| Admiralty × YOLO source reconciliation v0.1 | Organizer / editor / reviewer | Season Logistics Blueprint + source archive | Records archive fingerprint, source authority, conflicting versions, scoring discrepancies and visual provenance; not an event approval. |
+| Admiralty × YOLO Mock Tournament Field Guide v0.1 | Participants, team representatives, viewers | Participant Guide + Pilot / Recurring Rulesets | Fictional narrative and tactical teaching companion; clearly distinguishes source rules from proposals and current event settings. |
+| Admiralty × YOLO Mock Tournament HTML v0.1 | Participants, viewers and organizers | Narrative Field Guide | Responsive editorial presentation using exact source imagery; image paths are relative to the preserved `dwbotStuff` source assets. Proposal only. |
