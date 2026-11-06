@@ -1,8 +1,8 @@
 name: DWBOT Gate A 16-image OCR.Space PDF-first acceptance
 
-# One authorized development-corpus run, fingerprint-bound to the completed
-# imagesF-63 source run. Preflight must pass before the 16 provider requests;
-# every request writes a durable PDF/raster artifact and restricted-egress log.
+# One original Gate A development-corpus run plus one artifact-bound resume
+# continuation. The resume reuses the already submitted first image and may
+# submit only the remaining 15 after local recovery proves that first record exact.
 
 on:
   push:
@@ -24,7 +24,7 @@ env:
 
 jobs:
   gate-a:
-    if: github.run_attempt == 1 && github.event_name == 'push' && github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME'
+    if: github.run_attempt == 1 && github.event_name == 'push' && (github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME' || github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15')
     runs-on: windows-latest
     timeout-minutes: 240
     permissions:
@@ -46,6 +46,7 @@ jobs:
         run: |
           npm ci --no-audit --no-fund
           node --check scripts/run-gateA-parallel-reader-matrix.js
+          node --check scripts/prepare-gateA-16-resume.js
 
       - name: Verify completed Gate B source run fingerprint
         shell: powershell
@@ -142,6 +143,49 @@ jobs:
           # the candidate preload again, which Node's module cache safely ignores.
           "NODE_OPTIONS=--require `"$candidateGuard`" --require `"$failClosedGuard`"" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
 
+      - name: Download and verify original partial Gate A artifact
+        if: github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15'
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $priorRunId = '42202563673'
+          $priorArtifactId = 13495008195
+          $expectedDigest = 'sha256:398f8152847cd3ea58fb9e16ac01886fced0c880869ce6a430d3343e5cb4ecd8'
+          $priorJson = gh run view $priorRunId --repo $env:GITHUB_REPOSITORY --json name,headSha,status,conclusion
+          if ($LASTEXITCODE -ne 0) { throw 'Could not inspect the original partial Gate A run.' }
+          $prior = $priorJson | ConvertFrom-Json
+          if ($prior.name -ne 'DWBOT Gate A 16-image OCR.Space PDF-first acceptance' -or $prior.headSha -ne $env:GATEB_SOURCE_SHA -or $prior.status -ne 'completed' -or $prior.conclusion -ne 'cancelled') { throw 'Original Gate A run identity/state does not match the approved partial source run.' }
+          $artifactJson = gh api "repos/$env:GITHUB_REPOSITORY/actions/runs/$priorRunId/artifacts"
+          if ($LASTEXITCODE -ne 0) { throw 'Could not inspect original Gate A artifacts.' }
+          $artifact = (($artifactJson | ConvertFrom-Json).artifacts | Where-Object { $_.id -eq $priorArtifactId })
+          if ($null -eq $artifact -or $artifact.name -ne "dwbot-gateA-16-pdf-first-$priorRunId" -or $artifact.expired -ne $false -or $artifact.size_in_bytes -ne 1519776 -or $artifact.digest -ne $expectedDigest) { throw 'Original partial Gate A artifact ID/name/size/digest did not match the recorded artifact.' }
+          $partialDir = Join-Path $env:RUNNER_TEMP 'dwbot-gateA-partial-42202563673'
+          New-Item -ItemType Directory -Force $partialDir | Out-Null
+          gh run download $priorRunId --repo $env:GITHUB_REPOSITORY --name $artifact.name --dir $partialDir
+          if ($LASTEXITCODE -ne 0) { throw 'Could not download the original partial Gate A artifact.' }
+          $logLines = gh run view $priorRunId --repo $env:GITHUB_REPOSITORY --log
+          if ($LASTEXITCODE -ne 0) { throw 'Could not retrieve the original partial Gate A job log.' }
+          [System.IO.File]::WriteAllText((Join-Path $partialDir 'original-run.log'), ($logLines -join [Environment]::NewLine))
+          "GATEA_PARTIAL_ARTIFACT_DIR=$partialDir" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "GATEA_PARTIAL_ARTIFACT_ID=$priorArtifactId" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "GATEA_PARTIAL_ARTIFACT_SHA256=398f8152847cd3ea58fb9e16ac01886fced0c880869ce6a430d3343e5cb4ecd8" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Prepare no-duplicate Gate A resume checkpoint from existing PDF
+        if: github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15'
+        shell: powershell
+        run: |
+          node scripts/prepare-gateA-16-resume.js --source-root source --preflight testdata/gateA-16-preflight.json --partial-artifact-root "$env:GATEA_PARTIAL_ARTIFACT_DIR"
+          if ($LASTEXITCODE -ne 0) { throw 'First-image local recovery or original artifact verification failed; no remaining provider requests may start.' }
+
+      - name: Initialize Gate A restricted-egress diagnostic log
+        shell: powershell
+        run: |
+          $log = Join-Path $env:GITHUB_WORKSPACE 'source/testdata/gateA-16/non-ocr-network-attempts.log'
+          New-Item -ItemType Directory -Force (Split-Path $log -Parent) | Out-Null
+          [System.IO.File]::WriteAllText($log, '')
+          if (-not (Test-Path $log) -or (Get-Item $log).Length -ne 0) { throw 'Could not initialize an empty Gate A restricted-egress log before provider calls.' }
+
       - name: Run the 16-image OCR.Space Engine 2 PDF-first Gate A acceptance
         working-directory: source
         env:
@@ -151,6 +195,7 @@ jobs:
           OCRSPACE_ARTIFACT_DIR: testdata/gateA-16/artifacts
           OCR_IMAGE_TIMEOUT_MS: '180000'
           OCR_SUPERVISED_TIMEOUT_MS: '185000'
+          OCR_SEQUENCE_RESUME_FROM: ${{ github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' && 'testdata/gateA-16/resume-from-progress.json' || '' }}
         run: node scripts/run-additional-screenshot-regression.js
 
       - name: Run Gate A parallel local-reader matrix on verified PDF artifacts
@@ -195,20 +240,41 @@ jobs:
           $networkExists = Test-Path $networkPath
           $networkBytes = if ($networkExists) { (Get-Item $networkPath).Length } else { -1 }
           $network = $report.networkIsolation
+          $resumeManifestPath = Join-Path $sourceRoot 'testdata/gateA-16/resume-manifest.json'
+          $resumeManifest = if (Test-Path $resumeManifestPath) { Get-Content -Raw $resumeManifestPath | ConvertFrom-Json } else { $null }
+          $originalNetworkEvidencePass = $null -eq $resumeManifest -or ($resumeManifest.originalNetworkLogStatus -eq 'PRESENT' -and $resumeManifest.originalNetworkAttemptCount -eq 0)
           $matrixPath = Join-Path $env:GITHUB_WORKSPACE 'testdata/gateA-16/parallel-reader-matrix.json'
           $matrix = if (Test-Path $matrixPath) { Get-Content -Raw $matrixPath | ConvertFrom-Json } else { $null }
           $matrixPass = $null -ne $matrix -and $matrix.status -eq 'COMPLETED_DIAGNOSTIC_MATRIX' -and $matrix.inventory.imageCount -eq 16 -and $matrix.network.blockedAttempts -eq 0
           $reportPass = $null -ne $report -and $report.imageCount -eq 16 -and $report.completedImages -eq 16 -and $report.exactMatches -eq 16 -and $report.mandatoryExactMatches -eq 16 -and $report.requiredFieldsComplete -eq 16 -and $report.results.Count -eq 16 -and @($report.results | Where-Object { $_.pipelineCompleted -ne $true -or $_.allExpectedFieldsPass -ne $true -or $_.allRequiredFieldsPass -ne $true -or $_.requiredMissing.Count -ne 0 }).Count -eq 0
           $auditPass = $null -ne $audit -and $audit.sourceCount -eq 16 -and $audit.verifiedPdfCount -eq 16 -and $audit.images.Count -eq 16 -and @($audit.images | Where-Object { $_.valid -ne $true }).Count -eq 0
-          $networkPass = $null -ne $network -and $network.ocrSpaceEnabled -eq $true -and $network.ocrSpaceNetworkAllowed -eq $true -and $network.nonOcrNetworkRestricted -eq $true -and $network.nonOcrDeniedAttemptsDetected -eq $false -and $networkExists -and $networkBytes -eq 0
+          $currentNetworkPass = $null -ne $network -and $network.ocrSpaceEnabled -eq $true -and $network.ocrSpaceNetworkAllowed -eq $true -and $network.nonOcrNetworkRestricted -eq $true -and $network.nonOcrDeniedAttemptsDetected -eq $false -and $networkExists -and $networkBytes -eq 0
+          $networkPass = $currentNetworkPass -and $originalNetworkEvidencePass
           $fingerprintPass = $null -ne $preflight -and $preflight.status -eq 'PREFLIGHT_PASS_NO_PROVIDER_REQUESTS' -and $preflight.candidateFingerprint -eq $env:GATEB_SOURCE_SHA -and $preflight.candidateFingerprintMatchesGateBSource -eq $true
+          $requiredFields = @('result','player','map','mode','battleStart','credits','freeXp','damage','xp')
+          $wronglyAccepted = 0
+          $unresolved = 0
+          if ($report) {
+            foreach ($row in $report.results) {
+              foreach ($field in $requiredFields) {
+                $actualValue = $row.actual.$field
+                $expectedValue = $row.expected.$field
+                if ($null -eq $actualValue -or [string]::IsNullOrWhiteSpace([string]$actualValue)) { $unresolved++ }
+                elseif ([string]$actualValue -ne [string]$expectedValue) { $wronglyAccepted++ }
+              }
+            }
+          }
+          $reportSha = if (Test-Path $reportPath) { (Get-FileHash -Algorithm SHA256 $reportPath).Hash.ToLowerInvariant() } else { $null }
           $gateAStatus = if ($reportPass -and $auditPass -and $networkPass -and $fingerprintPass -and $runtimePass -and $matrixPass) { 'PASS' } else { 'FAIL' }
+          $networkRestriction = if ($networkPass) { 'PASS' } elseif ($null -ne $resumeManifest -and -not $originalNetworkEvidencePass) { 'RECONSTRUCTED_LIMITED_EVIDENCE' } else { 'FAIL' }
           $summary = [ordered]@{
             schemaVersion = 1
             gate = 'A'
             status = $gateAStatus
             candidateFingerprint = $env:GATEB_SOURCE_SHA
             candidateFingerprintMatchesGateBSource = $fingerprintPass
+            fingerprintLocked = $fingerprintPass
+            matchesGateBRunSource = $fingerprintPass
             gateBSourceRunId = $env:GATEB_SOURCE_RUN_ID
             gateBSourceCommitSha = $env:GATEB_SOURCE_SHA
             nodeVersion = $nodeVersion
@@ -219,17 +285,29 @@ jobs:
             parallelReaderMatrixAnalyzedImages = if ($matrix) { @($matrix.images | Where-Object { $_.status -eq 'ANALYZED' }).Count } else { 0 }
             parallelReaderMatrixNetwork = if ($matrix) { $matrix.network } else { $null }
             sourceImageCount = if ($preflight) { $preflight.imageCount } else { 0 }
+            completeImages = if ($report) { $report.completedImages } else { 0 }
+            exactCompleteRecords = if ($report) { $report.exactMatches } else { $null }
             exactMatches = if ($report) { $report.exactMatches } else { $null }
             mandatoryExactMatches = if ($report) { $report.mandatoryExactMatches } else { $null }
             requiredFieldsComplete = if ($report) { $report.requiredFieldsComplete } else { $null }
+            wronglyAcceptedMandatoryFieldValues = $wronglyAccepted
+            unresolvedMandatoryFieldValues = $unresolved
+            unauthorizedNetworkAttempts = if ($networkPass) { 0 } else { $null }
+            networkRestriction = $networkRestriction
             verifiedPdfCount = if ($audit) { $audit.verifiedPdfCount } else { 0 }
             reportPass = $reportPass
             pdfAuditPass = $auditPass
             networkPass = $networkPass
             networkLogBytes = $networkBytes
             networkIsolation = $network
+            originalNetworkLogStatus = if ($resumeManifest) { $resumeManifest.originalNetworkLogStatus } else { 'NOT_APPLICABLE_FRESH_RUN' }
+            originalNetworkAttemptCount = if ($resumeManifest) { $resumeManifest.originalNetworkAttemptCount } else { 0 }
+            resumeManifestSha256 = if (Test-Path $resumeManifestPath) { (Get-FileHash -Algorithm SHA256 $resumeManifestPath).Hash.ToLowerInvariant() } else { $null }
+            resumeManifest = $resumeManifest
+            sourceBuildSha256 = if ($report -and $report.sourceMetadata) { $report.sourceMetadata.sourceBuild.sha256 } else { $null }
             sourcePreflightSha256 = if (Test-Path $preflightPath) { (Get-FileHash -Algorithm SHA256 $preflightPath).Hash.ToLowerInvariant() } else { $null }
-            runReportSha256 = if (Test-Path $reportPath) { (Get-FileHash -Algorithm SHA256 $reportPath).Hash.ToLowerInvariant() } else { $null }
+            reportSha256 = $reportSha
+            runReportSha256 = $reportSha
             pdfAuditSha256 = if (Test-Path $auditPath) { (Get-FileHash -Algorithm SHA256 $auditPath).Hash.ToLowerInvariant() } else { $null }
             networkLogSha256 = if ($networkExists) { (Get-FileHash -Algorithm SHA256 $networkPath).Hash.ToLowerInvariant() } else { $null }
           }
@@ -251,6 +329,11 @@ jobs:
             source/testdata/gateA-16/report.json.progress.json
             source/testdata/gateA-16/report.json.pdf-audit.json
             source/testdata/gateA-16/gate-a-acceptance.json
+            source/testdata/gateA-16/resume-from-progress.json
+            source/testdata/gateA-16/resume-manifest.json
+            source/testdata/gateA-16/resume-first-local-reader.json
+            source/testdata/gateA-16/resume-local-network.log
+            source/testdata/gateA-16/original-run-42202563673.log
             source/testdata/gateA-16/non-ocr-network-attempts.log
             testdata/gateA-16/parallel-reader-matrix.json*
             testdata/gateA-16/parallel-reader-network.log
