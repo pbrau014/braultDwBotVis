@@ -1,5 +1,9 @@
 name: DWBOT Gate A 16-image OCR.Space PDF-first acceptance
 
+# One authorized development-corpus run, fingerprint-bound to the completed
+# imagesF-63 source run. Preflight must pass before the 16 provider requests;
+# every request writes a durable PDF/raster artifact and restricted-egress log.
+
 on:
   push:
     branches: [main]
