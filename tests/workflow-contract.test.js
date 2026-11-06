@@ -286,3 +286,19 @@ test('Gate A acceptance uses the accepted runtime, fail-closed network guard and
     assert.match(workflow, /cancel-in-progress: false/);
     assert.match(workflow, /DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME/);
 });
+
+
+test('four-image PDF-first runner refuses duplicates and supports fingerprint-bound resume', () => {
+    const runner = read('scripts/run-four-screenshot-pipeline.js');
+    const sequence = read('scripts/run-ocr-sequence.js');
+    const resume = read('src/ocr-sequence-resume.js');
+    assert.match(runner, /FOUR_SCREENSHOT_RESUME_FROM/);
+    assert.match(runner, /OCR_SEQUENCE_RESUME_FROM/);
+    assert.match(runner, /Existing OCR.Space artifacts are present without a resume token/);
+    assert.match(runner, /networkDiagnosticLogPresent: fs\.existsSync/);
+    assert.match(sequence, /validateSequenceResume/);
+    assert.match(sequence, /verifyCompletedSequenceArtifacts/);
+    assert.match(sequence, /orphaned-provider-artifact-not-resubmitted/);
+    assert.match(sequence, /ambiguous-prior-provider-submission-not-retried/);
+    assert.match(resume, /OCR_SEQUENCE_RESUME_FINGERPRINT_MISMATCH/);
+});
