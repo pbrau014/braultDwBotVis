@@ -118,7 +118,7 @@ jobs:
           Copy-Item -Path (Join-Path $progressFiles[0].DirectoryName '*') -Destination $outputRoot -Recurse -Force
           Copy-Item -LiteralPath $preflightFiles[0].FullName -Destination $newPreflightPath -Force
           $oldNetworkLogs = @(Get-ChildItem -Path $downloadRoot -Filter 'imagesF-63-blocked-network-attempts.log' -File -Recurse)
-          if ($oldNetworkLogs.Count -gt 1) { throw 'Prior artifact contains ambiguous network diagnostic logs.' }
+          if ($oldNetworkLogs.Count -ne 1) { throw 'Prior artifact must contain exactly one restricted-egress diagnostic log; refusing to resume without network provenance.' }
           if ($oldNetworkLogs.Count -eq 1) {
             Copy-Item -LiteralPath $oldNetworkLogs[0].FullName -Destination (Join-Path $env:GITHUB_WORKSPACE 'testdata\ocr-acceptance\imagesF-63-blocked-network-attempts.log') -Force
           }
