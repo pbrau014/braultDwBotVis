@@ -1,4 +1,19 @@
 ================================================================================
+CURRENT NODE.JS RUNTIME AUTHORIZATION — 2026-11-05
+================================================================================
+Node.js 22.16.0 is explicitly authorized and acceptable for DWBOT in place of
+all older Node.js 24+, >=24.17.0 or v24.22.1 minimum/prerequisite statements.
+The package manifest/lockfile, tracked .nvmrc and current GitHub Actions use
+22.16.0. Node 24 is optional only for a concrete, proven tool/dependency need.
+Preserve historical Node 24 test records as they actually ran; do not interpret
+their version as a current minimum. Windows-specific checks still require
+Windows execution, but do not require Node 24.
+
+================================================================================
+END CURRENT NODE.JS RUNTIME AUTHORIZATION
+================================================================================
+
+================================================================================
 CURRENT OCR.SPACE PDF-FIRST / EXPLICIT ENABLE OVERRIDE — 2026-11-06
 ================================================================================
 This addendum supersedes older active OCR.Space statements in this historical
