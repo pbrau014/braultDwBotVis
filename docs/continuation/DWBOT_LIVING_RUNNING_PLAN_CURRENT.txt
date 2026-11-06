@@ -145,11 +145,12 @@ C. Sixty-four-image inventory: dwbotStuff/DWBOT_64_IMAGE_INVENTORY_REVIEWED.json
    user-excluded. It is image-integrity/provenance data, NOT ground truth.
    Process all 64 once the exact source archive is available. Do not claim
    accuracy without independent nine-field annotations.
-D. imgsHalf1.zip is absent from the canonical repository tree. Accessible
-   inventory sources disagree on archive size (58,090,288 vs 57,665,767 bytes);
-   the latter record gives SHA-256
+D. imgsHalf1.zip is absent from the canonical repository tree. The inventory metrics are distinct, not conflicting: totalBytes 58,090,288 is
+   the sum of uncompressed image member sizes; sourceArchiveBytes 57,665,767 is
+   the ZIP size. The expected source archive SHA-256 is
    e32e43991ab90d6e2ca3e060f264456d175d0e93390f273d7f3a3f5d93fa98a2.
-   Retrieve the original archive and verify all 64 member hashes. Do not guess.
+   Retrieve imgsHalf1.zip, verify its exact size/hash, then verify all 64 member
+   hashes before processing. Do not guess.
 E. One OCR.Space request/PDF per image; local readers consume that PDF raster
    without another OCR.Space request. Report corpora separately.
 

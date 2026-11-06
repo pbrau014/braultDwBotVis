@@ -15,6 +15,10 @@ const bot = require('../src/bot');
 const root = path.resolve(__dirname, '..');
 const sourceRoot = process.env.OCRSPACE_64_IMAGE_ROOT
     ? path.resolve(process.env.OCRSPACE_64_IMAGE_ROOT) : null;
+const archivePath = process.env.OCRSPACE_64_ARCHIVE_PATH
+    ? path.resolve(process.env.OCRSPACE_64_ARCHIVE_PATH) : null;
+const EXPECTED_ARCHIVE_BYTES = 57665767;
+const EXPECTED_ARCHIVE_SHA256 = 'e32e43991ab90d6e2ca3e060f264456d175d0e93390f273d7f3a3f5d93fa98a2';
 const outputRoot = path.resolve(process.env.OCRSPACE_64_OUTPUT_DIR
     || path.join(root, 'testdata', 'ocrspace-64-image-acceptance'));
 const requiredEngines = ['tesseractjs', 'native'];
@@ -57,14 +61,22 @@ async function main() {
     if (!String(process.env.OCRSPACE_API_KEY || '').trim()) {
         throw new Error('OCRSPACE_API_KEY is required for the 64-image OCR.Space-first inventory run.');
     }
-    if (!sourceRoot) {
-        throw new Error('OCRSPACE_64_IMAGE_ROOT must point to the verified extraction root of imgsHalf1.zip.');
+    if (!sourceRoot || !archivePath) {
+        throw new Error('OCRSPACE_64_ARCHIVE_PATH and OCRSPACE_64_IMAGE_ROOT are required for verified imgsHalf1.zip processing.');
     }
+    const archiveBytes = await fs.readFile(archivePath);
+    const archiveSha256 = sha256(archiveBytes);
+    if (archiveBytes.length !== EXPECTED_ARCHIVE_BYTES || archiveSha256 !== EXPECTED_ARCHIVE_SHA256) {
+        throw new Error('imgsHalf1.zip fingerprint mismatch: expected ' + EXPECTED_ARCHIVE_BYTES + '/' + EXPECTED_ARCHIVE_SHA256 + ', got ' + archiveBytes.length + '/' + archiveSha256);
+    }
+    const summedImageBytes = inventory.records.reduce((sum, item) => sum + Number(item.bytes || 0), 0);
+    if (summedImageBytes !== Number(inventory.totalBytes)) throw new Error('Reviewed inventory totalBytes does not equal the sum of member image bytes.');
     const resolvedRoot = await fs.realpath(sourceRoot);
     await fs.mkdir(outputRoot, { recursive: true });
     const run = {
         schemaVersion: 1, status: 'running', createdAt: new Date().toISOString(),
-        sourceArchive: inventory.sourceArchive, sourceArchiveSha256: process.env.OCRSPACE_64_ARCHIVE_SHA256 || null,
+        sourceArchive: inventory.sourceArchive, sourceArchiveBytes: archiveBytes.length, sourceArchiveSha256: archiveSha256,
+        totalUncompressedImageBytes: summedImageBytes,
         inventorySha256: sha256(Buffer.from(JSON.stringify(inventory))),
         imageCount: 64, groundTruthStatus: 'not_transcribed_or_independently_reviewed',
         eligibleCount: inventory.records.filter(x => x.corpusDisposition === 'eligible_user_verified_visible_fields').length,
