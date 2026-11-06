@@ -270,3 +270,9 @@ The current WoWs Tournaments listing demonstrates why event settings must be ver
 
 The supplied `yoloPaperWork(1).zip` archive was integrity-checked and safely extracted on 2026-11-06. Size: 22,976,255 bytes; SHA-256: `b7598ed96d9af8ff1bd564e7aed945621800e2299e2f262d86541c62f34cf7b2`; 19 ZIP members; `testzip()` reported no corrupt member. The three Discord text sources have been preserved verbatim under `dwbotStuff/discordMsgs/`. Detailed source hashes and boundaries are in the source reconciliation record.
 
+
+
+### Current public tournament example (checked 2026-11-06)
+
+The WoWs Tournaments listing shows **King of the Sea XIX** scheduled 9 October–15 November 2026, with separate Europe, North America, APAC and International sections. Wargaming's official event page lists the International Finals over the weekends of 7–8 and 14–15 November, and the associated in-game event rewards page remains active through 2 December. These are KOTS dates, not YOLO dates. The example illustrates why event settings need a region, phase, signup window, match schedule and versioned notice rather than one ambiguous calendar entry. See [WoWs Tournaments](https://wows-tournaments.com/) and [Wargaming's King of the Sea XIX page](https://worldofwarships.com/en/content/king-of-the-sea-xix-tournament/).
+
