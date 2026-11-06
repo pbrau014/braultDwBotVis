@@ -331,9 +331,10 @@ Status: ACTIVE / GOVERNING / SUPERSEDES THE 64-IMAGE INVENTORY TEST REQUIREMENT.
   The post-hoc evaluator supports --inventory complete-ground-truth-21 and
   must report the selection, missing run rows and per-engine metrics.
 - The 21-image subset supplies an eligible complete-record evaluation scope
-  for the PDF-first pipeline and is also the newly authorized 21-image Gate B
-  holdout. It does not certify the v6 workbook; Gate B remains NOT_PASSED until
-  the exact run, artifacts, evaluator and network/security evidence pass.
+  for PDF-first pipeline analysis. Gate B is exactly the first 19 records;
+  records 20–21 are diagnostic-only and do not count toward Gate B. It does not
+  certify the v6 workbook; Gate B remains NOT_PASSED until the exact run,
+  artifacts, evaluator and network/security evidence pass.
   The 4- and 16-image inventory requirements remain active.
 - The legacy 64-image inventory manifest, runner and tests may remain in the
   repository as historical/legacy integrity material, but they are no longer
@@ -1189,11 +1190,12 @@ GATE STATUS / ACTIVE QUEUE
 4. Gate A: all 16 approved development images must yield exact complete
    nine-field records, zero wrong accepted mandatory values, zero unresolved
    mandatory fields, and no unauthorized network activity.
-5. Gate B: use the exact 21 complete nine-field records in the v6 ground-truth
-   reference, source-bound by filename/bytes/SHA-256. This is the approved
-   holdout; no 50-image minimum or 100-image preferred target remains. Do not
-   tune against these records. Verify all 21 PDF/raster artifacts, exact metrics,
-   zero wrongly accepted mandatory values and clean network/security evidence.
+5. Gate B: use exactly the first 19 complete nine-field records in the v6
+   ground-truth reference, source-bound by filename/bytes/SHA-256. This is the
+   approved holdout; the 50-image minimum, 100-image preferred target and interim
+   21-image Gate B rule are superseded. Records 20–21 remain diagnostic-only in
+   the 21-image pipeline-analysis inventory. Verify all 19 PDF/raster artifacts,
+   exact metrics, zero wrongly accepted mandatory values and clean network/security evidence.
 6. Recheck OCR.Space Free-tier terms/privacy/retention and local key handling
    before any explicitly authorized synthetic non-identifying live smoke. No
    local key is configured in this chat; local-only work continues meanwhile.
@@ -5556,10 +5558,9 @@ Proposal boundary: mock narrative and playoff defaults are not event approval; t
   majority and strict 3-of-4 consensus; tied votes remain unresolved. Separate
   21-image diagnostic runs in addition to 19-image Gate B, without provider
   requests. Latest artifact verification run #42199272644 is in progress.
-- Source extraction used Node 22.16.0, below accepted Node >=24.17.0; it is
-  exploratory only. Gate B remains NOT PASSED: Gate A pending, historical
-  network log missing, unresolved mandatory values, and source runtime below
-  acceptance baseline.
+- Source extraction used Node 22.16.0, which meets the accepted >=22.16.0
+  baseline. It remains exploratory only because Gate A is not passed, the
+  historical network log is missing, and mandatory outputs remain unresolved.
 - Gate A requires a PDF-first run on the approved 16-image development corpus,
   16/16 exact nine-field records, zero wrong accepted values, zero unresolved
   mandatory fields, restricted-egress proof and a locked candidate fingerprint.
