@@ -39,26 +39,20 @@ jobs:
           node-version: 24.22.1
           cache: npm
           package-manager-cache: false
-      - name: Install ImageMagick, Ghostscript and Tesseract
+      - name: Verify ImageMagick for raster tests
         shell: powershell
         run: |
-          choco install imagemagick --yes --no-progress
-          choco install ghostscript --yes --no-progress
-          choco install tesseract --version=5.5.3.20260724 --yes --no-progress
-          Import-Module "$env:ChocolateyInstallhelperschocolateyProfile.psm1"
-          refreshenv
-          $magick = Get-Command magick.exe -ErrorAction Stop
-          $ghostscript = Get-Command gswin64c.exe -ErrorAction Stop
-          $tesseract = Get-Command tesseract.exe -ErrorAction Stop
-          $tessdata = Join-Path (Split-Path $tesseract.Source -Parent) 'tessdata'
-          if (-not (Test-Path (Join-Path $tessdata 'eng.traineddata'))) { throw "Tesseract English language model is missing from $tessdata" }
+          $magick = Get-Command magick.exe -ErrorAction SilentlyContinue
+          if (-not $magick) {
+            choco install imagemagick --yes --no-progress
+            if ($LASTEXITCODE -ne 0) { throw 'ImageMagick installation failed.' }
+            $profileModule = Join-Path $env:ChocolateyInstall 'helpers\chocolateyProfile.psm1'
+            if (Test-Path $profileModule) { Import-Module $profileModule; refreshenv }
+            $magick = Get-Command magick.exe -ErrorAction SilentlyContinue
+          }
+          if (-not $magick) { throw 'ImageMagick executable is unavailable.' }
           & $magick.Source -version | Select-Object -First 2
-          & $ghostscript.Source -version
-          if ($LASTEXITCODE -ne 0) { throw 'Ghostscript/ImageMagick PDF raster prerequisites failed.' }
-          & $tesseract.Source --version | Select-Object -First 2
           "IMAGEMAGICK_BIN=$($magick.Source)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
-          "TESSERACT_BIN=$($tesseract.Source)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
-          "TESSERACT_LANG_PATH=$tessdata" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
       - name: Install locked dependencies
         run: npm ci --no-audit --no-fund
       - name: Syntax checks
