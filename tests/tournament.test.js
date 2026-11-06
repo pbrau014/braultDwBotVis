@@ -42,6 +42,20 @@ test('manual result entry validates fields and blocks accidental overwrites', ()
   assert.throws(() => T.recordResult(state, { player: p.name, event: 'race', gameNumber: 2, shipClass: 'DD', tier: 8, time: 0 }), /positive time/);
 });
 
+test('Race scoring uses inverse elapsed seconds so faster times earn more', () => {
+  const state = T.createState();
+  const fast = T.addPlayer(state, 'Fast');
+  const slow = T.addPlayer(state, 'Slow');
+  T.recordResult(state, { player: fast.id, event: 'race', gameNumber: 1, shipClass: 'DD', tier: 2, time: 60 });
+  T.recordResult(state, { player: slow.id, event: 'race', gameNumber: 1, shipClass: 'DD', tier: 2, time: 120 });
+  const inverseTotal = 1 / 60 + 1 / 120;
+  const fastExpected = 2 * 500 * (4 * ((1 / 60) / inverseTotal) / 2);
+  const slowExpected = 2 * 500 * (4 * ((1 / 120) / inverseTotal) / 2);
+  assert.ok(Math.abs(T.eventScore(state, fast, 'race') - fastExpected) < 1e-9);
+  assert.ok(Math.abs(T.eventScore(state, slow, 'race') - slowExpected) < 1e-9);
+  assert.ok(T.eventScore(state, fast, 'race') > T.eventScore(state, slow, 'race'));
+});
+
 test('Grand Yolo requires positive time and scores using the workbook Grand formula', () => {
   const state = T.createState();
   const p = T.addPlayer(state, 'Alpha');
@@ -231,7 +245,11 @@ test('HTML calculator and live DWBOT engine match all four event formulas', asyn
     num: value => { const n = Number(value); return Number.isFinite(n) ? n : 0; },
     cfg: key => state.settings.events[key],
     classWeightFor: code => ({ DD: 4, CA: 3, BB: 2 })[String(code || '-').toUpperCase()] || 0,
-    eventTotal: (player, key) => player.events[key].reduce((sum, game) => sum + Number(key === 'grand' ? game.damage : game.metric), 0),
+    eventTotal: (player, key) => player.events[key].reduce((sum, game) => {
+      if (key === 'grand') return sum + Number(game.damage || 0);
+      if (key === 'race') return sum + (Number(game.metric) > 0 ? 1 / Number(game.metric) : 0);
+      return sum + Number(game.metric || 0);
+    }, 0),
   };
   const htmlEventRawScore = vm.runInNewContext(functionSource + '\neventRawScore;', sandbox);
   for (const player of state.players) {
