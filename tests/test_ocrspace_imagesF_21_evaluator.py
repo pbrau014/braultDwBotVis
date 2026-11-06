@@ -47,7 +47,7 @@ class GateB21EvaluatorTests(unittest.TestCase):
         self.assertEqual(subset["id"], "complete-ground-truth-21")
         self.assertEqual(subset["imageCount"], 21)
         self.assertEqual(subset["groundTruthSha256"], hashlib.sha256(GT_PATH.read_bytes()).hexdigest())
-        expected = [{"filename": row["filename"], "bytes": row["sourceImage"]["bytes"], "sha256": row["sourceImage"]["sha256"]} for row in self.selected]
+        expected = [{"filename": row["filename"], "bytes": row["sourceImage"]["bytes"], "sha256": row["sourceImage"]["sha256"], "width": row["sourceImage"]["width"], "height": row["sourceImage"]["height"]} for row in self.selected]
         self.assertEqual(subset["records"], expected)
 
     def test_gate_b_subset_has_no_source_hash_overlap_with_four_image_regression_corpus(self):

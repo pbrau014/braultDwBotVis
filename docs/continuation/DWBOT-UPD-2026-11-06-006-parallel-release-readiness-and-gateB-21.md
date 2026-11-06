@@ -138,8 +138,12 @@ after completing the checklist. This is a template, not completed evidence:
           "filename": "<exact selected filename>",
           "status": "VERIFIED",
           "sourceSha256": "<source image SHA-256>",
+          "sourceWidth": 1920,
+          "sourceHeight": 1080,
           "pdfSha256": "<PDF SHA-256>",
-          "rasterSha256": "<PDF-derived PNG SHA-256>"
+          "rasterSha256": "<PDF-derived PNG SHA-256>",
+          "rasterWidth": 1920,
+          "rasterHeight": 1080
         }
       ]
     }
@@ -291,3 +295,10 @@ and its actual SHA-256 compared with the attested value; the candidate
 fingerprint must be compared with the Gate B run source. If that underlying
 evidence is unavailable or mismatched, do not author a PASS attestation and
 leave Gate B pending/blocked.
+
+
+The source-bound candidate manifest records each selected image's original
+width and height in addition to filename, byte size and SHA-256. The artifact
+verification report must reproduce those source dimensions and the PDF-derived
+raster dimensions; the evaluator reconciles both against the v6 reference and
+the exact run report. No arbitrary minimum pixel threshold is introduced.

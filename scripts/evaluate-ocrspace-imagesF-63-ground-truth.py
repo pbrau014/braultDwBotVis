@@ -74,8 +74,11 @@ def select_gate_b_records(gt):
         raise SystemExit("Gate B requires exactly the first 21 corpus-order records with complete, eligible, non-empty values for all nine fields.")
     for row in selected:
         source = row.get("sourceImage") or {}
-        if not re.fullmatch(r"[0-9a-f]{64}", str(source.get("sha256", ""))) or int(source.get("bytes") or 0) <= 0:
-            raise SystemExit("Gate B source-image fingerprint is incomplete: " + str(row.get("filename")))
+        if (not re.fullmatch(r"[0-9a-f]{64}", str(source.get("sha256", "")))
+                or int(source.get("bytes") or 0) <= 0
+                or int(source.get("width") or 0) <= 0
+                or int(source.get("height") or 0) <= 0):
+            raise SystemExit("Gate B source-image fingerprint/dimensions are incomplete: " + str(row.get("filename")))
     verify_gate_b_independence(selected)
     return selected
 
@@ -288,10 +291,14 @@ def verify_artifact_report(artifact, run_path, gt_path, selected_records, select
             reasons.append("Per-image artifact verification failed: " + name)
         if evidence.get("sourceSha256") != gt_row["sourceImage"]["sha256"] or evidence.get("sourceSha256") != run_row.get("sourceSha256"):
             reasons.append("Source-image hash does not reconcile: " + name)
+        if evidence.get("sourceWidth") != gt_row["sourceImage"].get("width") or evidence.get("sourceHeight") != gt_row["sourceImage"].get("height"):
+            reasons.append("Original source-image dimensions do not reconcile: " + name)
         if evidence.get("pdfSha256") != run_row.get("pdfSha256") or not evidence.get("pdfSha256"):
             reasons.append("PDF hash does not reconcile: " + name)
         if evidence.get("rasterSha256") != run_row.get("rasterSha256") or not evidence.get("rasterSha256"):
             reasons.append("PDF-derived raster hash does not reconcile: " + name)
+        if evidence.get("rasterWidth") != run_row.get("rasterWidth") or evidence.get("rasterHeight") != run_row.get("rasterHeight"):
+            reasons.append("PDF-derived raster dimensions do not reconcile: " + name)
     result_status = "PASS" if not reasons else ("PENDING_GATE_A" if gate_a_status == "PENDING_GATE_A" and len(reasons) == 1 else "FAIL")
     return {"status": result_status, "reasons": reasons,
             "verifiedImageCount": len(image_rows), "checks": checks, "gateAEvidenceStatus": gate_a_status}

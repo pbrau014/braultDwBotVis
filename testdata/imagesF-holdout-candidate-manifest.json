@@ -84,107 +84,149 @@
       {
         "filename": "PHX-1.jpg",
         "bytes": 121470,
-        "sha256": "2274fc1f5452a8ce0273764111dd8e781d195de42a846c51c730fd4db6eb126f"
+        "sha256": "2274fc1f5452a8ce0273764111dd8e781d195de42a846c51c730fd4db6eb126f",
+        "width": 1334,
+        "height": 627
       },
       {
         "filename": "Screen55shot_376.png",
         "bytes": 942673,
-        "sha256": "0fdbb49c43decfc895678dc8c0277fcb82f43eb1c36fe348fb46ccfc535c3e32"
+        "sha256": "0fdbb49c43decfc895678dc8c0277fcb82f43eb1c36fe348fb46ccfc535c3e32",
+        "width": 1920,
+        "height": 1080
       },
       {
         "filename": "Screens4hot_377.png",
         "bytes": 870187,
-        "sha256": "e0f6b14d2414f210c57da9e0884f5345e1beb4355bf4c38c5d1f960da1f4e3f3"
+        "sha256": "e0f6b14d2414f210c57da9e0884f5345e1beb4355bf4c38c5d1f960da1f4e3f3",
+        "width": 1920,
+        "height": 1080
       },
       {
         "filename": "Screens666hot_373.png",
         "bytes": 786478,
-        "sha256": "34ddede26d0ef5c4ee9a0aa3e755555af2b132c7a10e3b9b9a79efc68df29bfc"
+        "sha256": "34ddede26d0ef5c4ee9a0aa3e755555af2b132c7a10e3b9b9a79efc68df29bfc",
+        "width": 1920,
+        "height": 1080
       },
       {
         "filename": "Screenshot_20 526-10-18_135815.png",
         "bytes": 2671073,
-        "sha256": "fce5527e68d39037d73ecb116dab001da13a88b0fd8f9cb73d50e7ba04cf542f"
+        "sha256": "fce5527e68d39037d73ecb116dab001da13a88b0fd8f9cb73d50e7ba04cf542f",
+        "width": 2880,
+        "height": 1800
       },
       {
         "filename": "Screenshot_2026-08-05_094321.png",
         "bytes": 1442671,
-        "sha256": "7b6cbe589b448620092088a2e6f3894ee4c42d7fe41800ada7999a50019de9fa"
+        "sha256": "7b6cbe589b448620092088a2e6f3894ee4c42d7fe41800ada7999a50019de9fa",
+        "width": 1920,
+        "height": 1200
       },
       {
         "filename": "Screenshot_2026-08-05_175543.png",
         "bytes": 1112940,
-        "sha256": "69d155397c915da89a525ecf070293e89682abecb48fc6204fc36011672f7eb3"
+        "sha256": "69d155397c915da89a525ecf070293e89682abecb48fc6204fc36011672f7eb3",
+        "width": 2376,
+        "height": 1403
       },
       {
         "filename": "Screenshot_2026-09-02_182610.png",
         "bytes": 1048444,
-        "sha256": "8f0964b9f84b040587031eff0ed97b8ae07f85ff65a3a5af2ac9d643299009ca"
+        "sha256": "8f0964b9f84b040587031eff0ed97b8ae07f85ff65a3a5af2ac9d643299009ca",
+        "width": 1837,
+        "height": 1348
       },
       {
         "filename": "Screenshot_2026-09-23_100658.png",
         "bytes": 2207161,
-        "sha256": "c2bea3c768a9b7a952faab467fde07ac0e0eadbfb79b9cebb0edeadbc4634d6b"
+        "sha256": "c2bea3c768a9b7a952faab467fde07ac0e0eadbfb79b9cebb0edeadbc4634d6b",
+        "width": 1919,
+        "height": 1079
       },
       {
         "filename": "Screenshot_2026-10-02_154846.png",
         "bytes": 2403223,
-        "sha256": "143159096dec529090fdda209a80ea56040e19928d974971f3ce2e7bc5fa82fd"
+        "sha256": "143159096dec529090fdda209a80ea56040e19928d974971f3ce2e7bc5fa82fd",
+        "width": 1919,
+        "height": 1079
       },
       {
         "filename": "Screenshot_2026-10-13_221318.png",
         "bytes": 409654,
-        "sha256": "b3787f464f6e833a809bfdc7b63dd022ed9ad1ee8d87bc7a0d0227121e9de8b3"
+        "sha256": "b3787f464f6e833a809bfdc7b63dd022ed9ad1ee8d87bc7a0d0227121e9de8b3",
+        "width": 1919,
+        "height": 1079
       },
       {
         "filename": "Screenshot_2026-10-16_224234.png",
         "bytes": 1140425,
-        "sha256": "655c7578158d999f4243ea262163df6fb3126a83f5c936d140acc1ef9d79ef42"
+        "sha256": "655c7578158d999f4243ea262163df6fb3126a83f5c936d140acc1ef9d79ef42",
+        "width": 2403,
+        "height": 1318
       },
       {
         "filename": "Screenshot_2026-10-19_183512.png",
         "bytes": 887403,
-        "sha256": "7ab154463579411ded95af84d1439df42cae823b123f699030ba7260a99d87a8"
+        "sha256": "7ab154463579411ded95af84d1439df42cae823b123f699030ba7260a99d87a8",
+        "width": 1692,
+        "height": 1174
       },
       {
         "filename": "Screenshot_2026-10-24_200118.png",
         "bytes": 825369,
-        "sha256": "119ee537c6c2a93528dded878a676a8f631fdc0610899e2581a3cec4d9336139"
+        "sha256": "119ee537c6c2a93528dded878a676a8f631fdc0610899e2581a3cec4d9336139",
+        "width": 1571,
+        "height": 1055
       },
       {
         "filename": "Screenshot_2026-120-25_170028.png",
         "bytes": 2207688,
-        "sha256": "9c72d83fa619af27c2f729f45fca883faa41f9c7dfb07fe0821549a122980994"
+        "sha256": "9c72d83fa619af27c2f729f45fca883faa41f9c7dfb07fe0821549a122980994",
+        "width": 1919,
+        "height": 1079
       },
       {
         "filename": "Screenshot_366672.png",
         "bytes": 946661,
-        "sha256": "973df7197faed1168d1959aefd7cfb92e130fed9bb19e65b21ef53b06f2468d4"
+        "sha256": "973df7197faed1168d1959aefd7cfb92e130fed9bb19e65b21ef53b06f2468d4",
+        "width": 1920,
+        "height": 1080
       },
       {
         "filename": "Screenshot_3771.png",
         "bytes": 1078693,
-        "sha256": "b4d000406ddae81ee2277a72216576133c47920485071be32e772c4cd7ab9b10"
+        "sha256": "b4d000406ddae81ee2277a72216576133c47920485071be32e772c4cd7ab9b10",
+        "width": 1920,
+        "height": 1080
       },
       {
         "filename": "Screenshot_3778.png",
         "bytes": 1019258,
-        "sha256": "547b97572d1902e60c356c42690eed92d760b6a2ef1b7a9a67063272f20a9977"
+        "sha256": "547b97572d1902e60c356c42690eed92d760b6a2ef1b7a9a67063272f20a9977",
+        "width": 1920,
+        "height": 1080
       },
       {
         "filename": "Screenshot_379.png",
         "bytes": 1037940,
-        "sha256": "00b767cab9fa8d1f32b049c81b9b4a7345d93f6825e89f3c9fea42b3be3b3707"
+        "sha256": "00b767cab9fa8d1f32b049c81b9b4a7345d93f6825e89f3c9fea42b3be3b3707",
+        "width": 1920,
+        "height": 1080
       },
       {
         "filename": "Screenshot_55374.png",
         "bytes": 648612,
-        "sha256": "b97ab3f904d0977601f741bd1b2d25600b73639aa890a36cd271e49defd21d4a"
+        "sha256": "b97ab3f904d0977601f741bd1b2d25600b73639aa890a36cd271e49defd21d4a",
+        "width": 1920,
+        "height": 1080
       },
       {
         "filename": "lllfrfgfgff.png",
         "bytes": 1223923,
-        "sha256": "d120d3bd4b07281aabf7e0e564320d1c403129d9b081931f98c79e09b3cfcff3"
+        "sha256": "d120d3bd4b07281aabf7e0e564320d1c403129d9b081931f98c79e09b3cfcff3",
+        "width": 1920,
+        "height": 1080
       }
     ]
   }
