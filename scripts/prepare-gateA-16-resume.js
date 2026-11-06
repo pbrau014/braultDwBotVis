@@ -181,6 +181,8 @@ async function prepare(options) {
         OCR_SAVE_RAW_DIAGNOSTICS: '1',
         PADDLEOCR_FIELD_FALLBACK: '1',
         OCR_IMAGE_CHILD: '1',
+        // The child cwd is sourceRoot, so resolve the candidate and fail-closed guards from that directory.
+        NODE_OPTIONS: '--require=./scripts/block-network.js --require=../scripts/block-network.js',
     };
     const supervised = await runSupervisedProcess({
         command: process.execPath,
