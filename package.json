@@ -34,6 +34,7 @@
     "test:prelive": "npm run test:discord-preflight && npm run preflight:desktop-test && npm run test:desktop && npm run test:ocr",
     "test:persistence-recovery": "node scripts/run-persistence-recovery.js",
     "test:windows-native-ocr": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/run-windows-ocr-acceptance.ps1",
+    "test:ocrspace-64": "node scripts/run-ocrspace-64-inventory.js",
     "test:windows-release-gates": "npm run test:persistence-recovery && npm run test:windows-native-ocr"
   },
   "engines": {
