@@ -34,9 +34,9 @@ test('all-image PDF raster normalizer is source-bound, fail-closed, and provider
   const report = await normalizeInventory({
     runReport: run, groundTruth: gt, sourceImageRoot: sourceRoot, artifactRoot,
     requiredImageCount: 1,
-    readMetadata: async buffer => buffer === source
+    readMetadata: async buffer => buffer.equals(source)
       ? { width: 1920, height: 1080 }
-      : buffer === page ? { width: 1818, height: 2573 } : { width: 1818, height: 1023 },
+      : buffer.equals(page) ? { width: 1818, height: 2573 } : { width: 1818, height: 1023 },
     renderPdf: async () => page,
     normalizeRaster: async (_buffer, dimensions) => ({
       buffer: normalized,
