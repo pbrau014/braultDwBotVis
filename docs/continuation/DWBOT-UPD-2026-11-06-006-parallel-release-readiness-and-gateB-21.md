@@ -304,3 +304,61 @@ recorded dimensions. This selection does not impose an arbitrary pixel cutoff. T
 verification report must reproduce those source dimensions and the PDF-derived
 raster dimensions; the evaluator reconciles both against the v6 reference and
 the exact run report. No arbitrary minimum pixel threshold is introduced.
+
+
+## Further parallel implementation — 2026-11-06
+
+### Scoring and interface
+- Corrected the standalone HTML score calculator's Grand Yolo Tier weight from
+  1 to the DWBOT/workbook default 0.9. Legacy 0.9 settings are no longer
+  silently migrated to 1. The reset control restores 0.9 for this field and 1
+  for the other multipliers.
+- Added native mouseover titles plus visible/assistive descriptions for
+  calculator weights, pool behavior, ship-class weighting and reset behavior.
+- Added dynamic contextual help to the desktop Admin scoring settings. The
+  selected setting description is visible and is also exposed through
+  title/aria-describedby on the select and value input.
+- Regression tests were added to tournament and desktop UI contracts. These
+  changes do not change the approved formula or award policy.
+
+### Safe OCR batch recovery
+- Added a fingerprint-bound resume guard and tests. A resume must match the
+  exact archive SHA-256, original preflight report SHA-256, ordered 63-member
+  source list, per-image source hashes, and nine-field contract.
+- The PDF-first function now exposes an asynchronous durable checkpoint hook
+  after quota reservation and immediately before the provider request. If the
+  checkpoint fails, the provider is not called.
+- The 63-image runner writes atomic progress before the provider request and
+  after each image. Existing completed PDF/raster rows are skipped only after
+  their hashes are rechecked. Any row that may have reached OCR.Space but lacks
+  a verified completed record is marked ambiguous and is never automatically
+  resubmitted. A fresh run refuses to overwrite existing progress.
+- The manual workflow now accepts an optional prior run ID, checks the exact
+  workflow name and same source commit, downloads the prior artifact, verifies
+  the prior preflight hash and exact member list against a fresh archive
+  preflight, then restores progress and the network diagnostic log. The
+  workflow remains manual-dispatch-only; no new OCR.Space run was started.
+- Important limitation: the existing active run #42160979140 uses an older
+  pinned commit and did not have the new per-request durable checkpoint. It
+  cannot safely use this resume path. Continue waiting for its original
+  artifact upload; do not restart it or infer that any image is ready.
+
+### Tournament operations
+- Added
+  `04_Companion_Materials/Season_Logistics_and_Grand_YOLO_Finale_Blueprint_v0.1_PROPOSAL.md`.
+  It organizes the existing Pilot, candidate recurring season, playoff
+  decision register and season-ending Grand YOLO finale, including participant
+  and staff responsibilities, weekly operations cadence, and event-ready
+  gates. It is explicitly a proposal, not an event notice or approval.
+- The blueprint distinguishes the Grand Yolo calculator Round 4 formula from
+  the season-ending Grand YOLO championship event. It does not invent dates,
+  prizes, eligibility cutoffs, bracket format, or a finale scoring formula.
+- Added the blueprint to the companion crosswalk and JSON index. No Discord
+  channels, permissions, or live event settings were changed.
+
+### Verification state
+- Exact-head verification is pending for the latest source commit. Do not
+  describe the new tests or workflow as passing until the run completes and
+  its jobs/logs are inspected.
+- No change was made to the active OCR.Space extraction. No duplicate provider
+  request was initiated.
