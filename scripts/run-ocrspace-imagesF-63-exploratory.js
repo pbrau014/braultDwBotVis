@@ -270,6 +270,8 @@ async function main() {
             };
             await fs.writeFile(pdfPath, pdfFirst.pdfBuffer, { flag: 'wx' });
             await fs.writeFile(rasterPath, pdfFirst.rasterBuffer, { flag: 'wx' });
+            // Persist PDF/raster hashes before local OCR so a crash during reader execution can recover locally without another paid provider request.
+            await writeProgress(outputRoot, run);
             row.localReaders = [];
             row.localReaderFailures = [];
             for (const engine of engines) {
@@ -295,6 +297,8 @@ async function main() {
     run.accuracy = 'NOT_EVALUABLE_NO_INDEPENDENT_GROUND_TRUTH';
     run.gateB = 'NOT_PASSED';
     run.updatedAt = new Date().toISOString();
+    // Keep progress.json's terminal status aligned with the immutable final report.
+    await writeProgress(outputRoot, run);
     const reportPath = path.join(outputRoot, 'ocrspace-imagesF-63-exploratory-report.json');
     await fs.writeFile(reportPath, JSON.stringify(run, null, 2) + '\n');
     await fs.writeFile(reportPath + '.sha256', sha256(await fs.readFile(reportPath)) + '  ' + path.basename(reportPath) + '\n');
