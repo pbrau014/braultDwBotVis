@@ -26,7 +26,7 @@ test('OCR.Space Engine 2 processes the source image first and local readers rece
     });
     assert.equal(request.engine, 2);
     assert.equal(request.createSearchablePdf, true);
-    assert.equal(request.searchablePdfHideTextLayer, false);
+    assert.equal(request.searchablePdfHideTextLayer, true);
     assert.equal(request.imageBuffer, png);
     assert.deepEqual(ledger.reservations, [{ engine: 2, now: ledger.reservations[0].now }]);
     assert.equal(downloaded, 'https://api.ocr.space/parse/image/temporary.pdf');
@@ -34,6 +34,7 @@ test('OCR.Space Engine 2 processes the source image first and local readers rece
     assert.equal(result.status, 'complete');
     assert.equal(result.engine, 2);
     assert.equal(result.pdfSha256.length, 64);
+    assert.equal(result.pdfBuffer, pdf);
     assert.equal(result.rasterBuffer, png);
     assert.equal(result.providerText, 'Victory\\nShards');
 });
