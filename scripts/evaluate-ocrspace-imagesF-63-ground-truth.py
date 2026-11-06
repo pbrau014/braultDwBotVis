@@ -68,6 +68,14 @@ def verify_gate_b_independence(selected_records):
     }
 
 
+def select_analysis_21_records(gt):
+    records = gt.get("records", [])
+    eligible = [r for r in records if is_complete_reference(r)]
+    if len(eligible) != 21 or eligible != records[:21]:
+        raise SystemExit("The 21-image analysis inventory requires exactly the first 21 complete nine-field reference records.")
+    return eligible
+
+
 def select_gate_b_records(gt):
     records = gt.get("records", [])
     eligible = [r for r in records if is_complete_reference(r)]
@@ -333,10 +341,7 @@ def main():
     if args.inventory == GATE_B_INVENTORY:
         selected_records = select_gate_b_records(gt)
     elif args.inventory == ANALYSIS_21_INVENTORY:
-        eligible = [r for r in gt["records"] if is_complete_reference(r)]
-        if len(eligible) != 21 or eligible != gt["records"][:21]:
-            raise SystemExit("The 21-image analysis inventory requires exactly the first 21 complete nine-field reference records.")
-        selected_records = eligible
+        selected_records = select_analysis_21_records(gt)
     else:
         selected_records = gt["records"]
     selected_names = [r["filename"] for r in selected_records]
