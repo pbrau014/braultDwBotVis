@@ -174,7 +174,14 @@ function clearAllResults(state) {
   }
 }
 function eventTotal(player, key) {
-  return player.events[key].reduce((sum, game) => sum + num(key === 'grand' ? game.damage : game.metric), 0);
+  return player.events[key].reduce((sum, game) => {
+    if (key === 'grand') return sum + num(game.damage);
+    if (key === 'race') {
+      const seconds = num(game.metric);
+      return sum + (seconds > 0 ? 1 / seconds : 0);
+    }
+    return sum + num(game.metric);
+  }, 0);
 }
 function eventScore(state, player, key) {
   if (!EVENTS.includes(key)) throw new Error(`Unknown event: ${key}`);
@@ -183,7 +190,10 @@ function eventScore(state, player, key) {
   if (key !== 'grand') {
     const total = state.players.reduce((sum, p) => sum + eventTotal(p, key), 0);
     if (!total || games.some(g => num(g.tier) <= 0)) return 0;
-    const raw = games.reduce((sum, g) => sum + classWeightFor(g.class) * (num(g.metric) / total) / Math.pow(num(g.tier), num(settings.tierPower)), 0);
+    const raw = games.reduce((sum, g) => {
+      const metric = key === 'race' ? (num(g.metric) > 0 ? 1 / num(g.metric) : 0) : num(g.metric);
+      return sum + classWeightFor(g.class) * (metric / total) / Math.pow(num(g.tier), num(settings.tierPower));
+    }, 0);
     return 2 * num(settings.multiplier) * num(settings.pool) * raw;
   }
   const totalDamage = state.players.reduce((sum, p) => sum + eventTotal(p, 'grand'), 0);
