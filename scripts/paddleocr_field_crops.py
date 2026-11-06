@@ -257,7 +257,7 @@ def main() -> int:
             'apiFamily': api_family, 'imageSha256': sha256(image_path), 'sourceWidth': width, 'sourceHeight': height,
             'results': results,
         }
-        emit_json(payload, ensure_ascii=True, separators=(',', ':'))
+        emit_json(payload)
         # Keep valid per-crop results even when one ROI failed; the Node layer
         # filters each failed crop and preserves the rest. Network attempts still fail closed.
         return 3 if NETWORK_ATTEMPTS else 0
@@ -265,7 +265,7 @@ def main() -> int:
         payload = {'schemaVersion': 1, 'status': 'error', 'error': f'{type(exc).__name__}: {exc}',
                    'networkAttemptCount': len(NETWORK_ATTEMPTS), 'networkAttempts': NETWORK_ATTEMPTS,
                    'elapsedMs': round((time.perf_counter() - started_all) * 1000, 3), 'results': []}
-        emit_json(payload, ensure_ascii=True, separators=(',', ':'))
+        emit_json(payload)
         return 3 if NETWORK_ATTEMPTS else 1
 
 
