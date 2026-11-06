@@ -90,7 +90,8 @@ async function main() {
             sourceArchiveSha256: expectedArchiveSha,
             preflightReportSha256,
             verifiedMembers: preflight.verifiedMembers,
-            requiredFields
+            requiredFields,
+            runtime: { node: process.version, platform: process.platform, arch: process.arch }
         });
         run = saved;
         run.status = 'resuming-exploratory';
@@ -113,6 +114,7 @@ async function main() {
             gateB: 'NOT_PASSED',
             provider: 'OCR.Space',
             providerEngine: 2,
+            runtime: { node: process.version, platform: process.platform, arch: process.arch },
             pipeline: 'source screenshot -> OCR.Space Engine 2 searchable PDF -> validated PDF -> local PDF raster -> local readers',
             originalScreenshotFallback: false,
             results: [],
