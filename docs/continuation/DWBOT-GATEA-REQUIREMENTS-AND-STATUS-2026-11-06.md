@@ -63,3 +63,61 @@ The completed 63-image exploratory run produced 63 searchable PDFs and 63 PDF-de
 However, the extraction run used Node 22.16.0, below the accepted Node >=24.17.0 runtime, and its original network diagnostic log is missing. The 19-image post-hoc evaluation also has many unresolved mandatory fields. Gate B therefore remains NOT PASSED regardless of the exploratory field-level percentages.
 
 The 19-image evaluation and separate 21-image diagnostic are recorded in the artifact-verification reports. They do not waive Gate A or upgrade the exploratory source run into a release acceptance run.
+
+## 6. Latest Gate A preflight and interrupted one-image attempt — 2026-11-06
+
+The earlier statement that no Gate A source images were available is superseded
+in part. The original `imgs2add.zip` archive bytes are still unavailable, but
+the repository contains all 16 individual files in
+`fixtures/additional-screenshots/`. The Gate A preflight compared every file
+against the existing manifest SHA-256 and verified:
+- exactly 16 unique source images;
+- all nine required expected fields present for every image;
+- valid image dimensions;
+- exact candidate source SHA match to the completed 63-image run;
+- zero provider requests during preflight.
+
+Preflight result:
+- Status: `PREFLIGHT_PASS_NO_PROVIDER_REQUESTS`
+- Candidate/source commit: `adaf4f8c3a9573f56d0348a4bba36686fc31c22e`
+- Deterministic corpus fingerprint: `6c03d85173bb07103cee9a3075ffa708751b36da2ba3bb49d27fedcdb8468efe`
+- Manifest SHA-256: `57fe533e7dd4b0d8df77629a5e48c6fdb58f466c` (Git blob SHA; the
+  preflight report separately records the SHA-256 of manifest bytes).
+
+A one-time Gate A provider run was started at
+[#42202563673](https://github.com/pbrau014/braultDwBotVis/actions/runs/42202563673).
+It was cancelled during image 1 of 16. Its uploaded artifact
+`dwbot-gateA-16-pdf-first-42202563673` (artifact ID `13495008195`,
+ZIP SHA-256
+`398f8152847cd3ea58fb9e16ac01886fced0c880869ce6a430d3343e5cb4ecd8`)
+contains one PDF and one PDF-derived raster for `Screenshot_16.jpg`:
+- source SHA-256:
+  `4a58aad7cb1d21f9bb457e1ad728fee59ebff3873a1e47938cf401d41f784bbc`;
+- PDF: 535,706 bytes, SHA-256
+  `98532da5058778aeee8a46515a8a6a12a3c20cb865565f974271706777b7ec93`,
+  one page, 550 characters of searchable text;
+- PDF-derived raster: 1,033,392 bytes, 1818×2573 pixels, SHA-256
+  `620fd7395a4736d6c95a3ab89a1cb2924cfb019e7547d534b1ffcde6458bda72`.
+
+The job log records only `[OCR-SEQUENCE] 1/16 START Screenshot_16.jpg`
+before cancellation. The PDF/raster pair demonstrates that the first image
+reached artifact creation; no local-reader result or completed sequence report
+was uploaded. The remaining 15 images were not processed. The first image
+must not be resubmitted.
+
+The partial run used Node 22.16.0, below the required Node >=24.17.0. The
+source commit's older `scripts/block-network.js` only appends the diagnostic
+file when a blocked request occurs and silently catches log-write errors. The
+artifact contains no original network log; its historical denied-attempt
+count is unknown. Do not create an empty file after the fact and claim zero
+attempts. The partial Gate A report correctly records FAIL.
+
+The Gate A workflow definition has since been corrected to Node 24.17.0 and
+includes an explicit runtime check. Those changes do not retroactively alter
+the cancelled run. A second queued duplicate was cancelled before execution;
+no repeat submission of `Screenshot_16.jpg` was made. The latest Gate A
+status remains NOT PASSED. Any continuation must first implement and verify
+artifact-bound resume for the existing first PDF/raster, then process only
+the 15 unprocessed source hashes, preserving the first run's missing-log and
+runtime limitations in the final evidence. No Gate A PASS may be claimed from
+this mixed/interrupted evidence.
