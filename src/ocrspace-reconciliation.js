@@ -80,7 +80,22 @@ function reconcileOcrSpaceEvidence(evidenceBundle, localRecord = {}) {
         const parsed = parseEvidenceItem(item);
         for (const [key, value] of Object.entries(parsed)) {
             if (!REQUIRED_FIELDS.includes(key) || key === 'player' || !present(value)) continue;
-            candidates[key].push({ value: String(value).trim(), source: String(item.source || item.field || 'ocrspace') });
+            candidates[key].push({
+                value: String(value).trim(),
+                source: String(item.source || item.field || 'ocrspace'),
+                pageIndex: item.pageIndex ?? null,
+                pageNumber: item.pageNumber ?? null,
+                polygon: Array.isArray(item.polygon) ? item.polygon : [],
+                geometryValid: item.geometryValid === true,
+                geometryIssue: item.geometryIssue || null,
+                pageWidth: item.pageWidth ?? null,
+                pageHeight: item.pageHeight ?? null,
+                pageUnit: item.pageUnit || '',
+                words: Array.isArray(item.words) ? item.words.slice(0, 500) : [],
+                confidenceValues: Array.isArray(item.confidenceValues) ? item.confidenceValues : [],
+                originalScreenshotSha256: item.originalScreenshotSha256 || evidenceBundle?.originalScreenshotSha256 || evidenceBundle?.sourceSha256 || null,
+                providerInputSha256: item.providerInputSha256 || evidenceBundle?.providerInputSha256 || null,
+            });
         }
     }
 
