@@ -65,6 +65,10 @@ Reconciliation is fail-closed for detected cross-reader conflicts: a complete lo
 
 This compatibility description is not a release gate or a holdout-corpus prerequisite. Schema changes, if later required, must be explicit and include storage/workbook compatibility handling.
 
+### 4.1 Accuracy measurement
+
+`src/ocr-accuracy-metrics.js` and `scripts/summarize-multi-provider-accuracy.js` provide reproducible labelled evaluation. Predictions and ground truth are matched by original screenshot SHA-256; ground truth must contain all nine fields. Reports include per-field exact match and coverage, full nine-field exact records, wrong accepted values, unresolved fields, false acceptance/rejection, reader disagreement, provider availability, request/quota state, and runtime. Optional `fieldRegions` ground-truth boxes allow candidate-region correctness to be measured from provider polygons. If region labels are absent, that metric is explicitly unassessed. No score is claimed for unmatched screenshots or missing labels.
+
 ## 5. Local PaddleOCR setup
 
 On Windows, provision the pinned local CPU runtime and PP-OCRv6 models with the repository installer. The live multi-provider workflow runs this installer before the end-to-end smoke test and exports the resulting Python executable, detection/recognition model directories, and model manifest to the child readers. For a local installation, run `scripts/install-paddleocr-windows.ps1` with a runtime directory outside the repository, then set `PADDLEOCR_PYTHON_BIN`, `PADDLEOCR_DET_MODEL_DIR`, `PADDLEOCR_REC_MODEL_DIR`, and `PADDLEOCR_MODEL_MANIFEST` to the generated paths. If the model manifest is missing, PaddleOCR is reported as blocked rather than represented as a participating reader.
