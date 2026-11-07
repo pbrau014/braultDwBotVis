@@ -361,7 +361,7 @@ test('quota ledger reclaims a stale lock before reserving', async () => {
     try {
         const filePath = path.join(dir, 'quota.json');
         const lockPath = filePath + '.lock';
-        await fs.writeFile(lockPath, JSON.stringify({ pid: -1, createdAt: 'stale' }));
+        await fs.writeFile(lockPath, JSON.stringify({ pid: 2147483647, hostname: os.hostname(), token: 'dead-owner', createdAt: 'stale' }));
         const stale = new Date(Date.now() - 7000);
         await fs.utimes(lockPath, stale, stale);
         const ledger = new OcrSpaceQuotaLedger({ filePath, lockWaitMs: 500, staleLockMs: 5000 });
@@ -372,6 +372,43 @@ test('quota ledger reclaims a stale lock before reserving', async () => {
     } finally { await fs.rm(dir, { recursive: true, force: true }); }
 });
 
+
+test('OCR.Space quota reservations release only before the first provider request', async () => {
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'ocrspace-reservation-life-'));
+    try {
+        const filePath = path.join(dir, 'quota.json');
+        const ledger = new OcrSpaceQuotaLedger({ filePath });
+        const date = new Date('2026-11-05T12:00:00.000Z');
+        const unsent = await ledger.reserve({ engine: 2, now: date });
+        assert.equal(unsent.status, 'reserved');
+        assert.equal((await ledger.release({ reservationId: unsent.reservationId })).released, true);
+        const submitted = await ledger.reserve({ engine: 2, now: date });
+        await ledger.markSubmitted({ reservationId: submitted.reservationId });
+        assert.deepEqual(await ledger.release({ reservationId: submitted.reservationId }), {
+            released: false, reason: 'already_submitted', status: 'submitted',
+        });
+        const state = JSON.parse(await fs.readFile(filePath, 'utf8'));
+        assert.equal(state.daily['2026-11-05'], 1);
+        assert.equal(state.monthly['2026-11'], 1);
+        assert.equal(state.reservations[unsent.reservationId].status, 'released');
+        assert.equal(state.reservations[submitted.reservationId].status, 'submitted');
+    } finally { await fs.rm(dir, { recursive: true, force: true }); }
+});
+
+test('OCR.Space stale-lock recovery never steals a live local process lock', async () => {
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'ocrspace-live-lock-'));
+    try {
+        const filePath = path.join(dir, 'quota.json');
+        const lockPath = filePath + '.lock';
+        await fs.writeFile(lockPath, JSON.stringify({ pid: process.pid, hostname: os.hostname(), token: 'live-owner' }));
+        const stale = new Date(Date.now() - 7000);
+        await fs.utimes(lockPath, stale, stale);
+        const ledger = new OcrSpaceQuotaLedger({ filePath, lockWaitMs: 120, staleLockMs: 5000 });
+        await assert.rejects(ledger.reserve({ engine: 2 }), { code: 'OCRSPACE_QUOTA_LOCKED' });
+        const owner = JSON.parse(await fs.readFile(lockPath, 'utf8'));
+        assert.equal(owner.token, 'live-owner');
+    } finally { await fs.rm(dir, { recursive: true, force: true }); }
+});
 
 test('JSON response reader refuses unbounded arrayBuffer, text, and json fallbacks', async () => {
     const { readJsonBounded } = require('../src/ocrspace-client');
