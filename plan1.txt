@@ -1,3 +1,28 @@
+LATEST CROSS-SOURCE GATE B INVENTORY RECONCILIATION — 2026-11-07
+Status: VERIFIED LIBRARY DISCOVERY / SOURCE-LINEAGE CONFLICT PRESERVED / NOT A GATE PASS.
+
+A separate Library manifest, DWBOT_IMAGESF_HOLDOUT_CANDIDATE_MANIFEST.json, references a supplied 56-image review workbook and reports 46 populated image rows, 36 complete nine-field rows, 10 partial rows, and 10 eligible candidate images without a workbook row. The same manifest explicitly qualifies its JSON as an integrity inventory, not full expected-value ground truth, and says missing values were not inferred. The referenced workbook dwbot_56_image_ground_truth_review(3).xlsx was not found in the Library or current conversation. The accessible Library spreadsheet listing contains only the 63-image consolidated/working v5/v6 workbooks, not that 56-image workbook. Therefore the 36 count is a manifest-reported lead, not verified eligible Gate B labels, and must not be added to the current 21 count.
+
+The accessible DWBOT_IMAGESF_63_ground_truth_working_v6.xlsx and repository JSON testdata/ground-truth/imagesF-63-working-ground-truth-v6.json are a distinct 63-image working inventory: 21 complete eligible nine-field records and 42 partial records. The v6 workbook's Read Me identifies its own source and qualifications, preserves the four text-source audit, and reports the original imagesF.zip archive hash plus prior 63/63 candidate-image hash verification. This does not reconcile the missing 56-image workbook or establish that its 36 labels are present in the v6 JSON.
+
+Consequences:
+- Keep PR #19's current 21/63 result as the only count directly reproduced by its current repository JSON and CI audit.
+- Treat 36/56 as an unverified alternate inventory claim until the exact workbook is recovered and reconciled by filename, image hash, all nine values, source-line provenance, and reviewer history.
+- If all 36 are ultimately eligible, the shortfall to the 50 minimum would be 14; do not report that as the current verified shortfall. Under the current v6 JSON, the verified shortfall remains 29.
+- The 10 candidate images with no workbook row are not labelled and cannot count. The 10 partial rows also cannot count until all nine values are independently established.
+- No values may be inferred from OCR, from the other workbook, or from the unlabelled aggregate OCR dump. Preserve source and derivative identities.
+
+NEW CI / IMPLEMENTATION EVIDENCE:
+- PR #19 run 42317599533 completed successfully: all 10 then-current policy tests passed and the read-only inventory report reproduced 63 total / 21 eligible / 29 shortfall / 42 review-queue records. This is an inventory-tool CI pass only, not Gate B acceptance.
+- PR #19 now has an additional test and report field explicitly stating that its per-record SHA-256/byte/dimension checks validate metadata only and do not rehash original source-image bytes. That new test awaits CI.
+- PR #20 run 42317050142: all 3 scanner tests passed; current tracked tree had zero webhook URL matches; two historical commit/path findings were emitted without secret values. The scan exits 2 on findings, so the workflow conclusion is failure by design pending credential-owner revocation/history disposition.
+- PR #21 now includes a pull_request-only Ubuntu contract-test job for tests/gateA-resume.test.js. CI execution is not yet observed. The Windows local-only dispatch still pins Gate B source SHA adaf4f8c3a9573f56d0348a4bba36686fc31c22e and run 42160979140; reconcile that fingerprint against the required RC3 candidate before any manual recovery dispatch. Do not run a stale-source recovery.
+
+Gate A: NOT PASSED. Gate B: NOT PASSED. Production: NO-GO.
+================================================================================
+END CROSS-SOURCE GATE B INVENTORY RECONCILIATION
+================================================================================
+
 LATEST GATE A/B RUN RECONCILIATION — 2026-11-07
 Status: CURRENT / EVIDENCE-BASED / SUPERSEDES EARLIER "RUNNING" DESCRIPTIONS BELOW.
 
