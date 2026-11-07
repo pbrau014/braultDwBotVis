@@ -105,23 +105,8 @@ function auditGateBInventory({
     Number(a.corpusOrder || 0) - Number(b.corpusOrder || 0));
 
   for (const record of ordered) {
-    if (!recordHasEligibleNineFieldLabel(record)) {
-      rejected.incompleteNineFieldLabels++;
-      const missingFields = REQUIRED_FIELDS.filter(field =>
-        !(record.fieldStatus?.[field]?.eligible_for_exact_match === true
-          && ELIGIBLE_LABEL_STATUSES.has(record.fieldStatus?.[field]?.status)
-          && hasExpectedValue(record.expected?.[field])));
-      for (const field of missingFields) missingFieldCounts[field]++;
-      labelReviewQueue.push({
-        corpusOrder: Number(record.corpusOrder),
-        filename: record.filename || null,
-        sourceImageSha256: record.sourceImage?.sha256 || null,
-        missingFields,
-        missingFieldStatuses: Object.fromEntries(missingFields.map(field =>
-          [field, record.fieldStatus?.[field]?.status || 'MISSING_STATUS'])),
-      });
-      continue;
-    }
+    // Validate corpus identity for every row, including partial labels. An incomplete
+    // row must not hide a duplicate filename/hash/order or a development/regression overlap.
     const order = Number(record.corpusOrder);
     if (!Number.isSafeInteger(order) || order < 1) {
       rejected.invalidCorpusOrders++;
@@ -155,8 +140,25 @@ function auditGateBInventory({
       rejected.overlapsRegressionCorpus++;
       continue;
     }
+    if (!recordHasEligibleNineFieldLabel(record)) {
+      rejected.incompleteNineFieldLabels++;
+      const missingFields = REQUIRED_FIELDS.filter(field =>
+        !(record.fieldStatus?.[field]?.eligible_for_exact_match === true
+          && ELIGIBLE_LABEL_STATUSES.has(record.fieldStatus?.[field]?.status)
+          && hasExpectedValue(record.expected?.[field])));
+      for (const field of missingFields) missingFieldCounts[field]++;
+      labelReviewQueue.push({
+        corpusOrder: order,
+        filename: record.filename,
+        sourceImageSha256: source.sha256,
+        missingFields,
+        missingFieldStatuses: Object.fromEntries(missingFields.map(field =>
+          [field, record.fieldStatus?.[field]?.status || 'MISSING_STATUS'])),
+      });
+      continue;
+    }
     eligible.push({
-      corpusOrder: Number(record.corpusOrder),
+      corpusOrder: order,
       filename: record.filename,
       sourceImage: {
         sha256: source.sha256,
