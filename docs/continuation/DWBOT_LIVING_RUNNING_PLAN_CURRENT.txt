@@ -1,3 +1,12 @@
+LATEST PR #21 CONTRACT TEST UPDATE — 2026-11-07
+- Exact-head run 42320045285 completed SUCCESS on PR #21. All 10/10 Gate A workflow/recovery contract tests passed, including deterministic source-build fingerprint calculation and fail-closed rejection of a non-RC3 source tree. The read-only branch/tag survey again examined 24 refs and found no match for the recorded 89-file fingerprint. The actual Gate A job was SKIPPED on the pull_request event; no OCR/provider execution occurred.
+- This is a CI contract-test pass only. It does not validate the RC3 archive, Windows OCR, Gate A image acceptance, network restriction, or Gate B.
+
+Gate A remains BLOCKED on recovering/verifying the exact candidate source; Gate B remains BLOCKED on independent labels and original-image verification. Production remains NO-GO.
+================================================================================
+END LATEST PR #21 CONTRACT TEST UPDATE
+================================================================================
+
 LATEST SOURCE IDENTITY SEARCH RESULT — 2026-11-07 (UTC)
 - PR #21 source-survey CI run 42319770443 completed SUCCESS. It examined 24 GitHub repository branch/tag refs. None matched the recorded 2026-10-28 sourceBuild fingerprint 43f1e8b877d7f5832bca3ff070f8ae8164deb7c68da233694c64bece70b99166 over 89 files. The PR contract suite passed 9/9; the Gate A execution job was skipped. No OCR/provider activity occurred.
 - The accessible Library's named RC3 archive reference is DWBOT_RC3_CURRENT_SOURCE.zip with recorded SHA-256 c02f5bee9bf5a2b02294736c4ddf4dc520fe3841e264562c6fa9398b3f4e9fb5 in an older governing plan; that exact archive is not present in the current Library ZIP listing or current conversation file list. The accessible DWBOT_.zip (175,126,438 bytes) is a different/ambiguous name and must not be assumed to be the RC3 archive.
