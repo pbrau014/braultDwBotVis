@@ -59,6 +59,9 @@ $excludedReviewAssets = @(
 )
 $excludedFilePatterns = @(
     '^testdata/imgsHalf1-eligible-56\.zip\.\d{3}$'
+)
+$excludedDirectoryPatterns = @(
+    '(^|/)(node_modules|\.git|\.cache|coverage|release-artifacts|persistence-recovery|tournament-state|live-discord-state)(/|$)',
     '(^|/)provenance/input-archives(/|$)',
     '(^|/)docs/source-baselines(/|$)',
     '(^|/)docs/source-inputs(/|$)'
