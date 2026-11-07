@@ -2504,7 +2504,7 @@ async function extractTextCore(imageBuffer) {
             ocrSpace.raw = publicEvidence;
             ocrSpacePdfFirstEvidence = { ...publicEvidence, artifacts: artifactPaths };
             ocrSpaceSourceEvidence = {
-                status: 'complete', requests: Number(ocrSpace.requestCount) || 1,
+                status: 'complete', requests: Number(ocrSpace.requestCount) || Number(ocrSpace.httpRequestCount) || 0,
                 evidence: [{ field: 'fullScreenshot', source: 'ocrspace-searchable-pdf', status: 'success',
                     text: String(ocrSpace.text || '') }],
             };
