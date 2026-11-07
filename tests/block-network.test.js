@@ -21,7 +21,7 @@ function evaluateAllowlist(env, urls) {
 }
 
 test('network guard allows only explicitly enabled OCR.Space HTTPS hosts', () => {
-    assert.deepEqual(evaluateAllowlist({ OCRSPACE_NETWORK_ALLOWLIST: '1' }, [
+    assert.deepEqual(evaluateAllowlist({ OCRSPACE_ENABLED: '1', OCRSPACE_NETWORK_ALLOWLIST: '1' }, [
         'https://api.ocr.space/parse/image', 'https://ocr.space/',
         'http://api.ocr.space/', 'https://api.ocr.space.attacker.test/',
     ]), [true, true, false, false]);
@@ -29,6 +29,7 @@ test('network guard allows only explicitly enabled OCR.Space HTTPS hosts', () =>
 
 test('network guard allows only the exact configured Azure resource endpoint', () => {
     assert.deepEqual(evaluateAllowlist({
+        AZURE_DOCUMENT_INTELLIGENCE_ENABLED: '1',
         AZURE_DOCUMENT_INTELLIGENCE_NETWORK_ALLOWLIST: '1',
         AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT: 'https://dwbot.cognitiveservices.azure.com',
     }, [
@@ -39,8 +40,12 @@ test('network guard allows only the exact configured Azure resource endpoint', (
     ]), [true, false, false, false]);
 });
 
-test('network guard denies all OCR providers unless their allowlists are explicitly enabled', () => {
-    assert.deepEqual(evaluateAllowlist({}, [
+test('network guard denies all OCR providers unless their providers and allowlists are explicitly enabled', () => {
+    assert.deepEqual(evaluateAllowlist({
+        OCRSPACE_ENABLED: '0', OCRSPACE_NETWORK_ALLOWLIST: '1',
+        AZURE_DOCUMENT_INTELLIGENCE_ENABLED: '0', AZURE_DOCUMENT_INTELLIGENCE_NETWORK_ALLOWLIST: '1',
+        AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT: 'https://dwbot.cognitiveservices.azure.com',
+    }, [
         'https://api.ocr.space/', 'https://dwbot.cognitiveservices.azure.com/',
     ]), [false, false]);
 });
