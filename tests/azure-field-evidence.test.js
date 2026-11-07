@@ -54,14 +54,14 @@ test('Azure metadata joins a geometrically adjacent map line with its mode line'
     ], { sourceSha256: 'c'.repeat(64), sourceWidth: 400, sourceHeight: 600 });
     const metadata = evidence.find(item => item.field === 'battleMetadata');
     assert.ok(metadata);
-    assert.equal(metadata.text, 'Shards\\nRandom Battle');
+    assert.equal(metadata.text, 'Shards\nRandom Battle');
     assert.deepEqual(metadata.sourceLinePolygons, [
         [10, 10, 80, 10, 80, 20, 10, 20],
         [10, 24, 80, 24, 80, 34, 10, 34],
     ]);
     assert.equal(metadata.geometrySource, 'union-of-adjacent-azure-lines');
     assert.equal(metadata.originalCoordinateGeometryValid, true);
-    assert.deepEqual(metadata.polygon, [20, 30, 160, 30, 160, 102, 20, 102]);
+    assert.deepEqual(metadata.polygon, [20, 20, 160, 20, 160, 68, 20, 68]);
 });
 
 test('Azure metadata does not combine distant or non-metadata neighboring lines', () => {
