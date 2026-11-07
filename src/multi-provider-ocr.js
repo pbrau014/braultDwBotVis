@@ -85,6 +85,8 @@ async function runMultiProviderOcr({
                 quotaReservationStatus: value.quotaReservationStatus || null,
                 httpRequestCount: Number(value.httpRequestCount ?? value.requests) || requestCount,
                 elapsedMs: Number(value.elapsedMs) || null,
+                providerProcessingTimeMs: Number(value.providerProcessingTimeMs) || null,
+                startedAt: value.startedAt || null, completedAt: value.completedAt || null,
                 raw: value,
             };
         })().then(value => { providerState.ocrSpace = value; }).catch(error => {
