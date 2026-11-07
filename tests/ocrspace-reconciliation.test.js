@@ -103,3 +103,14 @@ test('field reconciliation retains provider geometry and original/provider input
     assert.equal(candidate.originalScreenshotSha256, 'original-hash');
     assert.equal(candidate.providerInputSha256, 'upload-hash');
 });
+
+test('invalid Azure line geometry is retained only as raw evidence, not a field candidate', () => {
+    const result = reconcileOcrSpaceEvidence({
+        status: 'complete',
+        evidence: [{
+            field: 'xp', source: 'azure-document-intelligence-line', status: 'success',
+            text: 'XP 999999', geometryValid: false, polygon: [], originalScreenshotSha256: 'same',
+        }],
+    }, localRecord);
+    assert.equal(result.fields.xp.status, 'no_remote_candidate');
+});
