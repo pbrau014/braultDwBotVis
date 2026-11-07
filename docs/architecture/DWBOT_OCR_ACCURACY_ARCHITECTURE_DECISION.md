@@ -32,7 +32,7 @@ AZURE_DOCUMENT_INTELLIGENCE_KEY=<secret>
 AZURE_DOCUMENT_INTELLIGENCE_MAX_PER_MONTH=450
 ```
 
-The F0 environment value is an operator attestation, not remote proof of the SKU. Confirm the resource is actually F0 in the provider console before enabling it. The adapter enforces a local monthly reservation ceiling, one screenshot/page per request, the F0 request-size ceiling, HTTPS resource endpoints, same-origin operation polling, bounded response reads, and no automatic retry on rate-limit responses. These controls do not guarantee that a misconfigured paid Azure resource cannot incur charges.
+The F0 environment value is an operator attestation, not remote proof of the SKU. Confirm the resource is actually F0 in the provider console before enabling it. The current Microsoft limits list 500 free pages per month for F0, a 4 MB maximum document, up to two pages per analysis, and one analyze/get operation per second. The adapter reserves one page per screenshot and caps local reservations at 450/month, leaving a 50-page safety margin. It enforces the F0 request-size ceiling, HTTPS resource endpoints, same-origin operation polling, bounded response reads, at-least-one-second polling intervals, and no automatic retry on rate-limit responses. These controls do not guarantee that a misconfigured paid Azure resource cannot incur charges.
 
 Missing credentials or unavailable resources are recorded as blocked; provider failures are recorded as failed. A requested multi-provider run is complete only when both online providers actually return success. There is no silent OCR.Space-only or local-only downgrade when the multi-provider switch is enabled.
 
