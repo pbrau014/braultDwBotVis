@@ -3,6 +3,7 @@ name: DWBOT Gate B 50-image holdout inventory preflight (read-only)
 on:
   push:
     branches:
+      - main
       - feat/gateb-50-image-independent-inventory-preflight
     paths:
       - 'scripts/audit-gateb-holdout-eligibility.js'
