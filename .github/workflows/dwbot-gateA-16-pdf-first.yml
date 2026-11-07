@@ -5,6 +5,8 @@ name: DWBOT Gate A 16-image OCR.Space PDF-first acceptance
 # A compliant Gate A result requires a fresh, fully guarded 16-image run with a new diagnostic log and locked source fingerprint.
 # The LOCAL-ONLY-RECOVERY and RESUME-15 paths remain fail-closed and must never repeat or extend the historical partial batch.
 # The local-only helper rebinds NODE_OPTIONS for its child process because its cwd is sourceRoot.
+# Run 42160979140 is the imagesF 63 exploratory source-anchor run, NOT Gate B acceptance or a Gate B pass.
+# Recovery is additionally pinned to the user's recorded RC3 sourceBuild SHA-256 and 89-file count.
 
 on:
   push:
@@ -56,6 +58,14 @@ jobs:
         with:
           node-version: 22.16.0
           package-manager-cache: false
+      - name: Check out pinned RC3 candidate source for identity verification
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: adaf4f8c3a9573f56d0348a4bba36686fc31c22e
+          path: source
+          persist-credentials: false
+      - name: Verify pinned source build matches recorded RC3 fingerprint
+        run: node -e "const f=require('./scripts/prepare-gateA-16-resume').sourceBuildFingerprint('source'); console.log(JSON.stringify(f)); if(f.sha256!=='43f1e8b877d7f5832bca3ff070f8ae8164deb7c68da233694c64bece70b99166'||f.files!==89) process.exit(1);"
       - name: Test Gate A recovery and local-only workflow contract
         run: node --test tests/gateA-resume.test.js
 
@@ -84,17 +94,18 @@ jobs:
           node --check scripts/run-gateA-parallel-reader-matrix.js
           node --check scripts/prepare-gateA-16-resume.js
 
-      - name: Verify completed Gate B source run fingerprint
+      - name: Verify pinned exploratory source-anchor run (not Gate B acceptance)
         shell: powershell
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $run = gh run view $env:GATEB_SOURCE_RUN_ID --repo $env:GITHUB_REPOSITORY --json headSha,status,conclusion
+          $run = gh run view $env:GATEB_SOURCE_RUN_ID --repo $env:GITHUB_REPOSITORY --json name,headSha,status,conclusion
           if ($LASTEXITCODE -ne 0) { throw 'Could not inspect the completed Gate B source run.' }
           $source = $run | ConvertFrom-Json
           if ($source.status -ne 'completed' -or $source.conclusion -ne 'success') { throw 'Gate B source run is not completed successfully.' }
-          if ($source.headSha -ne $env:GATEB_SOURCE_SHA) { throw 'Gate A candidate SHA does not match the Gate B source run SHA.' }
-          "Gate B run $env:GATEB_SOURCE_RUN_ID is completed and bound to $($source.headSha)."
+          if ($source.headSha -ne $env:GATEB_SOURCE_SHA) { throw 'Gate A candidate SHA does not match the pinned source-anchor run SHA.' }
+          if ($source.name -ne 'DWBOT imagesF 63 exploratory OCR.Space') { throw 'Pinned source-anchor run is not the expected exploratory source run; it is not Gate B acceptance.' }
+          "Exploratory source-anchor run $env:GATEB_SOURCE_RUN_ID is completed and bound to $($source.headSha); no Gate B pass is inferred."
 
       - name: Preflight all 16 development images and nine-field labels
         shell: powershell
@@ -114,6 +125,17 @@ jobs:
         with:
           node-version: 22.16.0
           package-manager-cache: false
+
+      - name: Verify pinned source build matches recorded RC3 fingerprint before recovery
+        shell: powershell
+        run: |
+          node -e "const f=require('./scripts/prepare-gateA-16-resume').sourceBuildFingerprint('source'); console.log(JSON.stringify(f)); if(f.sha256 -ne '43f1e8b877d7f5832bca3ff070f8ae8164deb7c68da233694c64bece70b99166' -or f.files -ne 89) { throw 'Source checkout does not match the recorded RC3 fingerprint; refusing recovery.' }"
+
+      - name: Install exact candidate dependencies
+        shell: powershell
+        run: |
+          npm ci --prefix source --no-audit --no-fund
+          if ($LASTEXITCODE -ne 0) { throw 'Candidate dependency installation failed; refusing local recovery.' }
 
       - name: Install local OCR and PDF runtime
         shell: powershell
