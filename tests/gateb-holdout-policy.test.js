@@ -46,13 +46,17 @@ function makeGroundTruth(count) {
   };
 }
 
-function makeRegressionHashes() {\n  return Array.from({ length: 4 }, (_, index) => digest(`regression-${index + 1}`));\n}\n\nfunction makeDevelopmentGroundTruth() {
+function makeDevelopmentGroundTruth() {
   return {
     records: Array.from({ length: 16 }, (_, index) => ({
       filename: `development-${index + 1}.png`,
       sha256: digest(`development-${index}`),
     })),
   };
+}
+
+function makeRegressionHashes() {
+  return Array.from({ length: 4 }, (_, index) => digest(`regression-${index + 1}`));
 }
 
 test('governing Gate B policy is nine fields, 50 minimum, 100 preferred', () => {
@@ -68,6 +72,7 @@ test('49 eligible independent images remain blocked and select none', () => {
   const report = auditGateBInventory({
     groundTruth: makeGroundTruth(49),
     developmentGroundTruth: makeDevelopmentGroundTruth(),
+    regressionImageHashes: makeRegressionHashes(),
   });
   assert.equal(report.status, 'BLOCKED_BELOW_MINIMUM_OR_PROVENANCE');
   assert.equal(report.eligibleIndependentNineFieldImageCount, 49);
@@ -80,6 +85,7 @@ test('50 eligible independent images meet only the inventory threshold, not Gate
   const report = auditGateBInventory({
     groundTruth: makeGroundTruth(50),
     developmentGroundTruth: makeDevelopmentGroundTruth(),
+    regressionImageHashes: makeRegressionHashes(),
   });
   assert.equal(report.status, 'INVENTORY_THRESHOLD_MET_NOT_GATE_ACCEPTANCE');
   assert.equal(report.selectedImageCount, 50);
@@ -90,6 +96,7 @@ test('100 eligible independent images meet the preferred target', () => {
   const report = auditGateBInventory({
     groundTruth: makeGroundTruth(100),
     developmentGroundTruth: makeDevelopmentGroundTruth(),
+    regressionImageHashes: makeRegressionHashes(),
   });
   assert.equal(report.eligibleIndependentNineFieldImageCount, 100);
   assert.equal(report.missingEligibleImagesToPreferred, 0);
@@ -103,26 +110,49 @@ test('a missing or ineligible XP label excludes the record', () => {
   const report = auditGateBInventory({
     groundTruth,
     developmentGroundTruth: makeDevelopmentGroundTruth(),
+    regressionImageHashes: makeRegressionHashes(),
   });
   assert.equal(report.eligibleIndependentNineFieldImageCount, 49);
   assert.equal(report.rejected.incompleteNineFieldLabels, 1);
   assert.equal(report.status, 'BLOCKED_BELOW_MINIMUM_OR_PROVENANCE');
 });
 
+test('missing-value sentinels are not accepted as ground-truth labels', () => {
+  const groundTruth = makeGroundTruth(50);
+  groundTruth.records[0].expected.xp = 'Not Detected';
+  const report = auditGateBInventory({
+    groundTruth,
+    developmentGroundTruth: makeDevelopmentGroundTruth(),
+    regressionImageHashes: makeRegressionHashes(),
+  });
+  assert.equal(report.eligibleIndependentNineFieldImageCount, 49);
+  assert.equal(report.rejected.incompleteNineFieldLabels, 1);
+});
+
 test('development and regression corpus overlaps are excluded', () => {
   const groundTruth = makeGroundTruth(50);
   const development = makeDevelopmentGroundTruth();
+  const regressionHashes = makeRegressionHashes();
   groundTruth.records[0].sourceImage.sha256 = development.records[0].sha256;
-  groundTruth.records[1].sourceImage.sha256 = digest('regression-1');
+  groundTruth.records[1].sourceImage.sha256 = regressionHashes[0];
   const report = auditGateBInventory({
     groundTruth,
     developmentGroundTruth: development,
-    regressionImageHashes: [digest('regression-1')],
+    regressionImageHashes,
   });
   assert.equal(report.independence.developmentOverlapCount, 1);
   assert.equal(report.independence.regressionOverlapCount, 1);
   assert.equal(report.eligibleIndependentNineFieldImageCount, 48);
   assert.equal(report.selectedImageCount, 0);
+});
+
+test('the minimum cannot be configured below 50', () => {
+  assert.throws(() => auditGateBInventory({
+    groundTruth: makeGroundTruth(100),
+    developmentGroundTruth: makeDevelopmentGroundTruth(),
+    regressionImageHashes: makeRegressionHashes(),
+    minimumImages: 19,
+  }), /cannot be configured below/);
 });
 
 test('current repository ground truth is correctly reported as 21 eligible, not a 50-image holdout', async () => {
