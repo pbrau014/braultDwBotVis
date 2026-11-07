@@ -143,6 +143,25 @@ jobs:
           & $opencvPython -c 'import cv2, numpy; print(cv2.__version__, numpy.__version__)'
           if ($LASTEXITCODE -ne 0) { throw 'OpenCV geometry runtime failed its import check.' }
           "OPENCV_PYTHON_BIN=$opencvPython" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+      - name: Provision pinned PaddleOCR CPU runtime for the live multi-provider smoke
+        if: github.event_name == 'workflow_dispatch' && inputs.run_live_multi_provider_smoke == true
+        shell: powershell
+        run: |
+          $runtimeRoot = Join-Path $env:LOCALAPPDATA 'WoWSYOLO\PaddleOCR'
+          & powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/install-paddleocr-windows.ps1 -ProjectRoot $env:GITHUB_WORKSPACE -RuntimeRoot $runtimeRoot -SkipProjectBenchmark
+          if ($LASTEXITCODE -ne 0) { throw 'Pinned PaddleOCR setup or offline inference verification failed.' }
+          $python = Join-Path $runtimeRoot 'venv\Scripts\python.exe'
+          $det = Join-Path $runtimeRoot 'models\PP-OCRv6_medium_det'
+          $rec = Join-Path $runtimeRoot 'models\PP-OCRv6_medium_rec'
+          $modelManifest = Join-Path $runtimeRoot 'models\paddleocr-model-manifest.json'
+          foreach ($item in @($python,$det,$rec,$modelManifest)) { if (-not (Test-Path $item)) { throw "PaddleOCR runtime evidence missing: $item" } }
+          "PADDLEOCR_PYTHON_BIN=$python" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "PADDLEOCR_DET_MODEL_DIR=$det" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "PADDLEOCR_REC_MODEL_DIR=$rec" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "PADDLEOCR_MODEL_MANIFEST=$modelManifest" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "PADDLE_PDX_ENABLE_MKLDNN_BYDEFAULT=False" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "PADDLEOCR_FIELD_FALLBACK_TIMEOUT_MS=60000" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "PADDLEOCR_FIELD_FALLBACK_MAX_CROPS=7" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
       - name: Install locked dependencies
         run: |
           node --version
@@ -158,6 +177,8 @@ jobs:
         env:
           DWBOT_MULTI_PROVIDER_ENABLED: '1'
           DWBOT_MULTI_PROVIDER_IMAGE_PATH: fixtures/four-screenshots/asashio-defeat.jpg
+          OCR_ENGINE: 'tesseractjs'
+          OCR_PARALLEL_READER_TIMEOUT_MS: '60000'
           OCRSPACE_ENABLED: '1'
           OCRSPACE_API_KEY: ${{ secrets.OCRSPACE_API_KEY }}
           OCRSPACE_NETWORK_ALLOWLIST: '1'

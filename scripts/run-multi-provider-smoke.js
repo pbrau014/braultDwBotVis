@@ -3,7 +3,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
-const { runMultiProviderOcr } = require('../src/multi-provider-ocr');
+const bot = require('../src/bot');
 
 async function main() {
     const root = path.resolve(__dirname, '..');
@@ -14,24 +14,14 @@ async function main() {
     }
     const imageBuffer = await fs.readFile(imagePath);
     const sourceSha256 = crypto.createHash('sha256').update(imageBuffer).digest('hex');
-    const events = [];
-    const result = await runMultiProviderOcr({
-        imageBuffer,
-        filename: path.basename(imagePath),
-        onProviderRequestStarted: details => {
-            events.push({
-                event: 'provider_request_started',
-                provider: details.provider,
-                model: details.model || null,
-                apiVersion: details.apiVersion || null,
-                engine: details.engine || null,
-                sourceSha256: details.sourceSha256 || sourceSha256,
-                uploadSha256: details.uploadSha256 || null,
-                inputBytes: details.inputBytes || details.uploadBytes || imageBuffer.length,
-                at: new Date().toISOString(),
-            });
-        },
-    });
+    let output;
+    try {
+        output = await bot.extractText(imageBuffer);
+    } finally {
+        await bot.terminateOcrWorker().catch(() => {});
+    }
+    const result = output?.fields?.multiProviderOcr || { status: 'missing-provider-evidence', requested: false, providers: {} };
+    const local = output?.fields?.parallelLocalReaders || { status: 'missing-local-reader-evidence', readers: {} };
     const providers = {};
     for (const [key, value] of Object.entries(result.providers || {})) {
         providers[key] = {
@@ -51,6 +41,23 @@ async function main() {
             reason: value.reason || null,
         };
     }
+    const localReaders = {};
+    for (const [key, value] of Object.entries(local.readers || {})) {
+        const readerOutput = value.output || {};
+        localReaders[key] = {
+            engine: value.engine || key,
+            status: value.status,
+            sourceSha256: value.sourceSha256 || sourceSha256,
+            attempts: Array.isArray(readerOutput.attempts) ? readerOutput.attempts.length : null,
+            textCharacters: Array.isArray(readerOutput.attempts)
+                ? readerOutput.attempts.reduce((sum, attempt) => sum + String(attempt.text || '').length, 0)
+                : null,
+            modelManifestSha256: readerOutput.modelManifestSha256 || null,
+            errorCode: value.errorCode || null,
+            error: value.error || null,
+            reason: value.reason || null,
+        };
+    }
     const report = {
         schemaVersion: 1,
         createdAt: new Date().toISOString(),
@@ -58,8 +65,9 @@ async function main() {
         status: result.status,
         requested: result.requested,
         activation: result.activation,
-        requestEvents: events,
+        requestEvents: output?.fields?.multiProviderRequestEvents || [],
         providers,
+        localReaders: { status: local.status, requested: local.requested || [], readers: localReaders },
         disclaimer: 'Connectivity smoke test only. Provider participation does not establish OCR accuracy or release acceptance.',
     };
     const outDir = path.join(root, 'testdata', 'multi-provider-smoke');
@@ -67,7 +75,7 @@ async function main() {
     const reportPath = path.join(outDir, new Date().toISOString().replace(/[:.]/g, '-') + '-' + sourceSha256.slice(0, 12) + '.json');
     await fs.writeFile(reportPath, JSON.stringify(report, null, 2) + '\n', { encoding: 'utf8', flag: 'wx' });
     process.stdout.write(JSON.stringify({ status: report.status, sourceSha256, providers, reportPath: path.relative(root, reportPath) }, null, 2) + '\n');
-    if (result.status !== 'complete') process.exitCode = 2;
+    if (result.status !== 'complete' || local.status !== 'complete') process.exitCode = 2;
 }
 
 main().catch(error => {

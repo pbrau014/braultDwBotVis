@@ -102,17 +102,15 @@ let desktopBridge = null;
 const DISCORD_MESSAGE_LIMIT = 1850;
 
 function runtimeSupported(version = process.versions.node) {
-    // Node 22.16.0 is the reproducible baseline. Accept that version and every
-    // newer stable Node release so newer Node 22 patches and later majors are valid.
-    // The minimum is 22.16.0 because this application uses DatabaseSync's timeout
-    // constructor option from node:sqlite, introduced in Node 22.16.0.
+    // Node 24.17.0 is the branch runtime floor. Accept newer stable releases.
+    // This aligns the runtime with the current package/CI baseline.
     const match = /^v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.exec(String(version).trim());
     if (!match) return false;
     const [, majorText, minorText, patchText] = match;
     const major = Number(majorText);
     const minor = Number(minorText);
     const patch = Number(patchText);
-    return major > 22 || (major === 22 && minor >= 16);
+    return major > 24 || (major === 24 && minor >= 17);
 }
 
 // ============================================================
@@ -3864,7 +3862,7 @@ if (process.env.NODE_ENV === 'test') {
 
 if (require.main === module) {
     if (!runtimeSupported()) {
-        console.error(`Unsupported Node.js runtime ${process.version}. This release requires Node.js v22.16.0 or newer.`);
+        console.error(`Unsupported Node.js runtime ${process.version}. This branch requires Node.js v24.17.0 or newer.`);
         process.exit(1);
     }
     process.on('SIGINT', () => shutdown('SIGINT'));
