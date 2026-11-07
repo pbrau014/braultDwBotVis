@@ -3,7 +3,10 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
-const { samePreflight, pngInfo, extractStartedFixtures, parseJsonUtf8, originalNetworkEvidenceAllowsProvider } = require('../scripts/prepare-gateA-16-resume');
+const path = require('node:path');
+const os = require('node:os');
+const crypto = require('node:crypto');
+const { samePreflight, pngInfo, extractStartedFixtures, parseJsonUtf8, originalNetworkEvidenceAllowsProvider, sourceBuildFingerprint, assertRecordedRc3SourceBuild, EXPECTED_RC3_SOURCE_BUILD_SHA256, EXPECTED_RC3_SOURCE_BUILD_FILES } = require('../scripts/prepare-gateA-16-resume');
 
 test('Gate A resume compares substantive preflight identity, fixture order and hashes', () => {
     const a = { status:'PREFLIGHT_PASS_NO_PROVIDER_REQUESTS', candidateFingerprint:'a'.repeat(40),
@@ -77,4 +80,65 @@ test('Gate A never resumes paid OCR.Space requests without original zero-attempt
     assert.equal(originalNetworkEvidenceAllowsProvider({
         originalNetworkLogStatus: 'PRESENT', originalNetworkAttemptCount: 1
     }), false);
+});
+
+test('manual Gate A dispatch is restricted to no-provider local-only recovery', () => {
+    const workflow = fs.readFileSync(path.join(__dirname, '..', '.github', 'workflows', 'dwbot-gateA-16-pdf-first.yml'), 'utf8');
+    assert.match(workflow, /workflow_dispatch:[\s\S]*?mode:[\s\S]*?options:[\s\S]*?- LOCAL-ONLY-RECOVERY/);
+    assert.match(workflow, /github\.event_name == 'workflow_dispatch' && inputs\.mode == 'LOCAL-ONLY-RECOVERY'/);
+    assert.match(workflow, /Prepare no-duplicate Gate A resume checkpoint[\s\S]*?github\.event_name == 'workflow_dispatch' && inputs\.mode == 'LOCAL-ONLY-RECOVERY'/);
+    const localOnlyStep = workflow.match(/- name: Prepare no-duplicate Gate A resume checkpoint([\s\S]*?)(?=\n      - name:)/)?.[1] || '';
+    assert.match(localOnlyStep, /OCRSPACE_ENABLED: '0'/);
+    assert.match(localOnlyStep, /OCRSPACE_NETWORK_ALLOWLIST: '0'/);
+    assert.doesNotMatch(localOnlyStep, /OCRSPACE_API_KEY/);
+    const providerStep = workflow.match(/- name: Run the 16-image OCR.Space Engine 2 PDF-first Gate A acceptance([\s\S]*?)(?=\n      - name:)/)?.[1] || '';
+    assert.match(providerStep, /if: github\.event_name != 'workflow_dispatch'/);
+    assert.match(providerStep, /OCRSPACE_ENABLED: '1'/);
+    const initializeStep = workflow.match(/- name: Initialize Gate A restricted-egress diagnostic log([\s\S]*?)(?=\n      - name:)/)?.[1] || '';
+    assert.match(initializeStep, /if: github\.event_name != 'workflow_dispatch'/);
+});
+
+
+test('source-build fingerprint helper matches the report metadata hashing contract', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dwbot-source-fingerprint-'));
+    try {
+        for (const dir of ['src', 'scripts', 'tests']) fs.mkdirSync(path.join(root, dir), { recursive: true });
+        const files = {
+            'src/a.js': 'alpha',
+            'scripts/z.js': 'zeta',
+            'tests/t.test.js': 'test',
+            'package.json': '{}',
+            'package-lock.json': '{}',
+        };
+        for (const [name, value] of Object.entries(files)) fs.writeFileSync(path.join(root, name), value);
+        fs.writeFileSync(path.join(root, 'src/a.js.bak'), 'excluded');
+        fs.mkdirSync(path.join(root, 'docs'), { recursive: true });
+        fs.writeFileSync(path.join(root, 'docs/ignored.md'), 'excluded');
+        const expected = crypto.createHash('sha256');
+        for (const name of Object.keys(files).sort()) expected.update(name).update('\0').update(files[name]).update('\0');
+        assert.deepEqual(sourceBuildFingerprint(root), { sha256: expected.digest('hex'), files: 5 });
+    } finally {
+        fs.rmSync(root, { recursive: true, force: true });
+    }
+});
+
+test('Gate A recovery is pinned to the recorded RC3 source build identity', () => {
+    assert.equal(EXPECTED_RC3_SOURCE_BUILD_SHA256, '43f1e8b877d7f5832bca3ff070f8ae8164deb7c68da233694c64bece70b99166');
+    assert.equal(EXPECTED_RC3_SOURCE_BUILD_FILES, 89);
+});
+
+
+test('Gate A recovery rejects a source tree that does not match the recorded RC3 fingerprint', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dwbot-rc3-mismatch-'));
+    try {
+        for (const dir of ['src', 'scripts', 'tests']) fs.mkdirSync(path.join(root, dir), { recursive: true });
+        fs.writeFileSync(path.join(root, 'src/a.js'), 'not RC3');
+        fs.writeFileSync(path.join(root, 'scripts/b.js'), 'not RC3');
+        fs.writeFileSync(path.join(root, 'tests/c.test.js'), 'not RC3');
+        fs.writeFileSync(path.join(root, 'package.json'), '{}');
+        fs.writeFileSync(path.join(root, 'package-lock.json'), '{}');
+        assert.throws(() => assertRecordedRc3SourceBuild(root), /does not match the recorded RC3 fingerprint/);
+    } finally {
+        fs.rmSync(root, { recursive: true, force: true });
+    }
 });

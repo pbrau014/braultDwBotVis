@@ -5,12 +5,29 @@ name: DWBOT Gate A 16-image OCR.Space PDF-first acceptance
 # A compliant Gate A result requires a fresh, fully guarded 16-image run with a new diagnostic log and locked source fingerprint.
 # The LOCAL-ONLY-RECOVERY and RESUME-15 paths remain fail-closed and must never repeat or extend the historical partial batch.
 # The local-only helper rebinds NODE_OPTIONS for its child process because its cwd is sourceRoot.
+# Run 42160979140 is the imagesF 63 exploratory source-anchor run, NOT Gate B acceptance or a Gate B pass.
+# Recovery is additionally pinned to the user's recorded RC3 sourceBuild SHA-256 and 89-file count.
 
 on:
   push:
     branches: [main]
     paths:
       - '.github/workflows/dwbot-gateA-16-pdf-first.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/dwbot-gateA-16-pdf-first.yml'
+      - 'tests/gateA-resume.test.js'
+      - 'scripts/prepare-gateA-16-resume.js'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Only the no-provider local recovery path is available for manual runs.'
+        type: choice
+        required: true
+        default: LOCAL-ONLY-RECOVERY
+        options:
+          - LOCAL-ONLY-RECOVERY
 
 permissions:
   contents: read
@@ -25,8 +42,59 @@ env:
   GATEB_SOURCE_RUN_ID: '42160979140'
 
 jobs:
+  gate-a-workflow-contract:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Check out exact pull request revision and repository history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up Node.js 22.16.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22.16.0
+          package-manager-cache: false
+      - name: Survey repository branches and tags for the recorded RC3 fingerprint
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const os = require('node:os');
+          const path = require('node:path');
+          const cp = require('node:child_process');
+          const { sourceBuildFingerprint } = require('./scripts/prepare-gateA-16-resume');
+          const expected = '43f1e8b877d7f5832bca3ff070f8ae8164deb7c68da233694c64bece70b99166';
+          const refs = cp.execFileSync('git', ['for-each-ref', '--format=%(refname)', 'refs/remotes/origin', 'refs/tags'], { encoding: 'utf8' })
+            .trim().split(/\r?\n/).filter(Boolean);
+          const results = [];
+          for (const ref of refs) {
+            const sha = cp.execFileSync('git', ['rev-parse', ref], { encoding: 'utf8' }).trim();
+            const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dwbot-rc3-fingerprint-'));
+            try {
+              cp.execFileSync('git', ['worktree', 'add', '--detach', dir, sha], { stdio: 'ignore' });
+              const fingerprint = sourceBuildFingerprint(dir);
+              results.push({ ref, sha, ...fingerprint, match: fingerprint.sha256 === expected && fingerprint.files === 89 });
+            } catch (error) {
+              results.push({ ref, sha, error: String(error.message || error).slice(0, 240) });
+            } finally {
+              try { cp.execFileSync('git', ['worktree', 'remove', '--force', dir], { stdio: 'ignore' }); } catch {}
+              fs.rmSync(dir, { recursive: true, force: true });
+            }
+          }
+          const matches = results.filter(item => item.match);
+          console.log(JSON.stringify({ expectedSourceBuildSha256: expected, expectedFiles: 89, refsExamined: results.length, matches, results }, null, 2));
+          console.log(matches.length ? 'RC3_SOURCE_BUILD_MATCH_FOUND' : 'NO_REPOSITORY_BRANCH_OR_TAG_MATCH_FOR_RECORDED_RC3');
+          NODE
+      - name: Test Gate A recovery and local-only workflow contract
+        run: node --test tests/gateA-resume.test.js
+
   gate-a:
-    if: github.run_attempt == 1 && github.event_name == 'push' && (github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME' || github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' || github.event.head_commit.message == 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY')
+    if: github.run_attempt == 1 && ((github.event_name == 'workflow_dispatch' && inputs.mode == 'LOCAL-ONLY-RECOVERY') || (github.event_name == 'push' && (github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME' || github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' || github.event.head_commit.message == 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY')))
     runs-on: windows-latest
     timeout-minutes: 240
     permissions:
@@ -50,17 +118,18 @@ jobs:
           node --check scripts/run-gateA-parallel-reader-matrix.js
           node --check scripts/prepare-gateA-16-resume.js
 
-      - name: Verify completed Gate B source run fingerprint
+      - name: Verify pinned exploratory source-anchor run (not Gate B acceptance)
         shell: powershell
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $run = gh run view $env:GATEB_SOURCE_RUN_ID --repo $env:GITHUB_REPOSITORY --json headSha,status,conclusion
+          $run = gh run view $env:GATEB_SOURCE_RUN_ID --repo $env:GITHUB_REPOSITORY --json name,headSha,status,conclusion
           if ($LASTEXITCODE -ne 0) { throw 'Could not inspect the completed Gate B source run.' }
           $source = $run | ConvertFrom-Json
           if ($source.status -ne 'completed' -or $source.conclusion -ne 'success') { throw 'Gate B source run is not completed successfully.' }
-          if ($source.headSha -ne $env:GATEB_SOURCE_SHA) { throw 'Gate A candidate SHA does not match the Gate B source run SHA.' }
-          "Gate B run $env:GATEB_SOURCE_RUN_ID is completed and bound to $($source.headSha)."
+          if ($source.headSha -ne $env:GATEB_SOURCE_SHA) { throw 'Gate A candidate SHA does not match the pinned source-anchor run SHA.' }
+          if ($source.name -ne 'DWBOT imagesF 63 exploratory OCR.Space') { throw 'Pinned source-anchor run is not the expected exploratory source run; it is not Gate B acceptance.' }
+          "Exploratory source-anchor run $env:GATEB_SOURCE_RUN_ID is completed and bound to $($source.headSha); no Gate B pass is inferred."
 
       - name: Preflight all 16 development images and nine-field labels
         shell: powershell
@@ -80,6 +149,23 @@ jobs:
         with:
           node-version: 22.16.0
           package-manager-cache: false
+
+      - name: Verify pinned source build matches recorded RC3 fingerprint before recovery
+        shell: powershell
+        run: |
+          node -e "const f=require('./scripts/prepare-gateA-16-resume').sourceBuildFingerprint('source'); console.log(JSON.stringify(f)); if(f.sha256!=='43f1e8b877d7f5832bca3ff070f8ae8164deb7c68da233694c64bece70b99166'||f.files!==89) { throw 'Source checkout does not match the recorded RC3 fingerprint; refusing recovery.' }"
+
+      - name: Install exact candidate dependencies for local recovery
+        shell: powershell
+        run: |
+          npm ci --prefix source --no-audit --no-fund
+          if ($LASTEXITCODE -ne 0) { throw 'Candidate dependency installation failed; refusing local recovery.' }
+
+      - name: Install exact candidate dependencies
+        shell: powershell
+        run: |
+          npm ci --prefix source --no-audit --no-fund
+          if ($LASTEXITCODE -ne 0) { throw 'Candidate dependency installation failed; refusing local recovery.' }
 
       - name: Install local OCR and PDF runtime
         shell: powershell
@@ -145,7 +231,7 @@ jobs:
           Write-Host 'Both guard sources verified; each OCR/local-reader Node step will preload them explicitly.'
 
       - name: Download and verify original partial Gate A artifact
-        if: github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' || github.event.head_commit.message == 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'
+        if: github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' || github.event.head_commit.message == 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'LOCAL-ONLY-RECOVERY')
         shell: powershell
         env:
           GH_TOKEN: ${{ github.token }}
@@ -176,7 +262,7 @@ jobs:
       # Original gate-a-acceptance.json contains a UTF-8 BOM; the recovery helper parses BOM-safe JSON.
       # Child OCR output and the enriched resume report use separate files; missing original egress evidence blocks all remaining paid requests.
       - name: Prepare no-duplicate Gate A resume checkpoint from existing PDF
-        if: github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' || github.event.head_commit.message == 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'
+        if: github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' || github.event.head_commit.message == 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'LOCAL-ONLY-RECOVERY')
         shell: powershell
         env:
           OCRSPACE_ENABLED: '0'
@@ -189,7 +275,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'First-image local recovery or original artifact verification failed; no remaining provider requests may start.' }
 
       - name: Initialize Gate A restricted-egress diagnostic log
-        if: github.event.head_commit.message != 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'
+        if: github.event_name != 'workflow_dispatch' && github.event.head_commit.message != 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'
         shell: powershell
         run: |
           $log = Join-Path $env:GITHUB_WORKSPACE 'source/testdata/gateA-16/non-ocr-network-attempts.log'
@@ -198,7 +284,7 @@ jobs:
           if (-not (Test-Path $log) -or (Get-Item $log).Length -ne 0) { throw 'Could not initialize an empty Gate A restricted-egress log before provider calls.' }
 
       - name: Run the 16-image OCR.Space Engine 2 PDF-first Gate A acceptance
-        if: github.event.head_commit.message != 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'
+        if: github.event_name != 'workflow_dispatch' && github.event.head_commit.message != 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'
         working-directory: source
         env:
           OCRSPACE_API_KEY: ${{ secrets.OCRSPACE_API_KEY }}
