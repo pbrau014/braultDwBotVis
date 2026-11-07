@@ -76,13 +76,17 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
     const apiKey = String(env.OCRSPACE_API_KEY || '').trim();
     if (!apiKey) return { status: 'blocked', reason: 'OCRSPACE_API_KEY is not configured', requests: 0 };
     if (!Buffer.isBuffer(imageBuffer) || !imageBuffer.length) throw fail('Source screenshot is empty.', 'OCRSPACE_INVALID_IMAGE');
+    let sourceMetadata = null;
+    try { sourceMetadata = await imageProcessor.metadata(imageBuffer); } catch {}
+    const sourceWidth = Number(sourceMetadata?.width) > 0 ? Number(sourceMetadata.width) : null;
+    const sourceHeight = Number(sourceMetadata?.height) > 0 ? Number(sourceMetadata.height) : null;
     const png = imageBuffer.length >= 8 && imageBuffer[0] === 0x89 && imageBuffer.subarray(1, 4).toString('ascii') === 'PNG';
     const jpeg = imageBuffer.length >= 3 && imageBuffer[0] === 0xff && imageBuffer[1] === 0xd8 && imageBuffer[2] === 0xff;
     const bmp = imageBuffer.length >= 2 && imageBuffer.subarray(0, 2).toString('ascii') === 'BM';
     const supported = png || jpeg || bmp;
     const upload = imageBuffer.length <= MAX_FREE_FILE_BYTES && supported
         ? { buffer: imageBuffer, filename, mimeType: png ? 'image/png' : jpeg ? 'image/jpeg' : 'image/bmp',
-            bytes: imageBuffer.length, resized: false }
+            bytes: imageBuffer.length, width: sourceWidth, height: sourceHeight, resized: false }
         : await prepareUpload(imageBuffer, MAX_FREE_FILE_BYTES);
     if (!Buffer.isBuffer(upload.buffer) || !upload.buffer.length || upload.buffer.length > MAX_FREE_FILE_BYTES) {
         throw fail('Prepared OCR.Space source is invalid or exceeds the Free API 1 MiB limit.', 'OCRSPACE_FILE_TOO_LARGE');
@@ -137,6 +141,45 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
         timeoutMs: Math.max(1000, Math.min(60000, Number(env.OCRSPACE_PDF_FIRST_TIMEOUT_MS) || 45000)),
         fetchImpl: providerFetch,
     });
+    const uploadWidth = Number(upload.width) > 0 ? Number(upload.width) : null;
+    const uploadHeight = Number(upload.height) > 0 ? Number(upload.height) : null;
+    const orientation = response.textOrientation === null || response.textOrientation === undefined
+        ? null : Number(response.textOrientation);
+    const sourceAspect = sourceWidth && sourceHeight ? sourceWidth / sourceHeight : null;
+    const uploadAspect = uploadWidth && uploadHeight ? uploadWidth / uploadHeight : null;
+    const aspectMatches = Number.isFinite(sourceAspect) && Number.isFinite(uploadAspect) &&
+        Math.abs(sourceAspect - uploadAspect) <= Math.max(0.002, sourceAspect * 0.002);
+    const canMapOverlay = orientation === 0 && aspectMatches;
+    const overlayTransformToOriginalScreenshot = canMapOverlay ? {
+        scaleX: sourceWidth / uploadWidth, scaleY: sourceHeight / uploadHeight,
+        offsetX: 0, offsetY: 0,
+    } : null;
+    const overlay = (Array.isArray(response.overlay) ? response.overlay : []).slice(0, 500).map(word => {
+        const providerPolygon = [
+            Number(word.left), Number(word.top),
+            Number(word.left) + Number(word.width), Number(word.top),
+            Number(word.left) + Number(word.width), Number(word.top) + Number(word.height),
+            Number(word.left), Number(word.top) + Number(word.height),
+        ];
+        const originalPolygon = overlayTransformToOriginalScreenshot
+            ? providerPolygon.map((value, index) => value * (index % 2 === 0
+                ? overlayTransformToOriginalScreenshot.scaleX : overlayTransformToOriginalScreenshot.scaleY))
+            : null;
+        const originalCoordinateGeometryValid = Boolean(originalPolygon &&
+            originalPolygon.every(Number.isFinite) && originalPolygon.every((value, index) =>
+                value >= 0 && value <= (index % 2 === 0 ? sourceWidth : sourceHeight)));
+        return {
+            ...word,
+            providerPolygon,
+            originalPolygon: originalCoordinateGeometryValid ? originalPolygon : null,
+            geometryValid: providerPolygon.length === 8 && providerPolygon.every(Number.isFinite),
+            originalCoordinateGeometryValid,
+            coordinateSpace: originalCoordinateGeometryValid ? 'original-screenshot-pixels' : 'provider-upload-pixels',
+            originalScreenshotSha256: sourceSha256,
+            providerInputSha256: uploadSha256,
+            transformToOriginalScreenshot: originalCoordinateGeometryValid ? overlayTransformToOriginalScreenshot : null,
+        };
+    });
     const pdfUrl = safeSearchablePdfUrl(response.searchablePdfUrl);
     if (!pdfUrl) throw fail('OCR.Space Engine 2 did not return SearchablePDFURL; local OCR from the original screenshot is not substituted.', 'OCRSPACE_SEARCHABLE_PDF_MISSING');
     const pdfBuffer = await downloadPdf(pdfUrl, { fetchImpl: providerFetch });
@@ -154,7 +197,13 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
         requests: requestCount, httpRequestCount: requestCount, providerRequestIds,
         startedAt: new Date(startedAt).toISOString(), completedAt: new Date().toISOString(),
         elapsedMs: Date.now() - startedAt, providerProcessingTimeMs: Number(response.processingTimeMs) || null,
-        uploadWidth: upload.width || null, uploadHeight: upload.height || null,
+        originalScreenshotWidth: sourceWidth, originalScreenshotHeight: sourceHeight,
+        uploadWidth, uploadHeight,
+        overlay, overlayWordCount: overlay.length,
+        overlayCoordinateSpace: overlay.some(word => word.originalCoordinateGeometryValid)
+            ? 'original-screenshot-pixels' : 'provider-upload-pixels',
+        overlayTransformToOriginalScreenshot,
+        textOrientation: orientation,
         uploadResized: upload.resized === true, uploadQuality: upload.quality || null,
         pdfBytes: pdfBuffer.length, pdfSha256: crypto.createHash('sha256').update(pdfBuffer).digest('hex'),
         rasterBytes: rasterBuffer.length, rasterSha256: crypto.createHash('sha256').update(rasterBuffer).digest('hex'),
