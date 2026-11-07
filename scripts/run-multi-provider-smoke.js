@@ -146,7 +146,6 @@ async function main() {
         networkRestriction: {
             enabled: process.env.OCR_NON_OCR_NETWORK_RESTRICTED === '1',
             guardLoadedBeforeBot: process.env.OCR_NON_OCR_NETWORK_RESTRICTED === '1',
-            azureExactHostAllowlistEnabled: process.env.AZURE_DOCUMENT_INTELLIGENCE_NETWORK_ALLOWLIST === '1',
             ocrSpaceProviderEnabled: process.env.OCRSPACE_ENABLED === '1',
             ocrSpaceExactHostAllowlistEnabled: process.env.OCRSPACE_NETWORK_ALLOWLIST === '1',
             azureProviderEnabled: process.env.AZURE_DOCUMENT_INTELLIGENCE_ENABLED === '1',
