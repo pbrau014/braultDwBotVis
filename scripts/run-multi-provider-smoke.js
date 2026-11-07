@@ -104,7 +104,8 @@ async function main() {
             reason: value.reason || null,
         };
     }
-    const networkLogPath = String(process.env.OCR_NON_OCR_NETWORK_LOG || '').trim();
+    const networkRestrictionEnabled = process.env.OCR_NON_OCR_NETWORK_RESTRICTED === '1';
+    const networkLogPath = networkRestrictionEnabled ? String(process.env.OCR_NON_OCR_NETWORK_LOG || '').trim() : '';
     let networkLog = { pathConfigured: Boolean(networkLogPath), present: false, blockedAttemptCount: null, sha256: null };
     if (networkLogPath) {
         const absoluteLogPath = path.resolve(root, networkLogPath);
@@ -147,7 +148,7 @@ async function main() {
         },
         disclaimer: 'Connectivity and evidence-capture smoke test only. Provider participation does not establish OCR accuracy or release acceptance. Restricted egress is enforced at the Node process level only; it is not an OS-level sandbox.',
         networkRestriction: {
-            enabled: process.env.OCR_NON_OCR_NETWORK_RESTRICTED === '1',
+            enabled: networkRestrictionEnabled,
             guardLoadedBeforeBot: process.env.OCR_NON_OCR_NETWORK_RESTRICTED === '1',
             ocrSpaceProviderEnabled: process.env.OCRSPACE_ENABLED === '1',
             ocrSpaceExactHostAllowlistEnabled: process.env.OCRSPACE_NETWORK_ALLOWLIST === '1',
