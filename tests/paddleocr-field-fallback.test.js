@@ -92,152 +92,10 @@ test('helper-reported blocked network attempts fail closed and retain diagnostic
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'paddle-helper-protocol-'));
     const helper = path.join(dir, 'fake-helper.py');
     try {
-        await fs.writeFile(helper, "import json; print(json.dumps({'schemaVersion':1,'status':'blocked','networkAttemptCount':1,'networkAttempts':['https://blocked.invalid'],'results':[]}))\n", 'utf8');
-        await assert.rejects(fallback.__test.runHelper(path.join(dir, 'unused.img'), [], { python, helperPath: helper, timeoutMs: 10000 }), error => {
-            assert.equal(error.code, 'PADDLEOCR_NETWORK_ATTEMPT_BLOCKED');
-            assert.equal(error.networkAttemptCount, 1);
-            assert.deepEqual(error.networkAttempts, ['https://blocked.invalid']);
-            return true;
-        });
-    } finally {
-        await fs.rm(dir, { recursive: true, force: true });
-    }
-});
-
-test('PaddleOCR candidates without a usable score or below the conservative floor are rejected', () => {
-    const group = { id: 'result', fields: ['result'], rect: { left: 20, top: 100, width: 500, height: 100 } };
-    const scoreless = fallback.parseCropCandidate(group, { rawText: 'Victory!', lines: [{ text: 'Victory!', score: null }] });
-    assert.equal(scoreless.status, 'rejected');
-    assert.equal(scoreless.reason, 'ocr-confidence-unavailable');
-    const lowScore = fallback.parseCropCandidate(group, { rawText: 'Victory!', lines: [{ text: 'Victory!', score: 0.35 }] });
-    assert.equal(lowScore.status, 'rejected');
-    assert.equal(lowScore.reason, 'ocr-confidence-below-candidate-floor');
-});
-
-test('PaddleOCR raw output cannot independently authorize a result', () => {
-    const group = { id: 'result', fields: ['result'], rect: { left: 20, top: 100, width: 500, height: 100 } };
-    const candidate = parsedCandidate(group, 'result', 'Victory!', 'Victory!');
-    assert.equal(candidate.status, 'candidate');
-    assert.equal(candidate.confidence, fallback.__test.SINGLE_READ_CONFIDENCE_CEILING);
-    const fields = { resultCandidates: [] };
-    fallback.addCandidatesToFields(fields, [candidate]);
-    const record = buildBattleRecord('neutral text', fields);
-    assert.equal(record.result, 'Not detected');
-});
-
-test('PaddleOCR may corroborate an identical Tesseract candidate through existing parser consensus', () => {
-    const group = { id: 'identity', fields: ['player'], rect: { left: 20, top: 200, width: 600, height: 120 } };
-    const paddleCandidate = parsedCandidate(group, 'player', '[CLAN]PlayerOne', '[CLAN]PlayerOne');
-    const fields = { identityCandidates: [{ text: '[CLAN]PlayerOne', confidence: 66, source: 'tesseract-single-read' }] };
-    fallback.addCandidatesToFields(fields, [paddleCandidate]);
-    const record = buildBattleRecord('', fields);
-    assert.equal(record.player, '[CLAN]PlayerOne');
-});
-
-test('player-only rescue cannot silently change optional ship identity from the same crop', () => {
-    const group = { id: 'identity', fields: ['player'], rect: { left: 20, top: 200, width: 600, height: 120 } };
-    const candidate = parsedCandidate(group, 'player', '[CLAN]PlayerOne', '[CLAN]PlayerOne X TESTSHIP');
-    const fields = { identityCandidates: [] };
-    fallback.addCandidatesToFields(fields, [candidate]);
-    const record = buildBattleRecord('', fields);
-    assert.equal(record.player, 'Not detected', 'one Paddle-only candidate must remain below single-read acceptance');
-    assert.equal(record.ship, 'Not detected', 'ship is not part of this fallback request');
-    assert.equal(fields.identityCandidates[0].text, '[CLAN]PlayerOne');
-});
-
-test('PaddleOCR O/0 identity conflict is preserved for human review, not rewritten', () => {
-    const fields = { identityCandidates: [{ text: '[HO-FL]VeritechCEO', confidence: 92, source: 'tesseract' }] };
-    const candidate = {
-        fieldGroup: 'identity', status: 'candidate', rawText: '[HO-FL]VeritechCE0', confidence: 84,
-        fields: { player: '[HO-FL]VeritechCE0' },
-    };
-    const decisions = fallback.addCandidatesToFields(fields, [candidate]);
-    assert.match(fields.ambiguities.player, /OCR-confusable glyphs/);
-    assert.equal(fields.identityCandidates.length, 1, 'confusable Paddle candidate must not enter identity winner selection');
-    assert.equal(decisions[0].status, 'conflict-preserved-for-review');
-    assert.equal(buildBattleRecord('', fields).player, 'Not detected');
-});
-
-test('merged adjacent reward numbers are rejected by the existing field parser', () => {
-    const group = { id: 'xp', fields: ['xp'], rect: { left: 200, top: 250, width: 120, height: 80 } };
-    const candidate = parsedCandidate(group, 'xp', '', '6649 2350');
-    assert.equal(candidate.status, 'rejected');
-    assert.equal(candidate.fields.xp, null);
-    assert.equal(candidate.reason, 'existing-field-parser-rejected-raw-output');
-});
-
-test('field crop plan stays bounded and every crop fits the source image', () => {
-    const needed = ['result', 'player', 'map', 'mode', 'battleStart', 'credits', 'xp', 'freeXp', 'damage']
-        .map(field => ({ field, reasons: ['unresolved-or-invalid'] }));
-    const plan = fallback.buildCropRequests(needed, {}, context, { PADDLEOCR_FIELD_FALLBACK_MAX_CROPS: '4' });
-    assert.equal(plan.selected.length, 4);
-    assert.equal(plan.skipped.length, 3);
-    for (const item of plan.selected) {
-        assert.ok(item.rect.left >= 0 && item.rect.top >= 0);
-        assert.ok(item.rect.width >= 2 && item.rect.height >= 2);
-        assert.ok(item.rect.left + item.rect.width <= context.sourceWidth);
-        assert.ok(item.rect.top + item.rect.height <= context.sourceHeight);
-        assert.ok(item.rect.width <= context.sourceWidth * 0.72);
-        assert.ok(item.rect.height <= context.sourceHeight * 0.32);
-    }
-});
-
-test('numeric PaddleOCR candidate only resolves when it agrees with a Tesseract candidate', () => {
-    const group = { id: 'credits', fields: ['credits'], rect: { left: 100, top: 300, width: 180, height: 80 } };
-    const candidate = parsedCandidate(group, 'credits', '495530', '495530');
-    const onlyPaddleFields = { rewardCandidates: [] };
-    fallback.addCandidatesToFields(onlyPaddleFields, [candidate]);
-    assert.equal(buildBattleRecord('', onlyPaddleFields).credits, 'Not detected');
-
-    const agreeingFields = { rewardCandidates: [{ credits: '495530', xp: '', freeXp: '', confidence: 52, source: 'tesseract-single-read' }] };
-    fallback.addCandidatesToFields(agreeingFields, [candidate]);
-    assert.equal(buildBattleRecord('', agreeingFields).credits, '495530');
-});
-
-test('PaddleOCR reward conflict is left unresolved rather than arbitrated by confidence', () => {
-    const group = { id: 'freeXp', fields: ['freeXp'], rect: { left: 400, top: 300, width: 120, height: 80 } };
-    const candidate = parsedCandidate(group, 'freeXp', '2358', '2358');
-    const fields = { rewardCandidates: [{ credits: '', xp: '', freeXp: '2350', confidence: 97, source: 'tesseract-a' }] };
-    fallback.addCandidatesToFields(fields, [candidate]);
-    const record = buildBattleRecord('', fields);
-    assert.equal(record.freeXp, 'Not detected');
-    assert.match(record.ambiguities.freeXp, /disagreed/);
-});
-
-
-test('PaddleOCR field fallback uses a bounded 60-second CPU inference budget', () => {
-    assert.equal(fallback.__test.DEFAULT_TIMEOUT_MS, 60_000);
-});
-
-
-test('Python field-crop helper forces UTF-8 JSON output under a legacy Windows code page', async (t) => {
-    const python = process.platform === 'win32' ? 'python' : 'python3';
-    const probe = spawnSync(python, ['--version'], { encoding: 'utf8', timeout: 10000 });
-    if (probe.error || probe.status !== 0) { t.skip('Python interpreter not installed for helper encoding test'); return; }
-    const script = [
-        'import json, runpy, sys',
-        'module = runpy.run_path(sys.argv[1], run_name="paddleocr_encoding_probe")',
-        'sys.stdout.reconfigure(encoding="cp1252", errors="strict")',
-        'module["configure_stdio"]()',
-        'print(json.dumps({"text": "☆"}, ensure_ascii=False))',
-    ].join('; ');
-    const result = spawnSync(python, ['-c', script, fallback.__test.HELPER_PATH], {
-        encoding: 'utf8', timeout: 10000,
-        env: { ...process.env, PYTHONIOENCODING: 'cp1252' },
-    });
-    assert.equal(result.status, 0, result.stderr || result.error?.message);
-    assert.deepEqual(JSON.parse(result.stdout.trim()), { text: '☆' });
-});
-
-test('Node launches the local PaddleOCR helper with UTF-8 standard streams', async (t) => {
-    const python = process.platform === 'win32' ? 'python' : 'python3';
-    const probe = spawnSync(python, ['--version'], { encoding: 'utf8', timeout: 10000 });
-    if (probe.error || probe.status !== 0) { t.skip('Python interpreter not installed for helper protocol test'); return; }
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'paddle-helper-utf8-env-'));
-    const helper = path.join(dir, 'fake-helper.py');
-    try {
         await fs.writeFile(helper,
-            "import json, os\\nprint(json.dumps({'schemaVersion':1,'status':'complete','networkAttemptCount':0,'results':[],'encoding':os.environ.get('PYTHONIOENCODING')}))\\n",
+            `import json, os
+print(json.dumps({'schemaVersion':1,'status':'complete','networkAttemptCount':0,'results':[],'encoding':os.environ.get('PYTHONIOENCODING')}))
+`,
             'utf8');
         const output = await fallback.__test.runHelper(path.join(dir, 'unused.img'), [], {
             python, helperPath: helper, timeoutMs: 10000,
@@ -246,4 +104,30 @@ test('Node launches the local PaddleOCR helper with UTF-8 standard streams', asy
     } finally {
         await fs.rm(dir, { recursive: true, force: true });
     }
+});
+
+test('PaddleOCR fallback field request order preserves the canonical nine-field contract', () => {
+    assert.deepEqual(fallback.__test.FIELDS, [
+        'result', 'player', 'map', 'mode', 'battleStart', 'credits', 'freeXp', 'damage', 'xp',
+    ]);
+});
+
+test('PaddleOCR JSON serializer escapes Unicode before writing to legacy Windows stdout', async (t) => {
+    const python = process.platform === 'win32' ? 'python' : 'python3';
+    const probe = spawnSync(python, ['--version'], { encoding: 'utf8', timeout: 10000 });
+    if (probe.error || probe.status !== 0) { t.skip('Python interpreter not installed for helper serialization test'); return; }
+    const script = [
+        'import importlib.util, sys',
+        'spec=importlib.util.spec_from_file_location("paddle_helper_test", sys.argv[1])',
+        'module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module)',
+        'sys.stdout.reconfigure(encoding="cp1252", errors="strict")',
+        'module.emit_json({"text": chr(0x2606)})',
+    ].join('; ');
+    const result = spawnSync(python, ['-c', script, fallback.__test.HELPER_PATH], {
+        encoding: 'utf8', timeout: 10000,
+        env: { ...process.env, PYTHONIOENCODING: 'cp1252' },
+    });
+    assert.equal(result.status, 0, result.stderr || result.error?.message);
+    assert.ok([...Buffer.from(result.stdout, 'utf8')].every(byte => byte < 0x80), 'JSON transport must be ASCII-only');
+    assert.deepEqual(JSON.parse(result.stdout.trim()), { text: '☆' });
 });

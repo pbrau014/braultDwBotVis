@@ -16,7 +16,7 @@ const {
 const { parseLocalizedNumericField, extractFocusedDamage, normaliseOcrNumber } = require('./number-parser');
 
 const HELPER_PATH = path.join(__dirname, '..', 'scripts', 'paddleocr_field_crops.py');
-const FIELDS = ['result', 'player', 'map', 'mode', 'battleStart', 'credits', 'xp', 'freeXp', 'damage'];
+const FIELDS = ['result', 'player', 'map', 'mode', 'battleStart', 'credits', 'freeXp', 'damage', 'xp'];
 const MAX_GROUPS = 7;
 const SINGLE_READ_CONFIDENCE_CEILING = 84;
 // Candidate scores are not calibrated probabilities. This low floor only filters
