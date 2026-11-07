@@ -40,7 +40,14 @@ The XP regression remains mandatory: accept the exact expected value `6646`; rej
 
 The current `main` package scripts and Gate B evaluator/workflow still contain 19-image selection assumptions. They are not compliant with this policy and must not be used to claim Gate B acceptance. A future implementation must introduce a source-bound 50+ inventory and corresponding evaluator/verifier contracts, retain 100 as the preferred target, and include tests proving that fewer than 50 eligible images fail closed. Do this only after the existing Gate A/B artifacts have been internally inspected and reconciled, so historical evidence is not altered or misrepresented.
 
-## Current evidence status
+## Cross-source inventory lineage reconciliation — 2026-11-07
+
+A separate Library manifest, `DWBOT_IMAGESF_HOLDOUT_CANDIDATE_MANIFEST.json`, reports that a referenced 56-image review workbook has 46 populated rows, including 36 complete nine-field rows, 10 partial rows, and 10 eligible candidate images without a row. The manifest explicitly says it is only an integrity inventory, not full expected-value ground truth. The exact workbook `dwbot_56_image_ground_truth_review(3).xlsx` is not present in the accessible Library or current conversation. Do not count its 36 reported rows as verified labels.
+
+The accessible `DWBOT_IMAGESF_63_ground_truth_working_v6.xlsx` and repository v6 JSON are a distinct 63-image working inventory with 21 complete eligible nine-field records and 42 partial records. PR #19's current CI audit reproduces 21/63 and a 29-record shortfall. Keep these inventory lineages separate. If the 56-workbook's 36 complete rows are later recovered and reconciled, the possible shortfall would be 14, but that is not the current verified count.
+
+PR #19's audit currently validates source-image SHA-256 syntax, byte count, and dimensions as metadata only; it does not recompute source-image hashes from original image bytes. The separate archive/member reconciliation remains required. A new report field and test now state this limitation explicitly.
+
 
 - Gate A: NOT PASSED.
 - Gate B: NOT PASSED.
