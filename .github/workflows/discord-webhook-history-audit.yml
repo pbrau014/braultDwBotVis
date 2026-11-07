@@ -1,0 +1,55 @@
+name: DWBOT Discord webhook exposure audit (redacted)
+
+on:
+  push:
+    branches:
+      - main
+      - security/discord-webhook-history-audit
+    paths:
+      - 'scripts/audit-discord-webhook-history.js'
+      - 'tests/discord-webhook-history-audit.test.js'
+      - '.github/workflows/discord-webhook-history-audit.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/audit-discord-webhook-history.js'
+      - 'tests/discord-webhook-history-audit.test.js'
+      - '.github/workflows/discord-webhook-history-audit.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: discord-webhook-audit-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    name: Scan current tree and full available Git history without printing secrets
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout complete history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up Node.js 22.16.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22.16.0
+          package-manager-cache: false
+      - name: Test redacted scanner
+        run: node --test tests/discord-webhook-history-audit.test.js
+      - name: Scan current tracked files and all fetched refs
+        run: node scripts/audit-discord-webhook-history.js --output "$RUNNER_TEMP/discord-webhook-history-audit.json"
+      - name: Retain redacted security audit report
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: discord-webhook-history-audit-${{ github.run_id }}
+          path: ${{ runner.temp }}/discord-webhook-history-audit.json
+          if-no-files-found: warn
+          retention-days: 30
