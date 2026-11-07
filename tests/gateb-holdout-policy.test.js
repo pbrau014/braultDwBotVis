@@ -179,3 +179,15 @@ test('current repository ground truth is correctly reported as 21 eligible, not 
   assert.equal(report.independence.developmentOverlapCount, 0);
   assert.equal(report.independence.regressionOverlapCount, 0);
 });
+
+test('an inferred or illegible status cannot count even if its eligibility flag is accidentally true', () => {
+  const groundTruth = makeGroundTruth(50);
+  groundTruth.records[0].fieldStatus.xp.status = 'MISSING_NOT_INFERRED';
+  const report = auditGateBInventory({
+    groundTruth,
+    developmentGroundTruth: makeDevelopmentGroundTruth(),
+    regressionImageHashes: makeRegressionHashes(),
+  });
+  assert.equal(report.eligibleIndependentNineFieldImageCount, 49);
+  assert.equal(report.rejected.incompleteNineFieldLabels, 1);
+});
