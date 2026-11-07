@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#091321">
+<title>YOLO Tourney · Workbook Score Calculator</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #0b1220;
+  --panel: #111b2a;
+  --panel-raised: #162235;
+  --line: #29384d;
+  --line-strong: #3a4b63;
+  --text: #e8eef6;
+  --muted: #9aa9bc;
+  --accent: #60a5fa;
+  --accent-ink: #07182c;
+  --danger: #ffb3bd;
+  --danger-bg: #2a1a25;
+  --info: #9dcaff;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+button, input, select { font: inherit; }
+button {
+  appearance: none;
+  border: 1px solid var(--line-strong);
+  border-radius: 7px;
+  padding: 8px 11px;
+  color: var(--text);
+  background: var(--panel-raised);
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease;
+}
+button:hover { background: #1d2d43; border-color: #71849b; }
+button:active { transform: translateY(1px); }
+button:disabled { opacity: .55; cursor: not-allowed; }
+button.primary { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); font-weight: 700; }
+button.primary:hover { background: #93c5fd; }
+button.danger { color: var(--danger); background: var(--danger-bg); border-color: #604050; }
+button.danger:hover { background: #3b2231; border-color: #936075; }
+button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--info); outline-offset: 2px;
+}
+input, select {
+  width: 100%; min-width: 0; padding: 8px 9px;
+  color: var(--text); background: #0b1422; border: 1px solid var(--line-strong); border-radius: 6px;
+}
+input:focus, select:focus { border-color: var(--accent); }
+.shell { max-width: 1440px; margin: 0 auto; padding: 24px clamp(12px, 2.8vw, 32px) 32px; }
+.top { display: flex; justify-content: space-between; align-items: flex-start; gap: 22px; flex-wrap: wrap; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.brand { max-width: 760px; }
+.eyebrow { color: var(--accent); font-size: 10px; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+.top h1 { margin: 5px 0 8px; font-size: clamp(26px, 3vw, 36px); line-height: 1.12; letter-spacing: -.035em; font-weight: 750; }
+.title-accent { color: var(--accent); }
+.top p, .panel p { color: var(--muted); margin: 4px 0 0; }
+.live-status { display: flex; align-items: center; gap: 7px; margin-top: 10px; color: var(--muted); font-size: 12px; }
+.status-dot { width: 6px; height: 6px; flex: 0 0 6px; border-radius: 50%; background: var(--accent); }
+.top-actions { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 16px 0; }
+.stat, .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; box-shadow: none; }
+.stat { min-width: 0; padding: 13px 14px; }
+.stat span { display: block; color: var(--muted); font-size: 12px; }
+.stat strong { display: block; margin-top: 5px; font-size: 22px; font-weight: 700; line-height: 1.2; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.stat strong small { color: var(--muted); font-size: 11px; font-weight: 500; letter-spacing: 0; }
+.cyan, .magenta, .gold, .violet { color: var(--text); }
+.tabs { display: flex; flex-wrap: wrap; gap: 5px; padding: 5px; margin: 18px 0 12px; border: 1px solid var(--line); border-radius: 9px; background: #0e1725; }
+.tabs button { border-color: transparent; color: var(--muted); background: transparent; padding: 8px 11px; }
+.tabs button:hover { color: var(--text); background: var(--panel-raised); }
+.tabs button.active { color: var(--accent-ink); background: var(--accent); font-weight: 700; }
+.panel { margin: 0 0 14px; padding: 17px; }
+.panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 13px; }
+.panel h2 { margin: 0; font-size: 18px; line-height: 1.3; letter-spacing: -.015em; }
+.panel-head p { font-size: 13px; }
+.controls { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 9px; }
+.field { display: flex; min-width: 105px; flex-direction: column; gap: 4px; }
+.field.pool { width: 130px; }
+.field label { color: var(--muted); font-size: 11px; font-weight: 650; }
+.chip { display: inline-flex; align-items: center; padding: 4px 8px; border: 1px solid var(--line-strong); border-radius: 5px; color: var(--muted); background: #0d1725; font-size: 11px; font-weight: 600; }
+.table-wrap { max-width: 100%; overflow: auto; border: 1px solid var(--line); border-radius: 8px; }
+table { width: 100%; min-width: 980px; border-collapse: separate; border-spacing: 0; background: #0e1725; }
+table.summary-table { min-width: 620px; }
+th, td { padding: 9px 10px; border-bottom: 1px solid #253348; border-right: 1px solid #1e2b3e; text-align: left; vertical-align: middle; }
+th { position: sticky; top: 0; z-index: 1; color: #bfcbd9; background: #172437; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .045em; white-space: nowrap; }
+td:last-child, th:last-child { border-right: 0; }
+tr:last-child td { border-bottom: 0; }
+tbody tr:hover td { background: #111e30; }
+td input, td select { min-width: 62px; padding: 7px; }
+td.name { min-width: 148px; }
+td.name input { min-width: 142px; }
+td.result { color: var(--accent); font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.money { color: #b8cbe3; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.rank { display: inline-flex; min-width: 25px; height: 25px; align-items: center; justify-content: center; border: 1px solid var(--line-strong); border-radius: 6px; color: var(--muted); font-weight: 700; }
+.rank-1 { color: var(--accent); border-color: #315d91; }
+.th-sub { color: var(--muted); font-weight: 450; text-transform: none; letter-spacing: 0; }
+.game-inputs { display: grid; grid-template-columns: repeat(3, minmax(52px, 1fr)); gap: 4px; min-width: 180px; }
+.grand-inputs { grid-template-columns: repeat(5, minmax(46px, 1fr)); min-width: 270px; }
+.hint { margin-top: 12px; padding: 10px 12px; border-left: 2px solid var(--line-strong); border-radius: 0 6px 6px 0; color: var(--muted); background: #0e1725; font-size: 12px; }
+.empty { padding: 28px; color: var(--muted); text-align: center; }
+.footer { margin-top: 22px; color: #78889c; font-size: 11px; text-align: center; }
+.hidden { display: none !important; }
+.mobile-mode .shell { max-width: 100%; padding: 14px 10px 26px; }
+.mobile-mode .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.mobile-mode .stat { padding: 10px; }
+.mobile-mode .tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.mobile-mode .tabs button { width: 100%; font-size: 12px; }
+.mobile-mode .top-actions { width: 100%; }
+.mobile-mode .top-actions button { flex: 1 1 115px; }
+.mobile-mode .controls .field { flex: 1 1 115px; }
+.mobile-mode .table-wrap { max-height: 70vh; }
+.mobile-mode table { min-width: 980px; }
+@media (max-width: 760px) {
+  .shell { padding-top: 15px; }
+  .top { gap: 14px; }
+  .top-actions { width: 100%; }
+  .top-actions button { flex: 1 1 110px; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .stat { padding: 11px; }
+  .stat strong { font-size: 19px; }
+  .tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tabs button { padding: 8px 6px; font-size: 12px; }
+  .panel { padding: 12px; }
+  .panel-head { align-items: flex-start; }
+  .controls .field { flex: 1 1 125px; }
+}
+@media print {
+  :root { color-scheme: light; }
+  body { color: #111; background: #fff; }
+  .shell { max-width: none; padding: 0; }
+  .panel, .stat { color: #111; background: #fff; border-color: #ccc; }
+  .tabs, .top-actions, .no-print, .footer, .hint { display: none !important; }
+  input, select { color: #111; background: #fff; border-color: #ccc; }
+  .table-wrap { overflow: visible; }
+  table { min-width: 0; background: #fff; }
+  th { position: static; color: #111; background: #eee; }
+  td, th { border-color: #ddd; }
+  .money, td.result { color: #111 !important; }
+}
+
+
+/* Minimalist layout refinement: consistent surfaces, restrained accents, clear hierarchy. */
+:root {
+  --bg: #0c1118;
+  --panel: #121a24;
+  --panel-raised: #192430;
+  --line: #263341;
+  --line-strong: #3a4a59;
+  --text: #e7edf3;
+  --muted: #99a7b5;
+  --accent: #60a5fa;
+  --accent-ink: #07182c;
+  --danger: #e6aab0;
+  --danger-bg: #281e25;
+  --info: #a8c8ed;
+}
+body { background: var(--bg); }
+.shell { max-width: 1380px; padding-top: 22px; }
+.top { align-items: center; padding-bottom: 18px; gap: 18px; }
+.top h1 { font-size: clamp(25px, 2.6vw, 32px); letter-spacing: -.025em; }
+.top p { max-width: 720px; }
+.top-actions { gap: 6px; }
+button { min-height: 35px; padding: 7px 10px; border-radius: 6px; }
+button.primary { font-weight: 650; }
+.tabs { position: sticky; top: 0; z-index: 5; gap: 3px; padding: 4px; margin: 14px 0 12px; border-radius: 7px; backdrop-filter: blur(12px); }
+.tabs button { padding: 8px 10px; }
+.stats { gap: 10px; margin: 14px 0; }
+.stat, .panel { border-radius: 8px; }
+.stat { padding: 13px 14px; }
+.stat strong { font-size: 21px; }
+.panel { padding: 16px; margin-bottom: 12px; }
+.panel-head { margin-bottom: 12px; }
+.panel h2 { font-size: 17px; }
+.panel-head p { max-width: 680px; }
+.event-stat { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+.event-stat button { margin-top: auto; white-space: nowrap; }
+.event-stat button span { display: inline; }
+.subhead { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); }
+.table-wrap { border-radius: 7px; }
+table { background: #0f1720; }
+th { color: #bdc8d3; background: #19232f; }
+th, td { padding: 8px 9px; }
+tbody tr:hover td { background: #15202b; }
+input, select { border-radius: 5px; }
+.hint { background: #0f1720; border-left-color: #315d91; }
+.chip { background: #131d27; }
+.footer { margin-top: 18px; }
+@media (max-width: 760px) {
+  .shell { padding: 12px 10px 24px; }
+  .top { align-items: flex-start; }
+  .top-actions { gap: 6px; }
+  .panel { padding: 12px; }
+  .tabs { position: static; }
+  .subhead .top-actions { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .subhead .top-actions button { width: 100%; min-width: 0; flex: none; }
+  .subhead .top-actions button:first-child { grid-column: 1 / -1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}
+
+
+
+
+.field-note { display:block; margin-top:4px; color:var(--muted); font-size:11px; line-height:1.35; }
+
+/* Blue visual system: consistent color hierarchy and clear grouping throughout the app. */
+:root {
+  --bg: #091321;
+  --panel: #101d2e;
+  --panel-raised: #152740;
+  --line: #233c5b;
+  --line-strong: #355a83;
+  --text: #e8f1ff;
+  --muted: #9fb3cc;
+  --accent: #60a5fa;
+  --accent-ink: #07182c;
+  --danger: #f2b7c0;
+  --danger-bg: #2b1d2a;
+  --info: #93c5fd;
+  --blue-line: #2d5d92;
+  --blue-soft: #102641;
+  --blue-wash: #0d1a2c;
+}
+html { background: var(--bg); }
+body { background: radial-gradient(ellipse at 50% -18%, #132b49 0, var(--bg) 48rem); color: var(--text); }
+.meta, .eyebrow { color: #7dbaff; }
+.top { border-bottom-color: #28496f; }
+.top h1 { color: #d8eaff; }
+.title-accent, .eyebrow { color: #73b4ff; }
+.top p, .panel p { color: #a8bfdd; }
+.live-status { color: #a9c4e5; }
+.status-dot { background: #60a5fa; box-shadow: 0 0 0 3px #60a5fa22; }
+button { border-color: #34577e; background: #15263d; }
+button:hover { background: #1b3554; border-color: #66a7f5; }
+button.primary { color: #06182c; background: #60a5fa; border-color: #60a5fa; }
+button.primary:hover { background: #93c5fd; border-color: #93c5fd; }
+button.danger { color: #f3bdc5; background: #2a1d2a; border-color: #674158; }
+button.danger:hover { background: #3a2438; border-color: #a16b91; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline-color: #93c5fd; }
+input, select { color: #e8f1ff; background: #09182b; border-color: #355a83; }
+input:hover, select:hover { border-color: #4c84bf; }
+input:focus, select:focus { border-color: #60a5fa; box-shadow: 0 0 0 2px #60a5fa24; }
+.tabs { background: #0c192b; border-color: #2a4d74; }
+.tabs button { color: #a7bdd7; }
+.tabs button:hover { color: #e8f1ff; background: #152a44; }
+.tabs button.active { color: #07182c; background: #60a5fa; box-shadow: 0 0 0 1px #93c5fd inset; }
+.stats { gap: 11px; }
+.stat, .panel { background: linear-gradient(160deg, #111f32 0%, #0f1b2b 100%); border-color: #27496f; }
+.stat { border-top: 2px solid #315f94; }
+.stat span { color: #a9beda; }
+.stat strong, .neon, .title-accent, td.result { color: #7dbaff; }
+.stat strong small { color: #a8bfdd; }
+.panel { border-left: 3px solid #3b82f6; box-shadow: 0 8px 24px #02081320; }
+.panel-head { padding-bottom: 10px; border-bottom: 1px solid #24466c; }
+.panel h2 { color: #cfe5ff; }
+.panel-head p { color: #a9c7e8; }
+.panel-head .eyebrow { margin-bottom: 3px; }
+.chip { color: #a9d0ff; background: #102744; border-color: #315f94; }
+.controls {
+  padding: 12px;
+  margin: 6px 0 14px;
+  gap: 10px;
+  border: 1px solid #2d5d92;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #10243c, #0d1a2b);
+}
+.field {
+  gap: 5px;
+  padding: 8px;
+  border: 1px solid #29496d;
+  border-radius: 7px;
+  background: #0c1a2c;
+}
+.field label { color: #9fcaff; font-size: 11px; letter-spacing: .015em; }
+.field input, .field select { border-color: #345b85; }
+.table-wrap { border-color: #2b4d74; box-shadow: 0 0 0 1px #0c1a2b inset; }
+table { background: #0b1727; }
+th { color: #c7e1ff; background: #172b43; border-color: #2b4b70; }
+th .th-sub { color: #8fb7e5; }
+th, td { border-bottom-color: #203b5a; border-right-color: #1b304a; }
+tbody tr:hover td { background: #11243b; }
+td.name strong, .summary-table td:first-child { color: #d3e7ff; }
+td.result { color: #82bbff; }
+.money { color: #b4d4fa; }
+.rank { color: #afc7e3; border-color: #375b82; background: #101f32; }
+.rank-1 { color: #8bc2ff; border-color: #4a88cb; background: #122b48; }
+.game-inputs {
+  padding: 5px;
+  gap: 4px;
+  border: 1px solid #2c4f76;
+  border-radius: 7px;
+  background: #0d1b2d;
+  box-shadow: 0 1px 0 #73b4ff0a inset;
+}
+.game-inputs input, .game-inputs select { background: #091729; border-color: #2e5279; }
+.game-inputs input:focus, .game-inputs select:focus { border-color: #60a5fa; }
+.hint { color: #b3c9e4; background: #0e2035; border: 1px solid #2a4f78; border-left: 3px solid #60a5fa; border-radius: 7px; }
+.subhead { border-top-color: #294b72; }
+.event-stat { border-top-color: #3979bd; }
+.event-stat > span:first-child { color: #9fcaff; font-weight: 700; letter-spacing: .025em; }
+.event-stat .muted { color: #a3bad6; }
+.event-stat button { border-color: #345e8b; }
+.footer { color: #7f9ab9; }
+.empty { color: #a3bad6; }
+
+@media (max-width: 760px) {
+  .controls { padding: 9px; gap: 8px; }
+  .field { min-width: 0; padding: 7px; }
+  .panel-head { border-bottom-color: #24466c; }
+  .game-inputs { padding: 4px; }
+}
+@media print {
+  :root { color-scheme: light; }
+  html, body { color: #111; background: #fff !important; }
+  .top { border-color: #ccc; }
+  .top h1, .title-accent, .eyebrow, .panel h2, .panel-head p, .top p { color: #111 !important; }
+  .panel, .stat { color: #111; background: #fff !important; border-color: #ccc; box-shadow: none; }
+  .panel-head { border-color: #ddd; }
+  .stat { border-top-color: #ccc; }
+  .controls, .field, .game-inputs { background: #fff !important; border-color: #ccc; }
+  .field label, .stat span, .hint, .chip, .event-stat > span:first-child { color: #333 !important; }
+  .tabs, .top-actions, .no-print, .footer, .hint { display: none !important; }
+  button, input, select { color: #111 !important; background: #fff !important; border-color: #ccc !important; }
+  .table-wrap { overflow: visible; box-shadow: none; }
+  table { min-width: 0; background: #fff !important; }
+  th { position: static; color: #111 !important; background: #eee !important; }
+  td, th { border-color: #ddd !important; }
+  .money, td.result, .rank { color: #111 !important; }
+}
+
+
+/* Readability upgrade: multiplier controls are self-contained, explanatory cards. */
+body { font-size: 15px; line-height: 1.58; }
+.panel { padding: 19px; }
+.panel h2 { font-size: 19px; line-height: 1.32; }
+.panel-head p, .top p { font-size: 14px; line-height: 1.6; }
+.controls { align-items: stretch; gap: 12px; }
+.field.multiplier-field {
+  flex: 1 1 255px;
+  min-width: 230px;
+  max-width: 390px;
+  align-self: stretch;
+  padding: 12px;
+  border-color: #315985;
+  background: linear-gradient(160deg, #10253d, #0b192a);
+}
+.multiplier-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 30px;
+  margin-bottom: 7px;
+}
+.multiplier-head label { font-size: 13px; line-height: 1.35; color: #c6e1ff; }
+.multiplier-head .reset-one {
+  flex: 0 0 auto;
+  min-height: 29px;
+  padding: 4px 8px;
+  border-color: #35669b;
+  color: #cfe5ff;
+  background: #112a46;
+  font-size: 11px;
+  font-weight: 700;
+}
+.multiplier-head .reset-one:hover { background: #1d4269; border-color: #76b5ff; }
+.multiplier-field input { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.field-note { color: #c0d3e9; font-size: 12px; line-height: 1.55; margin: 9px 0 0; }
+.field-example {
+  margin: 8px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid #294664;
+  color: #90bde9;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.field-example strong { color: #c4e0ff; }
+.field.pool { flex: 0 1 220px; width: 220px; min-width: 190px; }
+.field.pool .field-note { margin: 8px 0 0; }
+.controls .action-group { display: flex; flex: 1 1 100%; flex-wrap: wrap; gap: 8px; padding-top: 12px; border-top: 1px solid #28496e; }
+.controls .action-group button { flex: 0 0 auto; }
+.overview-head-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+button.critical-reset {
+  color: #fff !important;
+  background: #b91c2c !important;
+  border: 1px solid #f05b68 !important;
+  box-shadow: 0 2px 0 #6f1420;
+  font-weight: 800;
+}
+button.critical-reset:hover { background: #d92336 !important; border-color: #ff8c97 !important; }
+button.critical-reset:active { box-shadow: none; }
+.explainer-banner { margin: 10px 0 14px; padding: 13px 15px; border: 1px solid #315b86; border-radius: 8px; background: #0e2035; color: #bdd8f6; font-size: 13px; line-height: 1.6; }
+.explainer-banner strong { color: #e0efff; }
+@media (max-width: 760px) {
+  body { font-size: 14px; }
+  .panel { padding: 13px; }
+  .field.multiplier-field { flex: 1 1 100%; min-width: 0; max-width: none; }
+  .field.pool { flex: 1 1 100%; width: auto; min-width: 0; }
+  .controls .action-group { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .controls .action-group button { width: 100%; min-width: 0; }
+  .overview-head-actions { width: 100%; }
+  .overview-head-actions .critical-reset { width: 100%; }
+}
+@media print {
+  .multiplier-head .reset-one, .critical-reset { display: none !important; }
+  .field-example, .field-note, .explainer-banner { color: #222 !important; background: #fff !important; }
+  .field.multiplier-field { max-width: none; background: #fff !important; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="top">
+    <div class="brand">
+      <div class="eyebrow">Offline tournament toolkit · workbook edition</div>
+      <h1>YOLO TOURNEY <span class="title-accent">Score Calculator</span></h1>
+      <p>Manage your roster, enter results for seven games per round, calculate doubloons, and review season totals. This is a self-contained HTML app—no server, libraries, or linked assets required.</p>
+      <div class="live-status"><span class="status-dot"></span><span id="saveStatus">Ready · changes save locally</span></div>
+    </div>
+    <div class="top-actions no-print">
+      <button class="primary" id="addPlayerTop">＋ Add player</button>
+      <button id="exportBtn">Export backup</button>
+      <button id="importBtn">Import backup</button>
+      <button id="layoutToggle" type="button">Use mobile layout</button>
+      <button onclick="window.print()">Print</button>
+      <input type="file" id="importFile" accept=".json,application/json" class="hidden">
+    </div>
+  </header>
+  <div class="stats">
+    <div class="stat"><span>Players in roster</span><strong id="statPlayers" class="cyan">—</strong></div>
+    <div class="stat"><span>Total doubloons</span><strong id="statDubs" class="magenta">—</strong></div>
+    <div class="stat"><span>Selected event pool</span><strong id="statPool" class="gold">—</strong></div>
+    <div class="stat"><span>Scoring events</span><strong class="violet">04 <small>+ season totals</small></strong></div>
+  </div>
+  <nav class="tabs no-print" id="tabs" aria-label="Tournament sections">
+    <button class="active" data-page="dashboard">Overview</button>
+    <button data-page="damage">Round 1 · Damage</button>
+    <button data-page="kills">Round 2 · Kills</button>
+    <button data-page="race">Round 3 · Race</button>
+    <button data-page="grand">Round 4 · Grand Yolo</button>
+    <button data-page="totals">Tournament totals</button>
+    <button data-page="players">Player roster</button>
+  </nav>
+  <main id="app"></main>
+  <footer class="footer">Single HTML file · Offline-ready · Local browser storage · Export a JSON backup regularly</footer>
+</div>
+<script>
+
+const SEED = [{"id":1,"name":"Player 1","events":{"damage":[{"class":"DD","classWeight":4,"tier":2,"metric":20000},{"class":"DD","classWeight":4,"tier":2,"metric":20000},{"class":"DD","classWeight":4,"tier":2,"metric":20000},{"class":"DD","classWeight":4,"tier":2,"metric":20000},{"class":"DD","classWeight":4,"tier":2,"metric":20000},{"class":"DD","classWeight":4,"tier":2,"metric":20000},{"class":"DD","classWeight":4,"tier":2,"metric":20000}],"kills":[{"class":"DD","classWeight":4,"tier":2,"metric":1},{"class":"DD","classWeight":4,"tier":2,"metric":1},{"class":"DD","classWeight":4,"tier":2,"metric":1},{"class":"DD","classWeight":4,"tier":2,"metric":1},{"class":"DD","classWeight":4,"tier":2,"metric":1},{"class":"DD","classWeight":4,"tier":2,"metric":1},{"class":"DD","classWeight":4,"tier":2,"metric":1}],"race":[{"class":"DD","classWeight":4,"tier":2,"metric":70},{"class":"DD","classWeight":4,"tier":2,"metric":70},{"class":"DD","classWeight":4,"tier":2,"metric":70},{"class":"DD","classWeight":4,"tier":2,"metric":70},{"class":"DD","classWeight":4,"tier":2,"metric":70},{"class":"DD","classWeight":4,"tier":2,"metric":70},{"class":"DD","classWeight":4,"tier":2,"metric":70}],"grand":[{"class":"DD","classWeight":4,"tier":2,"damage":20000,"kills":1,"time":70},{"class":"DD","classWeight":4,"tier":2,"damage":20000,"kills":1,"time":70},{"class":"DD","classWeight":4,"tier":2,"damage":20000,"kills":1,"time":70},{"class":"DD","classWeight":4,"tier":2,"damage":20000,"kills":1,"time":70},{"class":"DD","classWeight":4,"tier":2,"damage":20000,"kills":1,"time":70},{"class":"DD","classWeight":4,"tier":2,"damage":20000,"kills":1,"time":70},{"class":"DD","classWeight":4,"tier":2,"damage":20000,"kills":1,"time":70}]}},{"id":2,"name":"Player 2","events":{"damage":[{"class":"DD","classWeight":4,"tier":3,"metric":30000},{"class":"DD","classWeight":4,"tier":3,"metric":30000},{"class":"DD","classWeight":4,"tier":3,"metric":30000},{"class":"DD","classWeight":4,"tier":3,"metric":30000},{"class":"DD","classWeight":4,"tier":3,"metric":30000},{"class":"DD","classWeight":4,"tier":3,"metric":30000},{"class":"DD","classWeight":4,"tier":3,"metric":30000}],"kills":[{"class":"DD","classWeight":4,"tier":6,"metric":3},{"class":"DD","classWeight":4,"tier":6,"metric":3},{"class":"DD","classWeight":4,"tier":6,"metric":3},{"class":"DD","classWeight":4,"tier":6,"metric":3},{"class":"DD","classWeight":4,"tier":6,"metric":3},{"class":"DD","classWeight":4,"tier":6,"metric":3},{"class":"DD","classWeight":4,"tier":6,"metric":3}],"race":[{"class":"DD","classWeight":4,"tier":6,"metric":80},{"class":"DD","classWeight":4,"tier":6,"metric":80},{"class":"DD","classWeight":4,"tier":6,"metric":80},{"class":"DD","classWeight":4,"tier":6,"metric":80},{"class":"DD","classWeight":4,"tier":6,"metric":80},{"class":"DD","classWeight":4,"tier":6,"metric":80},{"class":"DD","classWeight":4,"tier":6,"metric":80}],"grand":[{"class":"DD","classWeight":4,"tier":6,"damage":25000,"kills":3,"time":80},{"class":"DD","classWeight":4,"tier":6,"damage":25000,"kills":3,"time":80},{"class":"DD","classWeight":4,"tier":6,"damage":25000,"kills":3,"time":80},{"class":"DD","classWeight":4,"tier":6,"damage":25000,"kills":3,"time":80},{"class":"DD","classWeight":4,"tier":6,"damage":25000,"kills":3,"time":80},{"class":"DD","classWeight":4,"tier":6,"damage":25000,"kills":3,"time":80},{"class":"DD","classWeight":4,"tier":6,"damage":25000,"kills":3,"time":80}]}},{"id":3,"name":"Player 3","events":{"damage":[{"class":"DD","classWeight":4,"tier":4,"metric":40000},{"class":"DD","classWeight":4,"tier":4,"metric":40000},{"class":"DD","classWeight":4,"tier":4,"metric":40000},{"class":"DD","classWeight":4,"tier":4,"metric":40000},{"class":"DD","classWeight":4,"tier":4,"metric":40000},{"class":"DD","classWeight":4,"tier":4,"metric":40000},{"class":"DD","classWeight":4,"tier":4,"metric":40000}],"kills":[{"class":"DD","classWeight":4,"tier":10,"metric":6},{"class":"DD","classWeight":4,"tier":10,"metric":6},{"class":"DD","classWeight":4,"tier":10,"metric":6},{"class":"DD","classWeight":4,"tier":10,"metric":6},{"class":"DD","classWeight":4,"tier":10,"metric":6},{"class":"DD","classWeight":4,"tier":10,"metric":6},{"class":"DD","classWeight":4,"tier":10,"metric":6}],"race":[{"class":"DD","classWeight":4,"tier":10,"metric":90},{"class":"DD","classWeight":4,"tier":10,"metric":90},{"class":"DD","classWeight":4,"tier":10,"metric":90},{"class":"DD","classWeight":4,"tier":10,"metric":90},{"class":"DD","classWeight":4,"tier":10,"metric":90},{"class":"DD","classWeight":4,"tier":10,"metric":90},{"class":"DD","classWeight":4,"tier":10,"metric":90}],"grand":[{"class":"DD","classWeight":4,"tier":10,"damage":50000,"kills":6,"time":90},{"class":"DD","classWeight":4,"tier":10,"damage":50000,"kills":6,"time":90},{"class":"DD","classWeight":4,"tier":10,"damage":50000,"kills":6,"time":90},{"class":"DD","classWeight":4,"tier":10,"damage":50000,"kills":6,"time":90},{"class":"DD","classWeight":4,"tier":10,"damage":50000,"kills":6,"time":90},{"class":"DD","classWeight":4,"tier":10,"damage":50000,"kills":6,"time":90},{"class":"DD","classWeight":4,"tier":10,"damage":50000,"kills":6,"time":90}]}},{"id":4,"name":"Player 4","events":{"damage":[{"class":"DD","classWeight":4,"tier":5,"metric":50000},{"class":"DD","classWeight":4,"tier":5,"metric":50000},{"class":"DD","classWeight":4,"tier":5,"metric":50000},{"class":"DD","classWeight":4,"tier":5,"metric":50000},{"class":"DD","classWeight":4,"tier":5,"metric":50000},{"class":"DD","classWeight":4,"tier":5,"metric":50000},{"class":"DD","classWeight":4,"tier":5,"metric":50000}],"kills":[{"class":"CA","classWeight":3,"tier":2,"metric":2},{"class":"CA","classWeight":3,"tier":2,"metric":2},{"class":"CA","classWeight":3,"tier":2,"metric":2},{"class":"CA","classWeight":3,"tier":2,"metric":2},{"class":"CA","classWeight":3,"tier":2,"metric":2},{"class":"CA","classWeight":3,"tier":2,"metric":2},{"class":"CA","classWeight":3,"tier":2,"metric":2}],"race":[{"class":"CA","classWeight":3,"tier":2,"metric":120},{"class":"CA","classWeight":3,"tier":2,"metric":120},{"class":"CA","classWeight":3,"tier":2,"metric":120},{"class":"CA","classWeight":3,"tier":2,"metric":120},{"class":"CA","classWeight":3,"tier":2,"metric":120},{"class":"CA","classWeight":3,"tier":2,"metric":120},{"class":"CA","classWeight":3,"tier":2,"metric":120}],"grand":[{"class":"CA","classWeight":3,"tier":2,"damage":22000,"kills":2,"time":120},{"class":"CA","classWeight":3,"tier":2,"damage":22000,"kills":2,"time":120},{"class":"CA","classWeight":3,"tier":2,"damage":22000,"kills":2,"time":120},{"class":"CA","classWeight":3,"tier":2,"damage":22000,"kills":2,"time":120},{"class":"CA","classWeight":3,"tier":2,"damage":22000,"kills":2,"time":120},{"class":"CA","classWeight":3,"tier":2,"damage":22000,"kills":2,"time":120},{"class":"CA","classWeight":3,"tier":2,"damage":22000,"kills":2,"time":120}]}},{"id":5,"name":"Player 3","events":{"damage":[{"class":"DD","classWeight":4,"tier":6,"metric":60000},{"class":"DD","classWeight":4,"tier":6,"metric":60000},{"class":"DD","classWeight":4,"tier":6,"metric":60000},{"class":"DD","classWeight":4,"tier":6,"metric":60000},{"class":"DD","classWeight":4,"tier":6,"metric":60000},{"class":"DD","classWeight":4,"tier":6,"metric":60000},{"class":"DD","classWeight":4,"tier":6,"metric":60000}],"kills":[{"class":"CA","classWeight":3,"tier":6,"metric":4},{"class":"CA","classWeight":3,"tier":6,"metric":4},{"class":"CA","classWeight":3,"tier":6,"metric":4},{"class":"CA","classWeight":3,"tier":6,"metric":4},{"class":"CA","classWeight":3,"tier":6,"metric":4},{"class":"CA","classWeight":3,"tier":6,"metric":4},{"class":"CA","classWeight":3,"tier":6,"metric":4}],"race":[{"class":"CA","classWeight":3,"tier":6,"metric":130},{"class":"CA","classWeight":3,"tier":6,"metric":130},{"class":"CA","classWeight":3,"tier":6,"metric":130},{"class":"CA","classWeight":3,"tier":6,"metric":130},{"class":"CA","classWeight":3,"tier":6,"metric":130},{"class":"CA","classWeight":3,"tier":6,"metric":130},{"class":"CA","classWeight":3,"tier":6,"metric":130}],"grand":[{"class":"CA","classWeight":3,"tier":6,"damage":31000,"kills":4,"time":130},{"class":"CA","classWeight":3,"tier":6,"damage":31000,"kills":4,"time":130},{"class":"CA","classWeight":3,"tier":6,"damage":31000,"kills":4,"time":130},{"class":"CA","classWeight":3,"tier":6,"damage":31000,"kills":4,"time":130},{"class":"CA","classWeight":3,"tier":6,"damage":31000,"kills":4,"time":130},{"class":"CA","classWeight":3,"tier":6,"damage":31000,"kills":4,"time":130},{"class":"CA","classWeight":3,"tier":6,"damage":31000,"kills":4,"time":130}]}},{"id":6,"name":"Player 6","events":{"damage":[{"class":"DD","classWeight":4,"tier":7,"metric":70000},{"class":"DD","classWeight":4,"tier":7,"metric":70000},{"class":"DD","classWeight":4,"tier":7,"metric":70000},{"class":"DD","classWeight":4,"tier":7,"metric":70000},{"class":"DD","classWeight":4,"tier":7,"metric":70000},{"class":"DD","classWeight":4,"tier":7,"metric":70000},{"class":"DD","classWeight":4,"tier":7,"metric":70000}],"kills":[{"class":"CA","classWeight":3,"tier":10,"metric":7},{"class":"CA","classWeight":3,"tier":10,"metric":7},{"class":"CA","classWeight":3,"tier":10,"metric":7},{"class":"CA","classWeight":3,"tier":10,"metric":7},{"class":"CA","classWeight":3,"tier":10,"metric":7},{"class":"CA","classWeight":3,"tier":10,"metric":7},{"class":"CA","classWeight":3,"tier":10,"metric":7}],"race":[{"class":"CA","classWeight":3,"tier":10,"metric":140},{"class":"CA","classWeight":3,"tier":10,"metric":140},{"class":"CA","classWeight":3,"tier":10,"metric":140},{"class":"CA","classWeight":3,"tier":10,"metric":140},{"class":"CA","classWeight":3,"tier":10,"metric":140},{"class":"CA","classWeight":3,"tier":10,"metric":140},{"class":"CA","classWeight":3,"tier":10,"metric":140}],"grand":[{"class":"CA","classWeight":3,"tier":10,"damage":75000,"kills":7,"time":140},{"class":"CA","classWeight":3,"tier":10,"damage":75000,"kills":7,"time":140},{"class":"CA","classWeight":3,"tier":10,"damage":75000,"kills":7,"time":140},{"class":"CA","classWeight":3,"tier":10,"damage":75000,"kills":7,"time":140},{"class":"CA","classWeight":3,"tier":10,"damage":75000,"kills":7,"time":140},{"class":"CA","classWeight":3,"tier":10,"damage":75000,"kills":7,"time":140},{"class":"CA","classWeight":3,"tier":10,"damage":75000,"kills":7,"time":140}]}},{"id":7,"name":"Player 7","events":{"damage":[{"class":"DD","classWeight":4,"tier":8,"metric":80000},{"class":"DD","classWeight":4,"tier":8,"metric":80000},{"class":"DD","classWeight":4,"tier":8,"metric":80000},{"class":"DD","classWeight":4,"tier":8,"metric":80000},{"class":"DD","classWeight":4,"tier":8,"metric":80000},{"class":"DD","classWeight":4,"tier":8,"metric":80000},{"class":"DD","classWeight":4,"tier":8,"metric":80000}],"kills":[{"class":"BB","classWeight":2,"tier":2,"metric":3},{"class":"BB","classWeight":2,"tier":2,"metric":3},{"class":"BB","classWeight":2,"tier":2,"metric":3},{"class":"BB","classWeight":2,"tier":2,"metric":3},{"class":"BB","classWeight":2,"tier":2,"metric":3},{"class":"BB","classWeight":2,"tier":2,"metric":3},{"class":"BB","classWeight":2,"tier":2,"metric":3}],"race":[{"class":"BB","classWeight":2,"tier":2,"metric":190},{"class":"BB","classWeight":2,"tier":2,"metric":190},{"class":"BB","classWeight":2,"tier":2,"metric":190},{"class":"BB","classWeight":2,"tier":2,"metric":190},{"class":"BB","classWeight":2,"tier":2,"metric":190},{"class":"BB","classWeight":2,"tier":2,"metric":190},{"class":"BB","classWeight":2,"tier":2,"metric":190}],"grand":[{"class":"BB","classWeight":2,"tier":2,"damage":32000,"kills":3,"time":190},{"class":"BB","classWeight":2,"tier":2,"damage":32000,"kills":3,"time":190},{"class":"BB","classWeight":2,"tier":2,"damage":32000,"kills":3,"time":190},{"class":"BB","classWeight":2,"tier":2,"damage":32000,"kills":3,"time":190},{"class":"BB","classWeight":2,"tier":2,"damage":32000,"kills":3,"time":190},{"class":"BB","classWeight":2,"tier":2,"damage":32000,"kills":3,"time":190},{"class":"BB","classWeight":2,"tier":2,"damage":32000,"kills":3,"time":190}]}},{"id":8,"name":"Player 8","events":{"damage":[{"class":"DD","classWeight":4,"tier":9,"metric":90000},{"class":"DD","classWeight":4,"tier":9,"metric":90000},{"class":"DD","classWeight":4,"tier":9,"metric":90000},{"class":"DD","classWeight":4,"tier":9,"metric":90000},{"class":"DD","classWeight":4,"tier":9,"metric":90000},{"class":"DD","classWeight":4,"tier":9,"metric":90000},{"class":"DD","classWeight":4,"tier":9,"metric":90000}],"kills":[{"class":"BB","classWeight":2,"tier":6,"metric":5},{"class":"BB","classWeight":2,"tier":6,"metric":5},{"class":"BB","classWeight":2,"tier":6,"metric":5},{"class":"BB","classWeight":2,"tier":6,"metric":5},{"class":"BB","classWeight":2,"tier":6,"metric":5},{"class":"BB","classWeight":2,"tier":6,"metric":5},{"class":"BB","classWeight":2,"tier":6,"metric":5}],"race":[{"class":"BB","classWeight":2,"tier":6,"metric":200},{"class":"BB","classWeight":2,"tier":6,"metric":200},{"class":"BB","classWeight":2,"tier":6,"metric":200},{"class":"BB","classWeight":2,"tier":6,"metric":200},{"class":"BB","classWeight":2,"tier":6,"metric":200},{"class":"BB","classWeight":2,"tier":6,"metric":200},{"class":"BB","classWeight":2,"tier":6,"metric":200}],"grand":[{"class":"BB","classWeight":2,"tier":6,"damage":47000,"kills":5,"time":200},{"class":"BB","classWeight":2,"tier":6,"damage":47000,"kills":5,"time":200},{"class":"BB","classWeight":2,"tier":6,"damage":47000,"kills":5,"time":200},{"class":"BB","classWeight":2,"tier":6,"damage":47000,"kills":5,"time":200},{"class":"BB","classWeight":2,"tier":6,"damage":47000,"kills":5,"time":200},{"class":"BB","classWeight":2,"tier":6,"damage":47000,"kills":5,"time":200},{"class":"BB","classWeight":2,"tier":6,"damage":47000,"kills":5,"time":200}]}},{"id":9,"name":"Player 9","events":{"damage":[{"class":"DD","classWeight":4,"tier":10,"metric":100000},{"class":"DD","classWeight":4,"tier":10,"metric":100000},{"class":"DD","classWeight":4,"tier":10,"metric":100000},{"class":"DD","classWeight":4,"tier":10,"metric":100000},{"class":"DD","classWeight":4,"tier":10,"metric":100000},{"class":"DD","classWeight":4,"tier":10,"metric":100000},{"class":"DD","classWeight":4,"tier":10,"metric":100000}],"kills":[{"class":"BB","classWeight":2,"tier":10,"metric":9},{"class":"BB","classWeight":2,"tier":10,"metric":9},{"class":"BB","classWeight":2,"tier":10,"metric":9},{"class":"BB","classWeight":2,"tier":10,"metric":9},{"class":"BB","classWeight":2,"tier":10,"metric":9},{"class":"BB","classWeight":2,"tier":10,"metric":9},{"class":"BB","classWeight":2,"tier":10,"metric":9}],"race":[{"class":"BB","classWeight":2,"tier":10,"metric":210},{"class":"BB","classWeight":2,"tier":10,"metric":210},{"class":"BB","classWeight":2,"tier":10,"metric":210},{"class":"BB","classWeight":2,"tier":10,"metric":210},{"class":"BB","classWeight":2,"tier":10,"metric":210},{"class":"BB","classWeight":2,"tier":10,"metric":210},{"class":"BB","classWeight":2,"tier":10,"metric":210}],"grand":[{"class":"BB","classWeight":2,"tier":10,"damage":95000,"kills":9,"time":210},{"class":"BB","classWeight":2,"tier":10,"damage":95000,"kills":9,"time":210},{"class":"BB","classWeight":2,"tier":10,"damage":95000,"kills":9,"time":210},{"class":"BB","classWeight":2,"tier":10,"damage":95000,"kills":9,"time":210},{"class":"BB","classWeight":2,"tier":10,"damage":95000,"kills":9,"time":210},{"class":"BB","classWeight":2,"tier":10,"damage":95000,"kills":9,"time":210},{"class":"BB","classWeight":2,"tier":10,"damage":95000,"kills":9,"time":210}]}}];
+const EVENT_META = {"damage":{"title":"Round 1 \u2014 Damage","subtitle":"Distribute doubloons from damage dealt across seven games.","metric":"Damage","unit":"damage"},"kills":{"title":"Round 2 \u2014 Kills","subtitle":"Distribute doubloons from kills across seven games.","metric":"Kills","unit":"kills"},"race":{"title":"Round 3 \u2014 Race","subtitle":"Distribute doubloons from race results across seven games.","metric":"Time","unit":"time"},"grand":{"title":"Round 4 \u2014 Grand Yolo","subtitle":"Combined damage, kills, and time weighting across seven games.","metric":"Damage","unit":"damage"}};
+const KEYS = ["damage","kills","race","grand"];
+const STORAGE_KEY = "yoloTourneyWorkbookMerged_v3";
+const PRIOR_STORAGE_KEYS = ["yoloTourneyWorkbookMerged_v2", "yoloTourneyWorkbookMerged_v1"];
+const DEFAULT_SETTINGS = {
+  events: {
+    damage: {pool:500, multiplier:1, tierPower:1},
+    kills:  {pool:500, multiplier:1, tierPower:1},
+    race:   {pool:500, multiplier:1, tierPower:1},
+    grand:  {pool:500, multiplier:1, tierWeight:0.9, damageWeight:1, killsWeight:1, timeWeight:1}
+  }
+};
+let activePage = "dashboard";
+let state = loadState();
+
+function clone(v){ return JSON.parse(JSON.stringify(v)); }
+function num(v){ const n=Number(v); return Number.isFinite(n) ? n : 0; }
+function esc(v){ return String(v ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function fmt(v){ return (Number.isFinite(v)?v:0).toLocaleString(undefined,{maximumFractionDigits:2}); }
+function normalizeClass(code){ const c=String(code ?? "-").trim().toUpperCase(); return ["DD","CA","BB"].includes(c)?c:"-"; }
+function classWeightFor(code){ return ({DD:4,CA:3,BB:2})[normalizeClass(code)] ?? 0; }
+function makeDefaultSettings(){ return clone(DEFAULT_SETTINGS); }
+function defaultSettingValue(key,field){ return key==="grand"&&field==="tierWeight" ? 0.9 : 1; }
+
+function normalizeState(input){
+  const result={players:Array.isArray(input.players)?input.players:clone(SEED),settings:makeDefaultSettings()};
+  const old=input.settings||{};
+  if(old.events && typeof old.events==="object"){
+    for(const key of KEYS){
+      const savedEvent={...(old.events[key]||{})};
+      if(key==="grand"){
+        // Older versions stored this Round 4 coefficient under tierPower.
+        // Match the live DWBOT scoring engine: Grand Yolo tierWeight defaults to 0.9.
+        // Preserve explicit legacy values instead of silently converting 0.9 to 1.
+        if(savedEvent.tierWeight===undefined){
+          const legacyTier= savedEvent.tierPower;
+          savedEvent.tierWeight=legacyTier===undefined ? 0.9 : num(legacyTier);
+        }
+        delete savedEvent.tierPower;
+      }
+      result.settings.events[key]={...result.settings.events[key],...savedEvent};
+    }
+  } else {
+    const pools=old.pools||{};
+    for(const key of KEYS){
+      result.settings.events[key].pool=num(pools[key] ?? old.pool ?? 500);
+      result.settings.events[key].multiplier=num(old.classBonus ?? 1);
+      if(key==="grand"){
+        const legacyTier=old.grandTierWeight ?? old.grandTierPower ?? old.tierPower ?? 0.9;
+        result.settings.events[key].tierWeight=num(legacyTier);
+        result.settings.events[key].damageWeight=num(old.damageWeight ?? 1);
+        result.settings.events[key].killsWeight=num(old.killsWeight ?? 1);
+        result.settings.events[key].timeWeight=num(old.timeWeight ?? 1);
+      } else {
+        result.settings.events[key].tierPower=num(old.tierPower ?? 1);
+      }
+    }
+  }
+  result.players=result.players.map((p,i)=>{
+    const out={id:Number(p.id)||i+1,name:String(p.name||`Player ${i+1}`),events:{}};
+    for(const key of KEYS){
+      const oldGames=p.events?.[key]||[];
+      out.events[key]=Array.from({length:7},(_,j)=>{
+        const g=oldGames[j]||{};
+        const code=normalizeClass(g.class);
+        if(key==="grand") return {class:code,classWeight:classWeightFor(code),tier:num(g.tier??1),damage:num(g.damage),kills:num(g.kills),time:num(g.time)};
+        return {class:code,classWeight:classWeightFor(code),tier:num(g.tier??1),metric:num(g.metric)};
+      });
+    }
+    return out;
+  });
+  return result;
+}
+function loadState(){
+  try{
+    const saved=localStorage.getItem(STORAGE_KEY);
+    if(saved) return normalizeState(JSON.parse(saved));
+
+    // One-time migration from previous builds. They used the same storage origin
+    // but could retain stale scoring multipliers. Preserve the saved roster/results,
+    // while resetting scoring settings to the requested workbook defaults (pool 500,
+    // every multiplier 1). This corrects legacy summary rendering without forcing
+    // a reset of the player's entered game data.
+    for(const oldKey of PRIOR_STORAGE_KEYS){
+      const legacy=localStorage.getItem(oldKey);
+      if(!legacy) continue;
+      const migrated=normalizeState(JSON.parse(legacy));
+      migrated.settings=makeDefaultSettings();
+      try{localStorage.setItem(STORAGE_KEY,JSON.stringify(migrated));}catch(e){}
+      return migrated;
+    }
+  }catch(e){}
+  return normalizeState({players:clone(SEED),settings:makeDefaultSettings()});
+}
+function persist(){ try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));setStatus("Saved in this browser.");}catch(e){setStatus("Browser storage is unavailable. Use Export backup to keep your changes.");} }
+function setStatus(message){ const el=document.getElementById("saveStatus"); if(el)el.textContent=message; }
+function cfg(key){ return state.settings.events[key]; }
+function syncDerivedClassWeights(){
+  state.players.forEach(p=>KEYS.forEach(key=>(p.events[key]||[]).forEach(g=>{
+    g.class=normalizeClass(g.class); g.classWeight=classWeightFor(g.class);
+  })));
+}
+function getPlayer(id){ return state.players.find(p=>p.id===Number(id)); }
+function eventTotal(p,key){
+  return p.events[key].reduce((sum,g)=>{
+    if(key==="grand") return sum+num(g.damage);
+    if(key==="race") return sum+(num(g.metric)>0?1/num(g.metric):0);
+    return sum+num(g.metric);
+  },0);
+}
+
+/* Damage and Kills preserve the supplied workbook's share formula. Race uses
+   the resolved C01 policy: inverse elapsed seconds, so a faster time earns a
+   larger share. The archival workbook's direct-time formula is retained only
+   as historical evidence and is not copied into the active scoring engine. */
+function eventRawScore(p,key){
+  const games=p.events[key], settings=cfg(key);
+  if(key!=="grand"){
+    const total=state.players.reduce((sum,x)=>sum+eventTotal(x,key),0);
+    if(!total || games.some(g=>num(g.tier)<=0)) return 0;
+    return 2*num(settings.multiplier)*num(settings.pool)*games.reduce((sum,g)=>{
+      const metric=key==="race"?(num(g.metric)>0?1/num(g.metric):0):num(g.metric);
+      return sum+classWeightFor(g.class)*(metric/total)/Math.pow(num(g.tier),num(settings.tierPower));
+    },0);
+  }
+  const totalDamage=state.players.reduce((sum,x)=>sum+eventTotal(x,"grand"),0);
+  if(!totalDamage || games.some(g=>num(g.tier)<=0 || num(g.time)<=0)) return 0;
+  const playerDamage=eventTotal(p,"grand");
+  const weighted=games.reduce((sum,g)=>{
+    const tier=num(g.tier), time=num(g.time);
+    const perGame=(1/tier*100*num(settings.tierWeight))
+      +(num(g.damage)/tier/1000*num(settings.damageWeight))
+      +(num(g.kills)*10/tier*num(settings.killsWeight))
+      +(5/time*1000*num(settings.timeWeight));
+    return sum+perGame*classWeightFor(g.class)*(playerDamage/totalDamage);
+  },0);
+  return num(settings.multiplier)*weighted/3;
+}
+function eventScore(p,key){ const score=eventRawScore(p,key); return Number.isFinite(score)?score:0; }
+function eventGrandTotal(key){ return state.players.reduce((sum,p)=>sum+eventScore(p,key),0); }
+function totalDubs(){ return KEYS.reduce((sum,key)=>sum+eventGrandTotal(key),0); }
+function avg(values){ return values.length?values.reduce((a,b)=>a+b,0)/values.length:0; }
+function tournamentRows(){
+  return state.players.map(p=>{
+    const tierValues=["damage","kills","grand"].flatMap(k=>p.events[k].map(g=>num(g.tier)));
+    const classValues=["damage","kills","grand"].flatMap(k=>p.events[k].map(g=>classWeightFor(g.class)));
+    const dubs=KEYS.reduce((sum,k)=>sum+eventScore(p,k),0);
+    return {
+      id:p.id,name:p.name,
+      damage:(eventTotal(p,"damage")+eventTotal(p,"grand"))/2,
+      tier:avg(tierValues),
+      kills:avg(p.events.kills.map(g=>num(g.metric))),
+      class:avg(classValues),
+      dubs
+    };
+  });
+}
+function leaderboardTable(rows){
+  return `<div class="table-wrap"><table class="summary-table"><thead><tr><th>Rank</th><th>Player</th><th>Total doubloons</th></tr></thead><tbody>
+  ${rows.map((r,i)=>`<tr><td><span class="rank rank-${i+1}">${i+1}</span></td><td>${esc(r.name)}</td><td class="result">${fmt(r.dubs)}</td></tr>`).join("")||`<tr><td colspan="3" class="empty">No players to display.</td></tr>`}
+  </tbody></table></div>`;
+}
+function renderDashboard(){
+  const cards=[["damage","ROUND 01","Damage"],["kills","ROUND 02","Kills"],["race","ROUND 03","Race"],["grand","ROUND 04","Grand Yolo"]];
+  const rows=tournamentRows().sort((a,b)=>b.dubs-a.dubs).slice(0,5);
+  return `<section class="panel">
+    <div class="panel-head">
+      <div><div class="eyebrow">Tournament overview</div><h2>Overview</h2><p>Review standings, enter game results, and manage your roster. Your edits save locally in this browser.</p></div>
+      <div class="overview-head-actions"><span class="chip">Autosaves locally</span><button class="danger critical-reset" id="resetEntireSite" type="button" title="Restore workbook roster and results, reset every scoring setting, and return to desktop layout">Reset entire site to defaults</button></div>
+    </div>
+    <div class="explainer-banner"><strong>Scoring controls:</strong> Each round has an Overall multiplier. Rounds 1–3 also have Tier power; Round 4 has separate Tier, Damage, Kills, and Time weights. Every multiplier starts at <strong>1</strong>. Use its <strong>Reset to 1</strong> button to undo a custom adjustment without clearing game results.</div>
+    <div class="stats event-cards">${cards.map(([k,n,t])=>`<div class="stat event-stat"><span>${n} · ${t}</span><strong class="neon">${fmt(eventGrandTotal(k))}</strong><span class="muted">doubloons calculated</span><button data-goto="${k}">Open event <span aria-hidden="true">↗</span></button></div>`).join("")}</div>
+    <div class="panel-head subhead"><div><h2>Season leaders</h2><p>Ranked by calculated Doubloons across all four events.</p></div><div class="top-actions"><button data-goto="totals">Full standings ↗</button><button class="danger" id="clearAllData">Clear all results</button></div></div>
+    ${leaderboardTable(rows)}
+    <div class="hint">Reset entire site restores the source workbook roster and example results, resets pools to 500 and all multipliers to 1, clears legacy browser settings, and returns to the Overview in desktop layout. Export a backup before resetting if you need to keep your current data.</div>
+  </section>`;
+}
+function renderPlayers(){
+  return `<section class="panel"><div class="panel-head"><div><div class="eyebrow">Roster management</div><h2>Player roster</h2><p>Add, rename, or remove players. Each new player is included in all four events.</p></div><button class="primary" id="addPlayer">＋ Add player</button></div>
+  <div class="table-wrap"><table class="summary-table"><thead><tr><th>#</th><th>Player name</th><th>All-event doubloons</th><th>Action</th></tr></thead><tbody>
+  ${state.players.map((p,i)=>{const d=KEYS.reduce((s,k)=>s+eventScore(p,k),0);return `<tr><td>${i+1}</td><td><input aria-label="Player name" data-player-name="${p.id}" value="${esc(p.name)}"></td><td class="result">${fmt(d)}</td><td><button class="danger" data-remove="${p.id}">Remove</button></td></tr>`}).join("")||`<tr><td colspan="4" class="empty">No players yet. Add a player to get started.</td></tr>`}
+  </tbody></table></div><div class="hint">Removing a player removes their results from every event. Export a backup before making major roster changes.</div></section>`;
+}
+function multiplierField(key, field, label, description, example, defaultValue=1){
+  const id=`${key}-${field}`;
+  const value=cfg(key)[field];
+  return `<div class="field multiplier-field">
+    <div class="multiplier-head"><label for="${id}">${label}</label><button type="button" class="reset-one" data-reset-setting="${key}|${field}" title="Restore the workbook/DWBOT default (${defaultValue}) without changing entered results." aria-label="Reset ${label} to ${defaultValue}">Reset to ${defaultValue}</button></div>
+    <input id="${id}" type="number" step="0.1" inputmode="decimal" data-setting="${key}|${field}" value="${esc(value)}" title="${esc(description)}" aria-describedby="${id}-note ${id}-example">
+    <p class="field-note" id="${id}-note">${description}</p>
+    <p class="field-example" id="${id}-example"><strong>Example:</strong> ${example}</p>
+  </div>`;
+}
+function renderEvent(key){
+  const meta=EVENT_META[key], settings=cfg(key), grand=key==="grand";
+  let table=`<div class="table-wrap"><table><thead><tr><th>Player</th>${Array.from({length:7},(_,i)=>`<th>Game ${i+1}<br><span class="th-sub">${grand?"Class · Tier · Damage · Kills · Time":"Class · Tier · "+meta.metric}</span></th>`).join("")}<th>Total ${grand?"Damage":meta.metric}</th><th>Doubloons</th></tr></thead><tbody>`;
+  table+=state.players.map(p=>`<tr><td class="name"><strong>${esc(p.name)}</strong></td>${p.events[key].map((g,i)=>`<td><div class="game-inputs ${grand?"grand-inputs":""}">
+    <select title="Ship class weighting: DD = 4, CA = 3, BB = 2; — applies no class weight." aria-label="Game ${i+1} class for ${esc(p.name)}" data-game="${key}|${p.id}|${i}|class"><option value="DD" ${g.class==="DD"?"selected":""}>DD</option><option value="CA" ${g.class==="CA"?"selected":""}>CA</option><option value="BB" ${g.class==="BB"?"selected":""}>BB</option><option value="-" ${g.class==="-"?"selected":""}>—</option></select>
+    <input title="Tier" aria-label="Tier" type="number" min="1" step="any" data-game="${key}|${p.id}|${i}|tier" value="${esc(g.tier)}">
+    ${grand?`<input title="Damage" aria-label="Damage" type="number" min="0" step="any" data-game="${key}|${p.id}|${i}|damage" value="${esc(g.damage)}"><input title="Kills" aria-label="Kills" type="number" min="0" step="any" data-game="${key}|${p.id}|${i}|kills" value="${esc(g.kills)}"><input title="Time" aria-label="Time" type="number" min="0" step="any" data-game="${key}|${p.id}|${i}|time" value="${esc(g.time)}">`:`<input title="${meta.metric}" aria-label="${meta.metric}" type="number" min="0" step="any" data-game="${key}|${p.id}|${i}|metric" value="${esc(g.metric)}" >`}
+    </div></td>`).join("")}<td class="result">${fmt(eventTotal(p,key))}</td><td class="result">${fmt(eventScore(p,key))}</td></tr>`).join("");
+  table+=`<tr><td><strong>Totals</strong></td><td colspan="7" class="muted">Configured pool: ${fmt(settings.pool)} · Calculated event total: ${fmt(eventGrandTotal(key))}</td><td class="result">${fmt(state.players.reduce((s,p)=>s+eventTotal(p,key),0))}</td><td class="result">${fmt(eventGrandTotal(key))}</td></tr></tbody></table></div>`;
+  const overallDescription="Scales the entire round score after its other calculations. At 1, the score is unchanged; 2 doubles it; 0 turns this round's award off.";
+  const overallExample="Use 2 if this round should count twice as much toward the tournament total; return to 1 for the standard workbook weighting.";
+  const multiplierControls=grand
+    ? `${multiplierField(key,"tierWeight","Tier weight","Scales only the base 100 ÷ tier contribution in each Grand Yolo game. The workbook/DWBOT default is 0.9; 1 uses the unscaled base term, 2 doubles it, and 0 removes it without removing damage, kills, or time.","Keep 0.9 for the workbook/DWBOT default; use 1 only when the organizer intentionally wants the base tier term increased by 1/0.9.",0.9)}
+       ${multiplierField(key,"damageWeight","Damage weight","Scales the damage contribution (damage ÷ tier ÷ 1,000). Increasing it raises damage's influence; 0 ignores the damage term.","Use 2 when damage should count twice as much within Grand Yolo, without changing Kills or Time weights.")}
+       ${multiplierField(key,"killsWeight","Kills weight","Scales the kills contribution (kills × 10 ÷ tier). Increasing it raises kill points; 0 ignores the kills term.","Use 2 when each game's kill contribution should be doubled while damage and time stay as they are.")}
+       ${multiplierField(key,"timeWeight","Time weight","Scales the time contribution (5 ÷ time × 1,000). Larger weights make this term count more; 0 removes it. The formula rewards lower times with a larger base time term.","Use 2 if the time-derived contribution should have twice its current influence. Keep at 1 for the default formula.")}`
+    : `${multiplierField(key,"tierPower","Tier power","An exponent in the tier divisor: each metric share is divided by tier raised to this power. At 1 the divisor is tier itself; higher powers penalize larger tier values more; 0 removes the tier adjustment.","Use 2 if high-tier values should reduce points more sharply, or 0 if tier should not affect this round's score.")}`;
+  const poolDescription=grand
+    ? "This field is retained for workbook reference, but the Round 4 Grand Yolo formula does not use the Doubloon Pool. Changing it will not change this round's score."
+    : "Sets the pool factor used by this round's score formula. With all other values fixed, increasing the pool by 10% increases this round's calculated scores by 10%; event totals are not normalized to spend exactly the pool.";
+  return `<section class="panel">
+    <div class="panel-head"><div><div class="eyebrow">${grand?"Combined scoring":"Event scoring"}</div><h2>${meta.title}</h2><p>${meta.subtitle}</p></div><span class="chip">7 games per player</span></div>
+    <div class="explainer-banner"><strong>How to use these settings:</strong> Start with the displayed workbook/DWBOT defaults (Grand Yolo Tier weight is 0.9; other multipliers are 1). Use the explanation and example under each control to understand the effect. Each reset button restores that setting's actual default and keeps all game results. The number steppers change each multiplier by exactly 0.1 (one tenth).</div>
+    <div class="controls no-print">
+      <div class="field pool"><label for="${key}-poolInput">${grand?"Doubloon pool (not used in Round 4)":"Doubloon pool"}</label><input title="${esc(poolDescription)}" aria-describedby="${key}-pool-note" type="number" min="0" step="any" id="${key}-poolInput" data-setting="${key}|pool" value="${esc(settings.pool)}"><p class="field-note" id="${key}-pool-note">${poolDescription}</p></div>
+      ${multiplierField(key,"multiplier","Overall multiplier",overallDescription,overallExample)}
+      ${multiplierControls}
+      <div class="action-group"><button class="primary" id="addPlayer">＋ Add player</button><button data-goto="totals">Season totals ↗</button><button class="danger" id="clearEventData" data-clear-event="${key}">Clear this event</button></div>
+    </div>
+    ${table}
+  </section>`;
+}
+function renderTotals(){
+  const rosterRows=tournamentRows();
+  // Sum in roster order, matching the workbook's G12 SUM across its fixed rows.
+  const grandDubs=rosterRows.reduce((s,r)=>s+r.dubs,0);
+  const rows=rosterRows.sort((a,b)=>b.dubs-a.dubs);
+  return `<section class="panel"><div class="panel-head"><div><div class="eyebrow">Season report</div><h2>Tournament totals</h2><p>Summary columns follow the supplied workbook's season formulas.</p></div><button onclick="window.print()">Print standings</button></div>
+  <div class="table-wrap"><table class="summary-table"><thead><tr><th>Player</th><th>Avg. damage</th><th>Avg. tier</th><th>Avg. kills</th><th>Avg. class weight</th><th>Total doubloons</th></tr></thead><tbody>
+  ${rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${fmt(r.damage)}</td><td>${fmt(r.tier)}</td><td>${fmt(r.kills)}</td><td>${fmt(r.class)}</td><td class="result">${fmt(r.dubs)}</td></tr>`).join("")||`<tr><td colspan="6" class="empty">No players yet.</td></tr>`}
+  <tr><td><strong>Totals</strong></td><td colspan="4"></td><td class="result">${fmt(grandDubs)}</td></tr></tbody></table></div>
+  <div class="hint">Summary averages follow the supplied workbook formulas. Participant-facing values are tournament doubloons only; the historical H12 dollar diagnostic is not displayed.</div></section>`;
+}
+let editRenderTimer = null;
+// Defer rebuilds after input changes so the click that caused blur can still reach its target.
+function scheduleEditRender(){
+  if(editRenderTimer !== null) clearTimeout(editRenderTimer);
+  editRenderTimer = setTimeout(()=>{ editRenderTimer = null; render(); }, 0);
+}
+function render(){
+  syncDerivedClassWeights();
+  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("active",b.dataset.page===activePage));
+  document.getElementById("statPlayers").textContent=state.players.length;
+  document.getElementById("statDubs").textContent=fmt(totalDubs());
+  document.getElementById("statPool").textContent=fmt(cfg(KEYS.includes(activePage)?activePage:"damage").pool);
+  const app=document.getElementById("app");
+  if(activePage==="dashboard") app.innerHTML=renderDashboard();
+  else if(activePage==="players") app.innerHTML=renderPlayers();
+  else if(activePage==="totals") app.innerHTML=renderTotals();
+  else app.innerHTML=renderEvent(activePage);
+  const status=document.getElementById("saveStatus");
+  if(status && !status.textContent) status.textContent="Ready · changes save locally";
+}
+function addPlayer(){
+  const name=prompt("Enter the new player's name:");
+  if(!name||!name.trim())return;
+  const id=Math.max(0,...state.players.map(p=>p.id))+1;
+  const p={id,name:name.trim(),events:{}};
+  for(const key of KEYS) p.events[key]=Array.from({length:7},()=>key==="grand"
+    ? {class:"-",classWeight:0,tier:1,damage:0,kills:0,time:0}
+    : {class:"-",classWeight:0,tier:1,metric:0});
+  state.players.push(p);persist();render();
+}
+function removePlayer(id){
+  const p=getPlayer(id);if(!p)return;
+  if(!confirm(`Remove ${p.name} from every event?`))return;
+  state.players=state.players.filter(x=>x.id!==Number(id));persist();render();
+}
+function resetEvent(key){
+  state.players.forEach(p=>p.events[key]=Array.from({length:7},()=>key==="grand"
+    ? {class:"-",classWeight:0,tier:1,damage:0,kills:0,time:0}
+    : {class:"-",classWeight:0,tier:1,metric:0}));
+}
+function clearEventData(key){
+  if(!EVENT_META[key])return;
+  if(!confirm(`Clear all results for ${EVENT_META[key].title}? Player names and scoring settings will be kept.`))return;
+  resetEvent(key);persist();render();
+}
+function fieldLabel(field){
+  return ({multiplier:"Overall multiplier",tierPower:"Tier power",tierWeight:"Tier weight",damageWeight:"Damage weight",killsWeight:"Kills weight",timeWeight:"Time weight"})[field]||field;
+}
+function resetEntireSite(){
+  if(!confirm("Reset the ENTIRE site to defaults? This replaces the current roster and every game result with the original workbook data, resets all pools to 500, standard multipliers to 1, and Grand Yolo tier weight to 0.9, and returns the layout to desktop. Export a backup first if you want to keep current work."))return;
+  if(editRenderTimer!==null){clearTimeout(editRenderTimer);editRenderTimer=null;}
+  state=normalizeState({players:clone(SEED),settings:makeDefaultSettings()});
+  activePage="dashboard";
+  document.body.classList.remove("mobile-mode");
+  try{localStorage.removeItem("yoloTourneyLayout");for(const oldKey of PRIOR_STORAGE_KEYS)localStorage.removeItem(oldKey);}catch(e){}
+  persist();render();setStatus("Entire site reset to workbook data and default settings.");
+}
+function restoreDefaultData(){
+  if(!confirm("Restore the original workbook roster, game results, and default scoring settings? Current roster, game results, and scoring settings will be replaced."))return;
+  state.players=clone(SEED);state.settings=makeDefaultSettings();persist();render();
+}
+function clearAllEventData(){
+  if(!confirm("Clear results from all four events? Player names, roster, and scoring settings will be kept."))return;
+  KEYS.forEach(resetEvent);persist();render();
+}
+document.addEventListener("click",e=>{
+  const resetOne=e.target.closest("[data-reset-setting]");
+  if(resetOne){
+    const [key,field]=resetOne.dataset.resetSetting.split("|");
+    if(cfg(key) && ["multiplier","tierPower","tierWeight","damageWeight","killsWeight","timeWeight"].includes(field) && Object.prototype.hasOwnProperty.call(cfg(key),field)){
+      const defaultValue=defaultSettingValue(key,field);cfg(key)[field]=defaultValue;persist();render();setStatus(`${EVENT_META[key].title}: ${fieldLabel(field)} reset to ${defaultValue}.`);
+    }
+    return;
+  }
+  if(e.target.closest("#resetEntireSite")){resetEntireSite();return;}
+  const tab=e.target.closest("[data-page]");if(tab){activePage=tab.dataset.page;render();return;}
+  const go=e.target.closest("[data-goto]");if(go){activePage=go.dataset.goto;render();return;}
+  if(e.target.closest("#addPlayer")||e.target.closest("#addPlayerTop")){addPlayer();return;}
+  if(e.target.closest("#clearEventData")){clearEventData(e.target.closest("#clearEventData").dataset.clearEvent);return;}
+  if(e.target.closest("#clearAllData")){clearAllEventData();return;}
+  const remove=e.target.closest("[data-remove]");if(remove){removePlayer(remove.dataset.remove);return;}
+  if(e.target.closest("#layoutToggle")){
+    document.body.classList.toggle("mobile-mode");
+    const mobile=document.body.classList.contains("mobile-mode");
+    document.getElementById("layoutToggle").textContent=mobile?"Use desktop layout":"Use mobile layout";
+    try{localStorage.setItem("yoloTourneyLayout",mobile?"mobile":"desktop");}catch(e){}
+  }
+});
+document.addEventListener("change",e=>{
+  const t=e.target;
+  if(t.matches("[data-player-name]")){
+    const p=getPlayer(t.dataset.playerName);
+    if(p){p.name=t.value.trim()||p.name;persist();scheduleEditRender();}
+    return;
+  }
+  if(t.matches("[data-game]")){
+    const [key,id,index,field]=t.dataset.game.split("|"),p=getPlayer(id);
+    if(p){
+      const game=p.events[key][Number(index)];
+      if(field==="class"){game.class=normalizeClass(t.value);game.classWeight=classWeightFor(game.class);}
+      else game[field]=num(t.value);
+      syncDerivedClassWeights();persist();scheduleEditRender();
+    }
+    return;
+  }
+  if(t.matches("[data-setting]")){
+    const [key,field]=t.dataset.setting.split("|");
+    if(cfg(key) && Object.prototype.hasOwnProperty.call(cfg(key),field)){
+      cfg(key)[field]=num(t.value);
+      if(field==="pool")cfg(key)[field]=Math.max(0,num(t.value));
+      persist();scheduleEditRender();
+    }
+  }
+});
+document.getElementById("exportBtn").addEventListener("click",()=>{
+  const blob=new Blob([JSON.stringify({version:2,exportedAt:new Date().toISOString(),...state},null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url;a.download="yolo-tourney-backup.json";a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+document.getElementById("importBtn").addEventListener("click",()=>document.getElementById("importFile").click());
+document.getElementById("importFile").addEventListener("change",async e=>{
+  const file=e.target.files[0];if(!file)return;
+  try{
+    const imported=JSON.parse(await file.text());
+    if(!Array.isArray(imported.players)||!imported.settings)throw new Error("This file does not look like a tournament backup.");
+    if(confirm("Replace current tournament data with this backup?")){
+      state=normalizeState(imported);persist();render();setStatus("Backup imported and saved.");
+    }
+  }catch(err){alert("Could not import backup: "+err.message);}
+  e.target.value="";
+});
+try{
+  if(localStorage.getItem("yoloTourneyLayout")==="mobile"){
+    document.body.classList.add("mobile-mode");
+    document.getElementById("layoutToggle").textContent="Use desktop layout";
+  }
+}catch(e){}
+render();
+
+</script>
+
+</body>
+</html>
