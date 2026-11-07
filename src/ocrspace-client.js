@@ -121,7 +121,8 @@ async function recognizeCrop({ apiKey, imageBuffer, filename = 'dwbot-field-crop
             provider: 'ocr.space', engine: selectedEngine, exitCode, partial: exitCode === 2,
             parsedText: ok.map(x => String(x.ParsedText || '')).join('\n').slice(0, 12000),
             overlay: (overlayRequired || createSearchablePdf) ? compactOverlay(ok) : [],
-            textOrientation: Number.isFinite(Number(payload.TextOrientation)) ? Number(payload.TextOrientation) : null,
+            textOrientation: payload.TextOrientation === undefined || payload.TextOrientation === null
+                ? null : Number.isFinite(Number(payload.TextOrientation)) ? Number(payload.TextOrientation) : null,
             providerConfidence: null,
             searchablePdfUrl: createSearchablePdf ? safeSearchablePdfUrl(payload.SearchablePDFURL) : null,
             processingTimeMs: Number(payload.ProcessingTimeInMilliseconds) || null,
