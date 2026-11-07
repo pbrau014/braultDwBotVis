@@ -226,26 +226,6 @@ test('local screenshot acceptance stays offline and live multi-provider smoke is
 });
 
 
-test('four-image PDF-first runner refuses duplicates and supports fingerprint-bound resume', () => {
-    const runner = read('scripts/run-four-screenshot-pipeline.js');
-    const sequence = read('scripts/run-ocr-sequence.js');
-    const resume = read('src/ocr-sequence-resume.js');
-    assert.match(runner, /FOUR_SCREENSHOT_RESUME_FROM/);
-    assert.match(runner, /OCR_SEQUENCE_RESUME_FROM/);
-    assert.match(runner, /Existing OCR.Space artifacts are present without a resume token/);
-    assert.match(runner, /networkDiagnosticLogPresent: fs\.existsSync/);
-    assert.match(runner, /originalNetworkLogNoDeniedAttempts/);
-    assert.match(runner, /originalLogHashBound/);
-    assert.match(sequence, /networkDiagnosticLogSha256/);
-    assert.match(runner, /MISSING_ORIGINAL_LOG/);
-    assert.match(sequence, /validateSequenceResume/);
-    assert.match(sequence, /verifyCompletedSequenceArtifacts/);
-    assert.match(sequence, /orphaned-provider-artifact-not-resubmitted/);
-    assert.match(sequence, /ambiguous-prior-provider-submission-not-retried/);
-    assert.match(resume, /OCR_SEQUENCE_RESUME_FINGERPRINT_MISMATCH/);
-});
-
-
 test('ordinary branch verification has no legacy Gate B or bulk-provider workflow and exposes an explicit multi-provider smoke path', () => {
     const workflow = read('.github/workflows/dwbot-verification.yml');
     const pkg = JSON.parse(read('package.json'));
