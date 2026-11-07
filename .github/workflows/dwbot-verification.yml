@@ -57,6 +57,10 @@ jobs:
           node --check src/desktop-bridge.js
           node --check src/desktop-test-preflight.js
           node --check src/azure-document-intelligence-client.js
+          node --check src/azure-field-evidence.js
+          node --check src/ocr-accuracy-metrics.js
+          node --check scripts/block-network.js
+          node --check scripts/summarize-multi-provider-accuracy.js
           node --check src/azure-document-intelligence-quota-ledger.js
           node --check src/multi-provider-ocr.js
           node --check src/parallel-local-ocr.js
@@ -72,7 +76,6 @@ jobs:
           node --check src/ocr-sequence-resume.js
           node --check scripts/run-ocr-sequence.js
           node --check scripts/run-four-screenshot-pipeline.js
-          node --check scripts/run-ocrspace-imagesF-63-exploratory.js
           node --check scripts/run-additional-screenshot-regression.js
           node --check scripts/run-persistence-recovery.js
           node --check scripts/run-multi-provider-smoke.js
@@ -197,7 +200,6 @@ jobs:
         with:
           name: dwbot-windows-node24-multi-provider-and-recovery
           path: |
-            testdata/ocr-acceptance/**
             testdata/persistence-recovery/**
             testdata/multi-provider-smoke/**
           if-no-files-found: warn
