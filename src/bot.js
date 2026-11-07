@@ -2520,13 +2520,13 @@ async function extractTextCore(imageBuffer) {
                 provider: azure.provider || 'azure-document-intelligence',
                 model: azure.model || null, apiVersion: azure.apiVersion || null,
                 mimeType: azure.mimeType || null, inputBytes: azure.inputBytes || null,
-                pageCount: azure.pageCount || null,
+                pageCount: azure.pageCount || null, pages: Array.isArray(azure.pages) ? azure.pages : [],
                 // Keep provider-native line/word geometry attached to the evidence.
                 // Reconciliation may use text today, but diagnostics must not discard
                 // polygons, per-word confidence, or page structure.
                 evidence: [{ field: 'fullScreenshot', source: 'azure-document-intelligence', status: 'success',
                     text: String(azure.text || ''), lines: Array.isArray(azure.lines) ? azure.lines : [],
-                    pageCount: azure.pageCount || null, originalScreenshotSha256: azure.originalScreenshotSha256 || null,
+                    pages: Array.isArray(azure.pages) ? azure.pages : [], pageCount: azure.pageCount || null, originalScreenshotSha256: azure.originalScreenshotSha256 || null,
                     providerInputSha256: azure.providerInputSha256 || azure.inputSha256 || null,
                     model: azure.model || null, apiVersion: azure.apiVersion || null,
                     mimeType: azure.mimeType || null }],
