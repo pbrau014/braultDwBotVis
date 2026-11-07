@@ -78,3 +78,15 @@ test('Gate A never resumes paid OCR.Space requests without original zero-attempt
         originalNetworkLogStatus: 'PRESENT', originalNetworkAttemptCount: 1
     }), false);
 });
+
+test('manual Gate A dispatch is restricted to no-provider local-only recovery', () => {
+    const workflow = fs.readFileSync(path.join(__dirname, '..', '.github', 'workflows', 'dwbot-gateA-16-pdf-first.yml'), 'utf8');
+    assert.match(workflow, /workflow_dispatch:[\\s\\S]*?mode:[\\s\\S]*?options:[\\s\\S]*?- LOCAL-ONLY-RECOVERY/);
+    assert.match(workflow, /github\\.event_name == 'workflow_dispatch' && inputs\\.mode == 'LOCAL-ONLY-RECOVERY'/);
+    assert.match(workflow, /Prepare no-duplicate Gate A resume checkpoint[\\s\\S]*?github\\.event_name == 'workflow_dispatch' && inputs\\.mode == 'LOCAL-ONLY-RECOVERY'/);
+    const providerStep = workflow.match(/- name: Run the 16-image OCR.Space Engine 2 PDF-first Gate A acceptance([\\s\\S]*?)(?=\\n      - name:)/)?.[1] || '';
+    assert.match(providerStep, /if: github\\.event_name != 'workflow_dispatch'/);
+    assert.match(providerStep, /OCRSPACE_ENABLED: '1'/);
+    const initializeStep = workflow.match(/- name: Initialize Gate A restricted-egress diagnostic log([\\s\\S]*?)(?=\\n      - name:)/)?.[1] || '';
+    assert.match(initializeStep, /if: github\\.event_name != 'workflow_dispatch'/);
+});
