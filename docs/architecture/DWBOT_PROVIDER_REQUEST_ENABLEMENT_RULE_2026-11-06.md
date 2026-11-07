@@ -28,9 +28,9 @@ Enablement must be visible and auditable:
 
 ## Scope and safety boundary
 
-This rule does not mean sending arbitrary user screenshots to providers, uploading the independent Gate B holdout, bypassing privacy review, or spending money. Provider requests are enabled in the designated DWBOT pipeline only for approved DWBOT development/operational inputs and within verified free-tier limits. Any paid usage, tier upgrade, overage, or expansion to unrelated/private data requires separate authorization.
+This rule does not authorize sending arbitrary or unrelated private screenshots to providers, bypassing privacy review, or spending money. Provider requests are enabled in the designated DWBOT pipeline only for approved DWBOT development/operational inputs and within verified free-tier limits. Any paid usage, tier upgrade, overage, or expansion to unrelated/private data requires separate authorization.
 
-The existing Gate A diagnostic matrix is intentionally a no-provider replay of already-created OCR.Space artifacts. Its no-network setting remains appropriate for that diagnostic tool and must not be copied into the actual multi-provider orchestrator. Offline tests also remain network-isolated.
+Offline diagnostic/replay tools and unit tests must not initiate provider requests. The actual multi-provider orchestrator sends online requests only when its explicit multi-provider and provider-specific enablement settings are active.
 
 ## Branch isolation
 
