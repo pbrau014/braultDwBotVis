@@ -169,6 +169,8 @@ async function recognizeImage({
     const startedAt = Date.now();
     const deadline = startedAt + Math.max(5000, Math.min(90000, Number(timeoutMs) || 45000));
     let httpRequestCount = 0;
+    const providerRequestIds = [];
+    let operationId = null;
     const request = async (url, options) => {
         const method = String(options?.method || 'GET').toUpperCase();
         const requestIndex = httpRequestCount + 1;
@@ -188,6 +190,9 @@ async function recognizeImage({
         httpRequestCount++;
         const response = await fetchImpl(url, { ...options, signal: controller.signal, redirect: 'error' });
         if (response.redirected) throw fail('Azure redirected the request; rejected.', 'AZURE_OCR_REDIRECT_BLOCKED');
+        const requestId = response.headers?.get?.('apim-request-id') ||
+            response.headers?.get?.('x-ms-request-id') || response.headers?.get?.('request-id');
+        if (requestId) providerRequestIds.push(String(requestId).slice(0, 200));
         return response;
     };
     const timer = setTimeout(() => controller.abort(), Math.max(5000, Math.min(90000, Number(timeoutMs) || 45000)));
@@ -201,6 +206,7 @@ async function recognizeImage({
         if (response.status !== 202) throw fail('Azure analyze request returned HTTP ' + response.status + '.', 'AZURE_OCR_HTTP_ERROR', { httpStatus: response.status });
         const operationUrl = safeOperationUrl(response.headers?.get?.('operation-location'), normalizedEndpoint);
         if (!operationUrl) throw fail('Azure returned a missing or unapproved Operation-Location URL.', 'AZURE_OCR_OPERATION_URL_BLOCKED');
+        operationId = new URL(operationUrl).pathname.split('/').filter(Boolean).pop() || null;
 
         let payload = null;
         let polls = 0;
@@ -223,7 +229,9 @@ async function recognizeImage({
                     apiVersion: API_VERSION,
                     status: 'success',
                     sourceSha256,
+                    originalScreenshotSha256: sourceSha256,
                     inputSha256: sourceSha256,
+                    providerInputSha256: sourceSha256,
                     mimeType,
                     inputBytes: imageBuffer.length,
                     text: parsed.text,
@@ -232,6 +240,10 @@ async function recognizeImage({
                     pageCount: parsed.pageCount,
                     pollCount: polls,
                     httpRequestCount,
+                    providerRequestIds,
+                    operationId,
+                    startedAt: new Date(startedAt).toISOString(),
+                    completedAt: new Date().toISOString(),
                     elapsedMs: Date.now() - startedAt,
                 };
             }
@@ -245,6 +257,8 @@ async function recognizeImage({
             ? fail('Azure analysis timed out.', 'AZURE_OCR_TIMEOUT')
             : fail('Azure request failed: ' + String(error?.message || error).slice(0, 220), 'AZURE_OCR_NETWORK_ERROR');
         wrapped.httpRequestCount = httpRequestCount;
+        wrapped.providerRequestIds = providerRequestIds;
+        wrapped.operationId = operationId;
         throw wrapped;
     } finally { clearTimeout(timer); }
 }
