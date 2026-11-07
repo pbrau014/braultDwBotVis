@@ -66,7 +66,7 @@ test('full-screen OCR.Space and Azure text is parsed into separate remote candid
         '456',
         'Battle Performance',
         'Damage: 123456',
-    ].join('\\n');
+    ].join('\n');
     const result = reconcileOcrSpaceEvidence({
         status: 'complete', requests: 1,
         evidence: [{ field: 'fullScreenshot', source: 'azure-document-intelligence', status: 'success', text }],
