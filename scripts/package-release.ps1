@@ -5,11 +5,11 @@ if([string]::IsNullOrWhiteSpace($ProjectRoot)){$ProjectRoot=(Get-Location).Path}
 $ProjectRoot=(Resolve-Path -LiteralPath $ProjectRoot).Path
 if([string]::IsNullOrWhiteSpace($OutputRoot)){$OutputRoot=Join-Path $ProjectRoot 'release-artifacts'}
 $OutputRoot=[System.IO.Path]::GetFullPath($OutputRoot)
-$branch=(& git -C $ProjectRoot branch --show-current).Trim(); if($branch -ne 'main'){throw "Package only from the active implementation branch main; found $branch"}
+$branch=(& git -C $ProjectRoot branch --show-current).Trim(); if($branch -notin @('main','ocr-multiprovider')){throw "Package only from main or the isolated ocr-multiprovider branch; found $branch"}
 $commit=(& git -C $ProjectRoot rev-parse HEAD).Trim(); if($LASTEXITCODE -ne 0){throw 'Cannot resolve commit'}
 $status=@(& git -C $ProjectRoot status --porcelain); $unexpected=@($status | Where-Object { $_ -notmatch '^\?\? release-artifacts/' }); if($unexpected.Count){throw ('Working tree has non-artifact changes: '+($unexpected -join '; '))}
 New-Item -ItemType Directory -Force -Path $OutputRoot|Out-Null
-$stage=Join-Path $OutputRoot ('stage-'+$commit.Substring(0,12)); $zip=Join-Path $OutputRoot ('DWBOT-'+$commit.Substring(0,12)+'.zip')
+$stage=Join-Path $OutputRoot ('stage-'+$commit.Substring(0,12)); $packageLabel=if($branch -eq 'ocr-multiprovider'){'DWBOT-MULTIPROVIDER-CANDIDATE'}else{'DWBOT'}; $zip=Join-Path $OutputRoot ($packageLabel+'-'+$commit.Substring(0,12)+'.zip')
 if(Test-Path $stage){Remove-Item $stage -Recurse -Force}; if(Test-Path $zip){Remove-Item $zip -Force}; New-Item -ItemType Directory -Force -Path $stage|Out-Null
 $tracked=@(& git -C $ProjectRoot ls-files); if($LASTEXITCODE -ne 0 -or !$tracked.Count){throw 'Tracked inventory empty'}
 $included=@()
