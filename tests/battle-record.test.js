@@ -456,3 +456,33 @@ test('numeric conversion preserves legitimate zero-valued fields and rejects mal
     assert.equal(numericValueOrNull('12O4'), null);
     assert.equal(numericValueOrNull('9007199254740992'), null);
 });
+
+test('manual review queue accepts corrections for present-but-conflicting fields', () => {
+    const { applyReviewCorrection } = require('../src/battle-record');
+    const record = buildBattleRecord('Victory', {
+        identityCandidates: [{ text: '[ABCD]CaptainName' }],
+        metadataCandidates: [{ text: 'Estuary — Random Battle\nBattle start time: 15.09.2026 19:06' }],
+        resultCandidates: [{ text: 'Victory' }],
+        rewardCandidates: [{ credits: '899836', xp: '3776', freeXp: '1596' }],
+        damageCandidates: [{ value: '321070' }],
+    });
+    const queue = [{ key: 'map', label: 'Map', hint: 'the map name', reason: 'Independent readers disagree.' }];
+    const result = applyReviewCorrection(record, queue, 'New Dawn');
+    assert.equal(result.accepted, true);
+    assert.equal(result.record.map, 'New Dawn');
+    assert.deepEqual(result.reviewFields, []);
+});
+
+test('manual review queue retains an invalid field until a valid correction is supplied', () => {
+    const { applyReviewCorrection } = require('../src/battle-record');
+    const record = buildBattleRecord('', {});
+    const queue = [{ key: 'xp', label: 'XP', hint: 'the XP value' }];
+    const invalid = applyReviewCorrection(record, queue, 'not a number');
+    assert.equal(invalid.accepted, false);
+    assert.equal(invalid.reviewFields.length, 1);
+    assert.equal(invalid.record.xp, 'Not detected');
+    const valid = applyReviewCorrection(invalid.record, invalid.reviewFields, '3776');
+    assert.equal(valid.accepted, true);
+    assert.equal(valid.record.xp, '3776');
+    assert.deepEqual(valid.reviewFields, []);
+});
