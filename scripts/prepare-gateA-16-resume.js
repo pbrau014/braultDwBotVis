@@ -25,7 +25,7 @@ function sourceBuildFingerprint(root) {
     sourceFiles.push('package.json', 'package-lock.json');
     const uniqueFiles = [...new Set(sourceFiles)].sort();
     const hash = crypto.createHash('sha256');
-    for (const relative of uniqueFiles) hash.update(relative).update('\\0').update(fsSync.readFileSync(path.join(root, relative))).update('\\0');
+    for (const relative of uniqueFiles) hash.update(relative).update('\0').update(fsSync.readFileSync(path.join(root, relative))).update('\0');
     return { sha256: hash.digest('hex'), files: uniqueFiles.length };
 }
 function parseArgs(args) {
