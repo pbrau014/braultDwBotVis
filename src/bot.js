@@ -2680,8 +2680,9 @@ async function extractTextCore(imageBuffer) {
         timeoutMs: fallbackRemainingMs,
     });
     // The source-image PDF-first call is the sole OCR.Space request for this
-    // image. All local readers have already received the PDF-derived raster;
-    // do not issue a second crop-based remote request.
+    // image. Independent local readers received the original screenshot bytes;
+    // the primary Tesseract path uses a tracked, locally prepared derivative.
+    // Do not issue a second crop-based remote request.
     extractedFields.ocrSpaceRefinementEvidence = {
         status: 'not-run',
         reason: 'PDF-first source-image request is the only OCR.Space call; local readers process the PDF-derived raster',
