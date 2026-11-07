@@ -3549,7 +3549,7 @@ async function handleCorrectionMessage(message) {
         return true;
     }
 
-    const reviewFields = Array.isArray(pending.reviewFields)
+    const reviewFields = Array.isArray(pending.reviewFields) && pending.reviewFields.length
         ? pending.reviewFields
         : getMissingRequiredFields(pending.record);
     if (!reviewFields.length) {
@@ -3563,7 +3563,7 @@ async function handleCorrectionMessage(message) {
     // already contain a plausible value; it still requires an explicit human
     // correction/confirmation before the record may be posted.
     const activeField = reviewFields[0];
-    if (!content || /[\\r\\n]/.test(content) || /^(?:battle\\s*result|result|victory\\/defeat|defeat\\/victory|player(?:\\s*name)?|map(?:\\s*name)?|operation(?:\\s*name)?|battle\\s*mode|mode|battle\\s*start\\s*time|timestamp|battle\\s*timestamp|start\\s*time|credits|free\\s*xp|freexp|free\\s*experience|damage|xp)\\s*[:=]/i.test(content)) {
+    if (!content || /[\r\n]/.test(content) || /^(?:battle\s*result|result|victory\/defeat|defeat\/victory|player(?:\s*name)?|map(?:\s*name)?|operation(?:\s*name)?|battle\s*mode|mode|battle\s*start\s*time|timestamp|battle\s*timestamp|start\s*time|credits|free\s*xp|freexp|free\s*experience|damage|xp)\s*[:=]/i.test(content)) {
         await message.reply({
             content: makeCorrectionPrompt(pending.fileName, pending.record, reviewFields,
                 'Please send one value only, without a field label or a list.'),
@@ -3693,9 +3693,9 @@ async function handleIncomingMessage(message) {
             for (const unresolved of validation.unresolvedFields || []) {
                 if (reviewKeys.has(unresolved.field)) continue;
                 reviewKeys.add(unresolved.field);
+                const definition = REQUIRED_MANUAL_FIELDS.find(field => field.key === unresolved.field);
                 reviewFields.push({
-                    key: unresolved.field,
-                    label: fieldLabels[unresolved.field] || unresolved.field,
+                    ...(definition || { key: unresolved.field, label: fieldLabels[unresolved.field] || unresolved.field, hint: 'the required field value' }),
                     reason: 'Independent OCR evidence conflicts; verify this value against the original screenshot.',
                 });
             }
