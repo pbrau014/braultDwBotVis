@@ -16,6 +16,8 @@ GATE B / NO-PROVIDER RECOVERY:
 - The 19-image post-hoc diagnostic reported Tesseract.js 110/171 exact fields (64.33%), 2 wrong, 59 unresolved, and 2/19 exact complete records (10.53%). Native Tesseract reported 103/171 exact fields (60.23%), 2 wrong, 66 unresolved, and 0/19 exact complete records.
 - The separate 21-image diagnostic reported Tesseract.js 123/189 exact fields (65.08%), 2 wrong, 64 unresolved, and 2/21 exact complete records (9.52%). Native Tesseract reported 116/189 exact fields (61.38%), 2 wrong, 71 unresolved, and 0/21 exact complete records.
 - These metrics are diagnostics only; they do not pass Gate A or Gate B. The old 19/21 selection is superseded by the current 50-image minimum.
+- The read-only label audit identifies 42 incomplete records. Missing-field counts are player 39, map 39, mode 37, battleStart 41, freeXp 4, credits 2, damage 1, and xp 1 (counts overlap across records). A derived filename/hash/missing-field worklist is proposed in PR #19 at docs/continuation/GATE_B_LABEL_REVIEW_WORKLIST_2026-11-07.md.
+- The current 63-image corpus cannot reach the preferred 100-image target by itself; at least 37 additional independent holdout images are needed even if all 63 existing records become eligible.
 
 CURRENT IMPLEMENTATION BRANCHES / DRAFT PRs:
 - PR #17: current Gate B 50 minimum / 100 preferred policy overlay and updates to both living plan files.
