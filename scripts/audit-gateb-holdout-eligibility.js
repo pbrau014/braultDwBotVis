@@ -87,6 +87,8 @@ function auditGateBInventory({
   const seenHashes = new Set();
   const seenOrders = new Set();
   const eligible = [];
+  const labelReviewQueue = [];
+  const missingFieldCounts = Object.fromEntries(REQUIRED_FIELDS.map(field => [field, 0]));
   const rejected = {
     incompleteNineFieldLabels: 0,
     invalidSourceFingerprints: 0,
@@ -104,6 +106,19 @@ function auditGateBInventory({
   for (const record of ordered) {
     if (!recordHasEligibleNineFieldLabel(record)) {
       rejected.incompleteNineFieldLabels++;
+      const missingFields = REQUIRED_FIELDS.filter(field =>
+        !(record.fieldStatus?.[field]?.eligible_for_exact_match === true
+          && ELIGIBLE_LABEL_STATUSES.has(record.fieldStatus?.[field]?.status)
+          && hasExpectedValue(record.expected?.[field])));
+      for (const field of missingFields) missingFieldCounts[field]++;
+      labelReviewQueue.push({
+        corpusOrder: Number(record.corpusOrder),
+        filename: record.filename || null,
+        sourceImageSha256: record.sourceImage?.sha256 || null,
+        missingFields,
+        missingFieldStatuses: Object.fromEntries(missingFields.map(field =>
+          [field, record.fieldStatus?.[field]?.status || 'MISSING_STATUS'])),
+      });
       continue;
     }
     const order = Number(record.corpusOrder);
@@ -193,6 +208,8 @@ function auditGateBInventory({
     },
     rejected,
     blockingReasons,
+    missingFieldCounts,
+    labelReviewQueue,
     eligibleRecords: eligible,
     selectedRecords: selected,
     limitations: [
