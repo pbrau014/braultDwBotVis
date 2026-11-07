@@ -26,6 +26,8 @@ async function executeReader({ imageBuffer, engine, env, timeoutMs = 90000 }) {
         OCR_NON_OCR_NETWORK_RESTRICTED: '1',
         OCR_NON_OCR_NETWORK_LOG: networkLogPath,
         OCR_CV_ASSIST: '0',
+        OCR_IMAGE_TIMEOUT_MS: '45000',
+        OCR_SUPERVISED_TIMEOUT_MS: '50000',
         OCR_ENGINE: engine === 'paddleocr' ? 'tesseractjs' : engine,
         PADDLEOCR_FIELD_FALLBACK: engine === 'paddleocr' ? '1' : '0',
     };

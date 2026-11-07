@@ -285,12 +285,15 @@ test('crop cap parser is bounded to seven', () => {
 test('bot starts both online providers before local OCR and retains OCR.Space PDF artifacts as derivative evidence', async () => {
     const bot = await fs.readFile(path.join(__dirname, '..', 'src', 'bot.js'), 'utf8');
     const providerStart = bot.indexOf('multiProviderOcrPromise = runMultiProviderOcr');
+    const localStart = bot.indexOf('parallelLocalReadersPromise = runParallelLocalReaders');
     const cv = bot.indexOf('const cvAnalysis = await opencvFieldIsolation.analyze');
     const worker = bot.indexOf('const worker = await getOcrWorker()');
+    const localJoin = bot.indexOf('parallelLocalReadersEvidence = await parallelLocalReadersPromise');
     const providerJoin = bot.indexOf('multiProviderOcrEvidence = await multiProviderOcrPromise');
     const fields = bot.indexOf('const extractedFields = {', providerJoin);
     assert.ok(providerStart >= 0 && providerStart < cv && cv < worker);
-    assert.ok(providerJoin > worker && fields > providerJoin);
+    assert.ok(localStart >= 0 && localStart < cv && cv < worker);
+    assert.ok(localJoin > worker && providerJoin > worker && fields > Math.max(localJoin, providerJoin));
     assert.ok(bot.includes("source: 'ocrspace-searchable-pdf'"));
     assert.ok(bot.includes("const pdfPath = path.join(artifactDir, stem + '.ocrspace.pdf')"));
     assert.ok(bot.includes("const rasterPath = path.join(artifactDir, stem + '.ocrspace-page.png')"));
