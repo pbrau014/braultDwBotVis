@@ -252,7 +252,9 @@ test('requested multi-provider run sends identical original bytes to both provid
     assert.equal(result.status, 'complete');
     assert.equal(seen.length, 2);
     assert.equal(seen[0], image);
-    assert.equal(seen[1], image);\n    assert.equal(result.providers.azure.requestCount, 2);\n    assert.equal(result.providers.azure.httpRequestCount, 2);
+    assert.equal(seen[1], image);
+    assert.equal(result.providers.azure.requestCount, 2);
+    assert.equal(result.providers.azure.httpRequestCount, 2);
     const blocked = await runMultiProviderOcr({ imageBuffer: image, env: { ...env, AZURE_DOCUMENT_INTELLIGENCE_KEY: '' },
         ocrSpaceRunner: async () => ({ status: 'complete', requests: 1, providerText: 'x' }) });
     assert.equal(blocked.status, 'incomplete');
