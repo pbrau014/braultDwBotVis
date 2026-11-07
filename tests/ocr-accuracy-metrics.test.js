@@ -60,3 +60,19 @@ test('accuracy report rejects duplicate ground-truth hashes and reports unmatche
     assert.equal(report.sampleCounts.unmatchedGroundTruth, 1);
     assert.equal(report.metrics.fullNineFieldExactRecordRate, null);
 });
+
+test('accuracy report does not infer rejection when prediction acceptance state is absent', () => {
+    const report = createAccuracyReport({
+        predictions: [{ sourceSha256: 'image-c', record: truth }],
+        groundTruth: [{ sourceSha256: 'image-c', record: truth }],
+    });
+    assert.equal(report.metrics.predictionsWithoutAcceptanceState, 1);
+    assert.equal(report.metrics.falseRejectionRecords, 0);
+});
+
+test('accuracy report rejects ground-truth entries without a source hash or record', () => {
+    assert.throws(() => createAccuracyReport({
+        predictions: [],
+        groundTruth: [{ record: truth }],
+    }), /must include sourceSha256/);
+});
