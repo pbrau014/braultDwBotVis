@@ -68,29 +68,71 @@ async function readJsonBounded(response, maxBytes = MAX_RESPONSE_BYTES) {
     return JSON.parse(Buffer.concat(chunks, total).toString('utf8'));
 }
 
+function normalizePolygon(value, pageWidth = null, pageHeight = null) {
+    if (!Array.isArray(value) || value.length < 8 || value.length % 2 !== 0) {
+        return { polygon: [], geometryValid: false, geometryIssue: 'polygon_must_contain_at_least_four_xy_pairs' };
+    }
+    const polygon = value.map(Number);
+    if (!polygon.every(Number.isFinite)) {
+        return { polygon: [], geometryValid: false, geometryIssue: 'polygon_contains_non_finite_coordinate' };
+    }
+    if (polygon.some(value => value < 0)) {
+        return { polygon, geometryValid: false, geometryIssue: 'polygon_contains_negative_coordinate' };
+    }
+    if (Number.isFinite(pageWidth) && Number.isFinite(pageHeight) &&
+        polygon.some((value, index) => value > (index % 2 === 0 ? pageWidth : pageHeight))) {
+        return { polygon, geometryValid: false, geometryIssue: 'polygon_exceeds_page_dimensions' };
+    }
+    return { polygon, geometryValid: true, geometryIssue: null };
+}
+
 function flattenReadResult(payload) {
     const result = payload?.analyzeResult;
     if (!result || typeof result !== 'object') throw fail('Azure result omitted analyzeResult.', 'AZURE_OCR_INVALID_RESPONSE');
     const lines = [];
-    for (const page of Array.isArray(result.pages) ? result.pages : []) {
+    const pages = Array.isArray(result.pages) ? result.pages : [];
+    for (let pageIndex = 0; pageIndex < pages.length; pageIndex++) {
+        const page = pages[pageIndex];
+        const pageWidth = Number.isFinite(Number(page.width)) && page.width !== null ? Number(page.width) : null;
+        const pageHeight = Number.isFinite(Number(page.height)) && page.height !== null ? Number(page.height) : null;
         for (const line of Array.isArray(page.lines) ? page.lines : []) {
-            const polygon = Array.isArray(line.polygon) ? line.polygon.map(Number) : [];
-            const words = (Array.isArray(line.words) ? line.words : []).map(word => ({
-                text: String(word.content || '').slice(0, 300),
-                confidence: Number.isFinite(Number(word.confidence)) ? Number(word.confidence) : null,
-                polygon: Array.isArray(word.polygon) ? word.polygon.map(Number) : [],
-            }));
+            const lineGeometry = normalizePolygon(line.polygon, pageWidth, pageHeight);
+            const words = (Array.isArray(line.words) ? line.words : []).slice(0, MAX_WORDS_PER_LINE).map(word => {
+                const geometry = normalizePolygon(word.polygon, pageWidth, pageHeight);
+                const confidence = word.confidence === null || word.confidence === undefined
+                    ? null : Number(word.confidence);
+                return {
+                    text: String(word.content || '').slice(0, 300),
+                    confidence: Number.isFinite(confidence) && confidence >= 0 && confidence <= 1 ? confidence : null,
+                    ...geometry,
+                    pageIndex,
+                };
+            });
             lines.push({
                 text: String(line.content || '').slice(0, 2000),
-                polygon,
+                ...lineGeometry,
                 words,
+                pageIndex,
+                pageNumber: Number(page.pageNumber) || pageIndex + 1,
+                pageWidth,
+                pageHeight,
+                pageUnit: String(page.unit || ''),
             });
+            if (lines.length > MAX_LINES) throw fail('Azure result exceeds the configured line count limit.', 'AZURE_OCR_RESPONSE_TOO_COMPLEX');
         }
     }
     const text = typeof result.content === 'string'
         ? result.content.slice(0, 100000)
         : lines.map(line => line.text).join('\n').slice(0, 100000);
-    return { text, lines, pageCount: Array.isArray(result.pages) ? result.pages.length : 0 };
+    return {
+        text, lines, pageCount: pages.length,
+        pages: pages.slice(0, MAX_PAGES).map((page, pageIndex) => ({
+            pageIndex, pageNumber: Number(page.pageNumber) || pageIndex + 1,
+            width: Number.isFinite(Number(page.width)) && page.width !== null ? Number(page.width) : null,
+            height: Number.isFinite(Number(page.height)) && page.height !== null ? Number(page.height) : null,
+            unit: String(page.unit || ''),
+        })),
+    };
 }
 
 async function recognizeImage({
@@ -204,5 +246,5 @@ async function recognizeImage({
 
 module.exports = {
     API_VERSION, MODEL_ID, MAX_FREE_FILE_BYTES, DEFAULT_MONTHLY_LIMIT,
-    safeEndpoint, safeOperationUrl, detectMime, readJsonBounded, flattenReadResult, recognizeImage,
+    safeEndpoint, safeOperationUrl, detectMime, readJsonBounded, normalizePolygon, flattenReadResult, recognizeImage,
 };
