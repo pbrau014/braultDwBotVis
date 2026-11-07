@@ -46,7 +46,7 @@ function makeGroundTruth(count) {
   };
 }
 
-function makeDevelopmentGroundTruth() {
+function makeRegressionHashes() {\n  return Array.from({ length: 4 }, (_, index) => digest(`regression-${index + 1}`));\n}\n\nfunction makeDevelopmentGroundTruth() {
   return {
     records: Array.from({ length: 16 }, (_, index) => ({
       filename: `development-${index + 1}.png`,
