@@ -24,6 +24,7 @@ const { isAdminOnlyCommand } = require('./tournament-command-policy');
 const { getOcrSpaceActivation } = require('./ocrspace-field-evidence');
 const { createOcrSpacePdfFirst } = require('./ocrspace-pdf-first');
 const { getMultiProviderActivation, runMultiProviderOcr } = require('./multi-provider-ocr');
+const { runParallelLocalReaders } = require('./parallel-local-ocr');
 
 const { reconcileOcrSpaceEvidence } = require('./ocrspace-reconciliation');
 const path = require('node:path');
@@ -348,13 +349,19 @@ async function extractTextCore(imageBuffer) {
     const multiProviderActivation = getMultiProviderActivation(process.env);
     let multiProviderOcrEvidence = { status: 'not_requested', requested: false, providers: {} };
     let multiProviderOcrPromise = null;
+    let parallelLocalReadersPromise = null;
+    let parallelLocalReadersEvidence = { status: 'not_requested', readers: {} };
     let ocrSpacePdfFirstEvidence = { status: 'not_requested', reason: ocrSpaceActivation.reason, requests: 0 };
     let ocrSpaceSourceEvidence = { status: 'not_requested', reason: ocrSpaceActivation.reason, requests: 0, evidence: [] };
     if (multiProviderActivation.requested) {
-        // Start both online providers now; do not await them here. They execute
-        // concurrently with OpenCV and all local OCR passes on the original image.
+        // Start both online providers and all independent local readers now; do not
+        // await them here. They execute alongside OpenCV and the primary OCR path.
         multiProviderOcrPromise = runMultiProviderOcr({
             imageBuffer, filename: 'wows-battle-source.png', env: process.env,
+        });
+        parallelLocalReadersPromise = runParallelLocalReaders({
+            imageBuffer, env: process.env,
+            timeoutMs: Number(process.env.OCR_PARALLEL_READER_TIMEOUT_MS) || 60000,
         });
     }
     const cvAnalysis = await opencvFieldIsolation.analyze(imageBuffer, { force: false });
@@ -2463,6 +2470,10 @@ async function extractTextCore(imageBuffer) {
         ...(cvResultAttempt ? [cvResultAttempt] : []), ...explicitOutcomePanelReads].map((attempt) => ({
         text: String(attempt.text || ''), confidence: Number(attempt.confidence) || 0,
     }));
+    if (parallelLocalReadersPromise) {
+        parallelLocalReadersEvidence = await parallelLocalReadersPromise;
+    }
+
     if (multiProviderOcrPromise) {
         multiProviderOcrEvidence = await multiProviderOcrPromise;
         const ocrSpace = multiProviderOcrEvidence.providers?.ocrSpace;
@@ -2496,6 +2507,7 @@ async function extractTextCore(imageBuffer) {
         ocrSpaceEvidence: ocrSpaceSourceEvidence,
         ocrSpacePdfFirst: ocrSpacePdfFirstEvidence,
         multiProviderOcr: multiProviderOcrEvidence,
+        parallelLocalReaders: parallelLocalReadersEvidence,
         rewards: focusedRewards,
         rewardCandidates,
         legacyRewardCandidates,

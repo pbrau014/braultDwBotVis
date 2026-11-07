@@ -59,6 +59,7 @@ jobs:
           node --check src/azure-document-intelligence-client.js
           node --check src/azure-document-intelligence-quota-ledger.js
           node --check src/multi-provider-ocr.js
+          node --check src/parallel-local-ocr.js
           node --check src/ocrspace-client.js
           node --check src/ocrspace-pdf-first.js
           node --check src/ocrspace-quota-ledger.js
