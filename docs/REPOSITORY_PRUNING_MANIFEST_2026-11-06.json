@@ -1,0 +1,2332 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-11-06",
+  "repository": "pbrau014/braultDwBotVis",
+  "branch": "ocr-multiprovider",
+  "parentCommit": "b8000021ed79985d3df73da59fe1708007c608d2",
+  "sourceTreeSha": "e4837f9e3afca15a424d35e2cade6b70b6191e71",
+  "recursiveTreeTruncated": false,
+  "trackedBlobCountBefore": 632,
+  "removedFileCount": 385,
+  "removedBytes": 93794404,
+  "retainedPrinciples": [
+    "Keep DWBOT_BRANCH_CHARTER.md and the nine mandatory fields.",
+    "Keep the current source code, tests, runtime assets, current user manuals, source baseline, RC3 provenance archive, and the 56-image review workbook.",
+    "Keep the original user-supplied OCR implementation text and Discord scoring/workbook messages under docs/source-inputs/.",
+    "Keep testdata/ground-truth/imagesF-63-working-ground-truth-v6.json and related screenshot sources as optional labelled-evaluation inputs; they are not formal release gates.",
+    "Do not modify or merge into main."
+  ],
+  "binaryInspectionLimit": "The GitHub repository interface exposed binary blobs as opaque objects rather than decoded document contents. Deletion was limited to superseded draft/QA/release directories, duplicate backups/exports, stale gate artifacts, and clearly unrelated auxiliary files. Potentially relevant opaque sources (the 56-image review workbook, inventory JSON files, tournament DOCX source documents, current workbook, original source baseline, and RC3 archive) were retained. This manifest records original blob hashes and sizes; it does not claim every removed binary was text-extracted.",
+  "removedFiles": [
+    {
+      "path": ".github/workflows/dwbot-gateA-16-pdf-first.yml",
+      "gitBlobSha1": "47140c4957288e5a9bc6c9e67b2448d8be359f23",
+      "sizeBytes": 25514,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": ".github/workflows/dwbot-imagesF-21-artifact-verification.yml",
+      "gitBlobSha1": "80b2da2205273c3f710a6360c9db72794b28150e",
+      "sizeBytes": 29368,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": ".github/workflows/dwbot-imagesF-63-exploratory.yml",
+      "gitBlobSha1": "00d5e15e54480d746e7342bc08fc6f2ce894295b",
+      "sizeBytes": 10687,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": "04_Companion_Materials/Admiralty_Chronicle_The_First_YOLO_Season_v0.1_PROPOSAL.md",
+      "gitBlobSha1": "96385877b195fb1c8456cb440d5b4fcda9fb2834",
+      "sizeBytes": 23984,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Admiralty_YOLO_Mock_Tournament_Field_Guide_v0.1_PROPOSAL.md",
+      "gitBlobSha1": "e9a5ae962294e505484773bb8ec91a74f3cb284b",
+      "sizeBytes": 36301,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Admiralty_YOLO_Mock_Tournament_v0.1.html",
+      "gitBlobSha1": "779a14b6f90c9de535a61e8ea99ac9eb901d918d",
+      "sizeBytes": 26080,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Admiralty_YOLO_Source_Reconciliation_and_Visual_Provenance_v0.1.md",
+      "gitBlobSha1": "d38b8660a133fd6f3714cf7612607092c3065f89",
+      "sizeBytes": 16886,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Companion_Material_Crosswalk_v3.19.md",
+      "gitBlobSha1": "4e2b1d2df65d32ae085199dce0d39a3f94bdda3d",
+      "sizeBytes": 5703,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Discord_Bot_Maintainer_Security_and_Release_Guide_v1.1_DRAFT.docx",
+      "gitBlobSha1": "94de2f9d513fafc24682d1964427e8df65d88e15",
+      "sizeBytes": 46147,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Discord_Bot_Maintainer_Security_and_Release_Guide_v1.1_DRAFT.md",
+      "gitBlobSha1": "74069da45162b5b79945a69b241a85be6498c10b",
+      "sizeBytes": 10697,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Discord_Bot_Maintainer_Security_and_Release_Guide_v1.1_DRAFT.pdf",
+      "gitBlobSha1": "8664355484ee13f0cf44a6359ee388b571139164",
+      "sizeBytes": 101306,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Discord_Bot_Maintainer_Security_and_Release_Guide_v1.1_DRAFT_a11y.json",
+      "gitBlobSha1": "77fd64c813c42774f86ec15fcbd5d73fdbb838c1",
+      "sizeBytes": 322,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Event_Settings_and_Publication_Approval_Record_v1.1_DRAFT.docx",
+      "gitBlobSha1": "6caa30b31a7918a1f5031a5f986e70b082ff23d0",
+      "sizeBytes": 48681,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Event_Settings_and_Publication_Approval_Record_v1.1_DRAFT.md",
+      "gitBlobSha1": "8336865b10dd1ac6dcb3c668e3a4d92448f2c8cc",
+      "sizeBytes": 18474,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Event_Settings_and_Publication_Approval_Record_v1.1_DRAFT.pdf",
+      "gitBlobSha1": "2fb00705975cddd366e267e71c1ce3e3fbe18589",
+      "sizeBytes": 154029,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Event_Settings_and_Publication_Approval_Record_v1.1_DRAFT_a11y.json",
+      "gitBlobSha1": "0be9dfd4cda652d2227085bfa0a32d2fb62a8967",
+      "sizeBytes": 319,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Participant_Quick_Start_Evidence_and_Results_v1.1_DRAFT.docx",
+      "gitBlobSha1": "fd65d80d8697b3a38bc58ef65afdf9234513251a",
+      "sizeBytes": 43999,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Participant_Quick_Start_Evidence_and_Results_v1.1_DRAFT.md",
+      "gitBlobSha1": "d71196fc355673984d71e295b2e062e064a0a044",
+      "sizeBytes": 6493,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Participant_Quick_Start_Evidence_and_Results_v1.1_DRAFT.pdf",
+      "gitBlobSha1": "7d8dd1abdcda5b51badfc9d65fb833fa35be027a",
+      "sizeBytes": 84721,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Participant_Quick_Start_Evidence_and_Results_v1.1_DRAFT_a11y.json",
+      "gitBlobSha1": "91800825a1b341957b4eeef1f9c0d2b4db841a8e",
+      "sizeBytes": 317,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Participant_Quick_Start_Evidence_and_Results_v1.2_WORKING_UPDATE.md",
+      "gitBlobSha1": "8bb2b3d0a1562a2e5c3c900c9c5c40930df3f58d",
+      "sizeBytes": 8791,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Pilot_Event_Ruleset_v1.1_DRAFT.docx",
+      "gitBlobSha1": "3b21858d99c57d4ed936dd5bd28844c5ff7e7007",
+      "sizeBytes": 45699,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Pilot_Event_Ruleset_v1.1_DRAFT.md",
+      "gitBlobSha1": "906748f17507ad2a0ea4177a371cc3660e1d79fa",
+      "sizeBytes": 11180,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Pilot_Event_Ruleset_v1.1_DRAFT.pdf",
+      "gitBlobSha1": "3323f68943f2df55291af34bf93b7ba01639ffee",
+      "sizeBytes": 100998,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Pilot_Event_Ruleset_v1.1_DRAFT_a11y.json",
+      "gitBlobSha1": "2abcede09e6f138a15b963f10d28a78f724f455a",
+      "sizeBytes": 292,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/README_AND_INDEX.json",
+      "gitBlobSha1": "dc85e7e14f414f8bc2a105e38cbe3ed51e18290e",
+      "sizeBytes": 12912,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Recurring_Tournament_Ruleset_v1.1_DRAFT.docx",
+      "gitBlobSha1": "e892b11310428f851462b848d8cf40609c68c3f7",
+      "sizeBytes": 46628,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Recurring_Tournament_Ruleset_v1.1_DRAFT.md",
+      "gitBlobSha1": "6a1cb0f79ddb7ce89c0d3deabf90dfd94ac259f4",
+      "sizeBytes": 15059,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Recurring_Tournament_Ruleset_v1.1_DRAFT.pdf",
+      "gitBlobSha1": "0b4a7070912160cad09c616ab196a24f70e0b2b3",
+      "sizeBytes": 98587,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Recurring_Tournament_Ruleset_v1.1_DRAFT_a11y.json",
+      "gitBlobSha1": "9b0b8c868f6dbe1b615a6598a42fdea256321932",
+      "sizeBytes": 301,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Release_Gate_Status_and_Reconciliation_Record_v1.1.docx",
+      "gitBlobSha1": "138cf12dd3f71b54d72cd2394957decec26f2644",
+      "sizeBytes": 45167,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Release_Gate_Status_and_Reconciliation_Record_v1.1.md",
+      "gitBlobSha1": "daf6db39ff1ce19bee039b97eabf72b7a4296d56",
+      "sizeBytes": 10291,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Release_Gate_Status_and_Reconciliation_Record_v1.1.pdf",
+      "gitBlobSha1": "ab18d4e11628047e1770e0fe9df7d09b3b3e51d1",
+      "sizeBytes": 119010,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Release_Gate_Status_and_Reconciliation_Record_v1.1_a11y.json",
+      "gitBlobSha1": "7941fc6e81284326c9d2f1331acd6c36b0c68e1e",
+      "sizeBytes": 312,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/SOURCE_BUNDLE_STATUS_AND_ACQUISITION_RECORD.md",
+      "gitBlobSha1": "8e5e6bf7da95d595724e0fe903f5ded7ebeb2ae2",
+      "sizeBytes": 7473,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Scoring_Workbook_and_Validation_Guide_v1.1_DRAFT.docx",
+      "gitBlobSha1": "0ec56ed549c6174c4a3d224cf2b284790fa707e5",
+      "sizeBytes": 46285,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Scoring_Workbook_and_Validation_Guide_v1.1_DRAFT.md",
+      "gitBlobSha1": "73c62259dc7ab5fa9bf3cde8b09588f8d2a7e36f",
+      "sizeBytes": 13771,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Scoring_Workbook_and_Validation_Guide_v1.1_DRAFT.pdf",
+      "gitBlobSha1": "7c4b423bdcc8b69a9e8765e649aed94230848c28",
+      "sizeBytes": 110333,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Scoring_Workbook_and_Validation_Guide_v1.1_DRAFT_a11y.json",
+      "gitBlobSha1": "68c24d3cc27b887fef17c95c385c6a9d4c06443d",
+      "sizeBytes": 310,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Season_Logistics_and_Grand_YOLO_Finale_Blueprint_v0.1_PROPOSAL.md",
+      "gitBlobSha1": "3b1ab33ce39e361f834f9c52d3d9c25a03d0a101",
+      "sizeBytes": 14500,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Season_Logistics_and_Grand_YOLO_Finale_Blueprint_v0.2_PROPOSAL.md",
+      "gitBlobSha1": "8543e7df4bc9029c18c898201c4bf1085459d5c7",
+      "sizeBytes": 28597,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Training_Room_Host_and_Referee_Guide_v1.1_DRAFT.docx",
+      "gitBlobSha1": "f66a39777ccecaf8ef52ca85d7a244be1caca0da",
+      "sizeBytes": 44898,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Training_Room_Host_and_Referee_Guide_v1.1_DRAFT.md",
+      "gitBlobSha1": "e2547447287f14c1bf0a5ca4cb9adb42f3180b60",
+      "sizeBytes": 8952,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Training_Room_Host_and_Referee_Guide_v1.1_DRAFT.pdf",
+      "gitBlobSha1": "73c49551120d3585a915d159ffe34063eef35872",
+      "sizeBytes": 93504,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/Training_Room_Host_and_Referee_Guide_v1.1_DRAFT_a11y.json",
+      "gitBlobSha1": "14c1bd82fc48d69cc3c3839b23df08a6c1dc0a57",
+      "sizeBytes": 309,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/YOLO_Event_Night_Operations_Manual_v0.1_PROPOSAL.md",
+      "gitBlobSha1": "26acc1fc9d389cbe66834aaefe53bb17908b3985",
+      "sizeBytes": 16820,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/YOLO_Participant_Quick_Start_and_Evidence_Submission_Guide_v0.1_PROPOSAL.md",
+      "gitBlobSha1": "b7c2b0ff6973b2d9328ae72f696beeb9c390eeea",
+      "sizeBytes": 10600,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/YOLO_Scoring_and_Standings_Explainer_v0.1_PROPOSAL.md",
+      "gitBlobSha1": "8d1484f63725dca5dd6d67f3633c8780c6c37029",
+      "sizeBytes": 11038,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/pdf/Discord_Bot_Maintainer_Security_and_Release_Guide_v1.1_DRAFT.pdf",
+      "gitBlobSha1": "8664355484ee13f0cf44a6359ee388b571139164",
+      "sizeBytes": 101306,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/pdf/Event_Settings_and_Publication_Approval_Record_v1.1_DRAFT.pdf",
+      "gitBlobSha1": "2fb00705975cddd366e267e71c1ce3e3fbe18589",
+      "sizeBytes": 154029,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/pdf/Participant_Quick_Start_Evidence_and_Results_v1.1_DRAFT.pdf",
+      "gitBlobSha1": "7d8dd1abdcda5b51badfc9d65fb833fa35be027a",
+      "sizeBytes": 84721,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/pdf/Pilot_Event_Ruleset_v1.1_DRAFT.pdf",
+      "gitBlobSha1": "3323f68943f2df55291af34bf93b7ba01639ffee",
+      "sizeBytes": 100998,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/pdf/Recurring_Tournament_Ruleset_v1.1_DRAFT.pdf",
+      "gitBlobSha1": "0b4a7070912160cad09c616ab196a24f70e0b2b3",
+      "sizeBytes": 98587,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/pdf/Release_Gate_Status_and_Reconciliation_Record_v1.1.pdf",
+      "gitBlobSha1": "ab18d4e11628047e1770e0fe9df7d09b3b3e51d1",
+      "sizeBytes": 119010,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/pdf/Scoring_Workbook_and_Validation_Guide_v1.1_DRAFT.pdf",
+      "gitBlobSha1": "7c4b423bdcc8b69a9e8765e649aed94230848c28",
+      "sizeBytes": 110333,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "04_Companion_Materials/pdf/Training_Room_Host_and_Referee_Guide_v1.1_DRAFT.pdf",
+      "gitBlobSha1": "73c49551120d3585a915d159ffe34063eef35872",
+      "sizeBytes": 93504,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/Fresh_Visual_Inspection_Report_v3.17.md",
+      "gitBlobSha1": "e908ff46c7d26cb1e1556b5cc4469bfcf503cf7a",
+      "sizeBytes": 2343,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/Fresh_Visual_Inspection_Report_v3.18.md",
+      "gitBlobSha1": "add97d8df3197eb8ac69595bd438cb3025d5bda7",
+      "sizeBytes": 3899,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/Fresh_Visual_Inspection_Report_v3.19.md",
+      "gitBlobSha1": "c236ac5bf4dae66268fb5a993ce132fe8f4ba496",
+      "sizeBytes": 4236,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/Grand_Tournament_Instruction_Set_v3.15_Completion_and_Open_Gates.md",
+      "gitBlobSha1": "ff997553f11963d730b07abc89b1360779e835ea",
+      "sizeBytes": 8479,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/Grand_Tournament_Instruction_Set_v3.15_Package_Manifest.md",
+      "gitBlobSha1": "fa6515c625d9df78ca8c953994337bcb3768b51d",
+      "sizeBytes": 7763,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/Grand_Tournament_Instruction_Set_v3.15_Policy_Resolved_Source_Baseline.docx",
+      "gitBlobSha1": "65968430852119d9935e32971e7f5b9e4dd45f6d",
+      "sizeBytes": 371255,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/Grand_Tournament_Instruction_Set_v3.15_Policy_Resolved_Source_Baseline.md",
+      "gitBlobSha1": "8b250fa4103030575ab29ba473f3bd29e79847fe",
+      "sizeBytes": 209569,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/Grand_Tournament_Instruction_Set_v3.15_Policy_Resolved_Source_Baseline.pdf",
+      "gitBlobSha1": "a4964d7c0d90b2f820444193e87e4e4a28961b51",
+      "sizeBytes": 1279872,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/Grand_Tournament_Instruction_Set_v3.15_Readme.md",
+      "gitBlobSha1": "9c890752dacf6ef6177ad032613b7b9e763faef2",
+      "sizeBytes": 2557,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/Grand_Tournament_Instruction_Set_v3.15_Release_Index.json",
+      "gitBlobSha1": "1cf9264ad20e45fae81384809818d863d6b77dcc",
+      "sizeBytes": 5579,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/Package_Integrity_Verification.json",
+      "gitBlobSha1": "f17dab1f4938a232173b5cf095bd433d22fcdb75",
+      "sizeBytes": 681,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/Package_Integrity_Verification_v3.19.json",
+      "gitBlobSha1": "b3beb8cf053874faf93cab076d13a4d9cb23c7de",
+      "sizeBytes": 28991,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/Reorganization_and_QA_Report.md",
+      "gitBlobSha1": "5fb9b1581eb1f77a5b70e87da5428f0753983ac1",
+      "sizeBytes": 5216,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/_v3.19_editorial_change_rows.json",
+      "gitBlobSha1": "a28b51dbdce39b004ac0bd50c8ecece3ee840029",
+      "sizeBytes": 90021,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.17_Reorganization_and_QA_Report.json",
+      "gitBlobSha1": "3cac57a66a7bc062c03ad050587a78ddf969e14d",
+      "sizeBytes": 6571,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.18_Change_Log_and_Style_Specification.md",
+      "gitBlobSha1": "68db5e455477f38bb84cb279e1dc423d75ced7a3",
+      "sizeBytes": 3247,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.18_Document_Formatting_Stats.json",
+      "gitBlobSha1": "69f395ed8cd64fef93962770b3bcc7b04e86d425",
+      "sizeBytes": 3488,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.18_QA_Audit.json",
+      "gitBlobSha1": "0c1ca35b3037e2e70ceecd00fa48f1e586b827a1",
+      "sizeBytes": 11527,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.18_Render_Inventory.json",
+      "gitBlobSha1": "0459a5189cb565892b642c894913df6d4259e649",
+      "sizeBytes": 3260,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.19_Change_Log.md",
+      "gitBlobSha1": "ea762a5653366fe7fa10a8690f1af6d7460084d1",
+      "sizeBytes": 4004,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.19_Cross_Document_Consistency_Report.md",
+      "gitBlobSha1": "24c90c6c863324d323704d6067411e8bd80c5b2c",
+      "sizeBytes": 3903,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.19_Editorial_Audit_Report.md",
+      "gitBlobSha1": "928edfe5df706d7e20a2fdd5eb3a4fda854500e4",
+      "sizeBytes": 5139,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.19_Final_QA_Report.md",
+      "gitBlobSha1": "733f7dfc7f813f279155e76a3bb735afebe6d855",
+      "sizeBytes": 4538,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.19_Formatting_Rulebook.md",
+      "gitBlobSha1": "0c702aa602b37a3dc9b536df4ca239247531932c",
+      "sizeBytes": 2770,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.19_Internal_Navigation_Check.json",
+      "gitBlobSha1": "c8cf3dc0a0292bb5311b038d5a6c4f5648aeb41a",
+      "sizeBytes": 5390,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.19_Line_Review_Ledger.csv",
+      "gitBlobSha1": "06118f5a14caefe71fb2d2eb9a618e283b92bc47",
+      "sizeBytes": 2106184,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.19_QA_Audit.json",
+      "gitBlobSha1": "3020d7c1ee2a799c9b0137222c36da6b99f196fb",
+      "sizeBytes": 5099,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.19_Render_Inventory.json",
+      "gitBlobSha1": "d3a1e30d36e071cb6ac0c19acadfaee2713fbe22",
+      "sizeBytes": 2991,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.19_Terminology_and_Definition_Ledger.md",
+      "gitBlobSha1": "b64fa1833b4e2dc9b9de0a77d4f84b5a508e8bdb",
+      "sizeBytes": 5815,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.20_Editorial_Implementation_Audit.json",
+      "gitBlobSha1": "f6bd255affeacb094ec2bbbf6ed3c0002113b18b",
+      "sizeBytes": 4132,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.20_Three_Perspective_Editorial_Review.md",
+      "gitBlobSha1": "a123438d30828db278651b111d58caa91981954a",
+      "sizeBytes": 9651,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.21_Change_and_Verification_Report.md",
+      "gitBlobSha1": "56f429da47c8ed0c9aae1acebbed81d3657bba62",
+      "sizeBytes": 5487,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.21_Edit_Application_Summary.json",
+      "gitBlobSha1": "24f6c7186ed86213eb0d48850f6ef4677d6236d8",
+      "sizeBytes": 1258,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.21_Editorial_Implementation_Audit.json",
+      "gitBlobSha1": "677ae403234c042d2101f70a69c4112b3ea61de0",
+      "sizeBytes": 5838,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.22_Internal_Navigation_Check.json",
+      "gitBlobSha1": "872f7dd502b6b208c9d9ba136eb795c518463a1f",
+      "sizeBytes": 14175,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.22_Production_Readiness_and_Waiver_Report.md",
+      "gitBlobSha1": "d2037e13e639ee531e94b3f967a69ead038d4d1c",
+      "sizeBytes": 4780,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.22_accessibility_audits/Discord_Bot_Maintainer_Security_and_Release_Guide_v1.1_DRAFT_a11y.json",
+      "gitBlobSha1": "a5f97b51c6912e6b3bd70ffd67ad9a4ccef718cc",
+      "sizeBytes": 2063,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.22_accessibility_audits/Event_Settings_and_Publication_Approval_Record_v1.1_DRAFT_a11y.json",
+      "gitBlobSha1": "2c4652763d4a72085d4931dc594119b844946d60",
+      "sizeBytes": 2060,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.22_accessibility_audits/Grand_Tournament_Event_Operations_Manual_v3.19_a11y.json",
+      "gitBlobSha1": "9a1bcef6e57642acfe12a5723f215ec4e4ad923d",
+      "sizeBytes": 1371,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.22_accessibility_audits/Grand_Tournament_Participant_Guide_v3.19_a11y.json",
+      "gitBlobSha1": "33a69e121df59d887e75d832ba42e9fc1d952f65",
+      "sizeBytes": 3820,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.22_accessibility_audits/Grand_Tournament_Technical_Reference_v3.19_a11y.json",
+      "gitBlobSha1": "f2efdf23a6972110bb63ca5132df43fc8b2a4ba7",
+      "sizeBytes": 3830,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.22_accessibility_audits/Participant_Quick_Start_Evidence_and_Results_v1.1_DRAFT_a11y.json",
+      "gitBlobSha1": "8bd154fd9cef77af59d272146afb20c7491f5597",
+      "sizeBytes": 1835,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.22_accessibility_audits/Pilot_Event_Ruleset_v1.1_DRAFT_a11y.json",
+      "gitBlobSha1": "a104609545cea319b7aa8ef207f4aca62e2dab71",
+      "sizeBytes": 2256,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.22_accessibility_audits/Recurring_Tournament_Ruleset_v1.1_DRAFT_a11y.json",
+      "gitBlobSha1": "51642a86cd21db7a56f563b23cd8886e732a718c",
+      "sizeBytes": 2489,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.22_accessibility_audits/Release_Gate_Status_and_Reconciliation_Record_v1.1_a11y.json",
+      "gitBlobSha1": "15f8d1fb570541ed7e46bea46ff0fff51cdaba14",
+      "sizeBytes": 1384,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.22_accessibility_audits/Scoring_Workbook_and_Validation_Guide_v1.1_DRAFT_a11y.json",
+      "gitBlobSha1": "ccf7af3d5a171eedafc60ca75a04f770777ad926",
+      "sizeBytes": 2051,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.22_accessibility_audits/Training_Room_Host_and_Referee_Guide_v1.1_DRAFT_a11y.json",
+      "gitBlobSha1": "a8299dee50aea6562a244eeb43add7f5cf1fdfa9",
+      "sizeBytes": 2273,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/v3.22_build_verification.json",
+      "gitBlobSha1": "9f5481c556110f6dfcc9b0dcb8c05e0c44df5d81",
+      "sizeBytes": 7477,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review/Grand_Tournament_Event_Operations_Manual_v3.17_contact_001-009.jpg",
+      "gitBlobSha1": "b59e1f93f107c0392141944b8d4e1cddaa5acd4a",
+      "sizeBytes": 261761,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review/Grand_Tournament_Event_Operations_Manual_v3.17_contact_010-018.jpg",
+      "gitBlobSha1": "ddda2547754ea775aa39c89c9c6d018e057908dd",
+      "sizeBytes": 251811,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review/Grand_Tournament_Event_Operations_Manual_v3.17_contact_019-023.jpg",
+      "gitBlobSha1": "ba196b970deedc9cac7c3608e46ff01f8d2e3904",
+      "sizeBytes": 139622,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review/Grand_Tournament_Participant_Guide_v3.17_contact_001-009.jpg",
+      "gitBlobSha1": "efdcb77c180cb97692a05f8893fe5d5a21a83461",
+      "sizeBytes": 262672,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review/Grand_Tournament_Participant_Guide_v3.17_contact_010-014.jpg",
+      "gitBlobSha1": "83bb44a874be97230ca740b9653f82496f7f949b",
+      "sizeBytes": 138644,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review/Grand_Tournament_Technical_Reference_v3.17_contact_001-009.jpg",
+      "gitBlobSha1": "9e107cbf75395204181a38fc104d89e387156d76",
+      "sizeBytes": 262769,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review/Grand_Tournament_Technical_Reference_v3.17_contact_010-018.jpg",
+      "gitBlobSha1": "74177049e90caba1a0a90c81fb4cded99bf45101",
+      "sizeBytes": 249974,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review/Grand_Tournament_Technical_Reference_v3.17_contact_019-027.jpg",
+      "gitBlobSha1": "1c63ee8b262e267132c2224368a7e99048c9d2aa",
+      "sizeBytes": 241170,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review/Grand_Tournament_Technical_Reference_v3.17_contact_028-030.jpg",
+      "gitBlobSha1": "e18cfbc8011762fb23c607061dc813f03fb1551d",
+      "sizeBytes": 85202,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/ALL_CONTACT_SHEETS_OVERVIEW.jpg",
+      "gitBlobSha1": "50eb1b7d0410c575987c88240cde6a4d93290476",
+      "sizeBytes": 899798,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/PAGE_INVENTORY.json",
+      "gitBlobSha1": "0c8e04391c4867fbc5b37882e454baedccdd3820",
+      "sizeBytes": 11500,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_001-004.jpg",
+      "gitBlobSha1": "e2ed8e34cf0ef01dc1b2eb0e40c1fa1c986cd0c0",
+      "sizeBytes": 490774,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_005-008.jpg",
+      "gitBlobSha1": "0d89cab945ffdd129ec808247e12c28ecc2c3af7",
+      "sizeBytes": 580581,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_009-012.jpg",
+      "gitBlobSha1": "6bd98682fe76d7d1088f1ce1e20a80bc3cc708b6",
+      "sizeBytes": 554864,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_013-016.jpg",
+      "gitBlobSha1": "1c26cc3990afff17a4aca56a78ac007209fa18e4",
+      "sizeBytes": 539285,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_017-020.jpg",
+      "gitBlobSha1": "dc1a9fb984ff1896e453ce11ff48808d9666177e",
+      "sizeBytes": 521833,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_021-024.jpg",
+      "gitBlobSha1": "6e164121d21b3951db304fd8d60e0ec5509c4433",
+      "sizeBytes": 559712,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_025-028.jpg",
+      "gitBlobSha1": "4bb2be05bfe07118afeddb58ed306da1c79a74b0",
+      "sizeBytes": 517167,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_029-032.jpg",
+      "gitBlobSha1": "15b88c775c75d4ded4e56a98dd0224e19ce66806",
+      "sizeBytes": 473163,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_033-036.jpg",
+      "gitBlobSha1": "b54b27306087312f46eb35907686f8d976618882",
+      "sizeBytes": 561319,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_037-040.jpg",
+      "gitBlobSha1": "bbc3fb70802d7941f1fc64bcc89c281584a0af29",
+      "sizeBytes": 363685,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_041-044.jpg",
+      "gitBlobSha1": "7c10762ac923b791886fefb9bd495be24445f814",
+      "sizeBytes": 582386,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_045-048.jpg",
+      "gitBlobSha1": "34fb2bd6bf31bcdf96306c6905fcd23f4d9ff5f5",
+      "sizeBytes": 522102,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_049-052.jpg",
+      "gitBlobSha1": "7a746ddb38347b50388410a6096e479fb9715012",
+      "sizeBytes": 500822,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_053-056.jpg",
+      "gitBlobSha1": "5b4baf876f1a469765bd070a15a0136917bc4cbf",
+      "sizeBytes": 551578,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_057-060.jpg",
+      "gitBlobSha1": "4f57b51b7fcee3ecb34f310933b3e68ef68b777a",
+      "sizeBytes": 412647,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_061-064.jpg",
+      "gitBlobSha1": "1e6e1197a261609f6b603ab1f3aac6a2bb1af704",
+      "sizeBytes": 569812,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_065-068.jpg",
+      "gitBlobSha1": "2c9af6c38a71f36dbf014bd062213adf5f246d70",
+      "sizeBytes": 487444,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_069-072.jpg",
+      "gitBlobSha1": "ed7bdbb49caafcaa0bf86cb9ef99ba4c392d382c",
+      "sizeBytes": 369666,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_073-076.jpg",
+      "gitBlobSha1": "e8b1110a570627655548a8b0a9b7c009b5dd48c2",
+      "sizeBytes": 404699,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_077-080.jpg",
+      "gitBlobSha1": "6809ddf1f955e4d8a8c0b0664d6a9021cc78b6c6",
+      "sizeBytes": 360319,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_081-084.jpg",
+      "gitBlobSha1": "17f414b33944a7d5be6ea885e6ccf72335dff8a4",
+      "sizeBytes": 461680,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_085-088.jpg",
+      "gitBlobSha1": "c1d66608f5f2048853e17c138ac3d4a20b78641f",
+      "sizeBytes": 464955,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_089-092.jpg",
+      "gitBlobSha1": "5bdb9b847c1831615f14122176fb4caf8bf2f8eb",
+      "sizeBytes": 366866,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_093-096.jpg",
+      "gitBlobSha1": "381dcbcab574f3b099e8216b2ba9992c652107f9",
+      "sizeBytes": 463193,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "05_QA/visual_review_v3.18_final/contact_097-100.jpg",
+      "gitBlobSha1": "1b3f2fab3a548775daf01250102648509dd3d3e8",
+      "sizeBytes": 380120,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "06_Baselines/Grand_Tournament_Instruction_Set_v3.17_Reorganized_Release_Package.zip",
+      "gitBlobSha1": "281e87a0f57089bb06d2b393c31b785ecfeb64ab",
+      "sizeBytes": 4636603,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "07_Score_Reporter_Assets/ASSET_INTAKE_REQUIRED.md",
+      "gitBlobSha1": "a5fcd2525853b14b2debd1a60f2a8f4a399f2068",
+      "sizeBytes": 2029,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "08_Release/MANIFEST.sha256",
+      "gitBlobSha1": "553bf41a832a18e39c8d7e071ab8481f5b980500",
+      "sizeBytes": 21400,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "08_Release/README.md",
+      "gitBlobSha1": "c198b23de8c819eb264e4839a87b95faa74a9875",
+      "sizeBytes": 5691,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "08_Release/RELEASE_INDEX.json",
+      "gitBlobSha1": "e97b28c0ab7899843ae1c6cd18015a841a3d1ba3",
+      "sizeBytes": 6201,
+      "reason": "Removed superseded draft, QA-output, old baseline, placeholder, or release-package material. Current user manuals and the original v3.22 source baseline remain retained under their current paths."
+    },
+    {
+      "path": "EnterpriseOCRPipeline.py",
+      "gitBlobSha1": "cadf83d1627f69120f2442e5ccdb27a97108598c",
+      "sizeBytes": 61235,
+      "reason": "Removed a stale duplicate, obsolete plan, or superseded standalone artifact not referenced by the active implementation."
+    },
+    {
+      "path": "admin/implementationNotes/addedImgProcess.txt",
+      "gitBlobSha1": "25e26e05d572c4ed352f31a84e5ce208bde9abbf",
+      "sizeBytes": 19452,
+      "reason": "Removed a stale duplicate, obsolete plan, or superseded standalone artifact not referenced by the active implementation."
+    },
+    {
+      "path": "docs/OCRSPACE_ADAPTER_TEST_RESULTS_2026-11-03.md",
+      "gitBlobSha1": "c816b06d068ae11a75efcf52fb8f2360629348f2",
+      "sizeBytes": 2101,
+      "reason": "Removed a stale duplicate, obsolete plan, or superseded standalone artifact not referenced by the active implementation."
+    },
+    {
+      "path": "docs/PADDLEOCR-FIELD-CROP-FALLBACK-ITERATION20.md",
+      "gitBlobSha1": "c1ee5a86df41fbd25137ff1872e22f030873d496",
+      "sizeBytes": 10608,
+      "reason": "Removed a stale duplicate, obsolete plan, or superseded standalone artifact not referenced by the active implementation."
+    },
+    {
+      "path": "docs/continuation/DWBOT-GATEA-REQUIREMENTS-AND-STATUS-2026-11-06.md",
+      "gitBlobSha1": "794200df2abdaf0223e3bf8da1698dd1f47c2ef8",
+      "sizeBytes": 14931,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/continuation/DWBOT-OCRSPACE-ARTIFACT-VERIFICATION-CHECKLIST-v1.md",
+      "gitBlobSha1": "b76357213f40fd2f0f50c3ecc2663c53b8e85d43",
+      "sizeBytes": 10834,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/continuation/DWBOT-UPD-2026-11-05-001-imagesF-corpus.md",
+      "gitBlobSha1": "8959cea4181821938975dc51c68f2926c255dd36",
+      "sizeBytes": 3127,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/continuation/DWBOT-UPD-2026-11-05-002-groundtruth-gap-register.md",
+      "gitBlobSha1": "35816a3c2a7625d1f9bd0e2e72bb8c7dc6c52ce8",
+      "sizeBytes": 2570,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/continuation/DWBOT-UPD-2026-11-05-003-imagesF-63-exploratory-runner.md",
+      "gitBlobSha1": "2f7793b14787b9d6d2a00860b5cce9ca9298844c",
+      "sizeBytes": 2513,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/continuation/DWBOT-UPD-2026-11-06-004-imagesF-63-ground-truth.md",
+      "gitBlobSha1": "3a5ddba915f2a1968c9b720998022f0ea524a230",
+      "sizeBytes": 5400,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/continuation/DWBOT-UPD-2026-11-06-005-desktop-upload-ui.md",
+      "gitBlobSha1": "fc4bb8363b8f68d4ff88127228b22327ced77434",
+      "sizeBytes": 4195,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/continuation/DWBOT-UPD-2026-11-06-006-parallel-release-readiness-and-gateB-21.md",
+      "gitBlobSha1": "d37d39e13b28ee8f4c9cfd902a8eafd385e018ec",
+      "sizeBytes": 25298,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/continuation/DWBOT-UPD-2026-11-06-008-admiralty-yolo-narrative-and-race-c01.md",
+      "gitBlobSha1": "32ab2b180de0d9b861b2c358afe5ef69f3a144ad",
+      "sizeBytes": 6561,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/continuation/DWBOT-UPD-2026-11-06-008-gateA-network-reconciliation-and-imagesF-19-analysis.md",
+      "gitBlobSha1": "1008e6aee6ba9226556a812c684c479a644a5a89",
+      "sizeBytes": 11009,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/continuation/DWBOT-UPD-2026-11-06-009-ocrspace-63-artifact-audit-and-19-posthoc.md",
+      "gitBlobSha1": "623ef1147e935181b54b8b58cbdfcaf8a491f768",
+      "sizeBytes": 28355,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/continuation/DWBOT_CURRENT_AUTHORITY_2026-11-05.md",
+      "gitBlobSha1": "0248909fbf4fd445bd178eab85502fa395fbebfa",
+      "sizeBytes": 19619,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/continuation/DWBOT_LIVING_RUNNING_PLAN_CURRENT.txt",
+      "gitBlobSha1": "39211649e2444450aa8279f6736d06dd41afd963",
+      "sizeBytes": 484179,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/continuation/GITHUB_REPOSITORY_STATUS_2026-11-05.md",
+      "gitBlobSha1": "9f643691414d0397f15a9283155faa93a90f21bf",
+      "sizeBytes": 1047,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/continuation/GRANDYOLOINSTRUCT_DELIVERABLE_CROSSWALK.md",
+      "gitBlobSha1": "6196d37058f84772daa8131110163aa7daa1e892",
+      "sizeBytes": 10616,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/continuation/NEXT_CHAT_HANDOFF_2026-11-04.md",
+      "gitBlobSha1": "7d5c0f9fbcdd97ac72d69192b53eb3d85a212897",
+      "sizeBytes": 25954,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/continuation/NEXT_CHAT_HANDOFF_2026-11-05.md",
+      "gitBlobSha1": "9d468d60cf9f84caedbe231a7922573b13791025",
+      "sizeBytes": 47670,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/continuation/PROJECT_AUTHORITY_AND_IMPLEMENTATION_RULES.md",
+      "gitBlobSha1": "a875b899e5c721c6e8d3be17888b23ada87b06ed",
+      "sizeBytes": 10978,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/continuation/REQUIREMENTS_ARCHITECTURE_SCHEMA_CROSSWALK_2026-11-05.md",
+      "gitBlobSha1": "266c61c132b4cb26c1ee424375e6604922653c69",
+      "sizeBytes": 10855,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/continuation/evidence/DWBOT_ROOT_CLEANUP_REPORT_2026-11-05.json",
+      "gitBlobSha1": "6f600838e786ff8f4cc0d7a115859ae99995ff5c",
+      "sizeBytes": 28084,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/history/GITHUB_TRANSFER_STATUS_2026-11-05_HISTORICAL.md",
+      "gitBlobSha1": "8f0c0c3e55ed924ab34412e9463127fbdd4d5d80",
+      "sizeBytes": 14241,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/history/README.md",
+      "gitBlobSha1": "1cc311bbea12553c52f2c7cb73be165487e4a701",
+      "sizeBytes": 583,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/history/legacy-root-source/bot.js",
+      "gitBlobSha1": "e043a6dc0f7f85a56b5b797649f0ce41b8ce6809",
+      "sizeBytes": 222352,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/history/legacy-root-source/tournament.js",
+      "gitBlobSha1": "8d31ae60f98c12a13043e6d2d340f541ba8000e3",
+      "sizeBytes": 22365,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/inventory/DWBOT_GIT_TREE_INVENTORY_2026-11-04.json",
+      "gitBlobSha1": "f57615185b989d11becccc99cc1e57d3e338b250",
+      "sizeBytes": 162566,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/iteration21/ITERATION21-ACCEPTANCE-CONTRACT-REPORT.md",
+      "gitBlobSha1": "77ed21d02e645fa62c90f4f8238d44b0c06ff330",
+      "sizeBytes": 4685,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/iteration21/PATCH-APPLICATION-REPORT.md",
+      "gitBlobSha1": "7842a94022936e1746ffc201dd77cc62db9cf721",
+      "sizeBytes": 4209,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/iteration21/README-ITERATION21-PATCH.md",
+      "gitBlobSha1": "15764332e63fd50d5b39931c2a28f95b7c8d9acc",
+      "sizeBytes": 1980,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/iteration21/SHA256SUMS-ITERATION21.txt",
+      "gitBlobSha1": "b9a900fdb1196b7415d3337820c38ee2ff3d6ca0",
+      "sizeBytes": 2275,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/iteration22/ITERATION22-IMPLEMENTATION-REPORT.md",
+      "gitBlobSha1": "e1cb6902d910f8af3f892ce68ea39504a987c48c",
+      "sizeBytes": 12088,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/iteration22/NODE-RUNTIME-COMPATIBILITY-POLICY.md",
+      "gitBlobSha1": "5ec714d8455e94dcbaab28aecf76cf6a58b2d64f",
+      "sizeBytes": 2986,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/limits/chtGptLimits.txt",
+      "gitBlobSha1": "b5af097955fb7106531f6187fa47fd152b2db4a4",
+      "sizeBytes": 4112,
+      "reason": "Removed superseded handoff, old iteration, inventory, transfer, or ChatGPT-limit notes. Active authority is consolidated in the branch charter, README, and architecture docs."
+    },
+    {
+      "path": "docs/source-reconciliation/SHA256SUMS-ITERATION21-original.txt",
+      "gitBlobSha1": "b9a900fdb1196b7415d3337820c38ee2ff3d6ca0",
+      "sizeBytes": 2275,
+      "reason": "Removed obsolete plan variants and stale checksum lists superseded by the current branch charter and retained source inputs; current source reconciliation summary and variant-diff record remain."
+    },
+    {
+      "path": "docs/source-reconciliation/SHA256SUMS-continuation-original.txt",
+      "gitBlobSha1": "a28de271c983d4e5ee68cb07e66e273e24309fa0",
+      "sizeBytes": 34654,
+      "reason": "Removed obsolete plan variants and stale checksum lists superseded by the current branch charter and retained source inputs; current source reconciliation summary and variant-diff record remain."
+    },
+    {
+      "path": "docs/source-reconciliation/addedImgProcess-plan1ext-variant.txt",
+      "gitBlobSha1": "bc54beffd68a16f66bf2fa760e5a45166cbddb36",
+      "sizeBytes": 18860,
+      "reason": "Removed obsolete plan variants and stale checksum lists superseded by the current branch charter and retained source inputs; current source reconciliation summary and variant-diff record remain."
+    },
+    {
+      "path": "docs/source-reconciliation/plan1-V4-embedded-reference.txt",
+      "gitBlobSha1": "73d185ce2d0d91a598491b54c21673490d5b4795",
+      "sizeBytes": 109644,
+      "reason": "Removed obsolete plan variants and stale checksum lists superseded by the current branch charter and retained source inputs; current source reconciliation summary and variant-diff record remain."
+    },
+    {
+      "path": "docs/source-reconciliation/plan1-plan1ext-reference.txt",
+      "gitBlobSha1": "73d185ce2d0d91a598491b54c21673490d5b4795",
+      "sizeBytes": 109644,
+      "reason": "Removed obsolete plan variants and stale checksum lists superseded by the current branch charter and retained source inputs; current source reconciliation summary and variant-diff record remain."
+    },
+    {
+      "path": "dwbotStuff/ImplementationMarkDown_use_this.md",
+      "gitBlobSha1": "4aae4b29e4258fa553aa534c0e636ae15af2f8a3",
+      "sizeBytes": 283004,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/Tier_X_Clan_Battles_Competitive_Strategy_Final_Page_Image.pdf",
+      "gitBlobSha1": "8c838ee9aa208a115281cc1fff210ce338509dbe",
+      "sizeBytes": 4071089,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/addedImgProcess.txt",
+      "gitBlobSha1": "25e26e05d572c4ed352f31a84e5ce208bde9abbf",
+      "sizeBytes": 19452,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/admiralty_first_election_handbook.docx",
+      "gitBlobSha1": "5effa18d761498fe8e4ae3beafc78e147b7a3d4f",
+      "sizeBytes": 4639919,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/admiralty_first_election_handbook.pdf",
+      "gitBlobSha1": "0b3db4a27fe4c256c941131010a41720472b67f4",
+      "sizeBytes": 3084018,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/admiralty_organizational_chart.jpg",
+      "gitBlobSha1": "a53fcdd9c014e55a26195f4f58e141dd4bfdad30",
+      "sizeBytes": 572729,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/backupWkbkBrowser.html",
+      "gitBlobSha1": "fce9165255c3bbb667a538ae897f5fca99eb198f",
+      "sizeBytes": 64925,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/backupWorkbook.xlsm",
+      "gitBlobSha1": "e89f1bad4f3d3e6133a5db5e3215c41a3522b78c",
+      "sizeBytes": 1139897,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/cb strat img ref.png",
+      "gitBlobSha1": "6fa9607312bb30324ed54d4308f7da571731ad17",
+      "sizeBytes": 2364277,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/discordMsgs/how yolo wkbk work discord.txt",
+      "gitBlobSha1": "c295a56bcbf0c04b3bc4f55934a0a02692021657",
+      "sizeBytes": 5252,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/discordMsgs/yolo scoring guide discord.txt",
+      "gitBlobSha1": "e36b376d6213333550042d5155ec3dcb5b051c8d",
+      "sizeBytes": 2128,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/discordMsgs/yolo summary discord.txt",
+      "gitBlobSha1": "879e213692115ef33b25b63f27fd427279476198",
+      "sizeBytes": 1039,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/dwbotAllTxt.txt",
+      "gitBlobSha1": "0429028027d566ab6b31b51e89f9d80e3e5b0526",
+      "sizeBytes": 65837,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/govRec1.png",
+      "gitBlobSha1": "022c3e867d1d7814b3e2ca8ecdbef8e2d093bda6",
+      "sizeBytes": 2675879,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/govRec2.png",
+      "gitBlobSha1": "731ed2a73661530552a36258d8bdf3045a719ce6",
+      "sizeBytes": 2721907,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/mtheqfnl.jpg",
+      "gitBlobSha1": "b9e9c9c08886a6dd8eee18a12c84d02486b581cf",
+      "sizeBytes": 2665939,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/partial dyson sphere3_untouched.pdf",
+      "gitBlobSha1": "36c2afebb4f5c5645379950518d1a5cb0d115b2c",
+      "sizeBytes": 1341954,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/scoreReport_dark_clipboard (1).html",
+      "gitBlobSha1": "4e930f9b072fd85568f74779e611ef91f924f334",
+      "sizeBytes": 20388,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/test27xlsm.xlsm",
+      "gitBlobSha1": "e89f1bad4f3d3e6133a5db5e3215c41a3522b78c",
+      "sizeBytes": 1139897,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/tstCmdAllPlusAddon.md",
+      "gitBlobSha1": "e2be052ef997ed7d48ae84c416c3860a51d796d9",
+      "sizeBytes": 83138,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/tstCmdCondensed.txt",
+      "gitBlobSha1": "fab9612a96d2f232f27b376cabb16284632b0443",
+      "sizeBytes": 81118,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/yolo_tournament_complete_instruction_set.html",
+      "gitBlobSha1": "84baeaff696d92c625616cae7686c4eb2e3ca243",
+      "sizeBytes": 1362052,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/yolo_tournament_complete_instruction_set.pdf",
+      "gitBlobSha1": "01841a007e8ffb1f3e8be60fa83939cb91248365",
+      "sizeBytes": 1329974,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/yolo_tournament_scoreCalculator.html",
+      "gitBlobSha1": "8e4827618cd9825c96bd9aa57e10439d82de6815",
+      "sizeBytes": 65206,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/yolo_tourney_workbook_merged (4).html",
+      "gitBlobSha1": "fce9165255c3bbb667a538ae897f5fca99eb198f",
+      "sizeBytes": 64925,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "dwbotStuff/zeroThruSix.md",
+      "gitBlobSha1": "d42540573caff670f22c80387aeba2a2ebfe63bd",
+      "sizeBytes": 75139,
+      "reason": "Removed unrelated personal/auxiliary assets, duplicate workbook backups/HTML exports, stale task plans, and derivative copies. Relevant review workbook, source inventory, consolidated inventory, and original tournament DOCX sources are retained."
+    },
+    {
+      "path": "imgsHalf1-eligible-56.zip.001",
+      "gitBlobSha1": "63f5da2db497a16be6a7f6103dc39c9e67ae21f5",
+      "sizeBytes": 20971520,
+      "reason": "Removed a stale duplicate, obsolete plan, or superseded standalone artifact not referenced by the active implementation."
+    },
+    {
+      "path": "ocr-acceptance/2026-11-03T21-56-13-824Z-3734/local-asset-package-check.log",
+      "gitBlobSha1": "2f5020af5beb21e93d4d6193f225b522b65e0cbc",
+      "sizeBytes": 2299,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "ocr-acceptance/2026-11-03T21-56-13-824Z-3734/negative-control-asashio-known-good-baseline.log.stderr.tmp",
+      "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "sizeBytes": 0,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "ocr-acceptance/2026-11-03T21-56-13-824Z-3734/negative-control-asashio-known-good-baseline.log.stdout.tmp",
+      "gitBlobSha1": "51207b2ae901dde5fe32a165dd03580ac24a5562",
+      "sizeBytes": 44,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "ocr-acceptance/2026-11-03T21-56-13-824Z-3734/unit-and-contract-tests.log",
+      "gitBlobSha1": "9de6a9ce9146e7632dc554b3656f5037ad3f5cb3",
+      "sizeBytes": 24517,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "ocr-acceptance/iteration20-four-screenshot-pipeline.json",
+      "gitBlobSha1": "0b1d4cfd32884a0f0071e469af7b5f91d9db47df",
+      "sizeBytes": 7346,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "ocr-acceptance/iteration20-reported-screenshot.json",
+      "gitBlobSha1": "a76722f2d3e101c959c10c11436792ec5026f76c",
+      "sizeBytes": 4093,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "ocr-acceptance/iteration20-tesseract-only-acceptance.json",
+      "gitBlobSha1": "544885edc1a1bdf5516de653fad5b3f83facf3b1",
+      "sizeBytes": 102758,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "ocr-acceptance/iteration20-tesseract-only-comparison.json",
+      "gitBlobSha1": "e4dab0333a3e0a121da8336ec58e8780a9d29444",
+      "sizeBytes": 67037,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "ocr-acceptance/opencv-field-isolation-benchmark.json",
+      "gitBlobSha1": "bde0ef060fd8fd4c12f176e6d37644af82f2e868",
+      "sizeBytes": 40836,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "ocr-acceptance/paddleocr-integrated-acceptance-windows-node24.json",
+      "gitBlobSha1": "6781c90581c8f2f4871b68c6d6dc6fc004fe9390",
+      "sizeBytes": 1533489,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "ocr-acceptance/paddleocr-integrated-comparison-windows-node24-mandatory-v2.json",
+      "gitBlobSha1": "1d99131335da105451921a6b9c25e7ec037d8320",
+      "sizeBytes": 112795,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "ocr-acceptance/paddleocr-integrated-comparison-windows-node24.json",
+      "gitBlobSha1": "0f8c284482b4f0a0b71837aaefd7b9fd3fb7bba0",
+      "sizeBytes": 102248,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "ocr-acceptance/paddleocr-raw-benchmark.json",
+      "gitBlobSha1": "31a885ca353a816b6fa0dd669084498945b0599e",
+      "sizeBytes": 850,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "ocr-acceptance/paddleocr-testdata24.zip",
+      "gitBlobSha1": "51be6f518f005bc15f48408d3b4e04eda0541a34",
+      "sizeBytes": 300076,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "ocr-acceptance/tesseract-only-baseline-iteration19.json",
+      "gitBlobSha1": "e760618e7ba7849a583e4ffcfbbfda7333c51f49",
+      "sizeBytes": 1477029,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "ocr-acceptance/tesseract-only-baseline-windows-node24-metrics-v2.json",
+      "gitBlobSha1": "45dd56baa40d70aa21ac7040444ff9cdb42a535b",
+      "sizeBytes": 16480,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "ocr-acceptance/tesseract-only-baseline-windows-node24.json",
+      "gitBlobSha1": "675715d72d977afd3fbb55140528fbf0eabc49ef",
+      "sizeBytes": 1410804,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "package_bundle/DOWNLOAD_README.txt",
+      "gitBlobSha1": "cfea091b629e98a52de89d91b1e50de7c71f3d3b",
+      "sizeBytes": 2906,
+      "reason": "Removed a stale duplicate, obsolete plan, or superseded standalone artifact not referenced by the active implementation."
+    },
+    {
+      "path": "package_bundle/PACKAGE_LAYOUT.md",
+      "gitBlobSha1": "a955c31976bc4a6a48cc4459907522b7234d7249",
+      "sizeBytes": 1098,
+      "reason": "Removed a stale duplicate, obsolete plan, or superseded standalone artifact not referenced by the active implementation."
+    },
+    {
+      "path": "package_bundle/package_records/DWBOT_ITERATION22_MILESTONE_CANDIDATE_2026-11-03_RELEASE_RECORD(1).txt",
+      "gitBlobSha1": "f9ec74cacd9acddacc943b394ddf3ba9c78a3380",
+      "sizeBytes": 1347,
+      "reason": "Removed a stale duplicate, obsolete plan, or superseded standalone artifact not referenced by the active implementation."
+    },
+    {
+      "path": "package_bundle/package_records/DWBOT_NODE22PLUS_CHECKPOINT_003_MANIFEST.json",
+      "gitBlobSha1": "989500ea93ce36882860679288e6c941b131086e",
+      "sizeBytes": 92279,
+      "reason": "Removed a stale duplicate, obsolete plan, or superseded standalone artifact not referenced by the active implementation."
+    },
+    {
+      "path": "package_bundle/package_records/DWBOT_NODE22PLUS_IMPLEMENTATION_CHECKPOINT_2026-11-03_ORIGINAL_ARCHIVE.sha256.txt",
+      "gitBlobSha1": "8d01a560f44811b8ee0501d3b69c97f64b055fd3",
+      "sizeBytes": 124,
+      "reason": "Removed a stale duplicate, obsolete plan, or superseded standalone artifact not referenced by the active implementation."
+    },
+    {
+      "path": "package_bundle/package_records/DWBOT_NODE22PLUS_IMPLEMENTATION_CHECKPOINT_2026-11-03_PUBLICATION_SANITIZED.zip.sha256.txt",
+      "gitBlobSha1": "36237076533f6d36f9c931320d5772b60917ddd9",
+      "sizeBytes": 146,
+      "reason": "Removed a stale duplicate, obsolete plan, or superseded standalone artifact not referenced by the active implementation."
+    },
+    {
+      "path": "package_bundle/package_records/PROJECT_CURRENT_STATE_SUMMARY_V7.txt",
+      "gitBlobSha1": "2ee7da4ae10fb129a9abaa08fe3414f10519fd8d",
+      "sizeBytes": 6858,
+      "reason": "Removed a stale duplicate, obsolete plan, or superseded standalone artifact not referenced by the active implementation."
+    },
+    {
+      "path": "phase0-baseline/README.md",
+      "gitBlobSha1": "1e27397875e3aa444af66bfe3e58523621d08415",
+      "sizeBytes": 1130,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase0-baseline/SHA256SUMS-PHASE0-ORIGINAL.txt",
+      "gitBlobSha1": "69dce20e5ba3683b0414cf667ff9e394fc100389",
+      "sizeBytes": 7275,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase0-baseline/native-tesseract-direct-psm3-stderr.txt",
+      "gitBlobSha1": "c5dfad6e32b4a12738ddaacc1444a93dfb9a0505",
+      "sizeBytes": 22,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase0-baseline/native-tesseract-direct-psm3.txt",
+      "gitBlobSha1": "39fdf7238fa34dffcd8f96b4696d848100913f5c",
+      "sizeBytes": 401,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase0-baseline/tesseractjs-four-image-baseline.json",
+      "gitBlobSha1": "8c72b3dc834bbec69045d92227f7e3493f871f5c",
+      "sizeBytes": 7403,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase0-baseline/tesseractjs-reported-screenshot-baseline.json",
+      "gitBlobSha1": "1484f4ca5f4e1f0a095872578a15b6eb1d817abc",
+      "sizeBytes": 1829,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase0-baseline/verification/dependency-tree-linux-node22.log",
+      "gitBlobSha1": "a49591d9404f3ddf37f487ba10807beeaeb8c8ed",
+      "sizeBytes": 242,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase0-baseline/verification/full-suite-linux-node22.tap",
+      "gitBlobSha1": "9b59c6ac1ae87228b87c3f43bcca75e8471fe0d5",
+      "sizeBytes": 17342,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase0-baseline/verification/full-system-linux-node22.tap",
+      "gitBlobSha1": "38f1090ae143e6a922496f57d965e3b37142ee4a",
+      "sizeBytes": 1660,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase0-baseline/verification/phase0-completion-verification.json",
+      "gitBlobSha1": "84d3c82f237e2901219ee48cd2391a378df4dcdd",
+      "sizeBytes": 2724,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase0-baseline/verification/syntax-checks.log",
+      "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "sizeBytes": 0,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/README.md",
+      "gitBlobSha1": "fc8a15d45c03006e635510cf048d099b11e187f2",
+      "sizeBytes": 3336,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/acceptance-launcher-full-latest.log",
+      "gitBlobSha1": "0c8d5cbae7c978517095b33d7ac10b34bf4f14f8",
+      "sizeBytes": 6746,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/acceptance-launcher-full.log",
+      "gitBlobSha1": "f4fce9625cf10292a334872cf4e747bb1a299a48",
+      "sizeBytes": 5737,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/acceptance-report-8-command-historical.json",
+      "gitBlobSha1": "30c7a60f64b4a6e37c35b7289746db52e1e22f97",
+      "sizeBytes": 4149,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/acceptance-report-8-command-historical.sha256",
+      "gitBlobSha1": "e5895c189dbc9a794ed59321cc7bf0e5b5ccf385",
+      "sizeBytes": 89,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/acceptance-report.json",
+      "gitBlobSha1": "5314a580c6b4fb7815410517ca1068f181f51978",
+      "sizeBytes": 4567,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/acceptance-report.sha256",
+      "gitBlobSha1": "7b7afe5213eae7b55c2a66b478c0cb89e9427553",
+      "sizeBytes": 89,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/asashio-then-hoffmann-latest.json",
+      "gitBlobSha1": "9accafea582b0a01c18adbd1654eb294f0802adb",
+      "sizeBytes": 130813,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/asashio-then-hoffmann-no-network-latest.log",
+      "gitBlobSha1": "fb2891f5039f2486430abf4d4bc10ac1aac6aec2",
+      "sizeBytes": 741,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/asashio-then-hoffmann-no-network.log",
+      "gitBlobSha1": "cba928be740ad511c348db89f274918b7f420ac3",
+      "sizeBytes": 741,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/asashio-then-hoffmann.json",
+      "gitBlobSha1": "cdaa20edd4a638a66f5da037ccb40f69163a0c92",
+      "sizeBytes": 130813,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/five-image-sequence-1-latest.json",
+      "gitBlobSha1": "f9f03cdd327b79602207cde947c96bd2f083d237",
+      "sizeBytes": 330569,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/five-image-sequence-1.json",
+      "gitBlobSha1": "3da4dd0877fb2cb07f962f28cf0c3ade09bd3309",
+      "sizeBytes": 330569,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/five-image-sequence-2-latest.json",
+      "gitBlobSha1": "bc077c27c5e1e8d32ec6b8c0b0f5eb66e0d0e19a",
+      "sizeBytes": 330569,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/five-image-sequence-2.json",
+      "gitBlobSha1": "2030e11d7faf1bda6a0281d0d9e81f375202e19f",
+      "sizeBytes": 330569,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/five-image-sequence-3-latest.json",
+      "gitBlobSha1": "463094da879afbd0651191c650e831706442fa1e",
+      "sizeBytes": 330569,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/five-image-sequence-3.json",
+      "gitBlobSha1": "30bcdccb0ea8615be1fb8f568e1a5e523e3c7dff",
+      "sizeBytes": 330569,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/five-image-sequential-no-network-1-latest.log",
+      "gitBlobSha1": "2f43661fd54797380df906e8f47fa78a51f9dec5",
+      "sizeBytes": 1203,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/five-image-sequential-no-network-1.log",
+      "gitBlobSha1": "de10f1b6666065adec75a037287b8bacc17ad334",
+      "sizeBytes": 1203,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/five-image-sequential-no-network-2-latest.log",
+      "gitBlobSha1": "73d084d5c8c413b92f05cb125110628220461aed",
+      "sizeBytes": 1203,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/five-image-sequential-no-network-2.log",
+      "gitBlobSha1": "ad001e5b58410b0e5bfd2f6ac96d4dd8774c34ba",
+      "sizeBytes": 1203,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/five-image-sequential-no-network-3-latest.log",
+      "gitBlobSha1": "7e6bcfd74bcc265f50f190e3e98159f2ce36ef41",
+      "sizeBytes": 1203,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/five-image-sequential-no-network-3.log",
+      "gitBlobSha1": "cb0e32eee88a22aff41d560db83e53abc230bb16",
+      "sizeBytes": 1203,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/four-image-tesseractjs-no-network.json",
+      "gitBlobSha1": "58c5203cfce66a0c2ff5da3b40e5db2067f19583",
+      "sizeBytes": 266377,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/four-image-tesseractjs-no-network.log",
+      "gitBlobSha1": "d5e7ebafb12889136f8d1141bb216873e39a7e81",
+      "sizeBytes": 912,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/hoffmann-then-asashio-latest.json",
+      "gitBlobSha1": "065ffb0f6622b40807a38cf86ffff9730b010f0e",
+      "sizeBytes": 130813,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/hoffmann-then-asashio-no-network-latest.log",
+      "gitBlobSha1": "41d23524797ee3e39bf4226b8064d9cff5672d8d",
+      "sizeBytes": 741,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/hoffmann-then-asashio-no-network.log",
+      "gitBlobSha1": "0d01a0e5df8337373e764f215d3e9aa65c2fa487",
+      "sizeBytes": 741,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/hoffmann-then-asashio.json",
+      "gitBlobSha1": "a4ed6981379e64cfac798e682a9fcd875ae7ae67",
+      "sizeBytes": 130813,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-real-recognition-stall-recovery-latest.log",
+      "gitBlobSha1": "d7c40982879f37971447b1ce65dc0972b75e77ff",
+      "sizeBytes": 2331,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-25T02-31-51-949Z-37477/report.json",
+      "gitBlobSha1": "a02d5a15d5e1b2bf6cd854ecebbb3d76683e7b54",
+      "sizeBytes": 1798061,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-25T02-34-28-866Z-37901/report.json",
+      "gitBlobSha1": "5caf34d8c3b8b7e1379230d1c031b3681163809e",
+      "sizeBytes": 4016,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-25T02-54-30-363Z-40010/report.json",
+      "gitBlobSha1": "0d1d235c4f54450d4a693cd9caf70641e9a1707f",
+      "sizeBytes": 4016,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-25T02-57-32-366Z-40955.json",
+      "gitBlobSha1": "0035a0b8adf282eeb337f0943a3789b9f6ba1af2",
+      "sizeBytes": 4015,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-25T02-57-32-366Z-40955/report.json",
+      "gitBlobSha1": "0035a0b8adf282eeb337f0943a3789b9f6ba1af2",
+      "sizeBytes": 4015,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-25T03-20-36-701Z-47705/report.json",
+      "gitBlobSha1": "5152c516a6f4ffeb98c5de591afd0f343ac2cdff",
+      "sizeBytes": 4016,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-25T03-32-31-703Z-52276/report.json",
+      "gitBlobSha1": "c04b6f1da8441395c76ad3b22a26c1e3c8231c91",
+      "sizeBytes": 6281,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-25T13-26-02-344Z-25908/report.json",
+      "gitBlobSha1": "80807cb691d108b5207b5a3008f23944f140c924",
+      "sizeBytes": 6984,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-25T13-26-47-715Z-19856/report.json",
+      "gitBlobSha1": "1d91eb6709d14255095d3389d82bc711f209ff21",
+      "sizeBytes": 1740091,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-25T16-19-39-115Z-22024/report.json",
+      "gitBlobSha1": "8c359b36e0bd8b347a977115d8d1300f9afaa373",
+      "sizeBytes": 6980,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-25T16-20-22-901Z-17596/report.json",
+      "gitBlobSha1": "be390b359cac26c65fe04c6db6af633dbf18f434",
+      "sizeBytes": 6831,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-25T16-47-22-338Z-23776/report.json",
+      "gitBlobSha1": "e73c85cfae0b838c09f53f826c432e56a46777e6",
+      "sizeBytes": 6980,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-25T16-48-06-112Z-7912/report.json",
+      "gitBlobSha1": "9f0aa6b0a457eb2d7e6bd3b21696ace05d295b94",
+      "sizeBytes": 6830,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-26T02-33-45-917Z-8920/report.json",
+      "gitBlobSha1": "689eb4a759635537945bca19fe0f62e0df9f2875",
+      "sizeBytes": 6965,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-26T02-34-31-629Z-9148/report.json",
+      "gitBlobSha1": "cb15d7f73949899a9393d0fcbebec650659a538e",
+      "sizeBytes": 6840,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-26T03-00-40-555Z-16948/report.json",
+      "gitBlobSha1": "e5f756c192445c72a4aef5f57394f1d5cf25709e",
+      "sizeBytes": 6965,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-26T03-01-26-842Z-17197/report.json",
+      "gitBlobSha1": "68726b5d1510edb6d91f4e7de8ddda67da6f9481",
+      "sizeBytes": 6840,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-26T04-29-31-721Z-34611/report.json",
+      "gitBlobSha1": "2646b316511dbb890deaac908d03b1597f01c61f",
+      "sizeBytes": 6965,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-26T04-30-22-203Z-34871/report.json",
+      "gitBlobSha1": "ce508b414cfc43c7d14989fb7f1f6f1ff7c81dd3",
+      "sizeBytes": 6840,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-26T04-53-26-784Z-42282/report.json",
+      "gitBlobSha1": "a75b103a32da1b8df7127ce43b55778786b4f719",
+      "sizeBytes": 6965,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-26T04-54-15-802Z-42528/report.json",
+      "gitBlobSha1": "db91aaa35fb5991dc8aa05d6eb437f82132a5b61",
+      "sizeBytes": 6839,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-26T05-35-11-307Z-55268/report.json",
+      "gitBlobSha1": "93595bbd7356c004cf2f8ef5ae30e0b04eaadd40",
+      "sizeBytes": 6965,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-2026-10-26T05-36-01-032Z-55657/report.json",
+      "gitBlobSha1": "4d0656cf68ece1c9f585872aa528dcb8dd421931",
+      "sizeBytes": 6839,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/integrated-stall-recovery-latest.json",
+      "gitBlobSha1": "0035a0b8adf282eeb337f0943a3789b9f6ba1af2",
+      "sizeBytes": 4015,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/local-asset-package-check-latest.log",
+      "gitBlobSha1": "5dc5f2af7f87de9bf19b9954a8b51c6a2047de11",
+      "sizeBytes": 2137,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/local-asset-package-check.log",
+      "gitBlobSha1": "5dc5f2af7f87de9bf19b9954a8b51c6a2047de11",
+      "sizeBytes": 2137,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/native-auto-four-image-diagnostic.json",
+      "gitBlobSha1": "b04bb71c8c32317085c66fcd5757edf9c3c1d63f",
+      "sizeBytes": 244577,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/native-auto-four-image-diagnostic.log",
+      "gitBlobSha1": "d93ef276e8258160078c1c8a065510fd4d1a7538",
+      "sizeBytes": 908,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/native-tesseract-5.5.0-direct-psm3.txt",
+      "gitBlobSha1": "6676b8e3ac20cb8eddb46bf92de0858b2e3a537d",
+      "sizeBytes": 4004,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/node-check-latest.exit",
+      "gitBlobSha1": "12876896de524c658021e4a4917aa4310c6a8115",
+      "sizeBytes": 18,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/node-check-latest.log",
+      "gitBlobSha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "sizeBytes": 0,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/npm-ci-attempt-environment-note.md",
+      "gitBlobSha1": "a74840bc121d7388e442b892f575f48d4a220a63",
+      "sizeBytes": 1155,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/npm-ls-depth0-latest.log",
+      "gitBlobSha1": "de4236bd5970447f929c251f08060f8e3e0ac474",
+      "sizeBytes": 184,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/npm-test-latest.exit",
+      "gitBlobSha1": "41c7489100e91f415ced2d23518a139aea7adde8",
+      "sizeBytes": 16,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/npm-test-latest.log",
+      "gitBlobSha1": "73271e8f4eeb0bc08ea4475238ae05668844ab35",
+      "sizeBytes": 23748,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/npm-test.exit",
+      "gitBlobSha1": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56",
+      "sizeBytes": 2,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/npm-test.log",
+      "gitBlobSha1": "b9b54f09c579875273c370521fa3e297e37ebd8e",
+      "sizeBytes": 23755,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/reported-screenshot-no-network-latest.json",
+      "gitBlobSha1": "1f5703248731bd2bae5fc56d6d66aa9e29a1d697",
+      "sizeBytes": 1827,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/reported-screenshot-no-network-latest.log",
+      "gitBlobSha1": "cc36593b56bee6a2c424014a0c500325c7416ea5",
+      "sizeBytes": 44908,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/reported-screenshot-no-network.json",
+      "gitBlobSha1": "1f5703248731bd2bae5fc56d6d66aa9e29a1d697",
+      "sizeBytes": 1827,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/reported-screenshot-no-network.log",
+      "gitBlobSha1": "2d9aaf80fd784b2899923ad82ac195e2788c8581",
+      "sizeBytes": 44831,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/unit-and-contract-tests-latest.log",
+      "gitBlobSha1": "ae5ac1772ffdc062abc81b68e4e631e9ff6f4dc1",
+      "sizeBytes": 8416,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase1-evidence/unit-and-contract-tests.log",
+      "gitBlobSha1": "1e64347522c5b8f60fca2a968310aa5f85ab1f4d",
+      "sizeBytes": 8416,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase2-evidence/acceptance-10-of-10-2026-10-25.log",
+      "gitBlobSha1": "cdc8edd551dc0a44516d37239b07b4e8ae4ee094",
+      "sizeBytes": 7753,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase2-evidence/acceptance-2026-10-25T03-31-59-739Z-51914/acceptance-report.json",
+      "gitBlobSha1": "201587aa9374c3edc33b052812f57e58ee41b3dd",
+      "sizeBytes": 4926,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase2-evidence/acceptance-2026-10-25T03-31-59-739Z-51914/acceptance-report.sha256",
+      "gitBlobSha1": "5cc73d24f27f2b0f18582c83d71230af6da674a7",
+      "sizeBytes": 89,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase2-evidence/acceptance-2026-10-25T03-31-59-739Z-51914/asashio-hoffmann.json",
+      "gitBlobSha1": "387ee064426219bfff0916cbf0828a968d2ccb86",
+      "sizeBytes": 133180,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase2-evidence/acceptance-2026-10-25T03-31-59-739Z-51914/asashio-then-hoffmann-no-network.log",
+      "gitBlobSha1": "35c919283427d4defce03cc96cfe433479bf0c12",
+      "sizeBytes": 741,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase2-evidence/acceptance-2026-10-25T03-31-59-739Z-51914/deliberately-wrong-expected-value-must-fail.log",
+      "gitBlobSha1": "8c4af399a17e8291bad9bc40e785c6c93bb0dada",
+      "sizeBytes": 591,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase2-evidence/acceptance-2026-10-25T03-31-59-739Z-51914/five-image-sequence-1.json",
+      "gitBlobSha1": "7ea17e6707ea7d8267faa199091578814c43a6ae",
+      "sizeBytes": 332936,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase2-evidence/acceptance-2026-10-25T03-31-59-739Z-51914/five-image-sequential-no-network-1.log",
+      "gitBlobSha1": "646cf879d8e5c1fbcd71d405d970224921033e1a",
+      "sizeBytes": 1203,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase2-evidence/acceptance-2026-10-25T03-31-59-739Z-51914/hoffmann-asashio.json",
+      "gitBlobSha1": "2eff75ac877f3067e461bee3ba44ec02f6f4408b",
+      "sizeBytes": 133180,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase2-evidence/acceptance-2026-10-25T03-31-59-739Z-51914/hoffmann-then-asashio-no-network.log",
+      "gitBlobSha1": "bf43c4d6ebf19fb6aac2b567a4e67777df4b75cb",
+      "sizeBytes": 741,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase2-evidence/acceptance-2026-10-25T03-31-59-739Z-51914/integrated-real-recognition-stall-recovery.log",
+      "gitBlobSha1": "2cbe70c9bb25aadd6d413f8b8257b0772df402c1",
+      "sizeBytes": 63791,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase2-evidence/acceptance-2026-10-25T03-31-59-739Z-51914/local-asset-package-check.log",
+      "gitBlobSha1": "5dc5f2af7f87de9bf19b9954a8b51c6a2047de11",
+      "sizeBytes": 2137,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase2-evidence/acceptance-2026-10-25T03-31-59-739Z-51914/negative-expected-value.json",
+      "gitBlobSha1": "9498545a34c1ccc36297ebf61d4b8b93d36c0102",
+      "sizeBytes": 67105,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase2-evidence/acceptance-2026-10-25T03-31-59-739Z-51914/reported-screenshot-no-network.log",
+      "gitBlobSha1": "0935c89d05283e9945cb81df6f0f89c6bf67157e",
+      "sizeBytes": 46603,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase2-evidence/acceptance-2026-10-25T03-31-59-739Z-51914/reported-screenshot.json",
+      "gitBlobSha1": "eb56d3ade639d35d8e296300be2396d2ca53bcaa",
+      "sizeBytes": 4093,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase2-evidence/acceptance-2026-10-25T03-31-59-739Z-51914/unit-and-contract-tests.log",
+      "gitBlobSha1": "d99cc16d8e55ca187e0ba4fb1e778a319eb3b1d2",
+      "sizeBytes": 8697,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase2-evidence/acceptance-current-source-8-of-8-2026-10-25.log",
+      "gitBlobSha1": "afd6b8919c8308a1f119ca6782408799f13ab4a4",
+      "sizeBytes": 5897,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase2-evidence/npm-ls-depth0-2026-10-25.log",
+      "gitBlobSha1": "de4236bd5970447f929c251f08060f8e3e0ac474",
+      "sizeBytes": 184,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "phase2-evidence/npm-test-103-2026-10-25.log",
+      "gitBlobSha1": "63e0fec6fcc0ea06a1e1386825a5d4b9af033dcc",
+      "sizeBytes": 24009,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "plan1-V4-embedded-reference.txt",
+      "gitBlobSha1": "73d185ce2d0d91a598491b54c21673490d5b4795",
+      "sizeBytes": 109644,
+      "reason": "Removed a stale duplicate, obsolete plan, or superseded standalone artifact not referenced by the active implementation."
+    },
+    {
+      "path": "plan1-plan1ext-reference.txt",
+      "gitBlobSha1": "73d185ce2d0d91a598491b54c21673490d5b4795",
+      "sizeBytes": 109644,
+      "reason": "Removed a stale duplicate, obsolete plan, or superseded standalone artifact not referenced by the active implementation."
+    },
+    {
+      "path": "plan1.txt",
+      "gitBlobSha1": "c243de4aa6ade496eb0dca6a7b81a5afdb19fc13",
+      "sizeBytes": 200202,
+      "reason": "Removed a stale duplicate, obsolete plan, or superseded standalone artifact not referenced by the active implementation."
+    },
+    {
+      "path": "plan1_phase1_rc2_baseline_2026-10-25.txt",
+      "gitBlobSha1": "b02d310575220ec49204baa4d0a27bea55e004e1",
+      "sizeBytes": 47478,
+      "reason": "Removed a stale duplicate, obsolete plan, or superseded standalone artifact not referenced by the active implementation."
+    },
+    {
+      "path": "read-me.txt",
+      "gitBlobSha1": "197046e28a541c177b86a576c8105dcafca1b2e4",
+      "sizeBytes": 4092,
+      "reason": "Removed a stale duplicate, obsolete plan, or superseded standalone artifact not referenced by the active implementation."
+    },
+    {
+      "path": "reports/ci/2026-11-04-41813315107-node22-linux-full-log.txt",
+      "gitBlobSha1": "a5b2dda0a151b59528126fb2f74b39ac22fa813f",
+      "sizeBytes": 151908,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "reports/ci/2026-11-04-41814316145-final-branch-log.txt",
+      "gitBlobSha1": "efc593ad621c597c2557b2a947db85a511db5770",
+      "sizeBytes": 151905,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "runtime-node22plus-2026-11-03/README.md",
+      "gitBlobSha1": "8f616fbc98ce19ee992d32c45506ac7bc077699c",
+      "sizeBytes": 3207,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "runtime-node22plus-2026-11-03/incomplete-asashio-sequence.log",
+      "gitBlobSha1": "51207b2ae901dde5fe32a165dd03580ac24a5562",
+      "sizeBytes": 44,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "runtime-node22plus-2026-11-03/incomplete-reported-screenshot-cv-off.log",
+      "gitBlobSha1": "48a5414775b29b3b0d40864a019b57c2ac5e7a63",
+      "sizeBytes": 16027,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "runtime-node22plus-2026-11-03/incomplete-reported-screenshot-cv-on.log",
+      "gitBlobSha1": "839d2f91b033bd59a15f5b7fc159073727b50f55",
+      "sizeBytes": 241,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "runtime-node22plus-2026-11-03/node-version.txt",
+      "gitBlobSha1": "aebd91c521b776119a6d0a44ebedc2639cdfb1f0",
+      "sizeBytes": 9,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "runtime-node22plus-2026-11-03/npm-test.log",
+      "gitBlobSha1": "f5559d83fdc7c7c1b18707762a74b6ede67444cc",
+      "sizeBytes": 43337,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "runtime-node22plus-2026-11-03/npm-top-level-dependencies.log",
+      "gitBlobSha1": "a23abb51da9375e2503003a64c7f244c6be9c3f1",
+      "sizeBytes": 211,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "runtime-node22plus-2026-11-03/npm-version.txt",
+      "gitBlobSha1": "0b9ad11ccf4a69256623ca450ae0acebdd7e351c",
+      "sizeBytes": 7,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "runtime-node22plus-2026-11-03/ocr-report-metadata-tests.log",
+      "gitBlobSha1": "69782b4b23757d53a5dbaacd0cd18368ea7b2b7c",
+      "sizeBytes": 602,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "runtime-node22plus-2026-11-03/ocr-watchdog-tests.log",
+      "gitBlobSha1": "145dff50bdc0a4ecb245fc0e3a1afc787d096358",
+      "sizeBytes": 5206,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "runtime-node22plus-2026-11-03/opencv-tests.log",
+      "gitBlobSha1": "bf8909c371ea4855f43d6b37896854a4ec8a2330",
+      "sizeBytes": 1560,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "runtime-node22plus-2026-11-03/package-lock-runtime-consistency.log",
+      "gitBlobSha1": "6c262f4e224d2af4a7c898c44e640b6ca09032b6",
+      "sizeBytes": 56,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "runtime-node22plus-2026-11-03/paddleocr-fallback-tests.log",
+      "gitBlobSha1": "cf630c8f12740bab206fa6c3679ab60b897be922",
+      "sizeBytes": 3749,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "runtime-node22plus-2026-11-03/sqlite-tests.log",
+      "gitBlobSha1": "8c7743d40b266c46a816b342565de630bd917b2a",
+      "sizeBytes": 1570,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "runtime-node22plus-2026-11-03/tesseract-assets-check.log",
+      "gitBlobSha1": "249f895f09038c4e22c1dd23f64d953780a82a7a",
+      "sizeBytes": 2158,
+      "reason": "Removed historical run logs, temporary reports, and stale Node 22/Gate acceptance artifacts. New CI runs and the multi-provider smoke/accuracy reports are the active evidence path."
+    },
+    {
+      "path": "scripts/compare-paddleocr-integrated-acceptance.js",
+      "gitBlobSha1": "e03021379da81cdc91efc66342b8835c7654c65d",
+      "sizeBytes": 17212,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": "scripts/evaluate-ocrspace-imagesF-63-ground-truth.py",
+      "gitBlobSha1": "8ab876770a1303df9fecb5fc68036310defacd8c",
+      "sizeBytes": 24987,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": "scripts/evaluate-ocrspace-pdf-text-layer.js",
+      "gitBlobSha1": "c7442de5f9f6cd3a39f2dabbd42406814bbde8bd",
+      "sizeBytes": 17943,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": "scripts/prepare-gateA-16-resume.js",
+      "gitBlobSha1": "e42b6a166bafcca838be88e1deec9d23dc64c623",
+      "sizeBytes": 22261,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": "scripts/prepare-ocrspace-eligible-56.py",
+      "gitBlobSha1": "350580a44f5178f1a7d2d167c6f4c74915ea412e",
+      "sizeBytes": 7546,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": "scripts/prepare-ocrspace-imagesF-63.py",
+      "gitBlobSha1": "9a3f6ea40ebc356475bfb4799ba0f26a45929075",
+      "sizeBytes": 7173,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": "scripts/recover-ocrspace-imagesF-21-local-readers.js",
+      "gitBlobSha1": "e14e1117741288b06b309a16f6ff28bc05d24035",
+      "sizeBytes": 17131,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": "scripts/run-gateA-parallel-reader-matrix.js",
+      "gitBlobSha1": "56fe4542831cae7af3fb2316a8b1960a53ece53d",
+      "sizeBytes": 10528,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": "scripts/run-ocrspace-64-inventory.js",
+      "gitBlobSha1": "7b8546dd7140a9bd8f9c4e9c0491de7b75a082fd",
+      "sizeBytes": 11858,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": "scripts/run-ocrspace-imagesF-63-exploratory.js",
+      "gitBlobSha1": "791ff8d10f627366936e328df3797f91f9795ff3",
+      "sizeBytes": 18201,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": "scripts/run-paddleocr-integrated-acceptance.ps1",
+      "gitBlobSha1": "98821adcf53f92ca88e0ab281b9a67a93f321f92",
+      "sizeBytes": 7161,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": "scripts/run-windows-ocr-acceptance.ps1",
+      "gitBlobSha1": "c164d76298a517ac03f686507273da27005be6f0",
+      "sizeBytes": 19596,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": "scripts/verify-ocrspace-imagesF-21-artifacts.js",
+      "gitBlobSha1": "9b7cf1e018fd4ab2b355f9a6860707433d0917c1",
+      "sizeBytes": 22333,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": "tesseract.js.zip",
+      "gitBlobSha1": "70efa43c6454cc1ab27f752ab8b70e18146ee85a",
+      "sizeBytes": 652352,
+      "reason": "Removed a stale duplicate, obsolete plan, or superseded standalone artifact not referenced by the active implementation."
+    },
+    {
+      "path": "testdata/ground-truth/imagesF-63-working-ground-truth-v5.json",
+      "gitBlobSha1": "449944dfc02929359faa16a553bb3ee9667cc439",
+      "sizeBytes": 184239,
+      "reason": "Removed superseded Gate B manifest or older v5 ground-truth derivative; the v6 labelled source, 56-image review workbook, and original image archives remain retained."
+    },
+    {
+      "path": "testdata/imagesF-holdout-candidate-manifest.json",
+      "gitBlobSha1": "dbf1fd0c24dd24afa6ed15f009d14b701b3545d9",
+      "sizeBytes": 8137,
+      "reason": "Removed superseded Gate B manifest or older v5 ground-truth derivative; the v6 labelled source, 56-image review workbook, and original image archives remain retained."
+    },
+    {
+      "path": "tests/gateA-resume.test.js",
+      "gitBlobSha1": "c3422f7e7a73ae9daf74dbe0cfadd323afa751e0",
+      "sizeBytes": 4353,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": "tests/ocrspace-64-inventory.test.js",
+      "gitBlobSha1": "174e7d730aef5e4c6b3f88d6295e8e498501aade",
+      "sizeBytes": 1320,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": "tests/ocrspace-exploratory-resume.test.js",
+      "gitBlobSha1": "8aa645d5cc14da0c038660b46e3befbd5e31395c",
+      "sizeBytes": 3969,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": "tests/ocrspace-imagesF-21-artifact-verifier.test.js",
+      "gitBlobSha1": "16ac6b665a75e2e93b935f3244726e650bb538c2",
+      "sizeBytes": 10615,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": "tests/ocrspace-imagesF-21-ground-truth.test.js",
+      "gitBlobSha1": "83f9b85a875f7758671733d90c9a98068945f0a3",
+      "sizeBytes": 5050,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": "tests/ocrspace-imagesF-21-local-recovery.test.js",
+      "gitBlobSha1": "396b5238f7e026cf02e1bde95ee44e9f6bc5f28f",
+      "sizeBytes": 4987,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": "tests/test_ocrspace_imagesF_21_evaluator.py",
+      "gitBlobSha1": "a30792d70cfa63c286a1a75c8b7818f5e874f6b1",
+      "sizeBytes": 6470,
+      "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    }
+  ]
+}
