@@ -92,33 +92,48 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
         maxEngine3PerMonth: env.OCRSPACE_MAX_ENGINE3_PER_MONTH,
     });
     await ledger.reserve({ engine: 2, now: now() });
-    // The caller can durably checkpoint the request boundary before any provider
-    // bytes are sent. If that checkpoint fails, the provider is not contacted.
-    if (onProviderRequestStarted !== null) {
-        if (typeof onProviderRequestStarted !== 'function') throw fail('Provider-start checkpoint must be a function.', 'OCRSPACE_INVALID_CHECKPOINT_CALLBACK');
-        await onProviderRequestStarted({ engine: 2,
-            sourceSha256: crypto.createHash('sha256').update(imageBuffer).digest('hex'),
-            uploadSha256: crypto.createHash('sha256').update(upload.buffer).digest('hex'),
-            uploadBytes: upload.buffer.length });
+    if (onProviderRequestStarted !== null && typeof onProviderRequestStarted !== 'function') {
+        throw fail('Provider-start checkpoint must be a function.', 'OCRSPACE_INVALID_CHECKPOINT_CALLBACK');
     }
+    const sourceSha256 = crypto.createHash('sha256').update(imageBuffer).digest('hex');
+    const uploadSha256 = crypto.createHash('sha256').update(upload.buffer).digest('hex');
+    let requestCount = 0;
+    const providerFetch = async (url, options = {}) => {
+        const details = {
+            provider: 'ocr.space', engine: 2,
+            method: String(options.method || 'GET').toUpperCase(),
+            url: String(url), requestIndex: requestCount + 1,
+            sourceSha256, originalScreenshotSha256: sourceSha256,
+            uploadSha256, providerInputSha256: uploadSha256,
+            uploadBytes: upload.buffer.length,
+        };
+        // This is the actual fetch boundary for both the OCR POST and PDF GET.
+        await onProviderRequestStarted?.(details);
+        requestCount++;
+        return fetchImpl(url, options);
+    };
+    try {
     const response = await client({
         apiKey, imageBuffer: upload.buffer, filename: upload.filename || filename,
         mimeType: upload.mimeType || 'image/jpeg', engine: 2, overlayRequired: false,
         detectOrientation: true, isTable: false, scale: true,
         createSearchablePdf: true, searchablePdfHideTextLayer: true,
         timeoutMs: Math.max(1000, Math.min(60000, Number(env.OCRSPACE_PDF_FIRST_TIMEOUT_MS) || 45000)),
-        fetchImpl,
+        fetchImpl: providerFetch,
     });
     const pdfUrl = safeSearchablePdfUrl(response.searchablePdfUrl);
     if (!pdfUrl) throw fail('OCR.Space Engine 2 did not return SearchablePDFURL; local OCR from the original screenshot is not substituted.', 'OCRSPACE_SEARCHABLE_PDF_MISSING');
-    const pdfBuffer = await downloadPdf(pdfUrl, { fetchImpl });
+    const pdfBuffer = await downloadPdf(pdfUrl, { fetchImpl: providerFetch });
     const rasterBuffer = await renderPdf(pdfBuffer);
     const rasterMetadata = await readRasterMetadata(rasterBuffer);
     return {
         status: 'complete', provider: 'ocr.space', engine: 2,
-        sourceSha256: crypto.createHash('sha256').update(imageBuffer).digest('hex'),
-        uploadSha256: crypto.createHash('sha256').update(upload.buffer).digest('hex'),
-        uploadBytes: upload.buffer.length, uploadWidth: upload.width || null, uploadHeight: upload.height || null,
+        sourceSha256, originalScreenshotSha256: sourceSha256,
+        uploadSha256, providerInputSha256: uploadSha256,
+        uploadBytes: upload.buffer.length, mimeType: upload.mimeType || 'image/jpeg',
+        requests: requestCount, httpRequestCount: requestCount,
+        elapsedMs: Number(response.processingTimeMs) || null,
+        uploadWidth: upload.width || null, uploadHeight: upload.height || null,
         uploadResized: upload.resized === true, uploadQuality: upload.quality || null,
         pdfBytes: pdfBuffer.length, pdfSha256: crypto.createHash('sha256').update(pdfBuffer).digest('hex'),
         rasterBytes: rasterBuffer.length, rasterSha256: crypto.createHash('sha256').update(rasterBuffer).digest('hex'),
@@ -129,6 +144,13 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
         providerText: String(response.parsedText || '').slice(0, 12000),
         rasterBuffer, pdfBuffer,
     };
+    } catch (error) {
+        if (error && typeof error === 'object') {
+            error.httpRequestCount = requestCount;
+            error.requestCount = requestCount;
+        }
+        throw error;
+    }
 }
 
 module.exports = { createOcrSpacePdfFirst, downloadSearchablePdf, readPdfBounded, MAX_SEARCHABLE_PDF_BYTES };
