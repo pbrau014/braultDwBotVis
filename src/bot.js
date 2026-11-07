@@ -2505,8 +2505,19 @@ async function extractTextCore(imageBuffer) {
             ocrSpacePdfFirstEvidence = { ...publicEvidence, artifacts: artifactPaths };
             ocrSpaceSourceEvidence = {
                 status: 'complete', requests: Number(ocrSpace.requestCount) || Number(ocrSpace.httpRequestCount) || 0,
+                originalScreenshotSha256: ocrSpace.originalScreenshotSha256 || ocrSpace.sourceSha256 || null,
+                providerInputSha256: ocrSpace.providerInputSha256 || ocrSpace.inputSha256 || ocrSpace.uploadSha256 || null,
+                uploadSha256: ocrSpace.uploadSha256 || null,
+                searchablePdfSha256: ocrSpace.searchablePdfSha256 || ocrSpace.pdfSha256 || null,
+                rasterSha256: ocrSpace.rasterSha256 || null,
+                provider: ocrSpace.provider || 'ocr.space', engine: ocrSpace.engine || 2,
                 evidence: [{ field: 'fullScreenshot', source: 'ocrspace-searchable-pdf', status: 'success',
-                    text: String(ocrSpace.text || '') }],
+                    text: String(ocrSpace.text || ''),
+                    originalScreenshotSha256: ocrSpace.originalScreenshotSha256 || ocrSpace.sourceSha256 || null,
+                    providerInputSha256: ocrSpace.providerInputSha256 || ocrSpace.inputSha256 || ocrSpace.uploadSha256 || null,
+                    uploadSha256: ocrSpace.uploadSha256 || null,
+                    searchablePdfSha256: ocrSpace.searchablePdfSha256 || ocrSpace.pdfSha256 || null,
+                    rasterSha256: ocrSpace.rasterSha256 || null }],
             };
         } else {
             ocrSpacePdfFirstEvidence = { status: ocrSpace?.status || 'blocked', reason: ocrSpace?.reason || ocrSpace?.error || 'OCR.Space provider did not participate', requests: Number(ocrSpace?.requestCount) || 0 };
