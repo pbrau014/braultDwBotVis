@@ -2537,12 +2537,19 @@ async function extractTextCore(imageBuffer) {
                 // Keep provider-native line/word geometry attached to the evidence.
                 // Reconciliation may use text today, but diagnostics must not discard
                 // polygons, per-word confidence, or page structure.
-                evidence: [{ field: 'fullScreenshot', source: 'azure-document-intelligence', status: 'success',
-                    text: String(azure.text || ''), lines: Array.isArray(azure.lines) ? azure.lines : [],
-                    pages: Array.isArray(azure.pages) ? azure.pages : [], pageCount: azure.pageCount || null, originalScreenshotSha256: azure.originalScreenshotSha256 || null,
-                    providerInputSha256: azure.providerInputSha256 || azure.inputSha256 || null,
-                    model: azure.model || null, apiVersion: azure.apiVersion || null,
-                    mimeType: azure.mimeType || null }],
+                evidence: [
+                    { field: 'fullScreenshot', source: 'azure-document-intelligence', status: 'success',
+                        text: String(azure.text || ''), lines: Array.isArray(azure.lines) ? azure.lines : [],
+                        pages: Array.isArray(azure.pages) ? azure.pages : [], pageCount: azure.pageCount || null,
+                        originalScreenshotSha256: azure.originalScreenshotSha256 || null,
+                        providerInputSha256: azure.providerInputSha256 || azure.inputSha256 || null,
+                        originalScreenshotWidth: sourceWidth, originalScreenshotHeight: sourceHeight,
+                        model: azure.model || null, apiVersion: azure.apiVersion || null, mimeType: azure.mimeType || null },
+                    ...buildAzureFieldEvidence(azure.lines, {
+                        sourceSha256: azure.originalScreenshotSha256 || multiProviderOcrEvidence.sourceSha256 || null,
+                        sourceWidth, sourceHeight,
+                    }),
+                ],
             };
         } else {
             azureSourceEvidence = {
