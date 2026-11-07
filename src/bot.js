@@ -2738,8 +2738,8 @@ function reconcileParallelLocalReaderEvidence(readerBundle, localRecord = {}) {
 
 function validateWorldOfWarshipsScreenshot(ocrResult, extractedFields = {}) {
     const record = buildBattleRecord(ocrResult.text || '', extractedFields);
-    // Compare OCR.Space's first-pass text with the final local record as a
-    // diagnostic only. Remote-only values and disagreements never alter acceptance.
+    // Preserve independent provider and local-reader evidence. Remote-only values
+    // never fill a missing field; detected disagreements block automatic acceptance.
     const ocrSpaceReconciliation = reconcileOcrSpaceEvidence(extractedFields.ocrSpaceEvidence, record);
     const azureReconciliation = reconcileOcrSpaceEvidence(extractedFields.azureEvidence, record);
     const multiProviderReconciliation = { ocrSpace: ocrSpaceReconciliation, azure: azureReconciliation };
