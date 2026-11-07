@@ -196,3 +196,17 @@ test('an inferred or illegible status cannot count even if its eligibility flag 
   assert.equal(report.eligibleIndependentNineFieldImageCount, 49);
   assert.equal(report.rejected.incompleteNineFieldLabels, 1);
 });
+
+
+test('inventory report explicitly distinguishes fingerprint metadata from source-byte verification', () => {
+  const report = auditGateBInventory({
+    groundTruth: makeGroundTruth(49),
+    developmentGroundTruth: makeDevelopmentGroundTruth(),
+    regressionImageHashes: makeRegressionHashes(),
+  });
+  assert.deepEqual(report.sourceImageVerification, {
+    status: 'METADATA_ONLY_NOT_REHASHED',
+    verified: false,
+    qualification: 'This preflight validates recorded SHA-256 syntax, byte count, and dimensions only. It does not read or rehash source image bytes; archive/member integrity must be established by the separate source-archive reconciliation.',
+  });
+});
