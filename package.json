@@ -20,6 +20,7 @@
     "test:opencv": "node --test tests/opencv-field-isolation.test.js",
     "benchmark:paddleocr:offline": "node scripts/run-offline-paddleocr-benchmark.js",
     "summarize:ocr": "node scripts/summarize-ocr-acceptance.js",
+    "summarize:multi-provider-accuracy": "node scripts/summarize-multi-provider-accuracy.js",
     "test:paddleocr-fallback": "node --test tests/paddleocr-field-fallback.test.js",
     "acceptance:paddleocr": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/run-paddleocr-integrated-acceptance.ps1",
     "test:discord-gateway-diagnostics": "node --test tests/discord-gateway-diagnostics.test.js",
