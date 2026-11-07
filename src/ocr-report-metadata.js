@@ -62,7 +62,7 @@ function describeOcrConfiguration(env = process.env) {
             defaultEnabled: false,
             explicitlyEnabled: ocrSpaceExplicit,
             explicitlyDisabled: ocrSpaceExplicitlyDisabled,
-            activationReason: ocrSpace.reason,
+            activationReason: standaloneOcrSpaceActivation.reason || ocrSpace.reason,
             apiKeyConfigured: ocrSpaceKeyConfigured,
             networkEnabled: ocrSpaceNetworkEnabled,
             unrelatedEgressRestricted: nonOcrNetworkRestricted,
