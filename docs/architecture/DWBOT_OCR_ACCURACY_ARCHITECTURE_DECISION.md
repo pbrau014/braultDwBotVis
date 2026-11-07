@@ -61,7 +61,11 @@ Reconciliation is field-specific. Use source geometry, text-region association, 
 
 This compatibility description is not a release gate or a holdout-corpus prerequisite. Schema changes, if later required, must be explicit and include storage/workbook compatibility handling.
 
-## 5. Development workflow
+## 5. Local PaddleOCR setup
+
+On Windows, provision the pinned local CPU runtime and PP-OCRv6 models with the repository installer. The live multi-provider workflow runs this installer before the end-to-end smoke test and exports the resulting Python executable, detection/recognition model directories, and model manifest to the child readers. For a local installation, run `scripts/install-paddleocr-windows.ps1` with a runtime directory outside the repository, then set `PADDLEOCR_PYTHON_BIN`, `PADDLEOCR_DET_MODEL_DIR`, `PADDLEOCR_REC_MODEL_DIR`, and `PADDLEOCR_MODEL_MANIFEST` to the generated paths. If the model manifest is missing, PaddleOCR is reported as blocked rather than represented as a participating reader.
+
+## 6. Development workflow
 
 This branch does not use the former Gate A/B/C/D release sequence or independent holdout corpus as prerequisites for implementation. Continue through feature work, provider integration, tests, diagnostics, error handling, performance work, and documentation.
 
@@ -72,6 +76,6 @@ This branch does not use the former Gate A/B/C/D release sequence or independent
 - Do not automatically retry rate limits, bypass provider quotas, or upgrade paid tiers.
 - Report technical dependencies directly and continue all unrelated implementation tasks.
 
-## 6. Branch isolation
+## 7. Branch isolation
 
 All work belongs on `ocr-multiprovider`. Do not update `main`, create a merge, or use a main-branch release workflow without separate authorization.

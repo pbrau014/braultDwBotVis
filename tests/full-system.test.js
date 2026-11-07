@@ -922,19 +922,18 @@ test('interactive panel ignores unsupported and malformed interaction payloads s
   assert.match(replyContent, /event selection is invalid/i, 'malformed select values must produce a controlled public error');
 });
 
-test('runtime gate accepts Node 22.16.0 and newer stable releases', () => {
-  assert.equal(H.runtimeSupported('22.16.0'), true);
-  assert.equal(H.runtimeSupported('v22.16.0'), true);
-  assert.equal(H.runtimeSupported('22.16.1'), true);
-  assert.equal(H.runtimeSupported('22.17.0'), true);
-  assert.equal(H.runtimeSupported('23.0.0'), true);
+test('runtime compatibility requires Node 24.17.0 or newer stable releases', () => {
   assert.equal(H.runtimeSupported('24.17.0'), true);
+  assert.equal(H.runtimeSupported('v24.17.0'), true);
+  assert.equal(H.runtimeSupported('24.17.1'), true);
+  assert.equal(H.runtimeSupported('24.22.1'), true);
   assert.equal(H.runtimeSupported('25.0.0'), true);
-  assert.equal(H.runtimeSupported('22.15.9'), false);
-  assert.equal(H.runtimeSupported('22.0.0'), false);
-  assert.equal(H.runtimeSupported('21.99.99'), false);
+  assert.equal(H.runtimeSupported('26.0.0'), true);
+  assert.equal(H.runtimeSupported('24.16.9'), false);
+  assert.equal(H.runtimeSupported('24.0.0'), false);
+  assert.equal(H.runtimeSupported('23.99.99'), false);
   assert.equal(H.runtimeSupported('not-a-version'), false);
-  assert.equal(H.runtimeSupported('22.16.0-rc.1'), false);
+  assert.equal(H.runtimeSupported('24.17.0-rc.1'), false);
 });
 
 test.after(async () => {
