@@ -9,14 +9,28 @@ function safeSearchablePdfUrl(value) {
     catch { return null; }
 }
 function compactOverlay(results, maxWords = 500) {
-    const out = []; let left = maxWords;
-    for (const result of results || []) for (const line of (result && result.TextOverlay && result.TextOverlay.Lines) || []) {
-        for (const word of line.Words || []) {
-            if (left <= 0) return out;
-            const text = String(word.WordText || '').slice(0, 120);
-            const vals = [Number(word.Left), Number(word.Top), Number(word.Width), Number(word.Height)];
-            if (!text || !vals.every(Number.isFinite) || vals.some(n => n < 0)) continue;
-            out.push({ text, left: vals[0], top: vals[1], width: vals[2], height: vals[3] }); left--;
+    const out = [];
+    let remaining = maxWords;
+    for (let pageIndex = 0; pageIndex < (results || []).length; pageIndex++) {
+        const result = results[pageIndex];
+        const lines = (result && result.TextOverlay && result.TextOverlay.Lines) || [];
+        for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+            const line = lines[lineIndex];
+            const words = Array.isArray(line.Words) ? line.Words : [];
+            const lineText = String(line.LineText || words.map(word => String(word.WordText || '')).join(' ')).slice(0, 500);
+            for (const word of words) {
+                if (remaining <= 0) return out;
+                const text = String(word.WordText || '').slice(0, 120);
+                const vals = [Number(word.Left), Number(word.Top), Number(word.Width), Number(word.Height)];
+                if (!text || !vals.every(Number.isFinite) || vals.some(n => n < 0) || vals[2] <= 0 || vals[3] <= 0) continue;
+                const [left, top, width, height] = vals;
+                out.push({
+                    text, left, top, width, height, right: left + width, bottom: top + height,
+                    pageIndex, lineIndex, lineText,
+                    coordinateSpace: 'provider-upload-pixels',
+                });
+                remaining--;
+            }
         }
     }
     return out;
@@ -106,7 +120,8 @@ async function recognizeCrop({ apiKey, imageBuffer, filename = 'dwbot-field-crop
         return {
             provider: 'ocr.space', engine: selectedEngine, exitCode, partial: exitCode === 2,
             parsedText: ok.map(x => String(x.ParsedText || '')).join('\n').slice(0, 12000),
-            overlay: overlayRequired ? compactOverlay(ok) : [],
+            overlay: (overlayRequired || createSearchablePdf) ? compactOverlay(ok) : [],
+            textOrientation: Number.isFinite(Number(payload.TextOrientation)) ? Number(payload.TextOrientation) : null,
             providerConfidence: null,
             searchablePdfUrl: createSearchablePdf ? safeSearchablePdfUrl(payload.SearchablePDFURL) : null,
             processingTimeMs: Number(payload.ProcessingTimeInMilliseconds) || null,
