@@ -28,7 +28,12 @@ test('OCR.Space searchable PDF is derivative evidence and the original screensho
     const result = await createOcrSpacePdfFirst({
         imageBuffer: png, filename: 'source.png', env: { OCRSPACE_API_KEY: 'test-key' },
         quotaLedger: ledger,
-        client: async options => { request = options; return { searchablePdfUrl: 'https://api.ocr.space/parse/image/temporary.pdf', parsedText: 'Victory\\nShards', exitCode: 1, processingTimeMs: 123 }; },
+        client: async options => { request = options; return {
+            searchablePdfUrl: 'https://api.ocr.space/parse/image/temporary.pdf',
+            parsedText: 'Victory\\nShards', exitCode: 1, processingTimeMs: 123, textOrientation: 0,
+            overlay: [{ text: 'Victory', left: 10, top: 20, width: 30, height: 10, pageIndex: 0, lineIndex: 0, lineText: 'Victory' }],
+        }; },
+        readSourceMetadata: async () => ({ width: 1920, height: 1080 }),
         downloadPdf: async url => { downloaded = url; return pdf; },
         renderPdf: async bytes => { rendered = bytes; return png; },
         readRasterMetadata: async () => ({ width: 1920, height: 1080 }),
@@ -47,6 +52,15 @@ test('OCR.Space searchable PDF is derivative evidence and the original screensho
     assert.equal(result.pdfBuffer, pdf);
     assert.equal(result.rasterBuffer, png);
     assert.equal(result.providerText, 'Victory\\nShards');
+    assert.equal(result.originalScreenshotWidth, 1920);
+    assert.equal(result.originalScreenshotHeight, 1080);
+    assert.equal(result.overlayCoordinateSpace, 'original-screenshot-pixels');
+    assert.equal(result.overlayWordCount, 1);
+    assert.deepEqual(result.overlay[0].providerPolygon, [10,20,40,20,40,30,10,30]);
+    assert.deepEqual(result.overlay[0].originalPolygon, [10,20,40,20,40,30,10,30]);
+    assert.equal(result.overlay[0].originalCoordinateGeometryValid, true);
+    assert.equal(result.overlay[0].originalScreenshotSha256, result.sourceSha256);
+    assert.equal(result.overlay[0].providerInputSha256, result.uploadSha256);
 });
 
 test('OCR.Space releases quota reservation when request checkpoint fails before fetch', async t => {
