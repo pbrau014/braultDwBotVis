@@ -346,16 +346,28 @@ async function extractTextCore(imageBuffer) {
     const ocrSpaceActivation = getOcrSpaceActivation(process.env);
     const multiProviderActivation = getMultiProviderActivation(process.env);
     let multiProviderOcrEvidence = { status: 'not_requested', requested: false, providers: {} };
+    const multiProviderRequestEvents = [];
     let multiProviderOcrPromise = null;
     let parallelLocalReadersPromise = null;
     let parallelLocalReadersEvidence = { status: 'not_requested', readers: {} };
     let ocrSpacePdfFirstEvidence = { status: 'not_requested', reason: ocrSpaceActivation.reason, requests: 0 };
     let ocrSpaceSourceEvidence = { status: 'not_requested', reason: ocrSpaceActivation.reason, requests: 0, evidence: [] };
+    let azureSourceEvidence = { status: 'not_requested', requests: 0, evidence: [] };
     if (multiProviderActivation.requested) {
         // Start both online providers and all independent local readers now; do not
         // await them here. They execute alongside OpenCV and the primary OCR path.
         multiProviderOcrPromise = runMultiProviderOcr({
             imageBuffer, filename: 'wows-battle-source.png', env: process.env,
+            onProviderRequestStarted: async details => {
+                const event = { ...details, at: new Date().toISOString() };
+                multiProviderRequestEvents.push(event);
+                const eventLog = String(process.env.DWBOT_MULTI_PROVIDER_EVENT_LOG || '').trim();
+                if (eventLog) {
+                    const eventPath = path.resolve(eventLog);
+                    await fs.mkdir(path.dirname(eventPath), { recursive: true });
+                    await fs.appendFile(eventPath, JSON.stringify(event) + '\n', 'utf8');
+                }
+            },
         });
         parallelLocalReadersPromise = runParallelLocalReaders({
             imageBuffer, env: process.env,
@@ -2499,12 +2511,27 @@ async function extractTextCore(imageBuffer) {
             ocrSpacePdfFirstEvidence = { status: ocrSpace?.status || 'blocked', reason: ocrSpace?.reason || ocrSpace?.error || 'OCR.Space provider did not participate', requests: Number(ocrSpace?.requestCount) || 0 };
             ocrSpaceSourceEvidence = { status: 'incomplete', requests: Number(ocrSpace?.requestCount) || 0, evidence: [] };
         }
+        const azure = multiProviderOcrEvidence.providers?.azure;
+        if (azure?.status === 'success') {
+            azureSourceEvidence = {
+                status: 'complete', requests: Number(azure.requestCount) || 1,
+                evidence: [{ field: 'fullScreenshot', source: 'azure-document-intelligence', status: 'success',
+                    text: String(azure.text || '') }],
+            };
+        } else {
+            azureSourceEvidence = {
+                status: 'incomplete', requests: Number(azure?.requestCount) || 0,
+                reason: azure?.reason || azure?.error || 'Azure provider did not participate', evidence: [],
+            };
+        }
     }
 
     const extractedFields = {
         ocrSpaceEvidence: ocrSpaceSourceEvidence,
+        azureEvidence: azureSourceEvidence,
         ocrSpacePdfFirst: ocrSpacePdfFirstEvidence,
         multiProviderOcr: multiProviderOcrEvidence,
+        multiProviderRequestEvents,
         parallelLocalReaders: parallelLocalReadersEvidence,
         rewards: focusedRewards,
         rewardCandidates,
@@ -2664,6 +2691,9 @@ function validateWorldOfWarshipsScreenshot(ocrResult, extractedFields = {}) {
     // Compare OCR.Space's first-pass text with the final local record as a
     // diagnostic only. Remote-only values and disagreements never alter acceptance.
     const ocrSpaceReconciliation = reconcileOcrSpaceEvidence(extractedFields.ocrSpaceEvidence, record);
+    const azureReconciliation = reconcileOcrSpaceEvidence(extractedFields.azureEvidence, record);
+    const multiProviderReconciliation = { ocrSpace: ocrSpaceReconciliation, azure: azureReconciliation };
+    const localReaderReconciliation = reconcileParallelLocalReaderEvidence(extractedFields.parallelLocalReaders, record);
     const missing = getMissingRequiredFields(record);
     const requiredLabels = new Set(missing.map((field) => field.label));
     const checks = [
@@ -2680,6 +2710,9 @@ function validateWorldOfWarshipsScreenshot(ocrResult, extractedFields = {}) {
         accepted: missing.length === 0, checks, failed: missing, missing, record,
         text: cleanOcrText(ocrResult.text || ''),
         ocrSpaceReconciliation,
+        azureReconciliation,
+        multiProviderReconciliation,
+        localReaderReconciliation,
         confidence: Number(ocrResult.confidence) || 0,
         pageSegmentationMode: ocrResult.pageSegmentationMode || 'unknown',
     };
