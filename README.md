@@ -67,7 +67,7 @@ Generate the report with:
 npm run summarize:multi-provider-accuracy -- --predictions <predictions.json> --ground-truth <ground-truth.json> --output <accuracy-report.json>
 ```
 
-The report includes per-field exact match, full nine-field exact records, wrong accepted values, unresolved fields, false acceptance/rejection, reader disagreement, provider availability, runtime, quota/request counts, and optional source-region correctness. To score region correctness, add a `fieldRegions` object to each ground-truth entry, mapping fields to pixel boxes such as `{ "x": 100, "y": 200, "width": 300, "height": 80, "pageIndex": 0 }`; without those labels the region metric remains unassessed. Only source hashes present in both inputs are scored. Do not claim accuracy without complete independent ground truth.
+The report includes per-field exact match and coverage, full nine-field exact records, the individual wrong accepted values, unresolved-field records, false acceptance/rejection, acceptance coverage, reader disagreement, provider availability, runtime, quota/request counts, Node-process network-restriction diagnostics, and optional source-region correctness. To score region correctness, add a `fieldRegions` object to each ground-truth entry, mapping fields to pixel boxes such as `{ "x": 100, "y": 200, "width": 300, "height": 80, "pageIndex": 0 }`; without those labels the region metric remains unassessed. Only source hashes present in both inputs are scored. Do not claim accuracy without complete independent ground truth.
 
 ## Useful commands
 
