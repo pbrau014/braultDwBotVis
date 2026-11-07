@@ -22,6 +22,8 @@ async function executeReader({ imageBuffer, engine, env, timeoutMs = 90000 }) {
         OCRSPACE_NETWORK_ALLOWLIST: '0',
         OCRSPACE_API_KEY: '',
         AZURE_DOCUMENT_INTELLIGENCE_ENABLED: '0',
+        AZURE_DOCUMENT_INTELLIGENCE_NETWORK_ALLOWLIST: '0',
+        AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT: '',
         AZURE_DOCUMENT_INTELLIGENCE_KEY: '',
         OCR_NON_OCR_NETWORK_RESTRICTED: '1',
         OCR_NON_OCR_NETWORK_LOG: networkLogPath,
