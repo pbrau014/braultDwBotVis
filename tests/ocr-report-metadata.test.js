@@ -41,9 +41,17 @@ test('OCR configuration metadata reports explicit primary activation and provide
     assert.equal(defaults.ocrSpace.defaultEnabled, false);
     assert.equal(defaults.ocrSpace.explicitlyEnabled, false);
     assert.equal(defaults.ocrSpace.activationReason, 'OCRSPACE_ENABLED must be explicitly set to 1');
-    assert.deepEqual(defaults.ocrSequence, ['ocrspace-required-but-blocked-until-explicit-enable-and-key']);
+    assert.deepEqual(defaults.ocrSequence, ['original-screenshot-input', 'parallel-local-readers-original-image', 'field-level-reconciliation']);
+    assert.equal(defaults.multiProvider.requested, false);
+    assert.equal(defaults.azure.enabled, false);
 
     const enabled = describeOcrConfiguration({
+        DWBOT_MULTI_PROVIDER_ENABLED: '1',
+        AZURE_DOCUMENT_INTELLIGENCE_ENABLED: '1',
+        AZURE_DOCUMENT_INTELLIGENCE_KEY: 'never-log-this-azure-secret',
+        AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT: 'https://dwbot.cognitiveservices.azure.com',
+        AZURE_DOCUMENT_INTELLIGENCE_TIER: 'F0',
+        AZURE_DOCUMENT_INTELLIGENCE_NETWORK_ALLOWLIST: '1',
         OCR_ENGINE: 'TESSERACTJS',
         OCR_CV_ASSIST: '1',
         PADDLEOCR_FIELD_FALLBACK: '1',
@@ -58,23 +66,27 @@ test('OCR configuration metadata reports explicit primary activation and provide
     assert.equal(enabled.ocrSpace.enabled, true);
     assert.equal(enabled.ocrSpace.explicitlyEnabled, true);
     assert.equal(enabled.ocrSpace.networkEnabled, true);
+    assert.equal(enabled.azure.enabled, true);
+    assert.equal(enabled.azure.networkEnabled, true);
+    assert.equal(enabled.multiProvider.enabled, true);
     assert.equal(enabled.ocrSpace.unrelatedEgressRestricted, true);
     assert.equal(enabled.ocrSpaceNetworkEnabled, true);
     assert.equal(enabled.nonOcrNetworkRestricted, true);
-    assert.deepEqual(enabled.ocrSequence, ['ocrspace-engine2-source-image', 'searchable-pdf-download', 'pdf-page-raster', 'local-ocr-readers', 'field-validation']);
+    assert.deepEqual(enabled.ocrSequence, ['original-screenshot-input', 'parallel-local-readers-original-image', 'ocrspace-engine2-original-screenshot', 'azure-prebuilt-read-original-screenshot', 'searchable-pdf-download-derivative', 'pdf-page-raster-derivative', 'field-level-reconciliation']);
     assert.deepEqual(enabled.ocrSpace.allowedHttpsHosts, ['api.ocr.space', 'ocr.space']);
     assert.equal(enabled.imageTimeoutMs, 120000);
     assert.equal(enabled.operationTimeoutMs, 9000);
     assert.equal(JSON.stringify(enabled).includes('never-log-this-secret'), false);
+    assert.equal(JSON.stringify(enabled).includes('never-log-this-azure-secret'), false);
 
-    const zero = describeOcrConfiguration({ OCRSPACE_ENABLED: '0', OCRSPACE_API_KEY: 'local-key' });
+    const zero = describeOcrConfiguration({ DWBOT_MULTI_PROVIDER_ENABLED: '1', OCRSPACE_ENABLED: '0', OCRSPACE_API_KEY: 'local-key' });
     assert.equal(zero.ocrSpace.enabled, false);
-    assert.equal(zero.ocrSpace.explicitlyDisabled, false);
+    assert.equal(zero.ocrSpace.explicitlyDisabled, true);
     assert.equal(zero.ocrSpace.activationReason, 'OCRSPACE_ENABLED must be explicitly set to 1');
-    assert.deepEqual(zero.ocrSequence, ['ocrspace-required-but-blocked-until-explicit-enable-and-key']);
+    assert.deepEqual(zero.ocrSequence, ['original-screenshot-input', 'parallel-local-readers-original-image', 'field-level-reconciliation']);
 });
 
-test('OCR.Space report metadata keeps the required PDF-first request profile', () => {
+test('OCR.Space report metadata keeps searchable-PDF derivatives separate from local original-image readers', () => {
     const enabled = describeOcrConfiguration({
         OCRSPACE_ENABLED: '1',
         OCRSPACE_API_KEY: 'key',
@@ -86,7 +98,8 @@ test('OCR.Space report metadata keeps the required PDF-first request profile', (
     assert.deepEqual(enabled.ocrSpace.requestProfile, {
         detectOrientation: true, scale: true, tableMode: false,
         searchablePdf: true, searchablePdfHideTextLayer: true,
-        oneRequestPerImage: true, sourceImageFirst: true, localReadersUsePdfRaster: true,
+        oneRequestPerImage: true, sourceImageFirst: true,
+        localReadersUseOriginalScreenshot: true, localReadersUsePdfRaster: false,
     });
     assert.equal(enabled.ocrSpace.engine, 2);
     assert.equal(enabled.ocrSpace.limits.maxPerDay, 400);

@@ -207,6 +207,7 @@ test('OCR.Space requires explicit enablement and a local key; unset, 0 and inval
     assert.equal(unset.activation.explicitlyEnabled, false);
     assert.equal(zero.status, 'disabled');
     assert.equal(zero.activation.reason, 'OCRSPACE_ENABLED must be explicitly set to 1');
+    assert.equal(zero.activation.explicitlyDisabled, true);
     assert.equal(noKey.status, 'disabled');
     assert.equal(invalidSetting.status, 'disabled');
     assert.equal(explicitOn.status, 'complete');
