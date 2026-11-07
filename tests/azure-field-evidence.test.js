@@ -101,5 +101,5 @@ test('Azure battle-start evidence is parsed only from its explicit label', () =>
         geometryValid: true, pageWidth: 200, pageHeight: 300, pageUnit: 'pixel',
     }], { sourceWidth: 400, sourceHeight: 600 });
     assert.equal(candidate.field, 'battleStart');
-    assert.deepEqual(parseEvidenceItem(candidate), { battleStart: '2024-09-28T17:04' });
+    assert.deepEqual(parseEvidenceItem(candidate), { battleStart: '28.09.2024 17:04' });
 });
