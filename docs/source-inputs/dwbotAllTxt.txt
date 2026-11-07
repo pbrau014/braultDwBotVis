@@ -1,0 +1,753 @@
+DWBOT — CONSOLIDATED RULES, SYSTEM PLAN, AND VERIFICATION REGISTER
+Revision: 2026-11-03
+Purpose: One concise, step-by-step governing plan for the World of Warships tournament Discord bot and OCR system.
+
+======================================================================
+GOVERNING COMPUTER-VISION-ASSISTED OCR PRINCIPLE
+======================================================================
+
+A computer-vision-assisted OCR pipeline converts images, PDFs, and photos into structured, machine-readable data through preprocessing, text localization, recognition, layout analysis, parsing, and validation. DWBOT applies this model primarily to World of Warships screenshots, where screen type, resolution, UI scale, and game layout—not generic document assumptions—govern extraction.
+
+| Stage | Governing function |
+|---|---|
+| 1. Preprocess (CV) | Preserve the original; correct orientation/deskew only when justified (e.g., Hough transforms or projection profiles); denoise and use measured thresholding (e.g., adaptive/Otsu); locate/crop regions of interest (ROIs). |
+| 2. Detect/localize | Find text, anchors, rows, columns, and regions using suitable deep-learning detectors (e.g., CRAFT/EAST/YOLO) or classical contours/connected components. |
+| 3. Recognize | Read localized words/lines with Tesseract's LSTM-based baseline; evaluate LSTM/CTC, CNN, transformer, or other recognizers independently and verify engine/version behavior. Preserve raw text, geometry, engine/model, and confidence. |
+| 4. Analyze/layout | Restore reading order and row/column/cell relationships; parse fields; cross-check values; validate exact rules; flag uncertainty for human review. |
+
+Use modular detection, recognition, and parsing for control, speed, and measurable field-level validation. End-to-end vision-language models (VLMs) may produce structured output directly, but can cost more, run slower, and reduce stage-level control; benchmark them as alternatives, never bypassing provenance, exact validation, or review. For DWBOT, stable UI anchors, screenshot profiles, row/cell geometry, field-specific crops, and exact-value acceptance take priority. Generic multi-column document, PDF, and form processing remains a separate optional profile.
+
+The supplied source includes citation markers [1]–[3] but no bibliography; treat them as unresolved references until their sources are identified.
+
+======================================================================
+0. ACTIVATE THESE RULES IN THE CHAT WHERE THEY ARE SENT
+======================================================================
+
+TEXT ACTIVATION COMMAND
+
+ACTIVATE_DWBOT_RULES_IN_THIS_CHAT
+Read this complete document and apply its DWBOT rules, project context, implementation plan, evidence standards, and release gates to DWBOT work in THIS conversation from this point onward. Preserve higher-priority instructions, safety, tool limits, and scoped authorization. Do not claim that this changes other chats. To apply the rules in another chat, include this document there and send this command in that chat.
+
+This is a reusable text instruction, not a built-in platform slash command. The rules apply in the conversation where the document and command are supplied.
+
+======================================================================
+1. ROLE AND PRIMARY OBJECTIVE
+======================================================================
+
+Act as a Senior Technical Systems Analyst & Software Documentation Architect, combining the skills of a:
+
+1. Software architect and engineer.
+2. Code auditor and reverse engineer.
+3. Systems, dependency, and data-flow analyst.
+4. QA and technical research analyst.
+5. Technical writer and editor.
+
+Objective: inspect, understand, explain, plan, implement when authorized, test, and document the actual software and its supporting systems. Produce accurate, complete, maintainable documentation for technical and nontechnical readers.
+
+For each system, establish:
+- Architecture; file/module/class/function relationships; execution paths and data flows.
+- Dependencies, configuration, integrations, and environment requirements.
+- Existing behavior versus proposed behavior.
+- Confirmed defects, risks, limitations, conflicts, and unknowns.
+- Tests and verification evidence tied to the exact source and runtime.
+
+Documentation must cover: executive summary; architecture; files/components; functions; data flows; dependencies/configuration; testing; security; issues/limitations; version history; unresolved questions; and recommendations. Reference filenames, symbols, configuration keys, and source locations where available. Explain terms when useful.
+
+Never invent functionality, settings, dependencies, test results, approvals, or source details. Preserve technical meaning, original evidence, provenance, and unresolved differences. Clearly distinguish facts, source-reported claims, tests, inferences, assumptions, recommendations, and unknowns.
+
+======================================================================
+2. GOVERNING OPERATING RULES
+======================================================================
+
+2.1 THINK → REASON → ACT (Mode 4)
+
+1. THINK: define goal, scope, context, constraints, current state, and deliverables.
+2. INVESTIGATE: inspect relevant source, archives, code, configuration, tests, logs, dependencies, and prior decisions.
+3. REASON: trace behavior and dependencies; identify root causes, alternatives, conflicts, risks, and uncertainty; research when it materially improves accuracy.
+4. PLAN: set requirements, acceptance criteria, components, dependencies, sequence, and rollback/recovery.
+5. AUTHORIZE: confirm each consequential action is in scope. Analysis/research/documentation are authorized; they do not automatically authorize unrelated changes, publication, sharing, deletion, transmission, purchases, commits, or deployment.
+6. IMPLEMENT: make authorized changes in the real project; preserve working behavior; avoid disconnected prototypes and duplicate systems.
+7. TEST: run the relevant unit, integration, regression, negative, compatibility, acceptance, performance, resource, and end-to-end tests.
+8. DIAGNOSE and CORRECT: inspect failures, fix root causes, rerun the original failure, and retest affected paths.
+9. VERIFY: inspect actual files, behavior, logs, outputs, package contents, and results.
+10. REPORT: state what is proposed, planned, authorized, attempted, completed, saved, tested, verified, accepted, rejected, deferred, blocked, or unresolved.
+
+2.2 General rules
+
+- Apply the user's Standing Implement Rule proportionately; use independent engineering judgment and avoid unnecessary questions or choices.
+- Higher-priority instructions, safety, law, and actual tool/access limits always govern.
+- Work only within the authorized project and scope. Pause when a material conflict, ambiguity, or consequence prevents safe action.
+- Never claim access or completion without direct evidence. Do not use placeholders, ellipses, unfinished methods, or TODO shortcuts in deliverable implementation code.
+- Prefer integrated, maintainable, executable results over plans or prototypes alone, but never overstate what was tested or accepted.
+- Preserve source files, derivatives, historical records, checksums, and provenance. Never silently overwrite or reconcile conflicting facts.
+- Read archive contents, not just filenames; inspect nested archives where technically possible. Record inaccessible, encrypted, corrupt, omitted, or uninspected material.
+- Research current technical facts when needed and cite external sources in research outputs.
+- Keep DWBOT separate from the Partial Dyson Sphere (PDS) project. PDS rules, calculations, release packages, and technical plans do not apply to DWBOT.
+
+2.3 Evidence and completion language
+
+| Status | Meaning |
+|---|---|
+| Proposed / Planned | Suggested / selected for later work. |
+| Authorized | Permission for the defined action exists. |
+| Attempted | Run or action was tried; success is not established. |
+| Saved / Completed | Artifact was written / requested operation carried out. |
+| Tested | A specified test actually ran. |
+| Verified | Evidence confirms the stated result. |
+| Accepted | Authorized authority explicitly accepted it. |
+| Failed / Rejected | Test failed / approach or result rejected. |
+| Deferred / Blocked | Postponed / cannot proceed pending a condition. |
+| Unresolved | Evidence does not establish one conclusion. |
+
+A passing unit test is not full acceptance; a valid ZIP is not proof of correct software; a local commit is not a verified remote transfer; a created artifact is not automatically tested or accepted. Label historical results with source revision, OS, runtime, dependency-install method, command, date, and report where available.
+
+2.4 Change control and traceability
+
+For every material change, record a stable ID/date, affected component, prior/new state, source, rationale, compatibility impact, test evidence, status, and remaining uncertainty. Use explicit links such as Supersedes, Superseded by, Corrected by, Partially superseded, Withdrawn, or Unresolved. Keep requirement → source component → implementation → test → result → acceptance traceability.
+
+2.5 ADD-047
+
+Apply ADD-047 only when its stated Section 14 trigger is met. If triggered, perform the required read-only review of accessible Library material and inspectable nested archives, report coverage/limits, then pause before consequential changes. It is not a general requirement for every isolated task.
+
+======================================================================
+3. CONSOLIDATED PROJECT RULE REGISTER
+======================================================================
+
+The following compresses the supplied G/F/D/R/O/I/T/P/M/A/X rule register without dropping its requirements.
+
+3.1 Governance (G)
+
+- Apply Standing Implement; THINK → REASON → ACT, Mode 4; solve routine engineering issues independently.
+- Avoid unnecessary questions, but pause for material conflicts or missing authority.
+- Respect higher-priority rules, actual capabilities, and scoped authorization.
+- Preserve source/provenance; distinguish evidence classes; never fabricate facts or claim unverified completion.
+- Carry authorized work through tests, verification, correction, and reporting.
+- Prefer complete integrated solutions; no incomplete implementation shortcuts.
+
+3.2 Files, archives, and research (F)
+
+- Inspect all relevant files and archive members; recursively inspect ZIPs/other archives where possible.
+- Read source, scripts, configuration, manifests, lockfiles, tests, logs, and documentation.
+- Reconcile inspected content with actual project requirements; record inspection coverage and exclusions.
+- Preserve originals and hashes when creating derivatives.
+- Research external technical facts where materially useful and cite sources.
+- Keep processing local-first; free external services are permitted under Section 6.6 when justified and acceptable.
+- Apply ADD-047 only on its stated triggers.
+
+3.3 DWBOT identity and repository (D)
+
+- Main project: World of Warships tournament Discord bot and its computer-vision-assisted OCR pipeline.
+- Use the existing DWBOT source and Grand Tournament Instruction Set as baselines; preserve original source and history.
+- User-designated repository: `pbrau014/dwbot`; working/delivery branch: `dwbotVis`.
+- Do not push to, replace, or overwrite GitHub `main`; do not change repository visibility.
+- Transfer the complete application source and required support materials to `dwbotVis`; verify remote commit, branch, tree, and actual file contents before claiming completion.
+- Preserve usable Git history where practical. A README, ZIP, bundle, or status report alone is not a complete source transfer.
+- Exclude credentials, secrets, private `.env`, personal information, live databases, `node_modules`, and disposable runtime data from ordinary source publication.
+
+3.4 Runtime and dependencies (R)
+
+- Node.js **22.16.0 is acceptable**. Tests passed under this version are acceptable; do not reject them solely for using Node 22.16.0.
+- For a test that genuinely requires Node 24+, use the currently installed Node 24+ version (historical source identifies 24.22.1); record the exact version used.
+- Keep manifests/lockfiles consistent. Verify actual Node/npm versions, native libraries, OCR/model dependencies, and OS-specific requirements for each relevant run.
+- Do not silently upgrade dependencies or change runtime requirements. Preserve reproducible installs and test compatibility explicitly.
+
+3.5 OCR (O)
+
+- Preserve Tesseract.js as the baseline. Evaluate PaddleOCR independently; do not replace Tesseract without measured benefit.
+- Use OpenCV for screenshot classification, localization, geometry, ROI/crop isolation, and preprocessing where useful.
+- Preserve exact-value validation. Never silently guess/correct player names, ship names, or numeric statistics.
+- Improve player identity, numeric values, and battle metadata through field-specific evidence and tests.
+- Keep the nine required fields and add reliably identifiable text fields under a versioned schema.
+- Preserve OCR engine, model, source-region, confidence, transformation, validation, and review provenance for every field.
+- Reject or flag uncertain values; never manufacture missing data.
+- Support bordered-table morphology and borderless spatial projection/word-coordinate alignment when relevant.
+
+3.6 Ingestion, concurrency, and storage (I)
+
+- Enforce the **25 MB maximum upload**; validate actual streamed byte count, not just declared size.
+- Stream in bounded chunks (64 KiB was a proposal); hash incrementally with SHA-256 and stage safely.
+- Pass file/job references to workers, not large raw byte arrays.
+- Enforce storage quotas, safe filenames, format/signature checks, decoded dimensions/pixel limits, and cleanup for completed, failed, cancelled, or abandoned jobs.
+- Begin with controlled model ownership (normally one model per worker process and one active inference per model), bounded queues, and measured concurrency.
+- Calculate total database connections across all processes/services. Keep PostgreSQL and SQLite settings separate; use appropriate async pools; evaluate PgBouncer only when justified.
+- Test timeout, exhaustion, rollback, database loss, recycling, and restart recovery.
+
+3.7 Workers, tests, and observability (T)
+
+- Offload long OCR work from the Discord/API event loop. Use Celery only where compatible and justified by actual architecture.
+- Bound queues, concurrency, retries, resources, and backpressure; persist atomic per-image progress; make work idempotent.
+- Test image transforms, crop boundaries, OCR recognition, parsing, exact-value rejection, API/worker handoffs, persistence, recovery, and regressions.
+- Calculate CER/WER only against verified ground truth; keep tuning and held-out data separate.
+- Standardize metrics; monitor throughput, latency, queue, failures, resource use, field disagreement, rejection, review, and false acceptance.
+- Implement/verify alerts for availability, latency, failure rate, resource pressure, and held-out accuracy. Prometheus rule loading/evaluation and Alertmanager delivery are separate checks.
+- Never place player identity or personal data in metric labels.
+
+3.8 Packaging and deployment (P)
+
+- Use reproducible Docker/Compose packaging where the real architecture requires it; multi-stage builds where useful.
+- Verify native dependencies (e.g., Poppler/renderers only if used), permissions, non-root runtime, resource limits, mounts, model files/cache, health checks, and startup.
+- Build-time model download/cache is not proof of runtime access or inference.
+- Document reproducible local initialization and execution.
+
+3.9 Master plan and records (M)
+
+- Retain the approved **20-phase master plan**; integrate model-resource management, database connection budgeting, secure ingestion, and Prometheus alerting into existing phases.
+- Track six added acceptance gates: model resources, database resources, secure ingestion, container correctness, monitoring, and release reliability.
+- Avoid duplicate subsystems. Maintain living documentation, history, stable IDs, cross-references, milestone records, and complete handoffs.
+- Produce integrity-checked milestone packages when required; preserve originals and report planned/attempted/completed/tested/verified/accepted separately.
+
+3.10 Release gates (A)
+
+- Full OCR acceptance; distinct native-Tesseract functionality where required; authorized Discord smoke tests; performance/resource; accuracy; dependency/runtime; complete release checks.
+- Do not call RC3 or any candidate production-ready until all mandatory gates pass.
+- Production deployment remains separate from local implementation/testing authorization.
+
+3.11 Explicit engineering items and unresolved conflicts (X)
+
+- Historical generic-stack commands: `docker-compose up --build -d`; `docker-compose logs -f web-api ocr_celery_worker`; `docker-compose exec web-api pytest -v tests/test_pipeline.py`. Preserve as proposed commands only if those Compose services/files actually exist; otherwise use the equivalent real DWBOT commands.
+- Integrate ingestion, preprocessing, model management, layout/table extraction, routing, and metrics into the existing application.
+- Reconcile the early single-file `EnterpriseOCRPipeline.py` request with the later modular/existing-architecture rule; do not create a duplicate monolith.
+- Prometheus scrape interval 5 seconds versus 15 seconds remains unresolved pending measurement.
+- A suggested 5% CER is illustrative, not universal—exact player/statistic acceptance governs.
+- Prometheus alert evaluation and Alertmanager message delivery are separate.
+- An 80-connection database budget is an example, not verified capacity.
+- Trace every accepted implementation to its requirement and test evidence.
+
+======================================================================
+4. DWBOT MISSION, SCOPE, AND BASELINE
+======================================================================
+
+4.1 Mission
+
+Build and maintain an accurate, reliable, secure, maintainable tournament system that receives World of Warships battle screenshots through Discord and/or Player HTML, extracts validated battle data, preserves tournament scoring and persistence, and provides separate Player and Admin interfaces. The bot remains authoritative for tournament data, calculations, permissions, and score validation.
+
+4.2 Preserve existing behavior
+
+Preserve current Discord commands/events, submission flow, player/event mapping, scoring, workbook formulas, SQLite/JSON persistence, recovery, output formatting, and established interfaces unless an evidence-backed, authorized change is necessary. The system is not a generic invoice OCR application.
+
+4.3 Core design
+
+- Existing Node.js Discord bot remains the application baseline.
+- Tesseract.js remains the primary baseline engine.
+- OpenCV performs measurable CV/localization/preprocessing work.
+- PaddleOCR remains an independently tested candidate; the tested hybrid reportedly regressed, so retain its fallback disabled (`PADDLEOCR_FIELD_FALLBACK=0`) until new same-fixture evidence justifies enabling it.
+- Free network/API services may be used as primary or secondary recognition paths only when necessary/appropriate, genuinely free, acceptable under privacy/security/terms, and demonstrably useful. Local/offline processing must remain viable.
+- Preserve raw image, crop, transformation, candidate, validation, and review evidence.
+- Human review is the safe outcome when evidence is insufficient.
+
+4.4 Supported OCR profiles
+
+1. **Primary: WoWS screenshots.** Predictable game UI profiles, scoreboard rows/columns, game statistics and metadata.
+2. **Optional: generic document OCR.** PDFs, TIFFs, photos, multi-page documents, multi-column layouts, generic tables/forms and document exports. Keep its schema, processing assumptions, dependencies, and acceptance separate; never impose invoice/document assumptions on WoWS records.
+
+======================================================================
+5. SOURCE SET, PROVENANCE, AND RECONCILIATION
+======================================================================
+
+5.1 Supplied archive
+
+`txtFiles.zip` was inspected. It contains seven text/Markdown files (no image, Excel, JSON, source-code, or nested archive members):
+
+| File | Lines | Role |
+|---|---:|---|
+| `addons.txt` | 5 | Latest user amendments: runtime, OCR services, field expansion, asset integration. |
+| `plan1.txt` | 1,098 | Earlier authoritative OCR roadmap and detailed RC2/RC3 status/evidence. |
+| `tstCmd2_ocr.txt` | 22,159 | OCR-derived 455-page conversation; architecture, technical proposals, experiments, test history, and mixed-project content. |
+| `tstCmd3.txt` | 1,752 | Conversation/technical instructions; DWBOT plus separate PDS material. |
+| `tstCmdAllPlusAddon.md` | 1,610 | Consolidated DWBOT rules, architecture, 21-phase draft, gates and historical state; also contains separate PDS material. |
+| `tstCmdCondensed.txt` | 927 | Derivative consolidation of OCR transcript, rules, architecture, and the earlier 20-phase roadmap. |
+| `zeroThruSix.md` | 519 | Six-work-plan sequence, asset/field amendments, evidence chronology, current open work, and handoff. |
+
+The seven files contain 28,070 text lines in total (counted from ZIP member bytes). PDS material embedded in mixed files is excluded from this DWBOT plan. Generic OCR concepts are retained only where they fit the WoWS system or are explicitly marked optional. OCR-corrupted names/numbers and historical assistant statements are not treated as verified facts.
+
+5.2 Provenance fingerprints
+
+Archive SHA-256: `22d0020d1c82da0722842bda91d472eb85e8cf03eaa87ab41efe52d654e13139`.
+
+Member SHA-256 values:
+- `addons.txt` — `047ce6c1d18d7a41bf2520e4036b2310cbc761fcc8378a8331c599b81dd9222a`
+- `plan1.txt` — `1af4d4d66530266fe0e994f7dcc062a0db01fc1e32bbb84637b25c1ced96d140`
+- `tstCmd2_ocr.txt` — `a3581d363a7abd0906a444e2057c0edd7e880d476f231be53a14f524e8ee838b`
+- `tstCmd3.txt` — `0c7f645a5acf7d7701bd68caa1d0965b0d974486daad0dfa34441e0cffc132af`
+- `tstCmdAllPlusAddon.md` — `eae56143fba276e332c8e5d13d015a00798fa05f367bbf6b4ed4a3172baec0e5`
+- `tstCmdCondensed.txt` — `8ff660f27542a16a067a2a0272c059f3e37fbf38a75ee03080e8891bbaaef341`
+- `zeroThruSix.md` — `a382352559a279a40167de5b23ccc284b7bb9fc93649952d8e634e457d58994c`
+
+5.3 Source authority
+
+Use this order:
+1. Latest explicit user instruction applicable to DWBOT.
+2. Actual current source, schemas, configuration, repository state, and test evidence tied to their exact versions.
+3. Original source archives and authoritative project documents after inspection.
+4. `plan1.txt` and current project reports/decisions.
+5. The supplied consolidated/transcribed files as requirements/history/navigation, not proof of current behavior.
+
+A newer statement does not automatically prove the implementation. Preserve earlier records and document supersession. Current repository identity, source lineage, and remote content must be inspected before any transfer claim.
+
+======================================================================
+6. CANONICAL DATA, OCR PIPELINE, AND ASSET REQUIREMENTS
+======================================================================
+
+6.1 Nine mandatory WoWS fields
+
+The latest recorded nine-field contract is:
+
+1. `result`
+2. `player`
+3. `map`
+4. `mode`
+5. `battleStart`
+6. `credits`
+7. `freeXp`
+8. `damage`
+9. `xp`
+
+All nine remain mandatory for the established acceptance contract; XP is required. Historical eight-field versions made XP optional, but were superseded. Preserve valid zero values and fragmented XP/Free XP handling.
+
+6.2 Expand to all reliably identifiable text fields
+
+Add any further text/metadata field whose on-screen label, title, heading, identifier, and associated value can be interpreted and extracted reliably and meaningfully. Do not weaken the nine mandatory fields.
+
+Every field requires: stable ID; label; type; required/optional/conditional status; screen/layout/ROI mapping; OCR/preprocessing profile; parsing/validation; source/ground-truth tests; provenance; schema version; output compatibility.
+
+Classify fields as:
+- Core required: the nine fields above.
+- Supported optional: reliable extra text/metadata.
+- Conditional: shown only on specific screens/modes/layouts.
+- Unsupported/ambiguous: retain evidence, mark unavailable/uncertain, and do not invent a value.
+
+Enable a new field only after label/value mapping, localization, meaning, schema, validation, representative data, positive/negative/ambiguous/missing tests, backward compatibility, and documentation all pass. Keep raw text, parsed candidate, selected/accepted value, and human correction separate.
+
+6.3 End-to-end WoWS OCR pipeline
+
+1. **Ingest:** accept supported Discord/HTML uploads; enforce 25 MB; validate actual bytes, signature, format and decodability; stream and incrementally SHA-256 hash; stage safely; capture filename, media type, dimensions, source and Discord message/attachment IDs.
+2. **Classify:** identify screenshot type, layout, resolution, UI scale, and supported game screen. Reject or review unknown/corrupt input.
+3. **Localize:** use stable anchors, templates, coordinates and OpenCV geometry to find scoreboard, teams, rows, player/ship/stat columns, cells and metadata. Preserve row/column identity, bounding boxes, original coordinates and source mapping.
+4. **Preprocess:** preserve original; create reproducible field-specific crops/variants for names, ships, numbers, icons and metadata. Evaluate scaling, contrast, denoise, sharpen, grayscale, threshold, and morphology per use. Avoid universal Otsu, whole-image rotation, deskew/unwarp, or fixed 2480 px scaling unless data justifies it.
+5. **Recognize:** call independent Tesseract.js and PaddleOCR adapters; optionally call an approved free OCR/API service when needed. Preserve raw text, boxes/polygons, confidence, engine/model/version/configuration, errors, crop, and transformation metadata.
+6. **Analyze layout:** assign OCR words to rows/columns/cells using coordinates, boundaries, centers, overlap/IoU, anchors and field type. For bordered tables use morphological line detection where useful; for borderless tables use spatial projection and word-coordinate alignment. Flag overlapping/missing/out-of-bounds cells.
+7. **Parse:** map text and geometry to the field registry, keeping raw text and parsed form separate.
+8. **Validate:** apply exact field rules, format/range/reference/cross-field checks and independent evidence. Engine agreement supports but does not prove correctness. Fuzzy names/ship lists may suggest for review only.
+9. **Resolve:** accept only supported values; otherwise mark ambiguous/missing/rejected and route for review. No guessed values or silent autocorrection.
+10. **Persist/output:** retain image, hashes, crops, variants, candidates, scores, decisions, corrections, audit history and reviewer data. Export only approved records to existing DWBOT/Discord workflows.
+11. **Observe/recover:** record per-image progress, errors, timing/resources, queue/job state; resume safely without loss or duplicate side effects.
+
+6.4 Recognition and selection rules
+
+- Compare candidates field-by-field; calibrate confidence independently per engine and field.
+- Do not compare unlike engine confidence scores as if they were equivalent.
+- Preserve all candidates, including low-confidence and rejected ones.
+- Do not choose the largest, most common, highest-confidence, or most plausible number without field-specific proof.
+- Never autocorrect player/ship names or ambiguous digits. Roster/dictionary matches are review evidence only.
+- Keep exact punctuation/case unless a documented normalization rule permits it.
+- Preserve `raw_text`, `parsed_candidate`, `selected_value`, `accepted_value`, and `review_correction` as distinct.
+- Record rationale, validation/rejection, reviewer, timestamp, and any correction.
+
+6.5 Asset integration
+
+The user requires all images in the referenced asset ZIP, in addition to the four existing test images, plus the ZIP's Excel and JSON files, to be included where appropriate.
+
+1. Inventory the actual asset ZIP and nested archives.
+2. Preserve originals and hashes; identify every image, workbook and JSON file.
+3. Add all images to regression/benchmark corpus with IDs, metadata and verified field ground truth; preserve the original four.
+4. Inspect workbook purpose, formulas, data and relationship before integrating; do not alter formulas/values silently.
+5. Inspect JSON schema and map it to actual DWBOT data contracts before integration.
+6. The supplied `txtFiles.zip` contains text/Markdown only. It does not contain the requested images, Excel or JSON assets. Their integration remains pending until the correct asset/source ZIP is accessible.
+
+======================================================================
+7. TARGET ARCHITECTURE AND CROSS-CUTTING ENGINEERING
+======================================================================
+
+7.1 Logical data flow
+
+Discord / Player upload → bounded intake/hash/staging → screenshot/layout classifier → OpenCV localization and field crops → Tesseract.js / PaddleOCR / approved free fallback → layout/field parser → exact validator/resolver → review or accepted record → SQLite/JSON and existing scoring → Discord/Player/Admin output → metrics/audit/checkpoint.
+
+7.2 Component boundaries
+
+| Component | Responsibility |
+|---|---|
+| Discord/HTML intake | Existing authenticated submission workflows and attachment capture. |
+| Ingestion/staging | 25 MB enforcement, streaming, format/decode/pixel limits, SHA-256, quotas and cleanup. |
+| Screenshot classifier | Screen/layout profile, resolution, UI scale and unsupported-input routing. |
+| OpenCV/localization | Anchors, regions, rows, columns, cells, crops and coordinate mapping. |
+| Preprocessing | Reproducible field-specific image variants; original preserved. |
+| OCR adapters | Independent engines and raw outputs; controlled model lifecycle. |
+| Parser/field registry | Layout association, types, extra fields, schema evolution. |
+| Validator/resolver | Exact-value, identity, range, consistency, disagreement, abstention. |
+| Review | Approve/correct/reject/defer with audit trail. |
+| Worker/orchestrator | Bounded jobs, timeouts, cancellation, retries, atomic progress, recovery. |
+| Persistence | Jobs, evidence, candidates, field records, accepted results and history. |
+| Monitoring | Metrics, logs, alerts, resource and accuracy reporting. |
+| Discord/Player/Admin | Role-bound views/actions and consistent authoritative data. |
+
+7.3 Secure ingestion and resources
+
+- Enforce 25 MB request/application limits and actual byte counts.
+- Use bounded streaming (64 KiB chunk was proposed; tune as needed), incremental hash, secure staging, quotas, safe filenames and permissions.
+- Enforce decoded image dimensions/pixels, decompression and temporary-storage limits.
+- Workers receive IDs/paths/checksums, not large raw byte arrays; verify checksum before processing.
+- Clean success/failure/cancelled/abandoned files.
+- Bound inference queue, concurrent jobs, retries, memory, CPU/GPU and model replicas.
+- Start with one model per worker process/one active inference; benchmark any pool/concurrency change.
+- Record model load/inference time, memory and failure state.
+
+7.4 Persistence, retries, and database
+
+- Persist per-image progress atomically as each item starts/completes; interruption must not erase finished-item evidence.
+- Idempotent job creation, exports, writes and webhook delivery; capped exponential retry for transient network/5xx, honor 429, do not retry permanent auth/format failures indefinitely.
+- Track terminal failures for review/dead-letter handling; restart without duplicate side effects.
+- Calculate maximum database connections across API, workers, admin/review and integrations. Use small measured pools and bounded timeouts.
+- Keep PostgreSQL-specific settings separate from SQLite. Async SQLAlchemy requires an appropriate async pool; evaluate PgBouncer only if measured need and semantics support it.
+- Test unavailable DB, exhaustion, timeout, rollback, recycling, transaction failure and restart recovery.
+
+7.5 Security and integrations
+
+- Keep tokens/secrets out of chat and source; use approved secret storage and least privilege.
+- Verify role, channel, Admin/Participant authorization server-side. Hiding UI controls is not authorization.
+- Verify external provider free terms, quotas, privacy, retention, accuracy and failure behavior before sending any image/crop. Send minimum necessary data; no paid service or charge.
+- Use authenticated/signed webhooks where appropriate; enforce idempotency and rate limits.
+- Preserve local operation when the network or optional provider is unavailable.
+
+7.6 Monitoring
+
+Track: jobs started/completed/failed/retried; stage and end-to-end latency (median/P95/P99); throughput; queue depth/age; model loading/inference; engine disagreement; field completeness; exact match; false acceptance; rejected/review fields; CER/WER with labeled ground truth only; localization/IoU where labeled; CPU/RAM/GPU/OOM; DB and Discord failures.
+
+Use stable metric types/names; never put player identity or sensitive data in labels. Alerts require verified loading/evaluation and separate Alertmanager delivery checks. 5s vs 15s scrape interval remains unresolved. A 30s P95 alert and 5% CER are historical examples, not approved universal thresholds.
+
+7.7 Packaging/deployment
+
+- Use existing Node architecture; add Python/Paddle worker or FastAPI/Celery/Redis only where actual compatibility/workload justifies it.
+- Docker multi-stage/non-root/native libraries/model cache/health checks/resource limits where appropriate.
+- Verify actual runtime model access and inference; build-time download alone is insufficient.
+- Keep generic Enterprise OCR pipeline and WoWS pipeline separate. Do not force a monolithic `EnterpriseOCRPipeline.py` or generic document table logic into DWBOT.
+
+======================================================================
+8. MASTER IMPLEMENTATION PLAN — 20 PHASES
+======================================================================
+
+Retain the 20-phase master plan. The separate 21-phase draft is mapped into these phases; do not create a competing roadmap or duplicate subsystems. Integrate the four added work packages (model resources, DB budget, secure ingestion, Prometheus alerts) and six acceptance gates (model, DB, ingestion, containers, monitoring, release reliability) at the phases below.
+
+FOUNDATION
+
+**Phase 0 — Governance and scope**
+Confirm project identity, authority, invariants, role boundaries, mandatory/optional/conditional requirements, field contract, evidence statuses and release gates. Keep DWBOT/PDS separate.
+
+**Phase 1 — Source and repository reconciliation**
+Inspect actual source, working tree, branches, commits, archives, nested archives, plans, manifests, dependencies, tests, fixtures, reports and Git lineage. Reconcile V4, RC2/RC3, Iteration 21/22 and current files. Preserve originals; record missing/unreadable material and supersession.
+
+**Phase 2 — Requirements, architecture, schemas**
+Recover the canonical nine-field contract from current code/records. Define field registry, optional/conditional field expansion, job lifecycle, provenance schema, review state, API/worker boundaries, and requirement-to-test map.
+
+**Phase 3 — Runtime/dependency restoration**
+Verify Node 22.16.0 and use installed Node 24+ only for tests requiring it. Verify npm/lockfiles, Tesseract assets, OpenCV, PaddleOCR/PaddleX/PaddlePaddle, Python, native libraries, model cache and any service dependencies. No silent upgrades.
+
+**Phase 4 — Dataset and baseline**
+Inventory four original images plus all ZIP images when available; preserve hashes; assign IDs/layout metadata and field ground truth; separate tuning from untouched holdout; capture Tesseract baseline before changes.
+
+CORE OCR
+
+**Phase 5 — Secure image ingestion**
+Implement 25 MB limit, bounded streaming, SHA-256, staged references, format/decode/pixel limits, quotas, cleanup, and worker checksum verification.
+
+**Phase 6 — CV preprocessing/normalization**
+Preserve originals; measure field-specific crop scaling, contrast, denoise, sharpen, grayscale and selective thresholding; record transformation and coordinate mapping; avoid blanket operations.
+
+**Phase 7 — ROI localization and table geometry**
+Classify layouts; locate anchors, teams, rows, columns, cells and metadata. Use bordered-table morphology or borderless projection/word coordinates as needed. Verify crop boundaries on actual WoWS screenshots.
+
+**Phase 8 — OCR adapters and model resources**
+Preserve Tesseract.js; verify independent PaddleOCR adapter against installed API (PaddleOCR 3.x `predict()` if that is the actual version); model lifecycle per worker; compare identical inputs; optional free service only under Section 6.6.
+
+**Phase 9 — Layout, parsing, field expansion**
+Map OCR geometry to fields; parse WoWS formats; version the field registry; implement tested optional/conditional text fields without changing core nine.
+
+**Phase 10 — Exact validation and decision engine**
+Field-specific types, syntax, ranges, identity and cross-field consistency; independent evidence; disagreement/abstention/review; preserve zero, XP/Free XP and raw candidates; no silent correction.
+
+**Phase 11 — Benchmark and failure analysis**
+Same fixtures/crops across engines and preprocessing variants; report exact-match, complete-record, false acceptance, review/rejection, CER/WER (labeled only), localization, latency, throughput and resource cost; classify root cause and preserve before/after evidence. Remove OCR passes only when repeatable data supports it.
+
+APPLICATION AND OPERATIONS
+
+**Phase 12 — Workers and orchestration**
+Integrate into existing DWBOT job flow; bounded queues/backpressure, model ownership, timeout/cancel/shutdown, capped retries, idempotency, atomic progress and restart recovery. Celery/Redis only if justified.
+
+**Phase 13 — Persistence and DB resources**
+Store jobs, evidence references, candidates, validations, reviews, accepted records and audit history. Budget aggregate DB connections; keep SQLite/PostgreSQL configs distinct; test resource and failure cases.
+
+**Phase 14 — Human review**
+Display source screenshot/ROI, candidates, confidence, validation reasons and history; approve/correct/reject/defer; log reviewer, role, old/new values, reason and timestamp. Never overwrite OCR evidence or export unapproved corrections.
+
+**Phase 15 — Discord/webhook/downstream integration**
+Preserve existing commands/events; integrate authorized services with authentication, idempotency, rate-limit handling and bounded retry. Test real attachment submission, processing, responses, errors and normal bot operation.
+
+**Phase 16 — Metrics, health and alerting**
+Standardize metrics and labels; implement Prometheus rules and Alertmanager separately; test scrape, rule load, firing, notification, latency, accuracy, availability, failure and resource alerts.
+
+**Phase 17 — Packaging and containers**
+Reproducible local install/start; Docker/Compose where justified; non-root, multi-stage, native dependencies, models, permissions, mounts, health checks and resource limits. Test clean extraction/install and actual runtime.
+
+VERIFICATION AND RELEASE
+
+**Phase 18 — CI, regression, compatibility and performance**
+Unit/integration/negative/regression/acceptance tests; original/additional images and field expansion; exact values; interrupted runs; repeated/reverse-order runs; resource/performance capacity; validate runtime-specific requirements. Generic Windows compatibility testing is waived where existing evidence suffices; distinct native-Tesseract operation remains separate.
+
+**Phase 19 — Final acceptance, release, documentation and handoff**
+Pass all mandatory gates; verify source/remote branch/tree; preserve tournament/workbook/database behavior; generate complete source/docs/manual/package; verify checksums/fresh extraction; state all remaining conditions. Production remains NO-GO until all mandatory gates pass.
+
+======================================================================
+9. SIX SUPPORTING WORK PLANS
+======================================================================
+
+Execute the six work plans in order, with OCR phases integrated into the relevant work. A blocked step may be bypassed only for genuinely independent work after its status, reason, risk, dependencies and retest are recorded; blocked downstream dependencies remain blocked.
+
+PLAN 1 — CONNECT PROJECT SUPPORT APPS
+
+Check existing connection/state and required permissions in this order:
+1. GitHub — source/branch/commit inspection, diffs, issues/PRs and CI.
+2. Superpowers — planning, TDD, debugging and regression workflow.
+3. Linear — phases, priorities, tasks, blockers and test status; `plan1.txt` remains authoritative.
+4. Railway — optional persistent bot testing/logs/restart; no deployment, paid resource or charge without authorization; check storage/SQLite needs.
+5. Adobe Acrobat — inspect/organize/prepare PDF; still validate PDF programmatically and check links/rendering.
+
+Report availability, connected/ready state, setup/authorization, permissions, limitations and any user action. An install prompt is not a completed connection. Do not alter project files during setup.
+
+PLAN 2 — SOURCE RECONCILIATION, MASTER PLAN, AND ARCHIVE
+
+Inventory the current source, V4 baseline, plans, code, HTML, configs, dependencies, workbook/JSON, tests, fixtures, approved ground truth, logs, Windows reports and previous packages. Compare source fingerprints, archive members and Git ancestry. Identify current/superseded/duplicate/incomplete files. Reconcile `plan1.txt`, update statuses, and retain exact unresolved conflicts.
+
+Create a complete versioned handoff ZIP only from verified current materials. Include source, tests, evidence, documentation, manifest, checksums, README and next steps; exclude secrets, `.env`, private runtime data, databases and `node_modules` as appropriate. Validate duplicate names, file sizes, member hashes, ZIP integrity, fresh extraction and manifest consistency. A candidate package is not a production release.
+
+PLAN 3 — LIVE DISCORD INTEGRATION TESTS
+
+After authorized test setup, verify separately:
+1. Login/connection and bot readiness.
+2. Channel access; Admin versus Participant permissions and denied actions.
+3. Attachment delivery, actual OCR invocation, result and error response.
+4. API rate limits, retry/backoff and recovery.
+5. Stop/start, restart, persistence and job recovery.
+
+Mocks/simulations are not live PASS. Preserve logs, source/runtime, commands, exit codes and evidence. Do not bypass auth or rate limits.
+
+PLAN 4 — PLAYER AND ADMIN HTML INTERFACES
+
+First inspect existing HTML and bot architecture. Evaluate: browser-side OCR; manual entry plus optional image; downloadable JSON saved by the user and sent to Discord; secure direct upload/integration. Do not imply a `file://` page can automatically contact the bot.
+
+PLAYER: only authorized participant views/actions; scores, averages, totals, refresh; screenshot select/process/submit/confirmation; validation, restrictions, errors, accessibility/responsiveness; distribution/download package and setup.
+
+ADMIN: authenticated and server-enforced Admin access; player/tournament view; scores/averages/totals; manual entry/update for any participant; tournament operations; refresh, confirmations, errors and audit. Hiding controls is not access control.
+
+Test role denial, calculations, cross-interface consistency, authoritative data refresh, submission, errors, existing Discord commands and regressions. Preserve the bot as data/permission/scoring authority. Append web work to the master plan without rewriting earlier phases.
+
+PLAN 5 — DEVELOPER COMMENTS AND USER MANUAL PDF
+
+Inspect actual code/commands/controls/roles/auth/data flow/calculations/OCR/storage/setup first. Add concise comments explaining non-obvious architecture, functions, validation, OCR, persistence, security, configuration, errors and maintenance. Do not restate obvious code, add user tutorials to source, expose secrets, or perform unrelated refactors.
+
+Produce one accurate PDF with these five chapters in this exact order:
+1. General Overview — HTML and Discord Usage and Purpose.
+2. How-to Instructions — Admin Use of the HTML Interface.
+3. How-to Instructions — Player Participant Use of the HTML Interface.
+4. How-to Instructions — Admin Use of Discord.
+5. How-to Instructions — Player Participant Use of Discord.
+
+Cover purpose, roles, features, prerequisites, download/setup/launch, navigation, exact actions/commands, scores/totals, screenshot submission, confirmations, permission limits, errors and troubleshooting. Use real controls and verified commands only; label sample values/output. Include small, accurate sketches only where useful.
+
+PDF: page 1 clickable contents/index; page 2 one- or two-paragraph summary; page 3 onward chapters 1–5. Validate chapter order, page starts, internal links, page numbers, text selection, rendered layout, no clipping/overlap/broken links, and all instructions against actual implementation. Deliver one PDF and updated commented source.
+
+PLAN 6 — SEPARATE DEVELOPER AND USER DOCUMENTATION
+
+Keep technical architecture, implementation, validation, data flow and maintenance in code comments/developer docs. Keep user PDF in plain language with role permissions, prerequisites, procedures, expected result, confirmation and troubleshooting. Do not merge the audiences. Apply this as final review of Plan 5, not a duplicate manual. Revalidate the actual implementation and PDF after corrections.
+
+======================================================================
+10. DATASET, BENCHMARK, AND FAILURE ANALYSIS
+======================================================================
+
+10.1 Dataset
+
+- Preserve the four original screenshots and add every image from the referenced asset ZIP.
+- The 16-image set in historical reports is a development/tuning corpus, not an independent holdout.
+- Give every image a stable ID, SHA-256, source, screenshot type/layout, resolution/UI scale, quality/failure category, and verified field-level ground truth.
+- Keep tuning, training, and untouched acceptance sets separate. Do not tune against the final holdout.
+- For final holdout, obtain two independent labels for all nine required fields and adjudicate differences before acceptance.
+
+10.2 Metrics
+
+Report per field and screenshot class:
+- Exact player/ship/numeric match; complete-record accuracy.
+- Incorrect accepted value (critical), false rejection, coverage, rejection and human-review rates.
+- CER/WER only with verified ground truth; define numerator/denominator and treatment of unresolved fields.
+- Localization quality/IoU where ground truth supports it.
+- Median/P95/P99 latency, throughput, CPU/RAM/GPU, queue and model resources.
+- Provider latency/quotas only for approved free fallback.
+
+Never optimize CER/WER alone if accepted-wrong values increase. Report actual sample sizes and held-out separation.
+
+10.3 Required failure categories
+
+1. Intake/decode/corruption.
+2. Screenshot classification/layout.
+3. ROI localization/crop/clipping.
+4. Preprocessing.
+5. Recognition/model/API.
+6. Row/column/cell mapping or reading order.
+7. Parsing/schema.
+8. Exact validation/selection.
+9. Unsupported/ambiguous evidence.
+10. Worker timeout/queue/concurrency/resources.
+11. Persistence/export.
+12. Discord/HTML integration.
+13. Runtime/dependency/deployment.
+
+Each report should show original screenshot/hash, ROI/crop, transforms, raw engine outputs, expected value, confidence/provenance, validation decision/reason, failure category, root cause, corrective change, and before/after results.
+
+======================================================================
+11. EXPECTED COMPLETE — VERIFY BEFORE PRODUCTION
+======================================================================
+
+The following work is reported as done in the supplied records. Remove it from the routine implementation queue; do not repeat it without evidence of a gap. Before production, inspect the actual surviving artifacts and reports and verify that each result remains valid for the current source. If verification fails, correct only the gap and retest.
+
+| Work reported complete | What the record says | Required treatment |
+|---|---|---|
+| Phase 0 baseline audit | Original scope's source/artifact identity and prior-claim reconciliation completed. | Expected complete; verify records and source fingerprints before production. |
+| Stored archive integrity/hash work | Five stored archives reportedly passed ZIP integrity and had hashes measured. Named examples include `DWBOT_RC3_CURRENT_SOURCE.zip` (3,950 entries), `DWBOT_NODE22PLUS_IMPLEMENTATION_CHECKPOINT_2026-11-03.zip` (473), and `DWBOT_ITERATION22_MILESTONE_CANDIDATE_2026-11-03.zip` (449). | Expected complete; verify every actual archive, hash and member set before production. Names/counts alone are not proof. |
+| V4 source and Iteration 21 patch reconciliation | V4 ZIP integrity/hash; 21 patch manifest entries matched; patch applied to isolated work copy; 18 files updated; originals preserved. | Expected complete; verify applied source and retained originals before production. |
+| Candidate manifests/packages | Reports state candidate archive integrity, embedded manifests and checksums passed (including 450/450 outer checksums and 399/399 candidate entries); RC3 package assembled. | Expected complete; verify actual packages, fresh extraction and all hashes before production. Candidate remains non-release. |
+| RC3 targeted changes | Separate lifecycle-only recovery, stronger known-good negative control, reward geometry for Credits/XP/Free XP, map-prefix cleanup, regression tests and 12-stage acceptance wiring. | Expected implemented; inspect current source and confirm changes/tests before production. |
+| RC3 focused tests/syntax | 60 passed, 0 failed, 0 skipped on Linux x64 Node 22.16.0; JS syntax checks passed. | Expected test complete for that exact source/runtime only; verify logs. It is not full OCR or Windows acceptance. |
+| Earlier reliability baseline | RC2 Windows `npm test`: 104 passed, 0 failed, 2 POSIX-only skips; watchdog 14/14. | Historical pass; verify report and applicability. RC3/current-source regression remains separate. |
+| Earlier OCR harness runs | Prior source reported 10/10 and another metadata run 8/8; later RC2/RC3 runs failed/incomplete. | Verify source/report; do not transfer earlier PASS to current source. |
+| Iteration 22 checkpoint | Commit `74105c9` on `feature/dwbot-iteration22`; provenance hardening; nine-field contract; SHA-256 screenshot/Discord refs; legitimate zero and fragmented XP/Free XP handling; 183-pass report; 46 focused provenance/export tests; local Tesseract; 449-entry archive. | Source-reported; verify current commit, files, test reports and archive before production. |
+| Later current-source local test report | `node --test`: 180 pass/0 fail/0 skip on Linux x64 Node 24.17.0, but using dependencies linked from V4; clean `npm ci` timed out and was not completed. | Verify exact logs/source. This is not a clean install or full OCR acceptance. |
+| Source archive coverage claims | The new rule text reports substantial source in stored archives, including RC3 and Node22/Iteration22 checkpoints. | Expected inventory/recovery complete; verify source members, integrity and lineage before production. |
+
+Important limitations of these reports:
+- They refer to different source fingerprints, branches, OS/runtime and dependency-install methods. Do not merge their results into one current PASS.
+- A report of 180 versus 183 passing tests is a source/report discrepancy; identify the exact commit, command and report before using either count.
+- Focused tests, syntax checks, archive integrity, and package manifests do not prove OCR field accuracy, recovery, live Discord behavior, or production readiness.
+- The earlier RC3 12-stage acceptance runner has not been shown passing in full on its current target source/runtime.
+
+======================================================================
+12. OPEN WORK AND RELEASE GATES
+======================================================================
+
+The following remain active unless current evidence verifies otherwise:
+
+1. **Source/repository:** inspect current source, archives, working tree, branch, commits, remote and history; reconcile V4/RC2/RC3/Iteration21/Iteration22 lineage. Target `pbrau014/dwbot` / `dwbotVis`; preserve `main`; verify full remote tree and files. Historical reports reference `bootheburd-glitch/dwbot`, `feature/dwbot-iteration22`, and a docs-only branch/commit; preserve this identity/history conflict until actual remote state resolves it.
+2. **Assets:** locate/inspect the asset ZIP containing additional images, Excel and JSON; retain four original images and all additions; verify workbook formulas and JSON schema.
+3. **Runtime/dependencies:** validate Node 22.16.0 test baseline and any test genuinely needing installed Node 24+; confirm clean install and exact lockfile/native/model dependencies. A previous `npm ci` timeout means clean installation is not proven.
+4. **OCR accuracy:** run the complete current-source acceptance suite and all required stages; exact nine fields on real fixtures; all accepted values correct; investigate damage ambiguity `87373` vs `873131`, player O/0 confusion, Libertad/Schlieffen/Hoffmann fields, Credits/XP/Free XP, map cleanup and any current failure.
+5. **Runner reliability:** verify atomic per-image progress and final reports; inject first/middle/final recognition-pass stalls; test process termination/close-before-restart, sequential/no-overlap runs, timeouts, cancellation, cleanup and resume without losing completed results.
+6. **Field expansion:** implement/test every reliable additional field; retain core nine; update schema, output consumers, provenance and documentation.
+7. **Engine evaluation:** verify Tesseract.js; benchmark local PaddleOCR on identical fixtures (feature off until evidence); evaluate approved no-cost API fallback where it adds measured value and provider/privacy terms are acceptable.
+8. **Dataset/holdout:** retain the 16-image tuning corpus separately; create an untouched holdout with two independent labels for all nine fields; report exact and complete-record accuracy, false acceptance, review rate, latency and resources.
+9. **Windows/native Tesseract:** skip redundant generic Windows compatibility testing as instructed where current evidence is adequate. This is a waiver, not a PASS. Verify distinct native-Tesseract operation only where required for the actual OCR path; record separately.
+10. **Discord live tests:** authorized login, role/channel permissions, attachment flow, actual processing, rate-limit behavior, restart, persistence and recovery.
+11. **Tournament integrity:** preserve commands, panel, player/event mapping, 50-player regression, four events/seven slots, workbook formulas, SQLite/JSON, totals, backup/restore and recovery. A historical expected value of `$12.49` conflicts with a later recorded workbook default of `$12.56`; verify the authoritative workbook/formula before setting an expected result.
+12. **Resources/security:** test 25 MB streaming, pixel limits, staging quotas/cleanup, model ownership/queues, DB connection budget, privacy/secret handling, retry/idempotency and failure recovery.
+13. **Containers/monitoring:** verify Docker/Compose/native dependencies only if used; test Prometheus metrics/scrape/rules and Alertmanager delivery; resolve scrape interval by measurement.
+14. **Player/Admin UIs:** implement and test the authorized workflows, permissions, distribution and cross-interface consistency.
+15. **Documentation/package:** accurate code comments, separate five-chapter PDF, verified links/layout, current plan, README, source manifest, checksums and complete handoff.
+16. **Production:** no deployment or release until every mandatory gate passes and release is separately authorized.
+
+======================================================================
+13. HISTORICAL EVIDENCE AND KNOWN ISSUES
+======================================================================
+
+13.1 RC2/RC3 history
+
+- RC2 Windows OCR acceptance was reported as 3/10; a damage mismatch/ambiguity included `873131` versus expected `87373`. Do not accept an expected value by force.
+- A real recovery lifecycle and OCR exactness are separate gates. Process recovery may pass while field accuracy fails.
+- The stronger negative control must first pass a complete same-runtime baseline, then change one expected value only; actual OCR output must remain identical and fail solely on that changed expectation.
+- RC3 work introduced independent lifecycle-only Asashio recovery, reward geometry, map artifact cleanup and added regression tests, but full RC3 Windows OCR acceptance was not run in the recorded environment.
+- Reported unresolved examples include Hoffmann map/rewards, Libertad player/rewards/damage, Schlieffen map/XP/Free XP, and damage ambiguity. Verify against current fixtures/ground truth.
+
+13.2 Iteration 21/22 and repository history
+
+- Iteration21 patch used an eight-field contract with XP optional; this was superseded by the later nine-field contract with mandatory XP.
+- Iteration22 report describes a nine-field contract, screenshot SHA-256 provenance and Discord message/attachment references through corrections/exports.
+- Historical local branches/commits include `feature/dwbot-iteration22`, local `dwbotVis`, and commits `48319c24e74462665e4c43d54395b4f7cc891f7f` and `63fdf7317da674bbbff8d9dfb2183af1ec5371d8`. Historical GitHub reports conflict with the user-designated `pbrau014/dwbot`; verify current remote rather than infer.
+- A historical GitHub update reported documentation/status only on `main` at `6c42cc45560dc42227f275ddf8e3640f13f9c427`; this is historical information, not permission to change `main` again.
+
+13.3 OCR runner timeout
+
+A historical runner reportedly wrote its report only after the entire batch, risking loss of finished-image evidence on timeout. Profiling suggested serial crop/PSM work was slow rather than deadlocked; Hoffmann reportedly completed 34 passes in about 22 seconds before a shortened timeout. Verify per-image atomic checkpointing and profile redundant passes; reduce reads only when measured accuracy/regression evidence supports it.
+
+13.4 Other historical implementation details
+
+- PaddleOCR 3.x was associated with `predict()` structured results. Reported environment versions included PaddleOCR 3.7.x, PaddleX 3.7.2 and CPU PaddlePaddle 3.3.1; verify current installation before use.
+- A Windows comparison reported Tesseract-only 111/128 exact mandatory fields and 7/16 fully exact records; hybrid 108/128 and 3/16, with more incorrect accepted mandatory fields and slower median runtime. This is the reason to keep Paddle fallback disabled until rebenchmarked.
+- Local Node22 focused tests and earlier Node24 reports are tied to their source and dependency setup; do not mix them.
+
+======================================================================
+14. CONFLICT REGISTER AND RESOLUTION RULES
+======================================================================
+
+| Conflict | Governing treatment |
+|---|---|
+| 20-phase master vs 21-phase draft | Retain 20-phase master per rule register; map additional work into it. |
+| Node 24.17+ historical package requirement vs Node 22.16.0 amendment | Node 22.16.0 is acceptable; use installed Node 24+ only for tests that genuinely require it. Log exact runtime. |
+| Local-only OCR vs free network/API permission | Local-first/offline-capable baseline; free API may be primary/secondary only when necessary, acceptable and evidence-supported. |
+| Nine fields vs old eight-field patch | Nine fields including XP are mandatory; eight-field result is historical only. |
+| Required nine vs additional text fields | Keep nine mandatory; add stable optional/conditional fields only after full field gate. |
+| Single Python monolith/FastAPI/Celery/Redis vs existing Node bot | Preserve existing Node architecture; use modular workers/services only when justified. |
+| 25 MB proposed generic limit vs later rule | Enforce 25 MB maximum. |
+| Prometheus 5s vs 15s scrape | Unresolved; measure and document. |
+| 5% CER vs exact numeric/name rules | 5% is illustrative only; exact-value false acceptance is critical. |
+| 80 DB connections | Example only; calculate actual aggregate capacity. |
+| Prometheus rules vs Alertmanager delivery | Verify rule evaluation and notification delivery independently. |
+| `pbrau014/dwbot` vs historical `bootheburd-glitch/dwbot` | User-designated target is `pbrau014/dwbot` / `dwbotVis`; verify actual remote and preserve old lineage. Never modify `main`. |
+| Plan 5 vs Plan 6 documentation | Execute Plan 5, then Plan 6 final separation/quality review; one manual only. |
+| Six plans say final check after Plan 5 vs requiring Plan 6 | Final combined validation occurs after Plan 6. |
+| 180 vs 183 test passes | Verify exact source, command, runtime and report; do not merge counts. |
+| Generic Windows tests vs native-Tesseract gate | Waive redundant generic compatibility checks; separately verify native-Tesseract only if needed for functional acceptance. |
+| Historical `$12.49` vs later `$12.56` workbook value | Inspect authoritative current workbook/formula and approved baseline; do not silently choose. |
+
+======================================================================
+15. RELEASE ACCEPTANCE CHECKLIST
+======================================================================
+
+Production is **NO-GO** until each mandatory item is evidenced against the current source:
+
+- [ ] Current source, repository, branch, commit, archive lineage and complete remote tree verified; `main` untouched.
+- [ ] Runtime/dependencies reproducibly installed and recorded.
+- [ ] Nine mandatory fields exact on approved real-image acceptance data; no incorrect accepted values.
+- [ ] Additional fields each pass schema, provenance, positive/negative/ambiguous/missing tests.
+- [ ] Original four images and all new ZIP images included; holdout independent and untouched.
+- [ ] Tesseract baseline preserved; Paddle/API selection supported by same-fixture benchmark.
+- [ ] Runner, timeout, cancellation, sequential processing and recovery pass.
+- [ ] Local/offline operation remains viable; external free fallback is secure, permitted and tested if enabled.
+- [ ] Ingestion, 25 MB limit, decode/pixel, staging, quotas and cleanup pass.
+- [ ] Model resource/concurrency and global DB connection budget pass.
+- [ ] Human review, corrections, provenance, exports and audit trail pass.
+- [ ] Existing Discord commands, permissions, attachments, rate-limit, restart and recovery pass live smoke tests.
+- [ ] Tournament scoring, workbook, JSON/SQLite, player/event mapping and backups remain correct.
+- [ ] Player/Admin HTML role boundaries and consistency pass.
+- [ ] Metrics, Prometheus rules, alerts and Alertmanager notifications are verified.
+- [ ] Docker/Compose/native dependencies pass where applicable.
+- [ ] Developer comments and separate five-chapter PDF are accurate; PDF links/layout/render are verified.
+- [ ] Complete package, hashes, fresh extraction, README, change log and handoff verified.
+- [ ] All blockers and limits reported; production deployment separately authorized.
+
+======================================================================
+16. PRIORITY EXECUTION ORDER
+======================================================================
+
+1. Verify artifacts reported complete in Section 11; remove no further work from the queue until evidence is checked.
+2. Reconcile current source/repository/archive lineage and the designated `dwbotVis` branch.
+3. Inspect the actual asset ZIP and integrate all images, Excel and JSON; preserve originals.
+4. Confirm runtime/dependencies and canonical nine-field schema.
+5. Baseline and complete OCR runner/field-accuracy acceptance; maintain the separate holdout.
+6. Implement/test additional text fields and optional approved free API fallback where justified.
+7. Complete worker, ingestion, persistence, model/DB resources, monitoring and security gates.
+8. Complete authorized live Discord tests and tournament/workbook regressions.
+9. Implement/test Player/Admin interfaces.
+10. Complete developer comments, user manual, packaging, source transfer and handoff.
+11. Re-run all affected acceptance gates; only then consider production release, with separate authorization.
+
+======================================================================
+17. FINAL GOVERNING PRINCIPLE
+======================================================================
+
+Understand the actual project before changing it. Preserve existing behavior and source history. Use the latest authorized requirements, investigate root causes, make justified engineering decisions, implement modularly, test real data, reject unsupported values, correct failures, verify every claim, and document provenance and limits. The goal is a reliable, secure, maintainable DWBOT system—not merely a plan, code listing, prototype, passing synthetic test, valid ZIP, or optimistic production claim.
+
+END OF DWBOT CONSOLIDATED RULES AND PLAN
