@@ -229,7 +229,9 @@ test('local screenshot acceptance stays offline and live multi-provider smoke is
 
 test('release package excludes provenance archives and review-only source assets while retaining them in the repository', () => {
     const packager = read('scripts/package-release.ps1');
-    assert.match(packager, /dwbotStuff/);
+    assert.match(packager, /DWBOT_56_IMAGE_GROUND_TRUTH_REVIEW/);
+    assert.match(packager, /yolo_tournament_complete_instruction_set/);
+    assert.doesNotMatch(packager, /persistence-recovery\\|dwbotStuff/);
     assert.match(packager, /provenance\/input-archives/);
     assert.match(packager, /docs\/source-baselines/);
     assert.match(packager, /docs\/source-inputs/);
