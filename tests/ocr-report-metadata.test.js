@@ -5,14 +5,15 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 const { createOcrReportMetadata, describeOcrConfiguration } = require('../src/ocr-report-metadata');
 
-test('Windows OCR acceptance wrapper captures native npm stderr without PowerShell error-stream promotion', () => {
+test('Windows OCR acceptance wrapper captures native npm stdout and stderr to separate files', () => {
     const script = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'run-windows-ocr-acceptance.ps1'), 'utf8');
-    assert.match(script, /\$CommandLine='""'\+\$Npm\.Source/);
-    assert.match(script, /\$Npm=Get-Command npm\.cmd -ErrorAction Stop/);
-    assert.match(script, /Start-Process -FilePath \$env:ComSpec -ArgumentList @\('\/d','\/s','\/c',\$CommandLine\) -Wait -PassThru -NoNewWindow -RedirectStandardOutput \$OutputLog -RedirectStandardError \$ErrorLog/);
-    assert.doesNotMatch(script, /& npm\.cmd @Arguments 2> \$ErrorLog \| Tee-Object -FilePath \$OutputLog/);
-    assert.match(script, /Get-Content -LiteralPath \$ErrorLog -Raw/);
-    assert.match(script, /Remove-Item -LiteralPath \$OutputLog,\$ErrorLog/);
+    assert.match(script, /\$MinimumNodeVersion = \[version\]'24\.17\.0'/);
+    assert.match(script, /Start-Process -FilePath \$script:NpmPath -ArgumentList \$Arguments/);
+    assert.match(script, /-RedirectStandardOutput \$stdout -RedirectStandardError \$stderr/);
+    assert.match(script, /Get-Content -Raw -LiteralPath \$stdout/);
+    assert.match(script, /Get-Content -Raw -LiteralPath \$stderr/);
+    assert.match(script, /defaultAcceptanceNetworkMode = 'local-only'/);
+    assert.doesNotMatch(script, /& npm\.cmd @Arguments 2> \$ErrorLog \| Tee-Object/);
 });
 
 
