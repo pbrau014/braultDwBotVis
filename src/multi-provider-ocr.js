@@ -88,17 +88,25 @@ async function runMultiProviderOcr({
 
     if (activation.providers.azure.enabled) {
         let requestStarted = false;
+        let ledger = azureQuotaLedger || null;
+        let reservation = null;
         jobs.push((async () => {
-            const ledger = azureQuotaLedger || new AzureDocumentIntelligenceQuotaLedger({
+            ledger = ledger || new AzureDocumentIntelligenceQuotaLedger({
                 filePath: env.AZURE_DOCUMENT_INTELLIGENCE_QUOTA_PATH || path.join(process.cwd(), 'data', 'azure-document-intelligence-quota.json'),
                 maxPerMonth: env.AZURE_DOCUMENT_INTELLIGENCE_MAX_PER_MONTH,
             });
-            await ledger.reserve({ pages: 1, now: now() });
+            reservation = await ledger.reserve({ pages: 1, now: now() });
             const value = await azureRunner({
                 imageBuffer, endpoint: env.AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT,
                 apiKey: env.AZURE_DOCUMENT_INTELLIGENCE_KEY, fetchImpl,
                 timeoutMs: env.AZURE_DOCUMENT_INTELLIGENCE_TIMEOUT_MS,
-                onRequestStarted: async details => { await onProviderRequestStarted?.(details); requestStarted = true; },
+                onRequestStarted: async details => {
+                    await onProviderRequestStarted?.(details);
+                    if (reservation?.reservationId && typeof ledger.markSubmitted === 'function') {
+                        await ledger.markSubmitted({ reservationId: reservation.reservationId });
+                    }
+                    requestStarted = true;
+                },
                 beforeRequest: async details => {
                     const slot = await ledger.reserveRequestSlot();
                     if (slot.waitMs > 0) await new Promise(resolve => setTimeout(resolve, slot.waitMs));
@@ -111,8 +119,17 @@ async function runMultiProviderOcr({
                 providerInputSha256: value.inputSha256 || sourceSha256,
                 requestCount: Number(value.httpRequestCount) || 0,
             };
-        })().catch(error => {
-            providerState.azure = { provider: 'azure-document-intelligence', status: 'failed', sourceSha256, requestCount: Number(error.httpRequestCount) || (requestStarted ? 1 : 0), httpRequestCount: Number(error.httpRequestCount) || (requestStarted ? 1 : 0), errorCode: error.code || 'AZURE_OCR_ERROR', error: String(error.message || error).slice(0, 300) };
+        })().catch(async error => {
+            if (reservation?.reservationId && !requestStarted && typeof ledger?.release === 'function') {
+                await ledger.release({ reservationId: reservation.reservationId, reason: error.code || 'request_not_submitted' }).catch(() => {});
+            }
+            providerState.azure = {
+                provider: 'azure-document-intelligence', status: 'failed', sourceSha256,
+                requestCount: Number(error.httpRequestCount) || (requestStarted ? 1 : 0),
+                httpRequestCount: Number(error.httpRequestCount) || (requestStarted ? 1 : 0),
+                quotaReservationStatus: requestStarted ? 'submitted_or_unknown' : 'released_or_unreserved',
+                errorCode: error.code || 'AZURE_OCR_ERROR', error: String(error.message || error).slice(0, 300),
+            };
         }));
     } else {
         providerState.azure = { provider: 'azure-document-intelligence', status: 'blocked', sourceSha256, requestCount: 0, reason: activation.providers.azure.reason };
