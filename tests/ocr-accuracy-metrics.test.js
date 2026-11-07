@@ -76,3 +76,36 @@ test('accuracy report rejects ground-truth entries without a source hash or reco
         groundTruth: [{ record: truth }],
     }), /must include sourceSha256/);
 });
+
+test('accuracy report measures source-region correctness only when labelled regions exist', () => {
+    const report = createAccuracyReport({
+        predictions: [{
+            sourceSha256: 'region-image',
+            accepted: true,
+            elapsedMs: 120,
+            record: truth,
+            providers: { azure: { status: 'success', elapsedMs: 80, httpRequestCount: 2, quotaReservationStatus: 'submitted' } },
+            recordReview: {
+                azureReconciliation: {
+                    fields: {
+                        xp: { remoteCandidates: [{
+                            geometryValid: true, pageIndex: 0,
+                            polygon: [10,10,30,10,30,20,10,20],
+                        }] },
+                    },
+                },
+            },
+        }],
+        groundTruth: [{
+            sourceSha256: 'region-image',
+            record: truth,
+            fieldRegions: { xp: { x: 0, y: 0, width: 50, height: 50, pageIndex: 0 } },
+        }],
+    });
+    assert.equal(report.metrics.sourceRegionCorrectness.expectedFields, 1);
+    assert.equal(report.metrics.sourceRegionCorrectness.candidatesAssessed, 1);
+    assert.equal(report.metrics.sourceRegionCorrectness.candidateAccuracy, 1);
+    assert.equal(report.metrics.runtime.meanElapsedMs, 120);
+    assert.equal(report.metrics.providerAvailability.azure.meanElapsedMs, 80);
+    assert.equal(report.metrics.providerAvailability.azure.quotaReservationStates.submitted, 1);
+});
