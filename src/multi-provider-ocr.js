@@ -52,10 +52,15 @@ async function runMultiProviderOcr({
 
     if (activation.providers.ocrSpace.enabled) {
         let requestStarted = false;
+        let requestCount = 0;
         jobs.push((async () => {
             const value = await ocrSpaceRunner({
                 imageBuffer, filename, env, fetchImpl,
-                onProviderRequestStarted: async details => { await onProviderRequestStarted?.({ ...details, provider: 'ocr.space' }); requestStarted = true; },
+                onProviderRequestStarted: async details => {
+                    await onProviderRequestStarted?.({ ...details, provider: 'ocr.space' });
+                    requestCount = Number(details.requestIndex) || (requestCount + 1);
+                    requestStarted = true;
+                },
                 now,
             });
             if (value?.status !== 'complete') throw Object.assign(new Error(value?.reason || 'OCR.Space did not complete.'), { code: 'OCRSPACE_MULTI_PROVIDER_INCOMPLETE' });
@@ -75,12 +80,18 @@ async function runMultiProviderOcr({
                 pdfBytes: Number(value.pdfBytes) || null,
                 rasterBytes: Number(value.rasterBytes) || null,
                 mimeType: value.mimeType || null,
-                requestCount: Number(value.requests) || 1,
+                requestCount: Number(value.requestCount ?? value.requests) || requestCount,
+                httpRequestCount: Number(value.httpRequestCount ?? value.requests) || requestCount,
                 elapsedMs: Number(value.elapsedMs) || null,
                 raw: value,
             };
         })().then(value => { providerState.ocrSpace = value; }).catch(error => {
-            providerState.ocrSpace = { provider: 'ocr.space', status: 'failed', sourceSha256, requestCount: requestStarted ? 1 : 0, errorCode: error.code || 'OCRSPACE_ERROR', error: String(error.message || error).slice(0, 300) };
+            providerState.ocrSpace = {
+                provider: 'ocr.space', status: 'failed', sourceSha256,
+                requestCount: Number(error.requestCount ?? error.httpRequestCount) || requestCount,
+                httpRequestCount: Number(error.httpRequestCount) || requestCount,
+                errorCode: error.code || 'OCRSPACE_ERROR', error: String(error.message || error).slice(0, 300),
+            };
         }));
     } else {
         providerState.ocrSpace = { provider: 'ocr.space', status: 'blocked', sourceSha256, requestCount: 0, reason: activation.providers.ocrSpace.reason };
