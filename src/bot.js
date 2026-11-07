@@ -2514,9 +2514,22 @@ async function extractTextCore(imageBuffer) {
         const azure = multiProviderOcrEvidence.providers?.azure;
         if (azure?.status === 'success') {
             azureSourceEvidence = {
-                status: 'complete', requests: Number(azure.requestCount) || 1,
+                status: 'complete', requests: Number(azure.requestCount) || Number(azure.httpRequestCount) || 0,
+                originalScreenshotSha256: azure.originalScreenshotSha256 || multiProviderOcrEvidence.sourceSha256 || null,
+                providerInputSha256: azure.providerInputSha256 || azure.inputSha256 || null,
+                provider: azure.provider || 'azure-document-intelligence',
+                model: azure.model || null, apiVersion: azure.apiVersion || null,
+                mimeType: azure.mimeType || null, inputBytes: azure.inputBytes || null,
+                pageCount: azure.pageCount || null,
+                // Keep provider-native line/word geometry attached to the evidence.
+                // Reconciliation may use text today, but diagnostics must not discard
+                // polygons, per-word confidence, or page structure.
                 evidence: [{ field: 'fullScreenshot', source: 'azure-document-intelligence', status: 'success',
-                    text: String(azure.text || '') }],
+                    text: String(azure.text || ''), lines: Array.isArray(azure.lines) ? azure.lines : [],
+                    pageCount: azure.pageCount || null, originalScreenshotSha256: azure.originalScreenshotSha256 || null,
+                    providerInputSha256: azure.providerInputSha256 || azure.inputSha256 || null,
+                    model: azure.model || null, apiVersion: azure.apiVersion || null,
+                    mimeType: azure.mimeType || null }],
             };
         } else {
             azureSourceEvidence = {
