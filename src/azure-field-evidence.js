@@ -2,6 +2,50 @@
 
 const MODE_PATTERN = /\b(?:Co-op\s*Battle|Random\s*Battle|Ranked\s*Battle|Asymmetric\s*Battle|Scenario\s*Battle|Training\s*Battle|Convoy\s*Battle|Operations?|Brawl|Clan\s*Battle|Airship\s*Escort|Big\s*Hunt)\b/i;
 
+function polygonBounds(polygon) {
+    if (!Array.isArray(polygon) || polygon.length < 8 || polygon.length % 2) return null;
+    const values = polygon.map(Number);
+    if (!values.every(Number.isFinite)) return null;
+    const xs = values.filter((_, index) => index % 2 === 0);
+    const ys = values.filter((_, index) => index % 2 === 1);
+    const bounds = { left: Math.min(...xs), top: Math.min(...ys), right: Math.max(...xs), bottom: Math.max(...ys) };
+    return bounds.right > bounds.left && bounds.bottom > bounds.top ? bounds : null;
+}
+
+function mergeMetadataNeighbor(previous, current) {
+    if (!previous || previous.geometryValid !== true || current.geometryValid !== true ||
+        previous.pageIndex !== current.pageIndex) return null;
+    const previousText = String(previous.text || '').trim();
+    if (!previousText || /battle|personal score|team score|victory|defeat|battle start|received|credits|free xp|damage|\bxp\b/i.test(previousText)) return null;
+    const a = polygonBounds(previous.polygon);
+    const b = polygonBounds(current.polygon);
+    if (!a || !b) return null;
+    const previousHeight = a.bottom - a.top;
+    const currentHeight = b.bottom - b.top;
+    const verticalGap = b.top - a.bottom;
+    const overlap = Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left));
+    const minimumWidth = Math.max(1, Math.min(a.right - a.left, b.right - b.left));
+    if (verticalGap < -Math.max(previousHeight, currentHeight) * 0.5 ||
+        verticalGap > Math.max(previousHeight, currentHeight) * 2 ||
+        overlap / minimumWidth < 0.2) return null;
+    const bounds = {
+        left: Math.min(a.left, b.left), top: Math.min(a.top, b.top),
+        right: Math.max(a.right, b.right), bottom: Math.max(a.bottom, b.bottom),
+    };
+    return {
+        ...current,
+        text: previousText + '\n' + String(current.text || '').trim(),
+        polygon: [bounds.left, bounds.top, bounds.right, bounds.top,
+            bounds.right, bounds.bottom, bounds.left, bounds.bottom],
+        geometryValid: true,
+        words: [...(Array.isArray(previous.words) ? previous.words : []),
+            ...(Array.isArray(current.words) ? current.words : [])].slice(0, 500),
+        sourceLinePolygons: [previous.polygon, current.polygon],
+        sourceLineIndices: [previous.lineIndex ?? null, current.lineIndex ?? null],
+        geometrySource: 'union-of-adjacent-azure-lines',
+    };
+}
+
 function lineEvidence(line, field, sourceSha256, sourceWidth, sourceHeight) {
     const providerPolygon = Array.isArray(line.polygon) ? line.polygon : [];
     const pageWidth = Number(line.pageWidth);
@@ -27,7 +71,10 @@ function lineEvidence(line, field, sourceSha256, sourceWidth, sourceHeight) {
         pageIndex: line.pageIndex ?? null,
         pageNumber: line.pageNumber ?? null,
         polygon,
-        providerPolygon,
+        providerPolygon: line.sourceLinePolygons ? null : providerPolygon,
+        sourceLinePolygons: Array.isArray(line.sourceLinePolygons) ? line.sourceLinePolygons : [providerPolygon],
+        sourceLineIndices: Array.isArray(line.sourceLineIndices) ? line.sourceLineIndices : [line.lineIndex ?? null],
+        geometrySource: line.geometrySource || 'azure-provider-line',
         geometryValid: line.geometryValid === true,
         originalCoordinateGeometryValid,
         geometryIssue: line.geometryIssue || null,
@@ -54,14 +101,19 @@ function lineEvidence(line, field, sourceSha256, sourceWidth, sourceHeight) {
  */
 function buildAzureFieldEvidence(lines, { sourceSha256 = null, sourceWidth = null, sourceHeight = null } = {}) {
     const evidence = [];
-    for (const line of Array.isArray(lines) ? lines : []) {
+    const sourceLines = Array.isArray(lines) ? lines : [];
+    for (let lineIndex = 0; lineIndex < sourceLines.length; lineIndex++) {
+        const line = { ...sourceLines[lineIndex], lineIndex };
         const text = String(line?.text || '').trim();
         if (!text) continue;
         if (/^(?:victory|defeat)$/i.test(text)) {
             evidence.push(lineEvidence(line, 'result', sourceSha256, sourceWidth, sourceHeight));
         }
-        if (MODE_PATTERN.test(text) || /battle\s*start\s*time/i.test(text)) {
-            evidence.push(lineEvidence(line, 'battleMetadata', sourceSha256, sourceWidth, sourceHeight));
+        if (MODE_PATTERN.test(text) || /battle\\s*start\\s*time/i.test(text)) {
+            const combined = MODE_PATTERN.test(text) && lineIndex > 0
+                ? mergeMetadataNeighbor({ ...sourceLines[lineIndex - 1], lineIndex: lineIndex - 1 }, line)
+                : null;
+            evidence.push(lineEvidence(combined || line, 'battleMetadata', sourceSha256, sourceWidth, sourceHeight));
         }
         if (/\bcredits\b/i.test(text)) evidence.push(lineEvidence(line, 'credits', sourceSha256, sourceWidth, sourceHeight));
         const isFreeXp = /\bfree\s*xp\b/i.test(text);

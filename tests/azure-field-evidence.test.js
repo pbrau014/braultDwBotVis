@@ -38,3 +38,52 @@ test('Azure remote evidence never emits player identity candidates', () => {
     ], { sourceWidth: 10, sourceHeight: 10 });
     assert.equal(evidence.some(item => item.field === 'player'), false);
 });
+
+test('Azure metadata joins a geometrically adjacent map line with its mode line', () => {
+    const evidence = buildAzureFieldEvidence([
+        {
+            text: 'Shards', pageIndex: 0, pageNumber: 1,
+            polygon: [10, 10, 80, 10, 80, 20, 10, 20],
+            geometryValid: true, pageWidth: 200, pageHeight: 300, pageUnit: 'pixel', words: [],
+        },
+        {
+            text: 'Random Battle', pageIndex: 0, pageNumber: 1,
+            polygon: [10, 24, 80, 24, 80, 34, 10, 34],
+            geometryValid: true, pageWidth: 200, pageHeight: 300, pageUnit: 'pixel', words: [],
+        },
+    ], { sourceSha256: 'c'.repeat(64), sourceWidth: 400, sourceHeight: 600 });
+    const metadata = evidence.find(item => item.field === 'battleMetadata');
+    assert.ok(metadata);
+    assert.equal(metadata.text, 'Shards\\nRandom Battle');
+    assert.deepEqual(metadata.sourceLinePolygons, [
+        [10, 10, 80, 10, 80, 20, 10, 20],
+        [10, 24, 80, 24, 80, 34, 10, 34],
+    ]);
+    assert.equal(metadata.geometrySource, 'union-of-adjacent-azure-lines');
+    assert.equal(metadata.originalCoordinateGeometryValid, true);
+    assert.deepEqual(metadata.polygon, [20, 30, 160, 30, 160, 102, 20, 102]);
+});
+
+test('Azure metadata does not combine distant or non-metadata neighboring lines', () => {
+    const evidence = buildAzureFieldEvidence([
+        {
+            text: 'Victory', pageIndex: 0,
+            polygon: [10, 10, 80, 10, 80, 20, 10, 20],
+            geometryValid: true, pageWidth: 200, pageHeight: 300, pageUnit: 'pixel',
+        },
+        {
+            text: 'Credits 120000', pageIndex: 0,
+            polygon: [10, 24, 80, 24, 80, 34, 10, 34],
+            geometryValid: true, pageWidth: 200, pageHeight: 300, pageUnit: 'pixel',
+        },
+        {
+            text: 'Random Battle', pageIndex: 0,
+            polygon: [10, 100, 80, 100, 80, 110, 10, 110],
+            geometryValid: true, pageWidth: 200, pageHeight: 300, pageUnit: 'pixel',
+        },
+    ], { sourceWidth: 400, sourceHeight: 600 });
+    const metadata = evidence.find(item => item.field === 'battleMetadata');
+    assert.ok(metadata);
+    assert.equal(metadata.text, 'Random Battle');
+    assert.equal(metadata.geometrySource, 'azure-provider-line');
+});
