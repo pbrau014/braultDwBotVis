@@ -2673,9 +2673,25 @@ async function extractTextCore(imageBuffer) {
 function reconcileParallelLocalReaderEvidence(readerBundle, localRecord = {}) {
     const fields = ['result', 'player', 'map', 'mode', 'battleStart', 'credits', 'freeXp', 'damage', 'xp'];
     const readers = {};
+    const expectedSourceSha256 = readerBundle?.sourceSha256 || null;
     for (const [engine, reader] of Object.entries(readerBundle?.readers || {})) {
         if (reader?.status !== 'success') {
             readers[engine] = { status: reader?.status || 'unavailable', reason: reader?.reason || reader?.error || null, fields: {} };
+            continue;
+        }
+        if (expectedSourceSha256 && reader.sourceSha256 && reader.sourceSha256 !== expectedSourceSha256) {
+            readers[engine] = {
+                status: 'source_mismatch', sourceSha256: reader.sourceSha256,
+                expectedSourceSha256, fields: {},
+                reason: 'Reader evidence does not identify the same original screenshot bytes.',
+            };
+            continue;
+        }
+        if (expectedSourceSha256 && !reader.sourceSha256) {
+            readers[engine] = {
+                status: 'source_hash_missing', expectedSourceSha256, fields: {},
+                reason: 'Reader evidence has no source hash and cannot corroborate this record.',
+            };
             continue;
         }
         let candidateRecord = reader.output?.record || null;
