@@ -254,7 +254,7 @@ test('field-level review template creates blank provenance slots without copying
   assert.ok(rows.every(row => !Object.hasOwn(row, 'expectedValue')));
   const csv = renderCsv(rows);
   assert.match(csv, /^corpusOrder,filename,sourceImageSha256,field,/);
-  assert.equal(csv.trimEnd().split(/\\r?\\n/).length, 165);
+  assert.equal(csv.trimEnd().split(/\r?\n/).length, 165);
   assert.match(csv, /PENDING/);
 });
 
@@ -262,9 +262,9 @@ test('field review CSV escapes commas, quotes, and newlines', () => {
   const csv = renderCsv([{
     corpusOrder: 1, filename: 'a,b.png', sourceImageSha256: 'a'.repeat(64),
     field: 'player', currentStatus: 'MANUAL', currentExpectedValuePresent: false,
-    reviewedValue: '', reviewer: 'Reviewer "A"\\nSecond line', reviewedAt: '',
+    reviewedValue: '', reviewer: 'Reviewer "A"\nSecond line', reviewedAt: '',
     evidenceReference: '', evidenceNote: '', reviewStatus: 'PENDING',
   }]);
   assert.match(csv, /"a,b.png"/);
-  assert.match(csv, /"Reviewer ""A""\\nSecond line"/);
+  assert.match(csv, /"Reviewer ""A""\nSecond line"/);
 });
