@@ -6,7 +6,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
 const crypto = require('node:crypto');
-const { samePreflight, pngInfo, extractStartedFixtures, parseJsonUtf8, originalNetworkEvidenceAllowsProvider, sourceBuildFingerprint, EXPECTED_RC3_SOURCE_BUILD_SHA256, EXPECTED_RC3_SOURCE_BUILD_FILES } = require('../scripts/prepare-gateA-16-resume');
+const { samePreflight, pngInfo, extractStartedFixtures, parseJsonUtf8, originalNetworkEvidenceAllowsProvider, sourceBuildFingerprint, assertRecordedRc3SourceBuild, EXPECTED_RC3_SOURCE_BUILD_SHA256, EXPECTED_RC3_SOURCE_BUILD_FILES } = require('../scripts/prepare-gateA-16-resume');
 
 test('Gate A resume compares substantive preflight identity, fixture order and hashes', () => {
     const a = { status:'PREFLIGHT_PASS_NO_PROVIDER_REQUESTS', candidateFingerprint:'a'.repeat(40),
@@ -125,4 +125,20 @@ test('source-build fingerprint helper matches the report metadata hashing contra
 test('Gate A recovery is pinned to the recorded RC3 source build identity', () => {
     assert.equal(EXPECTED_RC3_SOURCE_BUILD_SHA256, '43f1e8b877d7f5832bca3ff070f8ae8164deb7c68da233694c64bece70b99166');
     assert.equal(EXPECTED_RC3_SOURCE_BUILD_FILES, 89);
+});
+
+
+test('Gate A recovery rejects a source tree that does not match the recorded RC3 fingerprint', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dwbot-rc3-mismatch-'));
+    try {
+        for (const dir of ['src', 'scripts', 'tests']) fs.mkdirSync(path.join(root, dir), { recursive: true });
+        fs.writeFileSync(path.join(root, 'src/a.js'), 'not RC3');
+        fs.writeFileSync(path.join(root, 'scripts/b.js'), 'not RC3');
+        fs.writeFileSync(path.join(root, 'tests/c.test.js'), 'not RC3');
+        fs.writeFileSync(path.join(root, 'package.json'), '{}');
+        fs.writeFileSync(path.join(root, 'package-lock.json'), '{}');
+        assert.throws(() => assertRecordedRc3SourceBuild(root), /does not match the recorded RC3 fingerprint/);
+    } finally {
+        fs.rmSync(root, { recursive: true, force: true });
+    }
 });
