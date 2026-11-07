@@ -122,16 +122,23 @@ test('durable provider-start checkpoint completes before the OCR.Space request',
             assert.equal(detail.engine, 2);
             assert.equal(detail.sourceSha256.length, 64);
         },
-        client: async () => {
+        fetchImpl: async () => ({ ok: true, status: 200 }),
+        client: async options => {
             order.push('provider');
+            await options.fetchImpl('https://api.ocr.space/parse/image', { method: 'POST' });
             return { searchablePdfUrl: 'https://api.ocr.space/result.pdf' };
         },
-        downloadPdf: async () => pdf,
+        downloadPdf: async (url, options) => {
+            await options.fetchImpl(url, { method: 'GET' });
+            return pdf;
+        },
         renderPdf: async () => png,
         readRasterMetadata: async () => ({ width: 1920, height: 1080 }),
     });
     assert.deepEqual(order, ['checkpoint', 'provider']);
     assert.equal(result.status, 'complete');
+    assert.equal(result.requests, 2);
+    assert.equal(result.httpRequestCount, 2);
 });
 
 test('failed durable provider-start checkpoint prevents any OCR.Space request', async () => {
@@ -139,7 +146,11 @@ test('failed durable provider-start checkpoint prevents any OCR.Space request', 
     await assert.rejects(createOcrSpacePdfFirst({
         imageBuffer: png, env: { OCRSPACE_API_KEY: 'test-key' }, quotaLedger: fakeLedger(),
         onProviderRequestStarted: async () => { throw new Error('checkpoint disk failure'); },
-        client: async () => { providerCalled = true; return { searchablePdfUrl: 'https://api.ocr.space/result.pdf' }; },
+        client: async options => {
+            await options.fetchImpl('https://api.ocr.space/parse/image', { method: 'POST' });
+            providerCalled = true;
+            return { searchablePdfUrl: 'https://api.ocr.space/result.pdf' };
+        },
     }), /checkpoint disk failure/);
     assert.equal(providerCalled, false);
 });
