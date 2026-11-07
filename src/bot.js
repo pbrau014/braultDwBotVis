@@ -2510,6 +2510,7 @@ async function extractTextCore(imageBuffer) {
                 providerInputSha256: ocrSpace.providerInputSha256 || ocrSpace.inputSha256 || ocrSpace.uploadSha256 || null,
                 uploadSha256: ocrSpace.uploadSha256 || null,
                 searchablePdfSha256: ocrSpace.searchablePdfSha256 || ocrSpace.pdfSha256 || null,
+                providerRequestIds: Array.isArray(ocrSpace.providerRequestIds) ? ocrSpace.providerRequestIds : [],
                 rasterSha256: ocrSpace.rasterSha256 || null,
                 provider: ocrSpace.provider || 'ocr.space', engine: ocrSpace.engine || 2,
                 evidence: [{ field: 'fullScreenshot', source: 'ocrspace-searchable-pdf', status: 'success',
@@ -2518,6 +2519,7 @@ async function extractTextCore(imageBuffer) {
                     providerInputSha256: ocrSpace.providerInputSha256 || ocrSpace.inputSha256 || ocrSpace.uploadSha256 || null,
                     uploadSha256: ocrSpace.uploadSha256 || null,
                     searchablePdfSha256: ocrSpace.searchablePdfSha256 || ocrSpace.pdfSha256 || null,
+                    providerRequestIds: Array.isArray(ocrSpace.providerRequestIds) ? ocrSpace.providerRequestIds : [],
                     rasterSha256: ocrSpace.rasterSha256 || null }],
             };
         } else {
@@ -2544,6 +2546,9 @@ async function extractTextCore(imageBuffer) {
                         pages: Array.isArray(azure.pages) ? azure.pages : [], pageCount: azure.pageCount || null,
                         originalScreenshotSha256: azure.originalScreenshotSha256 || null,
                         providerInputSha256: azure.providerInputSha256 || azure.inputSha256 || null,
+                        providerRequestIds: Array.isArray(azure.providerRequestIds) ? azure.providerRequestIds : [],
+                        operationId: azure.operationId || null,
+                        startedAt: azure.startedAt || null, completedAt: azure.completedAt || null,
                         originalScreenshotWidth: sourceWidth, originalScreenshotHeight: sourceHeight,
                         model: azure.model || null, apiVersion: azure.apiVersion || null, mimeType: azure.mimeType || null },
                     ...buildAzureFieldEvidence(azure.lines, {
