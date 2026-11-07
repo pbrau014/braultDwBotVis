@@ -1,12 +1,33 @@
 'use strict';
 
 const fs = require('node:fs/promises');
+const fsSync = require('node:fs');
 const fsConstants = require('node:fs').constants;
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { execFileSync } = require('node:child_process');
 
 function sha256(bytes) { return crypto.createHash('sha256').update(bytes).digest('hex'); }
+
+const EXPECTED_RC3_SOURCE_BUILD_SHA256 = '43f1e8b877d7f5832bca3ff070f8ae8164deb7c68da233694c64bece70b99166';
+const EXPECTED_RC3_SOURCE_BUILD_FILES = 89;
+function sourceBuildFingerprint(root) {
+    const sourceFiles = [];
+    const walk = relativeDir => {
+        const absoluteDir = path.join(root, relativeDir);
+        for (const entry of fsSync.readdirSync(absoluteDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+            const relative = path.posix.join(relativeDir.replaceAll(path.sep, '/'), entry.name);
+            if (entry.isDirectory()) walk(relative);
+            else if (entry.isFile() && !relative.endsWith('.bak')) sourceFiles.push(relative);
+        }
+    };
+    for (const dir of ['src', 'scripts', 'tests']) if (fsSync.existsSync(path.join(root, dir))) walk(dir);
+    sourceFiles.push('package.json', 'package-lock.json');
+    const uniqueFiles = [...new Set(sourceFiles)].sort();
+    const hash = crypto.createHash('sha256');
+    for (const relative of uniqueFiles) hash.update(relative).update('\\0').update(fsSync.readFileSync(path.join(root, relative))).update('\\0');
+    return { sha256: hash.digest('hex'), files: uniqueFiles.length };
+}
 function parseArgs(args) {
     const out = {};
     for (let i = 0; i < args.length; i += 2) {
@@ -64,7 +85,11 @@ async function prepare(options) {
     const expectedCandidateSha = String(process.env.GATEB_SOURCE_SHA || 'adaf4f8c3a9573f56d0348a4bba36686fc31c22e').toLowerCase();
     if (!sourceRoot || !preflightPath || !partialRoot) throw new Error('Usage: node scripts/prepare-gateA-16-resume.js --source-root DIR --preflight FILE --partial-artifact-root DIR');
     const sourceCommit = execFileSync('git', ['-C', sourceRoot, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim().toLowerCase();
-    if (sourceCommit !== expectedCandidateSha) throw new Error('Gate A source checkout does not match the locked Gate B candidate commit.');
+    if (sourceCommit !== expectedCandidateSha) throw new Error('Gate A source checkout does not match the locked candidate source-anchor commit.');
+    const sourceBuild = sourceBuildFingerprint(sourceRoot);
+    if (sourceBuild.sha256 !== EXPECTED_RC3_SOURCE_BUILD_SHA256 || sourceBuild.files !== EXPECTED_RC3_SOURCE_BUILD_FILES) {
+        throw new Error('Gate A source build does not match the recorded RC3 fingerprint (43f1e8...; 89 files); refusing recovery on a different candidate.');
+    }
     const manifestPath = path.join(sourceRoot, 'testdata', 'additional-screenshot-ground-truth.json');
     const manifestBytes = await fs.readFile(manifestPath);
     const manifest = parseJsonUtf8(manifestBytes);
@@ -296,6 +321,9 @@ async function prepare(options) {
     let sourceMetadata;
     try {
         sourceMetadata = require(path.join(sourceRoot, 'src', 'ocr-report-metadata')).createOcrReportMetadata(sourceRoot);
+        if (sourceMetadata.sourceBuild.sha256 !== sourceBuild.sha256 || sourceMetadata.sourceBuild.files !== sourceBuild.files) {
+            throw new Error('Source metadata collector disagrees with the independently computed RC3 source fingerprint.');
+        }
     } finally {
         for (const [key, value] of Object.entries(originalEnv)) {
             if (value === undefined) delete process.env[key]; else process.env[key] = value;
@@ -342,4 +370,4 @@ if (require.main === module) {
         process.exitCode = 1;
     });
 }
-module.exports = { prepare, samePreflight, pngInfo, extractStartedFixtures, parseJsonUtf8, originalNetworkEvidenceAllowsProvider };
+module.exports = { prepare, samePreflight, pngInfo, extractStartedFixtures, parseJsonUtf8, originalNetworkEvidenceAllowsProvider, sourceBuildFingerprint, EXPECTED_RC3_SOURCE_BUILD_SHA256, EXPECTED_RC3_SOURCE_BUILD_FILES };
