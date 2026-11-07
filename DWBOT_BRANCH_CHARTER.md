@@ -19,7 +19,7 @@ Provider requests are explicitly enabled functionality, not a permanently disabl
 - Secondary online provider: Azure AI Document Intelligence Read (`prebuilt-read`) using the API version supported by the adapter.
 - Local readers retained: Tesseract.js, native Tesseract, and PaddleOCR.
 - Image analysis and geometry: OpenCV.
-- All readers receive the same original screenshot as their source input. Derived PDF/raster outputs are additional evidence, not replacements for the original.
+- The original screenshot is the immutable source identity. Azure and the independent parallel local-reader workers receive the original bytes. The primary in-process Tesseract.js path uses a separately hashed local preprocessing derivative. OCR.Space receives the original bytes when they fit its 1 MiB Free API cap; otherwise it receives a bounded resized/re-encoded derivative with a separate hash. Any searchable PDF/raster outputs are additional derivatives, never replacements for the original source.
 - Preserve each provider's raw text, line/word geometry, model/API version, source and derived hashes, timing, request state, and errors.
 - A provider that was not configured, could not start, or failed must be represented honestly. Do not report it as having participated.
 - Credentials are provided through runtime secrets, never committed or logged.
