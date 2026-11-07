@@ -19,7 +19,7 @@ if (restrictNonOcrNetwork) {
   }
 }
 function blocked(kind, destination) {
-  const message = `[NON-OCR-SPACE-EGRESS-RESTRICTED] denied ${kind} ${String(destination || '').slice(0, 300)}\n`;
+  const message = `[NON-APPROVED-OCR-EGRESS-RESTRICTED] denied ${kind} ${String(destination || '').slice(0, 300)}\n`;
   if (restrictNonOcrNetwork) {
     try { fs.appendFileSync(logPath, message); }
     catch (cause) {
@@ -29,7 +29,7 @@ function blocked(kind, destination) {
       throw failure;
     }
   }
-  const error = new Error(`Non-OCR.Space network destination is outside the configured allowlist (${kind}).`);
+  const error = new Error(`Network destination is outside the configured OCR provider allowlist (${kind}).`);
   error.code = 'OCR_NETWORK_BLOCKED';
   throw error;
 }
@@ -44,17 +44,27 @@ function destination(args) {
   }
   return '[unknown destination]';
 }
-function ocrSpaceAllowed(value) {
-  if (process.env.OCRSPACE_NETWORK_ALLOWLIST !== '1') return false;
+function providerAllowed(value) {
   try {
     const url = new URL(String(value));
-    return url.protocol === 'https:' && ['api.ocr.space', 'ocr.space'].includes(url.hostname);
+    if (url.protocol !== 'https:' || url.username || url.password || url.port) return false;
+    if (process.env.OCRSPACE_NETWORK_ALLOWLIST === '1' &&
+        ['api.ocr.space', 'ocr.space'].includes(url.hostname)) return true;
+    // Azure is permitted only for the exact resource hostname configured by
+    // the operator, never for a broad *.cognitiveservices.azure.com wildcard.
+    if (process.env.AZURE_DOCUMENT_INTELLIGENCE_NETWORK_ALLOWLIST === '1') {
+      const configured = new URL(String(process.env.AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT || ''));
+      return configured.protocol === 'https:' && !configured.username && !configured.password &&
+        !configured.port && configured.pathname === '/' && !configured.search && !configured.hash &&
+        url.hostname === configured.hostname && url.origin === configured.origin;
+    }
+    return false;
   } catch { return false; }
 }
 const originalFetch = globalThis.fetch.bind(globalThis);
 globalThis.fetch = function guardedFetch(input, ...args) {
   const target = destination([input]);
-  if (ocrSpaceAllowed(target) || !restrictNonOcrNetwork) return originalFetch(input, ...args);
+  if (providerAllowed(target) || !restrictNonOcrNetwork) return originalFetch(input, ...args);
   try { blocked('fetch', target); } catch (error) { return Promise.reject(error); }
 };
 for (const moduleName of ['node:http', 'node:https']) {
@@ -64,7 +74,7 @@ for (const moduleName of ['node:http', 'node:https']) {
   const originalGet = mod.get.bind(mod);
   mod.request = function (...args) {
     const target = destination(args);
-    if ((proto === 'https' && ocrSpaceAllowed(target)) || !restrictNonOcrNetwork) return originalRequest(...args);
+    if ((proto === 'https' && providerAllowed(target)) || !restrictNonOcrNetwork) return originalRequest(...args);
     return blocked(proto, target);
   };
   mod.get = function (...args) {
