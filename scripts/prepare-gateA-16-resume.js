@@ -28,6 +28,13 @@ function sourceBuildFingerprint(root) {
     for (const relative of uniqueFiles) hash.update(relative).update('\0').update(fsSync.readFileSync(path.join(root, relative))).update('\0');
     return { sha256: hash.digest('hex'), files: uniqueFiles.length };
 }
+function assertRecordedRc3SourceBuild(root) {
+    const sourceBuild = sourceBuildFingerprint(root);
+    if (sourceBuild.sha256 !== EXPECTED_RC3_SOURCE_BUILD_SHA256 || sourceBuild.files !== EXPECTED_RC3_SOURCE_BUILD_FILES) {
+        throw new Error(`Source build does not match the recorded RC3 fingerprint (expected ${EXPECTED_RC3_SOURCE_BUILD_SHA256}, ${EXPECTED_RC3_SOURCE_BUILD_FILES} files; got ${sourceBuild.sha256}, ${sourceBuild.files} files).`);
+    }
+    return sourceBuild;
+}
 function parseArgs(args) {
     const out = {};
     for (let i = 0; i < args.length; i += 2) {
@@ -86,10 +93,7 @@ async function prepare(options) {
     if (!sourceRoot || !preflightPath || !partialRoot) throw new Error('Usage: node scripts/prepare-gateA-16-resume.js --source-root DIR --preflight FILE --partial-artifact-root DIR');
     const sourceCommit = execFileSync('git', ['-C', sourceRoot, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim().toLowerCase();
     if (sourceCommit !== expectedCandidateSha) throw new Error('Gate A source checkout does not match the locked candidate source-anchor commit.');
-    const sourceBuild = sourceBuildFingerprint(sourceRoot);
-    if (sourceBuild.sha256 !== EXPECTED_RC3_SOURCE_BUILD_SHA256 || sourceBuild.files !== EXPECTED_RC3_SOURCE_BUILD_FILES) {
-        throw new Error('Gate A source build does not match the recorded RC3 fingerprint (43f1e8...; 89 files); refusing recovery on a different candidate.');
-    }
+    const sourceBuild = assertRecordedRc3SourceBuild(sourceRoot);
     const manifestPath = path.join(sourceRoot, 'testdata', 'additional-screenshot-ground-truth.json');
     const manifestBytes = await fs.readFile(manifestPath);
     const manifest = parseJsonUtf8(manifestBytes);
@@ -370,4 +374,4 @@ if (require.main === module) {
         process.exitCode = 1;
     });
 }
-module.exports = { prepare, samePreflight, pngInfo, extractStartedFixtures, parseJsonUtf8, originalNetworkEvidenceAllowsProvider, sourceBuildFingerprint, EXPECTED_RC3_SOURCE_BUILD_SHA256, EXPECTED_RC3_SOURCE_BUILD_FILES };
+module.exports = { prepare, samePreflight, pngInfo, extractStartedFixtures, parseJsonUtf8, originalNetworkEvidenceAllowsProvider, sourceBuildFingerprint, assertRecordedRc3SourceBuild, EXPECTED_RC3_SOURCE_BUILD_SHA256, EXPECTED_RC3_SOURCE_BUILD_FILES };
