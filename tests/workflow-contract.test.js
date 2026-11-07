@@ -177,7 +177,7 @@ test('OCR attachment download is inside the bounded queue and unsafe timeout rec
     assert.match(botSource, /SERIAL_TASK_UNSETTLED.*SERIAL_QUEUE_CLOSED/s);
 });
 
-test('Node.js 22.16.0 is the accepted runtime baseline; Node 24 is not mandatory', () => {
+test('Node.js 24.22.1 is the branch runtime baseline', () => {
     const root = path.join(__dirname, '..');
     const packageJson = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
     const packageLock = JSON.parse(fs.readFileSync(path.join(root, 'package-lock.json'), 'utf8'));
@@ -185,12 +185,12 @@ test('Node.js 22.16.0 is the accepted runtime baseline; Node 24 is not mandatory
     const nvmrc = fs.readFileSync(path.join(root, '.nvmrc'), 'utf8').trim();
     const windowsAcceptance = fs.readFileSync(path.join(root, 'scripts', 'run-windows-ocr-acceptance.ps1'), 'utf8');
 
-    assert.equal(nvmrc, '22.16.0');
-    assert.equal(packageJson.engines?.node, '>=22.16.0');
-    assert.equal(packageLock.packages?.['']?.engines?.node, '>=22.16.0');
-    assert.match(workflow, /node-version:\s*22\.16\.0/);
-    assert.doesNotMatch(workflow, /node-version:\s*24(?:\.|\s|$)/);
-    assert.match(windowsAcceptance, /MinimumNodeVersion\s*=\s*'22\.16\.0'/);
+    assert.equal(nvmrc, '24.22.1');
+    assert.equal(packageJson.engines?.node, '>=24.17.0');
+    assert.equal(packageLock.packages?.['']?.engines?.node, '>=24.17.0');
+    assert.match(workflow, /node-version:\s*24\.22\.1/);
+    assert.doesNotMatch(workflow, /node-version:\s*22\.16\.0/);
+    assert.match(windowsAcceptance, /MinimumNodeVersion\s*=\s*'24\.17\.0'/);
 });
 
 
@@ -253,68 +253,7 @@ test('billable imagesF extraction workflow supports fingerprint-bound no-duplica
 });
 
 
-test('19-image Gate B artifact workflow verifies the completed run without provider requests', () => {
-    const workflow = read('.github/workflows/dwbot-imagesF-21-artifact-verification.yml');
-    assert.match(workflow, /^  workflow_dispatch:/m);
-    assert.match(workflow, /^  push:/m);
-    assert.match(workflow, /SOURCE_RUN_ID: \$\{\{ inputs\.source_run_id \|\| '42160979140' \}\}/);
-    assert.match(workflow, /gh run download/);
-    assert.match(workflow, /prepare-ocrspace-imagesF-63\.py/);
-    assert.match(workflow, /verify-ocrspace-imagesF-21-artifacts\.js/);
-    assert.match(workflow, /gate-b-complete-ground-truth-19/);
-    assert.match(workflow, /recover-ocrspace-imagesF-21-local-readers\.js/);
-    assert.match(workflow, /OCRSPACE_ENABLED: '0'/);
-    assert.match(workflow, /OCRSPACE_NETWORK_ALLOWLIST: '0'/);
-    assert.match(workflow, /evaluate-ocrspace-imagesF-63-ground-truth\.py/);
-    assert.match(workflow, /--network-log-reconciliation/);
-    assert.match(workflow, /evaluate-ocrspace-pdf-text-layer\.js/);
-    assert.match(workflow, /pdf-text-layer-analysis-19\.json/);
-    assert.match(workflow, /Discover and download the latest Gate A report for this exact source commit/);
-    assert.match(workflow, /DWBOT_GATE_A_REPORT/);
-    assert.match(workflow, /--gate-a-report/);
-    assert.match(workflow, /RECONSTRUCTED_LIMITED_EVIDENCE/);
-    assert.match(workflow, /originalBlockedAttemptCount = \$null/);
-    assert.match(workflow, /\$recoveryNetworkLog =/);
-    assert.doesNotMatch(workflow, /createOcrSpacePdfFirst|OCRSPACE_63_RESUME=1/);
-});
 
-
-test('Gate A acceptance uses the accepted runtime, fail-closed network guard and preserves interruption checkpoints', () => {
-    const workflow = read('.github/workflows/dwbot-gateA-16-pdf-first.yml').replace(/\r\n/g, '\n');
-    assert.ok(workflow.includes('node-version: 22.16.0'));
-    assert.ok(workflow.includes('runtimePass'));
-    assert.ok(workflow.includes('Configure fail-closed restricted-egress diagnostic preload'));
-    assert.ok(workflow.includes('source/scripts/block-network.js'));
-    assert.ok(workflow.includes('scripts/block-network.js'));
-    const preloads = workflow.split(String.fromCharCode(10)).filter(line => line.includes('NODE_OPTIONS:'));
-    assert.ok(preloads.length >= 3, 'each local/provider Node step must preload its restricted-egress guard');
-    const dualGuard = preloads.find(line => line.includes('source/scripts/block-network.js'));
-    assert.ok(dualGuard && dualGuard.indexOf('source/scripts/block-network.js') < dualGuard.lastIndexOf('/scripts/block-network.js'), 'fail-closed wrapper must load after candidate guard');
-    assert.match(workflow, /OCRSPACE_ENABLED: '1'/);
-    assert.match(workflow, /OCRSPACE_NETWORK_ALLOWLIST: '1'/);
-    assert.match(workflow, /OCR_NON_OCR_NETWORK_RESTRICTED: '1'/);
-    assert.doesNotMatch(workflow, /NODE_OPTIONS=.*GITHUB_ENV/);
-    assert.ok(workflow.includes('source/testdata/gateA-16/report.json.progress.json'));
-    assert.ok(workflow.includes('cancel-in-progress: false'));
-    assert.ok(workflow.includes('DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME'));
-    assert.ok(workflow.includes('DWBOT-GATE-A-16-PDF-FIRST-RESUME-15'));
-    assert.ok(workflow.includes('DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'));
-    assert.match(workflow, /Prepare no-duplicate Gate A resume checkpoint from existing PDF\n        if: github\.event\.head_commit\.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' \|\| github\.event\.head_commit\.message == 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'/);
-    assert.match(workflow, /Run the 16-image OCR\.Space Engine 2 PDF-first Gate A acceptance\n        if: github\.event\.head_commit\.message != 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'/);
-    assert.match(workflow, /\$isResume = -not \[string\]::IsNullOrWhiteSpace\(\$env:GATEA_PARTIAL_ARTIFACT_ID\)/);
-    assert.match(workflow, /MISSING_ORIGINAL_NETWORK_LOG/);
-    assert.match(workflow, /FAIL_MISSING_ORIGINAL_EVIDENCE/);
-    assert.ok(workflow.includes('Prepare no-duplicate Gate A resume checkpoint from existing PDF'));
-    assert.ok(workflow.includes('Initialize Gate A restricted-egress diagnostic log'));
-    assert.ok(workflow.includes('OCR_SEQUENCE_RESUME_FROM'));
-    assert.ok(workflow.includes('originalNetworkEvidencePass'));
-    assert.ok(workflow.includes('report.reportMetadata.sourceBuild.sha256'));
-    assert.ok(workflow.includes('run-gateA-parallel-reader-matrix.js'));
-    assert.ok(workflow.includes('parallelReaderMatrixPass'));
-    assert.ok(workflow.includes('Provision pinned local PaddleOCR CPU runtime'));
-    assert.ok(read('scripts/run-gateA-parallel-reader-matrix.js').includes('Promise.allSettled'));
-    assert.ok(read('scripts/run-gateA-parallel-reader-matrix.js').includes('renderSearchablePdfPage'));
-});
 
 
 test('four-image PDF-first runner refuses duplicates and supports fingerprint-bound resume', () => {
@@ -337,11 +276,15 @@ test('four-image PDF-first runner refuses duplicates and supports fingerprint-bo
 });
 
 
-test('ordinary verification uses Node 22.16 and cannot submit the legacy 56-image provider batch', () => {
+test('ordinary branch verification has no legacy Gate B or bulk-provider workflow and exposes an explicit multi-provider smoke path', () => {
     const workflow = read('.github/workflows/dwbot-verification.yml');
     const pkg = JSON.parse(read('package.json'));
-    assert.equal(pkg.engines.node, '>=22.16.0');
-    assert.ok(workflow.includes('node-version: 22.16.0'));
-    assert.ok(workflow.includes('run_legacy_56_provider_acceptance'));
-    assert.ok(workflow.includes("if: github.event_name == 'workflow_dispatch' && inputs.run_legacy_56_provider_acceptance == true"));
+    assert.equal(pkg.engines.node, '>=24.17.0');
+    assert.ok(workflow.includes('run_live_multi_provider_smoke'));
+    assert.ok(workflow.includes('DWBOT_MULTI_PROVIDER_ENABLED: \'1\''));
+    assert.ok(workflow.includes('AZURE_DOCUMENT_INTELLIGENCE_ENABLED: \'1\''));
+    assert.ok(workflow.includes('scripts/run-multi-provider-smoke.js'));
+    assert.ok(!workflow.includes('run_legacy_56_provider_acceptance'));
+    assert.ok(!workflow.includes('eligible-only 56-image archive'));
+    assert.ok(!workflow.includes('Post-hoc Gate B evaluator'));
 });
