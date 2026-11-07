@@ -2328,5 +2328,77 @@
       "sizeBytes": 6470,
       "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
     }
-  ]
+  ],
+  "initiallyRemovedFileCount": 385,
+  "initiallyRemovedBytes": 93794404,
+  "restoredAfterInitialPrune": [
+    {
+      "path": "dwbotStuff/backupWkbkBrowser.html",
+      "commit": "6b5b1ad0c4a524c4a5800aaf7b07ba3786b358b6",
+      "reason": "Restored because desktop UI contract tests require this original OCR-reader HTML baseline.",
+      "originalGitBlobSha1": "fce9165255c3bbb667a538ae897f5fca99eb198f",
+      "sizeBytes": 64925
+    },
+    {
+      "path": "dwbotStuff/yolo_tournament_scoreCalculator.html",
+      "commit": "3080ddf6f03545244b9022eab52ece63ac80059c",
+      "reason": "Restored because desktop UI contract tests require the tournament score calculator source asset.",
+      "originalGitBlobSha1": "8e4827618cd9825c96bd9aa57e10439d82de6815",
+      "sizeBytes": 65206
+    },
+    {
+      "path": "scripts/run-windows-ocr-acceptance.ps1",
+      "commit": "bfc7b918042a384b5672418ecca6f0839bb2749c",
+      "reason": "Restored to replace it with a current local/offline acceptance wrapper and preserve the Windows acceptance entry point.",
+      "originalGitBlobSha1": "c164d76298a517ac03f686507273da27005be6f0",
+      "sizeBytes": 19596
+    },
+    {
+      "path": "scripts/recover-ocrspace-imagesF-21-local-readers.js",
+      "commit": "abcca8e17fc8ffe0e099a2012902726d967ddc65",
+      "reason": "Restored because the retained PDF-text analysis and reader-matrix test tools import it; it remains an optional diagnostic, not a release gate.",
+      "originalGitBlobSha1": "e14e1117741288b06b309a16f6ff28bc05d24035",
+      "sizeBytes": 17131
+    },
+    {
+      "path": "scripts/run-gateA-parallel-reader-matrix.js",
+      "commit": "5cea0531ca882d539d6170ceff50c3920cfcb266",
+      "reason": "Restored because retained diagnostic contract tests import it; it is not invoked as a release prerequisite.",
+      "originalGitBlobSha1": "56fe4542831cae7af3fb2316a8b1960a53ece53d",
+      "sizeBytes": 10528
+    },
+    {
+      "path": "scripts/evaluate-ocrspace-pdf-text-layer.js",
+      "commit": "6bfb7601d8073f9e9804878bc96efe18971d6cb3",
+      "reason": "Restored because the retained PDF-text-layer evaluation tests and tools import it; it is optional analysis only.",
+      "originalGitBlobSha1": "c7442de5f9f6cd3a39f2dabbd42406814bbde8bd",
+      "sizeBytes": 17943
+    },
+    {
+      "path": "scripts/compare-paddleocr-integrated-acceptance.js",
+      "commit": "c3651cbc3c66ba775a6045b21256b6f51ff663bc",
+      "reason": "Restored because retained PaddleOCR comparison tests import it and it supports labelled comparison metrics.",
+      "originalGitBlobSha1": "e03021379da81cdc91efc66342b8835c7654c65d",
+      "sizeBytes": 17212
+    },
+    {
+      "path": "dwbotStuff/scoreReport_dark_clipboard (1).html",
+      "commit": "b10f40712a1b81bab0759d151a8718c352852ca4",
+      "reason": "Restored because desktop UI contract tests inspect this original browser OCR/report baseline; the webhook remediation is retained.",
+      "originalGitBlobSha1": "4e930f9b072fd85568f74779e611ef91f924f334",
+      "sizeBytes": 20388
+    },
+    {
+      "path": "scripts/verify-ocrspace-imagesF-21-artifacts.js",
+      "commit": "bf97c65d58e060c31911079b87fc0f3132829b62",
+      "reason": "Restored because retained PDF-text-layer and reader-recovery diagnostic tools import it; it does not enforce a release gate.",
+      "originalGitBlobSha1": "9b7cf1e018fd4ab2b355f9a6860707433d0917c1",
+      "sizeBytes": 22333
+    }
+  ],
+  "restoredFileCount": 9,
+  "restoredBytes": 255262,
+  "currentlyRemovedFileCount": 376,
+  "currentlyRemovedBytes": 93539142,
+  "followUpCorrection": "The initial cleanup removed several files still required by retained desktop/UI and diagnostic tests. Those nine files were restored from the exact pre-prune commit listed above. The Windows acceptance wrapper is being rewritten to current local/offline defaults; old Gate A matrix and OCR.Space PDF text-layer tools remain optional diagnostics only, not prerequisites. The current net removal is recorded separately from the initial prune count."
 }

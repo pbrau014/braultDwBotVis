@@ -5,6 +5,11 @@
 **Source archive:** `Grand_Tournament_Instruction_Set_v3.22.zip`  
 **Source archive SHA-256:** `12a69ee2cf880d7d0ebdf97b4e5fa2eff5290c5808f4aed84bf8256204e48b7e`
 
+
+## Current branch addendum — 2026-11-07
+
+This 2026-11-03 alignment record preserves a historical reconciliation snapshot. Its reference to an active `plan1.txt` resumption addendum describes the source material used at that time; that standalone plan is not part of the current branch. Current implementation authority is `DWBOT_BRANCH_CHARTER.md`, `README.md`, and `docs/architecture/DWBOT_OCR_ACCURACY_ARCHITECTURE_DECISION.md`. The current branch keeps the nine mandatory fields, runs local readers against the original screenshot, treats OCR.Space PDF/raster products as separate derivatives, and supports explicitly enabled OCR.Space plus Azure requests in the designated multi-provider pipeline. The former Gate A/B/C/D sequence and independent holdout corpus are not prerequisites for ordinary implementation. This addendum does not rewrite or certify the historical source package.
+
 ## 1. Scope and provenance
 
 The v3.22 documentation archive is a governing tournament-policy and operations reference for aligning bot behavior. It is not the bot source tree, not a canonical scoring workbook, and not proof that a running bot implements the documented event rules. Relevant Markdown sources, the release index, selected QA records, and the original archive checksum are preserved in `docs/source-baselines/grand-tournament-v3.22/`. The original uploaded ZIP was not modified.

@@ -1,5 +1,7 @@
 # DWBOT Local Operations and Release Verification Manual
 
+> **Historical snapshot — 2026-11-04.** This manual is retained for provenance and its desktop/Discord procedures, but its OCR.Space PDF-first local-reader flow, Node 22 baseline, and former release-gate sequence are superseded. Current implementation authority is `DWBOT_BRANCH_CHARTER.md`, `README.md`, and `docs/architecture/DWBOT_OCR_ACCURACY_ARCHITECTURE_DECISION.md`. Local readers use the original screenshot; online providers run only through the explicitly enabled multi-provider path. The former Gate A/B/C/D sequence is not a prerequisite.
+
 **Version:** 1.0 | **Prepared:** 4 November 2026
 **Release status:** Production NO-GO until all mandatory gates have current evidence.
 

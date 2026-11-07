@@ -205,20 +205,24 @@ test('Node.js 24.22.1 is the branch runtime baseline', () => {
 });
 
 
-test('eligible screenshot acceptance uses OCR.Space PDF-first and retains the isolated offline lifecycle test', () => {
+test('local screenshot acceptance stays offline and live multi-provider smoke is explicit', () => {
     const root = path.join(__dirname, '..');
     const acceptance = fs.readFileSync(path.join(root, 'scripts', 'accept-tesseractjs.js'), 'utf8');
     const windowsAcceptance = fs.readFileSync(path.join(root, 'scripts', 'run-windows-ocr-acceptance.ps1'), 'utf8');
     const workflow = fs.readFileSync(path.join(root, '.github', 'workflows', 'dwbot-verification.yml'), 'utf8');
 
-    assert.match(acceptance, /OCRSPACE_ENABLED:\s*'1'/);
-    assert.match(acceptance, /OCRSPACE_NETWORK_ALLOWLIST:\s*'1'/);
-    assert.match(acceptance, /OCRSPACE_ARTIFACT_DIR:\s*path\.join\(runDir/);
+    assert.match(acceptance, /DWBOT_MULTI_PROVIDER_ENABLED:\s*'0'/);
+    assert.match(acceptance, /OCRSPACE_ENABLED:\s*'0'/);
+    assert.match(acceptance, /OCRSPACE_NETWORK_ALLOWLIST:\s*'0'/);
+    assert.match(acceptance, /AZURE_DOCUMENT_INTELLIGENCE_ENABLED:\s*'0'/);
+    assert.match(acceptance, /additional-sixteen-images-sequential-local/);
+    assert.doesNotMatch(acceptance, /ocrspace-pdf-first|OCRSPACE_ARTIFACT_DIR/);
     assert.match(acceptance, /isolated-asashio-stall-recovery-lifecycle[\s\S]*?OCRSPACE_ENABLED:\s*'0'[\s\S]*?OCRSPACE_NETWORK_ALLOWLIST:\s*'0'/);
-    assert.match(windowsAcceptance, /OCRSPACE_ENABLED='1'/);
-    assert.match(windowsAcceptance, /OCRSPACE_NETWORK_ALLOWLIST='1'/);
+    assert.match(windowsAcceptance, /OCRSPACE_ENABLED\s*=\s*'0'/);
+    assert.match(windowsAcceptance, /AZURE_DOCUMENT_INTELLIGENCE_ENABLED\s*=\s*'0'/);
+    assert.match(workflow, /DWBOT_MULTI_PROVIDER_ENABLED:\s*'1'/);
     assert.match(workflow, /OCRSPACE_ENABLED:\s*'1'/);
-    assert.match(workflow, /OCRSPACE_NETWORK_ALLOWLIST:\s*'1'/);
+    assert.match(workflow, /AZURE_DOCUMENT_INTELLIGENCE_ENABLED:\s*'1'/);
 });
 
 
