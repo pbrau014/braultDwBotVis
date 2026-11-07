@@ -109,7 +109,7 @@ function buildAzureFieldEvidence(lines, { sourceSha256 = null, sourceWidth = nul
         if (/^(?:victory|defeat)$/i.test(text)) {
             evidence.push(lineEvidence(line, 'result', sourceSha256, sourceWidth, sourceHeight));
         }
-        if (MODE_PATTERN.test(text) || /battle\\s*start\\s*time/i.test(text)) {
+        if (MODE_PATTERN.test(text) || /battle\s*start\s*time/i.test(text)) {
             const combined = MODE_PATTERN.test(text) && lineIndex > 0
                 ? mergeMetadataNeighbor({ ...sourceLines[lineIndex - 1], lineIndex: lineIndex - 1 }, line)
                 : null;
