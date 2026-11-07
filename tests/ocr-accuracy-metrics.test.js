@@ -89,7 +89,8 @@ test('accuracy report measures source-region correctness only when labelled regi
                 azureReconciliation: {
                     fields: {
                         xp: { remoteCandidates: [{
-                            geometryValid: true, originalCoordinateGeometryValid: true, coordinateSpace: 'original-screenshot-pixels', pageIndex: 0,
+                            geometryValid: true, originalCoordinateGeometryValid: true, coordinateSpace: 'original-screenshot-pixels',
+                            originalScreenshotSha256: 'region-image', pageIndex: 0,
                             polygon: [10,10,30,10,30,20,10,20],
                         }] },
                     },
