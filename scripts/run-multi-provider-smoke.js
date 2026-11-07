@@ -138,6 +138,8 @@ async function main() {
             acceptedByCurrentApplicationValidator: validation.accepted,
             missingFields: (validation.missing || []).map(item => ({ key: item.key, label: item.label, reason: item.reason })),
             remoteReconciliation: validation.multiProviderReconciliation || null,
+            ocrSpaceReconciliation: validation.ocrSpaceReconciliation || null,
+            azureReconciliation: validation.azureReconciliation || null,
             localReaderReconciliation: validation.localReaderReconciliation || null,
             unresolvedFields: validation.unresolvedFields || [],
             checks: validation.checks || [],
