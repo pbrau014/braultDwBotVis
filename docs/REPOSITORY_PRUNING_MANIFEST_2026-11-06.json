@@ -2400,5 +2400,6 @@
   "restoredBytes": 255262,
   "currentlyRemovedFileCount": 376,
   "currentlyRemovedBytes": 93539142,
-  "followUpCorrection": "The initial cleanup removed several files still required by retained desktop/UI and diagnostic tests. Those nine files were restored from the exact pre-prune commit listed above. The Windows acceptance wrapper is being rewritten to current local/offline defaults; old Gate A matrix and OCR.Space PDF text-layer tools remain optional diagnostics only, not prerequisites. The current net removal is recorded separately from the initial prune count."
+  "followUpCorrection": "The initial cleanup removed several files still required by retained desktop/UI and diagnostic tests. Those nine files were restored from the exact pre-prune commit listed above. The Windows acceptance wrapper has now been rewritten with local/offline defaults; the old Gate A matrix and OCR.Space PDF text-layer tools remain optional diagnostics only, not prerequisites. The current net removal is 376 files (93,539,142 bytes), recorded separately from the initial prune count.",
+  "removedFilesScope": "Initial prune inventory at the first cleanup commit; entries subsequently restored are listed in restoredAfterInitialPrune. currentlyRemovedFileCount/currentlyRemovedBytes record the net removals after those restorations."
 }

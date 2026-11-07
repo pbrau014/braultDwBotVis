@@ -71,7 +71,7 @@ The report includes per-field exact match, full nine-field exact records, wrong 
 
 ## Useful commands
 
-For Windows local/offline acceptance, run `powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\run-windows-ocr-acceptance.ps1`. It runs persistence recovery and the full test suite with online providers explicitly disabled. Add `-RunLiveMultiProviderSmoke` only when you intentionally want to send the designated single development screenshot to both configured providers; the smoke remains separate from corpus accuracy tests.
+For Windows local/offline acceptance, run `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run-windows-ocr-acceptance.ps1`. It runs persistence recovery and the full test suite with online providers explicitly disabled. Add `-RunLiveMultiProviderSmoke` only when you intentionally want to send the designated single development screenshot to both configured providers; the smoke remains separate from corpus accuracy tests.
 
 ```powershell
 npm ci
