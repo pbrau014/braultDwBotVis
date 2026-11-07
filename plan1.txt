@@ -1,3 +1,127 @@
+LATEST PR #21 CONTRACT TEST UPDATE — 2026-11-07
+- Exact-head run 42320045285 completed SUCCESS on PR #21. All 10/10 Gate A workflow/recovery contract tests passed, including deterministic source-build fingerprint calculation and fail-closed rejection of a non-RC3 source tree. The read-only branch/tag survey again examined 24 refs and found no match for the recorded 89-file fingerprint. The actual Gate A job was SKIPPED on the pull_request event; no OCR/provider execution occurred.
+- This is a CI contract-test pass only. It does not validate the RC3 archive, Windows OCR, Gate A image acceptance, network restriction, or Gate B.
+
+Gate A remains BLOCKED on recovering/verifying the exact candidate source; Gate B remains BLOCKED on independent labels and original-image verification. Production remains NO-GO.
+================================================================================
+END LATEST PR #21 CONTRACT TEST UPDATE
+================================================================================
+
+LATEST SOURCE IDENTITY SEARCH RESULT — 2026-11-07 (UTC)
+- PR #21 source-survey CI run 42319770443 completed SUCCESS. It examined 24 GitHub repository branch/tag refs. None matched the recorded 2026-10-28 sourceBuild fingerprint 43f1e8b877d7f5832bca3ff070f8ae8164deb7c68da233694c64bece70b99166 over 89 files. The PR contract suite passed 9/9; the Gate A execution job was skipped. No OCR/provider activity occurred.
+- The accessible Library's named RC3 archive reference is DWBOT_RC3_CURRENT_SOURCE.zip with recorded SHA-256 c02f5bee9bf5a2b02294736c4ddf4dc520fe3841e264562c6fa9398b3f4e9fb5 in an older governing plan; that exact archive is not present in the current Library ZIP listing or current conversation file list. The accessible DWBOT_.zip (175,126,438 bytes) is a different/ambiguous name and must not be assumed to be the RC3 archive.
+- The older RC3 plan also records a separate 50-file RC3 work-copy fingerprint 1dd915e1a457a51eca5c2ca1c039697647643a274d6107cacb831e1ca81183ab. The Nov 5 XP-repair candidate and OCR.Space milestone plans record still other source-build fingerprints (78def... / 8c8b...). These are separate historical source identities; do not silently equate them with the 2026-10-28 89-file acceptance fingerprint.
+- The current GitHub main/branch survey fingerprints do not match the recorded 89-file candidate. PR #21's recovery helper and workflow are fail-closed on that mismatch. Gate A must remain blocked until the exact source candidate corresponding to the active acceptance fingerprint is recovered and verified, or the user explicitly selects a different authoritative source identity after reviewing the provenance conflict.
+- No source archive was extracted or substituted to work around the Data Analysis ZIP-inspection limit. Original files and all historical run evidence remain unchanged.
+
+CURRENT INDEPENDENT PROGRESS:
+- PR #19 run 42319588371: 15/15 tests pass; read-only audit confirms 21/63 complete eligible records, 42 partial, 29 short of Gate B minimum. The generated 164-row blank field-level label review template is available in artifact 13551889075 (8,414 bytes; SHA-256 6e708149c30c64521c620bdd7423942fd9239abd751f31d653761d02966a64ce). It contains no expected values and infers none.
+- PR #21 run 42319770443: 9/9 contract tests pass; branch survey completed; execution job skipped. No manual dispatch has been made.
+- PR #20 scanner run 42317050142: 3/3 tests pass; current tree clean; two historical findings remain and credential-owner revocation is outstanding.
+
+Gate A: BLOCKED ON AUTHORITATIVE SOURCE IDENTITY; NOT PASSED.
+Gate B: BLOCKED ON INDEPENDENT LABEL COMPLETION / IMAGE-LEVEL VERIFICATION; NOT PASSED.
+Production: NO-GO.
+================================================================================
+END LATEST SOURCE IDENTITY SEARCH RESULT
+================================================================================
+
+LATEST IMPLEMENTATION / CI UPDATE — 2026-11-07 (UTC)
+- PR #19 CI run 42319588371 completed SUCCESS. All 15 policy, identity, source-hash-scope, and review-template tests passed. The current v6 inventory remains 63 total / 21 eligible / 42 partial / 29 short of the 50-image minimum; selected Gate B images = 0; gateBPass = false.
+- The audit now checks filename, source hash metadata, corpus order, and Gate A/regression overlap across every row, including partial-label rows. This prevents an incomplete row from hiding a duplicate or overlap.
+- The workflow generated a 164-row field-level CSV review template for the 42 incomplete records. It contains filenames, image hashes, field names/statuses, and blank reviewer/value/provenance fields; it copies no expected values and infers none. Artifact ID 13551889075; size 8,414 bytes; artifact digest SHA-256 6e708149c30c64521c620bdd7423942fd9239abd751f31d653761d02966a64ce. The report and template were generated with OCR.Space disabled and no OCR/provider calls.
+- PR #21 source identity was tested. Pinned commit adaf4f8c3a9573f56d0348a4bba36686fc31c22e fingerprints to SHA-256 1414215fa0edfe937da7498372db2cea0244897559b8548278a5ac6e05109e2c, 113 files; the recorded RC3 fingerprint remains 43f1e8b877d7f5832bca3ff070f8ae8164deb7c68da233694c64bece70b99166, 89 files. They do not match. The fingerprint guard failed before any local OCR or provider step. Do not dispatch Gate A on adaf.
+- The previously referenced run 42160979140 is confirmed as workflow "DWBOT imagesF 63 exploratory OCR.Space" with a 63-image exploratory artifact, not Gate B acceptance. The workflow now explicitly says so and calls it a source-anchor run, not a Gate B pass.
+- PR #21's recovery helper now enforces the recorded RC3 sourceBuild fingerprint and 89-file count before touching recovery artifacts. A read-only CI survey of all repository branches/tags for that exact fingerprint is queued in run 42319770443. If no Git ref matches, the RC3 source must be recovered from its authoritative package/archive before any Gate A run.
+- PR #21's local-only manual dispatch remains unexecuted. The only observed run with the source check failed closed before OCR. No Gate A acceptance or Gate B pass is claimed.
+- PR #20 scanner run 42317050142: 3/3 tests passed; current tracked tree 0 matches; two historical commit/path findings; workflow exits nonzero on findings by design. Credential revocation remains an owner action.
+
+Gate A: NOT PASSED. Gate B: NOT PASSED. Production: NO-GO.
+================================================================================
+END LATEST IMPLEMENTATION / CI UPDATE
+================================================================================
+
+LATEST CROSS-SOURCE GATE B INVENTORY RECONCILIATION — 2026-11-07
+Status: VERIFIED LIBRARY DISCOVERY / SOURCE-LINEAGE CONFLICT PRESERVED / NOT A GATE PASS.
+
+A separate Library manifest, DWBOT_IMAGESF_HOLDOUT_CANDIDATE_MANIFEST.json, references a supplied 56-image review workbook and reports 46 populated image rows, 36 complete nine-field rows, 10 partial rows, and 10 eligible candidate images without a workbook row. The same manifest explicitly qualifies its JSON as an integrity inventory, not full expected-value ground truth, and says missing values were not inferred. The referenced workbook dwbot_56_image_ground_truth_review(3).xlsx was not found in the Library or current conversation. The accessible Library spreadsheet listing contains only the 63-image consolidated/working v5/v6 workbooks, not that 56-image workbook. Therefore the 36 count is a manifest-reported lead, not verified eligible Gate B labels, and must not be added to the current 21 count.
+
+The accessible DWBOT_IMAGESF_63_ground_truth_working_v6.xlsx and repository JSON testdata/ground-truth/imagesF-63-working-ground-truth-v6.json are a distinct 63-image working inventory: 21 complete eligible nine-field records and 42 partial records. The v6 workbook's Read Me identifies its own source and qualifications, preserves the four text-source audit, and reports the original imagesF.zip archive hash plus prior 63/63 candidate-image hash verification. This does not reconcile the missing 56-image workbook or establish that its 36 labels are present in the v6 JSON.
+
+Consequences:
+- Keep PR #19's current 21/63 result as the only count directly reproduced by its current repository JSON and CI audit.
+- Treat 36/56 as an unverified alternate inventory claim until the exact workbook is recovered and reconciled by filename, image hash, all nine values, source-line provenance, and reviewer history.
+- If all 36 are ultimately eligible, the shortfall to the 50 minimum would be 14; do not report that as the current verified shortfall. Under the current v6 JSON, the verified shortfall remains 29.
+- The 10 candidate images with no workbook row are not labelled and cannot count. The 10 partial rows also cannot count until all nine values are independently established.
+- No values may be inferred from OCR, from the other workbook, or from the unlabelled aggregate OCR dump. Preserve source and derivative identities.
+
+NEW CI / IMPLEMENTATION EVIDENCE:
+- PR #19 run 42317599533 completed successfully: all 10 then-current policy tests passed and the read-only inventory report reproduced 63 total / 21 eligible / 29 shortfall / 42 review-queue records. This is an inventory-tool CI pass only, not Gate B acceptance.
+- PR #19 now has an additional test and report field explicitly stating that its per-record SHA-256/byte/dimension checks validate metadata only and do not rehash original source-image bytes. That new test awaits CI.
+- PR #20 run 42317050142: all 3 scanner tests passed; current tracked tree had zero webhook URL matches; two historical commit/path findings were emitted without secret values. The scan exits 2 on findings, so the workflow conclusion is failure by design pending credential-owner revocation/history disposition.
+- PR #21 now includes a pull_request-only Ubuntu contract-test job for tests/gateA-resume.test.js. CI execution is not yet observed. The Windows local-only dispatch still pins Gate B source SHA adaf4f8c3a9573f56d0348a4bba36686fc31c22e and run 42160979140; reconcile that fingerprint against the required RC3 candidate before any manual recovery dispatch. Do not run a stale-source recovery.
+
+Gate A: NOT PASSED. Gate B: NOT PASSED. Production: NO-GO.
+================================================================================
+END CROSS-SOURCE GATE B INVENTORY RECONCILIATION
+================================================================================
+
+LATEST GATE A/B RUN RECONCILIATION — 2026-11-07
+Status: CURRENT / EVIDENCE-BASED / SUPERSEDES EARLIER "RUNNING" DESCRIPTIONS BELOW.
+
+Repository main remains at 668335ace6a31121ac8640de09d7bbeea9dbbb85. No PR from this continuation has been merged.
+
+GATE A:
+- Run 42249978731 failed. The 16-image preflight passed, but the historical first-image local recovery did not produce an exact nine-field record. No remaining provider requests were made.
+- Run 42255893851 failed before local OCR because Windows parsed absolute NODE_OPTIONS preload paths incorrectly ("Cannot find module 'D:...source/scripts/block-network.js'"). No provider requests were made.
+- Current main subsequently corrected the child preload paths to be relative to the child working directory (commits 74a018d8c43060d6767b682669dca71f1fb54407 and 3871c49cf001bc2183fa01105be1d98165f3070f). No post-fix Gate A local-only run is yet recorded.
+- The original partial Gate A run's restricted-egress diagnostic log remains missing. Even a successful local first-image recovery must stop at BLOCKED_MISSING_ORIGINAL_NETWORK_LOG. No remaining paid provider requests are authorized.
+
+GATE B / NO-PROVIDER RECOVERY:
+- Run 42268159303 completed with failure; artifact 13530943226 was uploaded (280,514 bytes; SHA-256 7883e48d7f206d2e2ba65d55d9b22a61c89b230454394825950a0328f8521cb1).
+- Local recovery processed 21 images with 0 provider requests and 0 blocked network attempts.
+- The 19-image artifact verifier reported source hashes PASS, PDF integrity PASS, searchable PDF text layer PASS, raster integrity PASS, PDF-derived raster provenance PASS, but localReaders FAIL, original network restriction NOT_VERIFIED_MISSING_ORIGINAL_LOG, Gate A evidence FAIL, and overall verification FAILED (PDF/raster 19/19; full 0/19). Secret scan reported PASS.
+- The 19-image post-hoc diagnostic reported Tesseract.js 110/171 exact fields (64.33%), 2 wrong, 59 unresolved, and 2/19 exact complete records (10.53%). Native Tesseract reported 103/171 exact fields (60.23%), 2 wrong, 66 unresolved, and 0/19 exact complete records.
+- The separate 21-image diagnostic reported Tesseract.js 123/189 exact fields (65.08%), 2 wrong, 64 unresolved, and 2/21 exact complete records (9.52%). Native Tesseract reported 116/189 exact fields (61.38%), 2 wrong, 71 unresolved, and 0/21 exact complete records.
+- These metrics are diagnostics only; they do not pass Gate A or Gate B. The old 19/21 selection is superseded by the current 50-image minimum.
+- The read-only label audit identifies 42 incomplete records. Missing-field counts are player 39, map 39, mode 37, battleStart 41, freeXp 4, credits 2, damage 1, and xp 1 (counts overlap across records). A derived filename/hash/missing-field worklist is proposed in PR #19 at docs/continuation/GATE_B_LABEL_REVIEW_WORKLIST_2026-11-07.md.
+- The current 63-image corpus cannot reach the preferred 100-image target by itself; at least 37 additional independent holdout images are needed even if all 63 existing records become eligible.
+
+CURRENT IMPLEMENTATION BRANCHES / DRAFT PRs:
+- PR #17: current Gate B 50 minimum / 100 preferred policy overlay and updates to both living plan files.
+- PR #18: current webhook-file status addendum; owner-side revocation remains unverified.
+- PR #19: read-only Gate B inventory preflight; current ground truth has 21 eligible images, shortfall 29.
+- PR #20: redacted Discord webhook current-tree/history scanner.
+- PR #21: manual Gate A dispatch restricted to LOCAL-ONLY-RECOVERY; no provider path is exposed.
+- All remain draft/open. No automated status checks were returned by the repository status endpoint at this review. Tests are authored but must not be described as executed or passed until CI evidence appears.
+
+PROHIBITED / UNCHANGED:
+- No OCR.Space submissions or duplicate provider requests.
+- No modification of historical source images, PDFs, rasters, ground-truth labels, manifests, reports, or logs.
+- Gate A: NOT PASSED. Gate B: NOT PASSED. Production: NO-GO.
+
+================================================================================
+END LATEST GATE A/B RUN RECONCILIATION
+================================================================================
+
+CURRENT GOVERNING GATE B POLICY — 2026-11-07
+Status: USER-DIRECTED / CURRENT / SUPERSEDES ALL 19- AND 21-IMAGE GATE B RULES BELOW.
+
+- Gate B requires at least 50 distinct holdout screenshots, each with independent, complete, eligible expected values for all nine mandatory fields. The preferred target is 100.
+- The nine fields remain ordered: result, player, map, mode, battleStart, credits, freeXp, damage, xp.
+- Existing 19-image and 21-image inventories, reports, artifact checks and metrics are historical/diagnostic only. They cannot produce a Gate B PASS under this policy.
+- The current v6 reference lists 63 source images but only 21 currently have complete eligible nine-field manual-transcription labels. The current shortfall is 29 to the minimum and 79 to the preferred target. Do not infer or fill the missing labels.
+- Preserve the declared manual-transcription source and source-line provenance. The current reference does not document a separate blind second reviewer; do not claim double-blind or certified annotation.
+- Gate A remains NOT PASSED. Gate B remains NOT PASSED. Production remains NO-GO.
+- No OCR.Space request or duplicate provider submission is authorized by this policy block. Do not repeat an existing request or modify historical Gate A/B evidence.
+- Gate B acceptance remains fail-closed: Gate A must first pass on the locked matching candidate; every selected source/PDF/raster must verify; all required readers must resolve all nine fields; zero wrong accepted mandatory values; zero unresolved mandatory outputs; zero unauthorized network attempts; and all required security checks must pass.
+- Preserve the XP regression: accept exact XP 6646; reject 66465.
+- The read-only policy implementation and audit code are being developed on isolated pull requests. No pull request is merged and no historical gate result is upgraded by this block.
+
+================================================================================
+END CURRENT GOVERNING GATE B POLICY
+================================================================================
+
 ================================================================================
 CURRENT GATE B HOLDOUT REQUIREMENT — 2026-11-06
 ================================================================================
