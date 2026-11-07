@@ -49,6 +49,22 @@ test('conflicting independent local reader prevents acceptance of a complete rec
     assert.equal(validation.checks.find(item => item.label === 'Map').passed, false);
 });
 
+test('local reader evidence from different source bytes is not used as corroboration', () => {
+    const validation = validateWorldOfWarshipsScreenshot({ text: 'Victory', confidence: 99 }, completeFields({
+        parallelLocalReaders: {
+            status: 'complete', sourceSha256: 'original-hash',
+            readers: {
+                nativeTesseract: {
+                    status: 'success', sourceSha256: 'different-image-hash',
+                    output: { record: { map: 'Faulty Fjord' } },
+                },
+            },
+        },
+    }));
+    assert.equal(validation.accepted, true);
+    assert.equal(validation.localReaderReconciliation.readers.nativeTesseract.status, 'source_mismatch');
+});
+
 test('remote provider disagreement is retained as unresolved rather than overridden by local completeness', () => {
     const validation = validateWorldOfWarshipsScreenshot({ text: 'Victory', confidence: 99 }, completeFields({
         ocrSpaceEvidence: {
