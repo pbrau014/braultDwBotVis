@@ -13,7 +13,14 @@ const REQUIRED_FIELDS = Object.freeze([
 const MINIMUM_IMAGES = 50;
 const PREFERRED_IMAGES = 100;
 const COMPLETE_STATUS = 'COMPLETE_9_FIELD_TRANSCRIPTION';
-const MISSING_EXPECTED = new Set(['', 'none', 'null', 'n/a', 'not applicable', 'not detected', 'not_detected', 'unknown']);
+const MISSING_EXPECTED = new Set(['', 'none', 'null', 'n/a', 'not applicable', 'not detected', 'not_detected', 'unknown', 'illegible', 'unreadable', 'uncertain', 'missing', 'absent']);
+const ELIGIBLE_LABEL_STATUSES = new Set([
+  'COMPLETE_MANUAL_TRANSCRIPTION_SOURCE',
+  'LOW_RES_MANUAL_TRANSCRIPTION_SOURCE',
+  'VISUALLY_CONFIRMED',
+  'VISUALLY_CONFIRMED_LOW_RES',
+  'IMAGE_VERIFIED_WITH_PREMIUM_FINAL_VALUE',
+]);
 
 function sha256(bytes) {
   return crypto.createHash('sha256').update(bytes).digest('hex');
@@ -38,6 +45,7 @@ function recordHasEligibleNineFieldLabel(record, fields = REQUIRED_FIELDS) {
   if (!record || record.recordStatus !== COMPLETE_STATUS) return false;
   return fields.every(field =>
     record.fieldStatus?.[field]?.eligible_for_exact_match === true
+    && ELIGIBLE_LABEL_STATUSES.has(record.fieldStatus?.[field]?.status)
     && hasExpectedValue(record.expected?.[field]));
 }
 
@@ -264,6 +272,7 @@ if (require.main === module) {
 
 module.exports = {
   REQUIRED_FIELDS,
+  ELIGIBLE_LABEL_STATUSES,
   MINIMUM_IMAGES,
   PREFERRED_IMAGES,
   auditGateBInventory,
