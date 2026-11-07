@@ -540,6 +540,25 @@ function applyCorrections(record, content) {
     return { record: next, recognized: Object.keys(parsed.values).length, invalid: parsed.invalid };
 }
 
+function applyReviewCorrection(record, reviewFields, content) {
+    const fields = Array.isArray(reviewFields) ? reviewFields : [];
+    if (!fields.length) return { record, reviewFields: [], activeField: null, accepted: true, invalid: [] };
+    const activeField = fields[0];
+    const applied = applyCorrections(record, `${activeField.label}: ${content}`);
+    const stillMissing = getMissingRequiredFields(applied.record).some(field => field.key === activeField.key);
+    const invalid = applied.invalid.some(issue => issue.key === activeField.key);
+    if (stillMissing || invalid) {
+        return { record: applied.record, reviewFields: fields, activeField, accepted: false, invalid: applied.invalid };
+    }
+    return {
+        record: applied.record,
+        reviewFields: fields.slice(1),
+        activeField,
+        accepted: true,
+        invalid: applied.invalid,
+    };
+}
+
 function formatBattleRecord(record) {
     const valueOf = (key) => {
         const value = String(record[key] || NOT_DETECTED).trim();
@@ -715,6 +734,7 @@ module.exports = {
     buildBattleRecord,
     getMissingRequiredFields,
     applyCorrections,
+    applyReviewCorrection,
     formatBattleRecord,
     makeTournamentExport,
     parseTierFromShip,
