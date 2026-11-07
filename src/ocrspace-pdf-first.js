@@ -62,10 +62,10 @@ async function downloadSearchablePdf(url, { fetchImpl = globalThis.fetch, timeou
 }
 
 /**
- * OCR.Space Engine 2 is the first OCR operation because the provider's current
- * engine matrix marks searchable-PDF output unsupported for Engine 3.
- * Tesseract/Paddle readers must consume the rasterized PDF page returned here,
- * never the original source image when this stage is configured.
+ * OCR.Space Engine 2 produces a searchable-PDF derivative from the original
+ * screenshot. The PDF/raster is retained as separate evidence; Azure and every
+ * local reader must still receive the same original screenshot bytes. Never
+ * substitute this derivative for the original source identity.
  */
 async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png', env = process.env,
     fetchImpl = globalThis.fetch, client = recognizeCrop, quotaLedger = null,
