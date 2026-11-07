@@ -85,3 +85,21 @@ test('disabled or failed provider evidence produces no remote candidates', () =>
     assert.equal(result.fields.xp.status, 'no_remote_candidate');
     assert.equal(result.fields.player.status, 'excluded_by_privacy_policy');
 });
+
+test('field reconciliation retains provider geometry and original/provider input identities', () => {
+    const result = reconcileOcrSpaceEvidence({
+        status: 'complete', originalScreenshotSha256: 'original-hash', providerInputSha256: 'upload-hash',
+        evidence: [{
+            field: 'xp', source: 'azure-document-intelligence-line', status: 'success', text: 'XP 6646',
+            pageIndex: 0, pageNumber: 1, polygon: [1,2,20,2,20,10,1,10], geometryValid: true,
+            pageWidth: 100, pageHeight: 80, pageUnit: 'pixel',
+            words: [{ text: '6646', confidence: 0.9, polygon: [2,3,10,3,10,8,2,8] }],
+            confidenceValues: [0.9], originalScreenshotSha256: 'original-hash', providerInputSha256: 'upload-hash',
+        }],
+    }, localRecord);
+    const candidate = result.fields.xp.remoteCandidates[0];
+    assert.equal(candidate.geometryValid, true);
+    assert.deepEqual(candidate.polygon, [1,2,20,2,20,10,1,10]);
+    assert.equal(candidate.originalScreenshotSha256, 'original-hash');
+    assert.equal(candidate.providerInputSha256, 'upload-hash');
+});
