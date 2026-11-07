@@ -27,6 +27,7 @@ test('Azure endpoint and operation URL are constrained to the configured HTTPS r
 test('Azure Read client posts original image bytes and preserves line and word geometry', async () => {
     const image = png();
     const calls = [];
+    const requestSlots = [];
     let poll = 0;
     const fetchImpl = async (url, options) => {
         calls.push({ url: String(url), method: options.method, body: options.body });
@@ -44,7 +45,7 @@ test('Azure Read client posts original image bytes and preserves line and word g
         return { status: 200, ok: true, redirected: false, headers: { get: () => String(bytes.length) },
             body: new ReadableStream({ start(controller) { controller.enqueue(bytes); controller.close(); } }) };
     };
-    const result = await recognizeImage({ imageBuffer: image, endpoint: 'https://dwbot.cognitiveservices.azure.com', apiKey: 'not-a-real-key', fetchImpl, pollIntervalMs: 1000 });
+    const result = await recognizeImage({ imageBuffer: image, endpoint: 'https://dwbot.cognitiveservices.azure.com', apiKey: 'not-a-real-key', fetchImpl, pollIntervalMs: 1000, beforeRequest: async details => { requestSlots.push(details.method); return { waitMs: 0 }; } });
     assert.equal(result.status, 'success');
     assert.equal(result.text, 'Victory\\nDamage 123');
     assert.equal(result.lines[0].words[0].confidence, 0.98);
@@ -52,6 +53,8 @@ test('Azure Read client posts original image bytes and preserves line and word g
     assert.equal(result.apiVersion, API_VERSION);
     assert.equal(result.model, MODEL_ID);
     assert.equal(poll, 1);
+    assert.equal(result.httpRequestCount, 2);
+    assert.deepEqual(requestSlots, ['POST', 'GET']);
 });
 
 test('Azure Read rejects over-limit images and invalid endpoints before network access', async () => {
@@ -79,6 +82,20 @@ test('Azure monthly quota ledger reserves within a hard sub-free-tier ceiling an
     assert.equal(monthKey('2026-11-06'), '2026-11');
     await fs.writeFile(path.join(dir, 'quota.json'), '{broken');
     await assert.rejects(() => ledger.reserve({ pages: 1, now: new Date('2026-11-06T00:00:00Z') }), { code: 'AZURE_OCR_QUOTA_LEDGER_CORRUPT' });
+});
+
+test('Azure F0 request slots serialize concurrent callers at a conservative 1.5-second interval', async t => {
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'dwbot-azure-rate-'));
+    t.after(() => fs.rm(dir, { recursive: true, force: true }));
+    const { MIN_REQUEST_INTERVAL_MS } = require('../src/azure-document-intelligence-quota-ledger');
+    const ledger = new AzureDocumentIntelligenceQuotaLedger({ filePath: path.join(dir, 'quota.json') });
+    const slots = await Promise.all([
+        ledger.reserveRequestSlot({ now: 10000 }),
+        ledger.reserveRequestSlot({ now: 10000 }),
+        ledger.reserveRequestSlot({ now: 10000 }),
+    ]);
+    assert.equal(MIN_REQUEST_INTERVAL_MS, 1500);
+    assert.deepEqual(slots.map(slot => slot.waitMs).sort((a, b) => a - b), [0, 1500, 3000]);
 });
 
 test('multi-provider activation requires explicit run and provider flags plus both credentials', () => {

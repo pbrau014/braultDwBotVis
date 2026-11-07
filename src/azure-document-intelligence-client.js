@@ -128,7 +128,6 @@ async function recognizeImage({
     };
     const timer = setTimeout(() => controller.abort(), Math.max(5000, Math.min(90000, Number(timeoutMs) || 45000)));
     try {
-        if (typeof onRequestStarted === 'function') await onRequestStarted({ provider: 'azure-document-intelligence', model: MODEL_ID, apiVersion: API_VERSION, sourceSha256, inputBytes: imageBuffer.length });
         const response = await request(analyzeUrl, {
             method: 'POST',
             headers: { 'Ocp-Apim-Subscription-Key': key, 'Content-Type': mimeType },

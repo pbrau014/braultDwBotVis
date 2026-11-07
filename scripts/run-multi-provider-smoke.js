@@ -30,6 +30,7 @@ async function main() {
             provider: value.provider || key,
             status: value.status,
             requestCount: value.requestCount ?? value.requests ?? 0,
+            httpRequestCount: value.httpRequestCount || 0,
             model: value.model || null,
             apiVersion: value.apiVersion || null,
             engine: value.engine || null,

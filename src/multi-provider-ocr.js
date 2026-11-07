@@ -90,10 +90,11 @@ async function runMultiProviderOcr({
                 apiKey: env.AZURE_DOCUMENT_INTELLIGENCE_KEY, fetchImpl,
                 timeoutMs: env.AZURE_DOCUMENT_INTELLIGENCE_TIMEOUT_MS,
                 onRequestStarted: async details => { requestStarted = true; await onProviderRequestStarted?.(details); },
+                beforeRequest: () => ledger.reserveRequestSlot(),
             });
             providerState.azure = { ...value, requestCount: 1 };
         })().catch(error => {
-            providerState.azure = { provider: 'azure-document-intelligence', status: 'failed', sourceSha256, requestCount: requestStarted ? 1 : 0, errorCode: error.code || 'AZURE_OCR_ERROR', error: String(error.message || error).slice(0, 300) };
+            providerState.azure = { provider: 'azure-document-intelligence', status: 'failed', sourceSha256, requestCount: requestStarted ? 1 : 0, httpRequestCount: Number(error.httpRequestCount) || 0, errorCode: error.code || 'AZURE_OCR_ERROR', error: String(error.message || error).slice(0, 300) };
         }));
     } else {
         providerState.azure = { provider: 'azure-document-intelligence', status: 'blocked', sourceSha256, requestCount: 0, reason: activation.providers.azure.reason };
