@@ -99,10 +99,15 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
     const uploadSha256 = crypto.createHash('sha256').update(upload.buffer).digest('hex');
     let requestCount = 0;
     const providerFetch = async (url, options = {}) => {
+        let safeUrl = '[invalid-url]';
+        try {
+            const parsedUrl = new URL(String(url));
+            safeUrl = parsedUrl.origin + parsedUrl.pathname;
+        } catch {}
         const details = {
             provider: 'ocr.space', engine: 2,
             method: String(options.method || 'GET').toUpperCase(),
-            url: String(url), requestIndex: requestCount + 1,
+            url: safeUrl, requestIndex: requestCount + 1,
             sourceSha256, originalScreenshotSha256: sourceSha256,
             uploadSha256, providerInputSha256: uploadSha256,
             uploadBytes: upload.buffer.length,
