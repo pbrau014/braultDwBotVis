@@ -11,6 +11,12 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/dwbot-gateA-16-pdf-first.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/dwbot-gateA-16-pdf-first.yml'
+      - 'tests/gateA-resume.test.js'
+      - 'scripts/prepare-gateA-16-resume.js'
   workflow_dispatch:
     inputs:
       mode:
@@ -34,6 +40,25 @@ env:
   GATEB_SOURCE_RUN_ID: '42160979140'
 
 jobs:
+  gate-a-workflow-contract:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Check out exact pull request revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js 22.16.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22.16.0
+          package-manager-cache: false
+      - name: Test Gate A recovery and local-only workflow contract
+        run: node --test tests/gateA-resume.test.js
+
   gate-a:
     if: github.run_attempt == 1 && ((github.event_name == 'workflow_dispatch' && inputs.mode == 'LOCAL-ONLY-RECOVERY') || (github.event_name == 'push' && (github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME' || github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' || github.event.head_commit.message == 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY')))
     runs-on: windows-latest
