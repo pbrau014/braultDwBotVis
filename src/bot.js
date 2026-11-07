@@ -51,9 +51,11 @@ const {
 } = require('./number-parser');
 const {
     NOT_DETECTED,
+    REQUIRED_MANUAL_FIELDS,
     buildBattleRecord,
     getMissingRequiredFields,
     applyCorrections,
+    applyReviewCorrection,
     formatBattleRecord,
     makeTournamentExport,
     makeCorrectionPrompt,
@@ -3519,14 +3521,18 @@ function cleanupPendingRecords() {
     }
     return changed;
 }
-async function promptForMissingValues(message, fileName, record, missing, sourceEvidence = null) {
+async function promptForMissingValues(message, fileName, record, reviewFields, sourceEvidence = null) {
     cleanupPendingRecords();
+    const fields = Array.isArray(reviewFields) ? reviewFields.map(field => ({ ...field })) : getMissingRequiredFields(record);
     pendingRecords.set(pendingKey(message), {
         record, fileName: String(fileName || 'uploaded image'), createdAt: Date.now(),
-        uploadMessageId: message.id, sourceEvidence,
+        uploadMessageId: message.id, sourceEvidence, reviewFields: fields,
     });
     await syncPendingOcrCorrections();
-    await message.reply({ content: makeCorrectionPrompt(fileName, record, missing), allowedMentions: { repliedUser: false, parse: [] } });
+    await message.reply({
+        content: makeCorrectionPrompt(fileName, record, fields, fields[0]?.reason || ''),
+        allowedMentions: { repliedUser: false, parse: [] },
+    });
 }
 
 async function handleCorrectionMessage(message) {
@@ -3543,38 +3549,49 @@ async function handleCorrectionMessage(message) {
         return true;
     }
 
-    const beforeMissing = getMissingRequiredFields(pending.record);
-    if (!beforeMissing.length) {
+    const reviewFields = Array.isArray(pending.reviewFields)
+        ? pending.reviewFields
+        : getMissingRequiredFields(pending.record);
+    if (!reviewFields.length) {
         pendingRecords.delete(key);
         await syncPendingOcrCorrections({ archive: false });
         await postBattleRecord(message, pending.record, pending.fileName, 'Required values confirmed.', pending.sourceEvidence || null);
         return true;
     }
 
-    // Ask for one value at a time. Accept a plain value only; reject multi-field
-    // corrections so the current question is always explicit and unambiguous.
-    const activeField = beforeMissing[0];
-    if (!content || /[\r\n]/.test(content) || /^(?:battle\s*result|result|victory\/defeat|defeat\/victory|player(?:\s*name)?|map(?:\s*name)?|operation(?:\s*name)?|battle\s*mode|mode|battle\s*start\s*time|timestamp|battle\s*timestamp|start\s*time|credits|free\s*xp|freexp|free\s*experience|damage)\s*[:=]/i.test(content)) {
+    // Ask for one missing or conflicting field at a time. A conflict field can
+    // already contain a plausible value; it still requires an explicit human
+    // correction/confirmation before the record may be posted.
+    const activeField = reviewFields[0];
+    if (!content || /[\\r\\n]/.test(content) || /^(?:battle\\s*result|result|victory\\/defeat|defeat\\/victory|player(?:\\s*name)?|map(?:\\s*name)?|operation(?:\\s*name)?|battle\\s*mode|mode|battle\\s*start\\s*time|timestamp|battle\\s*timestamp|start\\s*time|credits|free\\s*xp|freexp|free\\s*experience|damage|xp)\\s*[:=]/i.test(content)) {
         await message.reply({
-            content: makeCorrectionPrompt(pending.fileName, pending.record, beforeMissing,
+            content: makeCorrectionPrompt(pending.fileName, pending.record, reviewFields,
                 'Please send one value only, without a field label or a list.'),
             allowedMentions: { repliedUser: false, parse: [] },
         });
         return true;
     }
 
-    const applied = applyCorrections(pending.record, `${activeField.label}: ${content}`);
+    const applied = applyReviewCorrection(pending.record, reviewFields, content);
     pending.record = applied.record;
-    const missing = getMissingRequiredFields(pending.record);
-    if (missing.length) {
+    pending.reviewFields = applied.reviewFields;
+    if (!applied.accepted) {
         pendingRecords.set(key, pending);
         await syncPendingOcrCorrections();
-        const currentStillMissing = missing[0].key === activeField.key;
-        const retryReason = currentStillMissing
-            ? `That value wasn't accepted. ${applied.invalid[0]?.reason || 'Please check it and try again.'}`
-            : '';
+        const reason = applied.invalid[0]?.reason || 'Please check the value and try again.';
         await message.reply({
-            content: makeCorrectionPrompt(pending.fileName, pending.record, missing, retryReason),
+            content: makeCorrectionPrompt(pending.fileName, pending.record, pending.reviewFields, reason),
+            allowedMentions: { repliedUser: false, parse: [] },
+        });
+        return true;
+    }
+
+    if (pending.reviewFields.length) {
+        pendingRecords.set(key, pending);
+        await syncPendingOcrCorrections();
+        await message.reply({
+            content: makeCorrectionPrompt(pending.fileName, pending.record, pending.reviewFields,
+                pending.reviewFields[0]?.reason || ''),
             allowedMentions: { repliedUser: false, parse: [] },
         });
         return true;
@@ -3582,7 +3599,7 @@ async function handleCorrectionMessage(message) {
 
     pendingRecords.delete(key);
     await syncPendingOcrCorrections({ archive: false });
-    await postBattleRecord(message, pending.record, pending.fileName, 'Required values confirmed.', pending.sourceEvidence || null);
+    await postBattleRecord(message, pending.record, pending.fileName, 'Required values confirmed by the user.', pending.sourceEvidence || null);
     return true;
 }
 
