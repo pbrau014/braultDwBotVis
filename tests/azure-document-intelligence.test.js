@@ -229,7 +229,7 @@ test('multi-provider activation requires explicit run and provider flags plus bo
     const env = {
         DWBOT_MULTI_PROVIDER_ENABLED: '1', OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'x',
         AZURE_DOCUMENT_INTELLIGENCE_ENABLED: '1', AZURE_DOCUMENT_INTELLIGENCE_KEY: 'y',
-        AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT: 'https://dwbot.cognitiveservices.azure.com', AZURE_DOCUMENT_INTELLIGENCE_TIER: 'F0', AZURE_DOCUMENT_INTELLIGENCE_TIER: 'F0',
+        AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT: 'https://dwbot.cognitiveservices.azure.com', AZURE_DOCUMENT_INTELLIGENCE_TIER: 'F0',
     };
     assert.equal(getMultiProviderActivation(env).enabled, true);
     assert.equal(getMultiProviderActivation({ ...env, AZURE_DOCUMENT_INTELLIGENCE_KEY: '' }).enabled, false);
