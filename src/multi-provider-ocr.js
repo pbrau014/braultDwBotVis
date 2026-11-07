@@ -81,6 +81,7 @@ async function runMultiProviderOcr({
                 rasterBytes: Number(value.rasterBytes) || null,
                 mimeType: value.mimeType || null,
                 requestCount: Number(value.requestCount ?? value.requests) || requestCount,
+                quotaReservationStatus: value.quotaReservationStatus || null,
                 httpRequestCount: Number(value.httpRequestCount ?? value.requests) || requestCount,
                 elapsedMs: Number(value.elapsedMs) || null,
                 raw: value,
@@ -90,6 +91,7 @@ async function runMultiProviderOcr({
                 provider: 'ocr.space', status: 'failed', sourceSha256,
                 requestCount: Number(error.requestCount ?? error.httpRequestCount) || requestCount,
                 httpRequestCount: Number(error.httpRequestCount) || requestCount,
+                quotaReservationStatus: error.quotaReservationStatus || (requestCount ? 'submitted_or_unknown' : 'released_or_unreserved'),
                 errorCode: error.code || 'OCRSPACE_ERROR', error: String(error.message || error).slice(0, 300),
             };
         }));
