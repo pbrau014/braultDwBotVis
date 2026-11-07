@@ -55,7 +55,7 @@ async function runMultiProviderOcr({
         jobs.push((async () => {
             const value = await ocrSpaceRunner({
                 imageBuffer, filename, env, fetchImpl,
-                onProviderRequestStarted: async details => { requestStarted = true; await onProviderRequestStarted?.({ ...details, provider: 'ocr.space' }); },
+                onProviderRequestStarted: async details => { await onProviderRequestStarted?.({ ...details, provider: 'ocr.space' }); requestStarted = true; },
                 now,
             });
             if (value?.status !== 'complete') throw Object.assign(new Error(value?.reason || 'OCR.Space did not complete.'), { code: 'OCRSPACE_MULTI_PROVIDER_INCOMPLETE' });
@@ -89,7 +89,7 @@ async function runMultiProviderOcr({
                 imageBuffer, endpoint: env.AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT,
                 apiKey: env.AZURE_DOCUMENT_INTELLIGENCE_KEY, fetchImpl,
                 timeoutMs: env.AZURE_DOCUMENT_INTELLIGENCE_TIMEOUT_MS,
-                onRequestStarted: async details => { requestStarted = true; await onProviderRequestStarted?.(details); },
+                onRequestStarted: async details => { await onProviderRequestStarted?.(details); requestStarted = true; },
                 beforeRequest: () => ledger.reserveRequestSlot(),
             });
             providerState.azure = { ...value, requestCount: 1 };
