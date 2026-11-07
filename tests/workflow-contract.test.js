@@ -69,7 +69,9 @@ test('optional ship, result description, and ribbon data do not hold up a comple
 test('live bot asks for one plain correction value at a time', () => {
     const battleRecordSource = fs.readFileSync(path.join(__dirname, '..', 'src', 'battle-record.js'), 'utf8');
     assert.match(botSource, /const activeField = reviewFields\[0\]/);
-    assert.match(botSource, /`\$\{activeField\.label\}: \$\{content\}`/);
+    assert.match(botSource, /makeCorrectionPrompt\(pending\.fileName, pending\.record, reviewFields/);
+    assert.match(botSource, /applyReviewCorrection\(pending\.record, reviewFields, content\)/);
+    assert.match(botSource, /one value only, without a field label or a list/);
     assert.match(battleRecordSource, /Reply with the value only/);
     assert.doesNotMatch(botSource, /one `Field: value` per line|Correction problems:|Fields still missing:/i);
     assert.doesNotMatch(battleRecordSource, /Choose how to continue|Correction template|clearer, full, uncropped screenshot/i);
