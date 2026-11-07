@@ -228,6 +228,7 @@ async function recognizeImage({
                     inputBytes: imageBuffer.length,
                     text: parsed.text,
                     lines: parsed.lines,
+                    pages: parsed.pages,
                     pageCount: parsed.pageCount,
                     pollCount: polls,
                     httpRequestCount,
