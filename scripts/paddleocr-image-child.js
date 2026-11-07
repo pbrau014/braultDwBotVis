@@ -1,6 +1,6 @@
 'use strict';
 
-// Independent local PaddleOCR reader. Input is only a verified PDF-derived raster.
+// Independent local PaddleOCR reader. Input is the original screenshot bytes supplied by the orchestrator.
 process.env.OCRSPACE_ENABLED = '0';
 process.env.OCRSPACE_NETWORK_ALLOWLIST = '0';
 process.env.OCR_NON_OCR_NETWORK_RESTRICTED = '1';
@@ -25,7 +25,7 @@ async function main() {
     const chunks = []; let total = 0;
     for await (const chunk of process.stdin) {
         total += chunk.length;
-        if (total > 80_000_000) throw new Error('PaddleOCR raster exceeds 80 MB.');
+        if (total > 80_000_000) throw new Error('PaddleOCR source screenshot exceeds 80 MB.');
         chunks.push(Buffer.from(chunk));
     }
     const imageBuffer = Buffer.concat(chunks);
