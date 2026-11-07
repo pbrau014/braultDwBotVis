@@ -75,7 +75,23 @@ async function main() {
                 ? readerOutput.attempts.reduce((sum, attempt) => sum + String(attempt.text || '').length, 0)
                 : null,
             rawText: Array.isArray(readerOutput.attempts)
-                ? readerOutput.attempts.map(attempt => String(attempt.text || '').slice(0, 12000))
+                ? readerOutput.attempts.slice(0, 20).map(attempt => String(attempt.text || '').slice(0, 12000))
+                : [],
+            attemptEvidence: Array.isArray(readerOutput.attempts)
+                ? readerOutput.attempts.slice(0, 20).map(attempt => ({
+                    text: String(attempt.text || '').slice(0, 12000),
+                    confidence: Number.isFinite(Number(attempt.confidence)) ? Number(attempt.confidence) : null,
+                    pageSegmentationMode: attempt.pageSegmentationMode || null,
+                    imageWidth: attempt.imageWidth || null,
+                    imageHeight: attempt.imageHeight || null,
+                    sourceCrop: attempt.sourceCrop || null,
+                    transform: attempt.transform || null,
+                    words: Array.isArray(attempt.words) ? attempt.words.slice(0, 1000).map(word => ({
+                        text: String(word.text || '').slice(0, 300),
+                        confidence: Number.isFinite(Number(word.confidence)) ? Number(word.confidence) : null,
+                        bbox: word.bbox || null,
+                    })) : [],
+                }))
                 : [],
             modelManifestSha256: readerOutput.modelManifestSha256 || null,
             errorCode: value.errorCode || null,
