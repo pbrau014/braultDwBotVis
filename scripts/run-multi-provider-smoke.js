@@ -13,6 +13,7 @@ if (process.env.OCR_NON_OCR_NETWORK_RESTRICTED === '1') {
 const bot = require('../src/bot');
 
 async function main() {
+    const runStartedAt = Date.now();
     const root = path.resolve(__dirname, '..');
     const relativeImage = String(process.env.DWBOT_MULTI_PROVIDER_IMAGE_PATH || 'fixtures/four-screenshots/asashio-defeat.jpg').trim();
     const imagePath = path.resolve(root, relativeImage);
