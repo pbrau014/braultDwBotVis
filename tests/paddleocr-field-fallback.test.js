@@ -208,3 +208,42 @@ test('PaddleOCR reward conflict is left unresolved rather than arbitrated by con
 test('PaddleOCR field fallback uses a bounded 60-second CPU inference budget', () => {
     assert.equal(fallback.__test.DEFAULT_TIMEOUT_MS, 60_000);
 });
+
+
+test('Python field-crop helper forces UTF-8 JSON output under a legacy Windows code page', async (t) => {
+    const python = process.platform === 'win32' ? 'python' : 'python3';
+    const probe = spawnSync(python, ['--version'], { encoding: 'utf8', timeout: 10000 });
+    if (probe.error || probe.status !== 0) { t.skip('Python interpreter not installed for helper encoding test'); return; }
+    const script = [
+        'import json, runpy, sys',
+        'module = runpy.run_path(sys.argv[1], run_name="paddleocr_encoding_probe")',
+        'sys.stdout.reconfigure(encoding="cp1252", errors="strict")',
+        'module["configure_stdio"]()',
+        'print(json.dumps({"text": "☆"}, ensure_ascii=False))',
+    ].join('; ');
+    const result = spawnSync(python, ['-c', script, fallback.__test.HELPER_PATH], {
+        encoding: 'utf8', timeout: 10000,
+        env: { ...process.env, PYTHONIOENCODING: 'cp1252' },
+    });
+    assert.equal(result.status, 0, result.stderr || result.error?.message);
+    assert.deepEqual(JSON.parse(result.stdout.trim()), { text: '☆' });
+});
+
+test('Node launches the local PaddleOCR helper with UTF-8 standard streams', async (t) => {
+    const python = process.platform === 'win32' ? 'python' : 'python3';
+    const probe = spawnSync(python, ['--version'], { encoding: 'utf8', timeout: 10000 });
+    if (probe.error || probe.status !== 0) { t.skip('Python interpreter not installed for helper protocol test'); return; }
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'paddle-helper-utf8-env-'));
+    const helper = path.join(dir, 'fake-helper.py');
+    try {
+        await fs.writeFile(helper,
+            "import json, os\\nprint(json.dumps({'schemaVersion':1,'status':'complete','networkAttemptCount':0,'results':[],'encoding':os.environ.get('PYTHONIOENCODING')}))\\n",
+            'utf8');
+        const output = await fallback.__test.runHelper(path.join(dir, 'unused.img'), [], {
+            python, helperPath: helper, timeoutMs: 10000,
+        });
+        assert.equal(output.encoding, 'utf-8');
+    } finally {
+        await fs.rm(dir, { recursive: true, force: true });
+    }
+});

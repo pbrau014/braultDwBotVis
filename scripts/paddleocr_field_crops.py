@@ -19,6 +19,17 @@ import sys
 import time
 from typing import Any
 
+
+def configure_stdio() -> None:
+    """Keep the JSON protocol UTF-8 even under legacy Windows console code pages."""
+    for stream_name in ('stdout', 'stderr'):
+        stream = getattr(sys, stream_name, None)
+        if stream is not None and hasattr(stream, 'reconfigure'):
+            stream.reconfigure(encoding='utf-8', errors='strict' if stream_name == 'stdout' else 'backslashreplace')
+
+
+configure_stdio()
+
 NETWORK_ATTEMPTS: list[str] = []
 
 def _blocked_network(*args: Any, **kwargs: Any) -> Any:

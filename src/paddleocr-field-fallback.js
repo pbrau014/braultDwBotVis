@@ -337,7 +337,7 @@ function runHelper(imagePath, crops, options = {}) {
     const helper = options.helperPath || HELPER_PATH;
     const timeoutMs = Math.max(500, Number(options.timeoutMs) || DEFAULT_TIMEOUT_MS);
     return new Promise((resolve, reject) => {
-        const child = spawn(python, [helper], { stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true, shell: false });
+        const child = spawn(python, [helper], { stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true, shell: false, env: { ...process.env, PYTHONIOENCODING: 'utf-8' } });
         const stdout = []; const stderr = [];
         let stdoutSize = 0; let stderrSize = 0; let finished = false;
         let timer;
