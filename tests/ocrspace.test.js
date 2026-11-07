@@ -282,18 +282,19 @@ test('crop cap parser is bounded to seven', () => {
     assert.equal(parseCropCap('99'), 7);
 });
 
-test('bot runs OCR.Space Engine 2 PDF-first before local readers and retains PDF-derived artifacts', async () => {
+test('bot starts both online providers before local OCR and retains OCR.Space PDF artifacts as derivative evidence', async () => {
     const bot = await fs.readFile(path.join(__dirname, '..', 'src', 'bot.js'), 'utf8');
-    const pdfFirst = bot.indexOf('const pdfFirst = await createOcrSpacePdfFirst');
-    const rasterHandoff = bot.indexOf('imageBuffer = rasterBuffer', pdfFirst);
+    const providerStart = bot.indexOf('multiProviderOcrPromise = runMultiProviderOcr');
+    const cv = bot.indexOf('const cvAnalysis = await opencvFieldIsolation.analyze');
     const worker = bot.indexOf('const worker = await getOcrWorker()');
-    assert.ok(pdfFirst >= 0 && rasterHandoff > pdfFirst && rasterHandoff < worker);
-    assert.ok(bot.includes('const ocrSpaceConfigured = ocrSpaceActivation.enabled'));
+    const providerJoin = bot.indexOf('multiProviderOcrEvidence = await multiProviderOcrPromise');
+    const fields = bot.indexOf('const extractedFields = {', providerJoin);
+    assert.ok(providerStart >= 0 && providerStart < cv && cv < worker);
+    assert.ok(providerJoin > worker && fields > providerJoin);
     assert.ok(bot.includes("source: 'ocrspace-searchable-pdf'"));
-    assert.ok(bot.includes('OCR.Space is the required primary text-extraction stage.'));
-    assert.ok(bot.includes('OCRSPACE_ENABLED=1'));
     assert.ok(bot.includes("const pdfPath = path.join(artifactDir, stem + '.ocrspace.pdf')"));
     assert.ok(bot.includes("const rasterPath = path.join(artifactDir, stem + '.ocrspace-page.png')"));
+    assert.ok(!bot.includes('imageBuffer = rasterBuffer'));
 });
 
 test('quota ledger serializes independent Windows/Node processes and atomically replaces the existing state', async () => {
