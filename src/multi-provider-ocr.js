@@ -81,6 +81,7 @@ async function runMultiProviderOcr({
                 rasterBytes: Number(value.rasterBytes) || null,
                 mimeType: value.mimeType || null,
                 requestCount: Number(value.requestCount ?? value.requests) || requestCount,
+                providerRequestIds: Array.isArray(value.providerRequestIds) ? value.providerRequestIds : [],
                 quotaReservationStatus: value.quotaReservationStatus || null,
                 httpRequestCount: Number(value.httpRequestCount ?? value.requests) || requestCount,
                 elapsedMs: Number(value.elapsedMs) || null,
