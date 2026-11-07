@@ -102,6 +102,7 @@ async function recognizeImage({
     pollIntervalMs = 1100,
     maxPolls = 35,
     onRequestStarted = null,
+    beforeRequest = null,
 }) {
     const normalizedEndpoint = safeEndpoint(endpoint);
     const key = String(apiKey || '').trim();
@@ -121,7 +122,24 @@ async function recognizeImage({
     const controller = new AbortController();
     const startedAt = Date.now();
     const deadline = startedAt + Math.max(5000, Math.min(90000, Number(timeoutMs) || 45000));
+    let httpRequestCount = 0;
     const request = async (url, options) => {
+        const method = String(options?.method || 'GET').toUpperCase();
+        const requestIndex = httpRequestCount + 1;
+        const details = {
+            provider: 'azure-document-intelligence',
+            method,
+            url: String(url),
+            requestIndex,
+            model: MODEL_ID,
+            apiVersion: API_VERSION,
+            sourceSha256,
+        };
+        // Reserve the shared F0 request slot before crossing the network boundary.
+        // A callback failure deliberately prevents the request from being sent.
+        if (typeof beforeRequest === 'function') await beforeRequest(details);
+        if (typeof onRequestStarted === 'function') await onRequestStarted(details);
+        httpRequestCount++;
         const response = await fetchImpl(url, { ...options, signal: controller.signal, redirect: 'error' });
         if (response.redirected) throw fail('Azure redirected the request; rejected.', 'AZURE_OCR_REDIRECT_BLOCKED');
         return response;
@@ -166,6 +184,7 @@ async function recognizeImage({
                     lines: parsed.lines,
                     pageCount: parsed.pageCount,
                     pollCount: polls,
+                    httpRequestCount,
                     elapsedMs: Date.now() - startedAt,
                 };
             }
@@ -175,9 +194,11 @@ async function recognizeImage({
         }
         throw fail('Azure analysis did not complete within the configured polling budget.', 'AZURE_OCR_TIMEOUT');
     } catch (error) {
-        if (error?.code) throw error;
-        if (controller.signal.aborted || error?.name === 'AbortError') throw fail('Azure analysis timed out.', 'AZURE_OCR_TIMEOUT');
-        throw fail('Azure request failed: ' + String(error?.message || error).slice(0, 220), 'AZURE_OCR_NETWORK_ERROR');
+        const wrapped = error?.code ? error : controller.signal.aborted || error?.name === 'AbortError'
+            ? fail('Azure analysis timed out.', 'AZURE_OCR_TIMEOUT')
+            : fail('Azure request failed: ' + String(error?.message || error).slice(0, 220), 'AZURE_OCR_NETWORK_ERROR');
+        wrapped.httpRequestCount = httpRequestCount;
+        throw wrapped;
     } finally { clearTimeout(timer); }
 }
 
