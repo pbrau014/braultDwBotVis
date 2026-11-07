@@ -6,7 +6,7 @@
 
 ## 1. Runtime pipeline
 
-The target pipeline is an ensemble of remote and local readers, all operating from the same immutable original screenshot:
+The target pipeline uses one immutable original screenshot as the source identity. Azure and the independent parallel local-reader workers receive those original bytes. The primary in-process Tesseract.js path applies a local preprocessing derivative; its hash, dimensions, and verified coordinate transform are recorded. OCR.Space receives the original bytes when they fit the provider's 1 MiB Free API limit, otherwise a bounded resized/re-encoded derivative with a separate input hash:
 
 - **OCR.Space Engine 2** — primary online OCR provider; use the searchable-PDF-first workflow and retain the provider's parsed text, searchable PDF, raster page, upload metadata, hashes, and request diagnostics.
 - **Azure AI Document Intelligence Read** — secondary online OCR provider; use `prebuilt-read`, API `2024-11-30`, and retain full text, line and word polygons, confidence values, page count, status, and polling metadata.
@@ -15,7 +15,7 @@ The target pipeline is an ensemble of remote and local readers, all operating fr
 - **PaddleOCR** — independent local OCR reader where its runtime and model assets are installed.
 - **OpenCV** — image-quality, region geometry, and crop/transform assistance. It is not an OCR engine.
 
-The online providers are started concurrently for a designated multi-provider run. Tesseract.js, native Tesseract, PaddleOCR, and OpenCV continue as independent local branches. A searchable PDF or raster created by OCR.Space is derivative evidence and must never replace the original screenshot for the other providers.
+The online providers are started concurrently for a designated multi-provider run. Tesseract.js, native Tesseract, PaddleOCR, and OpenCV continue as independent local branches. A searchable PDF or raster created by OCR.Space is derivative evidence and must never replace the original screenshot for Azure or the independent local readers.
 
 ## 2. Explicit provider activation
 
@@ -45,7 +45,7 @@ Missing credentials or unavailable resources are recorded as blocked; provider f
 Each provider result preserves or is expected to preserve:
 
 - provider name, model, API/runtime version, and provider-specific engine settings;
-- original source SHA-256 and exact provider-input SHA-256 (the OCR.Space prepared upload hash, or the original screenshot hash for Azure);
+- original source SHA-256, primary Tesseract prepared-input hash/size/dimensions, and exact provider-input SHA-256 (the OCR.Space prepared upload hash, or the original screenshot hash for Azure);
 - any upload, searchable-PDF, raster, crop, or variant hashes;
 - input dimensions, MIME type, and byte count;
 - raw text and provider-native line/word geometry;
