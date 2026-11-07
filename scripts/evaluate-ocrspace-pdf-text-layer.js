@@ -7,13 +7,11 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
-const { extractPdfText } = require('./verify-ocrspace-imagesF-21-artifacts');
+const { extractPdfText } = require('../src/ocrspace-pdf-text-extractor');
 const { parseEvidenceItem } = require('../src/ocrspace-reconciliation');
 
 const FIELDS = ['result', 'player', 'map', 'mode', 'battleStart', 'credits', 'freeXp', 'damage', 'xp'];
 const NUMERIC = new Set(['credits', 'freeXp', 'damage', 'xp']);
-const GATE_B_19 = 'gate-b-complete-ground-truth-19';
-const ANALYSIS_21 = 'complete-ground-truth-21';
 
 function sha256(bytes) { return crypto.createHash('sha256').update(bytes).digest('hex'); }
 function norm(field, value) {
@@ -23,23 +21,16 @@ function norm(field, value) {
     if (NUMERIC.has(field)) return text.replace(/\D/g, '') || null;
     return text.replace(/\s+/g, ' ').replace(/[—–]/g, '-').toLocaleLowerCase('en-US');
 }
-function selectRecords(gt, inventory) {
+function selectRecords(gt, { limit = null } = {}) {
+    if (!gt || !Array.isArray(gt.records)) throw new Error('Ground truth must contain a records array.');
     const eligible = gt.records.filter(row => row.recordStatus === 'COMPLETE_9_FIELD_TRANSCRIPTION'
         && FIELDS.every(field => row.fieldStatus?.[field]?.eligible_for_exact_match === true
             && String(row.expected?.[field] ?? '').trim() !== ''));
-    if (inventory === GATE_B_19) {
-        if (eligible.length < 19 || eligible.slice(0, 19).some((row, index) => row !== gt.records[index])) {
-            throw new Error('Gate B requires the first 19 complete nine-field reference records.');
-        }
-        return eligible.slice(0, 19);
-    }
-    if (inventory === ANALYSIS_21) {
-        if (eligible.length !== 21 || eligible.some((row, index) => row !== gt.records[index])) {
-            throw new Error('21-image analysis requires exactly the first 21 complete nine-field reference records.');
-        }
-        return eligible;
-    }
-    throw new Error('Unsupported inventory: ' + inventory);
+    if (limit === null || limit === undefined) return eligible;
+    const count = Number(limit);
+    if (!Number.isSafeInteger(count) || count < 1) throw new Error('Record limit must be a positive integer.');
+    if (eligible.length < count) throw new Error('Requested ' + count + ' complete nine-field records, found ' + eligible.length + '.');
+    return eligible.slice(0, count);
 }
 function parseTextLayer(text) {
     const evidence = [
@@ -95,16 +86,17 @@ async function main() {
     const gtPath = arg('--ground-truth');
     const artifactRoot = arg('--artifact-root');
     const outputPath = arg('--output');
-    const inventory = arg('--inventory') || GATE_B_19;
+    const limitValue = arg('--limit');
+    const limit = limitValue === null ? null : Number(limitValue);
     if (![runPath, gtPath, artifactRoot, outputPath].every(Boolean)) {
-        throw new Error('Usage: node scripts/evaluate-ocrspace-pdf-text-layer.js --run-report FILE --ground-truth FILE --artifact-root DIR --output FILE [--inventory gate-b-complete-ground-truth-19|complete-ground-truth-21]');
+        throw new Error('Usage: node scripts/evaluate-ocrspace-pdf-text-layer.js --run-report FILE --ground-truth FILE --artifact-root DIR --output FILE [--limit N]');
     }
     const runBytes = await fs.readFile(runPath);
     const gtBytes = await fs.readFile(gtPath);
     const run = JSON.parse(runBytes.toString('utf8'));
     const gt = JSON.parse(gtBytes.toString('utf8'));
     if (run.sourceArchiveSha256 !== gt.candidateArchive?.sha256) throw new Error('Run archive fingerprint does not match the ground-truth corpus.');
-    const selected = selectRecords(gt, inventory);
+    const selected = selectRecords(gt, { limit });
     const byName = new Map((run.results || []).map(row => [row.filename, row]));
     if (byName.size !== (run.results || []).length) throw new Error('Duplicate run rows are not eligible for analysis.');
 
@@ -235,7 +227,7 @@ async function main() {
         runReportSha256: sha256(runBytes),
         groundTruthSha256: sha256(gtBytes),
         sourceArchiveSha256: run.sourceArchiveSha256,
-        inventorySelection: { id: inventory, imageCount: selected.length, filenames: selected.map(row => row.filename) },
+        inventorySelection: { selection: limit === null ? 'all-complete-nine-field-records' : 'first-n-complete-nine-field-records', limit, imageCount: selected.length, filenames: selected.map(row => row.filename) },
         parser: 'parseEvidenceItem from src/ocrspace-reconciliation.js applied to Ghostscript txtwrite output from each verified searchable PDF',
         combinationRules: {
             pdfTextPlusTesseractJsPlayer: 'PDF text-layer candidates for eight non-identity fields plus local Tesseract.js player candidate',
@@ -260,4 +252,4 @@ async function main() {
 if (require.main === module) {
     main().catch(error => { console.error('[DWBOT-PDF-TEXT-LAYER] FAILED:', String(error.message || error).slice(0, 1000)); process.exitCode = 1; });
 }
-module.exports = { parseTextLayer, parseProviderText, score, consensus, selectRecords, GATE_B_19, ANALYSIS_21 };
+module.exports = { parseTextLayer, parseProviderText, score, consensus, selectRecords };

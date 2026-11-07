@@ -1,7 +1,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { parseTextLayer, consensus, score, selectRecords, GATE_B_19, ANALYSIS_21 } = require('../scripts/evaluate-ocrspace-pdf-text-layer');
+const { parseTextLayer, consensus, score, selectRecords } = require('../scripts/evaluate-ocrspace-pdf-text-layer');
 
 test('searchable PDF text layer parses result, map, mode and battle start without remote player identity', () => {
     const text = [
@@ -52,7 +52,7 @@ test('fusion evaluation counts missing values as unresolved and never changes th
     assert.equal(JSON.stringify(actual), before);
 });
 
-test('Gate B and 21-image analysis use separate deterministic complete-record inventories', () => {
+test('labelled analysis selects deterministic complete nine-field records with an optional limit', () => {
     const records = Array.from({ length: 63 }, (_, i) => ({
         corpusOrder: i + 1,
         filename: 'image-' + (i + 1),
@@ -61,8 +61,9 @@ test('Gate B and 21-image analysis use separate deterministic complete-record in
         fieldStatus: Object.fromEntries(['result','player','map','mode','battleStart','credits','freeXp','damage','xp'].map(f => [f, { eligible_for_exact_match: i < 21 }]))
     }));
     const gt = { records };
-    assert.equal(selectRecords(gt, GATE_B_19).length, 19);
-    assert.equal(selectRecords(gt, ANALYSIS_21).length, 21);
+    assert.equal(selectRecords(gt).length, 21);
+    assert.equal(selectRecords(gt, { limit: 19 }).length, 19);
+    assert.throws(() => selectRecords(gt, { limit: 22 }), /complete nine-field records/);
 });
 
 
