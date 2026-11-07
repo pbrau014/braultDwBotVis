@@ -145,14 +145,14 @@ test('requested multi-provider run sends identical original bytes to both provid
         AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT: 'https://dwbot.cognitiveservices.azure.com', AZURE_DOCUMENT_INTELLIGENCE_TIER: 'F0', AZURE_DOCUMENT_INTELLIGENCE_TIER: 'F0',
     };
     const result = await runMultiProviderOcr({
-        imageBuffer: image, env, azureQuotaLedger: { reserve: async () => ({ reserved: 1 }) },
+        imageBuffer: image, env, azureQuotaLedger: { reserve: async () => ({ reserved: 1 }), reserveRequestSlot: async () => ({ waitMs: 0 }) },
         ocrSpaceRunner: async args => { seen.push(args.imageBuffer); return { status: 'complete', sourceSha256: 'same', providerText: 'text', requests: 1 }; },
-        azureRunner: async args => { seen.push(args.imageBuffer); return { provider: 'azure-document-intelligence', status: 'success', sourceSha256: 'same', text: 'text' }; },
+        azureRunner: async args => { seen.push(args.imageBuffer); await args.beforeRequest({ method: 'POST' }); await args.onRequestStarted({ method: 'POST' }); await args.beforeRequest({ method: 'GET' }); await args.onRequestStarted({ method: 'GET' }); return { provider: 'azure-document-intelligence', status: 'success', sourceSha256: 'same', inputSha256: 'same', httpRequestCount: 2, text: 'text' }; },
     });
     assert.equal(result.status, 'complete');
     assert.equal(seen.length, 2);
     assert.equal(seen[0], image);
-    assert.equal(seen[1], image);
+    assert.equal(seen[1], image);\n    assert.equal(result.providers.azure.requestCount, 2);\n    assert.equal(result.providers.azure.httpRequestCount, 2);
     const blocked = await runMultiProviderOcr({ imageBuffer: image, env: { ...env, AZURE_DOCUMENT_INTELLIGENCE_KEY: '' },
         ocrSpaceRunner: async () => ({ status: 'complete', requests: 1, providerText: 'x' }) });
     assert.equal(blocked.status, 'incomplete');
@@ -167,7 +167,7 @@ test('Azure provider failures are retained and never presented as participation'
         AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT: 'https://dwbot.cognitiveservices.azure.com', AZURE_DOCUMENT_INTELLIGENCE_TIER: 'F0', AZURE_DOCUMENT_INTELLIGENCE_TIER: 'F0',
     };
     const result = await runMultiProviderOcr({ imageBuffer: image, env,
-        azureQuotaLedger: { reserve: async () => ({ reserved: 1 }) },
+        azureQuotaLedger: { reserve: async () => ({ reserved: 1 }), reserveRequestSlot: async () => ({ waitMs: 0 }) },
         ocrSpaceRunner: async () => ({ status: 'complete', requests: 1 }),
         azureRunner: async () => { throw Object.assign(new Error('quota'), { code: 'AZURE_OCR_QUOTA_EXHAUSTED' }); },
     });
