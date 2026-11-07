@@ -3,6 +3,7 @@ name: DWBOT Discord webhook exposure audit (redacted)
 on:
   push:
     branches:
+      - main
       - security/discord-webhook-history-audit
     paths:
       - 'scripts/audit-discord-webhook-history.js'
