@@ -191,6 +191,31 @@ test('requested multi-provider run sends identical original bytes to both provid
     assert.equal(blocked.providers.azure.status, 'blocked');
 });
 
+test('multi-provider releases an Azure quota reservation when request-start logging fails before submission', async t => {
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'dwbot-azure-unsent-'));
+    t.after(() => fs.rm(dir, { recursive: true, force: true }));
+    const ledger = new AzureDocumentIntelligenceQuotaLedger({ filePath: path.join(dir, 'quota.json') });
+    const image = png();
+    const env = {
+        DWBOT_MULTI_PROVIDER_ENABLED: '1', OCRSPACE_ENABLED: '1', OCRSPACE_API_KEY: 'x',
+        AZURE_DOCUMENT_INTELLIGENCE_ENABLED: '1', AZURE_DOCUMENT_INTELLIGENCE_KEY: 'y',
+        AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT: 'https://dwbot.cognitiveservices.azure.com', AZURE_DOCUMENT_INTELLIGENCE_TIER: 'F0',
+    };
+    const result = await runMultiProviderOcr({
+        imageBuffer: image, env, azureQuotaLedger: ledger,
+        ocrSpaceRunner: async () => ({ status: 'complete', requests: 0, providerText: 'text' }),
+        azureRunner: async args => {
+            await args.onRequestStarted({ method: 'POST', requestIndex: 1 });
+            throw new Error('request should not proceed after logging failure');
+        },
+        onProviderRequestStarted: async () => { throw new Error('event log unavailable'); },
+    });
+    assert.equal(result.providers.azure.status, 'failed');
+    const state = JSON.parse(await fs.readFile(path.join(dir, 'quota.json'), 'utf8'));
+    assert.equal(state.monthly['2026-11'], 0);
+    assert.equal(Object.values(state.reservations)[0].status, 'released');
+});
+
 test('Azure provider failures are retained and never presented as participation', async () => {
     const image = png();
     const env = {
