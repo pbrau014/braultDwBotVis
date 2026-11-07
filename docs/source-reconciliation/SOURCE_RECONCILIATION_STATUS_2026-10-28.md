@@ -30,5 +30,9 @@ All nine fields are mandatory and ordered as follows: `result`, `player`, `map`,
 - `npm ci` did not complete within 240 seconds; no clean install is claimed. The test run is diagnostic only.
 - The candidate has no `.git` directory. No authenticated Git checkout, commit, push, repository migration, Windows Node 24 run, 16-image OCR acceptance run on the current source, independent holdout, Discord staging smoke test, restore rehearsal, or deployment was completed.
 
+## Current-branch addendum — 2026-11-07
+
+This 2026-10-28 record is a historical source-reconciliation snapshot. Its candidate/blocked status, Node 22 diagnostic results, and proposed Gate A/B/C/D release sequence are not the governing status or prerequisites for the current `ocr-multiprovider` branch. The active branch charter and README supersede those workflow directions: continue implementation and CI iteratively without reinstating the former gates or requiring an independent holdout corpus before ordinary work. The nine-field contract remains mandatory. Current CI verification must be tied to the exact branch commit and target Node 24 runtime; historical test results in this document are not current acceptance evidence. Original source archives and their provenance remain retained and unchanged.
+
 ## Release decision
 Production remains **NO-GO**. This milestone package is a candidate handoff to preserve the current work and evidence, not an authoritative source migration or release. Next: obtain a clean authenticated local Git checkout, reconcile the continuation's 26 stale-manifest mismatches and source lineage, then run clean Windows Node `>=24.17.0` install/tests and the supervised nine-field OCR acceptance gates. Preserve the original repository and history; do not create/migrate a new private repository until reconciliation is complete.
