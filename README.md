@@ -49,6 +49,8 @@ OCR_NON_OCR_NETWORK_RESTRICTED=1
 OCR_NON_OCR_NETWORK_LOG=testdata/multi-provider-smoke/network-blocked-attempts.log
 ```
 
+Azure and the independent local-reader workers receive the original screenshot bytes. OCR.Space receives the original bytes when they fit its 1 MiB Free API upload cap; otherwise it receives a bounded resized/re-encoded derivative. The report keeps original, upload, PDF, and raster hashes separate. OCR.Space searchable-PDF word overlays are retained in provider-upload coordinates and mapped to original pixels only when dimensions and orientation are verified; they remain diagnostic evidence, not accepted field values.
+
 The Azure `F0` setting is an operator attestation, not proof of the remote SKU. The local quota ledger is only a same-filesystem safety mechanism, not an account-wide Azure meter. Never enable paid usage, upgrade a tier, or submit unrelated/private images without separate authorization.
 
 The smoke script installs a Node-process egress guard before loading the bot. It allows only the exact configured Azure resource host and explicitly enabled OCR.Space hosts. This guard does **not** constrain OS-level traffic or arbitrary native/Python child processes; use Windows Firewall or an isolated runner when OS-level egress containment is required.
