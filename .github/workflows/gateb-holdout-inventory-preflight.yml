@@ -1,0 +1,64 @@
+name: DWBOT Gate B 50-image holdout inventory preflight (read-only)
+
+on:
+  push:
+    branches:
+      - feat/gateb-50-image-independent-inventory-preflight
+    paths:
+      - 'scripts/audit-gateb-holdout-eligibility.js'
+      - 'tests/gateb-holdout-policy.test.js'
+      - '.github/workflows/gateb-holdout-inventory-preflight.yml'
+      - 'testdata/ground-truth/imagesF-63-working-ground-truth-v6.json'
+      - 'testdata/additional-screenshot-ground-truth.json'
+      - 'fixtures/four-screenshots/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/audit-gateb-holdout-eligibility.js'
+      - 'tests/gateb-holdout-policy.test.js'
+      - '.github/workflows/gateb-holdout-inventory-preflight.yml'
+      - 'testdata/ground-truth/imagesF-63-working-ground-truth-v6.json'
+      - 'testdata/additional-screenshot-ground-truth.json'
+      - 'fixtures/four-screenshots/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gateb-holdout-preflight-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  inventory-only:
+    name: Audit independent nine-field holdout inventory (no OCR/provider calls)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      OCRSPACE_ENABLED: '0'
+      OCRSPACE_NETWORK_ALLOWLIST: '0'
+      OCR_NON_OCR_NETWORK_RESTRICTED: '1'
+    steps:
+      - name: Checkout exact triggering revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js 22.16.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22.16.0
+          package-manager-cache: false
+      - name: Run fail-closed inventory policy tests
+        run: node --test tests/gateb-holdout-policy.test.js
+      - name: Generate read-only inventory audit report
+        run: |
+          node scripts/audit-gateb-holdout-eligibility.js --output "$RUNNER_TEMP/gateb-holdout-inventory-preflight.json"
+      - name: Retain inventory audit report
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: gateb-holdout-inventory-preflight-${{ github.run_id }}
+          path: ${{ runner.temp }}/gateb-holdout-inventory-preflight.json
+          if-no-files-found: warn
+          retention-days: 30
