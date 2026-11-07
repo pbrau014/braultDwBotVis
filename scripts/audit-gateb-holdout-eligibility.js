@@ -305,6 +305,7 @@ module.exports = {
   PREFERRED_IMAGES,
   auditGateBInventory,
   recordHasEligibleNineFieldLabel,
+  hasExpectedValue,
   sourceFingerprintIsValid,
   runCli,
 };
