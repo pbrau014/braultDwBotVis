@@ -268,3 +268,14 @@ test('Windows CI uploads recovery summaries but never private backups or databas
     assert.doesNotMatch(artifactStep, /testdata\/persistence-recovery\/\*\*\s*$/m);
     assert.doesNotMatch(artifactStep, /full-private-backup|copied-full-private-backup|public-redacted-snapshot|\.sqlite/);
 });
+
+
+test('multi-provider smoke preserves original, prepared, and provider-overlay provenance', () => {
+    const bot = read('src/bot.js');
+    const smoke = read('scripts/run-multi-provider-smoke.js');
+    assert.match(bot, /sourceImageProvenance/);
+    assert.match(bot, /primaryTesseractPreparedInput/);
+    assert.match(smoke, /imageProvenance:\s*output\?\.fields\?\.sourceImageProvenance/);
+    assert.match(smoke, /providerOverlay:\s*Array\.isArray\(value\.raw\?\.overlay\)/);
+    assert.match(smoke, /overlayTransformToOriginalScreenshot/);
+});
