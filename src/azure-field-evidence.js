@@ -1,5 +1,7 @@
 'use strict';
 
+const { NOT_DETECTED, parseModeMap } = require('./battle-record');
+
 const MODE_PATTERN = /\b(?:Co-op\s*Battle|Random\s*Battle|Ranked\s*Battle|Asymmetric\s*Battle|Scenario\s*Battle|Training\s*Battle|Convoy\s*Battle|Operations?|Brawl|Clan\s*Battle|Airship\s*Escort|Big\s*Hunt)\b/i;
 
 function polygonBounds(polygon) {
@@ -129,6 +131,10 @@ function buildAzureFieldEvidence(lines, { sourceSha256 = null, sourceWidth = nul
                 evidence.push(lineEvidence(mapLine, 'map', sourceSha256, sourceWidth, sourceHeight));
                 evidence.push(lineEvidence(modeLine, 'mode', sourceSha256, sourceWidth, sourceHeight));
             } else {
+                const parsedMetadata = parseModeMap(text);
+                if (parsedMetadata.map !== NOT_DETECTED) {
+                    evidence.push(lineEvidence(line, 'map', sourceSha256, sourceWidth, sourceHeight));
+                }
                 evidence.push(lineEvidence(line, 'mode', sourceSha256, sourceWidth, sourceHeight));
             }
         }

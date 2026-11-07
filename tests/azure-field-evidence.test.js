@@ -103,3 +103,17 @@ test('Azure battle-start evidence is parsed only from its explicit label', () =>
     assert.equal(candidate.field, 'battleStart');
     assert.deepEqual(parseEvidenceItem(candidate), { battleStart: '28.09.2024 17:04' });
 });
+
+test('Azure extracts map and mode from a single metadata line without inventing either field', () => {
+    const { parseEvidenceItem } = require('../src/ocrspace-reconciliation');
+    const evidence = buildAzureFieldEvidence([{
+        text: 'Shards — Random Battle',
+        pageIndex: 0, pageNumber: 1,
+        polygon: [10, 10, 120, 10, 120, 25, 10, 25],
+        geometryValid: true, pageWidth: 200, pageHeight: 300, pageUnit: 'pixel',
+    }], { sourceWidth: 400, sourceHeight: 600 });
+    const map = evidence.find(item => item.field === 'map');
+    const mode = evidence.find(item => item.field === 'mode');
+    assert.deepEqual(parseEvidenceItem(map), { map: 'Shards' });
+    assert.deepEqual(parseEvidenceItem(mode), { mode: 'Random Battle' });
+});
