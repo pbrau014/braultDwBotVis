@@ -86,8 +86,20 @@ test('Azure metadata does not combine distant or non-metadata neighboring lines'
             geometryValid: true, pageWidth: 200, pageHeight: 300, pageUnit: 'pixel',
         },
     ], { sourceWidth: 400, sourceHeight: 600 });
-    const metadata = evidence.find(item => item.field === 'battleMetadata');
-    assert.ok(metadata);
-    assert.equal(metadata.text, 'Random Battle');
-    assert.equal(metadata.geometrySource, 'azure-provider-line');
+    const mode = evidence.find(item => item.field === 'mode');
+    assert.ok(mode);
+    assert.equal(mode.text, 'Random Battle');
+    assert.equal(mode.geometrySource, 'azure-provider-line');
+});
+
+test('Azure battle-start evidence is parsed only from its explicit label', () => {
+    const { parseEvidenceItem } = require('../src/ocrspace-reconciliation');
+    const [candidate] = buildAzureFieldEvidence([{
+        text: 'Battle Start Time: 28.09.2024 17:04',
+        pageIndex: 0, pageNumber: 1,
+        polygon: [10, 10, 150, 10, 150, 25, 10, 25],
+        geometryValid: true, pageWidth: 200, pageHeight: 300, pageUnit: 'pixel',
+    }], { sourceWidth: 400, sourceHeight: 600 });
+    assert.equal(candidate.field, 'battleStart');
+    assert.deepEqual(parseEvidenceItem(candidate), { battleStart: '2024-09-28T17:04' });
 });
