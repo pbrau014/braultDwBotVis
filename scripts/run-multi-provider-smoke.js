@@ -138,6 +138,7 @@ async function main() {
         schemaVersion: 1,
         createdAt: new Date().toISOString(),
         source: { path: path.relative(root, imagePath).replaceAll(path.sep, '/'), bytes: imageBuffer.length, sha256: sourceSha256 },
+        imageProvenance: output?.fields?.sourceImageProvenance || null,
         status: result.status,
         requested: result.requested,
         activation: result.activation,
