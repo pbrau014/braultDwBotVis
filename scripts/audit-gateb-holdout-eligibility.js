@@ -275,6 +275,8 @@ async function runCli(argv = process.argv.slice(2)) {
     preferredImages: report.preferredImages,
     missingEligibleImagesToPreferred: report.missingEligibleImagesToPreferred,
     selectedImageCount: report.selectedImageCount,
+    labelReviewQueueCount: report.labelReviewQueue.length,
+    missingFieldCounts: report.missingFieldCounts,
     inputs: report.inputs,
   }, null, 2) + '\n');
   return report;
