@@ -11,6 +11,7 @@ const {
   PREFERRED_IMAGES,
   auditGateBInventory,
 } = require('../scripts/audit-gateb-holdout-eligibility');
+const { buildFieldReviewRows, renderCsv } = require('../scripts/build-gateb-field-label-review-template');
 
 const root = path.resolve(__dirname, '..');
 const digest = value => crypto.createHash('sha256').update(value).digest('hex');
@@ -239,4 +240,31 @@ test('partial rows are checked for development and regression overlap', () => {
   assert.equal(report.rejected.overlapsDevelopmentCorpus, 1);
   assert.equal(report.eligibleIndependentNineFieldImageCount, 49);
   assert.equal(report.gateBPass, false);
+});
+
+
+test('field-level review template creates blank provenance slots without copying or inferring expected values', async () => {
+  const groundTruth = JSON.parse(await fs.readFile(path.join(root, 'testdata/ground-truth/imagesF-63-working-ground-truth-v6.json'), 'utf8'));
+  const rows = buildFieldReviewRows(groundTruth);
+  assert.equal(rows.length, 164);
+  assert.equal(rows.length, rows.reduce((count, row) => count + (row.reviewStatus === 'PENDING' ? 1 : 0), 0));
+  assert.ok(rows.every(row => /^[a-f0-9]{64}$/.test(row.sourceImageSha256)));
+  assert.ok(rows.every(row => row.reviewedValue === '' && row.reviewer === '' && row.reviewedAt === ''
+    && row.evidenceReference === '' && row.evidenceNote === ''));
+  assert.ok(rows.every(row => !Object.hasOwn(row, 'expectedValue')));
+  const csv = renderCsv(rows);
+  assert.match(csv, /^corpusOrder,filename,sourceImageSha256,field,/);
+  assert.equal(csv.trimEnd().split(/\\r?\\n/).length, 165);
+  assert.match(csv, /PENDING/);
+});
+
+test('field review CSV escapes commas, quotes, and newlines', () => {
+  const csv = renderCsv([{
+    corpusOrder: 1, filename: 'a,b.png', sourceImageSha256: 'a'.repeat(64),
+    field: 'player', currentStatus: 'MANUAL', currentExpectedValuePresent: false,
+    reviewedValue: '', reviewer: 'Reviewer "A"\\nSecond line', reviewedAt: '',
+    evidenceReference: '', evidenceNote: '', reviewStatus: 'PENDING',
+  }]);
+  assert.match(csv, /"a,b.png"/);
+  assert.match(csv, /"Reviewer ""A""\\nSecond line"/);
 });
