@@ -36,14 +36,16 @@ test('Azure Read client posts original image bytes and preserves line and word g
             status: 202, ok: false, redirected: false,
             headers: { get: name => name.toLowerCase() === 'operation-location'
                 ? 'https://dwbot.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-read/analyzeResults/id?api-version=2024-11-30'
-                : null },
+                : name.toLowerCase() === 'apim-request-id' ? 'post-id' : null },
         };
         poll++;
         const payload = { status: 'succeeded', analyzeResult: { content: 'Victory\\nDamage 123', pages: [{ lines: [
             { content: 'Victory', polygon: [1,2,3,2,3,4,1,4], words: [{ content: 'Victory', confidence: 0.98, polygon: [1,2,3,2,3,4,1,4] }] },
         ] }] } };
         const bytes = Buffer.from(JSON.stringify(payload));
-        return { status: 200, ok: true, redirected: false, headers: { get: () => String(bytes.length) },
+        return { status: 200, ok: true, redirected: false, headers: { get: name =>
+            name.toLowerCase() === 'apim-request-id' ? 'poll-id' :
+                name.toLowerCase() === 'content-length' ? String(bytes.length) : null },
             body: new ReadableStream({ start(controller) { controller.enqueue(bytes); controller.close(); } }) };
     };
     const result = await recognizeImage({ imageBuffer: image, endpoint: 'https://dwbot.cognitiveservices.azure.com', apiKey: 'not-a-real-key', fetchImpl, pollIntervalMs: 1000,
@@ -58,6 +60,11 @@ test('Azure Read client posts original image bytes and preserves line and word g
     assert.equal(result.model, MODEL_ID);
     assert.equal(poll, 1);
     assert.equal(result.httpRequestCount, 2);
+    assert.deepEqual(result.providerRequestIds, ['post-id', 'poll-id']);
+    assert.equal(result.operationId, 'id');
+    assert.equal(result.originalScreenshotSha256, result.sourceSha256);
+    assert.ok(result.startedAt);
+    assert.ok(result.completedAt);
     assert.deepEqual(requestSlots, ['POST', 'GET']);
     assert.deepEqual(startedRequests, [
         { method: 'POST', requestIndex: 1, provider: 'azure-document-intelligence' },
