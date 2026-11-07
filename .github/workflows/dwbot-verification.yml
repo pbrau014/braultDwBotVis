@@ -45,16 +45,6 @@ jobs:
           model_path="$(find /usr/share/tesseract-ocr -type f -name eng.traineddata -print -quit)"
           test -n "$model_path"
           echo "TESSERACT_LANG_PATH=$(dirname "$model_path")" >> "$GITHUB_ENV"
-      - name: Parse Windows acceptance wrapper
-        shell: powershell
-        run: |
-          $tokens = $null
-          $errors = $null
-          [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $env:GITHUB_WORKSPACE 'scripts/run-windows-ocr-acceptance.ps1'), [ref]$tokens, [ref]$errors) | Out-Null
-          if ($errors.Count -gt 0) {
-            $errors | ForEach-Object { Write-Host $_ }
-            throw 'Windows acceptance wrapper contains PowerShell syntax errors.'
-          }
       - name: Install locked dependencies
         run: |
           node --version
@@ -175,6 +165,16 @@ jobs:
           "PADDLE_PDX_ENABLE_MKLDNN_BYDEFAULT=False" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           "PADDLEOCR_FIELD_FALLBACK_TIMEOUT_MS=60000" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
           "PADDLEOCR_FIELD_FALLBACK_MAX_CROPS=7" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+      - name: Parse Windows acceptance wrapper
+        shell: powershell
+        run: |
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $env:GITHUB_WORKSPACE 'scripts/run-windows-ocr-acceptance.ps1'), [ref]$tokens, [ref]$errors) | Out-Null
+          if ($errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Host $_ }
+            throw 'Windows acceptance wrapper contains PowerShell syntax errors.'
+          }
       - name: Install locked dependencies
         run: |
           node --version
