@@ -1,3 +1,21 @@
+CURRENT GOVERNING GATE B POLICY — 2026-11-07
+Status: USER-DIRECTED / CURRENT / SUPERSEDES ALL 19- AND 21-IMAGE GATE B RULES BELOW.
+
+- Gate B requires at least 50 distinct holdout screenshots, each with independent, complete, eligible expected values for all nine mandatory fields. The preferred target is 100.
+- The nine fields remain ordered: result, player, map, mode, battleStart, credits, freeXp, damage, xp.
+- Existing 19-image and 21-image inventories, reports, artifact checks and metrics are historical/diagnostic only. They cannot produce a Gate B PASS under this policy.
+- The current v6 reference lists 63 source images but only 21 currently have complete eligible nine-field manual-transcription labels. The current shortfall is 29 to the minimum and 79 to the preferred target. Do not infer or fill the missing labels.
+- Preserve the declared manual-transcription source and source-line provenance. The current reference does not document a separate blind second reviewer; do not claim double-blind or certified annotation.
+- Gate A remains NOT PASSED. Gate B remains NOT PASSED. Production remains NO-GO.
+- No OCR.Space request or duplicate provider submission is authorized by this policy block. Do not repeat an existing request or modify historical Gate A/B evidence.
+- Gate B acceptance remains fail-closed: Gate A must first pass on the locked matching candidate; every selected source/PDF/raster must verify; all required readers must resolve all nine fields; zero wrong accepted mandatory values; zero unresolved mandatory outputs; zero unauthorized network attempts; and all required security checks must pass.
+- Preserve the XP regression: accept exact XP 6646; reject 66465.
+- The read-only policy implementation and audit code are being developed on isolated pull requests. No pull request is merged and no historical gate result is upgraded by this block.
+
+================================================================================
+END CURRENT GOVERNING GATE B POLICY
+================================================================================
+
 CURRENT CONNECTION-RESUME RECONCILIATION — 2026-11-06 18:22 UTC
 This block supersedes older "current" status blocks below; historical evidence remains unchanged.
 
