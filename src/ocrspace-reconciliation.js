@@ -14,6 +14,7 @@ function parseEvidenceItem(item) {
     const field = String(item.field || '');
     const text = String(item.text || '').trim();
     if (!text || item.status !== 'success') return {};
+    if (item.source === 'azure-document-intelligence-line' && item.geometryValid !== true) return {};
     if (field === 'fullScreenshot') {
         const parsed = {};
         const result = parseBattleResult(text);
