@@ -7,8 +7,8 @@
   "sourceTreeSha": "e4837f9e3afca15a424d35e2cade6b70b6191e71",
   "recursiveTreeTruncated": false,
   "trackedBlobCountBefore": 632,
-  "removedFileCount": 385,
-  "removedBytes": 93794404,
+  "removedFileCount": 386,
+  "removedBytes": 93855639,
   "retainedPrinciples": [
     "Keep DWBOT_BRANCH_CHARTER.md and the nine mandatory fields.",
     "Keep the current source code, tests, runtime assets, current user manuals, source baseline, RC3 provenance archive, and the 56-image review workbook.",
@@ -2327,6 +2327,12 @@
       "gitBlobSha1": "a30792d70cfa63c286a1a75c8b7818f5e874f6b1",
       "sizeBytes": 6470,
       "reason": "Removed legacy Gate A/B or imageF-specific workflow, runner, and tests. Current field-level conflict review and labelled-accuracy reporting replace those old gate-specific paths; Gate A/B are not release prerequisites."
+    },
+    {
+      "path": "services/cv_ocr/EnterpriseOCRPipeline.py",
+      "gitBlobSha1": "cadf83d1627f69120f2442e5ccdb27a97108598c",
+      "sizeBytes": 61235,
+      "reason": "Removed an unreferenced standalone FastAPI document-OCR service. Repository code search found no imports, routes, scripts, or workflow references; it has a separate Python dependency stack and data/upload persistence model that is not part of the active Node DWBOT OCR architecture. The original RC3 source archive and provenance inventory remain retained."
     }
   ],
   "initiallyRemovedFileCount": 385,
