@@ -103,6 +103,26 @@ async function main() {
             reason: value.reason || null,
         };
     }
+    const networkLogPath = String(process.env.OCR_NON_OCR_NETWORK_LOG || '').trim();
+    let networkLog = { pathConfigured: Boolean(networkLogPath), present: false, blockedAttemptCount: null, sha256: null };
+    if (networkLogPath) {
+        const absoluteLogPath = path.resolve(root, networkLogPath);
+        if (absoluteLogPath !== root && !absoluteLogPath.startsWith(root + path.sep)) {
+            throw new Error('Restricted-egress diagnostic log must be inside the checked-out repository.');
+        }
+        try {
+            const bytes = await fs.readFile(absoluteLogPath);
+            networkLog = {
+                pathConfigured: true, present: true,
+                path: path.relative(root, absoluteLogPath).replaceAll(path.sep, '/'),
+                blockedAttemptCount: (bytes.toString('utf8').match(/denied /g) || []).length,
+                sha256: crypto.createHash('sha256').update(bytes).digest('hex'),
+            };
+        } catch (error) {
+            if (error.code !== 'ENOENT') throw error;
+            networkLog = { ...networkLog, path: path.relative(root, absoluteLogPath).replaceAll(path.sep, '/'), present: false };
+        }
+    }
     const report = {
         schemaVersion: 1,
         createdAt: new Date().toISOString(),
@@ -127,7 +147,11 @@ async function main() {
             enabled: process.env.OCR_NON_OCR_NETWORK_RESTRICTED === '1',
             guardLoadedBeforeBot: process.env.OCR_NON_OCR_NETWORK_RESTRICTED === '1',
             azureExactHostAllowlistEnabled: process.env.AZURE_DOCUMENT_INTELLIGENCE_NETWORK_ALLOWLIST === '1',
+            ocrSpaceProviderEnabled: process.env.OCRSPACE_ENABLED === '1',
             ocrSpaceExactHostAllowlistEnabled: process.env.OCRSPACE_NETWORK_ALLOWLIST === '1',
+            azureProviderEnabled: process.env.AZURE_DOCUMENT_INTELLIGENCE_ENABLED === '1',
+            azureExactHostAllowlistEnabled: process.env.AZURE_DOCUMENT_INTELLIGENCE_NETWORK_ALLOWLIST === '1',
+            log: networkLog,
         },
     };
     const outDir = path.join(root, 'testdata', 'multi-provider-smoke');
@@ -135,7 +159,8 @@ async function main() {
     const reportPath = path.join(outDir, new Date().toISOString().replace(/[:.]/g, '-') + '-' + sourceSha256.slice(0, 12) + '.json');
     await fs.writeFile(reportPath, JSON.stringify(report, null, 2) + '\n', { encoding: 'utf8', flag: 'wx' });
     process.stdout.write(JSON.stringify({ status: report.status, sourceSha256, providers, reportPath: path.relative(root, reportPath) }, null, 2) + '\n');
-    if (result.status !== 'complete' || local.status !== 'complete') process.exitCode = 2;
+    if (networkLog.blockedAttemptCount > 0) process.exitCode = 3;
+    else if (result.status !== 'complete' || local.status !== 'complete') process.exitCode = 2;
 }
 
 main().catch(error => {
