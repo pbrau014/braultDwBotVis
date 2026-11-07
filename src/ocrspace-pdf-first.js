@@ -141,7 +141,7 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
     }
     return {
         status: 'complete', provider: 'ocr.space', engine: 2,
-        quotaReservationStatus: reservationSubmitted ? 'submitted' : 'released_no_request',
+        quotaReservationStatus: reservationSubmitted ? 'submitted' : reservation?.reservationId ? 'released_no_request' : 'untracked',
         sourceSha256, originalScreenshotSha256: sourceSha256,
         uploadSha256, providerInputSha256: uploadSha256,
         uploadBytes: upload.buffer.length, mimeType: upload.mimeType || 'image/jpeg',
@@ -165,7 +165,7 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
         if (error && typeof error === 'object') {
             error.httpRequestCount = requestCount;
             error.requestCount = requestCount;
-            error.quotaReservationStatus = reservationSubmitted ? 'submitted_or_unknown' : 'released_or_unreserved';
+            error.quotaReservationStatus = reservationSubmitted ? 'submitted_or_unknown' : reservation?.reservationId ? 'released_or_unreserved' : 'untracked';
         }
         throw error;
     }
