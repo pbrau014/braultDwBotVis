@@ -99,6 +99,7 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
     const sourceSha256 = crypto.createHash('sha256').update(imageBuffer).digest('hex');
     const uploadSha256 = crypto.createHash('sha256').update(upload.buffer).digest('hex');
     let requestCount = 0;
+    const providerRequestIds = [];
     const providerFetch = async (url, options = {}) => {
         let safeUrl = '[invalid-url]';
         try {
@@ -120,7 +121,11 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
             reservationSubmitted = true;
         }
         requestCount++;
-        return fetchImpl(url, { ...options, redirect: 'error' });
+        const response = await fetchImpl(url, { ...options, redirect: 'error' });
+        const requestId = response.headers?.get?.('x-request-id') ||
+            response.headers?.get?.('x-ocrspace-request-id') || response.headers?.get?.('request-id');
+        if (requestId) providerRequestIds.push(String(requestId).slice(0, 200));
+        return response;
     };
     try {
     const response = await client({
@@ -145,7 +150,7 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
         sourceSha256, originalScreenshotSha256: sourceSha256,
         uploadSha256, providerInputSha256: uploadSha256,
         uploadBytes: upload.buffer.length, mimeType: upload.mimeType || 'image/jpeg',
-        requests: requestCount, httpRequestCount: requestCount,
+        requests: requestCount, httpRequestCount: requestCount, providerRequestIds,
         elapsedMs: Number(response.processingTimeMs) || null,
         uploadWidth: upload.width || null, uploadHeight: upload.height || null,
         uploadResized: upload.resized === true, uploadQuality: upload.quality || null,
@@ -165,6 +170,7 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
         if (error && typeof error === 'object') {
             error.httpRequestCount = requestCount;
             error.requestCount = requestCount;
+            error.providerRequestIds = providerRequestIds;
             error.quotaReservationStatus = reservationSubmitted ? 'submitted_or_unknown' : reservation?.reservationId ? 'released_or_unreserved' : 'untracked';
         }
         throw error;
