@@ -51,10 +51,11 @@ async function runMultiProviderOcr({
     }
 
     if (activation.providers.ocrSpace.enabled) {
+        let requestStarted = false;
         jobs.push((async () => {
             const value = await ocrSpaceRunner({
                 imageBuffer, filename, env, fetchImpl,
-                onProviderRequestStarted: details => onProviderRequestStarted?.({ ...details, provider: 'ocr.space' }),
+                onProviderRequestStarted: async details => { requestStarted = true; await onProviderRequestStarted?.({ ...details, provider: 'ocr.space' }); },
                 now,
             });
             if (value?.status !== 'complete') throw Object.assign(new Error(value?.reason || 'OCR.Space did not complete.'), { code: 'OCRSPACE_MULTI_PROVIDER_INCOMPLETE' });
@@ -70,13 +71,14 @@ async function runMultiProviderOcr({
                 raw: value,
             };
         })().then(value => { providerState.ocrSpace = value; }).catch(error => {
-            providerState.ocrSpace = { provider: 'ocr.space', status: 'failed', sourceSha256, requestCount: 0, errorCode: error.code || 'OCRSPACE_ERROR', error: String(error.message || error).slice(0, 300) };
+            providerState.ocrSpace = { provider: 'ocr.space', status: 'failed', sourceSha256, requestCount: requestStarted ? 1 : 0, errorCode: error.code || 'OCRSPACE_ERROR', error: String(error.message || error).slice(0, 300) };
         }));
     } else {
         providerState.ocrSpace = { provider: 'ocr.space', status: 'blocked', sourceSha256, requestCount: 0, reason: activation.providers.ocrSpace.reason };
     }
 
     if (activation.providers.azure.enabled) {
+        let requestStarted = false;
         jobs.push((async () => {
             const ledger = azureQuotaLedger || new AzureDocumentIntelligenceQuotaLedger({
                 filePath: env.AZURE_DOCUMENT_INTELLIGENCE_QUOTA_PATH || path.join(process.cwd(), 'data', 'azure-document-intelligence-quota.json'),
@@ -87,11 +89,11 @@ async function runMultiProviderOcr({
                 imageBuffer, endpoint: env.AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT,
                 apiKey: env.AZURE_DOCUMENT_INTELLIGENCE_KEY, fetchImpl,
                 timeoutMs: env.AZURE_DOCUMENT_INTELLIGENCE_TIMEOUT_MS,
-                onRequestStarted: details => onProviderRequestStarted?.(details),
+                onRequestStarted: async details => { requestStarted = true; await onProviderRequestStarted?.(details); },
             });
             providerState.azure = { ...value, requestCount: 1 };
         })().catch(error => {
-            providerState.azure = { provider: 'azure-document-intelligence', status: 'failed', sourceSha256, requestCount: 0, errorCode: error.code || 'AZURE_OCR_ERROR', error: String(error.message || error).slice(0, 300) };
+            providerState.azure = { provider: 'azure-document-intelligence', status: 'failed', sourceSha256, requestCount: requestStarted ? 1 : 0, errorCode: error.code || 'AZURE_OCR_ERROR', error: String(error.message || error).slice(0, 300) };
         }));
     } else {
         providerState.azure = { provider: 'azure-document-intelligence', status: 'blocked', sourceSha256, requestCount: 0, reason: activation.providers.azure.reason };

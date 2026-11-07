@@ -347,49 +347,16 @@ async function extractTextCore(imageBuffer) {
     const ocrSpaceActivation = getOcrSpaceActivation(process.env);
     const multiProviderActivation = getMultiProviderActivation(process.env);
     let multiProviderOcrEvidence = { status: 'not_requested', requested: false, providers: {} };
+    let multiProviderOcrPromise = null;
     let ocrSpacePdfFirstEvidence = { status: 'not_requested', reason: ocrSpaceActivation.reason, requests: 0 };
     let ocrSpaceSourceEvidence = { status: 'not_requested', reason: ocrSpaceActivation.reason, requests: 0, evidence: [] };
     if (multiProviderActivation.requested) {
-        // Both remote readers receive the exact original screenshot bytes concurrently.
-        // OCR.Space PDF/raster derivatives remain separate evidence; local readers
-        // continue against the unchanged original screenshot.
-        multiProviderOcrEvidence = await runMultiProviderOcr({
+        // Start both online providers now; do not await them here. They execute
+        // concurrently with OpenCV and all local OCR passes on the original image.
+        multiProviderOcrPromise = runMultiProviderOcr({
             imageBuffer, filename: 'wows-battle-source.png', env: process.env,
         });
-        const ocrSpace = multiProviderOcrEvidence.providers?.ocrSpace;
-        if (ocrSpace?.status === 'success' && ocrSpace.raw) {
-            const { rasterBuffer, pdfBuffer, ...publicEvidence } = ocrSpace.raw;
-            let artifactPaths = null;
-            if (Buffer.isBuffer(pdfBuffer) && Buffer.isBuffer(rasterBuffer) && String(process.env.OCRSPACE_ARTIFACT_DIR || '').trim()) {
-                const artifactDir = path.resolve(process.env.OCRSPACE_ARTIFACT_DIR);
-                await fs.mkdir(artifactDir, { recursive: true });
-                const stem = publicEvidence.sourceSha256;
-                const pdfPath = path.join(artifactDir, stem + '.ocrspace.pdf');
-                const rasterPath = path.join(artifactDir, stem + '.ocrspace-page.png');
-                await fs.writeFile(pdfPath, pdfBuffer).catch(async error => { if (error.code !== 'EEXIST') throw error; });
-                await fs.writeFile(rasterPath, rasterBuffer).catch(async error => { if (error.code !== 'EEXIST') throw error; });
-                artifactPaths = { pdf: pdfPath, raster: rasterPath };
-            }
-            ocrSpace.raw = publicEvidence;
-            ocrSpacePdfFirstEvidence = { ...publicEvidence, artifacts: artifactPaths };
-            ocrSpaceSourceEvidence = {
-                status: 'complete', requests: Number(ocrSpace.requestCount) || 1,
-                evidence: [{ field: 'fullScreenshot', source: 'ocrspace-searchable-pdf', status: 'success',
-                    text: String(ocrSpace.text || '') }],
-            };
-        } else {
-            ocrSpacePdfFirstEvidence = { status: ocrSpace?.status || 'blocked', reason: ocrSpace?.reason || ocrSpace?.error || 'OCR.Space provider did not participate', requests: 0 };
-            ocrSpaceSourceEvidence = { status: 'incomplete', requests: 0, evidence: [] };
-        }
-    } else {
-        // A provider-specific flag without the overall run switch is an incomplete
-        // request, never permission to silently run OCR.Space alone.
-        if (process.env.OCRSPACE_ENABLED === '1' || process.env.AZURE_DOCUMENT_INTELLIGENCE_ENABLED === '1') {
-            multiProviderOcrEvidence = await runMultiProviderOcr({ imageBuffer, filename: 'wows-battle-source.png', env: process.env });
-        }
     }
-    // OpenCV and all local OCR readers operate on the unchanged original screenshot.
-    // OCR.Space's searchable PDF and raster are derivative evidence only.
     const cvAnalysis = await opencvFieldIsolation.analyze(imageBuffer, { force: false });
     ensureImageBudget();
     const worker = await getOcrWorker();
@@ -2496,6 +2463,35 @@ async function extractTextCore(imageBuffer) {
         ...(cvResultAttempt ? [cvResultAttempt] : []), ...explicitOutcomePanelReads].map((attempt) => ({
         text: String(attempt.text || ''), confidence: Number(attempt.confidence) || 0,
     }));
+    if (multiProviderOcrPromise) {
+        multiProviderOcrEvidence = await multiProviderOcrPromise;
+        const ocrSpace = multiProviderOcrEvidence.providers?.ocrSpace;
+        if (ocrSpace?.status === 'success' && ocrSpace.raw) {
+            const { rasterBuffer, pdfBuffer, ...publicEvidence } = ocrSpace.raw;
+            let artifactPaths = null;
+            if (Buffer.isBuffer(pdfBuffer) && Buffer.isBuffer(rasterBuffer) && String(process.env.OCRSPACE_ARTIFACT_DIR || '').trim()) {
+                const artifactDir = path.resolve(process.env.OCRSPACE_ARTIFACT_DIR);
+                await fs.mkdir(artifactDir, { recursive: true });
+                const stem = publicEvidence.sourceSha256;
+                const pdfPath = path.join(artifactDir, stem + '.ocrspace.pdf');
+                const rasterPath = path.join(artifactDir, stem + '.ocrspace-page.png');
+                await fs.writeFile(pdfPath, pdfBuffer).catch(async error => { if (error.code !== 'EEXIST') throw error; });
+                await fs.writeFile(rasterPath, rasterBuffer).catch(async error => { if (error.code !== 'EEXIST') throw error; });
+                artifactPaths = { pdf: pdfPath, raster: rasterPath };
+            }
+            ocrSpace.raw = publicEvidence;
+            ocrSpacePdfFirstEvidence = { ...publicEvidence, artifacts: artifactPaths };
+            ocrSpaceSourceEvidence = {
+                status: 'complete', requests: Number(ocrSpace.requestCount) || 1,
+                evidence: [{ field: 'fullScreenshot', source: 'ocrspace-searchable-pdf', status: 'success',
+                    text: String(ocrSpace.text || '') }],
+            };
+        } else {
+            ocrSpacePdfFirstEvidence = { status: ocrSpace?.status || 'blocked', reason: ocrSpace?.reason || ocrSpace?.error || 'OCR.Space provider did not participate', requests: Number(ocrSpace?.requestCount) || 0 };
+            ocrSpaceSourceEvidence = { status: 'incomplete', requests: Number(ocrSpace?.requestCount) || 0, evidence: [] };
+        }
+    }
+
     const extractedFields = {
         ocrSpaceEvidence: ocrSpaceSourceEvidence,
         ocrSpacePdfFirst: ocrSpacePdfFirstEvidence,
