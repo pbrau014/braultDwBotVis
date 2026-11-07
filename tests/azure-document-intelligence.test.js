@@ -141,7 +141,7 @@ test('Azure field evidence retains geometry and does not guess player identity',
         { text: 'Free XP 123', pageIndex: 0, pageUnit: 'pixel', polygon: [], geometryValid: false, words: [] },
         { text: '[WOLF1]PlayerName VIII YAMATO', pageIndex: 0, pageUnit: 'pixel', polygon: [], geometryValid: false, words: [] },
     ], { sourceSha256: 'original-hash', sourceWidth: 100, sourceHeight: 80 });
-    assert.deepEqual(evidence.map(item => item.field), ['result', 'battleMetadata', 'freeXp']);
+    assert.deepEqual(evidence.map(item => item.field), ['result', 'map', 'mode', 'freeXp']);
     assert.equal(evidence[0].coordinateSpace, 'original-screenshot-pixels');
     assert.equal(evidence[0].transformToOriginalScreenshot.scaleX, 1);
     assert.equal(evidence[0].transformToOriginalScreenshot.scaleY, 1);
