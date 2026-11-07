@@ -21,6 +21,8 @@ async function main() {
         await bot.terminateOcrWorker().catch(() => {});
     }
     const result = output?.fields?.multiProviderOcr || { status: 'missing-provider-evidence', requested: false, providers: {} };
+    const validationAttempt = output?.attempts?.[output.attempts.length - 1] || { text: '' };
+    const validation = bot.validateWorldOfWarshipsScreenshot(validationAttempt, output?.fields || {});
     const local = output?.fields?.parallelLocalReaders || { status: 'missing-local-reader-evidence', readers: {} };
     const providers = {};
     for (const [key, value] of Object.entries(result.providers || {})) {
@@ -68,6 +70,12 @@ async function main() {
         requestEvents: output?.fields?.multiProviderRequestEvents || [],
         providers,
         localReaders: { status: local.status, requested: local.requested || [], readers: localReaders },
+        recordReview: {
+            acceptedByCurrentApplicationValidator: validation.accepted,
+            missingFields: (validation.missing || []).map(item => ({ key: item.key, label: item.label, reason: item.reason })),
+            remoteReconciliation: validation.multiProviderReconciliation || null,
+            localReaderReconciliation: validation.localReaderReconciliation || null,
+        },
         disclaimer: 'Connectivity smoke test only. Provider participation does not establish OCR accuracy or release acceptance.',
     };
     const outDir = path.join(root, 'testdata', 'multi-provider-smoke');

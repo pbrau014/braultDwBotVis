@@ -54,6 +54,31 @@ test('remote-only values remain unconfirmed and do not mutate or complete the lo
     assert.equal(result.diagnosticOnly, true);
 });
 
+test('full-screen OCR.Space and Azure text is parsed into separate remote candidates', () => {
+    const text = [
+        'Victory',
+        'Shards',
+        'Random Battle',
+        'Battle Start Time: 28.09.2024 17:04',
+        'Received for the Battle',
+        '123456',
+        '6646',
+        '456',
+        'Battle Performance',
+        'Damage: 123456',
+    ].join('\\n');
+    const result = reconcileOcrSpaceEvidence({
+        status: 'complete', requests: 1,
+        evidence: [{ field: 'fullScreenshot', source: 'azure-document-intelligence', status: 'success', text }],
+    }, localRecord);
+    assert.equal(result.status, 'compared');
+    for (const key of ['result', 'map', 'mode', 'battleStart', 'credits', 'freeXp', 'damage', 'xp']) {
+        assert.equal(result.fields[key].status, 'agreement', key);
+    }
+    assert.equal(result.fields.player.status, 'excluded_by_privacy_policy');
+    assert.equal(result.fields.player.remoteCandidates.length, 0);
+});
+
 test('disabled or failed provider evidence produces no remote candidates', () => {
     const result = reconcileOcrSpaceEvidence({ status: 'disabled', requests: 0, evidence: [] }, localRecord);
     assert.equal(result.status, 'disabled');

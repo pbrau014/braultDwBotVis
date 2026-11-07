@@ -2629,6 +2629,36 @@ async function extractTextCore(imageBuffer) {
     return { attempts: [standard, sparse, combined], fields: extractedFields };
 }
 
+function reconcileParallelLocalReaderEvidence(readerBundle, localRecord = {}) {
+    const fields = ['result', 'player', 'map', 'mode', 'battleStart', 'credits', 'freeXp', 'damage', 'xp'];
+    const readers = {};
+    for (const [engine, reader] of Object.entries(readerBundle?.readers || {})) {
+        if (reader?.status !== 'success') {
+            readers[engine] = { status: reader?.status || 'unavailable', reason: reader?.reason || reader?.error || null, fields: {} };
+            continue;
+        }
+        let candidateRecord = reader.output?.record || null;
+        if (!candidateRecord) {
+            const attempts = Array.isArray(reader.output?.attempts) ? reader.output.attempts : [];
+            const attempt = attempts[attempts.length - 1] || attempts[0] || { text: '' };
+            candidateRecord = buildBattleRecord(String(attempt.text || ''), reader.output?.fields || {});
+        }
+        const comparisons = {};
+        for (const field of fields) {
+            const candidate = candidateRecord?.[field];
+            const local = localRecord?.[field];
+            const present = value => value !== null && value !== undefined &&
+                String(value).trim() !== '' && String(value).trim().toLowerCase() !== 'not detected';
+            if (!present(candidate)) comparisons[field] = { status: 'no_candidate' };
+            else if (!present(local)) comparisons[field] = { status: 'reader_only_unconfirmed', candidate: String(candidate).trim() };
+            else if (String(candidate).trim() === String(local).trim()) comparisons[field] = { status: 'agreement', value: String(candidate).trim() };
+            else comparisons[field] = { status: 'disagreement', localValue: String(local).trim(), candidateValue: String(candidate).trim() };
+        }
+        readers[engine] = { status: 'compared', sourceSha256: reader.sourceSha256 || readerBundle.sourceSha256 || null, fields: comparisons };
+    }
+    return { status: readerBundle?.status || 'not_requested', readers };
+}
+
 function validateWorldOfWarshipsScreenshot(ocrResult, extractedFields = {}) {
     const record = buildBattleRecord(ocrResult.text || '', extractedFields);
     // Compare OCR.Space's first-pass text with the final local record as a
@@ -3817,6 +3847,7 @@ module.exports = {
     buildBattleRecord,
     getMissingRequiredFields,
     formatBattleRecord,
+    reconcileParallelLocalReaderEvidence,
 };
 
 // Test-only seams let the offline integration suite exercise real command routing,

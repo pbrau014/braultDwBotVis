@@ -14,6 +14,30 @@ function parseEvidenceItem(item) {
     const field = String(item.field || '');
     const text = String(item.text || '').trim();
     if (!text || item.status !== 'success') return {};
+    if (field === 'fullScreenshot') {
+        const parsed = {};
+        const result = parseBattleResult(text);
+        if (present(result)) parsed.result = result;
+        const metadata = parseModeMap(text);
+        const battleStart = parseBattleStartTime(text);
+        if (present(metadata.map)) parsed.map = metadata.map;
+        if (present(metadata.mode)) parsed.mode = metadata.mode;
+        if (present(battleStart)) parsed.battleStart = battleStart;
+        const rewardStart = text.search(/received for the battle/i);
+        if (rewardStart >= 0) {
+            const afterHeading = text.slice(rewardStart + 'received for the battle'.length);
+            const rewardEnd = afterHeading.search(/battle performance/i);
+            const rewardText = rewardEnd >= 0 ? afterHeading.slice(0, rewardEnd) : afterHeading;
+            const rewards = extractFocusedRewards(rewardText) || {};
+            for (const fieldName of ['credits', 'freeXp', 'xp']) if (present(rewards[fieldName])) parsed[fieldName] = rewards[fieldName];
+        }
+        const damageLine = text.match(/damage(?:\s*[:\\-])?\s*([\d][\d\s,]*)/i);
+        if (damageLine) {
+            const damage = extractFocusedDamage(damageLine[0]);
+            if (present(damage)) parsed.damage = damage;
+        }
+        return parsed;
+    }
     if (field === 'result') {
         // Parse the remote text directly. Local candidate consensus thresholds
         // must not suppress diagnostic evidence merely because OCR.Space has no
@@ -88,8 +112,8 @@ function reconcileOcrSpaceEvidence(evidenceBundle, localRecord = {}) {
         diagnosticOnly: true,
         requests: Number(evidenceBundle?.requests) || 0,
         fields,
-        disclaimer: 'OCR.Space evidence is a diagnostic cross-check only. It never changes the local record or accepts a remote-only value; player identity is excluded by design.',
+        disclaimer: 'Remote OCR evidence is a diagnostic cross-check only. It never changes the local record or accepts a remote-only value; player identity is excluded from remote reconciliation.',
     };
 }
 
-module.exports = { reconcileOcrSpaceEvidence, parseEvidenceItem, REQUIRED_FIELDS };
+module.exports = { reconcileOcrSpaceEvidence, reconcileRemoteOcrEvidence: reconcileOcrSpaceEvidence, parseEvidenceItem, REQUIRED_FIELDS };
