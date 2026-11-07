@@ -32,6 +32,7 @@ function runGuard(restrictNonOcrNetwork, logPath = '') {
         encoding: 'utf8',
         env: {
             ...process.env,
+            OCRSPACE_ENABLED: '1',
             OCRSPACE_NETWORK_ALLOWLIST: '1',
             OCR_NON_OCR_NETWORK_RESTRICTED: restrictNonOcrNetwork ? '1' : '0',
             OCR_NON_OCR_NETWORK_LOG: logPath,
