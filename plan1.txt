@@ -1,3 +1,18 @@
+LATEST IMPLEMENTATION / CI UPDATE — 2026-11-07 (UTC)
+- PR #19 CI run 42319588371 completed SUCCESS. All 15 policy, identity, source-hash-scope, and review-template tests passed. The current v6 inventory remains 63 total / 21 eligible / 42 partial / 29 short of the 50-image minimum; selected Gate B images = 0; gateBPass = false.
+- The audit now checks filename, source hash metadata, corpus order, and Gate A/regression overlap across every row, including partial-label rows. This prevents an incomplete row from hiding a duplicate or overlap.
+- The workflow generated a 164-row field-level CSV review template for the 42 incomplete records. It contains filenames, image hashes, field names/statuses, and blank reviewer/value/provenance fields; it copies no expected values and infers none. Artifact ID 13551889075; size 8,414 bytes; artifact digest SHA-256 6e708149c30c64521c620bdd7423942fd9239abd751f31d653761d02966a64ce. The report and template were generated with OCR.Space disabled and no OCR/provider calls.
+- PR #21 source identity was tested. Pinned commit adaf4f8c3a9573f56d0348a4bba36686fc31c22e fingerprints to SHA-256 1414215fa0edfe937da7498372db2cea0244897559b8548278a5ac6e05109e2c, 113 files; the recorded RC3 fingerprint remains 43f1e8b877d7f5832bca3ff070f8ae8164deb7c68da233694c64bece70b99166, 89 files. They do not match. The fingerprint guard failed before any local OCR or provider step. Do not dispatch Gate A on adaf.
+- The previously referenced run 42160979140 is confirmed as workflow "DWBOT imagesF 63 exploratory OCR.Space" with a 63-image exploratory artifact, not Gate B acceptance. The workflow now explicitly says so and calls it a source-anchor run, not a Gate B pass.
+- PR #21's recovery helper now enforces the recorded RC3 sourceBuild fingerprint and 89-file count before touching recovery artifacts. A read-only CI survey of all repository branches/tags for that exact fingerprint is queued in run 42319770443. If no Git ref matches, the RC3 source must be recovered from its authoritative package/archive before any Gate A run.
+- PR #21's local-only manual dispatch remains unexecuted. The only observed run with the source check failed closed before OCR. No Gate A acceptance or Gate B pass is claimed.
+- PR #20 scanner run 42317050142: 3/3 tests passed; current tracked tree 0 matches; two historical commit/path findings; workflow exits nonzero on findings by design. Credential revocation remains an owner action.
+
+Gate A: NOT PASSED. Gate B: NOT PASSED. Production: NO-GO.
+================================================================================
+END LATEST IMPLEMENTATION / CI UPDATE
+================================================================================
+
 LATEST CROSS-SOURCE GATE B INVENTORY RECONCILIATION — 2026-11-07
 Status: VERIFIED LIBRARY DISCOVERY / SOURCE-LINEAGE CONFLICT PRESERVED / NOT A GATE PASS.
 
