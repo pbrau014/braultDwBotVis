@@ -253,3 +253,16 @@ test('ordinary branch verification has no legacy Gate B or bulk-provider workflo
     assert.ok(!workflow.includes('eligible-only 56-image archive'));
     assert.ok(!workflow.includes('Post-hoc Gate B evaluator'));
 });
+
+
+test('Windows CI uploads recovery summaries but never private backups or database copies', () => {
+    const workflow = read('.github/workflows/dwbot-verification.yml');
+    const start = workflow.indexOf('name: Upload Windows acceptance evidence even on failure');
+    const end = workflow.indexOf('  manual-and-package:', start);
+    assert.ok(start >= 0 && end > start);
+    const artifactStep = workflow.slice(start, end);
+    assert.match(artifactStep, /persistence-recovery\/\*\*\/persistence-recovery-report\.json/);
+    assert.match(artifactStep, /persistence-recovery\/\*\*\/persistence-recovery-report\.sha256/);
+    assert.doesNotMatch(artifactStep, /testdata\/persistence-recovery\/\*\*\s*$/m);
+    assert.doesNotMatch(artifactStep, /full-private-backup|copied-full-private-backup|public-redacted-snapshot|\.sqlite/);
+});
