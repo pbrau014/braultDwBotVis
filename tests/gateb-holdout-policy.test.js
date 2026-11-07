@@ -138,7 +138,7 @@ test('development and regression corpus overlaps are excluded', () => {
   const report = auditGateBInventory({
     groundTruth,
     developmentGroundTruth: development,
-    regressionImageHashes,
+    regressionImageHashes: regressionHashes,
   });
   assert.equal(report.independence.developmentOverlapCount, 1);
   assert.equal(report.independence.regressionOverlapCount, 1);
