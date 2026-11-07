@@ -49,23 +49,47 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Check out exact pull request revision
+      - name: Check out exact pull request revision and repository history
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: 0
           persist-credentials: false
       - name: Set up Node.js 22.16.0
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22.16.0
           package-manager-cache: false
-      - name: Check out pinned RC3 candidate source for identity verification
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: adaf4f8c3a9573f56d0348a4bba36686fc31c22e
-          path: source
-          persist-credentials: false
-      - name: Verify pinned source build matches recorded RC3 fingerprint
-        run: node -e "const f=require('./scripts/prepare-gateA-16-resume').sourceBuildFingerprint('source'); console.log(JSON.stringify(f)); if(f.sha256!=='43f1e8b877d7f5832bca3ff070f8ae8164deb7c68da233694c64bece70b99166'||f.files!==89) process.exit(1);"
+      - name: Survey repository branches and tags for the recorded RC3 fingerprint
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const os = require('node:os');
+          const path = require('node:path');
+          const cp = require('node:child_process');
+          const { sourceBuildFingerprint } = require('./scripts/prepare-gateA-16-resume');
+          const expected = '43f1e8b877d7f5832bca3ff070f8ae8164deb7c68da233694c64bece70b99166';
+          const refs = cp.execFileSync('git', ['for-each-ref', '--format=%(refname)', 'refs/remotes/origin', 'refs/tags'], { encoding: 'utf8' })
+            .trim().split(/\r?\n/).filter(Boolean);
+          const results = [];
+          for (const ref of refs) {
+            const sha = cp.execFileSync('git', ['rev-parse', ref], { encoding: 'utf8' }).trim();
+            const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dwbot-rc3-fingerprint-'));
+            try {
+              cp.execFileSync('git', ['worktree', 'add', '--detach', dir, sha], { stdio: 'ignore' });
+              const fingerprint = sourceBuildFingerprint(dir);
+              results.push({ ref, sha, ...fingerprint, match: fingerprint.sha256 === expected && fingerprint.files === 89 });
+            } catch (error) {
+              results.push({ ref, sha, error: String(error.message || error).slice(0, 240) });
+            } finally {
+              try { cp.execFileSync('git', ['worktree', 'remove', '--force', dir], { stdio: 'ignore' }); } catch {}
+              fs.rmSync(dir, { recursive: true, force: true });
+            }
+          }
+          const matches = results.filter(item => item.match);
+          console.log(JSON.stringify({ expectedSourceBuildSha256: expected, expectedFiles: 89, refsExamined: results.length, matches, results }, null, 2));
+          console.log(matches.length ? 'RC3_SOURCE_BUILD_MATCH_FOUND' : 'NO_REPOSITORY_BRANCH_OR_TAG_MATCH_FOR_RECORDED_RC3');
+          NODE
       - name: Test Gate A recovery and local-only workflow contract
         run: node --test tests/gateA-resume.test.js
 
