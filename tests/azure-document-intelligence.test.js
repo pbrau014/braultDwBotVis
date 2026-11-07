@@ -99,6 +99,25 @@ test('Azure result parser keeps raw line and word evidence', () => {
     assert.equal(parsed.lines[0].words[0].text, 'one');
 });
 
+test('Azure geometry carries page coordinates and rejects malformed or out-of-bounds polygons', () => {
+    const parsed = flattenReadResult({ analyzeResult: { content: 'line', pages: [{
+        pageNumber: 1, width: 100, height: 80, unit: 'pixel', lines: [
+            { content: 'valid', polygon: [1,2,20,2,20,10,1,10], words: [
+                { content: 'valid', confidence: 0.8, polygon: [1,2,10,2,10,8,1,8] },
+                { content: 'bad', confidence: 1.5, polygon: [1,2,200,2,200,10,1,10] },
+            ] },
+            { content: 'malformed', polygon: [1,2,3], words: [] },
+        ],
+    }] } });
+    assert.equal(parsed.pages[0].unit, 'pixel');
+    assert.equal(parsed.lines[0].pageIndex, 0);
+    assert.equal(parsed.lines[0].geometryValid, true);
+    assert.equal(parsed.lines[0].words[0].geometryValid, true);
+    assert.equal(parsed.lines[0].words[1].geometryValid, false);
+    assert.equal(parsed.lines[0].words[1].confidence, null);
+    assert.equal(parsed.lines[1].geometryValid, false);
+});
+
 test('Azure monthly quota ledger reserves within a hard sub-free-tier ceiling and fails closed', async t => {
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'dwbot-azure-quota-'));
     t.after(() => fs.rm(dir, { recursive: true, force: true }));
