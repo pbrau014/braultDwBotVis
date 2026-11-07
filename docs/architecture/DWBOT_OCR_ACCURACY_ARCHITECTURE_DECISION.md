@@ -10,14 +10,15 @@
 
 Optimize for **correct accepted records**, not raw OCR character count, throughput, or forced completion. A mandatory field is accepted only when its value is supported by field-specific evidence and validation. Otherwise it remains unresolved and the record is withheld for review.
 
-Adopt a local-first, multi-reader, field-aware architecture:
+Adopt an OCR.Space-primary, multi-provider, multi-reader, field-aware architecture:
 
 1. Preserve the original screenshot as immutable source evidence and calculate its SHA-256 before processing.
-2. Use OpenCV locally for image quality assessment, geometry, region isolation, and carefully selected image variants.
-3. Run Tesseract as the established local baseline and PaddleOCR as an independent local reader. During the accuracy-validation phase, collect both readers' evidence on the same approved inputs so their complementary strengths and disagreements can be measured.
-4. Reconcile candidate values per field using source geometry, text-region association, field-specific parsing, independent reader agreement, and domain constraints. Do not compare raw confidence scores across engines as if they were calibrated probabilities.
-5. Accept only validated nine-field records. Any unresolved or conflicting mandatory field fails closed and requires review.
-6. Keep OCR.Space disabled by default. It may be used only through an explicitly enabled, policy-controlled diagnostic/contingency path. Remote output is separate evidence, never an automatic override or a substitute for a missing local acceptance result.
+2. Request OCR.Space Engine 2 searchable-PDF-first and Azure AI Document Intelligence F0 Read (`prebuilt-read`) in the same explicitly enabled multi-provider run, concurrently, from the same original screenshot bytes. The Azure adapter uses API `2024-11-30`; only an independently verified F0 resource is permitted.
+3. Run Tesseract.js, native Tesseract and PaddleOCR as parallel local readers against the unchanged original screenshot; use OpenCV for geometry and controlled image preparation. OCR.Space PDF/raster outputs remain separately hashed derivatives and do not replace the source input for the secondary provider or local readers.
+4. Preserve a unified provenance envelope for each provider/reader: provider/model/API/runtime version, original and derived hashes, request status, timestamps, geometry, raw text, confidence metadata, quota reservation, errors and timing.
+5. Reconcile candidate values per field using source geometry, text-region association, field-specific parsing, independent reader agreement, and domain constraints. Do not compare raw confidence scores across engines as if they were calibrated probabilities.
+6. Remote output is evidence, never ground truth or an automatic override. Accept only validated nine-field records. Any unresolved or conflicting mandatory field fails closed and requires review.
+7. A designated multi-provider run is incomplete unless both OCR.Space and the configured free secondary provider actually participate. Missing credentials, missing F0 attestation, quota exhaustion, network failure or provider rejection must be visible; never silently downgrade to a single provider or local-only.
 
 ## Engine responsibilities
 
@@ -45,17 +46,17 @@ Retain PaddleOCR as an independent local detection/recognition reader. Use pinne
 
 The repository's historical 16-image comparison showed the then-current Tesseract+PaddleOCR integration performed worse than Tesseract alone under an eight-field policy (7/16 vs 3/16 complete records; 111/128 vs 108/128 exact mandatory fields; 2 vs 4 wrong accepted fields). That historical result is not a nine-field acceptance result and does not prove PaddleOCR is intrinsically inferior. It does prove the existing integration must not be promoted without controlled re-evaluation. Treat Tesseract as baseline and PaddleOCR as a measured independent reader until a nine-field comparison demonstrates improvement.
 
-### OCR.Space
+### OCR.Space primary online provider
 
-OCR.Space is not on the normal processing critical path. Keep it disabled by default and enforce an explicit allowlisted activation path. If enabled for a diagnostic:
-- transmit only the minimum necessary cropped region, not a full screenshot by default;
-- exclude player identity and other unnecessary personal information;
-- retain request metadata, provider/engine settings, response, and source hash;
-- keep provider output separate from local candidates;
-- never let a remote result silently replace a local candidate or make an otherwise failing Gate A/B pass;
-- record every network attempt, including denied attempts, and fail acceptance if network policy is violated.
+OCR.Space Engine 2 searchable-PDF-first is the primary online branch. It receives the original screenshot under the explicit provider-request rule, preserves the upload/PDF/raster hashes and quota checkpoints, and returns independent evidence. The PDF/raster are derivative artifacts; they do not replace the original screenshot for the secondary provider or local readers.
 
-Cloud results may assist a human reviewer or guide a future local improvement. They are not ground truth.
+### Azure AI Document Intelligence F0 secondary provider
+
+Use the `prebuilt-read` model and REST API `2024-11-30` against the original screenshot. Require an explicit run switch, provider switch, key, resource endpoint, and `AZURE_DOCUMENT_INTELLIGENCE_TIER=F0` attestation. The attestation is configuration evidence only: the operator must independently confirm the Azure resource's actual SKU is F0 before enabling it. Enforce a local ceiling of 450 pages/month, one page per screenshot, a 4 MiB input limit, HTTPS endpoint and same-origin polling allowlist, bounded response reads, one-request-per-second F0 polling, no automatic retry on 429, and no paid-tier upgrade. If the remote resource is not actually F0, the code cannot prevent charges merely by reading the environment variable; do not enable it until the portal SKU is verified.
+
+### Remote evidence policy
+
+Both online providers receive the same original screenshot bytes concurrently in a designated multi-provider run. Preserve provider outputs separately from local candidates; remote evidence never changes accepted record values or substitutes for ground truth. Missing participation makes the run incomplete. Do not send Gate B holdout inputs or unrelated/private screenshots to cloud services.
 
 ## Field-level reconciliation
 

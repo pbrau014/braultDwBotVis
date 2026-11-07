@@ -23,6 +23,7 @@ const { inspectTargetChannelPermissions } = require('./discord-gateway-diagnosti
 const { isAdminOnlyCommand } = require('./tournament-command-policy');
 const { getOcrSpaceActivation } = require('./ocrspace-field-evidence');
 const { createOcrSpacePdfFirst } = require('./ocrspace-pdf-first');
+const { getMultiProviderActivation, runMultiProviderOcr } = require('./multi-provider-ocr');
 
 const { reconcileOcrSpaceEvidence } = require('./ocrspace-reconciliation');
 const path = require('node:path');
@@ -344,56 +345,51 @@ async function extractTextCore(imageBuffer) {
     let sourceWidth = dimensions.width;
     let sourceHeight = dimensions.height;
     const ocrSpaceActivation = getOcrSpaceActivation(process.env);
-    const ocrSpaceConfigured = ocrSpaceActivation.enabled;
-    let ocrSpacePdfFirstEvidence = { status: 'disabled', reason: ocrSpaceActivation.reason, requests: 0 };
-    let ocrSpaceSourceEvidence = { status: 'disabled', reason: ocrSpaceActivation.reason, requests: 0, evidence: [] };
-    if (ocrSpaceConfigured) {
-        // The complete source screenshot is transmitted only under the user's
-        // explicit OCR.Space-first authorization. The API key never enters logs.
-        // All downstream OCR readers receive the returned PDF page raster.
-        const pdfFirst = await createOcrSpacePdfFirst({
+    const multiProviderActivation = getMultiProviderActivation(process.env);
+    let multiProviderOcrEvidence = { status: 'not_requested', requested: false, providers: {} };
+    let ocrSpacePdfFirstEvidence = { status: 'not_requested', reason: ocrSpaceActivation.reason, requests: 0 };
+    let ocrSpaceSourceEvidence = { status: 'not_requested', reason: ocrSpaceActivation.reason, requests: 0, evidence: [] };
+    if (multiProviderActivation.requested) {
+        // Both remote readers receive the exact original screenshot bytes concurrently.
+        // OCR.Space PDF/raster derivatives remain separate evidence; local readers
+        // continue against the unchanged original screenshot.
+        multiProviderOcrEvidence = await runMultiProviderOcr({
             imageBuffer, filename: 'wows-battle-source.png', env: process.env,
         });
-        if (pdfFirst.status !== 'complete') {
-            const error = new Error(pdfFirst.reason || 'OCR.Space searchable-PDF first pass did not complete.');
-            error.code = 'OCRSPACE_PDF_FIRST_BLOCKED';
-            throw error;
+        const ocrSpace = multiProviderOcrEvidence.providers?.ocrSpace;
+        if (ocrSpace?.status === 'success' && ocrSpace.raw) {
+            const { rasterBuffer, pdfBuffer, ...publicEvidence } = ocrSpace.raw;
+            let artifactPaths = null;
+            if (Buffer.isBuffer(pdfBuffer) && Buffer.isBuffer(rasterBuffer) && String(process.env.OCRSPACE_ARTIFACT_DIR || '').trim()) {
+                const artifactDir = path.resolve(process.env.OCRSPACE_ARTIFACT_DIR);
+                await fs.mkdir(artifactDir, { recursive: true });
+                const stem = publicEvidence.sourceSha256;
+                const pdfPath = path.join(artifactDir, stem + '.ocrspace.pdf');
+                const rasterPath = path.join(artifactDir, stem + '.ocrspace-page.png');
+                await fs.writeFile(pdfPath, pdfBuffer).catch(async error => { if (error.code !== 'EEXIST') throw error; });
+                await fs.writeFile(rasterPath, rasterBuffer).catch(async error => { if (error.code !== 'EEXIST') throw error; });
+                artifactPaths = { pdf: pdfPath, raster: rasterPath };
+            }
+            ocrSpace.raw = publicEvidence;
+            ocrSpacePdfFirstEvidence = { ...publicEvidence, artifacts: artifactPaths };
+            ocrSpaceSourceEvidence = {
+                status: 'complete', requests: Number(ocrSpace.requestCount) || 1,
+                evidence: [{ field: 'fullScreenshot', source: 'ocrspace-searchable-pdf', status: 'success',
+                    text: String(ocrSpace.text || '') }],
+            };
+        } else {
+            ocrSpacePdfFirstEvidence = { status: ocrSpace?.status || 'blocked', reason: ocrSpace?.reason || ocrSpace?.error || 'OCR.Space provider did not participate', requests: 0 };
+            ocrSpaceSourceEvidence = { status: 'incomplete', requests: 0, evidence: [] };
         }
-        const { rasterBuffer, pdfBuffer, ...publicEvidence } = pdfFirst;
-        let artifactPaths = null;
-        if (String(process.env.OCRSPACE_ARTIFACT_DIR || '').trim()) {
-            const artifactDir = path.resolve(process.env.OCRSPACE_ARTIFACT_DIR);
-            await fs.mkdir(artifactDir, { recursive: true });
-            const stem = publicEvidence.sourceSha256;
-            const pdfPath = path.join(artifactDir, stem + '.ocrspace.pdf');
-            const rasterPath = path.join(artifactDir, stem + '.ocrspace-page.png');
-            await fs.writeFile(pdfPath, pdfBuffer, { flag: 'wx' }).catch(async error => {
-                if (error.code !== 'EEXIST') throw error;
-                await fs.writeFile(pdfPath, pdfBuffer);
-            });
-            await fs.writeFile(rasterPath, rasterBuffer, { flag: 'wx' }).catch(async error => {
-                if (error.code !== 'EEXIST') throw error;
-                await fs.writeFile(rasterPath, rasterBuffer);
-            });
-            artifactPaths = { pdf: pdfPath, raster: rasterPath };
+    } else {
+        // A provider-specific flag without the overall run switch is an incomplete
+        // request, never permission to silently run OCR.Space alone.
+        if (process.env.OCRSPACE_ENABLED === '1' || process.env.AZURE_DOCUMENT_INTELLIGENCE_ENABLED === '1') {
+            multiProviderOcrEvidence = await runMultiProviderOcr({ imageBuffer, filename: 'wows-battle-source.png', env: process.env });
         }
-        imageBuffer = rasterBuffer;
-        metadata = await imageProcessor.metadata(imageBuffer);
-        dimensions = imageProcessor.assertDimensions(metadata.width, metadata.height, {
-            maxDimension: MAX_IMAGE_DIMENSION, maxPixels: MAX_IMAGE_PIXELS,
-        });
-        sourceWidth = dimensions.width;
-        sourceHeight = dimensions.height;
-        ocrSpacePdfFirstEvidence = { ...publicEvidence, pdfBytes: pdfBuffer.length, artifacts: artifactPaths };
-        ocrSpaceSourceEvidence = {
-            status: 'complete', requests: 1,
-            evidence: [{ field: 'fullScreenshot', source: 'ocrspace-searchable-pdf', status: 'success',
-                text: String(pdfFirst.providerText || '') }],
-        };
     }
-    // OpenCV remains geometry-only, now operating on the OCR.Space PDF page
-    // raster. Tesseract.js, PaddleOCR and native Tesseract all receive this raster,
-    // not the original source image.
+    // OpenCV and all local OCR readers operate on the unchanged original screenshot.
+    // OCR.Space's searchable PDF and raster are derivative evidence only.
     const cvAnalysis = await opencvFieldIsolation.analyze(imageBuffer, { force: false });
     ensureImageBudget();
     const worker = await getOcrWorker();
@@ -2503,6 +2499,7 @@ async function extractTextCore(imageBuffer) {
     const extractedFields = {
         ocrSpaceEvidence: ocrSpaceSourceEvidence,
         ocrSpacePdfFirst: ocrSpacePdfFirstEvidence,
+        multiProviderOcr: multiProviderOcrEvidence,
         rewards: focusedRewards,
         rewardCandidates,
         legacyRewardCandidates,

@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - main
+      - ocr-multiprovider
   workflow_dispatch:
     inputs:
       run_legacy_56_provider_acceptance:
@@ -55,6 +56,9 @@ jobs:
           node --check src/desktop-service.js
           node --check src/desktop-bridge.js
           node --check src/desktop-test-preflight.js
+          node --check src/azure-document-intelligence-client.js
+          node --check src/azure-document-intelligence-quota-ledger.js
+          node --check src/multi-provider-ocr.js
           node --check src/ocrspace-client.js
           node --check src/ocrspace-pdf-first.js
           node --check src/ocrspace-quota-ledger.js
@@ -70,6 +74,8 @@ jobs:
           node --check scripts/run-ocrspace-imagesF-63-exploratory.js
           node --check scripts/run-additional-screenshot-regression.js
           node --check scripts/run-persistence-recovery.js
+      - name: Multi-provider adapter and orchestration contracts
+        run: npm run test:multi-provider
       - name: OCR.space mocked contract
         run: npm run test:ocrspace
       - name: Post-hoc Gate B evaluator schema and missing-row tests
@@ -156,7 +162,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw '56-image archive reconstruction or integrity preflight failed; OCR.Space provider submissions are prohibited.' }
       - name: Windows process-level persistence and recovery
         run: npm run test:persistence-recovery
-      - name: Full Windows Node 22 test suite
+      - name: Full Windows Node 24 test suite
         run: npm test
       - name: Verify protected OCR.Space secret is configured (value withheld)
         shell: powershell
