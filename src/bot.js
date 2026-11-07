@@ -2696,18 +2696,62 @@ function validateWorldOfWarshipsScreenshot(ocrResult, extractedFields = {}) {
     const localReaderReconciliation = reconcileParallelLocalReaderEvidence(extractedFields.parallelLocalReaders, record);
     const missing = getMissingRequiredFields(record);
     const requiredLabels = new Set(missing.map((field) => field.label));
+    const unresolvedByField = Object.fromEntries([
+        'result', 'player', 'map', 'mode', 'battleStart', 'credits', 'freeXp', 'damage', 'xp',
+    ].map((field) => [field, []]));
+    // A complete-looking local record is not sufficient when independent readers
+    // or providers contradict it. Confidence values from different engines are not
+    // comparable; any unresolved disagreement fails closed for that field.
+    for (const [provider, reconciliation] of Object.entries({
+        ocrSpace: ocrSpaceReconciliation,
+        azure: azureReconciliation,
+    })) {
+        for (const [field, evidence] of Object.entries(reconciliation?.fields || {})) {
+            if (['disagreement', 'remote_conflict'].includes(evidence?.status) &&
+                unresolvedByField[field]) {
+                unresolvedByField[field].push({
+                    source: provider, status: evidence.status,
+                    localValue: evidence.localValue ?? null,
+                    candidates: evidence.remoteCandidates || [],
+                });
+            }
+        }
+    }
+    for (const [reader, result] of Object.entries(localReaderReconciliation?.readers || {})) {
+        for (const [field, evidence] of Object.entries(result?.fields || {})) {
+            if (evidence?.status === 'disagreement' && unresolvedByField[field]) {
+                unresolvedByField[field].push({
+                    source: reader, status: evidence.status,
+                    localValue: evidence.localValue ?? null,
+                    candidateValue: evidence.candidateValue ?? null,
+                });
+            }
+        }
+    }
+    const unresolvedFields = Object.entries(unresolvedByField)
+        .filter(([, evidence]) => evidence.length)
+        .map(([field, evidence]) => ({ field, evidence }));
+    const unresolvedKeys = new Set(unresolvedFields.map(item => item.field));
     const checks = [
-        'Battle Result', 'Player', 'Map', 'Battle Mode', 'Battle Start Time',
-        'Credits', 'Free XP', 'Damage', 'XP',
-    ].map((label) => ({
-        label,
-        passed: !requiredLabels.has(label),
-        reason: missing.find((field) => field.label === label)?.reason || `${label} is readable`,
-    }));
-    // XP is mandatory for acceptance. Ship, result description, and ribbons remain
-    // optional metadata; missing ribbon labels/counts must never hold up a record.
+        ['result', 'Battle Result'], ['player', 'Player'], ['map', 'Map'],
+        ['mode', 'Battle Mode'], ['battleStart', 'Battle Start Time'],
+        ['credits', 'Credits'], ['freeXp', 'Free XP'], ['damage', 'Damage'], ['xp', 'XP'],
+    ].map(([key, label]) => {
+        const missingField = missing.find((field) => field.label === label);
+        const conflict = unresolvedKeys.has(key);
+        return {
+            label,
+            passed: !requiredLabels.has(label) && !conflict,
+            reason: missingField?.reason || (conflict
+                ? 'Independent OCR evidence conflicts; manual review is required.'
+                : `${label} is readable and has no detected cross-reader conflict`),
+        };
+    });
+    // XP remains the ninth mandatory field. Missing or conflicting mandatory
+    // values remain unresolved; optional ship/ribbon metadata does not block.
     return {
-        accepted: missing.length === 0, checks, failed: missing, missing, record,
+        accepted: missing.length === 0 && unresolvedFields.length === 0,
+        checks, failed: missing, missing, unresolvedFields, record,
         text: cleanOcrText(ocrResult.text || ''),
         ocrSpaceReconciliation,
         azureReconciliation,
