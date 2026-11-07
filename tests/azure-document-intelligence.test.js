@@ -84,6 +84,32 @@ test('Azure network failures report every fetch invocation', async () => {
     assert.equal(calls, 1);
 });
 
+test('Azure 429 responses are not retried and report exact POST and poll counts', async () => {
+    let postCalls = 0;
+    await assert.rejects(() => recognizeImage({
+        imageBuffer: png(), endpoint: 'https://dwbot.cognitiveservices.azure.com', apiKey: 'x',
+        fetchImpl: async () => { postCalls++; return { status: 429, ok: false, redirected: false, headers: { get: () => null } }; },
+    }), error => error.code === 'AZURE_OCR_RATE_LIMIT' && error.httpRequestCount === 1);
+    assert.equal(postCalls, 1);
+
+    let calls = 0;
+    await assert.rejects(() => recognizeImage({
+        imageBuffer: png(), endpoint: 'https://dwbot.cognitiveservices.azure.com', apiKey: 'x',
+        pollIntervalMs: 1000,
+        fetchImpl: async (url, options) => {
+            calls++;
+            if (options.method === 'POST') return {
+                status: 202, ok: false, redirected: false,
+                headers: { get: name => name.toLowerCase() === 'operation-location'
+                    ? 'https://dwbot.cognitiveservices.azure.com/documentintelligence/documentModels/prebuilt-read/analyzeResults/id'
+                    : null },
+            };
+            return { status: 429, ok: false, redirected: false, headers: { get: () => null } };
+        },
+    }), error => error.code === 'AZURE_OCR_RATE_LIMIT' && error.httpRequestCount === 2);
+    assert.equal(calls, 2);
+});
+
 test('Azure Read rejects over-limit images and invalid endpoints before network access', async () => {
     let calls = 0;
     const fetchImpl = async () => { calls++; throw new Error('unexpected'); };
