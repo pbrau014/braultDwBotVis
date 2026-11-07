@@ -38,6 +38,12 @@ test('accuracy report measures field and full-record exactness, false acceptance
     assert.equal(report.sampleCounts.matchedImages, 2);
     assert.equal(report.metrics.fields.xp.wrongAccepted, 1);
     assert.equal(report.metrics.fields.xp.unresolved, 1);
+    assert.deepEqual(report.metrics.wrongAcceptedValues, [{
+        sourceSha256: 'image-a', field: 'xp', expectedValue: '1234', acceptedValue: '1235',
+    }]);
+    assert.equal(report.metrics.unresolvedFieldRecords.length, 1);
+    assert.equal(report.metrics.acceptedRecords, 1);
+    assert.equal(report.metrics.rejectedRecords, 1);
     assert.equal(report.metrics.fullNineFieldExactRecords, 1);
     assert.equal(report.metrics.fullNineFieldExactRecordRate, 0.5);
     assert.equal(report.metrics.falseAcceptanceRecords, 1);
@@ -109,4 +115,38 @@ test('accuracy report measures source-region correctness only when labelled regi
     assert.equal(report.metrics.runtime.meanElapsedMs, 120);
     assert.equal(report.metrics.providerAvailability.azure.meanElapsedMs, 80);
     assert.equal(report.metrics.providerAvailability.azure.quotaReservationStates.submitted, 1);
+});
+
+
+test('accuracy report counts an accepted record with an unresolved mandatory field as a false acceptance', () => {
+    const report = createAccuracyReport({
+        predictions: [{
+            sourceSha256: 'image-d', accepted: true, record: { ...truth },
+            unresolvedFields: [{ field: 'xp', reason: 'reader conflict' }],
+        }],
+        groundTruth: [{ sourceSha256: 'image-d', record: truth }],
+    });
+    assert.equal(report.metrics.falseAcceptanceRecords, 1);
+    assert.equal(report.metrics.wrongAcceptedValues.length, 0);
+    assert.equal(report.metrics.unresolvedFieldRecords[0].explicitlyUnresolved, true);
+});
+
+test('accuracy report aggregates Node-process network restriction diagnostics without claiming OS isolation', () => {
+    const report = createAccuracyReport({
+        predictions: [{
+            sourceSha256: 'image-e', accepted: true, record: truth,
+            networkRestriction: {
+                enabled: true, guardLoadedBeforeBot: false,
+                ocrSpaceProviderEnabled: true, ocrSpaceExactHostAllowlistEnabled: true,
+                azureProviderEnabled: false, azureExactHostAllowlistEnabled: false,
+                log: { pathConfigured: true, present: true, blockedAttemptCount: 2 },
+            },
+        }],
+        groundTruth: [{ sourceSha256: 'image-e', record: truth }],
+    });
+    assert.equal(report.metrics.networkDiagnostics.samples, 1);
+    assert.equal(report.metrics.networkDiagnostics.restrictedSamples, 1);
+    assert.equal(report.metrics.networkDiagnostics.guardActivationFailures, 1);
+    assert.equal(report.metrics.networkDiagnostics.blockedAttemptCount, 2);
+    assert.match(report.metrics.networkDiagnostics.scope, /not an OS-level egress sandbox/);
 });
