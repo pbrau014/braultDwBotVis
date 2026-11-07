@@ -5,6 +5,13 @@
 **Runtime:** Node v22.16.0 / npm 10.9.2 / Linux x64  
 **Disposition:** Phase 9 partially implemented; production NO-GO.
 
+## Current branch addendum — 2026-11-07
+
+This file's Node 22 results and `dwbotVis` branch references are historical only. The active implementation branch is `ocr-multiprovider`; `.nvmrc` pins Node.js 24.22.1 and `package.json` requires Node.js `>=24.17.0`. The latest fully verified CI checkpoint at the time of this addendum is commit `e5c6e085e8b7b5c014e77fe1effa363984c269ed`, run [42392499478](https://github.com/pbrau014/braultDwBotVis/actions/runs/42392499478): Linux offline tests, Windows Node 24.22.1/native Tesseract/persistence, and PDF/manual/clean-package verification all passed. Subsequent source-provenance and documentation commits were made after that checkpoint and require a new exact-commit CI run.
+
+No live Discord Gateway login, real role/permission test, OAuth browser test, or production-channel operation is claimed. The current branch still requires an isolated development bot/guild/channel and locally held credentials for those tests. CI success does not establish screenshot-level OCR accuracy or live Discord behavior. The former Gate A/B/C/D sequence and holdout corpus are not prerequisites for ordinary implementation on this branch.
+
+
 ## Historical working-copy verification (not current-branch results)
 
 The following results were recorded in a prior local working copy. They are preserved as provenance only; the corresponding complete workspace is not available in this execution environment, and these results have not been reproduced from the current `dwbotVis` branch.
