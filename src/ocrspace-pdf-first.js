@@ -91,7 +91,8 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
         maxPerDay: env.OCRSPACE_MAX_PER_DAY, maxPerMonth: env.OCRSPACE_MAX_PER_MONTH,
         maxEngine3PerMonth: env.OCRSPACE_MAX_ENGINE3_PER_MONTH,
     });
-    await ledger.reserve({ engine: 2, now: now() });
+    const reservation = await ledger.reserve({ engine: 2, now: now() });
+    let reservationSubmitted = false;
     if (onProviderRequestStarted !== null && typeof onProviderRequestStarted !== 'function') {
         throw fail('Provider-start checkpoint must be a function.', 'OCRSPACE_INVALID_CHECKPOINT_CALLBACK');
     }
@@ -114,6 +115,10 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
         };
         // This is the actual fetch boundary for both the OCR POST and PDF GET.
         await onProviderRequestStarted?.(details);
+        if (!reservationSubmitted && reservation?.reservationId && typeof ledger.markSubmitted === 'function') {
+            await ledger.markSubmitted({ reservationId: reservation.reservationId });
+            reservationSubmitted = true;
+        }
         requestCount++;
         return fetchImpl(url, options);
     };
@@ -131,8 +136,12 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
     const pdfBuffer = await downloadPdf(pdfUrl, { fetchImpl: providerFetch });
     const rasterBuffer = await renderPdf(pdfBuffer);
     const rasterMetadata = await readRasterMetadata(rasterBuffer);
+    if (!reservationSubmitted && reservation?.reservationId && typeof ledger.release === 'function') {
+        await ledger.release({ reservationId: reservation.reservationId, reason: 'no_http_request_invoked' });
+    }
     return {
         status: 'complete', provider: 'ocr.space', engine: 2,
+        quotaReservationStatus: reservationSubmitted ? 'submitted' : 'released_no_request',
         sourceSha256, originalScreenshotSha256: sourceSha256,
         uploadSha256, providerInputSha256: uploadSha256,
         uploadBytes: upload.buffer.length, mimeType: upload.mimeType || 'image/jpeg',
@@ -150,9 +159,13 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
         rasterBuffer, pdfBuffer,
     };
     } catch (error) {
+        if (!requestCount && !reservationSubmitted && reservation?.reservationId && typeof ledger.release === 'function') {
+            await ledger.release({ reservationId: reservation.reservationId, reason: error.code || 'request_not_submitted' }).catch(() => {});
+        }
         if (error && typeof error === 'object') {
             error.httpRequestCount = requestCount;
             error.requestCount = requestCount;
+            error.quotaReservationStatus = reservationSubmitted ? 'submitted_or_unknown' : 'released_or_unreserved';
         }
         throw error;
     }
