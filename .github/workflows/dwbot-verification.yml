@@ -205,7 +205,8 @@ jobs:
         with:
           name: dwbot-windows-node24-multi-provider-and-recovery
           path: |
-            testdata/persistence-recovery/**
+            testdata/persistence-recovery/**/persistence-recovery-report.json
+            testdata/persistence-recovery/**/persistence-recovery-report.sha256
             testdata/multi-provider-smoke/**
           if-no-files-found: warn
           retention-days: 30
