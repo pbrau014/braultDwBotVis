@@ -10,7 +10,7 @@ function enabled(value) { return String(value ?? '').trim() === '1'; }
 
 function getMultiProviderActivation(env = process.env) {
     const multiProviderExplicit = enabled(env.DWBOT_MULTI_PROVIDER_ENABLED);
-    const requested = multiProviderExplicit || enabled(env.OCRSPACE_ENABLED) || enabled(env.AZURE_DOCUMENT_INTELLIGENCE_ENABLED);
+    const requested = multiProviderExplicit;
     const ocrSpaceKeyConfigured = Boolean(String(env.OCRSPACE_API_KEY || '').trim());
     const ocrSpaceExplicit = enabled(env.OCRSPACE_ENABLED);
     const azureKeyConfigured = Boolean(String(env.AZURE_DOCUMENT_INTELLIGENCE_KEY || '').trim());
