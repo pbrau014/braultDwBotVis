@@ -13,7 +13,7 @@ const {
 } = require('../scripts/audit-gateb-holdout-eligibility');
 
 const root = path.resolve(__dirname, '..');
-const digest = value => crypto.createHash('sha256').update(String(value)).digest('hex');
+const digest = value => crypto.createHash('sha256').update(value).digest('hex');
 
 function makeRecord(index, overrides = {}) {
   const expected = Object.fromEntries(REQUIRED_FIELDS.map((field, fieldIndex) =>
