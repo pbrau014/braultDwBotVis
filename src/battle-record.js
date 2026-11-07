@@ -537,7 +537,7 @@ function applyCorrections(record, content) {
             next.ambiguities[issue.key] = `Your correction for ${issue.label} was not accepted: ${issue.reason}`;
         }
     }
-    return { record: next, recognized: Object.keys(parsed.values).length, invalid: parsed.invalid };
+    return { record: next, recognized: Object.keys(parsed.values).length, recognizedFields: Object.keys(parsed.values), invalid: parsed.invalid };
 }
 
 function applyReviewCorrection(record, reviewFields, content) {
@@ -547,8 +547,14 @@ function applyReviewCorrection(record, reviewFields, content) {
     const applied = applyCorrections(record, `${activeField.label}: ${content}`);
     const stillMissing = getMissingRequiredFields(applied.record).some(field => field.key === activeField.key);
     const invalid = applied.invalid.some(issue => issue.key === activeField.key);
-    if (stillMissing || invalid) {
-        return { record: applied.record, reviewFields: fields, activeField, accepted: false, invalid: applied.invalid };
+    const recognizedActiveField = Array.isArray(applied.recognizedFields) &&
+        applied.recognizedFields.includes(activeField.key);
+    if (stillMissing || invalid || !recognizedActiveField) {
+        const issues = applied.invalid.length ? applied.invalid : [{
+            key: activeField.key, label: activeField.label,
+            reason: 'The supplied value was not recognized for the active field.',
+        }];
+        return { record: applied.record, reviewFields: fields, activeField, accepted: false, invalid: issues };
     }
     return {
         record: applied.record,
