@@ -201,7 +201,7 @@ test('Node.js 24.22.1 is the branch runtime baseline', () => {
     assert.equal(packageLock.packages?.['']?.engines?.node, '>=24.17.0');
     assert.match(workflow, /node-version:\s*24\.22\.1/);
     assert.doesNotMatch(workflow, /node-version:\s*22\.16\.0/);
-    assert.match(windowsAcceptance, /MinimumNodeVersion\s*=\s*'24\.17\.0'/);
+    assert.match(windowsAcceptance, /MinimumNodeVersion\s*=\s*\[version\]'24\.17\.0'/);
 });
 
 
