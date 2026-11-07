@@ -11,8 +11,8 @@ on:
       - ocr-multiprovider
   workflow_dispatch:
     inputs:
-      run_legacy_56_provider_acceptance:
-        description: 'Submit the separate legacy 56-image OCR.Space provider batch; leave false for ordinary verification.'
+      run_live_multi_provider_smoke:
+        description: 'Run one explicitly enabled OCR.Space + Azure live smoke request against a repository development fixture.'
         required: false
         type: boolean
         default: false
@@ -147,45 +147,35 @@ jobs:
           node --version
           npm --version
           npm ci --no-audit --no-fund
-      - name: Reconstruct and verify eligible-only 56-image archive before provider access
-        shell: powershell
-        env:
-          OCRSPACE_56_ARCHIVE_PATH: ${{ runner.temp }}\\imgsHalf1-eligible-56.zip
-          OCRSPACE_56_IMAGE_ROOT: ${{ runner.temp }}\\imgsHalf1-eligible-56
-          OCRSPACE_56_PREFLIGHT_REPORT: ${{ github.workspace }}\\testdata\\ocr-acceptance\\ocrspace-56-preflight.json
-        run: |
-          $python = Get-Command python.exe -ErrorAction Stop
-          & $python.Source scripts/prepare-ocrspace-eligible-56.py
-          if ($LASTEXITCODE -ne 0) { throw '56-image archive reconstruction or integrity preflight failed; OCR.Space provider submissions are prohibited.' }
       - name: Windows process-level persistence and recovery
         run: npm run test:persistence-recovery
       - name: Full Windows Node 24 test suite
         run: npm test
-      - name: Verify protected OCR.Space secret is configured (value withheld)
+      - name: Explicit live multi-provider smoke test
+        if: github.event_name == 'workflow_dispatch' && inputs.run_live_multi_provider_smoke == true
         shell: powershell
         env:
-          OCRSPACE_API_KEY: ${{ secrets.OCRSPACE_API_KEY }}
-        run: |
-          $configured = -not [string]::IsNullOrWhiteSpace($env:OCRSPACE_API_KEY)
-          Write-Host "OCRSPACE_API_KEY configured: $configured"
-          if (-not $configured) { throw 'Protected OCRSPACE_API_KEY secret is missing or empty.' }
-      - name: Current-source Tesseract.js and native Tesseract screenshot acceptance
-        if: github.event_name == 'workflow_dispatch' && inputs.run_legacy_56_provider_acceptance == true
-        shell: powershell
-        env:
+          DWBOT_MULTI_PROVIDER_ENABLED: '1'
+          DWBOT_MULTI_PROVIDER_IMAGE_PATH: fixtures/four-screenshots/asashio-defeat.jpg
           OCRSPACE_ENABLED: '1'
           OCRSPACE_API_KEY: ${{ secrets.OCRSPACE_API_KEY }}
           OCRSPACE_NETWORK_ALLOWLIST: '1'
           OCR_NON_OCR_NETWORK_RESTRICTED: '1'
-        run: npm run test:windows-native-ocr
+          AZURE_DOCUMENT_INTELLIGENCE_ENABLED: '1'
+          AZURE_DOCUMENT_INTELLIGENCE_TIER: 'F0'
+          AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT: ${{ secrets.AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT }}
+          AZURE_DOCUMENT_INTELLIGENCE_KEY: ${{ secrets.AZURE_DOCUMENT_INTELLIGENCE_KEY }}
+          AZURE_DOCUMENT_INTELLIGENCE_MAX_PER_MONTH: '450'
+        run: node scripts/run-multi-provider-smoke.js
       - name: Upload Windows acceptance evidence even on failure
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: dwbot-windows-node22-native-ocr-and-recovery
+          name: dwbot-windows-node24-multi-provider-and-recovery
           path: |
             testdata/ocr-acceptance/**
             testdata/persistence-recovery/**
+            testdata/multi-provider-smoke/**
           if-no-files-found: warn
           retention-days: 30
 
