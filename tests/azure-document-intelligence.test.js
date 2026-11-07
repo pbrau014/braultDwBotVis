@@ -87,7 +87,8 @@ test('Azure network failures report every fetch invocation', async () => {
     await assert.rejects(() => recognizeImage({
         imageBuffer: png(), endpoint: 'https://dwbot.cognitiveservices.azure.com', apiKey: 'x',
         fetchImpl: async () => { calls++; throw new Error('network down'); },
-    }), error => error.code === 'AZURE_OCR_NETWORK_ERROR' && error.httpRequestCount === 1);
+    }), error => error.code === 'AZURE_OCR_NETWORK_ERROR' && error.httpRequestCount === 1 &&
+        Number.isFinite(error.elapsedMs) && typeof error.startedAt === 'string' && typeof error.completedAt === 'string');
     assert.equal(calls, 1);
 });
 
