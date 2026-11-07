@@ -79,7 +79,7 @@ for (const moduleName of ['node:http', 'node:https']) {
   };
   mod.get = function (...args) {
     const target = destination(args);
-    if ((proto === 'https' && ocrSpaceAllowed(target)) || !restrictNonOcrNetwork) return originalGet(...args);
+    if ((proto === 'https' && providerAllowed(target)) || !restrictNonOcrNetwork) return originalGet(...args);
     return blocked(`${proto}.get`, target);
   };
 }
@@ -87,6 +87,8 @@ const tls = require('node:tls');
 const originalTlsConnect = tls.connect.bind(tls);
 tls.connect = function (...args) {
   const target = destination(args);
-  if (ocrSpaceAllowed(target) || !restrictNonOcrNetwork) return originalTlsConnect(...args);
+  if (providerAllowed(target) || !restrictNonOcrNetwork) return originalTlsConnect(...args);
   return blocked('tls', target);
 };
+
+module.exports = { providerAllowed, destination };
