@@ -13,7 +13,7 @@ $stage=Join-Path $OutputRoot ('stage-'+$commit.Substring(0,12)); $packageLabel=i
 if(Test-Path $stage){Remove-Item $stage -Recurse -Force}; if(Test-Path $zip){Remove-Item $zip -Force}; New-Item -ItemType Directory -Force -Path $stage|Out-Null
 $tracked=@(& git -C $ProjectRoot ls-files); if($LASTEXITCODE -ne 0 -or !$tracked.Count){throw 'Tracked inventory empty'}
 $included=@()
-foreach($rel in $tracked){$n=$rel -replace '\\','/'; if($n -match '(^|/)(node_modules|\.git|\.cache|coverage|release-artifacts|persistence-recovery)(/|$)'){continue}; if($n -match '(^|/)\.env($|\.)'){continue}; if($n -match '(^|/)(tournament-state|live-discord-state)(/|$)'){continue}; $src=Join-Path $ProjectRoot $rel; if(!(Test-Path -LiteralPath $src -PathType Leaf)){throw "Missing tracked file $rel"}; $dst=Join-Path $stage $rel; New-Item -ItemType Directory -Force -Path (Split-Path -Parent $dst)|Out-Null; Copy-Item -LiteralPath $src -Destination $dst; $included+=$rel}
+foreach($rel in $tracked){$n=$rel -replace '\\','/'; if($n -match '(^|/)(node_modules|\.git|\.cache|coverage|release-artifacts|persistence-recovery|dwbotStuff)(/|$)' -or $n -match '(^|/)(provenance/input-archives|docs/source-baselines|docs/source-inputs)(/|$)'){continue}; if($n -match '(^|/)\.env($|\.)'){continue}; if($n -match '(^|/)(tournament-state|live-discord-state)(/|$)'){continue}; $src=Join-Path $ProjectRoot $rel; if(!(Test-Path -LiteralPath $src -PathType Leaf)){throw "Missing tracked file $rel"}; $dst=Join-Path $stage $rel; New-Item -ItemType Directory -Force -Path (Split-Path -Parent $dst)|Out-Null; Copy-Item -LiteralPath $src -Destination $dst; $included+=$rel}
 if(!($included -contains 'package.json') -or !($included -contains 'package-lock.json')){throw 'Node manifests missing'}
 $pdfSource=Join-Path $OutputRoot 'DWBOT_LOCAL_OPERATIONS_AND_RELEASE_VERIFICATION_MANUAL_2026-11-04.pdf'
 if(!(Test-Path -LiteralPath $pdfSource -PathType Leaf)){throw 'Rendered PDF manual is missing; package cannot be release-verified'}
@@ -24,7 +24,7 @@ if(!(Test-Path -LiteralPath $userPdfSource -PathType Leaf)){throw 'Rendered user
 $userPdfRel='docs/user/DWBOT_USER_MANUAL.pdf'
 $userPdfDest=Join-Path $stage $userPdfRel; New-Item -ItemType Directory -Force -Path (Split-Path -Parent $userPdfDest)|Out-Null; Copy-Item -LiteralPath $userPdfSource -Destination $userPdfDest; $included+=$userPdfRel
 $entries=@($included|Sort-Object|ForEach-Object{$p=Join-Path $stage $_; [pscustomobject]@{path=$_;sizeBytes=(Get-Item $p).Length;sha256=(Get-FileHash $p -Algorithm SHA256).Hash.ToLowerInvariant()}})
-$manifest=@{schemaVersion=1;sourceCommit=$commit;createdAt=(Get-Date).ToUniversalTime().ToString('o');excluded=@('.env*','node_modules','.git','.cache','coverage','runtime state/databases','private backups');files=$entries}
+$manifest=@{schemaVersion=1;sourceCommit=$commit;createdAt=(Get-Date).ToUniversalTime().ToString('o');excluded=@('.env*','node_modules','.git','.cache','coverage','runtime state/databases','private backups','dwbotStuff review-only source assets (retained in repository)','provenance/input-archives (retained in repository)','docs/source-baselines (retained in repository)','docs/source-inputs (retained in repository)');files=$entries}
 $manifest|ConvertTo-Json -Depth 6|Set-Content -LiteralPath (Join-Path $stage 'RELEASE_PACKAGE_MANIFEST.json') -Encoding utf8
 $archiveInputs=@(Get-ChildItem -LiteralPath $stage -Force | Select-Object -ExpandProperty FullName)
 Compress-Archive -Path $archiveInputs -DestinationPath $zip -CompressionLevel Optimal
