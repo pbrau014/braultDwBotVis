@@ -101,3 +101,11 @@ Run it only after setting the explicit provider flags, exact resource endpoint, 
 - `docs/GRAND-TOURNAMENT-V3.22-DWBOT-ALIGNMENT.md` — policy/source reconciliation and current nine-field application contract.
 
 This branch does not reinstate the former Gate A/B/C/D sequence or an independent holdout corpus as a prerequisite for ordinary implementation. Testing, labelled accuracy measurement, manual review, and honest reporting remain required engineering practices.
+
+## Retained source and provenance
+
+- `docs/source-baselines/` preserves the original v3.22 tournament documentation baseline; it is historical source, not the active OCR or release policy.
+- `provenance/` retains the RC3 source archive and its inventory/provenance records.
+- `docs/source-inputs/` preserves original OCR implementation notes and Discord-supplied workbook/scoring explanations.
+- `dwbotStuff/` retains the 56-image ground-truth review workbook, reviewed/consolidated image inventories, and original tournament instruction DOCX sources. These are reference inputs, not runtime dependencies.
+- `docs/REPOSITORY_PRUNING_MANIFEST_2026-11-06.json` records the original blob hashes and reasons for files removed from this branch.
