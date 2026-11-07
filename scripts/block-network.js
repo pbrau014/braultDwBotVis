@@ -48,11 +48,12 @@ function providerAllowed(value) {
   try {
     const url = new URL(String(value));
     if (url.protocol !== 'https:' || url.username || url.password || url.port) return false;
-    if (process.env.OCRSPACE_NETWORK_ALLOWLIST === '1' &&
+    if (process.env.OCRSPACE_ENABLED === '1' && process.env.OCRSPACE_NETWORK_ALLOWLIST === '1' &&
         ['api.ocr.space', 'ocr.space'].includes(url.hostname)) return true;
     // Azure is permitted only for the exact resource hostname configured by
     // the operator, never for a broad *.cognitiveservices.azure.com wildcard.
-    if (process.env.AZURE_DOCUMENT_INTELLIGENCE_NETWORK_ALLOWLIST === '1') {
+    if (process.env.AZURE_DOCUMENT_INTELLIGENCE_ENABLED === '1' &&
+        process.env.AZURE_DOCUMENT_INTELLIGENCE_NETWORK_ALLOWLIST === '1') {
       const configured = new URL(String(process.env.AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT || ''));
       return configured.protocol === 'https:' && !configured.username && !configured.password &&
         !configured.port && configured.pathname === '/' && !configured.search && !configured.hash &&
