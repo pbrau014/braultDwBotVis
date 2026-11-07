@@ -6,6 +6,9 @@ const API_VERSION = '2024-11-30';
 const MODEL_ID = 'prebuilt-read';
 const MAX_FREE_FILE_BYTES = 4 * 1024 * 1024;
 const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
+const MAX_PAGES = 20;
+const MAX_LINES = 10000;
+const MAX_WORDS_PER_LINE = 500;
 const DEFAULT_MONTHLY_LIMIT = 450;
 
 function fail(message, code, extra = {}) {
@@ -91,6 +94,7 @@ function flattenReadResult(payload) {
     if (!result || typeof result !== 'object') throw fail('Azure result omitted analyzeResult.', 'AZURE_OCR_INVALID_RESPONSE');
     const lines = [];
     const pages = Array.isArray(result.pages) ? result.pages : [];
+    if (pages.length > MAX_PAGES) throw fail('Azure result exceeds the configured page count limit.', 'AZURE_OCR_RESPONSE_TOO_COMPLEX');
     for (let pageIndex = 0; pageIndex < pages.length; pageIndex++) {
         const page = pages[pageIndex];
         const pageWidth = Number.isFinite(Number(page.width)) && page.width !== null ? Number(page.width) : null;
