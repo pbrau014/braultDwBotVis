@@ -71,6 +71,7 @@ function auditRepository() {
     historyFindings,
     secretValuesPrinted: false,
     historyScope: 'All refs available in this non-shallow checkout (git log --all).',
+    historyFindingsQualification: 'Each listed path is a file changed in a commit containing a matching added/removed line; it may not be the exact matching file if that commit changed multiple files.',
     limitations: [
       'This scan detects Discord webhook URL patterns only; it is not a general secret scanner.',
       'Remote forks, deleted branches no longer fetched, external clones, caches, and Discord-side credential state are outside this scan.',
