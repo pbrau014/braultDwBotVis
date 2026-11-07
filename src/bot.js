@@ -3630,7 +3630,10 @@ async function handleIncomingMessage(message) {
             }
             const ocrOutput = await ocrPromise;
             const validations = ocrOutput.attempts.map((attempt) => validateWorldOfWarshipsScreenshot(attempt, ocrOutput.fields));
-            validations.sort((a, b) => a.missing.length - b.missing.length || b.confidence - a.confidence);
+            validations.sort((a, b) =>
+                (a.missing.length + (a.unresolvedFields || []).length) -
+                    (b.missing.length + (b.unresolvedFields || []).length) ||
+                b.confidence - a.confidence);
             const validation = validations[0];
             const record = validation.record;
             const remoteCheck = validation.ocrSpaceReconciliation;
@@ -3639,14 +3642,31 @@ async function handleIncomingMessage(message) {
                     out[field.status] = (out[field.status] || 0) + 1;
                     return out;
                 }, {});
-                console.log('OCR.Space diagnostic cross-check (no acceptance authority): ' +
+                console.log('OCR.Space diagnostic cross-check (evidence only; conflicts block automatic posting): ' +
                     JSON.stringify({ status: remoteCheck.status, requests: remoteCheck.requests, fields: counts,
                         player: 'excluded_by_privacy_policy' }));
             }
-            const missing = getMissingRequiredFields(record);
-            console.log(`OCR result for ${fileName}: ${missing.length ? `pending ${missing.map((f) => f.label).join(', ')}` : 'complete'}; resolved ${9 - missing.length}/9 required fields; mean OCR confidence ${validation.confidence.toFixed(1)}; PSM ${validation.pageSegmentationMode}.`);
-            if (missing.length) {
-                await promptForMissingValues(message, fileName, record, missing, ocrOutput.sourceEvidence || null);
+            const missing = validation.missing || getMissingRequiredFields(record);
+            const fieldLabels = {
+                result: 'Battle Result', player: 'Player', map: 'Map', mode: 'Battle Mode',
+                battleStart: 'Battle Start Time', credits: 'Credits', freeXp: 'Free XP',
+                damage: 'Damage', xp: 'XP',
+            };
+            const reviewFields = [...missing];
+            const reviewKeys = new Set(reviewFields.map(field => field.key));
+            for (const unresolved of validation.unresolvedFields || []) {
+                if (reviewKeys.has(unresolved.field)) continue;
+                reviewKeys.add(unresolved.field);
+                reviewFields.push({
+                    key: unresolved.field,
+                    label: fieldLabels[unresolved.field] || unresolved.field,
+                    reason: 'Independent OCR evidence conflicts; verify this value against the original screenshot.',
+                });
+            }
+            const resolvedCount = 9 - reviewKeys.size;
+            console.log(`OCR result for ${fileName}: ${reviewFields.length ? `manual review required for ${reviewFields.map((f) => f.label).join(', ')}` : 'complete'}; resolved ${resolvedCount}/9 mandatory fields; ${(validation.unresolvedFields || []).length} conflict(s); mean OCR confidence ${validation.confidence.toFixed(1)}; PSM ${validation.pageSegmentationMode}.`);
+            if (!validation.accepted || reviewFields.length) {
+                await promptForMissingValues(message, fileName, record, reviewFields, ocrOutput.sourceEvidence || null);
                 continue;
             }
             await postBattleRecord(message, record, fileName, '', ocrOutput.sourceEvidence || null);
