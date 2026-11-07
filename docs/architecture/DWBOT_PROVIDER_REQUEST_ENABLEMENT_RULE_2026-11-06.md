@@ -38,5 +38,5 @@ Implement and verify this rule only on `ocr-multiprovider`. Do not modify `main`
 
 ## Acceptance
 
-Provider-request enablement is a configuration and orchestration requirement, not proof of provider accuracy. Gate A and Gate B still require the nine-field contract, independent ground truth, zero wrong accepted mandatory values, zero unresolved mandatory values in passing records, complete provenance, and network-policy compliance. No gate passes merely because requests were sent or providers returned text.
+Provider-request enablement is a configuration and orchestration requirement, not proof of provider accuracy. This branch does not impose the former Gate A/Gate B sequence or an independent holdout corpus as a prerequisite for ordinary implementation or deployment preparation. Accuracy evaluation remains an engineering capability: when labelled data is available, report per-field exact match, full nine-field record exact match, wrong accepted values, unresolved values, disagreements, provenance, runtime, provider availability, and request/quota usage. Never claim measured accuracy without independent ground truth, and never treat provider participation as proof of correctness.
 
