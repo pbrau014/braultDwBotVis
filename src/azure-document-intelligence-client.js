@@ -259,6 +259,9 @@ async function recognizeImage({
         wrapped.httpRequestCount = httpRequestCount;
         wrapped.providerRequestIds = providerRequestIds;
         wrapped.operationId = operationId;
+        wrapped.startedAt = new Date(startedAt).toISOString();
+        wrapped.completedAt = new Date().toISOString();
+        wrapped.elapsedMs = Date.now() - startedAt;
         throw wrapped;
     } finally { clearTimeout(timer); }
 }
