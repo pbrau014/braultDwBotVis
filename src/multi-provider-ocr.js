@@ -60,12 +60,21 @@ async function runMultiProviderOcr({
             });
             if (value?.status !== 'complete') throw Object.assign(new Error(value?.reason || 'OCR.Space did not complete.'), { code: 'OCRSPACE_MULTI_PROVIDER_INCOMPLETE' });
             return {
-                provider: 'ocr.space', status: 'success', sourceSha256,
-                inputSha256: value.sourceSha256 || sourceSha256,
+                provider: 'ocr.space', status: 'success',
+                sourceSha256, originalScreenshotSha256: sourceSha256,
+                // OCR.Space receives the prepared upload, not necessarily the
+                // original screenshot. Keep those identities separate.
+                inputSha256: value.uploadSha256 || null,
+                providerInputSha256: value.uploadSha256 || null,
+                uploadSha256: value.uploadSha256 || null,
                 engine: value.engine || 2,
                 text: String(value.providerText || ''),
                 searchablePdfSha256: value.pdfSha256 || null,
                 rasterSha256: value.rasterSha256 || null,
+                uploadBytes: Number(value.uploadBytes) || null,
+                pdfBytes: Number(value.pdfBytes) || null,
+                rasterBytes: Number(value.rasterBytes) || null,
+                mimeType: value.mimeType || null,
                 requestCount: Number(value.requests) || 1,
                 elapsedMs: Number(value.elapsedMs) || null,
                 raw: value,
@@ -90,11 +99,20 @@ async function runMultiProviderOcr({
                 apiKey: env.AZURE_DOCUMENT_INTELLIGENCE_KEY, fetchImpl,
                 timeoutMs: env.AZURE_DOCUMENT_INTELLIGENCE_TIMEOUT_MS,
                 onRequestStarted: async details => { await onProviderRequestStarted?.(details); requestStarted = true; },
-                beforeRequest: () => ledger.reserveRequestSlot(),
+                beforeRequest: async details => {
+                    const slot = await ledger.reserveRequestSlot();
+                    if (slot.waitMs > 0) await new Promise(resolve => setTimeout(resolve, slot.waitMs));
+                    return slot;
+                },
             });
-            providerState.azure = { ...value, requestCount: 1 };
+            providerState.azure = {
+                ...value,
+                originalScreenshotSha256: sourceSha256,
+                providerInputSha256: value.inputSha256 || sourceSha256,
+                requestCount: Number(value.httpRequestCount) || 0,
+            };
         })().catch(error => {
-            providerState.azure = { provider: 'azure-document-intelligence', status: 'failed', sourceSha256, requestCount: requestStarted ? 1 : 0, httpRequestCount: Number(error.httpRequestCount) || 0, errorCode: error.code || 'AZURE_OCR_ERROR', error: String(error.message || error).slice(0, 300) };
+            providerState.azure = { provider: 'azure-document-intelligence', status: 'failed', sourceSha256, requestCount: Number(error.httpRequestCount) || (requestStarted ? 1 : 0), httpRequestCount: Number(error.httpRequestCount) || (requestStarted ? 1 : 0), errorCode: error.code || 'AZURE_OCR_ERROR', error: String(error.message || error).slice(0, 300) };
         }));
     } else {
         providerState.azure = { provider: 'azure-document-intelligence', status: 'blocked', sourceSha256, requestCount: 0, reason: activation.providers.azure.reason };
