@@ -73,6 +73,28 @@ The queue lists only image identity, source fingerprint, and fields that are not
 | 62 | `pics-page12-image15.jpg` | `map` | `9f5ad6bc7c88bf5d00700bdb6514017453cf5b87e82bd7b2fa277471403f724d` |
 | 63 | `pics-page12-image43.jpg` | `player`, `map`, `mode`, `battleStart`, `credits` | `19818652844d212f823ba23fc020921a060601e9de59a00a5648ae203ca45b5e` |
 
+
+## Field-level review template — generated 2026-11-07
+
+A blank CSV template is published as an artifact from [Gate B inventory preflight run 42319588371](https://github.com/pbrau014/braultDwBotVis/actions/runs/42319588371). Download the artifact named `gateb-holdout-inventory-preflight` and open `gateb-field-label-review-template.csv`.
+
+- 164 rows: one row for each field currently missing or not eligible across the 42 incomplete records.
+- Includes corpus order, source filename, source-image SHA-256, field name, existing status, and whether an expected-value cell is populated.
+- Leaves `reviewedValue`, `reviewer`, `reviewedAt`, `evidenceReference`, and `evidenceNote` blank; every row starts `PENDING`.
+- No existing expected value or OCR candidate is copied into the review-value column. No values are inferred.
+- Artifact SHA-256: `6e708149c30c64521c620bdd7423942fd9239abd751f31d653761d02966a64ce`.
+
+### Reviewer procedure
+
+1. Resolve the exact original screenshot using the filename and SHA-256. Confirm the image hash against the original source archive before annotation.
+2. Read the screenshot itself. The searchable PDF text layer and OCR output are supporting diagnostics only, not the source of truth.
+3. Enter a value only when independently legible. Keep ambiguous or illegible fields blank and unresolved.
+4. Record reviewer identity, review timestamp, and a precise evidence reference (image region or source transcription line). Do not use an OCR result as the sole basis for a label.
+5. Preserve the original CSV. Save a separately versioned completed copy; do not edit the source workbook or the v6 JSON in place.
+6. Reconcile the completed copy into a new ground-truth candidate, rerun the read-only eligibility audit, inspect all differences, and freeze the independent holdout before any acceptance OCR run.
+
+The template is a review aid, not a ground-truth file and not an acceptance result. A populated field is not eligible merely because it is non-empty. The final nine-field eligibility and provenance checks still apply. Do not count the separate 56-workbook manifest's 36-row claim unless its exact workbook is recovered and independently reconciled.
+
 ## Annotation rules
 
 1. Review the original full-resolution screenshot, not OCR output or the PDF text layer alone.
