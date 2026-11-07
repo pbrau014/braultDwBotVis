@@ -28,6 +28,7 @@ test('Azure Read client posts original image bytes and preserves line and word g
     const image = png();
     const calls = [];
     const requestSlots = [];
+    const startedRequests = [];
     let poll = 0;
     const fetchImpl = async (url, options) => {
         calls.push({ url: String(url), method: options.method, body: options.body });
@@ -45,7 +46,10 @@ test('Azure Read client posts original image bytes and preserves line and word g
         return { status: 200, ok: true, redirected: false, headers: { get: () => String(bytes.length) },
             body: new ReadableStream({ start(controller) { controller.enqueue(bytes); controller.close(); } }) };
     };
-    const result = await recognizeImage({ imageBuffer: image, endpoint: 'https://dwbot.cognitiveservices.azure.com', apiKey: 'not-a-real-key', fetchImpl, pollIntervalMs: 1000, beforeRequest: async details => { requestSlots.push(details.method); return { waitMs: 0 }; } });
+    const result = await recognizeImage({ imageBuffer: image, endpoint: 'https://dwbot.cognitiveservices.azure.com', apiKey: 'not-a-real-key', fetchImpl, pollIntervalMs: 1000,
+        beforeRequest: async details => { requestSlots.push(details.method); return { waitMs: 0 }; },
+        onRequestStarted: async details => { startedRequests.push({ method: details.method, requestIndex: details.requestIndex, provider: details.provider }); },
+    });
     assert.equal(result.status, 'success');
     assert.equal(result.text, 'Victory\\nDamage 123');
     assert.equal(result.lines[0].words[0].confidence, 0.98);
@@ -55,6 +59,29 @@ test('Azure Read client posts original image bytes and preserves line and word g
     assert.equal(poll, 1);
     assert.equal(result.httpRequestCount, 2);
     assert.deepEqual(requestSlots, ['POST', 'GET']);
+    assert.deepEqual(startedRequests, [
+        { method: 'POST', requestIndex: 1, provider: 'azure-document-intelligence' },
+        { method: 'GET', requestIndex: 2, provider: 'azure-document-intelligence' },
+    ]);
+});
+
+test('Azure request hook failure prevents network access and preserves exact request count', async () => {
+    let calls = 0;
+    await assert.rejects(() => recognizeImage({
+        imageBuffer: png(), endpoint: 'https://dwbot.cognitiveservices.azure.com', apiKey: 'x',
+        fetchImpl: async () => { calls++; throw new Error('should not be reached'); },
+        beforeRequest: async () => { throw Object.assign(new Error('scheduler unavailable'), { code: 'SCHEDULER_FAILED' }); },
+    }), error => error.code === 'SCHEDULER_FAILED' && error.httpRequestCount === 0);
+    assert.equal(calls, 0);
+});
+
+test('Azure network failures report every fetch invocation', async () => {
+    let calls = 0;
+    await assert.rejects(() => recognizeImage({
+        imageBuffer: png(), endpoint: 'https://dwbot.cognitiveservices.azure.com', apiKey: 'x',
+        fetchImpl: async () => { calls++; throw new Error('network down'); },
+    }), error => error.code === 'AZURE_OCR_NETWORK_ERROR' && error.httpRequestCount === 1);
+    assert.equal(calls, 1);
 });
 
 test('Azure Read rejects over-limit images and invalid endpoints before network access', async () => {
