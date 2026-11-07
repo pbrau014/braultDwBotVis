@@ -1,3 +1,22 @@
+LATEST SOURCE IDENTITY SEARCH RESULT — 2026-11-07 (UTC)
+- PR #21 source-survey CI run 42319770443 completed SUCCESS. It examined 24 GitHub repository branch/tag refs. None matched the recorded 2026-10-28 sourceBuild fingerprint 43f1e8b877d7f5832bca3ff070f8ae8164deb7c68da233694c64bece70b99166 over 89 files. The PR contract suite passed 9/9; the Gate A execution job was skipped. No OCR/provider activity occurred.
+- The accessible Library's named RC3 archive reference is DWBOT_RC3_CURRENT_SOURCE.zip with recorded SHA-256 c02f5bee9bf5a2b02294736c4ddf4dc520fe3841e264562c6fa9398b3f4e9fb5 in an older governing plan; that exact archive is not present in the current Library ZIP listing or current conversation file list. The accessible DWBOT_.zip (175,126,438 bytes) is a different/ambiguous name and must not be assumed to be the RC3 archive.
+- The older RC3 plan also records a separate 50-file RC3 work-copy fingerprint 1dd915e1a457a51eca5c2ca1c039697647643a274d6107cacb831e1ca81183ab. The Nov 5 XP-repair candidate and OCR.Space milestone plans record still other source-build fingerprints (78def... / 8c8b...). These are separate historical source identities; do not silently equate them with the 2026-10-28 89-file acceptance fingerprint.
+- The current GitHub main/branch survey fingerprints do not match the recorded 89-file candidate. PR #21's recovery helper and workflow are fail-closed on that mismatch. Gate A must remain blocked until the exact source candidate corresponding to the active acceptance fingerprint is recovered and verified, or the user explicitly selects a different authoritative source identity after reviewing the provenance conflict.
+- No source archive was extracted or substituted to work around the Data Analysis ZIP-inspection limit. Original files and all historical run evidence remain unchanged.
+
+CURRENT INDEPENDENT PROGRESS:
+- PR #19 run 42319588371: 15/15 tests pass; read-only audit confirms 21/63 complete eligible records, 42 partial, 29 short of Gate B minimum. The generated 164-row blank field-level label review template is available in artifact 13551889075 (8,414 bytes; SHA-256 6e708149c30c64521c620bdd7423942fd9239abd751f31d653761d02966a64ce). It contains no expected values and infers none.
+- PR #21 run 42319770443: 9/9 contract tests pass; branch survey completed; execution job skipped. No manual dispatch has been made.
+- PR #20 scanner run 42317050142: 3/3 tests pass; current tree clean; two historical findings remain and credential-owner revocation is outstanding.
+
+Gate A: BLOCKED ON AUTHORITATIVE SOURCE IDENTITY; NOT PASSED.
+Gate B: BLOCKED ON INDEPENDENT LABEL COMPLETION / IMAGE-LEVEL VERIFICATION; NOT PASSED.
+Production: NO-GO.
+================================================================================
+END LATEST SOURCE IDENTITY SEARCH RESULT
+================================================================================
+
 LATEST IMPLEMENTATION / CI UPDATE — 2026-11-07 (UTC)
 - PR #19 CI run 42319588371 completed SUCCESS. All 15 policy, identity, source-hash-scope, and review-template tests passed. The current v6 inventory remains 63 total / 21 eligible / 42 partial / 29 short of the 50-image minimum; selected Gate B images = 0; gateBPass = false.
 - The audit now checks filename, source hash metadata, corpus order, and Gate A/regression overlap across every row, including partial-label rows. This prevents an incomplete row from hiding a duplicate or overlap.
