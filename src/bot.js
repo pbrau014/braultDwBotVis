@@ -2576,7 +2576,31 @@ async function extractTextCore(imageBuffer) {
         }
     }
 
+    const sourceAspectRatio = sourceWidth / sourceHeight;
+    const preparedAspectRatio = imageWidth / imageHeight;
+    const preparedAspectMatches = Number.isFinite(sourceAspectRatio) && Number.isFinite(preparedAspectRatio) &&
+        Math.abs(sourceAspectRatio - preparedAspectRatio) <= Math.max(0.002, sourceAspectRatio * 0.002);
+    const sourceImageProvenance = {
+        originalScreenshot: {
+            sha256: createHash('sha256').update(imageBuffer).digest('hex'),
+            bytes: imageBuffer.length, width: sourceWidth, height: sourceHeight,
+        },
+        primaryTesseractPreparedInput: {
+            sha256: createHash('sha256').update(preparedBuffer).digest('hex'),
+            bytes: preparedBuffer.length, width: imageWidth, height: imageHeight,
+            preprocessing: ['auto-orient', 'resize', 'grayscale', 'normalize', 'unsharp'],
+            requestedWidth: targetWidth,
+            coordinateSpace: 'prepared-image-pixels',
+            transformToOriginalScreenshot: preparedAspectMatches ? {
+                scaleX: sourceWidth / imageWidth, scaleY: sourceHeight / imageHeight,
+                offsetX: 0, offsetY: 0,
+            } : null,
+            transformVerified: preparedAspectMatches,
+        },
+    };
+
     const extractedFields = {
+        sourceImageProvenance,
         ocrSpaceEvidence: ocrSpaceSourceEvidence,
         azureEvidence: azureSourceEvidence,
         ocrSpacePdfFirst: ocrSpacePdfFirstEvidence,
