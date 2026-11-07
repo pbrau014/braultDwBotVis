@@ -71,13 +71,14 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
     fetchImpl = globalThis.fetch, client = recognizeCrop, quotaLedger = null,
     prepareUpload = imageProcessor.prepareOcrSpaceUpload,
     downloadPdf = downloadSearchablePdf, renderPdf = imageProcessor.renderSearchablePdfPage,
-    readRasterMetadata = imageProcessor.metadata, onProviderRequestStarted = null, now = () => new Date() } = {}) {
+    readRasterMetadata = imageProcessor.metadata, readSourceMetadata = imageProcessor.metadata,
+    onProviderRequestStarted = null, now = () => new Date() } = {}) {
     const startedAt = Date.now();
     const apiKey = String(env.OCRSPACE_API_KEY || '').trim();
     if (!apiKey) return { status: 'blocked', reason: 'OCRSPACE_API_KEY is not configured', requests: 0 };
     if (!Buffer.isBuffer(imageBuffer) || !imageBuffer.length) throw fail('Source screenshot is empty.', 'OCRSPACE_INVALID_IMAGE');
     let sourceMetadata = null;
-    try { sourceMetadata = await imageProcessor.metadata(imageBuffer); } catch {}
+    try { sourceMetadata = await readSourceMetadata(imageBuffer); } catch {}
     const sourceWidth = Number(sourceMetadata?.width) > 0 ? Number(sourceMetadata.width) : null;
     const sourceHeight = Number(sourceMetadata?.height) > 0 ? Number(sourceMetadata.height) : null;
     const png = imageBuffer.length >= 8 && imageBuffer[0] === 0x89 && imageBuffer.subarray(1, 4).toString('ascii') === 'PNG';
