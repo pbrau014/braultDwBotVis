@@ -190,3 +190,57 @@ test('failed durable provider-start checkpoint prevents any OCR.Space request', 
     }), /checkpoint disk failure/);
     assert.equal(providerCalled, false);
 });
+
+
+test('resized OCR.Space upload geometry maps back to original screenshot only with verified orientation and aspect ratio', async () => {
+    const original = Buffer.alloc(1024 * 1024 + 1, 7);
+    const derivative = Buffer.from('resized-provider-input');
+    const result = await createOcrSpacePdfFirst({
+        imageBuffer: original,
+        env: { OCRSPACE_API_KEY: 'test-key' },
+        quotaLedger: fakeLedger(),
+        readSourceMetadata: async () => ({ width: 1920, height: 1080 }),
+        prepareUpload: async () => ({
+            buffer: derivative, filename: 'source.jpg', mimeType: 'image/jpeg',
+            bytes: derivative.length, width: 960, height: 540, resized: true, quality: 80,
+        }),
+        client: async options => {
+            assert.equal(options.imageBuffer, derivative);
+            return {
+                searchablePdfUrl: 'https://api.ocr.space/parse/image/temporary.pdf',
+                parsedText: 'Victory', exitCode: 1, textOrientation: 0,
+                overlay: [{ text: 'Victory', left: 5, top: 10, width: 15, height: 5, pageIndex: 0, lineIndex: 0, lineText: 'Victory' }],
+            };
+        },
+        downloadPdf: async () => pdf,
+        renderPdf: async () => png,
+        readRasterMetadata: async () => ({ width: 1920, height: 1080 }),
+    });
+    assert.equal(result.sourceSha256, crypto.createHash('sha256').update(original).digest('hex'));
+    assert.equal(result.uploadSha256, crypto.createHash('sha256').update(derivative).digest('hex'));
+    assert.notEqual(result.sourceSha256, result.uploadSha256);
+    assert.equal(result.overlayCoordinateSpace, 'original-screenshot-pixels');
+    assert.deepEqual(result.overlay[0].originalPolygon, [10,20,40,20,40,30,10,30]);
+    assert.equal(result.overlay[0].originalCoordinateGeometryValid, true);
+});
+
+test('OCR.Space overlay remains in provider-upload coordinates when auto-orientation prevents a verified transform', async () => {
+    const result = await createOcrSpacePdfFirst({
+        imageBuffer: png,
+        env: { OCRSPACE_API_KEY: 'test-key' },
+        quotaLedger: fakeLedger(),
+        readSourceMetadata: async () => ({ width: 1920, height: 1080 }),
+        client: async () => ({
+            searchablePdfUrl: 'https://api.ocr.space/parse/image/temporary.pdf',
+            parsedText: 'Victory', exitCode: 1, textOrientation: 90,
+            overlay: [{ text: 'Victory', left: 5, top: 10, width: 15, height: 5, pageIndex: 0, lineIndex: 0, lineText: 'Victory' }],
+        }),
+        downloadPdf: async () => pdf,
+        renderPdf: async () => png,
+        readRasterMetadata: async () => ({ width: 1920, height: 1080 }),
+    });
+    assert.equal(result.overlayCoordinateSpace, 'provider-upload-pixels');
+    assert.equal(result.overlay[0].originalPolygon, null);
+    assert.equal(result.overlay[0].originalCoordinateGeometryValid, false);
+    assert.equal(result.overlay[0].coordinateSpace, 'provider-upload-pixels');
+});
