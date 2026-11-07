@@ -43,6 +43,7 @@ async function main() {
             apiVersion: value.apiVersion || null,
             rawText: String(value.text || value.raw?.providerText || '').slice(0, 12000),
             providerNativeLines: Array.isArray(value.lines) ? value.lines.slice(0, 10000) : [],
+            providerPages: Array.isArray(value.pages) ? value.pages.slice(0, 20) : [],
             engine: value.engine || null,
             sourceSha256: value.originalScreenshotSha256 || value.sourceSha256 || sourceSha256,
             originalScreenshotSha256: value.originalScreenshotSha256 || value.sourceSha256 || sourceSha256,
