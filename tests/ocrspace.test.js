@@ -42,7 +42,13 @@ test('Engine 2 is the default PDF-first profile with hidden searchable text laye
     assert.equal(request.options.body.get('isSearchablePdfHideTextLayer'), 'true');
     assert.equal(result.parsedText, '43110');
     assert.equal(result.providerConfidence, null);
-    assert.deepEqual(result.overlay, []);
+    assert.equal(result.overlay.length, 1);
+    assert.deepEqual(result.overlay[0], {
+        text: '43110', left: 3, top: 4, width: 40, height: 12,
+        right: 43, bottom: 16, pageIndex: 0, lineIndex: 0,
+        lineText: '43110', coordinateSpace: 'provider-upload-pixels',
+    });
+    assert.equal(result.textOrientation, null);
     assert.equal(result.searchablePdfUrl, 'https://api.ocr.space/download/mock.pdf');
 });
 
