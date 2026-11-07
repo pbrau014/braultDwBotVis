@@ -72,6 +72,7 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
     prepareUpload = imageProcessor.prepareOcrSpaceUpload,
     downloadPdf = downloadSearchablePdf, renderPdf = imageProcessor.renderSearchablePdfPage,
     readRasterMetadata = imageProcessor.metadata, onProviderRequestStarted = null, now = () => new Date() } = {}) {
+    const startedAt = Date.now();
     const apiKey = String(env.OCRSPACE_API_KEY || '').trim();
     if (!apiKey) return { status: 'blocked', reason: 'OCRSPACE_API_KEY is not configured', requests: 0 };
     if (!Buffer.isBuffer(imageBuffer) || !imageBuffer.length) throw fail('Source screenshot is empty.', 'OCRSPACE_INVALID_IMAGE');
@@ -151,7 +152,8 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
         uploadSha256, providerInputSha256: uploadSha256,
         uploadBytes: upload.buffer.length, mimeType: upload.mimeType || 'image/jpeg',
         requests: requestCount, httpRequestCount: requestCount, providerRequestIds,
-        elapsedMs: Number(response.processingTimeMs) || null,
+        startedAt: new Date(startedAt).toISOString(), completedAt: new Date().toISOString(),
+        elapsedMs: Date.now() - startedAt, providerProcessingTimeMs: Number(response.processingTimeMs) || null,
         uploadWidth: upload.width || null, uploadHeight: upload.height || null,
         uploadResized: upload.resized === true, uploadQuality: upload.quality || null,
         pdfBytes: pdfBuffer.length, pdfSha256: crypto.createHash('sha256').update(pdfBuffer).digest('hex'),
@@ -170,6 +172,7 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
         if (error && typeof error === 'object') {
             error.httpRequestCount = requestCount;
             error.requestCount = requestCount;
+            error.elapsedMs = Date.now() - startedAt;
             error.providerRequestIds = providerRequestIds;
             error.quotaReservationStatus = reservationSubmitted ? 'submitted_or_unknown' : reservation?.reservationId ? 'released_or_unreserved' : 'untracked';
         }
