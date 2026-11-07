@@ -3,6 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 const { createOcrSpacePdfFirst, downloadSearchablePdf, readPdfBounded } = require('../src/ocrspace-pdf-first');
+const { OcrSpaceQuotaLedger } = require('../src/ocrspace-quota-ledger');
 
 const pdf = Buffer.from('%PDF-1.7\\nmock-pdf-bytes\\n%%EOF');
 function streamResponse(bytes, headers = {}) {
@@ -19,7 +20,7 @@ function fakeLedger() {
     return { reservations, async reserve(value) { reservations.push(value); return { reserved: true }; } };
 }
 
-test('OCR.Space Engine 2 processes the source image first and local readers receive the PDF raster', async () => {
+test('OCR.Space searchable PDF is derivative evidence and the original screenshot is uploaded', async () => {
     const ledger = fakeLedger();
     let request;
     let downloaded;
@@ -46,6 +47,28 @@ test('OCR.Space Engine 2 processes the source image first and local readers rece
     assert.equal(result.pdfBuffer, pdf);
     assert.equal(result.rasterBuffer, png);
     assert.equal(result.providerText, 'Victory\\nShards');
+});
+
+test('OCR.Space releases quota reservation when request checkpoint fails before fetch', async t => {
+    const dir = await require('node:fs/promises').mkdtemp(require('node:path').join(require('node:os').tmpdir(), 'ocrspace-unsent-'));
+    t.after(() => require('node:fs/promises').rm(dir, { recursive: true, force: true }));
+    const ledger = new OcrSpaceQuotaLedger({ filePath: require('node:path').join(dir, 'quota.json') });
+    const date = new Date('2026-11-06T12:00:00.000Z');
+    let fetchCalls = 0;
+    await assert.rejects(createOcrSpacePdfFirst({
+        imageBuffer: png, env: { OCRSPACE_API_KEY: 'test-key' }, quotaLedger: ledger, now: () => date,
+        onProviderRequestStarted: async () => { throw new Error('checkpoint unavailable'); },
+        client: async options => {
+            await options.fetchImpl('https://api.ocr.space/parse/image', { method: 'POST' });
+            return { searchablePdfUrl: 'https://api.ocr.space/result.pdf' };
+        },
+        fetchImpl: async () => { fetchCalls++; return { ok: true, status: 200 }; },
+    }), /checkpoint unavailable/);
+    assert.equal(fetchCalls, 0);
+    const state = JSON.parse(await require('node:fs/promises').readFile(ledger.filePath, 'utf8'));
+    assert.equal(state.daily['2026-11-06'], 0);
+    assert.equal(state.monthly['2026-11'], 0);
+    assert.equal(Object.values(state.reservations)[0].status, 'released');
 });
 
 test('source images above the Free API cap are re-encoded before upload', async () => {
