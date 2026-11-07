@@ -11,6 +11,15 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/dwbot-gateA-16-pdf-first.yml'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Only the no-provider local recovery path is available for manual runs.'
+        type: choice
+        required: true
+        default: LOCAL-ONLY-RECOVERY
+        options:
+          - LOCAL-ONLY-RECOVERY
 
 permissions:
   contents: read
@@ -26,7 +35,7 @@ env:
 
 jobs:
   gate-a:
-    if: github.run_attempt == 1 && github.event_name == 'push' && (github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME' || github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' || github.event.head_commit.message == 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY')
+    if: github.run_attempt == 1 && ((github.event_name == 'workflow_dispatch' && inputs.mode == 'LOCAL-ONLY-RECOVERY') || (github.event_name == 'push' && (github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-ONE-TIME' || github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' || github.event.head_commit.message == 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY')))
     runs-on: windows-latest
     timeout-minutes: 240
     permissions:
@@ -145,7 +154,7 @@ jobs:
           Write-Host 'Both guard sources verified; each OCR/local-reader Node step will preload them explicitly.'
 
       - name: Download and verify original partial Gate A artifact
-        if: github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' || github.event.head_commit.message == 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'
+        if: github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' || github.event.head_commit.message == 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'LOCAL-ONLY-RECOVERY')
         shell: powershell
         env:
           GH_TOKEN: ${{ github.token }}
@@ -189,7 +198,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'First-image local recovery or original artifact verification failed; no remaining provider requests may start.' }
 
       - name: Initialize Gate A restricted-egress diagnostic log
-        if: github.event.head_commit.message != 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'
+        if: github.event_name != 'workflow_dispatch' && github.event.head_commit.message != 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'
         shell: powershell
         run: |
           $log = Join-Path $env:GITHUB_WORKSPACE 'source/testdata/gateA-16/non-ocr-network-attempts.log'
