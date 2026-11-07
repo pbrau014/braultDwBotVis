@@ -68,11 +68,20 @@ test('optional ship, result description, and ribbon data do not hold up a comple
 
 test('live bot asks for one plain correction value at a time', () => {
     const battleRecordSource = fs.readFileSync(path.join(__dirname, '..', 'src', 'battle-record.js'), 'utf8');
-    assert.match(botSource, /const activeField = beforeMissing\[0\]/);
+    assert.match(botSource, /const activeField = reviewFields\[0\]/);
     assert.match(botSource, /`\$\{activeField\.label\}: \$\{content\}`/);
     assert.match(battleRecordSource, /Reply with the value only/);
     assert.doesNotMatch(botSource, /one `Field: value` per line|Correction problems:|Fields still missing:/i);
     assert.doesNotMatch(battleRecordSource, /Choose how to continue|Correction template|clearer, full, uncropped screenshot/i);
+});
+
+test('conflicting-but-present mandatory OCR values persist in the human correction queue', () => {
+    assert.match(botSource, /reviewFields: fields/);
+    assert.match(botSource, /REQUIRED_MANUAL_FIELDS\.find\(field => field\.key === unresolved\.field\)/);
+    assert.match(botSource, /applyReviewCorrection\(pending\.record, reviewFields, content\)/);
+    assert.match(botSource, /pending\.reviewFields = applied\.reviewFields/);
+    assert.match(botSource, /if \(pending\.reviewFields\.length\)/);
+    assert.match(botSource, /Required values confirmed by the user/);
 });
 
 test('each corrected required value advances to the next missing field', () => {
