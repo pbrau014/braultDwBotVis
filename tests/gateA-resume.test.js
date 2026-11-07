@@ -115,7 +115,7 @@ test('source-build fingerprint helper matches the report metadata hashing contra
         fs.mkdirSync(path.join(root, 'docs'), { recursive: true });
         fs.writeFileSync(path.join(root, 'docs/ignored.md'), 'excluded');
         const expected = crypto.createHash('sha256');
-        for (const name of Object.keys(files).sort()) expected.update(name).update('\\0').update(files[name]).update('\\0');
+        for (const name of Object.keys(files).sort()) expected.update(name).update('\0').update(files[name]).update('\0');
         assert.deepEqual(sourceBuildFingerprint(root), { sha256: expected.digest('hex'), files: 5 });
     } finally {
         fs.rmSync(root, { recursive: true, force: true });
