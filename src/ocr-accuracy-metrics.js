@@ -150,7 +150,8 @@ function createAccuracyReport({ predictions, groundTruth, createdAt = new Date()
             regionMetrics.expectedFields++;
             const candidates = reconciliations.flatMap(bundle => bundle?.fields?.[field]?.remoteCandidates || [])
                 .filter(candidate => candidate?.geometryValid === true && candidate?.originalCoordinateGeometryValid === true &&
-                    candidate?.coordinateSpace === 'original-screenshot-pixels' && Array.isArray(candidate.polygon));
+                    candidate?.coordinateSpace === 'original-screenshot-pixels' &&
+                    candidate?.originalScreenshotSha256 === hash && Array.isArray(candidate.polygon));
             if (!candidates.length) {
                 regionMetrics.fieldsWithoutGeometry++;
                 continue;
