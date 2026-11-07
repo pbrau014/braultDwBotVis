@@ -1,7 +1,6 @@
 'use strict';
-// OCR.Space network access is explicitly permitted through a strict HTTPS host
-// allowlist. When unrelated-egress restriction is enabled, only non-provider
-// destinations are denied and recorded; OCR.Space is never blocked by this guard.
+// Network egress is permitted only for explicitly enabled providers and their
+// exact HTTPS host allowlists. This is a Node-process guard, not an OS sandbox.
 const fs = require('node:fs');
 const path = require('node:path');
 const logPath = process.env.OCR_NON_OCR_NETWORK_LOG;
