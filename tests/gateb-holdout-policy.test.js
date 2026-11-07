@@ -178,6 +178,11 @@ test('current repository ground truth is correctly reported as 21 eligible, not 
   assert.equal(report.gateBPass, false);
   assert.equal(report.independence.developmentOverlapCount, 0);
   assert.equal(report.independence.regressionOverlapCount, 0);
+  assert.equal(report.labelReviewQueue.length, 42);
+  assert.deepEqual(report.missingFieldCounts, {
+    result: 0, player: 39, map: 39, mode: 37, battleStart: 41,
+    credits: 2, freeXp: 4, damage: 1, xp: 1,
+  });
 });
 
 test('an inferred or illegible status cannot count even if its eligibility flag is accidentally true', () => {
