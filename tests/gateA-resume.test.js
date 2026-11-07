@@ -84,6 +84,10 @@ test('manual Gate A dispatch is restricted to no-provider local-only recovery', 
     assert.match(workflow, /workflow_dispatch:[\\s\\S]*?mode:[\\s\\S]*?options:[\\s\\S]*?- LOCAL-ONLY-RECOVERY/);
     assert.match(workflow, /github\\.event_name == 'workflow_dispatch' && inputs\\.mode == 'LOCAL-ONLY-RECOVERY'/);
     assert.match(workflow, /Prepare no-duplicate Gate A resume checkpoint[\\s\\S]*?github\\.event_name == 'workflow_dispatch' && inputs\\.mode == 'LOCAL-ONLY-RECOVERY'/);
+    const localOnlyStep = workflow.match(/- name: Prepare no-duplicate Gate A resume checkpoint([\\s\\S]*?)(?=\\n      - name:)/)?.[1] || '';
+    assert.match(localOnlyStep, /OCRSPACE_ENABLED: '0'/);
+    assert.match(localOnlyStep, /OCRSPACE_NETWORK_ALLOWLIST: '0'/);
+    assert.doesNotMatch(localOnlyStep, /OCRSPACE_API_KEY/);
     const providerStep = workflow.match(/- name: Run the 16-image OCR.Space Engine 2 PDF-first Gate A acceptance([\\s\\S]*?)(?=\\n      - name:)/)?.[1] || '';
     assert.match(providerStep, /if: github\\.event_name != 'workflow_dispatch'/);
     assert.match(providerStep, /OCRSPACE_ENABLED: '1'/);
