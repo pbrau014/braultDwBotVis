@@ -3,6 +3,13 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
+
+// Load local environment before installing the guard. The guard must be active
+// before bot/provider modules are loaded so their first network request is gated.
+require('dotenv').config();
+if (process.env.OCR_NON_OCR_NETWORK_RESTRICTED === '1') {
+    require('./block-network');
+}
 const bot = require('../src/bot');
 
 async function main() {
@@ -34,10 +41,18 @@ async function main() {
             model: value.model || null,
             apiVersion: value.apiVersion || null,
             engine: value.engine || null,
-            sourceSha256: value.sourceSha256 || sourceSha256,
-            inputSha256: value.inputSha256 || null,
+            sourceSha256: value.originalScreenshotSha256 || value.sourceSha256 || sourceSha256,
+            originalScreenshotSha256: value.originalScreenshotSha256 || value.sourceSha256 || sourceSha256,
+            inputSha256: value.providerInputSha256 || value.inputSha256 || null,
+            providerInputSha256: value.providerInputSha256 || value.inputSha256 || null,
             searchablePdfSha256: value.searchablePdfSha256 || value.pdfSha256 || null,
             rasterSha256: value.rasterSha256 || null,
+            uploadSha256: value.uploadSha256 || null,
+            uploadBytes: value.uploadBytes || null,
+            pdfBytes: value.pdfBytes || null,
+            rasterBytes: value.rasterBytes || null,
+            mimeType: value.mimeType || null,
+            pageCount: value.pageCount || null,
             elapsedMs: value.elapsedMs || null,
             errorCode: value.errorCode || null,
             error: value.error || null,
@@ -55,6 +70,9 @@ async function main() {
             textCharacters: Array.isArray(readerOutput.attempts)
                 ? readerOutput.attempts.reduce((sum, attempt) => sum + String(attempt.text || '').length, 0)
                 : null,
+            rawText: Array.isArray(readerOutput.attempts)
+                ? readerOutput.attempts.map(attempt => String(attempt.text || '').slice(0, 12000))
+                : [],
             modelManifestSha256: readerOutput.modelManifestSha256 || null,
             errorCode: value.errorCode || null,
             error: value.error || null,
@@ -76,8 +94,17 @@ async function main() {
             missingFields: (validation.missing || []).map(item => ({ key: item.key, label: item.label, reason: item.reason })),
             remoteReconciliation: validation.multiProviderReconciliation || null,
             localReaderReconciliation: validation.localReaderReconciliation || null,
+            unresolvedFields: validation.unresolvedFields || [],
+            checks: validation.checks || [],
+            fullRecord: validation.record || null,
         },
-        disclaimer: 'Connectivity smoke test only. Provider participation does not establish OCR accuracy or release acceptance.',
+        disclaimer: 'Connectivity and evidence-capture smoke test only. Provider participation does not establish OCR accuracy or release acceptance. Restricted egress is enforced at the Node process level only; it is not an OS-level sandbox.',
+        networkRestriction: {
+            enabled: process.env.OCR_NON_OCR_NETWORK_RESTRICTED === '1',
+            guardLoadedBeforeBot: process.env.OCR_NON_OCR_NETWORK_RESTRICTED === '1',
+            azureExactHostAllowlistEnabled: process.env.AZURE_DOCUMENT_INTELLIGENCE_NETWORK_ALLOWLIST === '1',
+            ocrSpaceExactHostAllowlistEnabled: process.env.OCRSPACE_NETWORK_ALLOWLIST === '1',
+        },
     };
     const outDir = path.join(root, 'testdata', 'multi-provider-smoke');
     await fs.mkdir(outDir, { recursive: true });
