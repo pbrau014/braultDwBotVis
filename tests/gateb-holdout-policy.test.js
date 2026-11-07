@@ -210,3 +210,33 @@ test('inventory report explicitly distinguishes fingerprint metadata from source
     qualification: 'This preflight validates recorded SHA-256 syntax, byte count, and dimensions only. It does not read or rehash source image bytes; archive/member integrity must be established by the separate source-archive reconciliation.',
   });
 });
+
+
+test('partial rows cannot conceal duplicate source-image hashes', () => {
+  const groundTruth = makeGroundTruth(50);
+  groundTruth.records[0].fieldStatus.xp.eligible_for_exact_match = false;
+  groundTruth.records[1].sourceImage.sha256 = groundTruth.records[0].sourceImage.sha256;
+  const report = auditGateBInventory({
+    groundTruth,
+    developmentGroundTruth: makeDevelopmentGroundTruth(),
+    regressionImageHashes: makeRegressionHashes(),
+  });
+  assert.equal(report.rejected.duplicateSourceHashes, 1);
+  assert.equal(report.eligibleIndependentNineFieldImageCount, 48);
+  assert.equal(report.gateBPass, false);
+});
+
+test('partial rows are checked for development and regression overlap', () => {
+  const groundTruth = makeGroundTruth(50);
+  const development = makeDevelopmentGroundTruth();
+  groundTruth.records[0].fieldStatus.xp.eligible_for_exact_match = false;
+  groundTruth.records[0].sourceImage.sha256 = development.records[0].sha256;
+  const report = auditGateBInventory({
+    groundTruth,
+    developmentGroundTruth: development,
+    regressionImageHashes: makeRegressionHashes(),
+  });
+  assert.equal(report.rejected.overlapsDevelopmentCorpus, 1);
+  assert.equal(report.eligibleIndependentNineFieldImageCount, 49);
+  assert.equal(report.gateBPass, false);
+});
