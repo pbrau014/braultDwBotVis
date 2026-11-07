@@ -120,7 +120,7 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
             reservationSubmitted = true;
         }
         requestCount++;
-        return fetchImpl(url, options);
+        return fetchImpl(url, { ...options, redirect: 'error' });
     };
     try {
     const response = await client({
