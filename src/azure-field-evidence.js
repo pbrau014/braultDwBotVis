@@ -46,8 +46,9 @@ function buildAzureFieldEvidence(lines, { sourceSha256 = null } = {}) {
             evidence.push(lineEvidence(line, 'battleMetadata', sourceSha256));
         }
         if (/\bcredits\b/i.test(text)) evidence.push(lineEvidence(line, 'credits', sourceSha256));
-        if (/\bfree\s*xp\b/i.test(text)) evidence.push(lineEvidence(line, 'freeXp', sourceSha256));
-        if (/(?<!free\s)\bxp\b/i.test(text)) evidence.push(lineEvidence(line, 'xp', sourceSha256));
+        const isFreeXp = /\bfree\s*xp\b/i.test(text);
+        if (isFreeXp) evidence.push(lineEvidence(line, 'freeXp', sourceSha256));
+        else if (/\bxp\b/i.test(text)) evidence.push(lineEvidence(line, 'xp', sourceSha256));
         if (/\bdamage\b/i.test(text)) evidence.push(lineEvidence(line, 'damage', sourceSha256));
     }
     return evidence;
