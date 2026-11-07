@@ -48,6 +48,11 @@ async function executeReader({ imageBuffer, engine, env, timeoutMs = 90000 }) {
             error.code = payload.code || 'PARALLEL_LOCAL_READER_FAILED';
             throw error;
         }
+        if (engine === 'paddleocr' && payload.output?.available !== true) {
+            const error = new Error(String(payload.output?.error || payload.output?.reason || payload.output?.helperStatus || 'PaddleOCR did not complete a valid local read.').slice(0, 700));
+            error.code = 'PADDLEOCR_READER_UNAVAILABLE';
+            throw error;
+        }
         return {
             engine,
             status: 'success',
