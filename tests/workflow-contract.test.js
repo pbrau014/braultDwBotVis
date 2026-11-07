@@ -227,15 +227,18 @@ test('local screenshot acceptance stays offline and live multi-provider smoke is
 
 
 
-test('release package excludes provenance archives and review-only source assets while retaining them in the repository', () => {
+test('release package excludes runtime state and review-only source assets while retaining useful HTML assets', () => {
     const packager = read('scripts/package-release.ps1');
     assert.match(packager, /DWBOT_56_IMAGE_GROUND_TRUTH_REVIEW/);
     assert.match(packager, /yolo_tournament_complete_instruction_set/);
-    assert.doesNotMatch(packager, /persistence-recovery\\|dwbotStuff/);
+    assert.match(packager, /persistence-recovery/);
+    assert.match(packager, /tournament-state/);
+    assert.match(packager, /live-discord-state/);
     assert.match(packager, /provenance\/input-archives/);
     assert.match(packager, /docs\/source-baselines/);
     assert.match(packager, /docs\/source-inputs/);
-    assert.match(packager, /runtime state\/databases/);
+    assert.match(packager, /excludedReviewAssets/);
+    assert.doesNotMatch(packager, /dwbotStuff\/\*|dwbotStuff\\\(\.\*\)/);
 });
 
 test('ordinary branch verification has no legacy Gate B or bulk-provider workflow and exposes an explicit multi-provider smoke path', () => {
