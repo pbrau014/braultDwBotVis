@@ -2,8 +2,11 @@
 
 const fs = require('node:fs/promises');
 const path = require('node:path');
+const os = require('node:os');
+const crypto = require('node:crypto');
 
 const MIN_REQUEST_INTERVAL_MS = 1500;
+const STALE_LOCK_MIN_AGE_MS = 30_000;
 
 function monthKey(date = new Date()) {
     const value = date instanceof Date ? date : new Date(date);
@@ -24,28 +27,58 @@ class AzureDocumentIntelligenceQuotaLedger {
         this.maxPerMonth = Number.isSafeInteger(requested) && requested > 0 ? Math.min(450, requested) : 450;
     }
 
+    async recoverStaleLock(lockPath) {
+        let firstStat;
+        let owner;
+        try {
+            firstStat = await fs.stat(lockPath);
+            owner = JSON.parse(await fs.readFile(lockPath, 'utf8'));
+        } catch { return false; }
+        const ageMs = Date.now() - firstStat.mtimeMs;
+        if (ageMs < STALE_LOCK_MIN_AGE_MS || owner?.hostname !== os.hostname() ||
+            !Number.isSafeInteger(owner?.pid) || owner.pid <= 0 || typeof owner.token !== 'string') return false;
+        let alive = true;
+        try { process.kill(owner.pid, 0); }
+        catch (error) { alive = error.code === 'EPERM'; }
+        if (alive) return false;
+        try {
+            const secondStat = await fs.stat(lockPath);
+            const secondOwner = JSON.parse(await fs.readFile(lockPath, 'utf8'));
+            if (secondStat.ino !== firstStat.ino || secondStat.mtimeMs !== firstStat.mtimeMs ||
+                secondOwner.token !== owner.token || secondOwner.pid !== owner.pid) return false;
+            await fs.rm(lockPath);
+            return true;
+        } catch { return false; }
+    }
+
     async withLock(operation) {
         await fs.mkdir(path.dirname(this.filePath), { recursive: true });
         const lockPath = this.filePath + '.lock';
         let handle;
+        const owner = { pid: process.pid, hostname: os.hostname(), createdAt: new Date().toISOString(), token: crypto.randomUUID() };
         for (let attempt = 0; attempt < 100; attempt++) {
             try {
                 handle = await fs.open(lockPath, 'wx', 0o600);
+                await handle.writeFile(JSON.stringify(owner) + '\n', 'utf8');
+                await handle.sync();
                 break;
             } catch (error) {
+                if (handle) { await handle.close().catch(() => {}); handle = null; }
                 if (error.code !== 'EEXIST') {
                     const wrapped = new Error('Azure quota ledger lock could not be acquired.');
                     wrapped.code = 'AZURE_OCR_QUOTA_LEDGER_ERROR';
                     throw wrapped;
                 }
+                if (await this.recoverStaleLock(lockPath)) continue;
                 if (attempt === 99) {
-                    const wrapped = new Error('Azure quota ledger remained locked; request was not sent.');
+                    const wrapped = new Error('Azure quota ledger remained locked or its owner could not be safely identified; request was not sent.');
                     wrapped.code = 'AZURE_OCR_QUOTA_LOCKED';
                     throw wrapped;
                 }
                 await new Promise(resolve => setTimeout(resolve, 20));
             }
         }
+        let tempPath = null;
         try {
             let state;
             try {
@@ -66,12 +99,19 @@ class AzureDocumentIntelligenceQuotaLedger {
             }
             state.rateLimit = state.rateLimit || { lastRequestAt: 0 };
             const result = await operation(state);
-            const temp = this.filePath + '.' + process.pid + '.' + Math.random().toString(16).slice(2) + '.tmp';
-            await fs.writeFile(temp, JSON.stringify(state, null, 2) + '\n', { encoding: 'utf8', mode: 0o600 });
-            await fs.rename(temp, this.filePath);
+            tempPath = this.filePath + '.' + process.pid + '.' + owner.token + '.tmp';
+            await fs.writeFile(tempPath, JSON.stringify(state, null, 2) + '\n', { encoding: 'utf8', mode: 0o600, flag: 'wx' });
+            await fs.rename(tempPath, this.filePath);
+            tempPath = null;
             return result;
         } finally {
-            try { await handle.close(); } finally { await fs.rm(lockPath, { force: true }); }
+            if (tempPath) await fs.rm(tempPath, { force: true }).catch(() => {});
+            try { await handle.close(); } finally {
+                try {
+                    const current = JSON.parse(await fs.readFile(lockPath, 'utf8'));
+                    if (current.token === owner.token) await fs.rm(lockPath, { force: true });
+                } catch {}
+            }
         }
     }
 
