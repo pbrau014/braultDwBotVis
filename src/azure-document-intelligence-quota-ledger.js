@@ -63,7 +63,7 @@ class AzureDocumentIntelligenceQuotaLedger {
                 await handle.sync();
                 break;
             } catch (error) {
-                if (handle) { await handle.close().catch(() => {}); handle = null; }
+                if (handle) { await handle.close().catch(() => {}); await fs.rm(lockPath, { force: true }).catch(() => {}); handle = null; }
                 if (error.code !== 'EEXIST') {
                     const wrapped = new Error('Azure quota ledger lock could not be acquired.');
                     wrapped.code = 'AZURE_OCR_QUOTA_LEDGER_ERROR';
@@ -89,6 +89,9 @@ class AzureDocumentIntelligenceQuotaLedger {
                 if (state.rateLimit !== undefined && (!state.rateLimit || typeof state.rateLimit !== 'object' || Array.isArray(state.rateLimit))) {
                     throw new Error('Unexpected rate-limit structure.');
                 }
+                if (state.reservations !== undefined && (!state.reservations || typeof state.reservations !== 'object' || Array.isArray(state.reservations))) {
+                    throw new Error('Unexpected reservation structure.');
+                }
             } catch (error) {
                 if (error.code === 'ENOENT') state = { version: 1, monthly: {}, rateLimit: { lastRequestAt: 0 } };
                 else {
@@ -98,6 +101,7 @@ class AzureDocumentIntelligenceQuotaLedger {
                 }
             }
             state.rateLimit = state.rateLimit || { lastRequestAt: 0 };
+            state.reservations = state.reservations || {};
             const result = await operation(state);
             tempPath = this.filePath + '.' + process.pid + '.' + owner.token + '.tmp';
             await fs.writeFile(tempPath, JSON.stringify(state, null, 2) + '\n', { encoding: 'utf8', mode: 0o600, flag: 'wx' });
@@ -128,7 +132,44 @@ class AzureDocumentIntelligenceQuotaLedger {
                 throw error;
             }
             state.monthly[key] = used + count;
-            return { reserved: count, used: used + count, limit: this.maxPerMonth, month: key };
+            const reservationId = crypto.randomUUID();
+            state.reservations[reservationId] = {
+                month: key, pages: count, status: 'reserved',
+                createdAt: new Date(timestamp(now)).toISOString(),
+            };
+            return { reservationId, reserved: count, used: used + count, limit: this.maxPerMonth, month: key, status: 'reserved' };
+        });
+    }
+
+    async markSubmitted({ reservationId } = {}) {
+        if (!reservationId || typeof reservationId !== 'string') throw new Error('Azure quota reservation ID is required.');
+        return this.withLock(async state => {
+            const reservation = state.reservations?.[reservationId];
+            if (!reservation) {
+                const error = new Error('Azure quota reservation was not found.');
+                error.code = 'AZURE_OCR_QUOTA_RESERVATION_NOT_FOUND';
+                throw error;
+            }
+            if (reservation.status === 'reserved') {
+                reservation.status = 'submitted';
+                reservation.submittedAt = new Date().toISOString();
+            }
+            return { reservationId, status: reservation.status, pages: reservation.pages, month: reservation.month };
+        });
+    }
+
+    async release({ reservationId, reason = 'not_submitted' } = {}) {
+        if (!reservationId || typeof reservationId !== 'string') throw new Error('Azure quota reservation ID is required.');
+        return this.withLock(async state => {
+            const reservation = state.reservations?.[reservationId];
+            if (!reservation) return { released: false, reason: 'not_found' };
+            if (reservation.status !== 'reserved') return { released: false, reason: 'already_submitted', status: reservation.status };
+            const used = Number(state.monthly[reservation.month]) || 0;
+            state.monthly[reservation.month] = Math.max(0, used - reservation.pages);
+            reservation.status = 'released';
+            reservation.releasedAt = new Date().toISOString();
+            reservation.releaseReason = String(reason).slice(0, 200);
+            return { released: true, pages: reservation.pages, month: reservation.month };
         });
     }
 
