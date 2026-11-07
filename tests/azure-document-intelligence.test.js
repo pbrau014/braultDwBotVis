@@ -99,6 +99,21 @@ test('Azure result parser keeps raw line and word evidence', () => {
     assert.equal(parsed.lines[0].words[0].text, 'one');
 });
 
+test('Azure field evidence retains geometry and does not guess player identity', () => {
+    const { buildAzureFieldEvidence } = require('../src/azure-field-evidence');
+    const evidence = buildAzureFieldEvidence([
+        { text: 'Victory', pageIndex: 0, pageNumber: 1, polygon: [1,2,20,2,20,10,1,10], geometryValid: true,
+            pageWidth: 100, pageHeight: 80, pageUnit: 'pixel', words: [{ text: 'Victory', confidence: 0.9, polygon: [1,2,20,2,20,10,1,10] }] },
+        { text: 'Estuary Random Battle', pageIndex: 0, pageUnit: 'pixel', polygon: [2,3,40,3,40,10,2,10], geometryValid: true, words: [] },
+        { text: 'Free XP 123', pageIndex: 0, pageUnit: 'pixel', polygon: [], geometryValid: false, words: [] },
+        { text: '[WOLF1]PlayerName VIII YAMATO', pageIndex: 0, pageUnit: 'pixel', polygon: [], geometryValid: false, words: [] },
+    ], { sourceSha256: 'original-hash' });
+    assert.deepEqual(evidence.map(item => item.field), ['result', 'battleMetadata', 'freeXp']);
+    assert.equal(evidence[0].coordinateSpace, 'original-screenshot-pixels');
+    assert.equal(evidence[0].transformToOriginalScreenshot.scaleX, 1);
+    assert.equal(evidence[0].originalScreenshotSha256, 'original-hash');
+});
+
 test('Azure geometry carries page coordinates and rejects malformed or out-of-bounds polygons', () => {
     const parsed = flattenReadResult({ analyzeResult: { content: 'line', pages: [{
         pageNumber: 1, width: 100, height: 80, unit: 'pixel', lines: [
