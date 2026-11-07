@@ -4,7 +4,9 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { samePreflight, pngInfo, extractStartedFixtures, parseJsonUtf8, originalNetworkEvidenceAllowsProvider } = require('../scripts/prepare-gateA-16-resume');
+const os = require('node:os');
+const crypto = require('node:crypto');
+const { samePreflight, pngInfo, extractStartedFixtures, parseJsonUtf8, originalNetworkEvidenceAllowsProvider, sourceBuildFingerprint, EXPECTED_RC3_SOURCE_BUILD_SHA256, EXPECTED_RC3_SOURCE_BUILD_FILES } = require('../scripts/prepare-gateA-16-resume');
 
 test('Gate A resume compares substantive preflight identity, fixture order and hashes', () => {
     const a = { status:'PREFLIGHT_PASS_NO_PROVIDER_REQUESTS', candidateFingerprint:'a'.repeat(40),
@@ -94,4 +96,33 @@ test('manual Gate A dispatch is restricted to no-provider local-only recovery', 
     assert.match(providerStep, /OCRSPACE_ENABLED: '1'/);
     const initializeStep = workflow.match(/- name: Initialize Gate A restricted-egress diagnostic log([\s\S]*?)(?=\n      - name:)/)?.[1] || '';
     assert.match(initializeStep, /if: github\.event_name != 'workflow_dispatch'/);
+});
+
+
+test('source-build fingerprint helper matches the report metadata hashing contract', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dwbot-source-fingerprint-'));
+    try {
+        for (const dir of ['src', 'scripts', 'tests']) fs.mkdirSync(path.join(root, dir), { recursive: true });
+        const files = {
+            'src/a.js': 'alpha',
+            'scripts/z.js': 'zeta',
+            'tests/t.test.js': 'test',
+            'package.json': '{}',
+            'package-lock.json': '{}',
+        };
+        for (const [name, value] of Object.entries(files)) fs.writeFileSync(path.join(root, name), value);
+        fs.writeFileSync(path.join(root, 'src/a.js.bak'), 'excluded');
+        fs.mkdirSync(path.join(root, 'docs'), { recursive: true });
+        fs.writeFileSync(path.join(root, 'docs/ignored.md'), 'excluded');
+        const expected = crypto.createHash('sha256');
+        for (const name of Object.keys(files).sort()) expected.update(name).update('\\0').update(files[name]).update('\\0');
+        assert.deepEqual(sourceBuildFingerprint(root), { sha256: expected.digest('hex'), files: 5 });
+    } finally {
+        fs.rmSync(root, { recursive: true, force: true });
+    }
+});
+
+test('Gate A recovery is pinned to the recorded RC3 source build identity', () => {
+    assert.equal(EXPECTED_RC3_SOURCE_BUILD_SHA256, '43f1e8b877d7f5832bca3ff070f8ae8164deb7c68da233694c64bece70b99166');
+    assert.equal(EXPECTED_RC3_SOURCE_BUILD_FILES, 89);
 });
