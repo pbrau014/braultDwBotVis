@@ -39,7 +39,8 @@ test('Azure remote evidence never emits player identity candidates', () => {
     assert.equal(evidence.some(item => item.field === 'player'), false);
 });
 
-test('Azure metadata joins a geometrically adjacent map line with its mode line', () => {
+test('Azure emits separate map and mode candidates with each original line geometry', () => {
+    const { parseEvidenceItem } = require('../src/ocrspace-reconciliation');
     const evidence = buildAzureFieldEvidence([
         {
             text: 'Shards', pageIndex: 0, pageNumber: 1,
@@ -52,16 +53,19 @@ test('Azure metadata joins a geometrically adjacent map line with its mode line'
             geometryValid: true, pageWidth: 200, pageHeight: 300, pageUnit: 'pixel', words: [],
         },
     ], { sourceSha256: 'c'.repeat(64), sourceWidth: 400, sourceHeight: 600 });
-    const metadata = evidence.find(item => item.field === 'battleMetadata');
-    assert.ok(metadata);
-    assert.equal(metadata.text, 'Shards\nRandom Battle');
-    assert.deepEqual(metadata.sourceLinePolygons, [
-        [10, 10, 80, 10, 80, 20, 10, 20],
-        [10, 24, 80, 24, 80, 34, 10, 34],
-    ]);
-    assert.equal(metadata.geometrySource, 'union-of-adjacent-azure-lines');
-    assert.equal(metadata.originalCoordinateGeometryValid, true);
-    assert.deepEqual(metadata.polygon, [20, 20, 160, 20, 160, 68, 20, 68]);
+    const map = evidence.find(item => item.field === 'map');
+    const mode = evidence.find(item => item.field === 'mode');
+    assert.ok(map && mode);
+    assert.equal(map.text, 'Shards\nRandom Battle');
+    assert.equal(mode.text, 'Shards\nRandom Battle');
+    assert.deepEqual(parseEvidenceItem(map), { map: 'Shards' });
+    assert.deepEqual(parseEvidenceItem(mode), { mode: 'Random Battle' });
+    assert.equal(map.geometrySource, 'azure-adjacent-map-line');
+    assert.equal(mode.geometrySource, 'azure-mode-line');
+    assert.equal(map.originalCoordinateGeometryValid, true);
+    assert.equal(mode.originalCoordinateGeometryValid, true);
+    assert.deepEqual(map.polygon, [20, 20, 160, 20, 160, 40, 20, 40]);
+    assert.deepEqual(mode.polygon, [20, 48, 160, 48, 160, 68, 20, 68]);
 });
 
 test('Azure metadata does not combine distant or non-metadata neighboring lines', () => {

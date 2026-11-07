@@ -46,6 +46,14 @@ function parseEvidenceItem(item) {
         const result = parseBattleResult(text);
         return present(result) ? { result } : {};
     }
+    if (field === 'map' || field === 'mode') {
+        const metadata = parseModeMap(text);
+        return present(metadata[field]) ? { [field]: metadata[field] } : {};
+    }
+    if (field === 'battleStart') {
+        const battleStart = parseBattleStartTime(text);
+        return present(battleStart) ? { battleStart } : {};
+    }
     if (field === 'battleMetadata') {
         // Keep the remote parse independent from local multi-crop consensus.
         // Reconciliation below compares the parsed values but never promotes them.

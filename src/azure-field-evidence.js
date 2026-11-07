@@ -109,11 +109,31 @@ function buildAzureFieldEvidence(lines, { sourceSha256 = null, sourceWidth = nul
         if (/^(?:victory|defeat)$/i.test(text)) {
             evidence.push(lineEvidence(line, 'result', sourceSha256, sourceWidth, sourceHeight));
         }
-        if (MODE_PATTERN.test(text) || /battle\s*start\s*time/i.test(text)) {
-            const combined = MODE_PATTERN.test(text) && lineIndex > 0
-                ? mergeMetadataNeighbor({ ...sourceLines[lineIndex - 1], lineIndex: lineIndex - 1 }, line)
-                : null;
-            evidence.push(lineEvidence(combined || line, 'battleMetadata', sourceSha256, sourceWidth, sourceHeight));
+        if (MODE_PATTERN.test(text)) {
+            const previous = lineIndex > 0 ? { ...sourceLines[lineIndex - 1], lineIndex: lineIndex - 1 } : null;
+            const combined = mergeMetadataNeighbor(previous, line);
+            if (combined && previous) {
+                const combinedText = combined.text;
+                const mapLine = {
+                    ...previous, text: combinedText,
+                    sourceLinePolygons: [previous.polygon],
+                    sourceLineIndices: [lineIndex - 1],
+                    geometrySource: 'azure-adjacent-map-line',
+                };
+                const modeLine = {
+                    ...line, text: combinedText,
+                    sourceLinePolygons: [line.polygon],
+                    sourceLineIndices: [lineIndex],
+                    geometrySource: 'azure-mode-line',
+                };
+                evidence.push(lineEvidence(mapLine, 'map', sourceSha256, sourceWidth, sourceHeight));
+                evidence.push(lineEvidence(modeLine, 'mode', sourceSha256, sourceWidth, sourceHeight));
+            } else {
+                evidence.push(lineEvidence(line, 'mode', sourceSha256, sourceWidth, sourceHeight));
+            }
+        }
+        if (/battle\s*start\s*time/i.test(text)) {
+            evidence.push(lineEvidence(line, 'battleStart', sourceSha256, sourceWidth, sourceHeight));
         }
         if (/\bcredits\b/i.test(text)) evidence.push(lineEvidence(line, 'credits', sourceSha256, sourceWidth, sourceHeight));
         const isFreeXp = /\bfree\s*xp\b/i.test(text);
