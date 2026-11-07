@@ -19,7 +19,7 @@ function getOcrSpaceActivation(env = {}) {
         : !apiKeyConfigured ? 'OCRSPACE_API_KEY is not configured' : null;
     return {
         enabled, defaultEnabled: false, setting: setting || 'missing',
-        explicitlyEnabled, explicitlyDisabled: false,
+        explicitlyEnabled, explicitlyDisabled: setting === '0',
         apiKeyConfigured, reason,
     };
 }
