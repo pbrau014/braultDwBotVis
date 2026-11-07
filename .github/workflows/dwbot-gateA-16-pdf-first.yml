@@ -129,7 +129,7 @@ jobs:
       - name: Verify pinned source build matches recorded RC3 fingerprint before recovery
         shell: powershell
         run: |
-          node -e "const f=require('./scripts/prepare-gateA-16-resume').sourceBuildFingerprint('source'); console.log(JSON.stringify(f)); if(f.sha256 -ne '43f1e8b877d7f5832bca3ff070f8ae8164deb7c68da233694c64bece70b99166' -or f.files -ne 89) { throw 'Source checkout does not match the recorded RC3 fingerprint; refusing recovery.' }"
+          node -e "const f=require('./scripts/prepare-gateA-16-resume').sourceBuildFingerprint('source'); console.log(JSON.stringify(f)); if(f.sha256!=='43f1e8b877d7f5832bca3ff070f8ae8164deb7c68da233694c64bece70b99166'||f.files!==89) { throw 'Source checkout does not match the recorded RC3 fingerprint; refusing recovery.' }"
 
       - name: Install exact candidate dependencies
         shell: powershell
