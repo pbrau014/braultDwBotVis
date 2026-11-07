@@ -1,8 +1,8 @@
-> **Current architecture override (2026-11-05):** PaddleOCR runtime is a downstream local reader for the raster rendered from the OCR.Space Engine 2 searchable PDF. It must not independently read the original screenshot after the PDF-first stage. Historical install/benchmark notes remain provenance.
+> **Current architecture (2026-11-06):** PaddleOCR is an independent local reader. In a designated multi-provider run it receives the same original screenshot bytes as Azure, OCR.Space, Tesseract.js, and native Tesseract. OCR.Space PDF/raster outputs remain separate derivative evidence and do not replace the original input.
 
 # PaddleOCR local runtime
 
-The runtime is an optional local OCR benchmark engine. The Node/Tesseract bot remains the authoritative pipeline until identical-fixture results demonstrate that PaddleOCR improves field/record accuracy without unacceptable false acceptance.
+The runtime is an optional independent local OCR reader. It must remain separate from Tesseract.js and native Tesseract evidence. Do not compare raw confidence scores across engines or allow PaddleOCR to override a conflicting mandatory field. Preserve its field candidates and unresolved disagreements for human review.
 
 ## Windows install
 
@@ -18,11 +18,11 @@ Python 3.9–3.13 x64 is required; Python 3.12 is preferred. The setup downloads
 
 ## Current environment status
 
-The assistant execution container is currently unable to resolve/reach package indexes, so PaddleOCR and its weights could not be installed in that environment during this task. Do not interpret the presence of installer scripts or an empty/partial runtime directory as a successful install. Run `scripts/install-paddleocr-linux.sh` after package/model host access is restored. The project-specific benchmark remains explicitly offline and refuses to fetch packages or model weights.
+An installer script or model manifest is not proof that a runtime is installed. Verify the installed Python package versions, model hashes, offline inference smoke, and reader participation on the target Windows environment before reporting PaddleOCR as available. The project-specific benchmark remains explicitly offline and refuses to fetch packages or model weights.
 
 ## Model and version choice
 
-The setup pins PaddleOCR 3.7.0 and CPU PaddlePaddle 3.3.1 and targets the official English PP-OCRv6 medium text detector and recognizer, the current default model family in the official PaddleOCR quick start/documentation as checked 2026-10-26. These models are candidates only; the installation smoke test is not an accuracy claim. Run the raw benchmark and then integrated field-specific acceptance before considering any candidate-selection changes.
+The setup pins PaddleOCR 3.7.0 and CPU PaddlePaddle 3.3.1 and targets the English PP-OCRv6 medium detector and recognizer. These models are candidates only; installation and local inference do not establish screenshot accuracy. Compare per-field exact values against complete labelled ground truth and report false acceptance, unresolved fields, runtime, and reader disagreements before changing any acceptance policy.
 
 ## Linux install
 
