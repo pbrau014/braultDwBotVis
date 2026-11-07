@@ -145,7 +145,7 @@ test('durable provider-start checkpoint completes before the OCR.Space request',
             assert.equal(detail.engine, 2);
             assert.equal(detail.sourceSha256.length, 64);
         },
-        fetchImpl: async () => { order.push('network'); return { ok: true, status: 200 }; },
+        fetchImpl: async (url, options) => { assert.equal(options.redirect, 'error'); order.push('network'); return { ok: true, status: 200 }; },
         client: async options => {
             await options.fetchImpl('https://api.ocr.space/parse/image', { method: 'POST' });
             return { searchablePdfUrl: 'https://api.ocr.space/result.pdf' };
