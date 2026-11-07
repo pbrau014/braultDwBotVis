@@ -3,6 +3,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const path = require('node:path');
 const { samePreflight, pngInfo, extractStartedFixtures, parseJsonUtf8, originalNetworkEvidenceAllowsProvider } = require('../scripts/prepare-gateA-16-resume');
 
 test('Gate A resume compares substantive preflight identity, fixture order and hashes', () => {
