@@ -238,6 +238,8 @@ test('release package excludes runtime state and review-only source assets while
     assert.match(packager, /docs\/source-baselines/);
     assert.match(packager, /docs\/source-inputs/);
     assert.match(packager, /excludedReviewAssets/);
+    assert.match(packager, /excludedFilePatterns/);
+    assert.match(packager, /imgsHalf1-eligible-56/);
     assert.doesNotMatch(packager, /dwbotStuff\/\*|dwbotStuff\\\(\.\*\)/);
 });
 
