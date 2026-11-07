@@ -13,13 +13,14 @@ const REQUIRED_FIELDS = Object.freeze([
 const MINIMUM_IMAGES = 50;
 const PREFERRED_IMAGES = 100;
 const COMPLETE_STATUS = 'COMPLETE_9_FIELD_TRANSCRIPTION';
+const MISSING_EXPECTED = new Set(['', 'none', 'null', 'n/a', 'not applicable', 'not detected', 'not_detected', 'unknown']);
 
 function sha256(bytes) {
   return crypto.createHash('sha256').update(bytes).digest('hex');
 }
 
 function hasExpectedValue(value) {
-  if (typeof value === 'string') return value.trim().length > 0;
+  if (typeof value === 'string') return !MISSING_EXPECTED.has(value.trim().toLowerCase());
   if (typeof value === 'number') return Number.isFinite(value);
   return false;
 }
@@ -67,14 +68,24 @@ function auditGateBInventory({
     .map(row => row.sha256 || row.sourceImage?.sha256)
     .filter(value => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value)));
   const regressionHashes = new Set(regressionImageHashes);
+  if (developmentGroundTruth.records.length !== 16 || developmentHashes.size !== 16) {
+    throw new Error('Gate A independence reference must contain 16 unique development-image hashes.');
+  }
+  if (regressionImageHashes.length !== 4 || regressionHashes.size !== 4
+      || [...regressionHashes].some(value => typeof value !== 'string' || !/^[a-f0-9]{64}$/.test(value))) {
+    throw new Error('The independent four-image regression inventory must contain exactly four unique SHA-256 values.');
+  }
   const seenNames = new Set();
   const seenHashes = new Set();
+  const seenOrders = new Set();
   const eligible = [];
   const rejected = {
     incompleteNineFieldLabels: 0,
     invalidSourceFingerprints: 0,
     duplicateFilenames: 0,
     duplicateSourceHashes: 0,
+    invalidCorpusOrders: 0,
+    duplicateCorpusOrders: 0,
     overlapsDevelopmentCorpus: 0,
     overlapsRegressionCorpus: 0,
   };
@@ -87,6 +98,16 @@ function auditGateBInventory({
       rejected.incompleteNineFieldLabels++;
       continue;
     }
+    const order = Number(record.corpusOrder);
+    if (!Number.isSafeInteger(order) || order < 1) {
+      rejected.invalidCorpusOrders++;
+      continue;
+    }
+    if (seenOrders.has(order)) {
+      rejected.duplicateCorpusOrders++;
+      continue;
+    }
+    seenOrders.add(order);
     const source = record.sourceImage;
     if (!record.filename || !sourceFingerprintIsValid(source)) {
       rejected.invalidSourceFingerprints++;
@@ -127,12 +148,14 @@ function auditGateBInventory({
   const provenanceDeclared = manualSourceDeclared
     && groundTruth.sourceLineAudit?.preservedInWorkbook === true;
   const overlapCount = rejected.overlapsDevelopmentCorpus + rejected.overlapsRegressionCorpus;
-  const ready = eligible.length >= minimumImages
-    && provenanceDeclared
-    && overlapCount === 0
-    && rejected.invalidSourceFingerprints === 0
-    && rejected.duplicateFilenames === 0
-    && rejected.duplicateSourceHashes === 0;
+  const blockingReasons = [];
+  if (eligible.length < minimumImages) blockingReasons.push('INSUFFICIENT_ELIGIBLE_NINE_FIELD_LABELS');
+  if (!provenanceDeclared) blockingReasons.push('MANUAL_LABEL_PROVENANCE_OR_SOURCE_LINE_AUDIT_MISSING');
+  if (overlapCount > 0) blockingReasons.push('HOLDOUT_OVERLAPS_DEVELOPMENT_OR_REGRESSION_CORPUS');
+  if (rejected.invalidSourceFingerprints > 0) blockingReasons.push('INVALID_SOURCE_IMAGE_FINGERPRINTS');
+  if (rejected.duplicateFilenames > 0 || rejected.duplicateSourceHashes > 0) blockingReasons.push('DUPLICATE_SOURCE_IMAGE_IDENTITY');
+  if (rejected.invalidCorpusOrders > 0 || rejected.duplicateCorpusOrders > 0) blockingReasons.push('INVALID_OR_DUPLICATE_CORPUS_ORDER');
+  const ready = blockingReasons.length === 0;
   const selected = ready ? eligible.slice(0, preferredImages) : [];
 
   return {
@@ -161,6 +184,7 @@ function auditGateBInventory({
       regressionOverlapCount: rejected.overlapsRegressionCorpus,
     },
     rejected,
+    blockingReasons,
     eligibleRecords: eligible,
     selectedRecords: selected,
     limitations: [
