@@ -1,0 +1,140 @@
+# 📊 YOLO TOURNEY WORKBOOK — HOW SCORING WORKS
+
+This workbook calculates each player's **Doubloons earned**, combines rewards across events, and summarizes the season on the **Tourney Totals** tab.
+
+## 🗂️ 1. WHAT EACH TAB DOES
+
+- 💥 **Event1-Damage** — Rewards damage dealt in Round 1.
+- 🎯 **Event2-Kills** — Rewards kills in Round 2.
+- 🏁 **Event3-Race** — Calculates rewards using race time data.
+- 👑 **Event4-GrandYolo** — Combines damage, kills, time, ship class, and tier into a weighted score.
+- 📊 **Tourney Totals** — Combines event rewards and summarizes season averages and dollar values.
+
+## ✍️ 2. HOW TO ENTER SCORES
+
+Each event sheet has up to **7 game entries per player**.
+
+Enter the relevant values for each game:
+- 🚢 **Class** — DD, CA, or BB.
+- 🔢 **Class weight** — The numeric multiplier assigned to that class.
+- ⭐ **Tier** — The ship's tier.
+- 💥 **Damage**, 🎯 **Kills**, or ⏱️ **Time** — Depending on the event.
+
+The workbook uses these entries to calculate totals and Doubloons automatically.
+
+**Important:** Keep the class weights, tier values, and scoring settings consistent with the workbook's existing setup.
+
+## 🧮 3. HOW THE EVENT SCORES WORK
+
+### 💥 Damage, kills & race sheets
+
+Each sheet calculates a player's reward using:
+- The player's performance in each game.
+- The player's share of the event-wide total.
+- The class multiplier.
+- The ship tier, adjusted by the tier-weight setting.
+- The Doubloon Pool setting.
+
+The general calculation is:
+
+`Doubloons = 2 × Pool × Σ(Class Weight × Performance Share ÷ Tier^Tier Weight)`
+
+For damage and kills, *Performance Share* is that game's damage or kills divided by the event-wide total for that metric. The race sheet uses its recorded time values instead.
+
+The workbook adds the weighted contributions from all 7 games to calculate the player's **Dblns Earnd** value.
+
+### 👑 Grand YOLO scoring
+
+The Grand YOLO sheet combines four factors for each game:
+
+- 🚢 **Class weight**
+- ⭐ **Tier**
+- 💥 **Damage**
+- 🎯 **Kills**
+- ⏱️ **Time**
+
+Each game receives a weighted score, adjusted by the player's share of total damage. The seven game scores are added together and divided by 3 to calculate the Grand YOLO Doubloon result.
+
+The default weights are controlled by the scoring settings on the sheet. Changing those settings changes the result.
+
+## 🪙 4. EXAMPLE: HOW `DBLNS EARND` IS CALCULATED
+
+Suppose a player has these results on the **Event1-Damage** sheet:
+
+| Setting | Value |
+|---|---:|
+| Doubloon Pool | 500 |
+| Class weight (DD) | 4 |
+| Ship tier | 2 |
+| Damage per game | 20,000 |
+| Games played | 7 |
+| Total damage across all players | 1,000,000 |
+
+**Step 1 — Calculate one game's contribution**
+
+`4 × (20,000 ÷ 1,000,000) ÷ 2¹ = 0.04`
+
+**Step 2 — Apply the pool multiplier**
+
+`2 × 500 × 0.04 = 40 Doubloons`
+
+**Step 3 — Add all seven games**
+
+`40 × 7 = 280 Doubloons`
+
+🏆 **Result: 280 Doubloons earned.**
+
+*This is an illustrative example assuming the same result in all seven games, a tier-weight setting of 1, and the stated event-wide total. Actual results depend on the workbook's inputs and settings.*
+
+## 📊 5. HOW THE FINAL RESULTS TAB WORKS
+
+The **Tourney Totals** tab pulls results from the event sheets for each player.
+
+| Column | How it is calculated |
+|---|---|
+| **Avg. Dmg** | Average of the player's total damage from Event 1 and Grand YOLO. |
+| **Avg. Tier** | Average tier across 21 game entries from Events 1, 2, and 4. |
+| **Avg. Kills** | Average kills across the 7 games in Event 2. |
+| **Avg. Class** | Average numeric class weight across 21 game entries. |
+| **Player** | Player name linked from Event 1. |
+| **Doubloons** | Sum of Doubloons earned across all four event sheets. |
+| **Dollars** | Doubloons multiplied by `0.54 ÷ 100`. |
+
+### 🚢 How Avg. Class becomes a ship class
+
+The workbook uses the average numeric class weight to assign a class label:
+
+- **DD:** Average greater than 3.6
+- **CA:** Average from 2.7 through 3.6
+- **BB:** Average below 2.7
+
+### 💰 How Doubloons and Dollars are related
+
+The final Doubloons formula is:
+
+`Event 1 + Event 2 + Event 3 + Grand YOLO`
+
+For example, if a player earns:
+
+- Event 1: 280 Doubloons
+- Event 2: 100 Doubloons
+- Event 3: 50 Doubloons
+- Grand YOLO: 170 Doubloons
+
+**Total = 600 Doubloons**
+
+The dollar calculation is:
+
+`600 × 0.54 ÷ 100 = $3.24`
+
+The dollar figure is a workbook conversion, not necessarily an official in-game purchase value.
+
+## ⚙️ 6. IMPORTANT THINGS TO REMEMBER
+
+- ✅ Enter game results in the correct event sheet.
+- 🔢 Do not overwrite formula cells such as **Total Dmg**, **Total Kills**, **Total Time**, or **Dblns Earnd**.
+- 🪙 The Doubloon Pool and scoring weights affect calculated rewards.
+- 📈 The final tab updates from the event sheets, so incorrect inputs can affect season totals.
+- ⚠️ The workbook's formulas use fixed ranges and settings. If the number of players or scoring rules changes, verify that the formulas still cover the intended data.
+
+**In short:** Enter the game results → the event tabs calculate Doubloons → *Tourney Totals* combines the rewards and calculates averages and dollar equivalents. 🚀
