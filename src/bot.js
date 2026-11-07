@@ -2533,6 +2533,7 @@ async function extractTextCore(imageBuffer) {
                 model: azure.model || null, apiVersion: azure.apiVersion || null,
                 mimeType: azure.mimeType || null, inputBytes: azure.inputBytes || null,
                 pageCount: azure.pageCount || null, pages: Array.isArray(azure.pages) ? azure.pages : [],
+                originalScreenshotWidth: sourceWidth, originalScreenshotHeight: sourceHeight,
                 // Keep provider-native line/word geometry attached to the evidence.
                 // Reconciliation may use text today, but diagnostics must not discard
                 // polygons, per-word confidence, or page structure.
