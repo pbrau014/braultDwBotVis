@@ -32,6 +32,7 @@ function hasExpectedValue(value) {
   return false;
 }
 
+// Validates the recorded fingerprint metadata only. It does not read or hash the original image bytes.
 function sourceFingerprintIsValid(source) {
   return Boolean(source
     && typeof source.sha256 === 'string'
@@ -200,6 +201,11 @@ function auditGateBInventory({
       separateBlindSecondReviewerDocumented: false,
       qualification: 'Declared manual transcription provenance is retained; this audit does not certify double-blind review.',
     },
+    sourceImageVerification: {
+      status: 'METADATA_ONLY_NOT_REHASHED',
+      verified: false,
+      qualification: 'This preflight validates recorded SHA-256 syntax, byte count, and dimensions only. It does not read or rehash source image bytes; archive/member integrity must be established by the separate source-archive reconciliation.',
+    },
     independence: {
       developmentCorpusImageCount: developmentGroundTruth.records.length,
       developmentOverlapCount: rejected.overlapsDevelopmentCorpus,
@@ -216,6 +222,7 @@ function auditGateBInventory({
       'This is an inventory eligibility audit only, not OCR accuracy or Gate B acceptance.',
       'No OCR.Space requests are made.',
       'No source images, labels, PDFs, rasters, reports, or manifests are modified.',
+      'Per-image source byte hashes are not recomputed by this metadata-only preflight; do not treat its fingerprint-shape check as source-image integrity verification.',
       'A ready inventory still requires Gate A PASS, locked source fingerprints, verified artifacts, zero wrong accepted values, zero unresolved mandatory outputs, network proof, and security checks.',
     ],
   };
