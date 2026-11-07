@@ -209,7 +209,7 @@ jobs:
             testdata/persistence-recovery/**/persistence-recovery-report.sha256
             testdata/multi-provider-smoke/**
           if-no-files-found: warn
-          retention-days: 30
+          retention-days: 7
 
   manual-and-package:
     name: PDF manual and clean package verification
