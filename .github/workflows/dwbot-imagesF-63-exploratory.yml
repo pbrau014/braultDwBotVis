@@ -1,4 +1,4 @@
-name: DWBOT imagesF 63 exploratory OCR.Space
+name: DWBOT legacy OCR.Space-only 63-image workflow (disabled on multi-provider branch)
 
 concurrency:
   group: dwbot-imagesF-63-exploratory-${{ github.ref }}
@@ -17,11 +17,10 @@ permissions:
   actions: read
 
 jobs:
-  # This workflow submits billable external OCR requests. Pushes (including
-  # documentation/test updates) must never start a second exploratory batch.
-  # Run only after an explicit workflow_dispatch action.
+  # Superseded on this branch by the coordinated OCR.Space + Azure smoke path.
+  # The legacy OCR.Space-only 63-image batch is intentionally unavailable here.
   imagesf-63-exploratory:
-    if: github.event_name == 'workflow_dispatch'
+    if: false
     name: Windows OCR.Space Engine 2 - imagesF 63 exploratory PDF-first
     runs-on: windows-latest
     timeout-minutes: 240

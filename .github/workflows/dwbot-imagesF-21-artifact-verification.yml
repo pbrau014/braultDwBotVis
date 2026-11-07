@@ -1,4 +1,4 @@
-name: DWBOT 19-image Gate B artifact verification and post-hoc evaluation
+name: DWBOT legacy 19-image artifact evaluator (not used on multi-provider branch)
 
 on:
   push:
@@ -26,13 +26,6 @@ on:
       - 'package.json'
       - 'testdata/imagesF-holdout-candidate-manifest.json'
       - 'testdata/ground-truth/imagesF-63-working-ground-truth-v6.json'
-  workflow_dispatch:
-    inputs:
-      source_run_id:
-        description: 'Completed 63-image OCR.Space exploratory run ID; this workflow never submits OCR requests.'
-        required: true
-        type: string
-
 concurrency:
   group: dwbot-imagesF-19-gateB-artifact-verification-${{ github.ref }}
   cancel-in-progress: false
