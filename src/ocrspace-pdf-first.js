@@ -162,18 +162,22 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
             Number(word.left) + Number(word.width), Number(word.top) + Number(word.height),
             Number(word.left), Number(word.top) + Number(word.height),
         ];
+        const providerGeometryValid = providerPolygon.length === 8 && providerPolygon.every(Number.isFinite) &&
+            providerPolygon.every((value, index) => value >= 0 &&
+                (index % 2 === 0 ? !uploadWidth || value <= uploadWidth : !uploadHeight || value <= uploadHeight));
         const originalPolygon = overlayTransformToOriginalScreenshot
             ? providerPolygon.map((value, index) => value * (index % 2 === 0
                 ? overlayTransformToOriginalScreenshot.scaleX : overlayTransformToOriginalScreenshot.scaleY))
             : null;
-        const originalCoordinateGeometryValid = Boolean(originalPolygon &&
+        const originalCoordinateGeometryValid = Boolean(providerGeometryValid && originalPolygon &&
             originalPolygon.every(Number.isFinite) && originalPolygon.every((value, index) =>
                 value >= 0 && value <= (index % 2 === 0 ? sourceWidth : sourceHeight)));
         return {
             ...word,
             providerPolygon,
             originalPolygon: originalCoordinateGeometryValid ? originalPolygon : null,
-            geometryValid: providerPolygon.length === 8 && providerPolygon.every(Number.isFinite),
+            geometryValid: providerGeometryValid,
+            geometryIssue: providerGeometryValid ? null : 'overlay_word_polygon_invalid_or_out_of_upload_bounds',
             originalCoordinateGeometryValid,
             coordinateSpace: originalCoordinateGeometryValid ? 'original-screenshot-pixels' : 'provider-upload-pixels',
             originalScreenshotSha256: sourceSha256,
@@ -201,7 +205,7 @@ async function createOcrSpacePdfFirst({ imageBuffer, filename = 'wows-battle.png
         originalScreenshotWidth: sourceWidth, originalScreenshotHeight: sourceHeight,
         uploadWidth, uploadHeight,
         overlay, overlayWordCount: overlay.length,
-        overlayCoordinateSpace: overlay.some(word => word.originalCoordinateGeometryValid)
+        overlayCoordinateSpace: overlay.length > 0 && overlay.every(word => word.originalCoordinateGeometryValid)
             ? 'original-screenshot-pixels' : 'provider-upload-pixels',
         overlayTransformToOriginalScreenshot,
         textOrientation: orientation,
