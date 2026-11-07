@@ -154,7 +154,7 @@ jobs:
           Write-Host 'Both guard sources verified; each OCR/local-reader Node step will preload them explicitly.'
 
       - name: Download and verify original partial Gate A artifact
-        if: github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' || github.event.head_commit.message == 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'LOCAL-ONLY-RECOVERY')
+        if: github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' || github.event.head_commit.message == 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'LOCAL-ONLY-RECOVERY') || (github.event_name == 'workflow_dispatch' && inputs.mode == 'LOCAL-ONLY-RECOVERY')
         shell: powershell
         env:
           GH_TOKEN: ${{ github.token }}
@@ -185,7 +185,7 @@ jobs:
       # Original gate-a-acceptance.json contains a UTF-8 BOM; the recovery helper parses BOM-safe JSON.
       # Child OCR output and the enriched resume report use separate files; missing original egress evidence blocks all remaining paid requests.
       - name: Prepare no-duplicate Gate A resume checkpoint from existing PDF
-        if: github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' || github.event.head_commit.message == 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'
+        if: github.event.head_commit.message == 'DWBOT-GATE-A-16-PDF-FIRST-RESUME-15' || github.event.head_commit.message == 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'LOCAL-ONLY-RECOVERY')
         shell: powershell
         env:
           OCRSPACE_ENABLED: '0'
@@ -207,7 +207,7 @@ jobs:
           if (-not (Test-Path $log) -or (Get-Item $log).Length -ne 0) { throw 'Could not initialize an empty Gate A restricted-egress log before provider calls.' }
 
       - name: Run the 16-image OCR.Space Engine 2 PDF-first Gate A acceptance
-        if: github.event.head_commit.message != 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'
+        if: github.event_name != 'workflow_dispatch' && github.event.head_commit.message != 'DWBOT-GATE-A-16-LOCAL-ONLY-RECOVERY'
         working-directory: source
         env:
           OCRSPACE_API_KEY: ${{ secrets.OCRSPACE_API_KEY }}
