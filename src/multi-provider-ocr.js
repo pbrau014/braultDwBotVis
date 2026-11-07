@@ -92,6 +92,7 @@ async function runMultiProviderOcr({
                 requestCount: Number(error.requestCount ?? error.httpRequestCount) || requestCount,
                 httpRequestCount: Number(error.httpRequestCount) || requestCount,
                 quotaReservationStatus: error.quotaReservationStatus || (requestCount ? 'submitted_or_unknown' : 'released_or_unreserved'),
+                providerRequestIds: Array.isArray(error.providerRequestIds) ? error.providerRequestIds : [],
                 errorCode: error.code || 'OCRSPACE_ERROR', error: String(error.message || error).slice(0, 300),
             };
         }));
@@ -141,6 +142,8 @@ async function runMultiProviderOcr({
                 requestCount: Number(error.httpRequestCount) || (requestStarted ? 1 : 0),
                 httpRequestCount: Number(error.httpRequestCount) || (requestStarted ? 1 : 0),
                 quotaReservationStatus: requestStarted ? 'submitted_or_unknown' : 'released_or_unreserved',
+                providerRequestIds: Array.isArray(error.providerRequestIds) ? error.providerRequestIds : [],
+                operationId: error.operationId || null,
                 errorCode: error.code || 'AZURE_OCR_ERROR', error: String(error.message || error).slice(0, 300),
             };
         }));
