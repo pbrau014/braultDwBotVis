@@ -1,3 +1,39 @@
+LATEST GATE A/B RUN RECONCILIATION — 2026-11-07
+Status: CURRENT / EVIDENCE-BASED / SUPERSEDES EARLIER "RUNNING" DESCRIPTIONS BELOW.
+
+Repository main remains at 668335ace6a31121ac8640de09d7bbeea9dbbb85. No PR from this continuation has been merged.
+
+GATE A:
+- Run 42249978731 failed. The 16-image preflight passed, but the historical first-image local recovery did not produce an exact nine-field record. No remaining provider requests were made.
+- Run 42255893851 failed before local OCR because Windows parsed absolute NODE_OPTIONS preload paths incorrectly ("Cannot find module 'D:...source/scripts/block-network.js'"). No provider requests were made.
+- Current main subsequently corrected the child preload paths to be relative to the child working directory (commits 74a018d8c43060d6767b682669dca71f1fb54407 and 3871c49cf001bc2183fa01105be1d98165f3070f). No post-fix Gate A local-only run is yet recorded.
+- The original partial Gate A run's restricted-egress diagnostic log remains missing. Even a successful local first-image recovery must stop at BLOCKED_MISSING_ORIGINAL_NETWORK_LOG. No remaining paid provider requests are authorized.
+
+GATE B / NO-PROVIDER RECOVERY:
+- Run 42268159303 completed with failure; artifact 13530943226 was uploaded (280,514 bytes; SHA-256 7883e48d7f206d2e2ba65d55d9b22a61c89b230454394825950a0328f8521cb1).
+- Local recovery processed 21 images with 0 provider requests and 0 blocked network attempts.
+- The 19-image artifact verifier reported source hashes PASS, PDF integrity PASS, searchable PDF text layer PASS, raster integrity PASS, PDF-derived raster provenance PASS, but localReaders FAIL, original network restriction NOT_VERIFIED_MISSING_ORIGINAL_LOG, Gate A evidence FAIL, and overall verification FAILED (PDF/raster 19/19; full 0/19). Secret scan reported PASS.
+- The 19-image post-hoc diagnostic reported Tesseract.js 110/171 exact fields (64.33%), 2 wrong, 59 unresolved, and 2/19 exact complete records (10.53%). Native Tesseract reported 103/171 exact fields (60.23%), 2 wrong, 66 unresolved, and 0/19 exact complete records.
+- The separate 21-image diagnostic reported Tesseract.js 123/189 exact fields (65.08%), 2 wrong, 64 unresolved, and 2/21 exact complete records (9.52%). Native Tesseract reported 116/189 exact fields (61.38%), 2 wrong, 71 unresolved, and 0/21 exact complete records.
+- These metrics are diagnostics only; they do not pass Gate A or Gate B. The old 19/21 selection is superseded by the current 50-image minimum.
+
+CURRENT IMPLEMENTATION BRANCHES / DRAFT PRs:
+- PR #17: current Gate B 50 minimum / 100 preferred policy overlay and updates to both living plan files.
+- PR #18: current webhook-file status addendum; owner-side revocation remains unverified.
+- PR #19: read-only Gate B inventory preflight; current ground truth has 21 eligible images, shortfall 29.
+- PR #20: redacted Discord webhook current-tree/history scanner.
+- PR #21: manual Gate A dispatch restricted to LOCAL-ONLY-RECOVERY; no provider path is exposed.
+- All remain draft/open. No automated status checks were returned by the repository status endpoint at this review. Tests are authored but must not be described as executed or passed until CI evidence appears.
+
+PROHIBITED / UNCHANGED:
+- No OCR.Space submissions or duplicate provider requests.
+- No modification of historical source images, PDFs, rasters, ground-truth labels, manifests, reports, or logs.
+- Gate A: NOT PASSED. Gate B: NOT PASSED. Production: NO-GO.
+
+================================================================================
+END LATEST GATE A/B RUN RECONCILIATION
+================================================================================
+
 CURRENT GOVERNING GATE B POLICY — 2026-11-07
 Status: USER-DIRECTED / CURRENT / SUPERSEDES ALL 19- AND 21-IMAGE GATE B RULES BELOW.
 
