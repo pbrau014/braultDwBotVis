@@ -23,9 +23,10 @@ The webhook owner must revoke/delete the exposed webhook in the Discord channel'
 
 ## History and limitations
 
-Repository history was not rewritten. This preserves existing commits and avoids a force-push to the authorized delivery branch. This remediation only removes the credential from the current `dwbotVis` file; the current `main` branch copy and prior commits still contain it. It does not purge cached clones, forks, mirrors or external copies. The project authority currently keeps `main` read-only, so no change was made there. The owner should revoke the webhook promptly and review Discord channel activity for unexpected posts.
+Repository history was not rewritten. The exposed value may remain in prior Git commits, cached clones, forks, mirrors, and external copies. Current working-tree content is not sufficient to invalidate an exposed webhook. The owner must revoke/delete the webhook in Discord's channel Integrations settings and review channel activity. No webhook request was made by this remediation.
 
+## Verified current-file status — 2026-11-07
 
-## Critical outstanding exposure
+The current `main` copy and the current `ocr-multiprovider` copy of `dwbotStuff/scoreReport_dark_clipboard (1).html` were both fetched and found to have the same Git blob SHA-1 (`4e930f9b072fd85568f74779e611ef91f924f334`). The current file contains no webhook URL, `DISCORD_WEBHOOK_URL`, or `postTextToDiscord` reference. A scan of all eight tracked HTML files on `ocr-multiprovider` found no Discord webhook URL, webhook symbol, or bot-token pattern.
 
-The default `main` branch remains unchanged and still contains the same hard-coded webhook in the current version of the HTML file. This is not merely a historical-commit concern. Until the webhook is revoked in Discord, it must be treated as potentially usable by anyone who can read the public repository. The code fix on `dwbotVis` does not neutralize it. The owner must revoke/delete it immediately; updating `main` requires a separately authorized change because current project rules designate `main` as read-only.
+This verifies current-file cleanup only; it does not prove the webhook was revoked in Discord or purge historical copies. No changes to `main` were made in this continuation.
