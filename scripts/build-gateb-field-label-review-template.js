@@ -7,11 +7,7 @@ const REQUIRED_FIELDS = [
   'result', 'player', 'map', 'mode', 'battleStart',
   'credits', 'freeXp', 'damage', 'xp',
 ];
-const ELIGIBLE_LABEL_STATUSES = new Set([
-  'COMPLETE_MANUAL_TRANSCRIPTION_SOURCE',
-  'VISUALLY_CONFIRMED',
-  'VISUALLY_REVIEWED',
-]);
+const { ELIGIBLE_LABEL_STATUSES, hasExpectedValue } = require('./audit-gateb-holdout-eligibility');
 
 function csvCell(value) {
   const text = value === null || value === undefined ? '' : String(value);
@@ -31,7 +27,7 @@ function buildFieldReviewRows(groundTruth) {
     for (const field of REQUIRED_FIELDS) {
       const status = record.fieldStatus?.[field]?.status || 'MISSING_STATUS';
       const value = record.expected?.[field];
-      const present = value !== null && value !== undefined && String(value).trim().length > 0;
+      const present = hasExpectedValue(value);
       const eligible = record.fieldStatus?.[field]?.eligible_for_exact_match === true
         && ELIGIBLE_LABEL_STATUSES.has(status)
         && present;
