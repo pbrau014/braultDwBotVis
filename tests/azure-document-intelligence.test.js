@@ -111,6 +111,38 @@ test('Azure monthly quota ledger reserves within a hard sub-free-tier ceiling an
     await assert.rejects(() => ledger.reserve({ pages: 1, now: new Date('2026-11-06T00:00:00Z') }), { code: 'AZURE_OCR_QUOTA_LEDGER_CORRUPT' });
 });
 
+
+test('Azure quota ledger recovers only stale locks owned by a dead local process', async t => {
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'dwbot-azure-stale-lock-'));
+    t.after(() => fs.rm(dir, { recursive: true, force: true }));
+    const ledger = new AzureDocumentIntelligenceQuotaLedger({ filePath: path.join(dir, 'quota.json') });
+    const lockPath = ledger.filePath + '.lock';
+    const deadOwner = { pid: 2147483647, hostname: require('node:os').hostname(), token: 'dead-owner' };
+    await fs.writeFile(lockPath, JSON.stringify(deadOwner));
+    const old = new Date(Date.now() - 60_000);
+    await fs.utimes(lockPath, old, old);
+    assert.equal(await ledger.recoverStaleLock(lockPath), true);
+    const liveOwner = { pid: process.pid, hostname: require('node:os').hostname(), token: 'live-owner' };
+    await fs.writeFile(lockPath, JSON.stringify(liveOwner));
+    await fs.utimes(lockPath, old, old);
+    assert.equal(await ledger.recoverStaleLock(lockPath), false);
+});
+
+test('Azure quota ledger records reservation lifecycle and releases only unsent pages', async t => {
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'dwbot-azure-reservation-'));
+    t.after(() => fs.rm(dir, { recursive: true, force: true }));
+    const ledger = new AzureDocumentIntelligenceQuotaLedger({ filePath: path.join(dir, 'quota.json') });
+    const reservation = await ledger.reserve({ pages: 1, now: new Date('2026-11-06T00:00:00Z') });
+    assert.equal(reservation.status, 'reserved');
+    assert.equal((await ledger.release({ reservationId: reservation.reservationId })).released, true);
+    assert.equal((await ledger.reserve({ pages: 1, now: new Date('2026-11-06T00:00:00Z') })).used, 1);
+    const submitted = await ledger.reserve({ pages: 1, now: new Date('2026-11-06T00:00:00Z') });
+    await ledger.markSubmitted({ reservationId: submitted.reservationId });
+    assert.deepEqual(await ledger.release({ reservationId: submitted.reservationId }), {
+        released: false, reason: 'already_submitted', status: 'submitted',
+    });
+});
+
 test('Azure F0 request slots serialize concurrent callers at a conservative 1.5-second interval', async t => {
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'dwbot-azure-rate-'));
     t.after(() => fs.rm(dir, { recursive: true, force: true }));
