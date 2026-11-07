@@ -27,6 +27,7 @@ const { getMultiProviderActivation, runMultiProviderOcr } = require('./multi-pro
 const { runParallelLocalReaders } = require('./parallel-local-ocr');
 
 const { reconcileOcrSpaceEvidence } = require('./ocrspace-reconciliation');
+const { buildAzureFieldEvidence } = require('./azure-field-evidence');
 const path = require('node:path');
 const { createHash } = require('node:crypto');
 const os = require('node:os');
