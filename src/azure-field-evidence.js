@@ -3,6 +3,22 @@
 const MODE_PATTERN = /\b(?:Co-op\s*Battle|Random\s*Battle|Ranked\s*Battle|Asymmetric\s*Battle|Scenario\s*Battle|Training\s*Battle|Convoy\s*Battle|Operations?|Brawl|Clan\s*Battle|Airship\s*Escort|Big\s*Hunt)\b/i;
 
 function lineEvidence(line, field, sourceSha256, sourceWidth, sourceHeight) {
+    const providerPolygon = Array.isArray(line.polygon) ? line.polygon : [];
+    const pageWidth = Number(line.pageWidth);
+    const pageHeight = Number(line.pageHeight);
+    const width = Number(sourceWidth);
+    const height = Number(sourceHeight);
+    const canTransform = line.geometryValid === true && line.pageUnit === 'pixel' &&
+        Number.isFinite(width) && width > 0 && Number.isFinite(height) && height > 0 &&
+        Number.isFinite(pageWidth) && pageWidth > 0 && Number.isFinite(pageHeight) && pageHeight > 0;
+    const transform = canTransform ? {
+        scaleX: width / pageWidth, scaleY: height / pageHeight, offsetX: 0, offsetY: 0,
+    } : null;
+    const polygon = transform ? providerPolygon.map((value, index) =>
+        Number(value) * (index % 2 === 0 ? transform.scaleX : transform.scaleY)) : providerPolygon;
+    const originalCoordinateGeometryValid = Boolean(transform && polygon.length >= 8 &&
+        polygon.every(Number.isFinite) && polygon.every((value, index) =>
+            value >= 0 && value <= (index % 2 === 0 ? width : height)));
     return {
         field,
         source: 'azure-document-intelligence-line',
@@ -10,8 +26,10 @@ function lineEvidence(line, field, sourceSha256, sourceWidth, sourceHeight) {
         text: String(line.text || ''),
         pageIndex: line.pageIndex ?? null,
         pageNumber: line.pageNumber ?? null,
-        polygon: Array.isArray(line.polygon) ? line.polygon : [],
+        polygon,
+        providerPolygon,
         geometryValid: line.geometryValid === true,
+        originalCoordinateGeometryValid,
         geometryIssue: line.geometryIssue || null,
         pageWidth: line.pageWidth ?? null,
         pageHeight: line.pageHeight ?? null,
@@ -24,14 +42,8 @@ function lineEvidence(line, field, sourceSha256, sourceWidth, sourceHeight) {
         providerInputSha256: sourceSha256 || null,
         originalScreenshotWidth: Number(sourceWidth) || null,
         originalScreenshotHeight: Number(sourceHeight) || null,
-        coordinateSpace: line.pageUnit === 'pixel' && Number(sourceWidth) > 0 && Number(sourceHeight) > 0
-            ? 'original-screenshot-pixels' : 'azure-page-units',
-        transformToOriginalScreenshot: line.pageUnit === 'pixel' &&
-            Number(sourceWidth) > 0 && Number(sourceHeight) > 0 &&
-            Number(line.pageWidth) > 0 && Number(line.pageHeight) > 0
-            ? { scaleX: Number(sourceWidth) / Number(line.pageWidth),
-                scaleY: Number(sourceHeight) / Number(line.pageHeight), offsetX: 0, offsetY: 0 }
-            : null,
+        coordinateSpace: originalCoordinateGeometryValid ? 'original-screenshot-pixels' : 'azure-page-units',
+        transformToOriginalScreenshot: originalCoordinateGeometryValid ? transform : null,
     };
 }
 

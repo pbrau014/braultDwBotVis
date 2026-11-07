@@ -26,7 +26,7 @@
     "test:discord-command-policy": "node --test tests/tournament-command-policy.test.js",
     "test:discord-preflight": "node --test tests/discord-gateway-diagnostics.test.js tests/tournament-command-policy.test.js tests/discord-test-preflight.test.js",
     "preflight:discord-test": "node scripts/preflight-discord-test.js",
-    "test:multi-provider": "node --test tests/azure-document-intelligence.test.js tests/parallel-local-ocr.test.js tests/block-network.test.js tests/ocr-conflict-acceptance.test.js tests/ocr-accuracy-metrics.test.js",
+    "test:multi-provider": "node --test tests/azure-document-intelligence.test.js tests/azure-field-evidence.test.js tests/parallel-local-ocr.test.js tests/block-network.test.js tests/ocr-conflict-acceptance.test.js tests/ocr-accuracy-metrics.test.js",
     "smoke:multi-provider": "node scripts/run-multi-provider-smoke.js",
     "test:ocrspace": "node --test tests/ocrspace.test.js tests/ocrspace-prepass.test.js tests/ocrspace-pdf-first.test.js tests/ocrspace-pdf-text-layer.test.js tests/ocrspace-reconciliation.test.js tests/ocr-report-metadata.test.js tests/parallel-ocr-readers.test.js",
     "test:ocr": "npm run test:multi-provider && npm run test:ocrspace && npm run test:ocr-sequence-checkpoint && npm run test:ocr-watchdog && npm run test:paddleocr-fallback",
