@@ -28,7 +28,10 @@ function getRecord(item) {
 
 function isAccepted(item) {
     if (typeof item?.accepted === 'boolean') return item.accepted;
-    return item?.recordReview?.acceptedByCurrentApplicationValidator === true;
+    if (typeof item?.recordReview?.acceptedByCurrentApplicationValidator === 'boolean') {
+        return item.recordReview.acceptedByCurrentApplicationValidator;
+    }
+    return null;
 }
 
 function unresolvedSet(item) {
@@ -44,7 +47,7 @@ function createAccuracyReport({ predictions, groundTruth, createdAt = new Date()
     for (const item of groundTruth) {
         const hash = String(item?.sourceSha256 || item?.originalScreenshotSha256 || '').trim();
         const record = getRecord(item);
-        if (!hash || !record) continue;
+        if (!hash || !record) throw new Error('Each ground-truth entry must include sourceSha256 and a complete record.');
         const missingTruth = REQUIRED_FIELDS.filter(field => !present(record[field]));
         if (missingTruth.length) throw new Error('Ground truth for ' + hash + ' is missing mandatory fields: ' + missingTruth.join(', '));
         if (truthByHash.has(hash)) throw new Error('Duplicate ground-truth source hash: ' + hash);
@@ -57,6 +60,7 @@ function createAccuracyReport({ predictions, groundTruth, createdAt = new Date()
     let fullRecordExactMatches = 0;
     let falseAcceptanceRecords = 0;
     let falseRejectionRecords = 0;
+    let predictionsWithoutAcceptanceState = 0;
     let readerDisagreementFields = 0;
     let matchedImages = 0;
     const unmatchedPredictions = [];
@@ -76,6 +80,7 @@ function createAccuracyReport({ predictions, groundTruth, createdAt = new Date()
         const record = getRecord(prediction) || {};
         const unresolved = unresolvedSet(prediction);
         const accepted = isAccepted(prediction);
+        if (accepted === null) predictionsWithoutAcceptanceState++;
         let recordExact = true;
         let recordHasWrongAccepted = false;
         let recordHasUnresolved = false;
@@ -92,14 +97,14 @@ function createAccuracyReport({ predictions, groundTruth, createdAt = new Date()
                 recordHasUnresolved = true;
                 readerDisagreementFields += unresolved.has(field) ? 1 : 0;
             }
-            if (accepted && actual !== null && expected !== null && actual !== expected) {
+            if (accepted === true && actual !== null && expected !== null && actual !== expected) {
                 stat.wrongAccepted++;
                 recordHasWrongAccepted = true;
             }
         }
         if (recordExact) fullRecordExactMatches++;
-        if (accepted && (!recordExact || recordHasWrongAccepted)) falseAcceptanceRecords++;
-        if (!accepted && recordExact && !recordHasUnresolved) falseRejectionRecords++;
+        if (accepted === true && (!recordExact || recordHasWrongAccepted)) falseAcceptanceRecords++;
+        if (accepted === false && recordExact && !recordHasUnresolved) falseRejectionRecords++;
         for (const [provider, value] of Object.entries(prediction?.providers || {})) {
             const item = providerAvailability[provider] || (providerAvailability[provider] = { success: 0, failed: 0, blocked: 0, requests: 0 });
             if (value?.status === 'success') item.success++;
@@ -134,6 +139,7 @@ function createAccuracyReport({ predictions, groundTruth, createdAt = new Date()
             fullNineFieldExactRecordRate: denominator ? fullRecordExactMatches / denominator : null,
             falseAcceptanceRecords,
             falseRejectionRecords,
+            predictionsWithoutAcceptanceState,
             readerDisagreementFields,
             totalProviderRequests,
             providerAvailability,
