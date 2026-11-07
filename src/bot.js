@@ -54,7 +54,6 @@ const {
     REQUIRED_MANUAL_FIELDS,
     buildBattleRecord,
     getMissingRequiredFields,
-    applyCorrections,
     applyReviewCorrection,
     formatBattleRecord,
     makeTournamentExport,
