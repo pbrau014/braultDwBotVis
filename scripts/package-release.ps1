@@ -58,7 +58,7 @@ $excludedReviewAssets = @(
     'dwbotStuff/README.md'
 )
 $excludedFilePatterns = @(
-    '^testdata/imgsHalf1-eligible-56\.zip\.\d{3}
+    '^testdata/imgsHalf1-eligible-56\.zip\.\d{3}$'
     '(^|/)provenance/input-archives(/|$)',
     '(^|/)docs/source-baselines(/|$)',
     '(^|/)docs/source-inputs(/|$)'
