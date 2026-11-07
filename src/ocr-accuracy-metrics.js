@@ -94,6 +94,17 @@ function createAccuracyReport({ predictions, groundTruth, createdAt = new Date()
     let totalProviderRequests = 0;
     let totalPredictionElapsedMs = 0;
     let predictionRuntimeSamples = 0;
+    let acceptedRecords = 0;
+    let rejectedRecords = 0;
+    const wrongAcceptedValues = [];
+    const unresolvedFieldRecords = [];
+    const networkDiagnostics = {
+        samples: 0, restrictedSamples: 0, guardLoadedSamples: 0,
+        guardActivationFailures: 0, blockedAttemptSamples: 0,
+        blockedAttemptCount: 0, missingLogSamples: 0,
+        ocrSpaceEnabledSamples: 0, azureEnabledSamples: 0,
+        scope: 'Node-process restriction only; this is not an OS-level egress sandbox.',
+    };
     const regionMetrics = { expectedFields: 0, candidatesAssessed: 0, correctCandidates: 0, fieldsWithoutGeometry: 0, fields: {} };
 
     for (const prediction of predictions) {
@@ -110,6 +121,23 @@ function createAccuracyReport({ predictions, groundTruth, createdAt = new Date()
         const unresolved = unresolvedSet(prediction);
         const accepted = isAccepted(prediction);
         if (accepted === null) predictionsWithoutAcceptanceState++;
+        else if (accepted) acceptedRecords++;
+        else rejectedRecords++;
+        const network = prediction?.networkRestriction || prediction?.networkDiagnostics;
+        if (network && typeof network === 'object') {
+            networkDiagnostics.samples++;
+            if (network.enabled === true) networkDiagnostics.restrictedSamples++;
+            if (network.guardLoadedBeforeBot === true) networkDiagnostics.guardLoadedSamples++;
+            if (network.enabled === true && network.guardLoadedBeforeBot !== true) networkDiagnostics.guardActivationFailures++;
+            if (network.ocrSpaceProviderEnabled === true && network.ocrSpaceExactHostAllowlistEnabled === true) networkDiagnostics.ocrSpaceEnabledSamples++;
+            if (network.azureProviderEnabled === true && network.azureExactHostAllowlistEnabled === true) networkDiagnostics.azureEnabledSamples++;
+            const blockedCount = Number(network.log?.blockedAttemptCount);
+            if (Number.isFinite(blockedCount) && blockedCount >= 0) {
+                if (blockedCount > 0) networkDiagnostics.blockedAttemptSamples++;
+                networkDiagnostics.blockedAttemptCount += blockedCount;
+            }
+            if (network.log?.pathConfigured === true && network.log?.present !== true) networkDiagnostics.missingLogSamples++;
+        }
         let recordExact = true;
         let recordHasWrongAccepted = false;
         let recordHasUnresolved = false;
@@ -125,14 +153,26 @@ function createAccuracyReport({ predictions, groundTruth, createdAt = new Date()
                 stat.unresolved++;
                 recordHasUnresolved = true;
                 readerDisagreementFields += unresolved.has(field) ? 1 : 0;
+                unresolvedFieldRecords.push({
+                    sourceSha256: hash, field,
+                    explicitlyUnresolved: unresolved.has(field),
+                    missing: actual === null,
+                    expectedValue: truth[field] ?? null,
+                    predictedValue: record[field] ?? null,
+                });
             }
             if (accepted === true && actual !== null && expected !== null && actual !== expected) {
                 stat.wrongAccepted++;
                 recordHasWrongAccepted = true;
+                wrongAcceptedValues.push({
+                    sourceSha256: hash, field,
+                    expectedValue: truth[field] ?? null,
+                    acceptedValue: record[field] ?? null,
+                });
             }
         }
         if (recordExact) fullRecordExactMatches++;
-        if (accepted === true && (!recordExact || recordHasWrongAccepted)) falseAcceptanceRecords++;
+        if (accepted === true && (!recordExact || recordHasWrongAccepted || recordHasUnresolved)) falseAcceptanceRecords++;
         if (accepted === false && recordExact && !recordHasUnresolved) falseRejectionRecords++;
         const runtimeMs = Number(prediction?.elapsedMs);
         if (Number.isFinite(runtimeMs) && runtimeMs >= 0) {
@@ -223,8 +263,14 @@ function createAccuracyReport({ predictions, groundTruth, createdAt = new Date()
             fullNineFieldExactRecordRate: denominator ? fullRecordExactMatches / denominator : null,
             falseAcceptanceRecords,
             falseRejectionRecords,
+            acceptedRecords,
+            rejectedRecords,
+            acceptanceCoverage: predictions.length ? (acceptedRecords + rejectedRecords) / predictions.length : null,
             predictionsWithoutAcceptanceState,
+            wrongAcceptedValues,
+            unresolvedFieldRecords,
             readerDisagreementFields,
+            networkDiagnostics,
             totalProviderRequests,
             providerAvailability,
             runtime: {
